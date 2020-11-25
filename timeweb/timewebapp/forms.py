@@ -13,13 +13,10 @@
    # password = forms.CharField(widget = forms.PasswordInput()) 
 # import form class from django 
 from django import forms 
-   
-# import GeeksModel from models.py 
-from .models import GeeksModel 
-   
-# create a ModelForm 
-class GeeksForm(forms.ModelForm): 
-    # specify the name of model to use 
-    class Meta: 
-        model = GeeksModel 
-        fields = "__all__"
+
+# creating a django form
+class GeeksForm(forms.Form): 
+    title = forms.CharField(widget = forms.Textarea,required=False) 
+    description = forms.CharField(widget = forms.CheckboxInput,required=False) 
+    views = forms.IntegerField(widget = forms.TextInput,required=False) 
+    date = forms.DateField(required=False,widget = forms.SelectDateWidget) 
