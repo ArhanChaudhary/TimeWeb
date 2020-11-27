@@ -1,6 +1,6 @@
 from django.contrib import admin  
     
 # Register your models here.  
-# from .models import TimewebModel  
+from .models import TimewebModel  
     
-# admin.site.register(TimewebModel)  
+admin.site.register(TimewebModel)  

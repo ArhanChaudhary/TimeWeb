@@ -10,9 +10,9 @@ class TimewebModel(models.Model):
     title = models.CharField(max_length = 200) 
     description = models.TextField() 
     last_modified = models.DateTimeField(blank = True, default= now) 
-    img = models.ImageField(upload_to = "images/") 
+    #img = models.ImageField(blank = True, upload_to = "uploads/") 
    
-        # renames the instances of the model 
-        # with their title name 
+    # renames the instances of the model 
+    # with their title name 
     def __str__(self): 
-        return self.title 
+        return self.title + ":" + self.description
