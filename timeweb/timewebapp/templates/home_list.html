@@ -1,0 +1,6 @@
+<form method='POST'>
+    {% csrf_token %} 
+    {{ allobj|linebreaks }}
+    {{ form }}
+    <input type="submit" value="Submit"> 
+</form>
