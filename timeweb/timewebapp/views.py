@@ -1,8 +1,6 @@
-from django.shortcuts import render
-from .forms import TimewebForm, TimewebFormList
+from django.shortcuts import render, get_object_or_404
 from .models import TimewebModel
-# creating a home view
-
+from .forms import TimewebForm
 
 def home_view(request):
 
@@ -36,15 +34,20 @@ def list_view(request):
     # dictionary for initial data with
     # field names as keys
     context = {}
-    form = TimewebFormList(request.POST or None, request.FILES or None)
-    context['form'] = form
+    # form = TimewebFormList(request.POST or None, request.FILES or None)
+    # context['form'] = form
+    # if form.is_valid():
+    #    save_data = form.save(commit=False)
+    #    selected_obj = TimewebModel.objects.get(
+    #        pk=save_data.enter_id_to_delete)
+    #    selected_obj.delete()
     context['allobj'] = 'All Objects:\n' + \
-        '\n'.join(obj.__str__() for obj in TimewebModel.objects.all())
-    if form.is_valid():
-        save_data = form.save(commit=False)
-        selected_obj = TimewebModel.objects.get(
-            pk=save_data.enter_id_to_delete)
-        selected_obj.delete()
-        context['allobj'] = 'All Objects:\n' + \
             '\n'.join(obj.__str__() for obj in TimewebModel.objects.all())
+    context['objlist'] = TimewebModel.objects.all()
     return render(request, "home_list.html", context)
+    
+def detail_view(request, pk):
+    context = {}
+    obj = get_object_or_404(TimewebModel, pk=pk)
+    context['title'] = obj.title
+    return render(request, "home_detail.html", context)

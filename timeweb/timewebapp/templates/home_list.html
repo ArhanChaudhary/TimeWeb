@@ -1,6 +1,14 @@
-<form method='POST'>
-    {% csrf_token %} 
-    {{ allobj|linebreaks }}
-    {{ form }}
-    <input type="submit" value="Submit"> 
-</form>
+<html>
+
+    <head>
+    </head>
+
+    <body>
+        {% for obj in objlist %}
+        <p>
+            <a href="{% url 'details' obj.pk%}">{{ obj.title }}</a>
+        </p>
+        {% endfor %}
+    </body>
+
+</html>

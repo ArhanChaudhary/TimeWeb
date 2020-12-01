@@ -16,7 +16,3 @@ class TimewebModel(models.Model):
     # with their title name
     def __str__(self):
         return self.title
-
-
-class TimewebListModel(models.Model):
-    enter_id_to_delete = models.CharField(blank=True, max_length=200)

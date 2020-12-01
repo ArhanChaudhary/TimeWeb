@@ -1,5 +1,17 @@
-<form method="POST"> 
-    {% csrf_token %} 
-    {{ form.as_p }} 
-    <input type="submit" value="Submit"> 
-</form> 
+<html>
+
+    <head>
+    </head>
+
+    <body>
+        <div>
+            <form method="POST"> 
+                {% csrf_token %} 
+                {{ form.as_p }} 
+                <input type="submit" value="Submit"> 
+                <a href="{% url 'lists' %}">Lists view</a>
+            </form>
+        </div>
+    </body>
+
+</html>
