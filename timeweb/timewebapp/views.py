@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import TimewebModel
 from .forms import TimewebForm
 
@@ -11,7 +11,8 @@ def home_view(request, pk=None):
     if pk == None:
         form = TimewebForm(request.POST or None, request.FILES or None)
     else:
-        # add the dictionary during initialization
+        
+        # Create a form instance with the submitted data
         form = TimewebForm(request.POST or None, request.FILES or None,initial={
             'title':get_object_or_404(TimewebModel, pk=pk).title,
             'description':get_object_or_404(TimewebModel, pk=pk).description,
@@ -32,18 +33,19 @@ def home_view(request, pk=None):
             save_data.title = form_data.title
             save_data.description = form_data.description
             save_data.save()
-        print("Database saved")
+        print("Saved")
+        return redirect('../')
     elif 'Deletebutton' in request.POST:
         if pk == None:
 
-            # Do nothing if pk is None
             pass
         else:
             selected_form = get_object_or_404(TimewebModel, pk=pk)
             selected_form.delete()
-
-    return render(request, "home.html", context)
-
+        print("Deleted")
+        return redirect('../')
+    else:
+        return render(request, "home.html", context)
 
 def list_view(request):
 

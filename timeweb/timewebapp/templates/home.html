@@ -7,13 +7,9 @@
         <div>
             <form method="POST"> 
                 {% csrf_token %}
-                {{ form.as_p }} 
-                {{ form.errors }}
+                {{ form.as_p }}
                 <input type="submit" name="Submitbutton" value="Submit">
                 <input type="submit" name="Deletebutton" value="Delete">
-                <p>
-                    <a href="{% url 'lists' %}">Back to list view</a>
-                </p>
             </form>
         </div>
     </body>
