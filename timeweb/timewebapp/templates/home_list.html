@@ -4,11 +4,17 @@
     </head>
 
     <body>
-        {% for obj in objlist %}
-        <p>
-            <a href="{% url 'details' obj.pk%}">{{ obj.title }}</a>
-        </p>
-        {% endfor %}
+        <p>Click on an Object to Modify or Delete it</p>
+        <ol>
+            {% for obj in objlist %}
+                <li>
+                    <p><a href="{% url 'home' obj.pk%}">{{ obj.title }}</a></p>
+                </li>
+            {% endfor %}
+        </ol>
+        <form action="{% url 'new'%}"> 
+            <input type="submit" value="New">
+        </form>
     </body>
 
 </html>

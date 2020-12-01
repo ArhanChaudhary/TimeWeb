@@ -6,10 +6,14 @@
     <body>
         <div>
             <form method="POST"> 
-                {% csrf_token %} 
+                {% csrf_token %}
                 {{ form.as_p }} 
-                <input type="submit" value="Submit"> 
-                <a href="{% url 'lists' %}">Lists view</a>
+                {{ form.errors }}
+                <input type="submit" name="Submitbutton" value="Submit">
+                <input type="submit" name="Deletebutton" value="Delete">
+                <p>
+                    <a href="{% url 'lists' %}">Back to list view</a>
+                </p>
             </form>
         </div>
     </body>

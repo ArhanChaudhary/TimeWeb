@@ -14,3 +14,9 @@ class TimewebForm(forms.ModelForm):
         model = TimewebModel
         fields = "__all__"
         #exclude = ["img", "last_modified"]
+    
+    # Placeholder
+    # def __init__(self, *args, **kwargs):
+    #     super(TimewebForm, self).__init__(*args, **kwargs)
+    #     for k,v in self.fields.items():
+    #         v.widget.attrs['placeholder'] = k.capitalize()
