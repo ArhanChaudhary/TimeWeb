@@ -7,9 +7,10 @@ def home_view(request, pk=None):
     # dictionary for initial data with
     # field names as keys
     context = {}
-
     if pk == None:
         form = TimewebForm(request.POST or None, request.FILES or None)
+        context['submit'] = 'Create'
+        context['delete'] = 'Cancel'
     else:
         
         # Create a form instance with the submitted data
@@ -17,8 +18,9 @@ def home_view(request, pk=None):
             'title':get_object_or_404(TimewebModel, pk=pk).title,
             'description':get_object_or_404(TimewebModel, pk=pk).description,
             })
+        context['submit'] = 'Update'
+        context['delete'] = 'Delete'
     context['form'] = form
-
     # check if form data is valid
     if form.is_valid() and 'Submitbutton' in request.POST:
 
