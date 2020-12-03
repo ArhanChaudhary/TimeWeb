@@ -1,6 +1,34 @@
 <html>
 
     <head>
+        <style>
+            #box {
+                width:400px;
+                height:300px;
+                background: #f2f2f2;
+                border: 1px solid #000;
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script>
+
+            $(document).ready(function() {
+                $("#box").mousemove(function(event){ 
+                    var relX = event.pageX - $(this).offset().left;
+                    var relY = event.pageY - $(this).offset().top;
+                    var relBoxCoords = "(" + relX + "," + relY + ")";
+                    $.ajax({
+                        type: "POST",
+                        url: "/timeweb/",
+                        data: {
+                            'coords': relBoxCoords,
+                            'csrfmiddlewaretoken': "{{ csrf_token }}"
+                        },
+                    });
+                    return false;
+                });
+            });
+        </script>
     </head>
 
     <body>
@@ -15,6 +43,8 @@
         <form method="GET" action="{% url 'new'%}"> 
             <input type="submit" value="New">
         </form>
+        <div id="box"></div>
+        <p>{{ my }}</p>
     </body>
 
 </html>

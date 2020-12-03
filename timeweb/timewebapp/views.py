@@ -1,15 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
+from django.http import JsonResponse
 from .models import TimewebModel
 from .forms import TimewebForm
-from .__init__ import debug
 import logging # import the logging library
 
+coords = ''
 
 class TimewebView(View):
 
     # Get an instance of a logger
     logger = logging.getLogger(__name__)
+
+    def __init__(self):
+        self.context = {}
 
     def make_form_instance(self,request,pk):
         if pk == None:
@@ -18,8 +22,6 @@ class TimewebView(View):
             self.context['delete'] = 'Cancel'
             self.context['form'] = self.form
         else:
-            
-            # Create a form instance with the submitted data
             self.form = TimewebForm(request.POST or None, request.FILES or None,initial={
                 'title':get_object_or_404(TimewebModel, pk=pk).title,
                 'description':get_object_or_404(TimewebModel, pk=pk).description,
@@ -29,21 +31,15 @@ class TimewebView(View):
             self.context['form'] = self.form
 
     def get(self,request,pk=None):
-        self.context = {}
         self.make_form_instance(request,pk)
         self.logger.debug(self.context)
         return render(request, "home.html", self.context)
 
     def post(self,request,pk=None):
-        # dictionary for initial data with
-        # field names as keys
-        self.context = {}
         self.make_form_instance(request,pk)
         self.logger.debug(self.context)
-        # check if form data is valid
         if self.form.is_valid() and 'Submitbutton' in request.POST:
             if pk == None: # Handle "new"
-                # save the form data to model
                 save_data = self.form.save(commit=False)
                 save_data.save()
                 self.logger.debug("Added new record")
@@ -66,20 +62,26 @@ class TimewebView(View):
             return render(request, "home.html", self.context)
 
 class TimewebListView(View):
-
-    # Get an instance of a logger
+    context = {}
     logger = logging.getLogger(__name__)
 
-    def get(self,request):
-        # dictionary for initial data with
-        # field names as keys
-        self.context = {}
-        objlis2 = TimewebModel.objects.all()
-        for obj in objlis2:
+    def make_list(self):
+        objlist = TimewebModel.objects.all()
+        for obj in objlist:
             if obj.title == '':
                 obj.title = 'No title'
-        self.context['objlist'] = objlis2
+        self.context['objlist'] = objlist
+
+    def get(self,request):
+        self.make_list()
+
+        global coords
+        self.context['my'] = coords
+        print(self.context)
         return render(request, "home_list.html", self.context)
-    
-    # def post(self,request):
-    #     pass
+
+    def post(self,request):
+        global coords
+        coords = request.POST['coords']
+        return redirect(".")
+        
