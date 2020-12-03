@@ -12,7 +12,7 @@
                 </li>
             {% endfor %}
         </ol>
-        <form action="{% url 'new'%}"> 
+        <form method="GET" action="{% url 'new'%}"> 
             <input type="submit" value="New">
         </form>
     </body>

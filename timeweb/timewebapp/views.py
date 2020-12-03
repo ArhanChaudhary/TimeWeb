@@ -1,62 +1,85 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
 from .models import TimewebModel
 from .forms import TimewebForm
+from .__init__ import debug
+import logging # import the logging library
 
-def home_view(request, pk=None):
 
-    # dictionary for initial data with
-    # field names as keys
-    context = {}
-    if pk == None:
-        form = TimewebForm(request.POST or None, request.FILES or None)
-        context['submit'] = 'Create'
-        context['delete'] = 'Cancel'
-    else:
-        
-        # Create a form instance with the submitted data
-        form = TimewebForm(request.POST or None, request.FILES or None,initial={
-            'title':get_object_or_404(TimewebModel, pk=pk).title,
-            'description':get_object_or_404(TimewebModel, pk=pk).description,
-            })
-        context['submit'] = 'Update'
-        context['delete'] = 'Delete'
-    context['form'] = form
-    # check if form data is valid
-    if form.is_valid() and 'Submitbutton' in request.POST:
+class TimewebView(View):
 
+    # Get an instance of a logger
+    logger = logging.getLogger(__name__)
+
+    def make_form_instance(self,request,pk):
         if pk == None:
-            # save the form data to model
-            save_data = form.save(commit=False)
-            save_data.save()
+            self.form = TimewebForm(request.POST or None, request.FILES or None)
+            self.context['submit'] = 'Create'
+            self.context['delete'] = 'Cancel'
+            self.context['form'] = self.form
         else:
-            form_data = form.save(commit=False)
+            
+            # Create a form instance with the submitted data
+            self.form = TimewebForm(request.POST or None, request.FILES or None,initial={
+                'title':get_object_or_404(TimewebModel, pk=pk).title,
+                'description':get_object_or_404(TimewebModel, pk=pk).description,
+                })
+            self.context['submit'] = 'Update'
+            self.context['delete'] = 'Delete'
+            self.context['form'] = self.form
 
-            save_data = get_object_or_404(TimewebModel, pk=pk)
-            save_data.title = form_data.title
-            save_data.description = form_data.description
-            save_data.save()
-        print("Saved")
-        return redirect('../')
-    elif 'Deletebutton' in request.POST:
-        if pk == None:
+    def get(self,request,pk=None):
+        self.context = {}
+        self.make_form_instance(request,pk)
+        self.logger.debug(self.context)
+        return render(request, "home.html", self.context)
 
-            pass
+    def post(self,request,pk=None):
+        # dictionary for initial data with
+        # field names as keys
+        self.context = {}
+        self.make_form_instance(request,pk)
+        self.logger.debug(self.context)
+        # check if form data is valid
+        if self.form.is_valid() and 'Submitbutton' in request.POST:
+            if pk == None: # Handle "new"
+                # save the form data to model
+                save_data = self.form.save(commit=False)
+                save_data.save()
+                self.logger.debug("Added new record")
+            else: #Handle "Update"
+                form_data = self.form.save(commit=False)
+
+                save_data = get_object_or_404(TimewebModel, pk=pk)
+                save_data.title = form_data.title
+                save_data.description = form_data.description
+                save_data.save()
+                self.logger.debug("Updated")
+            return redirect('../')
+        elif 'Deletebutton' in request.POST:
+                selected_form = get_object_or_404(TimewebModel, pk=pk)
+                selected_form.delete()
+                self.logger.debug("Deleted")
+                return redirect('../')
         else:
-            selected_form = get_object_or_404(TimewebModel, pk=pk)
-            selected_form.delete()
-        print("Deleted")
-        return redirect('../')
-    else:
-        return render(request, "home.html", context)
+            self.logger.debug("Invalid Form")
+            return render(request, "home.html", self.context)
 
-def list_view(request):
+class TimewebListView(View):
 
-    # dictionary for initial data with
-    # field names as keys
-    context = {}
-    objlist = TimewebModel.objects.all()
-    for obj in objlist:
-        if obj.title == '':
-            obj.title = 'No title'
-    context['objlist'] = objlist
-    return render(request, "home_list.html", context)
+    # Get an instance of a logger
+    logger = logging.getLogger(__name__)
+
+    def get(self,request):
+        # dictionary for initial data with
+        # field names as keys
+        self.context = {}
+        objlis2 = TimewebModel.objects.all()
+        for obj in objlis2:
+            if obj.title == '':
+                obj.title = 'No title'
+        self.context['objlist'] = objlis2
+        return render(request, "home_list.html", self.context)
+    
+    # def post(self,request):
+    #     pass
