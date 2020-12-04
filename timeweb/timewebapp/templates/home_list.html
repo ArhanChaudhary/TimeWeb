@@ -11,18 +11,17 @@
         </style>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
         <script>
-
             $(document).ready(function() {
-                $("#box").mousemove(function(event){ 
+                $("#box").mousemove(function(event) { 
                     var relX = event.pageX - $(this).offset().left;
                     var relY = event.pageY - $(this).offset().top;
                     var relBoxCoords = "(" + relX + "," + relY + ")";
                     $.ajax({
                         type: "POST",
-                        url: "/timeweb/",
+                        url: "{{ lists }}",
                         data: {
                             'coords': relBoxCoords,
-                            'csrfmiddlewaretoken': "{{ csrf_token }}"
+                            "csrfmiddlewaretoken": "{{ csrf_token }}",
                         },
                     });
                     return false;
@@ -44,7 +43,7 @@
             <input type="submit" value="New">
         </form>
         <div id="box"></div>
-        <p>{{ my }}</p>
+        <p>{{ coords }}</p>
     </body>
 
 </html>

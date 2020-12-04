@@ -76,12 +76,11 @@ class TimewebListView(View):
         self.make_list()
 
         global coords
-        self.context['my'] = coords
-        print(self.context)
+        self.context['coords'] = coords
+        print(self.context['coords'])
         return render(request, "home_list.html", self.context)
 
     def post(self,request):
         global coords
         coords = request.POST['coords']
         return redirect(".")
-        
