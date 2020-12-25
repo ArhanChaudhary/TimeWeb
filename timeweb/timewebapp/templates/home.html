@@ -5,13 +5,12 @@
 
     <body>
         <div>
-            <form method="POST"> 
+            <form method="POST">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <input type="submit" name="Submitbutton" value="{{submit}}">
-                <input type="submit" name="Deletebutton" value="{{delete}}">
+                <button type="submit" name="Submitbutton">{{submit}}</button>
                 <p>
-                    <a href="{% url 'lists' %}">Back to assignment view</a>
+                    <a href="{% url 'home' %}">Back to assignment view</a>
                 </p>
             </form>
         </div>

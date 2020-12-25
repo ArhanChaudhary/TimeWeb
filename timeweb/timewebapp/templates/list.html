@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <style>
+    </style>
+  </head>
+
+  <body>
+    <p>Click on an Assignment to Modify or Delete it</p>
+    <table>
+      {% for obj in objlist %}
+        <tr>
+          <td>
+            <a href="{% url 'graph' obj.pk %}">{{ obj.title }}</a>
+          </td>
+          <form method="GET" action="{% url 'list' obj.pk%}">
+            <td>
+              <button type="submit">Update</button>
+            </td>
+          </form>
+          <form method="POST">
+            <td>
+              {% csrf_token %}
+              <button type="submit" name="{{ obj.pk }}" value="deleted">Delete</button>           
+            </td>
+          </form>
+        </tr>
+      {% endfor %}
+    </table>
+    <form method="GET" action="{% url 'new'%}">
+      <button type="submit">New</button>
+    </form>
+  </body>
+</html>
+{% comment %}{% endcomment %}
