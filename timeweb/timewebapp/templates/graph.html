@@ -1,0 +1,552 @@
+<html>
+
+    <head>
+        <title>TimeWeb</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+        <style>
+            #header {
+                width:100%;
+                background:#0d1a26;
+                height:60px;
+                margin-bottom:13px;
+                margin:0px;
+                padding:5px;
+            }
+            #content {
+                border-right:20px solid gray;
+                border-left:20px solid gray;
+                margin:0px;
+                overflow:hidden;
+            }
+            #logo {
+                display:block;
+                margin-left:auto;
+                margin-right:auto;
+                width:auto;
+                height:auto;
+                max-height:60px;
+            }
+            body {
+                margin:0px;
+                background:rgb(255,255,255);
+                background: radial-gradient(circle, rgb(255,255,255) 0%, rgb(202,202,202) 100%);
+            }
+            canvas {
+                padding:0px;
+                display:block;
+                {% comment %} 13 * 2 + 4 * 2 + 10 * 2{% endcomment %}
+                height:65%;
+                max-height:400px;
+                margin:5px;
+            }
+            #fixed-graph {
+                width:calc(100% - 74px);
+                border:4px solid rgb(178,178,178);
+                border-radius:12px;
+                margin-left:13px;
+                position:absolute;
+                z-index:-1;
+            }
+            #graph {
+                width:calc(100% - 34px);
+                margin-left:13px;
+                border:4px solid transparent;
+            }
+            #data {
+                border:3px solid silver;
+                border-radius:6px;
+                min-height:200px;
+            }
+        </style>
+        <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+        <script>
+        $(function() {
+            // If you have been added by me, please visit my github for an explanation of each part of this code
+            // Use let and const for efficiency
+            var graph = document.getElementById("graph");
+            var fixed_graph = document.getElementById("fixed-graph");
+            var scale = window.devicePixelRatio;
+
+            var skew_ratio = 1.5;
+            var funct_round = 6;
+            var min_work_time = 0;
+            var x = 240000;
+            var y = 20;
+            var red_line_start_x = 0;
+            var red_line_start_y = 0;
+            var nwd = [];
+            var ignore_ends = true;
+            var assign_day_of_week = 3;
+            var unit = "Minute";
+            var ctime = 2;
+            var dif_assign = 0;
+            var works = [0,1,2];
+
+            var mods;
+            var skew_ratio_lim = 10000;
+
+            var len_works = works.length;
+            var draw_point = false;
+            var remainder_mode = false;
+            var y_fremainder = (y - red_line_start_y) % funct_round;
+            var ignore_ends_mwt = ignore_ends && min_work_time;
+            var len_nwd = nwd.length;
+            var set_skew_ratio = false;
+            if (min_work_time) {
+                var min_work_time_funct_round = Math.ceil(min_work_time/funct_round)*funct_round;
+            } else {
+                var min_work_time_funct_round = funct_round;
+            }
+            $(window).resize(function resize() {
+                width = fixed_graph.getBoundingClientRect().width;
+                height = fixed_graph.getBoundingClientRect().height;
+                graph.width = width * scale;
+                graph.height = height * scale;
+                fixed_graph.width = width * scale;
+                fixed_graph.height = height * scale;
+                wCon = (width-55)/x;
+                hCon = (height-55)/y;
+                drawfixed();
+                draw();
+
+                // return itself so the "}());" runs after this function is defined
+                return resize;
+            }());
+            function pset(x2=NaN,y2=NaN) {
+                try {
+                    var x1 = Math.floor(x - red_line_start_x);
+                    var y1 = y - red_line_start_y;
+                    if (len_nwd) {
+                        x1 -= Math.floor(x1/7) * len_nwd + mods[x1 % 7];
+                    }
+                    if (x2===NaN) {
+                        a = y1 * (1 - skew_ratio) / ((x1-1) * x1);
+                        b = (y1 - x1 * x1 * a) / x1;
+                    } else {
+                        x2 = (x2 - 50) / wCon - red_line_start_x;
+                        y2 = (height - y2 - 50) / hCon - red_line_start_y;
+                        if (x2 < 0) {
+                            skew_ratio = skew_ratio_lim;
+                            throw "definevars";
+                        }
+                        var floorx2 = Math.floor(x2);
+                        if (len_nwd) {
+                            if (nwd.includes((assign_day_of_week + floorx2 + red_line_start_x) % 7)) {
+                                x2 = floorx2;
+                            }
+                            x2 -= Math.floor(x2/7) * len_nwd + mods[floorx2 % 7];
+                        }
+                        if (x2 >= x1) {
+                            a = y1/x1;
+                            b = a * (1-x1);
+                            skew_ratio = 2 - skew_ratio_lim;
+                        } else {
+                            if (remainder_mode) {
+                                y2 -= y_fremainder;
+                            }
+                            a = (x2 * y1 - x1 * y2) / ((x1-x2) * x1 * x2);
+                            b = (y1 - x1 * x1 * a) / x1;
+                            skew_ratio = (a + b) * x1 / y1;
+                            if (skew_ratio > skew_ratio_lim) {
+                                skew_ratio = skew_ratio_lim;
+                            } else if (skew_ratio < 2 - skew_ratio_lim) {
+                                skew_ratio = 2 - skew_ratio_lim;
+                            } else if (0.975 < skew_ratio && skew_ratio < 1.025) {
+                                if (!x1) {
+                                    throw "zerodivision";
+                                }
+                                skew_ratio = 1;
+                                a = 0;
+                                b = y1/x1;
+                            }
+                        }
+                    }
+                    if (!Number.isFinite(a)) {
+                        throw "zerodivision";
+                    }
+                } catch {
+                    a = 0;
+                    b = y1;
+                    if (x1) {
+                        return_y_cutoff = 0;
+                    } else {
+                        return_y_cutoff = -1;
+                    }
+                    return_0_cutoff = 1;
+                    cutoff_transition_value = 0;
+                    return;
+                }
+                if (a <= 0 || a * b > 0) {
+                    var funct_zero = 0;
+                } else {
+                    var funct_zero = -b/a;
+                }
+                if (a >= 0) {
+                    var funct_y = x1;
+                } else {
+                    var funct_y = ((Math.sqrt(b*b+4*a*y1)-b)/a/2).toFixed(10);
+                }
+                if (funct_round < min_work_time) {
+                    cutoff_transition_value = 0;
+                    if (a) {
+                        cutoff_to_use_round = ((min_work_time_funct_round-b)/a/2).toFixed(10)-1e-10;
+                        if (funct_zero < cutoff_to_use_round && cutoff_to_use_round < funct_y) {
+                            for (var n of [Math.floor(cutoff_to_use_round),Math.floor(cutoff_to_use_round + 1)]) {
+                                var output = funct(n,false);
+                                if (output > y) {
+                                    output = y;
+                                } else if (output < 0) {
+                                    output = 0;
+                                }
+                                if (n == Math.floor(cutoff_to_use_round)) {
+                                    var prev_output = output;
+                                }
+                            }
+                            if (output - prev_output) {
+                                cutoff_transition_value = min_work_time_funct_round - output + prev_output;
+                            } else {
+                                cutoff_transition_value = 0;
+                            }
+                        } else {
+                            cutoff_transition_value = 0;
+                        }
+                    }
+                }
+                if (ignore_ends_mwt) {
+                    var y_value_to_cutoff = y1;    
+                } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (funct_y < cutoff_to_use_round))) {
+                    var y_value_to_cutoff = y1 - min_work_time_funct_round / 2;
+                } else {
+                    var y_value_to_cutoff = y1 - min_work_time_funct_round + funct_round / 2;
+                }
+                if (y_value_to_cutoff > 0 && y > red_line_start_y && (a || b)) {
+                    if (a) {
+                        return_y_cutoff = ((Math.sqrt(b*b+4*a*y_value_to_cutoff)-b)/a/2).toFixed(10)-1e-10;
+                    } else {
+                        return_y_cutoff = (y_value_to_cutoff/b).toFixed(10)-1e-10;
+                    }
+                } else {
+                    return_y_cutoff = 0;
+                }
+                if (return_y_cutoff < 1000) {
+                    if (return_y_cutoff < 1) {
+                        var output = 0;
+                    } else {
+                        for (let n = Math.floor(return_y_cutoff);n>0;n--) {
+                            var output = funct(n,false);
+                            if (output <= y - min_work_time_funct_round) {
+                                break;
+                            }
+                            return_y_cutoff--;
+                        }
+                    }
+                    if (ignore_ends_mwt) {
+                        var lower = [return_y_cutoff,y-red_line_start_y-output];
+
+                        var did_loop = false;
+                        for (var n = Math.ceil(return_y_cutoff);n<x1;n++) {
+                            var pre_output = funct(n,false);
+                            if (pre_output >= y) {
+                                break;
+                            }
+                            did_loop = true;
+                            var output = pre_output;
+                            return_y_cutoff++;
+                        }
+                        if (did_loop) {
+                            var upper = [return_y_cutoff,y-red_line_start_y-output];
+                            return_y_cutoff = [upper,lower][+(min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
+                        }
+                    }
+                }
+                if (ignore_ends_mwt) {
+                    var y_value_to_cutoff = 0;
+                } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (funct_zero < cutoff_to_use_round))) {
+                    var y_value_to_cutoff = min_work_time_funct_round / 2;
+                } else {
+                    var y_value_to_cutoff = min_work_time_funct_round - funct_round / 2;
+                }
+                if (y_value_to_cutoff < y1 && y > red_line_start_y && (a || b)) {
+                    if (a) {
+                        return_0_cutoff = ((Math.sqrt(b*b+4*a*y_value_to_cutoff)-b)/a/2).toFixed(10)-1e-10;
+                    } else {
+                        return_0_cutoff = (y_value_to_cutoff/b).toFixed(10)-1e-10;
+                    }
+                } else {
+                    return_0_cutoff = 1;
+                }
+                if (x1 - return_0_cutoff < 1000) {
+                    if (x1 - return_0_cutoff < 1) {
+                        var output = 0;
+                    } else {
+                        for (var n = Math.ceil(return_0_cutoff);n<x1;n++) {
+                            var output = funct(n,false);
+                            if (output >= min_work_time_funct_round + red_line_start_y) {
+                                break;
+                            }
+                            return_0_cutoff++;
+                        }
+                    }
+                    if (ignore_ends_mwt) {
+                        var upper = [return_0_cutoff,output];
+
+                        var did_loop = false;
+                        for (var n=Math.floor(return_0_cutoff);n>0;n--) {
+                            var pre_output = funct(n,false);
+                            if (pre_output <= red_line_start_y) {
+                                break;
+                            }
+                            did_loop = true;
+                            var output = pre_output;
+                            return_0_cutoff--;
+                        }
+                        if (did_loop) {
+                            var lower = [return_0_cutoff,output];
+                            return_0_cutoff = [lower,upper][+(min_work_time_funct_round * 2 - upper[1] > lower[1])][0];
+                        }
+                    }
+                }
+            }
+            function funct(n,translate=true) {
+                if (translate) {
+                    n -= red_line_start_x;
+                    if (len_nwd) {
+                        n -= Math.floor(n/7) * len_nwd + mods[n % 7];
+                    }
+                    if (n > return_y_cutoff) {
+                        return y;
+                    } else if (n < return_0_cutoff) {
+                        return red_line_start_y;
+                    }
+                }
+                if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (n < cutoff_to_use_round))) {
+                    var output = min_work_time_funct_round * Math.round(n*(a*n+b)/min_work_time_funct_round);
+                    if (a < 0) {
+                        output += cutoff_transition_value;
+                    } else {
+                        output -= cutoff_transition_value;
+                    }
+                } else {
+                    var output = funct_round * Math.round(n*(a*n+b)/funct_round)
+                }
+                if (remainder_mode && output) {
+                    output += y_fremainder;
+                }
+                return output + red_line_start_y;
+            }
+
+            function mousemove(event) { 
+                let x2 = event.pageX - event.currentTarget.offsetLeft;
+                let y2 = event.pageY - event.currentTarget.offsetTop;
+                draw(x2,y2);
+                document.getElementById("text").innerHTML = "Skew ratio: " + skew_ratio;
+            }
+            // stop set skew ratio if canvas is clicked
+            $("#graph").click(function() { 
+                graph.removeEventListener("mousemove",mousemove); 
+            });
+            
+            // enabled set skew ratio if button is pressed
+            document.getElementById("set-skew-ratio-button").onclick = function() { 
+                graph.addEventListener('mousemove',mousemove); 
+            }
+            function draw(x2=NaN,y2=NaN) {
+                let screen = graph.getContext("2d");
+                screen.scale(scale,scale);
+                screen.clearRect(0, 0, width, height);
+                
+                pset(x2,y2);
+
+                let radius = wCon/3; // calculates circle radius
+                if (radius > 3) {
+                    radius = 3;
+                } else if (radius < 2) {
+                    radius = 2;
+                }
+                let circle_x;
+                let circle_y;
+                let line_end = Math.floor(x+Math.ceil(1/wCon));
+                screen.strokeStyle = "rgb(233,68,46)"; // red
+                screen.lineWidth = radius;
+                screen.beginPath();
+                for (let point = red_line_start_x;point<line_end;point+=Math.ceil(1/wCon)) {
+                    circle_x = Math.round(point*wCon+50);
+                    if (circle_x > width-5) {
+                        circle_x = width-5;
+                    }
+                    circle_y = Math.round(height-funct(point)*hCon-50);
+                    screen.lineTo(circle_x,circle_y);
+                    screen.arc(circle_x,circle_y,radius,0,2 * Math.PI);
+                    screen.moveTo(circle_x,circle_y);
+                }
+                screen.stroke();
+                screen.beginPath();
+                radius *= 3/4;
+                if (len_works + 1 < line_end) {
+                    len_end = len_works + 1;
+                }
+                screen.strokeStyle = "rgb(1,147,255)"; // blue
+                screen.lineWidth = radius;
+                for (let point = 0;point<line_end;point+=Math.ceil(1/wCon)) {
+                    circle_x = Math.round((point+dif_assign)*wCon+50);
+                    if (circle_x > width-5) {
+                        circle_x = width-5
+                    }
+                    circle_y = Math.round(height-works[point]*hCon-50);
+                    screen.lineTo(circle_x-(point==0)*radius/2,circle_y);
+                    screen.arc(circle_x,circle_y,radius,0,2 * Math.PI);
+                    screen.moveTo(circle_x,circle_y);
+                }
+                screen.stroke();
+                screen.scale(1/scale,1/scale);
+            }
+            function drawfixed() {
+
+                // bg gradient
+                let screen = fixed_graph.getContext("2d");
+                screen.scale(scale,scale);
+                gradient = screen.createLinearGradient(0,0,0,height*4/3);
+                gradient.addColorStop(0,"white");
+                gradient.addColorStop(1,"lightgray");
+                screen.fillStyle = gradient;
+                screen.fillRect(0, 0, width, height*4/3);
+
+                // x and y axis rectangles
+                screen.fillStyle = "rgb(185,185,185)";
+                screen.fillRect(40, 0, 10, height);
+                screen.fillRect(0, height-50, width, 10);
+    
+                // x axis label
+                screen.fillStyle = "black";
+                screen.textAlign = "center";
+                screen.font = '17.1875px Open Sans';
+                screen.fillText("Days", (width-50)/2+50, height-5);
+
+                // y axis label
+                screen.rotate(Math.PI/2);
+                if (unit == "Minute") {
+                    var text = 'Minutes of Work';
+                } else {
+                    var text = unit + 's (' + format_minutes(ctime) + ') per ' + unit;
+                }
+                screen.fillText(text, (height-50)/2, -2);
+                screen.rotate(-Math.PI/2);
+
+                screen.font = '13.75px Open Sans';
+                screen.textBaseline = "top";
+                let x_axis_scale = Math.pow(10,Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0]/Math.ceil((width-100)/100));
+                if (x >= 10) {
+                    let small_x_axis_scale = x_axis_scale / 5;
+                    let label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
+                    let font_size = 13.75;
+                    for (let smaller_index = 1;smaller_index<=Math.floor(x/small_x_axis_scale);smaller_index++) {
+                        let displayed_number = smaller_index * small_x_axis_scale;
+                        if (smaller_index % 5) {
+                            screen.fillStyle = "rgb(215,215,215)";
+                            screen.fillRect(displayed_number*wCon+48.5,0,2,height-50);
+                            screen.fillStyle = "rgb(80,80,80)";
+                        }
+                        if (label_index || !(smaller_index % 5)) {
+                            if (!(smaller_index % 5)) {
+                                screen.fillStyle = "black";
+                                screen.font = font_size + 2.75 + 'px Open Sans';
+                            }
+                            let numberwidth = screen.measureText(displayed_number).width;
+                            let number_x_pos = displayed_number*wCon+50;
+                            if (number_x_pos + numberwidth/2 > width-1) {
+                                number_x_pos = width-numberwidth/2-1;
+                            }
+                            screen.fillText(displayed_number,number_x_pos,height-39);
+                            if (!(smaller_index % 5)) {
+                                screen.font = font_size + 'px Open Sans';
+                            }
+                        }
+                    }
+                }
+                screen.textBaseline = "alphabetic";
+                let y_axis_scale = Math.pow(10,Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0]/Math.ceil((height-100)/100));
+                if (y >= 10) {
+                    let small_y_axis_scale = y_axis_scale / 5;
+                    let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
+                    if (font_size < 8.5) {
+                        font_size = 8.5;
+                    }
+                    screen.font = font_size + 'px Open Sans';
+
+                    let text_height = screen.measureText(0).width * 2;
+                    let label_index = text_height < small_y_axis_scale*hCon;
+                    screen.textAlign = "right";
+                    for (let smaller_index = 1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
+                        let displayed_number = smaller_index * small_y_axis_scale;
+                        if (smaller_index % 5) {
+                            screen.fillStyle = "rgb(215,215,215)";
+                            screen.fillRect(50,height-51.5-displayed_number*hCon,width-50,2);
+                            screen.fillStyle = "rgb(80,80,80)";
+                        } 
+                        if (label_index || !(smaller_index % 5)) {
+                            if (!(smaller_index % 5)) {
+                                screen.fillStyle = "black";
+                                screen.font = font_size * 1.2 + 'px Open Sans';
+                            }
+                            let number_y_pos = height-displayed_number*hCon-52+text_height/2;
+                            if (number_y_pos < 6 + text_height/2) {
+                                number_y_pos = 6 + text_height/2;
+                            }
+                            if (38.5 - screen.measureText(displayed_number).width < 1) {
+                                screen.textAlign = "left";
+                                screen.fillText(displayed_number,1,number_y_pos);
+                                screen.textAlign = "right";
+                            } else {
+                                screen.fillText(displayed_number,38.5,number_y_pos);
+                            }
+                            if (!(smaller_index % 5)) {
+                                screen.font = font_size + 'px Open Sans';
+                            }
+                        }                      
+                    }
+                }
+                // redo this and make it so that the numbers show up on the small_y_axis_scale
+                screen.fillStyle = "rgb(205,205,205)";
+                for (let bigger_index = Math.ceil(x - x % x_axis_scale);bigger_index>0;bigger_index-=x_axis_scale) {
+                    screen.fillRect(bigger_index*wCon+47.5,0,5,height-50);
+                }
+                for (let bigger_index = Math.ceil(y - y % y_axis_scale);bigger_index>0;bigger_index-=y_axis_scale) {
+                    if (bigger_index * 2 < y_axis_scale) {
+                        break;
+                    }
+                    screen.fillRect(50,height-bigger_index*hCon-52.5,width-50,5);
+                }
+            }
+
+            function format_minutes(total_minutes) {
+                var hour = Math.floor(total_minutes / 60);
+                var minute = Math.ceil(total_minutes % 60);
+                if (!hour) {
+                    if (total_minutes && total_minutes < 1) {
+                        return "<1m";
+                    }
+                    return minute + "m";
+                } else if (!minute) {
+                    return hour + "h";
+                } else {
+                    return hour + "h " + minute + "m";
+                }
+            }
+        });
+        </script>
+    </head>
+    <body>
+        <div id="header">
+            <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="alba-font" border="0" id="logo">
+        </div>
+        <div id="content">
+            <canvas id="fixed-graph"></canvas>
+            <canvas id="graph">Your browser does not support the canvas tag.</canvas>
+            <button id="set-skew-ratio-button">Set skew ratio</button>
+            <p id="text" style="margin:0;display:inline-block"></p>
+            <div id="data"></div>
+        </div>
+    </body>
+
+</html>
