@@ -1,33 +1,113 @@
-<html>
-  <head>
-    <style>
-    </style>
-  </head>
+{% extends "template.html" %}
+{% load static %}
 
-  <body>
-    <table>
-      {% for obj in objlist %}
-        <tr>
-          <td>
-            <a href="{% url 'graph' obj.pk %}">{{ obj.title }}</a>
-          </td>
-          <form method="GET" action="{% url 'list' obj.pk%}">
-            <td>
-              <button type="submit">Update</button>
-            </td>
-          </form>
-          <form method="POST">
-            <td>
-              {% csrf_token %}
-              <button type="submit" name="{{ obj.pk }}" value="deleted">Delete</button>           
-            </td>
-          </form>
-        </tr>
-      {% endfor %}
-    </table>
-    <form method="GET" action="{% url 'new'%}">
-      <button type="submit">New</button>
-    </form>
-  </body>
-</html>
-{% comment %}{% endcomment %}
+{% block css %}
+#imagenew {
+  left: 5px;
+  position:absolute;
+}
+#newassignmenttext {
+  position:absolute;
+  left:75px;
+  top:0px;
+  color:white;
+  font-size:20px;
+  font-family:"Open Sans";
+}
+#title {
+  min-width:calc(95px + 8vw);
+  max-width:calc(95px + 8vw);
+  font-size:min(16.76px,calc(11px + 0.4vw));
+  font-family:"Open Sans";
+  overflow-wrap:break-word;
+}
+#title:hover span {
+  display:none;
+}
+#title:hover:before {
+  content:'Click to open';
+}
+a:visited { 
+  text-decoration: none;
+  color:blue;
+}
+#daysleft {
+  position:absolute;
+  font-size:0.7em;
+  font-family:"Open Sans";
+  text-decoration: none;
+  color:black;
+  margin-top:-4px;
+}
+#status {
+  font-size:min(16.76px,calc(11px + 0.4vw));
+  font-family:"Open Sans";
+  margin:0 70px 0 max(5px,calc(-5px + 2vw));
+}
+#assignment {
+  margin:10px;
+  min-height:20px;
+  padding:15px;
+  border:2px solid gray;
+  border-radius:5px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  min-width:700px;
+}
+.button {
+  position:absolute;
+  background: radial-gradient(circle, lightgray 40%, gray 100%);
+  border:2px solid gray;
+  border-radius:50%;
+}
+#updatebutton {
+  top:9px;
+  right:45px;
+  height:30px;
+  width:30px;
+}
+#updatebuttonimage {
+  top:4.5px;
+  left:5.5px;
+  position:relative;
+}
+#deletebutton {
+  top:3px;
+  right:0px;
+  margin:5px;
+  height:35px;
+  width:35px;
+}
+.button:hover {
+  background: radial-gradient(circle, white 35%, gray 100%);
+}
+{% endblock %}
+
+{% block header %}
+<a href="{% url 'new' %}">
+  <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
+</a>
+<p id="newassignmenttext">New Assignment</p>
+<a href="{% url 'home' %}">
+  <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="alba-font" border="0" id="logo">
+</a>
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+  {% for obj in objlist %}
+    <div id="assignment">
+      <a href="{% url 'graph' obj.pk %}" id="title"><span>{{ obj.title }}</span><p id="daysleft">1d</p></a>
+      <p id="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+      <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
+        <img height="20" id="updatebuttonimage" src="{% static 'edit.png' %}" alt="delete"></img>
+      </a>
+      <button name="{{ obj.pk }}" value="deleted" class="button" id="deletebutton">
+        <img height="22" src="{% static 'delete.png' %}" alt="edit"></img>
+      </button>
+    </div>
+  {% endfor %}
+</form>
+{% endblock %}

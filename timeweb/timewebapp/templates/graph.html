@@ -6,7 +6,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
         <style>
             #header {
-                width:100%;
+                width:calc(100% - 10px);
                 background:#0d1a26;
                 height:60px;
                 margin-bottom:13px;
@@ -17,7 +17,7 @@
                 border-right:20px solid gray;
                 border-left:20px solid gray;
                 margin:0px;
-                overflow:hidden;
+                height:100%;
             }
             #logo {
                 display:block;
@@ -34,7 +34,6 @@
             }
             canvas {
                 padding:0px;
-                display:block;
                 {% comment %} 13 * 2 + 4 * 2 + 10 * 2{% endcomment %}
                 height:65%;
                 max-height:400px;
@@ -544,6 +543,7 @@
             <canvas id="fixed-graph"></canvas>
             <canvas id="graph">Your browser does not support the canvas tag.</canvas>
             <button id="set-skew-ratio-button">Set skew ratio</button>
+            <a href="{% url 'home' %}" style="margin:0;display:inline-block">Back</a>
             <p id="text" style="margin:0;display:inline-block"></p>
             <div id="data"></div>
         </div>
