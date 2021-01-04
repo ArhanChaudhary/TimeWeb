@@ -2,6 +2,18 @@
 {% load static %}
 
 {% block css %}
+.header.animate {
+  transform:translateY(-70px);
+  height:80px;
+}
+.footer.animate {
+  transform:translateY(-70px);
+}
+#content.animate {
+  border-width:0px;
+  height:115%;
+  transform:translateY(-70px);
+}
 #imagenew {
   left: 5px;
   position:absolute;
@@ -13,6 +25,11 @@
   color:white;
   font-size:20px;
   font-family:"Open Sans";
+  width:calc(50% - 190px);
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 #title {
   min-width:calc(95px + 8vw);
@@ -22,38 +39,56 @@
   overflow-wrap:break-word;
 }
 #title:hover span {
-  display:none;
+  opacity:0;
 }
 #title:hover:before {
+  top:50%;
+  transform:translateY(-50%);
+  position:absolute;
   content:'Click to open';
+  text-decoration:underline;
 }
 a:visited { 
   text-decoration: none;
   color:blue;
+}
+.assignmentscontainer {
+  transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
+}
+.assignmentscontainer.animate {
+  transform:translateY(calc(-100% - 20px));
 }
 #daysleft {
   position:absolute;
   font-size:0.7em;
   font-family:"Open Sans";
   text-decoration: none;
+  margin-top:-2px;
   color:black;
-  margin-top:-4px;
 }
 #status {
   font-size:min(16.76px,calc(11px + 0.4vw));
   font-family:"Open Sans";
   margin:0 70px 0 max(5px,calc(-5px + 2vw));
 }
+#assignmentcontainer {
+  min-height:40px;
+  min-width:720px;
+}
 #assignment {
   margin:10px;
-  min-height:20px;
   padding:15px;
   border:2px solid gray;
   border-radius:5px;
   position:relative;
   display:flex;
+  width:calc(100% - 54px);
   align-items:center;
-  min-width:700px;
+  transition:all .2s ease-in-out;
+}
+#assignment:hover {
+  transform:scale(1.05) translateX(20px);
+  width:calc(100% - 95.5px);
 }
 .button {
   position:absolute;
@@ -68,8 +103,8 @@ a:visited {
   width:30px;
 }
 #updatebuttonimage {
-  top:4.5px;
-  left:5.5px;
+  top:5px;
+  left:5px;
   position:relative;
 }
 #deletebutton {
@@ -82,32 +117,61 @@ a:visited {
 .button:hover {
   background: radial-gradient(circle, white 35%, gray 100%);
 }
+.button:active, .button:focus {
+  background: radial-gradient(circle, white 55%, gray 100%);
+  outline:0;
+}
 {% endblock %}
 
+{% block js %}
+<script>
+    window.addEventListener('popstate', function() {
+        history.pushState(null, null, document.URL);
+    }());
+    function removeanimation() {
+        const footer = document.getElementsByClassName("footer");
+        footer[0].classList.remove('animate');
+        const header = document.getElementsByClassName("header");
+        header[0].classList.remove('animate');
+        const content = document.getElementById("content");
+        content.classList.remove('animate');
+        const container = document.getElementsByClassName("assignmentscontainer");
+        container[0].classList.remove('animate');
+    }
+    window.addEventListener('load', removeanimation, false);
+</script>
+{% endblock %}
 {% block header %}
-<a href="{% url 'new' %}">
-  <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
-</a>
-<p id="newassignmenttext">New Assignment</p>
-<a href="{% url 'home' %}">
-  <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="alba-font" border="0" id="logo">
-</a>
+  <a href="{% url 'new' %}">
+    <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
+  </a>
+  <p id="newassignmenttext">New Assignment</p>
+  <a href="{% url 'home' %}">
+    <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="alba-font" border="0" id="logo">
+  </a>
 {% endblock %}
 
 {% block content %}
-<form method="POST">
-  {% csrf_token %}
-  {% for obj in objlist %}
-    <div id="assignment">
-      <a href="{% url 'graph' obj.pk %}" id="title"><span>{{ obj.title }}</span><p id="daysleft">1d</p></a>
-      <p id="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-      <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
-        <img height="20" id="updatebuttonimage" src="{% static 'edit.png' %}" alt="delete"></img>
-      </a>
-      <button name="{{ obj.pk }}" value="deleted" class="button" id="deletebutton">
-        <img height="22" src="{% static 'delete.png' %}" alt="edit"></img>
-      </button>
-    </div>
-  {% endfor %}
-</form>
+<div class="assignmentscontainer animate">
+  <form method="POST">
+    {% csrf_token %}
+    {% for obj in objlist %}
+      <div id="assignmentcontainer">
+        <div id="assignment">
+          <a href="{% url 'graph' obj.pk %}" id="title"><span>{{ obj.title }}</span><p id="daysleft">1d</p></a>
+          <p id="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+          <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
+            <img height="20" id="updatebuttonimage" src="{% static 'edit.png' %}" alt="delete"></img>
+          </a>
+          <button name="{{ obj.pk }}" value="deleted" class="button" id="deletebutton">
+            <img height="22" src="{% static 'delete.png' %}" alt="edit"></img>
+          </button>
+        </div>
+      </div>
+    {% endfor %}
+  </form>
+</div>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

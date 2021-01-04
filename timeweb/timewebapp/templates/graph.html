@@ -29,6 +29,7 @@
             }
             body {
                 margin:0px;
+                min-width:360px;
                 background:rgb(255,255,255);
                 background: radial-gradient(circle, rgb(255,255,255) 0%, rgb(202,202,202) 100%);
             }
@@ -97,7 +98,7 @@
             } else {
                 var min_work_time_funct_round = funct_round;
             }
-            $(window).resize(function resize() {
+            $(window).resize(function() {
                 width = fixed_graph.getBoundingClientRect().width;
                 height = fixed_graph.getBoundingClientRect().height;
                 graph.width = width * scale;
@@ -108,9 +109,6 @@
                 hCon = (height-55)/y;
                 drawfixed();
                 draw();
-
-                // return itself so the "}());" runs after this function is defined
-                return resize;
             }());
             function pset(x2=NaN,y2=NaN) {
                 try {
