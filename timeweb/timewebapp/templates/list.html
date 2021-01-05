@@ -15,7 +15,7 @@
   transform:translateY(-70px);
 }
 #imagenew {
-  left: 5px;
+  left:5px;
   position:absolute;
 }
 #newassignmenttext {
@@ -25,7 +25,7 @@
   color:white;
   font-size:20px;
   font-family:"Open Sans";
-  width:calc(50% - 190px);
+  display:inline-block;
 
   white-space:nowrap;
   overflow:hidden;
@@ -38,24 +38,19 @@
   font-family:"Open Sans";
   overflow-wrap:break-word;
 }
-#title:hover span {
+#assignment:hover #title span {
   opacity:0;
 }
-#title:hover:before {
+#assignment:hover #title:before {
   top:50%;
   transform:translateY(-50%);
   position:absolute;
   content:'Click to open';
-  text-decoration:underline;
 }
-a:visited { 
-  text-decoration: none;
-  color:blue;
+#assignmentscontainer {
+  transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
 }
-.assignmentscontainer {
-  transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
-}
-.assignmentscontainer.animate {
+#assignmentscontainer.animate {
   transform:translateY(calc(-100% - 20px));
 }
 #daysleft {
@@ -74,8 +69,21 @@ a:visited {
 #assignmentcontainer {
   min-height:40px;
   min-width:720px;
+  position:relative;
+  transition:min-height .2s ease-in-out;
+}
+#assignmentcontainer.animate {
+  min-height:0.1px;
+  margin-top:-10px;
+  display:block;
+}
+#assignmentcontainer.animate #assignment {
+  position:absolute;
+  opacity:0;
 }
 #assignment {
+  box-shadow: 0px 0px 8px 3px rgba(52,52,52,0.3); 
+  background:white;
   margin:10px;
   padding:15px;
   border:2px solid gray;
@@ -84,11 +92,11 @@ a:visited {
   display:flex;
   width:calc(100% - 54px);
   align-items:center;
-  transition:all .2s ease-in-out;
+  transition:transform .2s ease-in-out, width .2s ease-in-out, opacity .1s ease-in-out;
 }
 #assignment:hover {
-  transform:scale(1.05) translateX(20px);
-  width:calc(100% - 95.5px);
+  transform:scale(1.05) translateX(2%);
+  width:calc(96.1% - 55px);
 }
 .button {
   position:absolute;
@@ -97,7 +105,7 @@ a:visited {
   border-radius:50%;
 }
 #updatebutton {
-  top:9px;
+  top:8px;
   right:45px;
   height:30px;
   width:30px;
@@ -107,7 +115,7 @@ a:visited {
   left:5px;
   position:relative;
 }
-#deletebutton {
+.deletebutton {
   top:3px;
   right:0px;
   margin:5px;
@@ -117,8 +125,10 @@ a:visited {
 .button:hover {
   background: radial-gradient(circle, white 35%, gray 100%);
 }
-.button:active, .button:focus {
+.button:active {
   background: radial-gradient(circle, white 55%, gray 100%);
+}
+.button:focus {
   outline:0;
 }
 {% endblock %}
@@ -129,47 +139,67 @@ a:visited {
         history.pushState(null, null, document.URL);
     }());
     function removeanimation() {
-        const footer = document.getElementsByClassName("footer");
-        footer[0].classList.remove('animate');
-        const header = document.getElementsByClassName("header");
-        header[0].classList.remove('animate');
-        const content = document.getElementById("content");
-        content.classList.remove('animate');
-        const container = document.getElementsByClassName("assignmentscontainer");
-        container[0].classList.remove('animate');
+        $(".animate").removeClass("animate");
     }
     window.addEventListener('load', removeanimation, false);
+
+    $(function() {
+      $('.deletebutton').click(function() {
+          const val = $(this).val();
+          const name = $(this).attr('name');
+          let data = {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+          }
+          data[name] = val;
+
+          const assignment = $(this).parent().parent()
+          const success = function() {
+            $(assignment).addClass("animate");
+            setTimeout(function() {
+              $(assignment).remove();
+            }, 200);
+          }
+          $.ajax({
+              type: "POST",
+              data: data,
+              success: success
+          });
+      });
+    });
 </script>
 {% endblock %}
 {% block header %}
   <a href="{% url 'new' %}">
     <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
+    <p id="newassignmenttext">New Assignment</p>
   </a>
-  <p id="newassignmenttext">New Assignment</p>
-  <a href="{% url 'home' %}">
-    <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="alba-font" border="0" id="logo">
+  <a href="{% url 'home' %}" id="logo">
+    <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
   </a>
 {% endblock %}
 
 {% block content %}
-<div class="assignmentscontainer animate">
-  <form method="POST">
-    {% csrf_token %}
-    {% for obj in objlist %}
+<div id="assignmentscontainer" class="animate">
+  {% for obj in objlist %}
       <div id="assignmentcontainer">
+        <a href="http://example.com"></a>
         <div id="assignment">
-          <a href="{% url 'graph' obj.pk %}" id="title"><span>{{ obj.title }}</span><p id="daysleft">1d</p></a>
+          <span id="title">
+            <span>{{ obj.title }}</span>
+            <p id="daysleft">1d</p>
+          </span>
           <p id="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+          
+          {% comment %} REPLACE BAC K WITH A TAGS {% endcomment %}
           <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
-            <img height="20" id="updatebuttonimage" src="{% static 'edit.png' %}" alt="delete"></img>
+            <img height="20" src="{% static 'edit.png' %}" alt="delete" id="updatebuttonimage"/>
           </a>
-          <button name="{{ obj.pk }}" value="deleted" class="button" id="deletebutton">
-            <img height="22" src="{% static 'delete.png' %}" alt="edit"></img>
+          <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
+            <img height="22" src="{% static 'delete.png' %}" alt="edit"/>
           </button>
         </div>
       </div>
-    {% endfor %}
-  </form>
+  {% endfor %}
 </div>
 {% endblock %}
 
