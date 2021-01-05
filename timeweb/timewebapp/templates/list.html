@@ -25,7 +25,8 @@
   color:white;
   font-size:20px;
   font-family:"Open Sans";
-  display:inline-block;
+  display:block;
+  max-width:calc(50% - 190px);
 
   white-space:nowrap;
   overflow:hidden;
@@ -51,13 +52,13 @@
   transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
 }
 #assignmentscontainer.animate {
-  transform:translateY(calc(-100% - 20px));
+  transform:translateY(max(calc(-100vh + 140px),calc(-100% - 20px)));
 }
 #daysleft {
   position:absolute;
   font-size:0.7em;
   font-family:"Open Sans";
-  text-decoration: none;
+  text-decoration:none;
   margin-top:-2px;
   color:black;
 }
@@ -82,7 +83,7 @@
   opacity:0;
 }
 #assignment {
-  box-shadow: 0px 0px 8px 3px rgba(52,52,52,0.3); 
+  box-shadow: 0px 0px 4px rgba(52,52,52,0.7); 
   background:white;
   margin:10px;
   padding:15px;
@@ -92,20 +93,24 @@
   display:flex;
   width:calc(100% - 54px);
   align-items:center;
-  transition:transform .2s ease-in-out, width .2s ease-in-out, opacity .1s ease-in-out;
+  transition:transform .2s ease-in-out, width .2s ease-in-out, border .2s ease-in-out, opacity .1s ease-in-out;
 }
 #assignment:hover {
   transform:scale(1.05) translateX(2%);
   width:calc(96.1% - 55px);
+  border:2px solid rgba(0,0,0,0.7);
+
 }
 .button {
   position:absolute;
   background: radial-gradient(circle, lightgray 40%, gray 100%);
   border:2px solid gray;
   border-radius:50%;
+  top:0px;
+  bottom:0px;
+  margin:auto;
 }
 #updatebutton {
-  top:8px;
   right:45px;
   height:30px;
   width:30px;
@@ -116,9 +121,7 @@
   position:relative;
 }
 .deletebutton {
-  top:3px;
-  right:0px;
-  margin:5px;
+  right:5px;
   height:35px;
   width:35px;
 }
@@ -145,25 +148,29 @@
 
     $(function() {
       $('.deletebutton').click(function() {
-          const val = $(this).val();
-          const name = $(this).attr('name');
-          let data = {
-            'csrfmiddlewaretoken': '{{ csrf_token }}',
-          }
-          data[name] = val;
+        if (confirm('Are you sure you want to delete this assignment?')) {
+            const val = $(this).val();
+            const name = $(this).attr('name');
+            let data = {
+              'csrfmiddlewaretoken': '{{ csrf_token }}',
+            }
+            data[name] = val;
 
-          const assignment = $(this).parent().parent()
-          const success = function() {
-            $(assignment).addClass("animate");
-            setTimeout(function() {
-              $(assignment).remove();
-            }, 200);
-          }
-          $.ajax({
-              type: "POST",
-              data: data,
-              success: success
-          });
+            const assignment = $(this).parent().parent()
+            const success = function() {
+              $(assignment).addClass("animate");
+              setTimeout(function() {
+                $(assignment).remove();
+              }, 200);
+            }
+            $.ajax({
+                type: "POST",
+                data: data,
+                success: success
+            });
+        } else {
+          return false;
+        }
       });
     });
 </script>
@@ -171,7 +178,9 @@
 {% block header %}
   <a href="{% url 'new' %}">
     <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
-    <p id="newassignmenttext">New Assignment</p>
+    <div id="newassignmenttextcontainer">
+      <p id="newassignmenttext">New Assignment</p>
+    </div>
   </a>
   <a href="{% url 'home' %}" id="logo">
     <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
@@ -179,7 +188,7 @@
 {% endblock %}
 
 {% block content %}
-<div id="assignmentscontainer" class="animate">
+<div id="assignmentscontainer" class="animate" amount="{{ objlist.count }}">
   {% for obj in objlist %}
       <div id="assignmentcontainer">
         <a href="http://example.com"></a>
