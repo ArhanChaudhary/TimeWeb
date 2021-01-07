@@ -18,7 +18,7 @@ class TimewebView(View):
         # Creates form after user enters "New" 
         if pk == None:
             self.form = TimewebForm(request.POST or None, request.FILES or None)
-            self.context['submit'] = 'Create'
+            self.context['submit'] = 'Create Assignment'
         else:
             self.form = TimewebForm(request.POST or None, request.FILES or None,initial={
                 'title':get_object_or_404(TimewebModel, pk=pk).title,
