@@ -38,20 +38,12 @@
   text-overflow:ellipsis;
 }
 #title {
+  float:left;
   min-width:calc(95px + 8vw);
   max-width:calc(95px + 8vw);
   font-size:min(16.76px,calc(11px + 0.4vw));
   font-family:"Open Sans";
   overflow-wrap:break-word;
-}
-#assignment:hover #title span {
-  opacity:0;
-}
-#assignment:hover #title:before {
-  top:50%;
-  transform:translateY(-50%);
-  position:absolute;
-  content:'Click to open';
 }
 #assignmentscontainer {
   transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
@@ -67,25 +59,24 @@
   margin-top:-2px;
   color:black;
 }
-#status {
+.status {
+  float:left;
   font-size:min(16.76px,calc(11px + 0.4vw));
   font-family:"Open Sans";
-  margin:0 70px 0 max(5px,calc(-5px + 2vw));
+  margin:0 70px 0 0;
 }
-#assignmentcontainer {
+.assignmentcontainer {
   min-height:40px;
   min-width:720px;
   position:relative;
-  transition:min-height .2s ease-in-out;
+  overflow: visible !important;
 }
-#assignmentcontainer.animate {
-  min-height:0.1px;
+.assignmentheader {
+  display:flex;
+  align-items:center;
+  position:relative;
 }
-#assignmentcontainer.animate #assignment {
-  position:absolute;
-  opacity:0;
-}
-#assignment {
+.assignment {
   box-shadow: 0px 0px 4px rgba(52,52,52,0.7); 
   background:white;
   margin:10px;
@@ -93,16 +84,28 @@
   border:2px solid gray;
   border-radius:5px;
   position:relative;
-  display:flex;
   width:calc(100% - 54px);
-  align-items:center;
-  transition:all .2s ease-in-out, opacity .1s ease-in-out;
+  min-height:0px;
+  transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height .05s ease-out;
 }
-#assignment:hover {
+.assignment.disablehover {
+  display:block;
+  min-height:65%;
+}
+.assignment:not(.disablehover):hover {
   transform:scale(1.05) translateX(2%);
   width:calc(96.1% - 55px);
   border:2px solid rgba(0,0,0,0.7);
   box-shadow: 0px 0px 7px rgba(52,52,52,0.7); 
+}
+.assignment:not(.disablehover):hover #title span {
+  opacity:0;
+}
+.assignment:not(.disablehover):hover #title:before {
+  top:50%;
+  transform:translateY(-50%);
+  position:absolute;
+  content:'Click to open';
 }
 .button {
   position:absolute;
@@ -114,7 +117,7 @@
   margin:auto;
 }
 #updatebutton {
-  right:45px;
+  right:30px;
   height:30px;
   width:30px;
 }
@@ -124,7 +127,7 @@
   position:relative;
 }
 .deletebutton {
-  right:5px;
+  right:-10px;
   height:35px;
   width:35px;
 }
@@ -136,50 +139,113 @@
 }
 .button:focus {
   outline:0;
+  border: 2px solid rgb(0,95,204);
+}
+.graph {
+  position:relative;
+  top:10px;
+  float:right;
+  display:none;
+  transition:all 1.5s ease-in-out; 
+}
+.arrowcontainer {
+  float:left;
+  margin-left:max(5px,calc(-5px + 2vw));
 }
 {% endblock %}
 
 {% block js %}
+
 <script>
-    window.addEventListener('popstate', function() {
-        history.pushState(null, null, document.URL);
-    }());
-    function removeanimation() {
-        $(".animate").removeClass("animate");
+  {% comment %} Doesn't allow the user to go back and load deleted assignments {% endcomment %}
+  window.addEventListener('popstate', function() {
+      history.pushState(null, null, document.URL);
+  }());
+</script>
+
+<script>
+  {% comment %} Makes animation happen on page load {% endcomment %}
+  function removeanimation() {
+      $(".animate").removeClass("animate");
+  }
+  window.addEventListener('load', removeanimation, false);
+</script>
+
+<script>
+  {% comment %} Keybind {% endcomment %}
+  $(document).keypress(function(e){
+    if (e.shiftKey && e.key == 'N') {
+        window.location.replace("{% url 'new' %}");
     }
-    window.addEventListener('load', removeanimation, false);
-    $(document).keypress(function(e){
-      if (e.shiftKey && e.key == 'N') {
-          window.location.replace("{% url 'new' %}");
+  });
+</script>
+
+<script>
+  $(function() {
+    $('.deletebutton').click(function() {
+      if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
+
+          // Data sent to server pointing to which assignment to delete
+          const val = $(this).val();
+          const name = $(this).attr('name');
+          let data = {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+          }
+          data[name] = val;
+
+          const assignmentcontainer = $(this).parent().parent().parent();
+          const success = function() {
+            // If the data was successfully sent, play the delete assignment animation
+            $(assignmentcontainer).css({
+              // CSS doesn't allow transitions without presetting the property
+              // So, use JQuery to set it's property and animate
+              "height":$(assignmentcontainer).height()+20+"px",
+
+              "margin-bottom":"-10px",
+              "min-height":"0px",
+            });
+            if (!assignmentcontainer.is(':first-child')) {
+              $(assignmentcontainer).css("margin-top","-10px");
+            }
+            $(assignmentcontainer).find(".assignment").css({
+              "position":"absolute",
+              "opacity":"0",
+            })
+            $(assignmentcontainer).animate({height:"10px"},200,function() {
+              $(assignmentcontainer).remove();
+            });
+          }
+          // Use an ajax POST to avoid a page reload which will replay the starting animation
+          $.ajax({
+              type: "POST",
+              data: data,
+              success: success,
+          });
+      } else {
+        return false;
       }
     });
-    $(function() {
-      $('.deletebutton').click(function() {
-        if (confirm('Are you sure you want to delete this assignment?')) {
-            const val = $(this).val();
-            const name = $(this).attr('name');
-            let data = {
-              'csrfmiddlewaretoken': '{{ csrf_token }}',
-            }
-            data[name] = val;
+  });
+</script>
 
-            const assignment = $(this).parent().parent()
-            const success = function() {
-              $(assignment).addClass("animate");
-              setTimeout(function() {
-                $(assignment).remove();
-              }, 200);
-            }
-            $.ajax({
-                type: "POST",
-                data: data,
-                success: success
-            });
-        } else {
-          return false;
-        }
-      });
-    });
+<script>
+$(function() {
+  $(".assignment").click(function(event) {
+    if (!["A","IMG","BUTTON"].includes(event.target.tagName)) {
+      const target = $(this).find(".graph");
+      const arrow = $(this).find(".arrow");
+      if (target.attr("style")) {
+        $(this).removeClass("disablehover");
+        target.removeAttr("style");
+        arrow.attr("points","5,0 5,20 15,10");
+      } else {
+        $(this).addClass("disablehover");
+        target.attr("style","display:block");
+        arrow.attr("points","0,5 20,5 10,15");
+      }
+    }
+  });
+})
 </script>
 {% endblock %}
 {% block header %}
@@ -199,21 +265,27 @@
 {% block content %}
 <div id="assignmentscontainer" class="animate">
   {% for obj in objlist %}
-      <div id="assignmentcontainer">
-        <div id="assignment" tabindex="0">
-          <span id="title">
-            <span>{{ obj.title }}</span>
-            <p id="daysleft">1d</p>
-          </span>
-          <p id="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-          
-          {% comment %} REPLACE BAC K WITH A TAGS {% endcomment %}
-          <a tabindex="-1" class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
-            <img height="20" src="{% static 'edit.png' %}" alt="delete" id="updatebuttonimage"/>
-          </a>
-          <button tabindex="-1" name="{{ obj.pk }}" value="deleted" class="button deletebutton">
-            <img height="22" src="{% static 'delete.png' %}" alt="edit"/>
-          </button>
+      <div class="assignmentcontainer">
+        <div class="assignment" tabindex="0">
+          <div class="assignmentheader">
+            <span id="title">
+              <span>{{ obj.title }}</span>
+              <p id="daysleft">1d</p>
+            </span>
+            <svg width="25px" height="20px" class="arrowcontainer">
+              <polygon class="arrow" points="5,0 5,20 15,10"></polygon>
+            </svg>
+            <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+            <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
+              <img height="20" src="{% static 'edit.png' %}" alt="delete" id="updatebuttonimage" draggable="false"/>
+            </a>
+            <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
+              <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
+            </button>
+          </div>
+          <div class="graph">
+text95843475893 754975389573495743 95347573457435 8439574359text95843475893 754975389573495743 95347573457435 8439574359text95843475893 754975389573495743 95347573457435 8439574359text95843475893 754975389573495743 95347573457435 8439574359text95843475893 754975389573495743 95347573457435 8439574359text95843475893 754975389573495743 95347573457435 8439574359
+          </div>
         </div>
       </div>
   {% endfor %}
