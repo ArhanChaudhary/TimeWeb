@@ -98,7 +98,7 @@
             } else {
                 var min_work_time_funct_round = funct_round;
             }
-            $(window).resize(function() {
+            $(window).resize(function resize() {
                 width = fixed_graph.getBoundingClientRect().width;
                 height = fixed_graph.getBoundingClientRect().height;
                 graph.width = width * scale;
@@ -109,7 +109,8 @@
                 hCon = (height-55)/y;
                 drawfixed();
                 draw();
-            }());
+                return resize;
+            });
             function pset(x2=NaN,y2=NaN) {
                 try {
                     var x1 = Math.floor(x - red_line_start_x);
