@@ -2,6 +2,12 @@
 {% load static %}
 
 {% block css %}
+.header {
+  transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
+}
+#content, .footer {
+  transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
+}
 .header.animate {
   transform:translateY(-70px);
   height:80px;
@@ -87,6 +93,11 @@
   width:calc(100% - 54px);
   min-height:0px;
 }
+.assignment:focus, .button:focus {
+  outline:0;
+  border:2px solid rgb(0,95,204) !important;
+  box-shadow: 0px 0px 4px rgba(0,95,204,0.5); 
+}
 .assignment.disablehover {
   display:block;
   min-height:65vh;
@@ -98,7 +109,7 @@
 .assignment:not(.disablehover):hover {
   transform:scale(1.05) translateX(2%);
   width:calc(96.1% - 55px);
-  border:2px solid rgba(0,0,0,0.7);
+  border-color: rgba(0,0,0,0.7);
   box-shadow: 0px 0px 7px rgba(52,52,52,0.7); 
 }
 .assignment:not(.disablehover):hover #title span {
@@ -140,10 +151,6 @@
 .button:active {
   background: radial-gradient(circle, white 55%, gray 100%);
 }
-.button:focus {
-  outline:0;
-  border:2px solid rgb(0,95,204);
-}
 .graphcontainer {
   position:relative;
   top:10px;
@@ -155,6 +162,7 @@
 }
 canvas {
   padding:0px;
+  border-radius:12px;
   height:clamp(200px,65vh,400px);
   width:calc(100% - 34px);
   min-height:200px;
@@ -163,7 +171,6 @@ canvas {
 }
 .fixed-graph {
   border:4px solid rgb(178,178,178);
-  border-radius:12px;
   margin-left:13px;
   position:absolute;
 }
@@ -194,10 +201,12 @@ canvas {
 </script>
 
 <script>
-  {% comment %} Keybind {% endcomment %}
+  // Keybinds
   $(document).keypress(function(e){
     if (e.shiftKey && e.key == 'N') {
-        window.location.replace("{% url 'new' %}");
+      window.location.replace("{% url 'new' %}");
+    } else if (e.key == "Enter" && !$(document.activeElement).hasClass('button')) {
+      document.activeElement.click();
     }
   });
 </script>
@@ -229,7 +238,7 @@ canvas {
             if (!assignmentcontainer.is(':first-child')) {
               $(assignmentcontainer).css("margin-top","-10px");
             }
-            $(assignmentcontainer).find(".assignment").css({
+            $(assignmentcontainer.children(":first-child")).css({
               "position":"absolute",
               "opacity":"0",
             })
@@ -256,7 +265,7 @@ canvas {
                 } else if (exception === 'abort') {
                     alert('Request aborted');
                 } else {
-                    alert('Uncaught Error\n' + jqXHR.responseText);
+                    alert('Uncaught Error, \n' + jqXHR.responseText+"\nPlease contact me if you see this");
                 }
               }
           });
@@ -272,7 +281,7 @@ $(function() {
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
       const assignment = $(this);
-      const graphcontainer = assignment.find(".graphcontainer");
+      const graphcontainer = assignment.children(":nth-child(2)");
       const not_first_click = assignment.data('not_first_click');
       if (graphcontainer.attr("style")) {
         assignment.removeClass("disablehover");
@@ -284,13 +293,13 @@ $(function() {
         assignment.find(".risingarrowanimation").get(0).beginElement();
 
         // If you have been added by me, please visit my github for an explanation of each part of this code
-        var graph = this.querySelector(".graph");
-        var fixed_graph = this.querySelector(".fixed-graph");
+        var graph = this.querySelector('.graph');
+        var fixed_graph = this.querySelector('.fixed-graph');
         var scale = window.devicePixelRatio;
 
         var skew_ratio = 1.5;
-        var funct_round = 6;
-        var min_work_time = 0;
+        var funct_round = 1;
+        var min_work_time = 2;
         var x = 24;
         var y = 20;
         var red_line_start_x = 0;
@@ -565,7 +574,7 @@ $(function() {
             draw(x2,y2);
         }
         // stop set skew ratio if canvas is clicked
-        $(".graph").click(function() { 
+        $(graph).click(function() { 
             graph.removeEventListener("mousemove",mousemove); 
         });
         
@@ -578,7 +587,7 @@ $(function() {
             screen.scale(scale,scale);
             screen.clearRect(0, 0, width, height);
             pset(x2,y2);
-
+            console.log(skew_ratio);
             let radius = wCon/3; // calculates circle radius
             if (radius > 3) {
                 radius = 3;
@@ -761,10 +770,12 @@ $(function() {
   });
 });
 </script>
-
 {% endblock %}
-{% block header %}
-  <a href="{% url 'new' %}" title="(Shift + N)">
+
+
+{% block body %}
+<div class="headerfooter header animate">
+  <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
     <div id="imagenewcontainer">
       <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
     </div>
@@ -775,44 +786,44 @@ $(function() {
   <a href="{% url 'home' %}" id="logo">
     <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
   </a>
-{% endblock %}
+</div>
 
-{% block content %}
-<div id="assignmentscontainer" class="animate">
-  {% for obj in objlist %}
-      <div class="assignmentcontainer">
-        <div class="assignment" tabindex="0">
-          <div class="assignmentheader">
-            <span id="title">
-              <span>{{ obj.title }}</span>
-              <p id="daysleft">1d</p>
-            </span>
-            <svg width="30px" height="20px" class="arrowcontainer">
-              <polygon class="arrow" points="5,0 5,20 15,10">
-                <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
-                <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
-              </polygon>
-            </svg>
-            <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-            <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
-              <img height="20" src="{% static 'edit.png' %}" alt="delete" id="updatebuttonimage" draggable="false"/>
-            </a>
-            <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
-              <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
-            </button>
-          </div>
-          <div class="graphcontainer">
-            <canvas class="fixed-graph"></canvas>
-            <canvas class="graph">Your browser does not support the canvas tag.</canvas>
-            <button class="set-skew-ratio-button">Set skew ratio</button>
-            <div class="graphfooter">
+<div id="content" class="animate">
+  <div id="assignmentscontainer" class="animate">
+    {% for obj in objlist %}
+        <div class="assignmentcontainer">
+          <div class="assignment" tabindex="0">
+            <div class="assignmentheader">
+              <span id="title">
+                <span>{{ obj.title }}</span>
+                <p id="daysleft">1d</p>
+              </span>
+              <svg width="30px" height="20px" class="arrowcontainer">
+                <polygon class="arrow" points="5,0 5,20 15,10">
+                  <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
+                  <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
+                </polygon>
+              </svg>
+              <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+              <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
+                <img height="20" src="{% static 'edit.png' %}" alt="delete" id="updatebuttonimage" draggable="false"/>
+              </a>
+              <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
+                <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
+              </button>
+            </div>
+            <div class="graphcontainer">
+              <canvas class="fixed-graph"></canvas>
+              <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+              <button class="set-skew-ratio-button">Set skew ratio</button>
+              <div class="graphfooter">
+              </div>
             </div>
           </div>
         </div>
-      </div>
-  {% endfor %}
+    {% endfor %}
+  </div>
 </div>
-{% endblock %}
 
-{% block footer %}
+<div class="headerfooter footer animate"></div>
 {% endblock %}

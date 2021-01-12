@@ -32,7 +32,7 @@ class TimewebView(View):
     def get(self,request,pk=None):
         
         self.make_form_instance(request,pk)
-        return render(request, "home.html", self.context)
+        return render(request, "new.html", self.context)
 
     def post(self,request,pk=None):
         self.make_form_instance(request,pk)
@@ -52,7 +52,7 @@ class TimewebView(View):
             return redirect('../')
         else:
             self.logger.debug("Invalid Form")
-            return render(request, "home.html", self.context)
+            return render(request, "new.html", self.context)
 
 class TimewebListView(View):
     context = {}
