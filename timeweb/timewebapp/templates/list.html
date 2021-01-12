@@ -69,7 +69,7 @@
   min-height:40px;
   min-width:720px;
   position:relative;
-  overflow: visible !important;
+  overflow:visible !important;
 }
 .assignmentheader {
   display:flex;
@@ -77,7 +77,7 @@
   position:relative;
 }
 .assignment {
-  box-shadow: 0px 0px 4px rgba(52,52,52,0.7); 
+  box-shadow: 0px 0px 4px rgba(52,52,52,0.5); 
   background:white;
   margin:10px;
   padding:15px;
@@ -86,11 +86,14 @@
   position:relative;
   width:calc(100% - 54px);
   min-height:0px;
-  transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height .05s ease-out;
 }
 .assignment.disablehover {
   display:block;
-  min-height:600px;
+  min-height:65vh;
+  transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
+}
+.assignment:not(.disablehover) {
+  transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0.1s ease-out;
 }
 .assignment:not(.disablehover):hover {
   transform:scale(1.05) translateX(2%);
@@ -139,42 +142,42 @@
 }
 .button:focus {
   outline:0;
-  border: 2px solid rgb(0,95,204);
+  border:2px solid rgb(0,95,204);
 }
 .graphcontainer {
   position:relative;
   top:10px;
   display:none;
-  transition:all 1.5s ease-in-out; 
 }
 .arrowcontainer {
   float:left;
   margin-left:max(5px,calc(-5px + 2vw));
 }
-
 canvas {
-    padding:0px;
-    max-height:400px;
-    margin:5px;
-    width:calc(100% - 34px);
+  padding:0px;
+  height:clamp(200px,65vh,400px);
+  width:calc(100% - 34px);
+  min-height:200px;
+  max-height:400px;
+  margin:5px;
 }
 .fixed-graph {
-    border:4px solid rgb(178,178,178);
-    border-radius:12px;
-    margin-left:13px;
-    position:absolute;
+  border:4px solid rgb(178,178,178);
+  border-radius:12px;
+  margin-left:13px;
+  position:absolute;
 }
 .graph {
-    margin-left:13px;
-    border:4px solid transparent;
+  margin-left:13px;
+  position:relative;
+  border:4px solid transparent;
 }
 .graphfooter {
-  height:50px;
+  height:100px;
 }
 {% endblock %}
 
 {% block js %}
-
 <script>
   {% comment %} Doesn't allow the user to go back and load deleted assignments {% endcomment %}
   window.addEventListener('popstate', function() {
@@ -239,6 +242,23 @@ canvas {
               type: "POST",
               data: data,
               success: success,
+              error: function(jqXHR, exception) {
+                if (jqXHR.status === 0) {
+                    alert('Failed to connect, try verifying your network');
+                } else if (jqXHR.status == 404) {
+                    alert('Requested page not found, try again');
+                } else if (jqXHR.status == 500) {
+                    alert('Internal Server Error. Please contact me if you see this')
+                } else if (exception === 'parsererror') {
+                    alert('Requested JSON parse failed');
+                } else if (exception === 'timeout') {
+                    alert('Time out error');
+                } else if (exception === 'abort') {
+                    alert('Request aborted');
+                } else {
+                    alert('Uncaught Error\n' + jqXHR.responseText);
+                }
+              }
           });
       } else {
         return false;
@@ -251,19 +271,19 @@ canvas {
 $(function() {
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
-      const target = $(this).find(".graphcontainer");
-      const arrow = $(this).find(".arrow");
-      if (target.attr("style")) {
-        $(this).removeClass("disablehover");
-        target.removeAttr("style");
-        arrow.attr("points","5,0 5,20 15,10");
+      const assignment = $(this);
+      const graphcontainer = assignment.find(".graphcontainer");
+      const not_first_click = assignment.data('not_first_click');
+      if (graphcontainer.attr("style")) {
+        assignment.removeClass("disablehover");
+        graphcontainer.removeAttr("style");
+        assignment.find(".fallingarrowanimation").get(0).beginElement();
       } else {
-        $(this).addClass("disablehover");
-        target.attr("style","display:block");
-        arrow.attr("points","0,5 20,5 10,15");
+        assignment.addClass("disablehover");
+        graphcontainer.attr("style","display:block");
+        assignment.find(".risingarrowanimation").get(0).beginElement();
 
         // If you have been added by me, please visit my github for an explanation of each part of this code
-        // Use let and const for efficiency
         var graph = this.querySelector(".graph");
         var fixed_graph = this.querySelector(".fixed-graph");
         var scale = window.devicePixelRatio;
@@ -271,7 +291,7 @@ $(function() {
         var skew_ratio = 1.5;
         var funct_round = 6;
         var min_work_time = 0;
-        var x = 240000;
+        var x = 24;
         var y = 20;
         var red_line_start_x = 0;
         var red_line_start_y = 0;
@@ -298,20 +318,24 @@ $(function() {
         } else {
             var min_work_time_funct_round = funct_round;
         }
-        $(window).resize(function resize() {
-          width = fixed_graph.getBoundingClientRect().width;
-          height = fixed_graph.getBoundingClientRect().height;
-          // height increasing for no fucking reason
-          graph.width = width * scale;
-          graph.height = height * scale;
-          fixed_graph.width = width * scale;
-          fixed_graph.height = height * scale;
-          wCon = (width-55)/x;
-          hCon = (height-55)/y;
-          drawfixed();
-          draw();
-          return resize;
-        }());
+        function resize() {
+          if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
+            width = fixed_graph.getBoundingClientRect().width;
+            height = fixed_graph.getBoundingClientRect().height;
+            graph.width = width * scale;
+            graph.height = height * scale;
+            fixed_graph.width = width * scale;
+            fixed_graph.height = height * scale;
+            wCon = (width-55)/x;
+            hCon = (height-55)/y;
+            drawfixed();
+            draw();
+          }
+        };
+        resize();
+        if (!not_first_click) {
+          $(window).resize(resize);
+        }
         function pset(x2=NaN,y2=NaN) {
             try {
                 var x1 = Math.floor(x - red_line_start_x);
@@ -711,27 +735,28 @@ $(function() {
             }
             for (let bigger_index = Math.ceil(y - y % y_axis_scale);bigger_index>0;bigger_index-=y_axis_scale) {
                 if (bigger_index * 2 < y_axis_scale) {
-                    break;
+                  break;
                 }
                 screen.fillRect(50,height-bigger_index*hCon-52.5,width-50,5);
             }
         }
 
         function format_minutes(total_minutes) {
-            var hour = Math.floor(total_minutes / 60);
-            var minute = Math.ceil(total_minutes % 60);
-            if (!hour) {
-                if (total_minutes && total_minutes < 1) {
-                    return "<1m";
-                }
-                return minute + "m";
-            } else if (!minute) {
-                return hour + "h";
-            } else {
-                return hour + "h " + minute + "m";
-            }
+          var hour = Math.floor(total_minutes / 60);
+          var minute = Math.ceil(total_minutes % 60);
+          if (!hour) {
+              if (total_minutes && total_minutes < 1) {
+                return "<1m";
+              }
+              return minute + "m";
+          } else if (!minute) {
+            return hour + "h";
+          } else {
+            return hour + "h " + minute + "m";
+          }
         }
       }
+      assignment.data('not_first_click',true);
     }
   });
 });
@@ -762,8 +787,11 @@ $(function() {
               <span>{{ obj.title }}</span>
               <p id="daysleft">1d</p>
             </span>
-            <svg width="25px" height="20px" class="arrowcontainer">
-              <polygon class="arrow" points="5,0 5,20 15,10"></polygon>
+            <svg width="30px" height="20px" class="arrowcontainer">
+              <polygon class="arrow" points="5,0 5,20 15,10">
+                <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
+                <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
+              </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
             <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
