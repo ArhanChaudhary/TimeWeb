@@ -5,7 +5,7 @@
 .header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
 }
-#content, .footer {
+.footer, #content {
   transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
 }
 .header.animate {
@@ -17,9 +17,16 @@
 }
 #content.animate {
   border-width:0px;
-  height:115%;
+  height:115vh;
   transform:translateY(-70px);
 }
+#assignmentscontainer {
+  transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
+}
+#assignmentscontainer.animate {
+  transform:translateY(max(calc(-100vh + 140px),calc(-100% - 20px)));
+}
+
 #imagenew {
   left:5px;
   position:absolute;
@@ -43,48 +50,15 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
-#title {
-  float:left;
-  min-width:calc(95px + 8vw);
-  max-width:calc(95px + 8vw);
-  font-size:min(16.76px,calc(11px + 0.4vw));
-  font-family:"Open Sans";
-  overflow-wrap:break-word;
-}
-#assignmentscontainer {
-  transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
-}
-#assignmentscontainer.animate {
-  transform:translateY(max(calc(-100vh + 140px),calc(-100% - 20px)));
-}
-#daysleft {
-  position:absolute;
-  font-size:0.7em;
-  font-family:"Open Sans";
-  text-decoration:none;
-  margin-top:-2px;
-  color:black;
-}
-.status {
-  float:left;
-  font-size:min(16.76px,calc(11px + 0.4vw));
-  font-family:"Open Sans";
-  margin:0 70px 0 0;
-}
 .assignmentcontainer {
   min-height:40px;
   min-width:720px;
   position:relative;
   overflow:visible !important;
 }
-.assignmentheader {
-  display:flex;
-  align-items:center;
-  position:relative;
-}
 .assignment {
   box-shadow: 0px 0px 4px rgba(52,52,52,0.5); 
-  background:white;
+  background:white;//rgba(233,68,46,0.5);
   margin:10px;
   padding:15px;
   border:2px solid gray;
@@ -106,20 +80,54 @@
 .assignment:not(.disablehover) {
   transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0.1s ease-out;
 }
+.assignment:not(.disablehover):hover:focus {
+  box-shadow: 0px 0px 7px rgba(0,95,204,0.7) !important; 
+}
 .assignment:not(.disablehover):hover {
   transform:scale(1.05) translateX(2%);
   width:calc(96.1% - 55px);
   border-color: rgba(0,0,0,0.7);
   box-shadow: 0px 0px 7px rgba(52,52,52,0.7); 
 }
-.assignment:not(.disablehover):hover #title span {
+.assignment:not(.disablehover):hover .title span {
   opacity:0;
 }
-.assignment:not(.disablehover):hover #title:before {
+.assignment:not(.disablehover):hover .title:before {
   top:50%;
   transform:translateY(-50%);
   position:absolute;
   content:'Click to open';
+}
+.assignmentheader {
+  display:flex;
+  align-items:center;
+  position:relative;
+}
+.title {
+  float:left;
+  min-width:calc(95px + 8vw);
+  max-width:calc(95px + 8vw);
+  font-size:min(16.76px,calc(11px + 0.4vw));
+  font-family:"Open Sans";
+  overflow-wrap:break-word;
+}
+.daysleft {
+  position:absolute;
+  font-size:0.7em;
+  font-family:"Open Sans";
+  text-decoration:none;
+  margin-top:-2px;
+  color:black;
+}
+.arrowcontainer {
+  float:left;
+  margin-left:max(5px,calc(-5px + 2vw));
+}
+.status {
+  float:left;
+  font-size:min(16.76px,calc(11px + 0.4vw));
+  font-family:"Open Sans";
+  margin:0 70px 0 0;
 }
 .button {
   position:absolute;
@@ -130,12 +138,12 @@
   bottom:0px;
   margin:auto;
 }
-#updatebutton {
+.updatebutton {
   right:30px;
   height:30px;
   width:30px;
 }
-#updatebuttonimage {
+.updatebuttonimage {
   top:5px;
   left:5px;
   position:relative;
@@ -145,20 +153,21 @@
   height:35px;
   width:35px;
 }
-.button:hover {
+.deletebuttonimage {
+  top:1px;
+  position:relative;
+}
+.button:hover, .button:focus {
   background: radial-gradient(circle, white 35%, gray 100%);
 }
 .button:active {
   background: radial-gradient(circle, white 55%, gray 100%);
 }
+
 .graphcontainer {
   position:relative;
   top:10px;
   display:none;
-}
-.arrowcontainer {
-  float:left;
-  margin-left:max(5px,calc(-5px + 2vw));
 }
 canvas {
   padding:0px;
@@ -170,7 +179,8 @@ canvas {
   margin:5px;
 }
 .fixed-graph {
-  border:4px solid rgb(178,178,178);
+  border:4px solid rgba(0,0,0,0.35);
+  {% comment %} rgb(178,178,178) {% endcomment %}
   margin-left:13px;
   position:absolute;
 }
@@ -179,6 +189,7 @@ canvas {
   position:relative;
   border:4px solid transparent;
 }
+
 .graphfooter {
   height:100px;
 }
@@ -186,97 +197,105 @@ canvas {
 
 {% block js %}
 <script>
-  {% comment %} Doesn't allow the user to go back and load deleted assignments {% endcomment %}
-  window.addEventListener('popstate', function() {
-      history.pushState(null, null, document.URL);
-  }());
+{% comment %} Doesn't allow the user to go back and load deleted assignments {% endcomment %}
+window.addEventListener('popstate', function() {
+    history.pushState(null, null, document.URL);
+}());
 </script>
 
 <script>
-  {% comment %} Makes animation happen on page load {% endcomment %}
+{% comment %} Handles starting animation {% endcomment %}
+$(function() {
+  $(".animate").removeClass("animate");
+
+  const content = document.getElementById("content");
   function removeanimation() {
-      $(".animate").removeClass("animate");
+    content.style.transition = 'none';
+    content.removeEventListener('transitionend',removeanimation);
   }
-  window.addEventListener('load', removeanimation, false);
+  content.addEventListener('transitionend',removeanimation);
+});
 </script>
 
 <script>
-  // Keybinds
-  $(document).keypress(function(e){
-    if (e.shiftKey && e.key == 'N') {
-      window.location.replace("{% url 'new' %}");
-    } else if (e.key == "Enter" && !$(document.activeElement).hasClass('button')) {
-      document.activeElement.click();
+{% comment %} Keybinds {% endcomment %}
+$(document).keypress(function(e){
+  if (e.shiftKey && e.key == 'N') {
+    window.location.replace("{% url 'new' %}");
+  } else if (e.key == "Enter" && !$(document.activeElement).hasClass('button')) {
+    document.activeElement.click();
+  }
+});
+</script>
+
+<script>
+{% comment %} Handles delete button {% endcomment %}
+$(function() {
+  $('.deletebutton').click(function() {
+    if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
+
+        // Data sent to server pointing to which assignment to delete
+        const val = $(this).val();
+        const name = $(this).attr('name');
+        let data = {
+          'csrfmiddlewaretoken': '{{ csrf_token }}',
+        }
+        data[name] = val;
+
+        const assignmentcontainer = $(this).parent().parent().parent();
+        const success = function() {
+          // If the data was successfully sent, play the delete assignment animation
+          $(assignmentcontainer).css({
+            // CSS doesn't allow transitions without presetting the property
+            // So, use JQuery to set it's property and animate
+            "height":$(assignmentcontainer).height()+20+"px",
+
+            "margin-bottom":"-10px",
+            "min-height":"0px",
+          });
+          if (!assignmentcontainer.is(':first-child')) {
+            $(assignmentcontainer).css("margin-top","-10px");
+          }
+          $(assignmentcontainer.children(":first-child")).css({
+            "position":"absolute",
+            "opacity":"0",
+          })
+          $(assignmentcontainer).animate({height:"10px"},200,function() {
+            $(assignmentcontainer).remove();
+          });
+        }
+        // Use an ajax POST to avoid a page reload which will replay the starting animation
+        $.ajax({
+            type: "POST",
+            data: data,
+            success: success,
+            error: function(jqXHR, exception) {
+              if (jqXHR.status === 0) {
+                  alert('Failed to connect, try verifying your network');
+              } else if (jqXHR.status == 404) {
+                  alert('Requested page not found, try again');
+              } else if (jqXHR.status == 500) {
+                  alert('Internal Server Error. Please contact me if you see this')
+              } else if (exception === 'parsererror') {
+                  alert('Requested JSON parse failed');
+              } else if (exception === 'timeout') {
+                  alert('Time out error');
+              } else if (exception === 'abort') {
+                  alert('Request aborted');
+              } else {
+                  alert('Uncaught Error, \n' + jqXHR.responseText+"\nPlease contact me if you see this");
+              }
+            }
+        });
+    } else {
+      return false;
     }
   });
+});
 </script>
 
 <script>
-  $(function() {
-    $('.deletebutton').click(function() {
-      if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
-
-          // Data sent to server pointing to which assignment to delete
-          const val = $(this).val();
-          const name = $(this).attr('name');
-          let data = {
-            'csrfmiddlewaretoken': '{{ csrf_token }}',
-          }
-          data[name] = val;
-
-          const assignmentcontainer = $(this).parent().parent().parent();
-          const success = function() {
-            // If the data was successfully sent, play the delete assignment animation
-            $(assignmentcontainer).css({
-              // CSS doesn't allow transitions without presetting the property
-              // So, use JQuery to set it's property and animate
-              "height":$(assignmentcontainer).height()+20+"px",
-
-              "margin-bottom":"-10px",
-              "min-height":"0px",
-            });
-            if (!assignmentcontainer.is(':first-child')) {
-              $(assignmentcontainer).css("margin-top","-10px");
-            }
-            $(assignmentcontainer.children(":first-child")).css({
-              "position":"absolute",
-              "opacity":"0",
-            })
-            $(assignmentcontainer).animate({height:"10px"},200,function() {
-              $(assignmentcontainer).remove();
-            });
-          }
-          // Use an ajax POST to avoid a page reload which will replay the starting animation
-          $.ajax({
-              type: "POST",
-              data: data,
-              success: success,
-              error: function(jqXHR, exception) {
-                if (jqXHR.status === 0) {
-                    alert('Failed to connect, try verifying your network');
-                } else if (jqXHR.status == 404) {
-                    alert('Requested page not found, try again');
-                } else if (jqXHR.status == 500) {
-                    alert('Internal Server Error. Please contact me if you see this')
-                } else if (exception === 'parsererror') {
-                    alert('Requested JSON parse failed');
-                } else if (exception === 'timeout') {
-                    alert('Time out error');
-                } else if (exception === 'abort') {
-                    alert('Request aborted');
-                } else {
-                    alert('Uncaught Error, \n' + jqXHR.responseText+"\nPlease contact me if you see this");
-                }
-              }
-          });
-      } else {
-        return false;
-      }
-    });
-  });
-</script>
-
-<script>
+{% comment %} Handles the entire graph {% endcomment %}
 $(function() {
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
@@ -587,7 +606,6 @@ $(function() {
             screen.scale(scale,scale);
             screen.clearRect(0, 0, width, height);
             pset(x2,y2);
-            console.log(skew_ratio);
             let radius = wCon/3; // calculates circle radius
             if (radius > 3) {
                 radius = 3;
@@ -774,6 +792,7 @@ $(function() {
 
 
 {% block body %}
+
 <div class="headerfooter header animate">
   <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
     <div id="imagenewcontainer">
@@ -794,22 +813,22 @@ $(function() {
         <div class="assignmentcontainer">
           <div class="assignment" tabindex="0">
             <div class="assignmentheader">
-              <span id="title">
+              <span class="title">
                 <span>{{ obj.title }}</span>
-                <p id="daysleft">1d</p>
+                <p class="daysleft">1d</p>
               </span>
               <svg width="30px" height="20px" class="arrowcontainer">
                 <polygon class="arrow" points="5,0 5,20 15,10">
                   <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
-                  <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
+                  <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10">
                 </polygon>
               </svg>
               <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-              <a class="button" id="updatebutton" href="{% url 'list' obj.pk%}">
-                <img height="20" src="{% static 'edit.png' %}" alt="delete" id="updatebuttonimage" draggable="false"/>
+              <a class="button updatebutton" href="{% url 'list' obj.pk%}">
+                <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
               </a>
               <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
-                <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
+                <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
               </button>
             </div>
             <div class="graphcontainer">
@@ -826,4 +845,5 @@ $(function() {
 </div>
 
 <div class="headerfooter footer animate"></div>
+
 {% endblock %}
