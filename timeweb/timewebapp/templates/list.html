@@ -50,6 +50,18 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
+#info {
+  font-family:"Open Sans";
+  font-size:17px;
+  margin:10px 0 0 10px;
+}
+#hidebutton {
+  position:relative;
+  left:1px;
+  bottom:0.65px;
+  font-family:"Open Sans";
+}
 .assignmentcontainer {
   min-height:40px;
   min-width:720px;
@@ -138,6 +150,12 @@
   bottom:0px;
   margin:auto;
 }
+.button:hover, .button:focus {
+  background: radial-gradient(circle, white 35%, gray 100%);
+}
+.button:active {
+  background: radial-gradient(circle, white 55%, gray 100%);
+}
 .updatebutton {
   right:30px;
   height:30px;
@@ -156,12 +174,6 @@
 .deletebuttonimage {
   top:1px;
   position:relative;
-}
-.button:hover, .button:focus {
-  background: radial-gradient(circle, white 35%, gray 100%);
-}
-.button:active {
-  background: radial-gradient(circle, white 55%, gray 100%);
 }
 
 .graphcontainer {
@@ -197,29 +209,26 @@ canvas {
 
 {% block js %}
 <script>
-{% comment %} Doesn't allow the user to go back and load deleted assignments {% endcomment %}
+// Doesn't allow the user to go back and load deleted assignments to avoid a 404
 window.addEventListener('popstate', function() {
     history.pushState(null, null, document.URL);
 }());
 </script>
 
 <script>
-{% comment %} Handles starting animation {% endcomment %}
+// Starting animation
 $(function() {
   $(".animate").removeClass("animate");
 
-  const content = document.getElementById("content");
-  function removeanimation() {
-    content.style.transition = 'none';
-    content.removeEventListener('transitionend',removeanimation);
-  }
-  content.addEventListener('transitionend',removeanimation);
+  setTimeout(function() {
+    document.getElementById('content').style.transition = 'none';
+  }, 1300); // 50ms extra delay
 });
 </script>
 
 <script>
-{% comment %} Keybinds {% endcomment %}
-$(document).keypress(function(e){
+// Keybinds
+$(document).keypress(function(e) {
   if (e.shiftKey && e.key == 'N') {
     window.location.replace("{% url 'new' %}");
   } else if (e.key == "Enter" && !$(document.activeElement).hasClass('button')) {
@@ -229,10 +238,11 @@ $(document).keypress(function(e){
 </script>
 
 <script>
-{% comment %} Handles delete button {% endcomment %}
+// Delete button
 $(function() {
+  candelete = true;
   $('.deletebutton').click(function() {
-    if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
+    if (candelete && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
         // Data sent to server pointing to which assignment to delete
         const val = $(this).val();
@@ -243,8 +253,13 @@ $(function() {
         data[name] = val;
 
         const assignmentcontainer = $(this).parent().parent().parent();
+
+        // If the data was successfully sent, delete the assignment
         const success = function() {
-          // If the data was successfully sent, play the delete assignment animation
+          // Disables buttons
+          assignmentcontainer.find(".updatebutton").removeAttr("href");
+          candelete = false;
+          
           $(assignmentcontainer).css({
             // CSS doesn't allow transitions without presetting the property
             // So, use JQuery to set it's property and animate
@@ -253,7 +268,7 @@ $(function() {
             "margin-bottom":"-10px",
             "min-height":"0px",
           });
-          if (!assignmentcontainer.is(':first-child')) {
+          if (!assignmentcontainer.is(':nth-child(2)')) {
             $(assignmentcontainer).css("margin-top","-10px");
           }
           $(assignmentcontainer.children(":first-child")).css({
@@ -271,19 +286,19 @@ $(function() {
             success: success,
             error: function(jqXHR, exception) {
               if (jqXHR.status === 0) {
-                  alert('Failed to connect, try verifying your network');
+                  alert('Failed to connect');
               } else if (jqXHR.status == 404) {
                   alert('Requested page not found, try again');
               } else if (jqXHR.status == 500) {
-                  alert('Internal Server Error. Please contact me if you see this')
+                  alert('Internal server error. Please contact me if you see this')
               } else if (exception === 'parsererror') {
                   alert('Requested JSON parse failed');
               } else if (exception === 'timeout') {
-                  alert('Time out error');
+                  alert('Timeout error');
               } else if (exception === 'abort') {
                   alert('Request aborted');
               } else {
-                  alert('Uncaught Error, \n' + jqXHR.responseText+"\nPlease contact me if you see this");
+                  alert('Uncaught Error, \n' + jqXHR.responseText + "\nPlease contact me if you see this");
               }
             }
         });
@@ -295,7 +310,16 @@ $(function() {
 </script>
 
 <script>
-{% comment %} Handles the entire graph {% endcomment %}
+$(function() {
+  $("#hidebutton").click(function() {
+    $(this.previousSibling).toggle();
+    this.innerHTML = this.innerHTML === 'Hide' ? 'Show' : 'Hide';
+  });
+});
+</script>
+
+<script>
+// Entire graph
 $(function() {
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
@@ -311,7 +335,6 @@ $(function() {
         graphcontainer.attr("style","display:block");
         assignment.find(".risingarrowanimation").get(0).beginElement();
 
-        // If you have been added by me, please visit my github for an explanation of each part of this code
         var graph = this.querySelector('.graph');
         var fixed_graph = this.querySelector('.fixed-graph');
         var scale = window.devicePixelRatio;
@@ -593,9 +616,9 @@ $(function() {
             draw(x2,y2);
         }
         // stop set skew ratio if canvas is clicked
-        $(graph).click(function() { 
-            graph.removeEventListener("mousemove",mousemove); 
-        });
+        graph.onclick = function() {
+          graph.removeEventListener("mousemove",mousemove); 
+        }
         
         // enabled set skew ratio if button is pressed
         this.querySelector(".set-skew-ratio-button").onclick = function() { 
@@ -788,6 +811,7 @@ $(function() {
   });
 });
 </script>
+
 {% endblock %}
 
 
@@ -809,6 +833,7 @@ $(function() {
 
 <div id="content" class="animate">
   <div id="assignmentscontainer" class="animate">
+    <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hidebutton">Hide</button></div>
     {% for obj in objlist %}
         <div class="assignmentcontainer">
           <div class="assignment" tabindex="0">
@@ -820,7 +845,7 @@ $(function() {
               <svg width="30px" height="20px" class="arrowcontainer">
                 <polygon class="arrow" points="5,0 5,20 15,10">
                   <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
-                  <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10">
+                  <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
                 </polygon>
               </svg>
               <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
