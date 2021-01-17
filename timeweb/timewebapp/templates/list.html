@@ -5,8 +5,11 @@
 .header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
 }
-.footer, #content {
+.footer {
   transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
+}
+#content {
+  transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
 }
 .header.animate {
   transform:translateY(-70px);
@@ -16,7 +19,7 @@
   transform:translateY(-70px);
 }
 #content.animate {
-  border-width:0px;
+  border-width:0;
   height:115vh;
   transform:translateY(-70px);
 }
@@ -39,7 +42,7 @@
 #newassignmenttext {
   position:absolute;
   left:75px;
-  top:0px;
+  top:0;
   color:white;
   font-size:20px;
   font-family:"Open Sans";
@@ -69,7 +72,7 @@
   overflow:visible !important;
 }
 .assignment {
-  box-shadow: 0px 0px 4px rgba(52,52,52,0.5); 
+  box-shadow: 0 0 4px rgba(52,52,52,0.5); 
   background:white;//rgba(233,68,46,0.5);
   margin:10px;
   padding:15px;
@@ -77,12 +80,12 @@
   border-radius:5px;
   position:relative;
   width:calc(100% - 54px);
-  min-height:0px;
+  min-height:0;
 }
 .assignment:focus, .button:focus {
   outline:0;
   border:2px solid rgb(0,95,204) !important;
-  box-shadow: 0px 0px 4px rgba(0,95,204,0.5); 
+  box-shadow: 0 0 4px rgba(0,95,204,0.5); 
 }
 .assignment.disablehover {
   display:block;
@@ -93,13 +96,13 @@
   transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0.1s ease-out;
 }
 .assignment:not(.disablehover):hover:focus {
-  box-shadow: 0px 0px 7px rgba(0,95,204,0.7) !important; 
+  box-shadow: 0 0 7px rgba(0,95,204,0.7) !important; 
 }
 .assignment:not(.disablehover):hover {
-  transform:scale(1.05) translateX(2%);
-  width:calc(96.1% - 55px);
+  transform: scale(1.05) translateX(2%);
+  width: calc(96.1% - 55px);
   border-color: rgba(0,0,0,0.7);
-  box-shadow: 0px 0px 7px rgba(52,52,52,0.7); 
+  box-shadow: 0 0 7px rgba(52,52,52,0.7); 
 }
 .assignment:not(.disablehover):hover .title span {
   opacity:0;
@@ -123,13 +126,17 @@
   font-family:"Open Sans";
   overflow-wrap:break-word;
 }
+.importance {
+  position:absolute;
+  font-size:0.7em;
+  font-family:"Open Sans";
+  margin-top:calc(-1em - 1px);
+}
 .daysleft {
   position:absolute;
   font-size:0.7em;
   font-family:"Open Sans";
-  text-decoration:none;
   margin-top:-2px;
-  color:black;
 }
 .arrowcontainer {
   float:left;
@@ -146,8 +153,8 @@
   background: radial-gradient(circle, lightgray 40%, gray 100%);
   border:2px solid gray;
   border-radius:50%;
-  top:0px;
-  bottom:0px;
+  top:0;
+  bottom:0;
   margin:auto;
 }
 .button:hover, .button:focus {
@@ -182,7 +189,7 @@
   display:none;
 }
 canvas {
-  padding:0px;
+  padding:0;
   border-radius:12px;
   height:clamp(200px,65vh,400px);
   width:calc(100% - 34px);
@@ -240,9 +247,12 @@ $(document).keypress(function(e) {
 <script>
 // Delete button
 $(function() {
-  candelete = true;
+  if (document.getElementsByClassName("importance").length !== 1) {
+    $(".importance:first").html("Most Important");
+    $(".importance:last").html("Least Important");
+  }
   $('.deletebutton').click(function() {
-    if (candelete && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
+    if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
         // Data sent to server pointing to which assignment to delete
         const val = $(this).val();
@@ -256,9 +266,6 @@ $(function() {
 
         // If the data was successfully sent, delete the assignment
         const success = function() {
-          // Disables buttons
-          assignmentcontainer.find(".updatebutton").removeAttr("href");
-          candelete = false;
           
           $(assignmentcontainer).css({
             // CSS doesn't allow transitions without presetting the property
@@ -277,6 +284,10 @@ $(function() {
           })
           $(assignmentcontainer).animate({height:"10px"},200,function() {
             $(assignmentcontainer).remove();
+            if (document.getElementsByClassName("importance").length === 1) {
+              $(".importance:first").empty();
+              $(".importance:last").empty();
+            }
           });
         }
         // Use an ajax POST to avoid a page reload which will replay the starting animation
@@ -310,6 +321,7 @@ $(function() {
 </script>
 
 <script>
+// Hide and show estimated completion time
 $(function() {
   $("#hidebutton").click(function() {
     $(this.previousSibling).toggle();
@@ -342,8 +354,8 @@ $(function() {
         var skew_ratio = 1.5;
         var funct_round = 1;
         var min_work_time = 2;
-        var x = 24;
-        var y = 20;
+        var x = 50;
+        var y = 50;
         var red_line_start_x = 0;
         var red_line_start_y = 0;
         var nwd = [];
@@ -356,7 +368,6 @@ $(function() {
 
         var mods;
         var skew_ratio_lim = 10000;
-
         var len_works = works.length;
         var draw_point = false;
         var remainder_mode = false;
@@ -382,8 +393,9 @@ $(function() {
             drawfixed();
             draw();
           }
-        };
+        }
         resize();
+        setTimeout(resize,200); // calling getBoundingClientRect() immediately returns the scaleY(1.02) height and width
         if (!not_first_click) {
           $(window).resize(resize);
         }
@@ -778,7 +790,6 @@ $(function() {
                     }                      
                 }
             }
-            // redo this and make it so that the numbers show up on the small_y_axis_scale
             screen.fillStyle = "rgb(205,205,205)";
             for (let bigger_index = Math.ceil(x - x % x_axis_scale);bigger_index>0;bigger_index-=x_axis_scale) {
                 screen.fillRect(bigger_index*wCon+47.5,0,5,height-50);
@@ -835,36 +846,37 @@ $(function() {
   <div id="assignmentscontainer" class="animate">
     <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hidebutton">Hide</button></div>
     {% for obj in objlist %}
-        <div class="assignmentcontainer">
-          <div class="assignment" tabindex="0">
-            <div class="assignmentheader">
-              <span class="title">
-                <span>{{ obj.title }}</span>
-                <p class="daysleft">1d</p>
-              </span>
-              <svg width="30px" height="20px" class="arrowcontainer">
-                <polygon class="arrow" points="5,0 5,20 15,10">
-                  <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
-                  <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
-                </polygon>
-              </svg>
-              <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-              <a class="button updatebutton" href="{% url 'list' obj.pk%}">
-                <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
-              </a>
-              <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
-                <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
-              </button>
-            </div>
-            <div class="graphcontainer">
-              <canvas class="fixed-graph"></canvas>
-              <canvas class="graph">Your browser does not support the canvas tag.</canvas>
-              <button class="set-skew-ratio-button">Set skew ratio</button>
-              <div class="graphfooter">
-              </div>
+      <div class="assignmentcontainer">
+        <div class="assignment" tabindex="0">
+          <div class="assignmentheader">
+            <span class="title">
+              <p class="importance"></p>
+              <span>{{ obj.title }}</span>
+              <p class="daysleft">1d</p>
+            </span>
+            <svg width="30px" height="20px" class="arrowcontainer">
+              <polygon class="arrow" points="5,0 5,20 15,10">
+                <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
+                <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
+              </polygon>
+            </svg>
+            <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+            <a class="button updatebutton" href="{% url 'list' obj.pk%}">
+              <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
+            </a>
+            <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
+              <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
+            </button>
+          </div>
+          <div class="graphcontainer">
+            <canvas class="fixed-graph"></canvas>
+            <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+            <button class="set-skew-ratio-button">Set skew ratio</button>
+            <div class="graphfooter">
             </div>
           </div>
         </div>
+      </div>
     {% endfor %}
   </div>
 </div>
