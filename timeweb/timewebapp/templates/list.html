@@ -2,20 +2,20 @@
 {% load static %}
 
 {% block css %}
-.header {
+#header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
 }
-.footer {
+#footer {
   transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
 }
 #content {
   transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
 }
-.header.animate {
+#header.animate {
   transform:translateY(-70px);
   height:80px;
 }
-.footer.animate {
+#footer.animate {
   transform:translateY(-70px);
 }
 #content.animate {
@@ -100,7 +100,7 @@
 }
 .assignment:not(.disablehover):hover {
   transform: scale(1.05) translateX(2%);
-  width: calc(96.1% - 55px);
+  width: calc(96.2% - 55px);
   border-color: rgba(0,0,0,0.7);
   box-shadow: 0 0 7px rgba(52,52,52,0.7); 
 }
@@ -130,7 +130,7 @@
   position:absolute;
   font-size:0.7em;
   font-family:"Open Sans";
-  margin-top:calc(-1em - 1px);
+  margin-top:calc(-1em - 2px);
 }
 .daysleft {
   position:absolute;
@@ -235,10 +235,10 @@ $(function() {
 
 <script>
 // Keybinds
-$(document).keypress(function(e) {
-  if (e.shiftKey && e.key == 'N') {
+$(document).keypress(function(event) {
+  if (event.shiftKey && event.key == 'N') {
     window.location.replace("{% url 'new' %}");
-  } else if (e.key == "Enter" && !$(document.activeElement).hasClass('button')) {
+  } else if (event.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON') {
     document.activeElement.click();
   }
 });
@@ -333,6 +333,12 @@ $(function() {
 <script>
 // Entire graph
 $(function() {
+  function PreventArrowScroll(event) {
+    // arrow keys
+    if ([37, 38, 39, 40].indexOf(event.keyCode) > -1) {
+        event.preventDefault();
+    }
+  }
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
       const assignment = $(this);
@@ -342,7 +348,17 @@ $(function() {
         assignment.removeClass("disablehover");
         graphcontainer.removeAttr("style");
         assignment.find(".fallingarrowanimation").get(0).beginElement();
+
+        // If no graphs are open, allow auto scroll
+        if (!document.getElementsByClassName("disablehover").length) {
+          window.removeEventListener("keydown", PreventArrowScroll, false);
+        }
       } else {
+        // Prevents auto scroll if a graph is open
+        if (!document.getElementsByClassName("disablehover").length) {
+          window.addEventListener("keydown", PreventArrowScroll, false);
+        }
+
         assignment.addClass("disablehover");
         graphcontainer.attr("style","display:block");
         assignment.find(".risingarrowanimation").get(0).beginElement();
@@ -351,11 +367,11 @@ $(function() {
         var fixed_graph = this.querySelector('.fixed-graph');
         var scale = window.devicePixelRatio;
 
-        var skew_ratio = 1.5;
+        var skew_ratio = 1;
         var funct_round = 1;
         var min_work_time = 2;
-        var x = 50;
-        var y = 50;
+        var x = 500000;
+        var y = 500000;
         var red_line_start_x = 0;
         var red_line_start_y = 0;
         var nwd = [];
@@ -366,8 +382,10 @@ $(function() {
         var dif_assign = 0;
         var works = [0,1,2];
 
+
         var mods;
         var skew_ratio_lim = 10000;
+
         var len_works = works.length;
         var draw_point = false;
         var remainder_mode = false;
@@ -395,9 +413,50 @@ $(function() {
           }
         }
         resize();
-        setTimeout(resize,200); // calling getBoundingClientRect() immediately returns the scaleY(1.02) height and width
+        setTimeout(resize,250); // calling getBoundingClientRect() immediately returns the scaleY(1.02) height and width, add 50ms delay
         if (!not_first_click) {
+          
+          // Sets event handlers only on the assignment's first click
           $(window).resize(resize);
+
+          let abort;
+          let fired = false;
+          let graphinterval;
+          let whichkey;
+          function ChangeSkewRatio() {
+            if (whichkey) {
+              skew_ratio -= 0.1;
+            } else {
+              skew_ratio += 0.1;
+            }
+            //skew_ratio = Math.round(skew_ratio*10)/10;
+            draw();
+            console.log(skew_ratio);
+          }
+          $(document).keydown(function(event) {
+            const rect = fixed_graph.getBoundingClientRect();
+            if (rect.bottom - rect.height / 3 > 70 && rect.y + rect.height / 3 < document.getElementById("footer").getBoundingClientRect().y /* Originally window.innerHeight - (window.innerHeight - footer.y) */ && !fired) {
+              fired = true;
+              if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                whichkey = event.key === "ArrowDown";
+                ChangeSkewRatio()
+                abort = false;
+                setTimeout(function() {
+                  if (!abort) {
+                    clearInterval(graphinterval);
+                    graphinterval = setInterval(ChangeSkewRatio,13); // Draws every frame
+                  }
+                },500);
+              }
+            }
+          });
+          $(document).keyup(function(event) {
+            fired = false;
+            if ((event.key === "ArrowDown") === whichkey) {
+              abort = true;
+              clearInterval(graphinterval);
+            }
+          });
         }
         function pset(x2=NaN,y2=NaN) {
             try {
@@ -406,7 +465,7 @@ $(function() {
                 if (len_nwd) {
                     x1 -= Math.floor(x1/7) * len_nwd + mods[x1 % 7];
                 }
-                if (x2===NaN) {
+                if (isNaN(x2)) {
                     a = y1 * (1 - skew_ratio) / ((x1-1) * x1);
                     b = (y1 - x1 * x1 * a) / x1;
                 } else {
@@ -440,7 +499,7 @@ $(function() {
                             skew_ratio = 2 - skew_ratio_lim;
                         } else if (0.975 < skew_ratio && skew_ratio < 1.025) {
                             if (!x1) {
-                                throw "zerodivision";
+                                throw "zerodivision1";
                             }
                             skew_ratio = 1;
                             a = 0;
@@ -449,7 +508,7 @@ $(function() {
                     }
                 }
                 if (!Number.isFinite(a)) {
-                    throw "zerodivision";
+                    throw "zerodivision2";
                 }
             } catch {
                 a = 0;
@@ -828,7 +887,7 @@ $(function() {
 
 {% block body %}
 
-<div class="headerfooter header animate">
+<div class="headerfooter animate" id="header">
   <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
     <div id="imagenewcontainer">
       <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
@@ -881,6 +940,6 @@ $(function() {
   </div>
 </div>
 
-<div class="headerfooter footer animate"></div>
+<div class="headerfooter animate" id="footer"></div>
 
 {% endblock %}

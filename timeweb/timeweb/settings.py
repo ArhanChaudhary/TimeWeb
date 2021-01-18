@@ -24,7 +24,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-print(SECRET_KEY)
 # Application definition
 
 INSTALLED_APPS = [
