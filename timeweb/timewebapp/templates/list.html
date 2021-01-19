@@ -93,7 +93,7 @@
   transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
 }
 .assignment:not(.disablehover) {
-  transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0.1s ease-out;
+  transition:all .2s ease-in-out, opacity .1s ease-in-out;
 }
 .assignment:not(.disablehover):hover:focus {
   box-shadow: 0 0 7px rgba(0,95,204,0.7) !important; 
@@ -197,6 +197,9 @@ canvas {
   max-height:400px;
   margin:5px;
 }
+canvas:focus {
+  box-shadow: 0 0 7px rgba(52,52,52,0.7);
+}
 .fixed-graph {
   border:4px solid rgba(0,0,0,0.35);
   {% comment %} rgb(178,178,178) {% endcomment %}
@@ -237,6 +240,7 @@ $(window).load(function() {
 <script>
 // Keybinds
 $(document).keypress(function(event) {
+  console.log(document.activeElement);
   if (event.shiftKey && event.key == 'N') {
     window.location.replace("{% url 'new' %}");
   } else if (event.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON') {
@@ -373,22 +377,7 @@ $(function() {
 
         let selected_assignment = dat[[].indexOf.call(this.parentNode.parentNode.children, this.parentNode)];
         var [file_sel,ad,x,y,works,dif_assign,skew_ratio,ctime,funct_round,nwd,fixed_mode,dynamic_start,unit,total_mode,remainder_mode,min_work_time] = selected_assignment;
-        var ad = new Date(ad);
-        /*funct_round = 1,
-        min_work_time = 2,
-        x = 50,
-        y = 50,
-        red_line_start_x = 0,
-        red_line_start_y = 0,
-        nwd = [],
-        ignore_ends = true,
-        ad = new Date(2021,1,14),
-        unit = "Minute",
-        ctime = 2,
-        dif_assign = 0,
-        works = [0,1,2],
-        skew_ratio = 1,
-        remainder_mode = false,*/
+        var ad = new Date(...ad); // This is not compatible with internet explorer!
 
         var mods,
         skew_ratio_lim = 10000,
@@ -428,7 +417,7 @@ $(function() {
           $(window).resize(resize);
 
           // Up and down arrow event handler
-          let abort, // Set to false on initial arrow keypress. if the user lets go of that key within 500ms, this is set to true and the interval is aborted
+          let graphtimeout, // Set to false on initial arrow keypress. if the user lets go of that key within 500ms, this is set to true and the interval is aborted
               fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
               graphinterval, // set the interval to a variable so it can be cleared
               whichkey // Determines if use is holding up or down arrow, improves AI
@@ -454,12 +443,9 @@ $(function() {
                 if (event.key === "ArrowUp" || event.key === "ArrowDown") {
                   whichkey = event.key;
                   ChangeSkewRatio()
-                  abort = false;
-                  setTimeout(function() {
-                    if (!abort) {
-                      clearInterval(graphinterval);
-                      graphinterval = setInterval(ChangeSkewRatio,13); // Draws every frame
-                    }
+                  graphtimeout = setTimeout(function() {
+                    clearInterval(graphinterval);
+                    graphinterval = setInterval(ChangeSkewRatio,13); // Draws every frame
                   },500);
                 }
               }
@@ -468,7 +454,7 @@ $(function() {
           $(document).keyup(function(event) {
             fired = false;
             if (event.key === whichkey) {
-              abort = true;
+              clearTimeout(graphtimeout);
               clearInterval(graphinterval);
             }
           });
@@ -902,27 +888,6 @@ $(function() {
               </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            {% comment %} tabindex not working here {% endcomment %}
             <a class="button updatebutton" href="{% url 'list' obj.pk%}">
               <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
             </a>
@@ -932,7 +897,7 @@ $(function() {
           </div>
           <div class="graphcontainer">
             <canvas class="fixed-graph"></canvas>
-            <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+            <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
             <button class="set-skew-ratio-button">Set skew ratio</button>
             <div class="graphfooter">
             </div>

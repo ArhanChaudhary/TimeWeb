@@ -7,7 +7,7 @@ from django.db import models
 class TimewebModel(models.Model):
     # fields of the model
     title = models.CharField(max_length=200,blank=True)
-    description = models.TextField(blank=True)
+    description = models.CharField(max_length=200,blank=True)
 
     # renames the instances of the model
     # with their title name

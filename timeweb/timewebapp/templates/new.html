@@ -1,20 +1,26 @@
-<html>
+{% extends "template.html" %}
 
-    <head>
-    
-    </head>
-
-    <body>
-        <div>
-            <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" name="Submitbutton">{{submit}}</button>
-                <p>
-                    <a href="{% url 'home' %}">Back to assignment view</a>
-                </p>
-            </form>
-        </div>
-    </body>
-
-</html>
+{% block css %}
+.field {
+    width(100% - 50px);
+    margin:5px;
+}
+{% endblock %}
+{% block body %}
+    <div class="headerfooter animate" id="header">
+        <a href="{% url 'home' %}" id="logo">
+            <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
+        </a>
+    </div>
+    <div id="content" class="animate">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" name="Submitbutton">{{submit}}</button>
+            <p>
+                <a href="{% url 'home' %}">Back to assignment view</a>
+            </p>
+        </form>
+    </div>
+    <div class="headerfooter animate" id="footer"></div>
+{% endblock %}
