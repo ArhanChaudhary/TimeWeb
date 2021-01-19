@@ -339,7 +339,7 @@ $(function() {
 // Entire graph
 $(function() {
   let dat = JSON.parse(document.getElementById("load-data").textContent);
-  let [date_last_closed,warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,display_instructions,autofill,ignore_ends,dark_mode,show_progress_bar,show_past,last_opened_backup,hourly_backup,daily_backup,weekly_backup] = dat[0]
+  let [date_last_closed,warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,display_instructions,autofill,ignore_ends,dark_mode,show_progress_bar,show_past] = dat[0]
   function PreventArrowScroll(event) {
     // arrow keys
     if ([37, 38, 39, 40].indexOf(event.keyCode) > -1) {
@@ -376,10 +376,10 @@ $(function() {
         scale = window.devicePixelRatio;
 
         let selected_assignment = dat[[].indexOf.call(this.parentNode.parentNode.children, this.parentNode)];
-        var [file_sel,ad,x,y,works,dif_assign,skew_ratio,ctime,funct_round,nwd,fixed_mode,dynamic_start,unit,total_mode,remainder_mode,min_work_time] = selected_assignment;
-        var ad = new Date(...ad); // This is not compatible with internet explorer!
+        var [file_sel,ad,x,y,works,dif_assign,skew_ratio,ctime,funct_round,nwd,fixed_mode,dynamic_start,unit,total_mode,remainder_mode,min_work_time] = selected_assignment,
+        ad = new Date(...ad), // This is not compatible with internet explorer!
 
-        var mods,
+        mods,
         skew_ratio_lim = 10000,
 
         red_line_start_x = fixed_mode ? 0 : dynamic_start,
@@ -392,6 +392,19 @@ $(function() {
         len_nwd = nwd.length,
         set_skew_ratio = false,
         min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time/funct_round)*funct_round : funct_round;
+        function set_mod_days() {
+          const xday = assign_day_of_week + red_line_start_x;
+          mods = [0];
+          let mod_counter = 0;
+          for (let mod_day = 0; mod_day < 6; mod_day++) {
+            if (nwd.includes((xday + mod_day) % 7)) {
+              mod_counter++;
+            }
+            mods.push(mod_counter);
+          }
+        }
+        set_mod_days();
+        console.log(mods);
         function resize() {
           if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
             width = fixed_graph.getBoundingClientRect().width;
@@ -471,7 +484,7 @@ $(function() {
 
         function pset(x2=NaN,y2=NaN) {
             try {
-                var x1 = len_nwd ? Math.floor(x - red_line_start_x) - Math.floor(x1/7) * len_nwd - mods[x1 % 7] : Math.floor(x - red_line_start_x);
+                var x1 = len_nwd ? Math.floor(x - red_line_start_x) - Math.floor(x/7) * len_nwd - mods[x % 7] : Math.floor(x - red_line_start_x);
                 var y1 = y - red_line_start_y;
                 if (isNaN(x2)) {
                     a = y1 * (1 - skew_ratio) / ((x1-1) * x1);
@@ -518,7 +531,8 @@ $(function() {
                 if (!Number.isFinite(a)) {
                     throw "zerodivision2";
                 }
-            } catch {
+            } catch(err) {
+                console.log(err,x1);
                 a = 0;
                 b = y1;
                 x1 ? return_y_cutoff = 0 : return_y_cutoff = -1;
