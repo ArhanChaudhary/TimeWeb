@@ -2,6 +2,9 @@
 {% load static %}
 
 {% block css %}
+.relativepositioningwrapper {
+  position:relative;
+}
 #header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
 }
@@ -39,6 +42,18 @@
   height:60px;
   width:70px;
 }
+#imagesettings {
+  position:absolute;
+}
+#imagesettingscontainer {
+  position:absolute;
+  height:60px;
+  width:70px;
+  right:0px;
+}
+#imagesettingscontainer:hover {
+  cursor:pointer;
+}
 #newassignmenttext {
   position:absolute;
   left:75px;
@@ -73,7 +88,7 @@
 }
 .assignment {
   box-shadow: 0 0 4px rgba(52,52,52,0.5); 
-  background:white;//rgba(233,68,46,0.5);
+  background:rgb(214,141,132);
   margin:10px;
   padding:15px;
   border:2px solid gray;
@@ -100,9 +115,10 @@
 }
 .assignment:not(.disablehover):hover {
   transform: scale(1.05) translateX(2%);
-  width: calc(96.2% - 55px);
+  width: calc(96.1% - 55px);
   border-color: rgba(0,0,0,0.7);
-  box-shadow: 0 0 7px rgba(52,52,52,0.7); 
+  box-shadow: 0 0 7px rgba(52,52,52,0.7);
+  cursor:pointer;
 }
 .assignment:not(.disablehover):hover .title span {
   opacity:0;
@@ -181,6 +197,8 @@
 .deletebuttonimage {
   top:1px;
   position:relative;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 .graphcontainer {
@@ -198,11 +216,11 @@ canvas {
   margin:5px;
 }
 canvas:focus {
-  box-shadow: 0 0 7px rgba(52,52,52,0.7);
+  box-shadow: 0 0 0 2px rgb(0,95,204), 0 0 5px 2px rgb(0,95,204);
+  outline:0;
 }
 .fixed-graph {
-  border:4px solid rgba(0,0,0,0.35);
-  {% comment %} rgb(178,178,178) {% endcomment %}
+  border:4px solid rgba(108,108,108,.75); {% comment %} rgb(178,178,178) {% endcomment %}
   margin-left:13px;
   position:absolute;
 }
@@ -230,17 +248,15 @@ window.addEventListener('popstate', function() {
 // Starting animation
 $(window).load(function() {
   // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
+  
+  $("#footer").one("transitionend",() => document.getElementById('content').style.transition = 'none');
   $(".animate").removeClass("animate");
-  setTimeout(() => {
-    document.getElementById('content').style.transition = 'none';
-  }, 1300); // 50ms extra delay
 });
 </script>
 
 <script>
 // Keybinds
 $(document).keypress(function(event) {
-  console.log(document.activeElement);
   if (event.shiftKey && event.key == 'N') {
     window.location.replace("{% url 'new' %}");
   } else if (event.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON') {
@@ -253,8 +269,8 @@ $(document).keypress(function(event) {
 // Delete button
 $(function() {
   if (document.getElementsByClassName("importance").length !== 1) {
-    $(".importance:first").html("Most Important");
-    $(".importance:last").html("Least Important");
+    $(".title:first").prepend('<p class="importance">Most Important</p>');
+    $(".title:last").prepend('<p class="importance">Least Important</p>');
   }
   $('.deletebutton').click(function() {
     if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
@@ -314,7 +330,7 @@ $(function() {
               } else if (exception === 'abort') {
                   alert('Request aborted');
               } else {
-                  alert('Uncaught Error, \n' + jqXHR.responseText + "\nPlease contact me if you see this");
+                  alert('Uncaught Error, \n' + jqXHR.responseText);
               }
             }
         });
@@ -342,7 +358,7 @@ $(function() {
   let [date_last_closed,warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,display_instructions,autofill,ignore_ends,dark_mode,show_progress_bar,show_past] = dat[0]
   function PreventArrowScroll(event) {
     // arrow keys
-    if ([37, 38, 39, 40].indexOf(event.keyCode) > -1) {
+    if ([37, 38, 39, 40].includes(event.keyCode)) {
         event.preventDefault();
     }
   }
@@ -350,12 +366,17 @@ $(function() {
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
       assignment = $(this);
-      const graphcontainer = assignment.children(":nth-child(2)");
+      const graphcontainer = assignment.find(".graphcontainer");
       const not_first_click = assignment.data('not_first_click');
       if (graphcontainer.attr("style")) {
         assignment.removeClass("disablehover");
-        graphcontainer.removeAttr("style");
-        assignment.find(".fallingarrowanimation").get(0).beginElement();
+        assignment.one("transitionend",function() {
+          assignment.removeAttr("style");
+          graphcontainer.removeAttr("style");
+        });
+        assignment.attr("style","overflow:hidden");
+        graphcontainer.attr("style","position:absolute;display:block");
+        assignment.find(".fallingarrowanimation").get(0).beginElement(); // Maybe make find more efficient
 
         // If no graphs are open, allow auto scroll
         if (!document.getElementsByClassName("disablehover").length) {
@@ -404,11 +425,14 @@ $(function() {
           }
         }
         set_mod_days();
-        console.log(mods);
-        function resize() {
+        function resize(reversescale) {
+          console.log(reversescale);
           if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
-            width = fixed_graph.getBoundingClientRect().width;
-            height = fixed_graph.getBoundingClientRect().height;
+            ({width, height} = fixed_graph.getBoundingClientRect());
+            if (reversescale) {
+              width /= 1.01; 
+              height /= 1.05;
+            }
             graph.width = width * scale;
             graph.height = height * scale;
             fixed_graph.width = width * scale;
@@ -420,20 +444,20 @@ $(function() {
           }
         }
 
-        resize();
-        setTimeout(resize,250); // calling getBoundingClientRect() immediately returns the scaleY(1.02) height and width, add 50ms delay
+        resize(true);
+        assignment.one("transitionend",() => resize(false)); // calling getBoundingClientRect() immediately returns the scale(1.05) height and width
         
         // Sets event handlers only on the assignment's first click
         if (!not_first_click) {
           
           // Graph resize event handler
-          $(window).resize(resize);
+          $(window).resize(() => resize(false));
 
           // Up and down arrow event handler
-          let graphtimeout, // Set to false on initial arrow keypress. if the user lets go of that key within 500ms, this is set to true and the interval is aborted
+          let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
               fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
               graphinterval, // set the interval to a variable so it can be cleared
-              whichkey // Determines if use is holding up or down arrow, improves AI
+              whichkey // Determines if the user is holding up or down arrow
           function ChangeSkewRatio() {
 
             // I have no idea why, but for some reason skew_ratio in this scope isn't redefined when skew_ratio in the global environment changes
@@ -446,6 +470,7 @@ $(function() {
               skew_ratio = 2 - skew_ratio;
             }
             selected_assignment[6] = skew_ratio;
+            console.log(skew_ratio);
             draw();
           }
           $(document).keydown(function(event) {
@@ -484,7 +509,7 @@ $(function() {
 
         function pset(x2=NaN,y2=NaN) {
             try {
-                var x1 = len_nwd ? Math.floor(x - red_line_start_x) - Math.floor(x/7) * len_nwd - mods[x % 7] : Math.floor(x - red_line_start_x);
+                var x1 = len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] : x - red_line_start_x;
                 var y1 = y - red_line_start_y;
                 if (isNaN(x2)) {
                     a = y1 * (1 - skew_ratio) / ((x1-1) * x1);
@@ -496,8 +521,8 @@ $(function() {
                         skew_ratio = skew_ratio_lim;
                         throw "definevars";
                     }
-                    var floorx2 = Math.floor(x2);
                     if (len_nwd) {
+                        let floorx2 = Math.floor(x2);
                         if (nwd.includes((assign_day_of_week + floorx2 + red_line_start_x) % 7)) {
                             x2 = floorx2;
                         }
@@ -526,22 +551,30 @@ $(function() {
                             a = 0;
                             b = y1/x1;
                         }
+                        console.log(skew_ratio);
                     }
                 }
                 if (!Number.isFinite(a)) {
                     throw "zerodivision2";
                 }
             } catch(err) {
-                console.log(err,x1);
                 a = 0;
                 b = y1;
-                x1 ? return_y_cutoff = 0 : return_y_cutoff = -1;
+                return_y_cutoff = x1 ? 0 : -1;
                 return_0_cutoff = 1;
                 cutoff_transition_value = 0;
                 return;
             }
-            var funct_zero = a <= 0 || a * b > 0 ? 0 : -b/a;
-            var funct_y = a >= 0 ? x1 : ((Math.sqrt(b*b+4*a*y1)-b)/a/2).toFixed(10);
+            if (a <= 0 || a * b > 0) {
+                var funct_zero = 0;
+            } else {
+                var funct_zero = -b/a;
+            }
+            if (a >= 0) {
+                var funct_y = x1;
+            } else {
+                var funct_y = ((Math.sqrt(b*b+4*a*y1)-b)/a/2).toFixed(10);
+            }
             
             if (funct_round < min_work_time) {
                 cutoff_transition_value = 0;
@@ -559,7 +592,11 @@ $(function() {
                                 var prev_output = output;
                             }
                         }
-                        cutoff_transition_value = output - prev_output ? min_work_time_funct_round - output + prev_output : 0;
+                        if (output - prev_output) {
+                            cutoff_transition_value = min_work_time_funct_round - output + prev_output;
+                        } else {
+                            cutoff_transition_value = 0;
+                        }
                     } else {
                         cutoff_transition_value = 0;
                     }
@@ -870,9 +907,12 @@ $(function() {
 {% block body %}
 
 <div class="headerfooter animate" id="header">
+  <div id="imagesettingscontainer">
+    <img height="60" id="imagesettings" src="{% static 'settings.png' %}" alt="settings"/>
+  </div>
   <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
     <div id="imagenewcontainer">
-      <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"></img>
+      <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"/>
     </div>
     <div id="newassignmenttextcontainer">
       <p id="newassignmenttext">New Assignment</p>
@@ -891,7 +931,6 @@ $(function() {
         <div class="assignment" tabindex="0">
           <div class="assignmentheader">
             <span class="title">
-              <p class="importance"></p>
               <span>{{ obj.title }}</span>
               <p class="daysleft">1d</p>
             </span>
@@ -909,11 +948,13 @@ $(function() {
               <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
             </button>
           </div>
-          <div class="graphcontainer">
-            <canvas class="fixed-graph"></canvas>
-            <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
-            <button class="set-skew-ratio-button">Set skew ratio</button>
-            <div class="graphfooter">
+          <div class="relativepositioningwrapper">
+            <div class="graphcontainer">
+              <canvas class="fixed-graph"></canvas>
+              <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
+              <button class="set-skew-ratio-button">Set skew ratio</button>
+              <div class="graphfooter">
+              </div>
             </div>
           </div>
         </div>
