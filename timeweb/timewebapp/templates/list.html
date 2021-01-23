@@ -87,8 +87,8 @@
   overflow:visible !important;
 }
 .assignment {
-  box-shadow: 0 0 4px rgba(52,52,52,0.5); 
-  background:rgb(214,141,132);
+  box-shadow: 0 0 4px rgba(52,52,52,0.5);
+  background:rgb(244,141,132);//rgb(132,200,65);
   margin:10px;
   padding:15px;
   border:2px solid gray;
@@ -365,7 +365,7 @@ $(function() {
 
   $(".assignment").click(function(event) {
     if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
-      assignment = $(this);
+      let assignment = $(this);
       const graphcontainer = assignment.find(".graphcontainer");
       const not_first_click = assignment.data('not_first_click');
       if (graphcontainer.attr("style")) {
@@ -396,7 +396,7 @@ $(function() {
         fixed_graph = this.querySelector('.fixed-graph'),
         scale = window.devicePixelRatio;
 
-        let selected_assignment = dat[[].indexOf.call(this.parentNode.parentNode.children, this.parentNode)];
+        let selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)];
         var [file_sel,ad,x,y,works,dif_assign,skew_ratio,ctime,funct_round,nwd,fixed_mode,dynamic_start,unit,total_mode,remainder_mode,min_work_time] = selected_assignment,
         ad = new Date(...ad), // This is not compatible with internet explorer!
 
@@ -413,6 +413,7 @@ $(function() {
         len_nwd = nwd.length,
         set_skew_ratio = false,
         min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time/funct_round)*funct_round : funct_round;
+
         function set_mod_days() {
           const xday = assign_day_of_week + red_line_start_x;
           mods = [0];
@@ -426,9 +427,10 @@ $(function() {
         }
         set_mod_days();
         function resize(reversescale) {
-          console.log(reversescale);
           if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
             ({width, height} = fixed_graph.getBoundingClientRect());
+
+            console.log(width,height);
             if (reversescale) {
               width /= 1.01; 
               height /= 1.05;
@@ -445,11 +447,10 @@ $(function() {
         }
 
         resize(true);
-        assignment.one("transitionend",() => resize(false)); // calling getBoundingClientRect() immediately returns the scale(1.05) height and width
-        
+        assignment.one("transitionend",function(event) {alert(1);console.log(event);resize(false)}); // calling getBoundingClientRect() returns the scale(1.05) height and width
         // Sets event handlers only on the assignment's first click
         if (!not_first_click) {
-          
+
           // Graph resize event handler
           $(window).resize(() => resize(false));
 
@@ -466,7 +467,7 @@ $(function() {
             skew_ratio = selected_assignment[6];
 
             skew_ratio = whichkey === "ArrowDown" ? (skew_ratio - 0.1).toFixed(1) : (+skew_ratio /* Force addition instead of concatination */ + 0.1).toFixed(1);
-            if (funct(1) === y && whichkey === "ArrowUp" || !funct(x-1) && whichkey === "ArrowDown") {
+            if (funct(1,false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] - 1 : x - red_line_start_x - 1,false) && whichkey === "ArrowDown") {
               skew_ratio = 2 - skew_ratio;
             }
             selected_assignment[6] = skew_ratio;
@@ -557,7 +558,7 @@ $(function() {
                 if (!Number.isFinite(a)) {
                     throw "zerodivision2";
                 }
-            } catch(err) {
+            } catch {
                 a = 0;
                 b = y1;
                 return_y_cutoff = x1 ? 0 : -1;
@@ -701,7 +702,11 @@ $(function() {
             }
             if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (n < cutoff_to_use_round))) {
                 var output = min_work_time_funct_round * Math.round(n*(a*n+b)/min_work_time_funct_round);
-                a < 0 ? output += cutoff_transition_value : output -= cutoff_transition_value;
+                if (a < 0) {
+                  output += cutoff_transition_value;
+                } else {
+                  output -= cutoff_transition_value;
+                }
             } else {
                 var output = funct_round * Math.round(n*(a*n+b)/funct_round);
             }
@@ -722,7 +727,6 @@ $(function() {
             screen.scale(scale,scale);
             screen.clearRect(0, 0, width, height);
             pset(x2,y2);
-            //console.log(skew_ratio);
             //console.trace()
             let radius = wCon/3; // calculates circle radius
             if (radius > 3) {
@@ -769,7 +773,6 @@ $(function() {
         }
 
         function drawfixed() {
-
             // bg gradient
             let screen = fixed_graph.getContext("2d");
             screen.scale(scale,scale);
@@ -792,12 +795,13 @@ $(function() {
 
             // y axis label
             screen.rotate(Math.PI/2);
-            screen.fillText(unit == "Minute" ? 'Minutes of Work' : unit + 's (' + format_minutes(ctime) + ') per ' + unit, (height-50)/2, -2);
+            screen.fillText(unit === "Minute" ? 'Minutes of Work' : unit + 's (' + format_minutes(ctime) + ') per ' + unit, (height-50)/2, -2);
             screen.rotate(-Math.PI/2);
 
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
             let x_axis_scale = Math.pow(10,Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0]/Math.ceil((width-100)/100));
+            
             if (x >= 10) {
                 let small_x_axis_scale = x_axis_scale / 5;
                 let label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
