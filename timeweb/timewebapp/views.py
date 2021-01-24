@@ -65,7 +65,19 @@ class TimewebListView(View):
                 obj.title = 'No title'
         self.context['objlist'] = objlist
         self.context['data'] = [[(2021, 1-1, 11, 21, 33), 50, 25, 1, (4,), False, True, True, True, True, True], 
-            ['</script>', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,3], 0, 1, 2, 1, [0,1,2,3], False, 0, 'Minute', False, False, 2],
+
+
+
+
+
+
+
+
+
+
+
+        # date object
+            ['</script>', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,3], 0, -19.4, 2, 1, [0,1,2,3], False, 0, 'Minute', False, False, 2],
             ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 3],
             ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 4],
             ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 5],

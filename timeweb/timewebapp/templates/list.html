@@ -49,7 +49,7 @@
   position:absolute;
   height:60px;
   width:70px;
-  right:0px;
+  right:0;
 }
 #imagesettingscontainer:hover {
   cursor:pointer;
@@ -233,10 +233,47 @@ canvas:focus {
 .graphfooter {
   height:100px;
 }
+#rightfooter {
+  margin:5px 20px;
+  padding:1px 0;
+  width:150px;
+  border-left:1px solid gray;
+  text-align:right;
+}
+#leftfooter {
+  margin:5px 20px;
+  padding:1px 0;
+  width:150px;
+  border-right:1px solid gray;
+}
+.footerlink {
+  display:block;
+  font-family:"Open Sans";
+  font-size:8.75px;
+  color:gray;
+  text-decoration:none;
+}
+.footerlink:hover {
+  text-decoration:underline;
+}
+#socials {
+  display:flex;
+  width:calc(100% - 352px);
+  justify-content:space-around;
+  margin:0 -15px;
+  flex-wrap:wrap;
+  overflow:hidden;
+  padding:6.5px 0;
+}
+.socialicon {
+  margin: 0 15px 10px 15px;
+}
 {% endblock %}
 
 {% block js %}
+
 {{ data|json_script:"load-data" }}
+
 <script>
 // Doesn't allow the user to go back and load deleted assignments to avoid a 404
 window.addEventListener('popstate', function() {
@@ -268,7 +305,7 @@ $(document).keypress(function(event) {
 <script>
 // Delete button
 $(function() {
-  if (document.getElementsByClassName("importance").length !== 1) {
+  if (document.getElementsByClassName("title").length !== 1) {
     $(".title:first").prepend('<p class="importance">Most Important</p>');
     $(".title:last").prepend('<p class="importance">Least Important</p>');
   }
@@ -290,11 +327,11 @@ $(function() {
           
           $(assignmentcontainer).css({
             // CSS doesn't allow transitions without presetting the property
-            // So, use JQuery to set it's property and animate
+            // So, use JQuery to preset and animate its property
             "height":$(assignmentcontainer).height()+20+"px",
 
             "margin-bottom":"-10px",
-            "min-height":"0px",
+            "min-height":"0",
           });
           if (!assignmentcontainer.is(':nth-child(2)')) {
             $(assignmentcontainer).css("margin-top","-10px");
@@ -305,7 +342,7 @@ $(function() {
           })
           $(assignmentcontainer).animate({height:"10px"},200,function() {
             $(assignmentcontainer).remove();
-            if (document.getElementsByClassName("importance").length === 1) {
+            if (document.getElementsByClassName("title").length === 1) {
               $(".importance:first").empty();
               $(".importance:last").empty();
             }
@@ -426,13 +463,13 @@ $(function() {
           }
         }
         set_mod_days();
+
+
         function resize(reversescale) {
           if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
             ({width, height} = fixed_graph.getBoundingClientRect());
-
-            console.log(width,height);
             if (reversescale) {
-              width /= 1.01; 
+              width /= 1.01;
               height /= 1.05;
             }
             graph.width = width * scale;
@@ -447,7 +484,17 @@ $(function() {
         }
 
         resize(true);
-        assignment.one("transitionend",function(event) {alert(1);console.log(event);resize(false)}); // calling getBoundingClientRect() returns the scale(1.05) height and width
+
+        // calling getBoundingClientRect() returns the scale(1.05) height and width
+        assignment.on("transitionend",function(event) {
+
+          // Resize again when width transition ends
+          if (event.originalEvent.propertyName === "width") {
+            resize(false);
+            assignment.off("transitionend");
+          }
+        });
+
         // Sets event handlers only on the assignment's first click
         if (!not_first_click) {
 
@@ -461,7 +508,7 @@ $(function() {
               whichkey // Determines if the user is holding up or down arrow
           function ChangeSkewRatio() {
 
-            // I have no idea why, but for some reason skew_ratio in this scope isn't redefined when skew_ratio in the global environment changes
+            // I have no idea why, but for some reason skew_ratio in this scope isn't redefined when skew_ratio in the local environment changes
             // So, redefine it manually
             // Maybe take a look into why this happens sometime later
             skew_ratio = selected_assignment[6];
@@ -471,13 +518,12 @@ $(function() {
               skew_ratio = 2 - skew_ratio;
             }
             selected_assignment[6] = skew_ratio;
-            console.log(skew_ratio);
             draw();
           }
           $(document).keydown(function(event) {
             if ($(fixed_graph).is(":visible")) {
               const rect = fixed_graph.getBoundingClientRect();
-              if (rect.bottom - rect.height / 5 > 70 && rect.y + rect.height / 5 < document.getElementById("footer").getBoundingClientRect().y /* Originally window.innerHeight - (window.innerHeight - footer.y) */ && !fired) {
+              if (rect.bottom - rect.height / 5 > 70 && rect.y + rect.height / 5 < Math.min(window.innerHeight,document.getElementById("footer").getBoundingClientRect().y) /* Originally Math.min(window.innerHeight,window.innerHeight - (window.innerHeight - footer.y)) */ && !fired) {
                 fired = true;
                 if (event.key === "ArrowUp" || event.key === "ArrowDown") {
                   whichkey = event.key;
@@ -912,11 +958,11 @@ $(function() {
 
 <div class="headerfooter animate" id="header">
   <div id="imagesettingscontainer">
-    <img height="60" id="imagesettings" src="{% static 'settings.png' %}" alt="settings"/>
+    <img height="60" id="imagesettings" src="{% static 'settings.png' %}" alt="settings" draggable="false"/>
   </div>
   <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
     <div id="imagenewcontainer">
-      <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new"/>
+      <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
     </div>
     <div id="newassignmenttextcontainer">
       <p id="newassignmenttext">New Assignment</p>
@@ -967,6 +1013,24 @@ $(function() {
   </div>
 </div>
 
-<div class="headerfooter animate" id="footer"></div>
+<div class="headerfooter animate" id="footer">
+  <div id="leftfooter">
+    <a href="#" class="footerlink">Contact me</a>
+    <a href="#" class="footerlink">Terms of service</a>
+    <a href="#" class="footerlink">Privacy policy</a>
+    <a href="#" class="footerlink">Licenses</a>
+  </div>
+  <div id="socials">
+    <img height="45" class="socialicon" src="{% static 'twitter.png' %}" alt="twitter" draggable="false"/>
+    <img height="45" class="socialicon" src="{% static 'twitter.png' %}" alt="twitter" draggable="false"/>
+    <img height="45" class="socialicon" src="{% static 'twitter.png' %}" alt="twitter" draggable="false"/>
+  </div>
+  <div id="rightfooter">
+    <a href="#" class="footerlink">About me</a>
+    <a href="#" class="footerlink">How does this work</a>
+    <a href="#" class="footerlink">Keybinds</a>
+    <a href="#" class="footerlink">Changelog</a>
+  </div>
+</div>
 
 {% endblock %}
