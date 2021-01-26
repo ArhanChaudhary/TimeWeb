@@ -16,7 +16,6 @@ class TimewebModel(models.Model):
     # fields of the model
     file_sel = models.CharField(
         max_length=40,
-        blank=True,
         verbose_name='Name: '
     )
     ad = models.DateField(
@@ -28,19 +27,22 @@ class TimewebModel(models.Model):
     unit = models.CharField(
         max_length=40,
         blank=True,
+        default="Minute",
     )
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(1.00)]
+        validators=[MinValueValidator(1.00)],
     )
     adone = models.DecimalField(
         max_digits=15,
         decimal_places=2,
+        default=0,
         validators=[MinValueValidator(0.00)]
     )
     dif_assign = models.IntegerField(
         blank=True,
+        null=True,
     )
     skew_ratio = models.DecimalField(
         max_digits=15,
@@ -54,15 +56,21 @@ class TimewebModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(0.00)],
+        blank=True,
+        null=True,
     )
     min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(0.00)],
+        blank=True,
+        null=True,
     )
     nwd = models.CharField(
         max_length=2,
         choices=Weekdays.choices,
+        blank=True,
+        null=True,
     )
     fixed_mode = models.BooleanField(
         default=False,

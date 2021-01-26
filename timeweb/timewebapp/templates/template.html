@@ -13,64 +13,77 @@
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
         <style>
             #header {
-                width:calc(100% - 10px);
-                background:rgb(13,26,38);
-                height:60px;
-                padding:5px;
-                position:relative;
-                z-index:2;
-                box-shadow:0px 3px 7px rgb(52,52,52), 0px -5px 0px rgb(13,26,38);
+                width: calc(100% - 10px);
+                background: rgb(13,26,38);
+                height: 60px;
+                padding: 5px;
+                position: relative;
+                z-index: 2;
+                box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
             }
             #content {
-                border-right:20px solid gray;
-                border-left:20px solid gray;
-                height:calc(100vh - 70px);
-                overflow:auto;
+                border-right: 20px solid gray;
+                border-left: 20px solid gray;
+                height: calc(100vh - 70px);
+                overflow: auto;
             }
             #logo {
-                display:block;
-                margin-left:auto;
-                margin-right:auto;
-                max-height:60px;
-                max-width:211px;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                max-height: 60px;
+                max-width: 211px;
             }
             body {
-                margin:0px;
-                background:radial-gradient(circle, white 0%, rgb(202,202,202) 100%);
-                overflow:hidden;
+                margin: 0;
+                background: radial-gradient(circle, white 0, rgb(202,202,202) 100%);
+                overflow: hidden;
             }
-
+            #imagemenucontainer {
+                position: absolute;
+                height: 60px;
+                width: 89px;
+                right: 0;
+            }
             nav {
-                left:0px;
-                top:0px;
-                position:absolute;
-                margin-left:100%;
-                transition:all .2s ease-in-out;
-                width:89px;
-            }
-            .navitem {
-                text-decoration:none;
-                text-align:center;
-                display:block;
-                padding:10px;
-                color:white;
-                font-family:"Open Sans";
-                font-size:12.5px;
-                background:rgb(45,59,71);
-            }
-            .navitem:hover {
-                background:rgb(82,107,130);
-            }
-            #imagemenu {
-                margin-left:32px;
-                margin-top:17.5px;
-                cursor:none;
-            }
-            #imagemenucontainer:hover ~ nav, nav:hover {
-                transform:translateX(-100%);
+                left: 0;
+                top: 0;
+                position: absolute;
+                margin-left: 100%;
+                transition: all .2s ease-in-out;
+                width: 89px;
             }
             #navitems, #navimagemenucontainer {
-                transition:all .2s ease-in-out;
+                transition: box-shadow .2s ease-in-out;
+            }
+            #navimagemenucontainer {
+                background: rgb(13,26,38);
+                padding: 5px 0;
+                position: relative;
+                z-index: 1;
+            }
+            rect {
+                fill: white;
+            }
+            #navitems {
+                position: relative;
+                top: -4px;
+            }
+            .navitem {
+                text-decoration: none;
+                text-align: center;
+                display: block;
+                padding: 10px;
+                color: white;
+                font-family: "Open Sans";
+                font-size: 12.5px;
+                background: rgb(45,59,71);
+            }
+            .navitem:hover {
+                background: rgb(82,107,130);
+            }
+            #imagemenucontainer:hover ~ nav, nav:hover {
+                transform: translateX(-100%);
             }
             #imagemenucontainer:hover ~ nav #navitems, nav:hover #navitems {
                 box-shadow: 0 0 4px 2px black;
@@ -78,46 +91,34 @@
             #imagemenucontainer:hover ~ nav #navimagemenucontainer, nav:hover #navimagemenucontainer {
                 box-shadow: -5px 0 5px -5px gray;
             }
-            #imagemenucontainer {
-                position:absolute;
-                height:60px;
-                width:89px;
-                right:0;
-            }
-            #navimagemenu{
-                margin-top:22.5px;
-                margin-left:32px;
-                cursor:none;
-            }
-            #navimagemenucontainer {
-                background:rgb(13,26,38);
-                height:70px;
-                position:relative;
-                z-index:1;
-            }
             {% block css %}{% endblock %}
         </style>
         {% block js %}{% endblock %}
     </head>
     <body>
         <div class="animate" id="header">
-            <div id="imagemenucontainer">
-                <img height="25" id="imagemenu" src="{% static 'hamburger.png' %}" alt="menu" draggable="false"/>
-            </div>
+            
+            <svg width="89px" height="60px" id="imagemenucontainer">
+                <rect y="19.75" x="32" width="25" height="4.25"/>
+                <rect y="28" x="32" width="25" height="4.25"/>
+                <rect y="36.25" x="32" width="25" height="4.25"/>
+            </svg>
             <nav>
-                <div id="navimagemenucontainer">
-                <img height="25" id="navimagemenu" src="{% static 'hamburger.png' %}" alt="menu" draggable="false"/>
-                </div>
+                <svg width="89px" height="60px" id="navimagemenucontainer">
+                    <rect y="19.75" x="32" width="25" height="4.25"/>
+                    <rect y="28" x="32" width="25" height="4.25"/>
+                    <rect y="36.25" x="32" width="25" height="4.25"/>
+                </svg>
                 <div id="navitems">
-                <a href="#" class="navitem">Settings</a>
-                <a href="#" class="navitem">Keybinds</a>
-                <a href="#" class="navitem">How Does This Work</a>
-                <a href="#" class="navitem">About Me</a> {% comment %} (contact, credits, motives, etc) {% endcomment %}
-                <a href="#" class="navitem">Changelog</a>
-                <a href="#" class="navitem">Terms of Service</a>
-                <a href="#" class="navitem">Privacy Policy</a>
-                <a href="#" class="navitem">Licenses</a>
-                <a href="#" class="navitem">Contact Me</a>
+                    <a href="#" class="navitem">Settings</a>
+                    <a href="#" class="navitem">Keybinds</a>
+                    <a href="#" class="navitem">How Does This Work</a>
+                    <a href="#" class="navitem">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
+                    <a href="#" class="navitem">Changelog</a>
+                    <a href="#" class="navitem">Terms of Service</a>
+                    <a href="#" class="navitem">Privacy Policy</a>
+                    <a href="#" class="navitem">Licenses</a>
+                    <a href="#" class="navitem">Contact Me</a>
                 </div>
             </nav>
             {% if display_new %}
@@ -131,7 +132,9 @@
                 </a>
             {% endif %}
             <a href="{% url 'home' %}" id="logo">
-                <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
+                <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" id="logo"/>
+                {% comment %} https://fontmeme.com/fonts/alba-font/ {% endcomment %}
+                {% comment %} https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
             </a>
         </div>
         {% block body %}{% endblock %}

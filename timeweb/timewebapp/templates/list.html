@@ -9,7 +9,7 @@
    }
 }
 .relativepositioningwrapper {
-  position:relative;
+  position: relative;
 }
 #header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
@@ -18,148 +18,139 @@
   transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
 }
 #header.animate {
-  transform:translateY(-70px);
-  height:80px;
+  transform: translateY(-70px);
+  height: 80px;
 }
 #content.animate {
-  border-width:0;
-  height:115vh;
-  transform:translateY(-70px);
+  border-width: 0;
+  height: 115vh;
+  transform: translateY(-70px);
 }
 #assignmentscontainer {
-  transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
+  transition: all 1.2s cubic-bezier(0.26, 0.74, 0, 1.03);
 }
 #assignmentscontainer.animate {
-  transform:translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
+  transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
 }
 
 #imagenew {
-  left:5px;
-  position:absolute;
+  left: 5px;
+  position: absolute;
 }
 #imagenewcontainer {
-  position:absolute;
-  height:60px;
-  width:70px;
+  position: absolute;
+  height: 60px;
+  width: 70px;
 }
 #newassignmenttext {
-  position:absolute;
-  left:75px;
-  top:0;
-  color:white;
-  font-size:20px;
-  font-family:"Open Sans";
-  display:block;
-  max-width:calc(50% - 190px);
+  position: absolute;
+  left: 75px;
+  top: 0;
+  color: white;
+  font-size: 20px;
+  font-family: "Open Sans";
+  display: block;
+  max-width: calc(50% - 190px);
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #info {
-  font-family:"Open Sans";
-  font-size:17px;
-  margin:10px 0 0 10px;
+  font-family: "Open Sans";
+  font-size: 17px;
+  margin: 10px 0 0 10px;
 }
 #hidebutton {
-  position:relative;
-  left:1px;
-  bottom:0.65px;
-  font-family:"Open Sans";
+  position: relative;
+  left: 1px;
+  bottom: 0.65px;
+  font-family: "Open Sans";
 }
 .assignmentcontainer {
-  min-height:40px;
-  min-width:720px;
-  position:relative;
-  overflow:visible !important;
+  min-height: 40px;
+  min-width: 720px;
+  position: relative;
+  overflow: visible !important;
 }
 .assignment {
   box-shadow: 0 0 4px rgba(52,52,52,0.5);
-  background:rgb(244,141,132);//rgb(132,200,65);
-  margin:10px;
-  padding:15px;
-  border:2px solid rgb(80,80,80);
-  border-radius:5px;
-  position:relative;
-  width:calc(100% - 54px);
-  min-height:0;
+  background: rgb(244,141,132);//rgb(132,200,65);
+  margin: 10px;
+  padding: 15px;
+  border: 2px solid rgb(80,80,80);
+  border-radius: 5px;
+  position: relative;
+  width: calc(100% - 54px);
+  min-height: 0;
 }
 .assignment:focus, .button:focus {
-  outline:0;
-  border:2px solid rgb(0,95,204) !important;
+  outline: 0;
+  border: 2px solid rgb(0,95,204) !important;
   box-shadow: 0 0 4px rgba(0,95,204,0.5); 
 }
 .assignment.disablehover {
-  display:block;
-  min-height:65vh;
-  transition:all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
+  display: block;
+  min-height: 65vh;
+  transition: all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
 }
 .assignment:not(.disablehover) {
-  transition:all .2s ease-in-out, opacity .1s ease-in-out;
+  transition: all .2s ease-in-out, opacity .1s ease-in-out;
 }
 .assignment:not(.disablehover):hover:focus {
   box-shadow: 0 0 7px rgba(0,95,204,0.7) !important; 
 }
 .assignment:not(.disablehover):hover {
   transform: scale(1.05) translateX(2%);
-  width: calc(96.1% - 55px);
+  width: calc(96.2% - 55px);
   border-color: rgba(0,0,0,0.7);
   box-shadow: 0 0 7px rgba(52,52,52,0.7);
-  cursor:pointer;
-}
-.assignment:not(.disablehover):hover .title span {
-  opacity:0;
-}
-.assignment:not(.disablehover):hover .title:before {
-  top:50%;
-  transform:translateY(-50%);
-  position:absolute;
-  content:'Click to open';
+  cursor: pointer;
 }
 .assignmentheader {
-  display:flex;
-  align-items:center;
-  position:relative;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 .title {
   float:left;
-  min-width:calc(95px + 8vw);
-  max-width:calc(95px + 8vw);
-  font-size:min(16.76px,calc(11px + 0.4vw));
-  font-family:"Open Sans";
-  overflow-wrap:break-word;
+  min-width: calc(95px + 8vw);
+  max-width: calc(95px + 8vw);
+  font-size: min(16.76px,calc(11px + 0.4vw));
+  font-family: "Open Sans";
+  overflow-wrap: break-word;
 }
 .importance {
-  position:absolute;
-  font-size:0.7em;
-  font-family:"Open Sans";
-  margin-top:calc(-1em - 2px);
+  position: absolute;
+  font-size: 0.7em;
+  font-family: "Open Sans";
+  margin-top: -1em;
 }
 .daysleft {
-  position:absolute;
-  font-size:0.7em;
-  font-family:"Open Sans";
-  margin-top:-2px;
+  position: absolute;
+  font-size: 0.7em;
+  font-family: "Open Sans";
+  margin-top: -2px;
 }
 .arrowcontainer {
-  float:left;
-  margin-left:max(5px,calc(-5px + 2vw));
+  float: left;
+  margin-left: max(5px,calc(-5px + 2vw));
 }
 .status {
-  float:left;
-  font-size:min(16.76px,calc(11px + 0.4vw));
-  font-family:"Open Sans";
-  margin:0 70px 0 0;
+  float: left;
+  font-size: min(16.76px,calc(11px + 0.4vw));
+  font-family: "Open Sans";
+  margin: 0 70px 0 0;
 }
 .button {
-  position:absolute;
+  position: absolute;
   background: radial-gradient(circle, lightgray 40%, gray 100%);
-  border:2px solid gray;
-  border-radius:50%;
-  top:0;
-  bottom:0;
-  margin:auto;
+  border: 2px solid gray;
+  border-radius: 50%;
+  top: 0;
+  bottom: 0;
+  margin: auto;
 }
 .button:hover, .button:focus {
   background: radial-gradient(circle, white 35%, gray 100%);
@@ -168,58 +159,58 @@
   background: radial-gradient(circle, white 55%, gray 100%);
 }
 .updatebutton {
-  right:30px;
-  height:30px;
-  width:30px;
+  right: 30px;
+  height: 30px;
+  width: 30px;
 }
 .updatebuttonimage {
-  top:5px;
-  left:5px;
-  position:relative;
+  top: 5px;
+  left: 5px;
+  position: relative;
 }
 .deletebutton {
-  right:-10px;
-  height:35px;
-  width:35px;
+  right: -10px;
+  height: 35px;
+  width: 35px;
 }
 .deletebuttonimage {
-  top:1px;
-  position:relative;
-  margin-left:auto;
-  margin-right:auto;
+  top: 1px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .graphcontainer {
-  position:relative;
-  top:10px;
-  display:none;
+  position: relative;
+  top: 10px;
+  display: none;
 }
 canvas {
-  padding:0;
-  border-radius:12px;
-  height:clamp(200px,65vh,400px);
-  width:calc(100% - 34px);
-  min-height:200px;
-  max-height:400px;
-  margin:5px;
+  padding: 0;
+  border-radius: 12px;
+  height: clamp(200px,65vh,400px);
+  width: calc(100% - 34px);
+  min-height: 200px;
+  max-height: 400px;
+  margin: 5px;
 }
 canvas:focus {
   box-shadow: 0 0 0 2px rgb(0,95,204), 0 0 5px 2px rgb(0,95,204);
-  outline:0;
+  outline: 0;
 }
 .fixed-graph {
-  border:4px solid rgba(108,108,108,.75); {% comment %} rgb(178,178,178) {% endcomment %}
-  margin-left:13px;
-  position:absolute;
+  border: 4px solid rgba(108,108,108,.75); {% comment %} rgb(178,178,178) {% endcomment %}
+  margin-left: 13px;
+  position: absolute;
 }
 .graph {
-  margin-left:13px;
-  position:relative;
-  border:4px solid transparent;
+  margin-left: 13px;
+  position: relative;
+  border: 4px solid transparent;
 }
 
 .graphfooter {
-  height:100px;
+  height: 100px;
 }
 {% endblock %}
 
@@ -369,8 +360,8 @@ $(function() {
           assignment.removeAttr("style");
           graphcontainer.removeAttr("style");
         });
-        assignment.attr("style","overflow:hidden");
-        graphcontainer.attr("style","position:absolute;display:block");
+        assignment.attr("style","overflow: hidden");
+        graphcontainer.attr("style","position: absolute;display: block");
         assignment.find(".fallingarrowanimation").get(0).beginElement(); // Maybe make find more efficient
 
         // If no graphs are open, allow auto scroll
@@ -384,7 +375,7 @@ $(function() {
         }
 
         assignment.addClass("disablehover");
-        graphcontainer.attr("style","display:block");
+        graphcontainer.attr("style","display: block");
         assignment.find(".risingarrowanimation").get(0).beginElement();
 
         let graph = this.querySelector('.graph'),
@@ -392,14 +383,15 @@ $(function() {
         scale = window.devicePixelRatio,
 
         selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)],
-        [file_sel,ad,x,unit,y,works,dif_assign,skew_ratio,ctime,funct_round,min_work_time,nwd,fixed_mode,dynamic_start,total_mode,remainder_mode] = selected_assignment,
+        [file_sel,ad,x,unit,y,works,dif_assign,skew_ratio,ctime,funct_round,min_work_time,nwd,fixed_mode,dynamic_start,total_mode,remainder_mode] = selected_assignment;
+        ad = new Date(ad);
 
-        mods,
+        let mods,
         skew_ratio_lim = 10000,
 
         red_line_start_x = fixed_mode ? 0 : dynamic_start,
         red_line_start_y = fixed_mode ? 0 : works[red_line_start_x - dif_assign],
-        assign_day_of_week = new Date(...ad).getDay(),
+        assign_day_of_week = ad.getDay(),
         len_works = works.length,
         draw_point = false,
         y_fremainder = (y - red_line_start_y) % funct_round,
@@ -409,11 +401,10 @@ $(function() {
         min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time/funct_round)*funct_round : funct_round;
 
         function set_mod_days() {
-          const xday = assign_day_of_week + red_line_start_x;
           mods = [0];
           let mod_counter = 0;
           for (let mod_day = 0; mod_day < 6; mod_day++) {
-            if (nwd.includes((xday + mod_day) % 7)) {
+            if (nwd.includes((assign_day_of_week + red_line_start_x + mod_day) % 7)) {
               mod_counter++;
             }
             mods.push(mod_counter);
@@ -533,8 +524,8 @@ $(function() {
 
         function pset(x2=NaN,y2=NaN) {
             try {
-                var x1 = len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] : x - red_line_start_x;
-                var y1 = y - red_line_start_y;
+                var x1 = len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] : x - red_line_start_x,
+                    y1 = y - red_line_start_y;
                 if (isNaN(x2)) {
                     a = y1 * (1 - skew_ratio) / ((x1-1) * x1);
                     b = (y1 - x1 * x1 * a) / x1;
@@ -546,7 +537,7 @@ $(function() {
                         throw "definevars";
                     }
                     if (len_nwd) {
-                        let floorx2 = Math.floor(x2);
+                        const floorx2 = Math.floor(x2);
                         if (nwd.includes((assign_day_of_week + floorx2 + red_line_start_x) % 7)) {
                             x2 = floorx2;
                         }
@@ -651,11 +642,11 @@ $(function() {
                     }
                 }
                 if (ignore_ends_mwt) {
-                    var lower = [return_y_cutoff,y-red_line_start_y-output];
+                    const lower = [return_y_cutoff,y-red_line_start_y-output];
 
-                    var did_loop = false;
-                    for (var n = Math.ceil(return_y_cutoff);n<x1;n++) {
-                        var pre_output = funct(n,false);
+                    let did_loop = false;
+                    for (let n = Math.ceil(return_y_cutoff);n<x1;n++) {
+                        const pre_output = funct(n,false);
                         if (pre_output >= y) {
                             break;
                         }
@@ -664,7 +655,7 @@ $(function() {
                         return_y_cutoff++;
                     }
                     if (did_loop) {
-                        var upper = [return_y_cutoff,y-red_line_start_y-output];
+                        const upper = [return_y_cutoff,y-red_line_start_y-output];
                         return_y_cutoff = [upper,lower][+(min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
                     }
                 }
@@ -685,7 +676,7 @@ $(function() {
                 if (x1 - return_0_cutoff < 1) {
                     var output = 0;
                 } else {
-                    for (var n = Math.ceil(return_0_cutoff);n<x1;n++) {
+                    for (let n = Math.ceil(return_0_cutoff);n<x1;n++) {
                         var output = funct(n,false);
                         if (output >= min_work_time_funct_round + red_line_start_y) {
                             break;
@@ -694,11 +685,11 @@ $(function() {
                     }
                 }
                 if (ignore_ends_mwt) {
-                    var upper = [return_0_cutoff,output];
+                    const upper = [return_0_cutoff,output];
 
-                    var did_loop = false;
-                    for (var n=Math.floor(return_0_cutoff);n>0;n--) {
-                        var pre_output = funct(n,false);
+                    let did_loop = false;
+                    for (let n=Math.floor(return_0_cutoff);n>0;n--) {
+                        const pre_output = funct(n,false);
                         if (pre_output <= red_line_start_y) {
                             break;
                         }
@@ -707,7 +698,7 @@ $(function() {
                         return_0_cutoff--;
                     }
                     if (did_loop) {
-                        var lower = [return_0_cutoff,output];
+                        const lower = [return_0_cutoff,output];
                         return_0_cutoff = [lower,upper][+(min_work_time_funct_round * 2 - upper[1] > lower[1])][0];
                     }
                 }
@@ -739,14 +730,13 @@ $(function() {
             return output + red_line_start_y;
         }
 
-        function mousemove(event) { 
-            let x2 = event.pageX - $(fixed_graph).offset().left;
-            let y2 = event.pageY - $(fixed_graph).offset().top;
-            draw(x2,y2);
+        function mousemove(event) {
+          const offset = $(fixed_graph).offset();
+          draw(event.pageX - offset.left,event.pageY - offset.top);
         }
         
         function draw(x2=NaN,y2=NaN) {
-            let screen = graph.getContext("2d");
+            const screen = graph.getContext("2d");
             screen.scale(scale,scale);
             screen.clearRect(0, 0, width, height);
             pset(x2,y2);
@@ -757,9 +747,9 @@ $(function() {
             } else if (radius < 2) {
                 radius = 2;
             }
-            let circle_x;
-            let circle_y;
-            let line_end = Math.floor(x+Math.ceil(1/wCon));
+            let circle_x,
+                circle_y;
+            const line_end = Math.floor(x+Math.ceil(1/wCon));
             screen.strokeStyle = "rgb(233,68,46)"; // red
             screen.lineWidth = radius;
             screen.beginPath();
@@ -818,19 +808,20 @@ $(function() {
 
             // y axis label
             screen.rotate(Math.PI/2);
-            screen.fillText(unit === "Minute" ? 'Minutes of Work' : unit + 's (' + format_minutes(ctime) + ') per ' + unit, (height-50)/2, -2);
+            screen.fillText(unit === "Minute" ? 'Minutes of Work' : unit + 's (' + format_minutes(ctime) + ') per ' + unit, (height-50)/2, -6);
             screen.rotate(-Math.PI/2);
 
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
-            let x_axis_scale = Math.pow(10,Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0]/Math.ceil((width-100)/100));
+            const x_axis_scale = Math.pow(10,Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0]/Math.ceil((width-100)/100));
             
+            // Terribly written code, rewrite later
             if (x >= 10) {
-                let small_x_axis_scale = x_axis_scale / 5;
-                let label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
-                let font_size = 13.75;
-                for (let smaller_index = 1;smaller_index<=Math.floor(x/small_x_axis_scale);smaller_index++) {
-                    let displayed_number = smaller_index * small_x_axis_scale;
+                const small_x_axis_scale = x_axis_scale / 5,
+                      label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon,
+                      font_size = 13.75;
+                for (let smaller_index=1;smaller_index<=Math.floor(x/small_x_axis_scale);smaller_index++) {
+                    const displayed_number = smaller_index * small_x_axis_scale;
                     if (smaller_index % 5) {
                         screen.fillStyle = "rgb(215,215,215)";
                         screen.fillRect(displayed_number*wCon+48.5,0,2,height-50);
@@ -841,8 +832,8 @@ $(function() {
                             screen.fillStyle = "black";
                             screen.font = font_size + 2.75 + 'px Open Sans';
                         }
-                        let numberwidth = screen.measureText(displayed_number).width;
-                        let number_x_pos = displayed_number*wCon+50;
+                        const numberwidth = screen.measureText(displayed_number).width,
+                              number_x_pos = displayed_number*wCon+50;
                         if (number_x_pos + numberwidth/2 > width-1) {
                             number_x_pos = width-numberwidth/2-1;
                         }
@@ -854,20 +845,19 @@ $(function() {
                 }
             }
             screen.textBaseline = "alphabetic";
-            let y_axis_scale = Math.pow(10,Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0]/Math.ceil((height-100)/100));
+            const y_axis_scale = Math.pow(10,Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0]/Math.ceil((height-100)/100));
             if (y >= 10) {
-                let small_y_axis_scale = y_axis_scale / 5;
-                let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
+                const small_y_axis_scale = y_axis_scale / 5,
+                      font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875,
+                      text_height = screen.measureText(0).width * 2,
+                      label_index = text_height < small_y_axis_scale*hCon;
                 if (font_size < 8.5) {
                     font_size = 8.5;
                 }
                 screen.font = font_size + 'px Open Sans';
-
-                let text_height = screen.measureText(0).width * 2;
-                let label_index = text_height < small_y_axis_scale*hCon;
                 screen.textAlign = "right";
-                for (let smaller_index = 1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
-                    let displayed_number = smaller_index * small_y_axis_scale;
+                for (let smaller_index=1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
+                    const displayed_number = smaller_index * small_y_axis_scale;
                     if (smaller_index % 5) {
                         screen.fillStyle = "rgb(215,215,215)";
                         screen.fillRect(50,height-51.5-displayed_number*hCon,width-50,2);
@@ -878,7 +868,7 @@ $(function() {
                             screen.fillStyle = "black";
                             screen.font = font_size * 1.2 + 'px Open Sans';
                         }
-                        let number_y_pos = height-displayed_number*hCon-52+text_height/2;
+                        const number_y_pos = height-displayed_number*hCon-52+text_height/2;
                         if (number_y_pos < 6 + text_height/2) {
                             number_y_pos = 6 + text_height/2;
                         }
@@ -941,7 +931,7 @@ $(function() {
         <div class="assignment" tabindex="0">
           <div class="assignmentheader">
             <span class="title">
-              <span>{{ obj.file_sel }}</span>
+              {{ obj.file_sel }}
               <p class="daysleft">1d</p>
             </span>
             <svg width="30px" height="20px" class="arrowcontainer">
