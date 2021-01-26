@@ -20,11 +20,20 @@ class TimewebView(View):
             self.form = TimewebForm(request.POST or None, request.FILES or None)
             self.context['submit'] = 'Create Assignment'
         else:
+            self.selectedform = get_object_or_404(TimewebModel, pk=pk)
             self.form = TimewebForm(request.POST or None, request.FILES or None,initial={
-                'title':get_object_or_404(TimewebModel, pk=pk).title,
-                'description':get_object_or_404(TimewebModel, pk=pk).description,
-                })
-            self.context['submit'] = 'Submit'
+                'file_sel':self.selectedform.file_sel,
+                'ad':self.selectedform.ad,
+                'x':self.selectedform.x,
+                'unit':self.selectedform.unit,
+                'y':self.selectedform.y,
+                'adone':self.selectedform.adone,
+                'ctime':self.selectedform.ctime,
+                'funct_round':self.selectedform.funct_round,
+                'min_work_time':self.selectedform.min_work_time,
+                'nwd':self.selectedform.nwd,
+            })
+            self.context['submit'] = 'Update Assignment'
         self.context['form'] = self.form
         self.context['pk'] = pk
 
@@ -35,6 +44,7 @@ class TimewebView(View):
         return render(request, "new.html", self.context)
 
     def post(self,request,pk=None):
+        print(request.POST)
         self.make_form_instance(request,pk)
         if self.form.is_valid() and 'Submitbutton' in request.POST:
             if pk == None: # Handle "new"
@@ -45,8 +55,16 @@ class TimewebView(View):
                 form_data = self.form.save(commit=False)
 
                 save_data = get_object_or_404(TimewebModel, pk=pk)
-                save_data.title = form_data.title
-                save_data.description = form_data.description
+                save_data.file_sel = form_data.file_sel
+                save_data.ad = form_data.ad
+                save_data.x = form_data.x
+                save_data.unit = form_data.unit
+                save_data.y = form_data.y
+                save_data.adone = form_data.adone
+                save_data.ctime = form_data.ctime
+                save_data.funct_round = form_data.funct_round
+                save_data.min_work_time = form_data.min_work_time
+                save_data.nwd = form_data.nwd
                 save_data.save()
                 self.logger.debug("Updated")
             return redirect('../')
@@ -55,42 +73,18 @@ class TimewebView(View):
             return render(request, "new.html", self.context)
 
 class TimewebListView(View):
-    context = {}
     logger = logging.getLogger(__name__)
+    def __init__(self):
+        self.context = {'display_new':True}
 
     def make_list(self):
         objlist = TimewebModel.objects.all()
         for obj in objlist:
-            if obj.title == '':
-                obj.title = 'No title'
+            if obj.file_sel == '':
+                obj.file_sel = 'No title'
         self.context['objlist'] = objlist
-        self.context['data'] = [[(2021, 1-1, 11, 21, 33), 50, 25, 1, (4,), False, True, True, True, True, True], 
-
-
-
-
-
-
-
-
-
-
-
-        # date object
-            ['</script>', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,3], 0, -19.4, 2, 1, [0,1,2,3], False, 0, 'Minute', False, False, 2],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 3],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 4],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 5],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 6],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 7],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 8],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 9],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 10],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 11],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 12],
-            ['Yes title', (2021, 1-1, 14, 0, 0), 50, 50, [0,1,2], 0, 1, 2, 1, [0,1,2,3,4,5], False, 0, 'Minute', False, False, 13],
-        ]
-
+        self.context['data'] = [[(2021, 1-1, 11, 21, 33), 50, 25, 1, (4,), False, True, True, True, True, True]] + [list(vars(obj).values())[2:] for obj in objlist]
+        print('-'*50+'\n'+str(self.context['data'])+'\n'+'-'*50)
     def get(self,request):
         self.make_list()
         return render(request, "list.html", self.context)
@@ -101,18 +95,14 @@ class TimewebListView(View):
     # However, it still cannot be referanced because 'Deletebutton': [''] is not a good indication
     # So, pass in a value into the button such that the new request.POST will have Deletebutton': ['deleted'] instead
     def post(self,request):
+        print(request.POST)
         for key, value in request.POST.items():
             if value == "deleted":
                 pk = key
                 selected_form = get_object_or_404(TimewebModel, pk=pk)
                 selected_form.delete()
                 self.logger.debug("Deleted")
+            elif value == "skew_ratio":
+                pass
         self.make_list()
         return render(request, "list.html", self.context)
-
-class TimewebGraphView(View):
-    context = {}
-    logger = logging.getLogger(__name__)
-
-    def get(self,request,pk):
-        return render(request, "graph.html", self.context)

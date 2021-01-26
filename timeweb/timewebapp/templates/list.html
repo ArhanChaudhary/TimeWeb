@@ -1,15 +1,18 @@
 {% extends "template.html" %}
+
 {% load static %}
 
 {% block css %}
+@media (max-width: 360px) {                  
+   #logo {
+      display: none;
+   }
+}
 .relativepositioningwrapper {
   position:relative;
 }
 #header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
-}
-#footer {
-  transition: all 1.25s cubic-bezier(.25,.57,.51,.97);
 }
 #content {
   transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
@@ -17,9 +20,6 @@
 #header.animate {
   transform:translateY(-70px);
   height:80px;
-}
-#footer.animate {
-  transform:translateY(-70px);
 }
 #content.animate {
   border-width:0;
@@ -30,7 +30,7 @@
   transition: all 1.2s cubic-bezier(.21,.66,.01,1.13);
 }
 #assignmentscontainer.animate {
-  transform:translateY(max(calc(-100vh + 140px),calc(-100% - 20px)));
+  transform:translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
 }
 
 #imagenew {
@@ -41,18 +41,6 @@
   position:absolute;
   height:60px;
   width:70px;
-}
-#imagesettings {
-  position:absolute;
-}
-#imagesettingscontainer {
-  position:absolute;
-  height:60px;
-  width:70px;
-  right:0;
-}
-#imagesettingscontainer:hover {
-  cursor:pointer;
 }
 #newassignmenttext {
   position:absolute;
@@ -91,7 +79,7 @@
   background:rgb(244,141,132);//rgb(132,200,65);
   margin:10px;
   padding:15px;
-  border:2px solid gray;
+  border:2px solid rgb(80,80,80);
   border-radius:5px;
   position:relative;
   width:calc(100% - 54px);
@@ -233,41 +221,6 @@ canvas:focus {
 .graphfooter {
   height:100px;
 }
-#rightfooter {
-  margin:5px 20px;
-  padding:1px 0;
-  width:150px;
-  border-left:1px solid gray;
-  text-align:right;
-}
-#leftfooter {
-  margin:5px 20px;
-  padding:1px 0;
-  width:150px;
-  border-right:1px solid gray;
-}
-.footerlink {
-  display:block;
-  font-family:"Open Sans";
-  font-size:8.75px;
-  color:gray;
-  text-decoration:none;
-}
-.footerlink:hover {
-  text-decoration:underline;
-}
-#socials {
-  display:flex;
-  width:calc(100% - 352px);
-  justify-content:space-around;
-  margin:0 -15px;
-  flex-wrap:wrap;
-  overflow:hidden;
-  padding:6.5px 0;
-}
-.socialicon {
-  margin: 0 15px 10px 15px;
-}
 {% endblock %}
 
 {% block js %}
@@ -286,7 +239,12 @@ window.addEventListener('popstate', function() {
 $(window).load(function() {
   // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
   
-  $("#footer").one("transitionend",() => document.getElementById('content').style.transition = 'none');
+  $("#content").on("transitionend",function(event) {
+    if (event.originalEvent.propertyName === "height") {
+      document.getElementById('content').style.transition = 'none';
+      $("#content").off("transitionend");
+    }
+  });
   $(".animate").removeClass("animate");
 });
 </script>
@@ -429,20 +387,19 @@ $(function() {
         graphcontainer.attr("style","display:block");
         assignment.find(".risingarrowanimation").get(0).beginElement();
 
-        var graph = this.querySelector('.graph'),
+        let graph = this.querySelector('.graph'),
         fixed_graph = this.querySelector('.fixed-graph'),
-        scale = window.devicePixelRatio;
+        scale = window.devicePixelRatio,
 
-        let selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)];
-        var [file_sel,ad,x,y,works,dif_assign,skew_ratio,ctime,funct_round,nwd,fixed_mode,dynamic_start,unit,total_mode,remainder_mode,min_work_time] = selected_assignment,
-        ad = new Date(...ad), // This is not compatible with internet explorer!
+        selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)],
+        [file_sel,ad,x,unit,y,works,dif_assign,skew_ratio,ctime,funct_round,min_work_time,nwd,fixed_mode,dynamic_start,total_mode,remainder_mode] = selected_assignment,
 
         mods,
         skew_ratio_lim = 10000,
 
         red_line_start_x = fixed_mode ? 0 : dynamic_start,
         red_line_start_y = fixed_mode ? 0 : works[red_line_start_x - dif_assign],
-        assign_day_of_week = ad.getDay(),
+        assign_day_of_week = new Date(...ad).getDay(),
         len_works = works.length,
         draw_point = false,
         y_fremainder = (y - red_line_start_y) % funct_round,
@@ -508,22 +465,16 @@ $(function() {
               whichkey // Determines if the user is holding up or down arrow
           function ChangeSkewRatio() {
 
-            // I have no idea why, but for some reason skew_ratio in this scope isn't redefined when skew_ratio in the local environment changes
-            // So, redefine it manually
-            // Maybe take a look into why this happens sometime later
-            skew_ratio = selected_assignment[6];
-
             skew_ratio = whichkey === "ArrowDown" ? (skew_ratio - 0.1).toFixed(1) : (+skew_ratio /* Force addition instead of concatination */ + 0.1).toFixed(1);
             if (funct(1,false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] - 1 : x - red_line_start_x - 1,false) && whichkey === "ArrowDown") {
               skew_ratio = 2 - skew_ratio;
             }
-            selected_assignment[6] = skew_ratio;
             draw();
           }
           $(document).keydown(function(event) {
             if ($(fixed_graph).is(":visible")) {
               const rect = fixed_graph.getBoundingClientRect();
-              if (rect.bottom - rect.height / 5 > 70 && rect.y + rect.height / 5 < Math.min(window.innerHeight,document.getElementById("footer").getBoundingClientRect().y) /* Originally Math.min(window.innerHeight,window.innerHeight - (window.innerHeight - footer.y)) */ && !fired) {
+              if (rect.bottom - rect.height / 5 > 70 && rect.y + rect.height / 5 < window.innerHeight && !fired) {
                 fired = true;
                 if (event.key === "ArrowUp" || event.key === "ArrowDown") {
                   whichkey = event.key;
@@ -549,8 +500,34 @@ $(function() {
 
           graph.onclick = function() {
             // stop set skew ratio if canvas is clicked
-            graph.removeEventListener("mousemove",mousemove); 
-            selected_assignment[6] = skew_ratio;
+            graph.removeEventListener("mousemove",mousemove);
+
+            let data = {
+              'csrfmiddlewaretoken': '{{ csrf_token }}',
+            };
+            data["skew_ratio"] = skew_ratio;
+            console.log(data);
+            $.ajax({
+                type: "POST",
+                data: data,
+                error: function(jqXHR, exception) {
+                  if (jqXHR.status === 0) {
+                      alert('Failed to save');
+                  } else if (jqXHR.status == 404) {
+                      alert('Requested page not found, try again');
+                  } else if (jqXHR.status == 500) {
+                      alert('Internal server error. Please contact me if you see this')
+                  } else if (exception === 'parsererror') {
+                      alert('Requested JSON parse failed');
+                  } else if (exception === 'timeout') {
+                      alert('Timeout error');
+                  } else if (exception === 'abort') {
+                      alert('Request aborted');
+                  } else {
+                      alert('Uncaught Error, \n' + jqXHR.responseText);
+                  }
+                }
+            });
           }
         }
 
@@ -956,23 +933,6 @@ $(function() {
 
 {% block body %}
 
-<div class="headerfooter animate" id="header">
-  <div id="imagesettingscontainer">
-    <img height="60" id="imagesettings" src="{% static 'settings.png' %}" alt="settings" draggable="false"/>
-  </div>
-  <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
-    <div id="imagenewcontainer">
-      <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
-    </div>
-    <div id="newassignmenttextcontainer">
-      <p id="newassignmenttext">New Assignment</p>
-    </div>
-  </a>
-  <a href="{% url 'home' %}" id="logo">
-    <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
-  </a>
-</div>
-
 <div id="content" class="animate">
   <div id="assignmentscontainer" class="animate">
     <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hidebutton">Hide</button></div>
@@ -981,7 +941,7 @@ $(function() {
         <div class="assignment" tabindex="0">
           <div class="assignmentheader">
             <span class="title">
-              <span>{{ obj.title }}</span>
+              <span>{{ obj.file_sel }}</span>
               <p class="daysleft">1d</p>
             </span>
             <svg width="30px" height="20px" class="arrowcontainer">
@@ -1010,26 +970,6 @@ $(function() {
         </div>
       </div>
     {% endfor %}
-  </div>
-</div>
-
-<div class="headerfooter animate" id="footer">
-  <div id="leftfooter">
-    <a href="#" class="footerlink">Contact me</a>
-    <a href="#" class="footerlink">Terms of service</a>
-    <a href="#" class="footerlink">Privacy policy</a>
-    <a href="#" class="footerlink">Licenses</a>
-  </div>
-  <div id="socials">
-    <img height="45" class="socialicon" src="{% static 'twitter.png' %}" alt="twitter" draggable="false"/>
-    <img height="45" class="socialicon" src="{% static 'twitter.png' %}" alt="twitter" draggable="false"/>
-    <img height="45" class="socialicon" src="{% static 'twitter.png' %}" alt="twitter" draggable="false"/>
-  </div>
-  <div id="rightfooter">
-    <a href="#" class="footerlink">About me</a>
-    <a href="#" class="footerlink">How does this work</a>
-    <a href="#" class="footerlink">Keybinds</a>
-    <a href="#" class="footerlink">Changelog</a>
   </div>
 </div>
 

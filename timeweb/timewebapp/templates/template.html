@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
 
     <head>
@@ -11,26 +12,19 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
         <style>
-            .headerfooter {
+            #header {
                 width:calc(100% - 10px);
-                background:#0d1a26;
+                background:rgb(13,26,38);
                 height:60px;
                 padding:5px;
                 position:relative;
-            }
-            #header {
                 z-index:2;
-                box-shadow:0px 3px 7px rgb(52,52,52), 0px -5px 0px #0d1a26;
-            }
-            #footer {
-                box-shadow:0px -3px 7px rgb(52,52,52);
-                display:flex;
+                box-shadow:0px 3px 7px rgb(52,52,52), 0px -5px 0px rgb(13,26,38);
             }
             #content {
                 border-right:20px solid gray;
                 border-left:20px solid gray;
-                height:calc(100vh - 140px);
-                min-height:620px;
+                height:calc(100vh - 70px);
                 overflow:auto;
             }
             #logo {
@@ -41,15 +35,105 @@
                 max-width:211px;
             }
             body {
-                min-width:360px;
                 margin:0px;
                 background:radial-gradient(circle, white 0%, rgb(202,202,202) 100%);
+                overflow:hidden;
+            }
+
+            nav {
+                left:0px;
+                top:0px;
+                position:absolute;
+                margin-left:100%;
+                transition:all .2s ease-in-out;
+                width:89px;
+            }
+            .navitem {
+                text-decoration:none;
+                text-align:center;
+                display:block;
+                padding:10px;
+                color:white;
+                font-family:"Open Sans";
+                font-size:12.5px;
+                background:rgb(45,59,71);
+            }
+            .navitem:hover {
+                background:rgb(82,107,130);
+            }
+            #imagemenu {
+                margin-left:32px;
+                margin-top:17.5px;
+                cursor:none;
+            }
+            #imagemenucontainer:hover ~ nav, nav:hover {
+                transform:translateX(-100%);
+            }
+            #navitems, #navimagemenucontainer {
+                transition:all .2s ease-in-out;
+            }
+            #imagemenucontainer:hover ~ nav #navitems, nav:hover #navitems {
+                box-shadow: 0 0 4px 2px black;
+            }
+            #imagemenucontainer:hover ~ nav #navimagemenucontainer, nav:hover #navimagemenucontainer {
+                box-shadow: -5px 0 5px -5px gray;
+            }
+            #imagemenucontainer {
+                position:absolute;
+                height:60px;
+                width:89px;
+                right:0;
+            }
+            #navimagemenu{
+                margin-top:22.5px;
+                margin-left:32px;
+                cursor:none;
+            }
+            #navimagemenucontainer {
+                background:rgb(13,26,38);
+                height:70px;
+                position:relative;
+                z-index:1;
             }
             {% block css %}{% endblock %}
         </style>
         {% block js %}{% endblock %}
     </head>
     <body>
+        <div class="animate" id="header">
+            <div id="imagemenucontainer">
+                <img height="25" id="imagemenu" src="{% static 'hamburger.png' %}" alt="menu" draggable="false"/>
+            </div>
+            <nav>
+                <div id="navimagemenucontainer">
+                <img height="25" id="navimagemenu" src="{% static 'hamburger.png' %}" alt="menu" draggable="false"/>
+                </div>
+                <div id="navitems">
+                <a href="#" class="navitem">Settings</a>
+                <a href="#" class="navitem">Keybinds</a>
+                <a href="#" class="navitem">How Does This Work</a>
+                <a href="#" class="navitem">About Me</a> {% comment %} (contact, credits, motives, etc) {% endcomment %}
+                <a href="#" class="navitem">Changelog</a>
+                <a href="#" class="navitem">Terms of Service</a>
+                <a href="#" class="navitem">Privacy Policy</a>
+                <a href="#" class="navitem">Licenses</a>
+                <a href="#" class="navitem">Contact Me</a>
+                </div>
+            </nav>
+            {% if display_new %}
+                <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
+                    <div id="imagenewcontainer">
+                    <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
+                    </div>
+                    <div id="newassignmenttextcontainer">
+                    <p id="newassignmenttext">New Assignment</p>
+                    </div>
+                </a>
+            {% endif %}
+            <a href="{% url 'home' %}" id="logo">
+                <img src="https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png" alt="TimeWeb" border="0" id="logo">
+            </a>
+        </div>
         {% block body %}{% endblock %}
     </body>
 </html>
