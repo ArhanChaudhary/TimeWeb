@@ -3,11 +3,6 @@
 {% load static %}
 
 {% block css %}
-@media (max-width: 360px) {                  
-   #logo {
-      display: none;
-   }
-}
 .relativepositioningwrapper {
   position: relative;
 }
@@ -61,6 +56,7 @@
   font-family: "Open Sans";
   font-size: 17px;
   margin: 10px 0 0 10px;
+  {% comment %} position:fixed; make this fixed {% endcomment %}
 }
 #hidebutton {
   position: relative;
@@ -70,13 +66,13 @@
 }
 .assignmentcontainer {
   min-height: 40px;
-  min-width: 720px;
+  min-width: 420px;
   position: relative;
   overflow: visible !important;
 }
 .assignment {
   box-shadow: 0 0 4px rgba(52,52,52,0.5);
-  background: rgb(244,141,132);//rgb(132,200,65);
+  background: white;rgb(244,141,132);rgb(132,200,65);
   margin: 10px;
   padding: 15px;
   border: 2px solid rgb(80,80,80);
@@ -131,7 +127,7 @@
   position: absolute;
   font-size: 0.7em;
   font-family: "Open Sans";
-  margin-top: -2px;
+  margin-top: -3px;
 }
 .arrowcontainer {
   float: left;
@@ -146,7 +142,7 @@
 .button {
   position: absolute;
   background: radial-gradient(circle, lightgray 40%, gray 100%);
-  border: 2px solid gray;
+  border: 2px solid rgb(80,80,80);
   border-radius: 50%;
   top: 0;
   bottom: 0;
@@ -172,14 +168,13 @@
   right: -10px;
   height: 35px;
   width: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .deletebuttonimage {
-  top: 1px;
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
+  top: -1px;
 }
-
 .graphcontainer {
   position: relative;
   top: 10px;
@@ -262,12 +257,10 @@ $(function() {
     if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
         // Data sent to server pointing to which assignment to delete
-        const val = $(this).val();
-        const name = $(this).attr('name');
         let data = {
           'csrfmiddlewaretoken': '{{ csrf_token }}',
+          'deleted': $(this).attr('name'),
         }
-        data[name] = val;
 
         const assignmentcontainer = $(this).parent().parent().parent();
 
@@ -385,7 +378,8 @@ $(function() {
         selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)],
         [file_sel,ad,x,unit,y,works,dif_assign,skew_ratio,ctime,funct_round,min_work_time,nwd,fixed_mode,dynamic_start,total_mode,remainder_mode] = selected_assignment;
         ad = new Date(ad);
-
+        x = Math.floor((Date.parse(x) - ad) / 86400000);
+        nwd = nwd.map(Number);
         let mods,
         skew_ratio_lim = 10000,
 
@@ -399,7 +393,6 @@ $(function() {
         len_nwd = nwd.length,
         set_skew_ratio = false,
         min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time/funct_round)*funct_round : funct_round;
-
         function set_mod_days() {
           mods = [0];
           let mod_counter = 0;
@@ -411,7 +404,6 @@ $(function() {
           }
         }
         set_mod_days();
-
 
         function resize(reversescale) {
           if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
@@ -442,7 +434,39 @@ $(function() {
             assignment.off("transitionend");
           }
         });
-
+        let ajax;
+        function UpdateSkewRatio() {
+          clearTimeout(ajax);
+          ajax = setTimeout(function() {
+            let data = {
+              'csrfmiddlewaretoken': '{{ csrf_token }}',
+              'skew_ratio': skew_ratio,
+              'pk': $(graph).attr('name'),
+            };
+            // send value with skew ratio so it can be reference in backend
+            $.ajax({
+              type: "POST",
+              data: data,
+              error: function(jqXHR, exception) {
+                if (jqXHR.status === 0) {
+                  alert('Failed to save');
+                } else if (jqXHR.status == 404) {
+                  alert('Requested page not found, try again');
+                } else if (jqXHR.status == 500) {
+                  alert('Internal server error. Please contact me if you see this');
+                } else if (exception === 'parsererror') {
+                  alert('Requested JSON parse failed');
+                } else if (exception === 'timeout') {
+                  alert('Timeout error');
+                } else if (exception === 'abort') {
+                  alert('Request aborted');
+                } else {
+                  alert('Uncaught Error, \n' + jqXHR.responseText);
+                }
+              }
+            });
+          },1000);
+        }
         // Sets event handlers only on the assignment's first click
         if (!not_first_click) {
 
@@ -457,9 +481,10 @@ $(function() {
           function ChangeSkewRatio() {
 
             skew_ratio = whichkey === "ArrowDown" ? (skew_ratio - 0.1).toFixed(1) : (+skew_ratio /* Force addition instead of concatination */ + 0.1).toFixed(1);
-            if (funct(1,false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] - 1 : x - red_line_start_x - 1,false) && whichkey === "ArrowDown") {
+            if (funct(1,false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor((x - red_line_start_x)/7) * len_nwd - mods[(x - red_line_start_x) % 7] - 1 : x - red_line_start_x - 1,false) && whichkey === "ArrowDown") {
               skew_ratio = 2 - skew_ratio;
             }
+            UpdateSkewRatio();
             draw();
           }
           $(document).keydown(function(event) {
@@ -487,45 +512,29 @@ $(function() {
           });
 
           // setting and stopping set skew ratio handler
-          this.querySelector(".set-skew-ratio-button").onclick = () => graph.addEventListener('mousemove',mousemove); // enable set skew ratio if button is pressed
+          let update = false;
+          this.querySelector(".set-skew-ratio-button").onclick = function() {
+            graph.addEventListener('mousemove',mousemove); // enable set skew ratio if button is pressed
+            update = true;
+          }
 
           graph.onclick = function() {
-            // stop set skew ratio if canvas is clicked
-            graph.removeEventListener("mousemove",mousemove);
-
-            let data = {
-              'csrfmiddlewaretoken': '{{ csrf_token }}',
-            };
-            data["skew_ratio"] = skew_ratio;
-            console.log(data);
-            $.ajax({
-                type: "POST",
-                data: data,
-                error: function(jqXHR, exception) {
-                  if (jqXHR.status === 0) {
-                      alert('Failed to save');
-                  } else if (jqXHR.status == 404) {
-                      alert('Requested page not found, try again');
-                  } else if (jqXHR.status == 500) {
-                      alert('Internal server error. Please contact me if you see this')
-                  } else if (exception === 'parsererror') {
-                      alert('Requested JSON parse failed');
-                  } else if (exception === 'timeout') {
-                      alert('Timeout error');
-                  } else if (exception === 'abort') {
-                      alert('Request aborted');
-                  } else {
-                      alert('Uncaught Error, \n' + jqXHR.responseText);
-                  }
-                }
-            });
+            if (update) {
+              // stop set skew ratio if canvas is clicked
+              graph.removeEventListener("mousemove",mousemove);
+              UpdateSkewRatio();
+              update = false;
+            }
           }
         }
 
         function pset(x2=NaN,y2=NaN) {
             try {
-                var x1 = len_nwd ? x - red_line_start_x - Math.floor(x/7) * len_nwd - mods[x % 7] : x - red_line_start_x,
+                var x1 = x - red_line_start_x,
                     y1 = y - red_line_start_y;
+                if (len_nwd) {
+                  x1 -= Math.floor(x1/7) * len_nwd + mods[x1 % 7];
+                }
                 if (isNaN(x2)) {
                     a = y1 * (1 - skew_ratio) / ((x1-1) * x1);
                     b = (y1 - x1 * x1 * a) / x1;
@@ -669,6 +678,9 @@ $(function() {
             }
             if (y_value_to_cutoff < y1 && y > red_line_start_y && (a || b)) {
                 return_0_cutoff = (a ? (Math.sqrt(b*b+4*a*y_value_to_cutoff)-b)/a/2 : y_value_to_cutoff/b).toFixed(10)-1e-10;
+                if (return_0_cutoff < 0) {
+                  return_0_cutoff++;
+                }
             } else {
                 return_0_cutoff = 1;
             }
@@ -707,7 +719,10 @@ $(function() {
 
         function funct(n,translate=true) {
             if (translate) {
-                n -= len_nwd ? Math.floor(n/7) * len_nwd + mods[n % 7] + red_line_start_x : red_line_start_x;
+                n -= red_line_start_x;
+                if (len_nwd) {
+                  n -= Math.floor(n/7) * len_nwd + mods[n % 7];
+                }
                 if (n > return_y_cutoff) {
                     return y;
                 } else if (n < return_0_cutoff) {
@@ -747,10 +762,12 @@ $(function() {
             } else if (radius < 2) {
                 radius = 2;
             }
+            
+
             let circle_x,
                 circle_y;
             const line_end = Math.floor(x+Math.ceil(1/wCon));
-            screen.strokeStyle = "rgb(233,68,46)"; // red
+            screen.strokeStyle = screen.fillStyle = "rgb(233,68,46)"; // red
             screen.lineWidth = radius;
             screen.beginPath();
             for (let point = red_line_start_x;point<line_end;point+=Math.ceil(1/wCon)) {
@@ -761,6 +778,9 @@ $(function() {
                 circle_y = Math.round(height-funct(point)*hCon-50);
                 screen.lineTo(circle_x,circle_y);
                 screen.arc(circle_x,circle_y,radius,0,2 * Math.PI);
+                if (point == red_line_start_x) {
+                  screen.fill();
+                }
                 screen.moveTo(circle_x,circle_y);
             }
             screen.stroke();
@@ -808,7 +828,18 @@ $(function() {
 
             // y axis label
             screen.rotate(Math.PI/2);
-            screen.fillText(unit === "Minute" ? 'Minutes of Work' : unit + 's (' + format_minutes(ctime) + ') per ' + unit, (height-50)/2, -6);
+            screen.measureText(Math.floor(x))
+            if (unit === "Minute") {
+              var text = 'Minutes of Work',
+                  label_x_pos = -2;
+            } else {
+              var text = unit + 's (' + format_minutes(ctime) + ' per ' + unit + ')',
+                  label_x_pos = -5;
+            }
+            if (screen.measureText(text).width > height - 50) {
+              text = unit + 's';
+            }
+            screen.fillText(text, (height-50)/2, label_x_pos);
             screen.rotate(-Math.PI/2);
 
             screen.font = '13.75px Open Sans';
@@ -817,83 +848,97 @@ $(function() {
             
             // Terribly written code, rewrite later
             if (x >= 10) {
-                const small_x_axis_scale = x_axis_scale / 5,
-                      label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon,
-                      font_size = 13.75;
-                for (let smaller_index=1;smaller_index<=Math.floor(x/small_x_axis_scale);smaller_index++) {
-                    const displayed_number = smaller_index * small_x_axis_scale;
-                    if (smaller_index % 5) {
-                        screen.fillStyle = "rgb(215,215,215)";
-                        screen.fillRect(displayed_number*wCon+48.5,0,2,height-50);
-                        screen.fillStyle = "rgb(80,80,80)";
+              const small_x_axis_scale = x_axis_scale / 5,
+                    label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon,
+                    font_size = 13.75;
+              for (let smaller_index=1;smaller_index<=Math.floor(x/small_x_axis_scale);smaller_index++) {
+                if (smaller_index % 5) {
+                  const displayed_number = smaller_index * small_x_axis_scale;
+                  screen.fillStyle = "rgb(215,215,215)"; // Line color
+                  screen.fillRect(displayed_number*wCon+48.5,0,2,height-50); // Draws line index
+                  screen.fillStyle = "rgb(80,80,80)"; // Number color
+                  if (label_index) {
+                    const numberwidth = screen.measureText(displayed_number).width;
+                    let number_x_pos = displayed_number*wCon+50;
+                    if (number_x_pos + numberwidth/2 > width-1) {
+                      number_x_pos = width-numberwidth/2-1;
                     }
-                    if (label_index || !(smaller_index % 5)) {
-                        if (!(smaller_index % 5)) {
-                            screen.fillStyle = "black";
-                            screen.font = font_size + 2.75 + 'px Open Sans';
-                        }
-                        const numberwidth = screen.measureText(displayed_number).width,
-                              number_x_pos = displayed_number*wCon+50;
-                        if (number_x_pos + numberwidth/2 > width-1) {
-                            number_x_pos = width-numberwidth/2-1;
-                        }
-                        screen.fillText(displayed_number,number_x_pos,height-39);
-                        if (!(smaller_index % 5)) {
-                            screen.font = font_size + 'px Open Sans';
-                        }
-                    }
+                    screen.fillText(displayed_number,number_x_pos,height-39);
+                  }
                 }
+              }
             }
+            
             screen.textBaseline = "alphabetic";
             const y_axis_scale = Math.pow(10,Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0]/Math.ceil((height-100)/100));
+            let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
             if (y >= 10) {
-                const small_y_axis_scale = y_axis_scale / 5,
-                      font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875,
-                      text_height = screen.measureText(0).width * 2,
-                      label_index = text_height < small_y_axis_scale*hCon;
+                const small_y_axis_scale = y_axis_scale / 5;
                 if (font_size < 8.5) {
                     font_size = 8.5;
                 }
                 screen.font = font_size + 'px Open Sans';
+                const text_height = screen.measureText(0).width * 2,
+                      label_index = text_height < small_y_axis_scale*hCon;
                 screen.textAlign = "right";
                 for (let smaller_index=1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
                     const displayed_number = smaller_index * small_y_axis_scale;
                     if (smaller_index % 5) {
-                        screen.fillStyle = "rgb(215,215,215)";
-                        screen.fillRect(50,height-51.5-displayed_number*hCon,width-50,2);
-                        screen.fillStyle = "rgb(80,80,80)";
-                    } 
-                    if (label_index || !(smaller_index % 5)) {
-                        if (!(smaller_index % 5)) {
-                            screen.fillStyle = "black";
-                            screen.font = font_size * 1.2 + 'px Open Sans';
-                        }
-                        const number_y_pos = height-displayed_number*hCon-52+text_height/2;
-                        if (number_y_pos < 6 + text_height/2) {
-                            number_y_pos = 6 + text_height/2;
-                        }
-                        if (38.5 - screen.measureText(displayed_number).width < 1) {
-                            screen.textAlign = "left";
-                            screen.fillText(displayed_number,1,number_y_pos);
-                            screen.textAlign = "right";
-                        } else {
-                            screen.fillText(displayed_number,38.5,number_y_pos);
-                        }
-                        if (!(smaller_index % 5)) {
-                            screen.font = font_size + 'px Open Sans';
-                        }
-                    }                      
+                      screen.fillStyle = "rgb(215,215,215)";
+                      screen.fillRect(50,height-51.5-displayed_number*hCon,width-50,2);
+                      screen.fillStyle = "rgb(80,80,80)";
+                      if (label_index) {
+                          let number_y_pos = height-displayed_number*hCon-54+text_height/2;
+                          if (number_y_pos < 4 + text_height/2) {
+                              number_y_pos = 4 + text_height/2;
+                          }
+                          if (38.5 - screen.measureText(displayed_number).width < 20+label_x_pos) {
+                              screen.textAlign = "left";
+                              screen.fillText(displayed_number,20+label_x_pos,number_y_pos);
+                              screen.textAlign = "right";
+                          } else {
+                              screen.fillText(displayed_number,38.5,number_y_pos);
+                          }
+                      }
+                    }           
                 }
             }
-            screen.fillStyle = "rgb(205,205,205)";
-            for (let bigger_index = Math.ceil(x - x % x_axis_scale);bigger_index>0;bigger_index-=x_axis_scale) {
-                screen.fillRect(bigger_index*wCon+47.5,0,5,height-50);
-            }
+            font_size *= 1.2;
+            screen.font = font_size + 'px Open Sans';
+            const text_height = screen.measureText(0).width * 2;
             for (let bigger_index = Math.ceil(y - y % y_axis_scale);bigger_index>0;bigger_index-=y_axis_scale) {
                 if (bigger_index * 2 < y_axis_scale) {
                   break;
                 }
+                screen.fillStyle = "rgb(205,205,205)";
                 screen.fillRect(50,height-bigger_index*hCon-52.5,width-50,5);
+                screen.fillStyle = "black";
+                let number_y_pos = height-bigger_index*hCon-54+text_height/2;
+                if (number_y_pos < 4 + text_height/2) {
+                    number_y_pos = 4 + text_height/2;
+                }
+                if (38.5 - screen.measureText(bigger_index).width < 20+label_x_pos) {
+                    screen.textAlign = "left";
+                    screen.fillText(bigger_index,20+label_x_pos,number_y_pos);
+                    screen.textAlign = "right";
+                } else {
+                    screen.fillText(bigger_index,38.5,number_y_pos);
+                } 
+            }
+
+            screen.textBaseline = "top";
+            screen.textAlign = "center";
+            screen.font = '16.5px Open Sans';
+            for (let bigger_index = Math.ceil(x - x % x_axis_scale);bigger_index>0;bigger_index-=x_axis_scale) {
+              screen.fillStyle = "rgb(205,205,205)";
+              screen.fillRect(bigger_index*wCon+47.5,0,5,height-50);
+              screen.fillStyle = "black";
+              const numberwidth = screen.measureText(bigger_index).width;
+              let number_x_pos = bigger_index*wCon+50;
+              if (number_x_pos + numberwidth/2 > width-1) {
+                  number_x_pos = width-numberwidth/2-1;
+              }
+              screen.fillText(bigger_index,number_x_pos,height-39);
             }
         }
 
@@ -936,22 +981,22 @@ $(function() {
             </span>
             <svg width="30px" height="20px" class="arrowcontainer">
               <polygon class="arrow" points="5,0 5,20 15,10">
-                <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"/>
-                <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"/>
+                <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
+                <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
             <a class="button updatebutton" href="{% url 'list' obj.pk%}">
               <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
             </a>
-            <button name="{{ obj.pk }}" value="deleted" class="button deletebutton">
+            <button name="{{ obj.pk }}" class="button deletebutton">
               <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
             </button>
           </div>
           <div class="relativepositioningwrapper">
             <div class="graphcontainer">
               <canvas class="fixed-graph"></canvas>
-              <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
+              <canvas name="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <button class="set-skew-ratio-button">Set skew ratio</button>
               <div class="graphfooter">
               </div>

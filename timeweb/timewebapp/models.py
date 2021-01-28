@@ -2,17 +2,22 @@
 # from built-in library
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from multiselectfield import MultiSelectField
 
+WEEKDAYS = ((0, "Sunday"),
+                (1,"Monday"),
+                (2,"Tuesday"),
+                (3,"Wednesday"),
+                (4,"Thursday"),
+                (5,"Friday"),
+                (6,"Saturday"))
+
+def default_works():
+    return 0
+# print(weekday_field.fields)
 # declare a new model with a name "TimewebModel"
 class TimewebModel(models.Model):
-    class Weekdays(models.TextChoices):
-        SUN = '0',"SUNDAY"
-        MON = '1',"MONDAY"
-        TUE = '2',"TUESDAY"
-        WED = '3',"WEDNESDAY"
-        THU = '4',"THURSDAY"
-        FRI = '5',"FRIDAY"
-        SAT = '6',"SATURDAY"
+    
     # fields of the model
     file_sel = models.CharField(
         max_length=40,
@@ -26,7 +31,6 @@ class TimewebModel(models.Model):
     )
     unit = models.CharField(
         max_length=40,
-        blank=True,
         default="Minute",
     )
     y = models.DecimalField(
@@ -34,28 +38,25 @@ class TimewebModel(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(1.00)],
     )
-    adone = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=0,
-        validators=[MinValueValidator(0.00)]
+    works = models.JSONField(
+        default=default_works,
     )
     dif_assign = models.IntegerField(
         blank=True,
         null=True,
     )
-    skew_ratio = models.DecimalField(
-        max_digits=15,
-        decimal_places=3,
+    skew_ratio = models.TextField(
         default=1,
     )
-    ctime = models.IntegerField(
-        validators=[MinValueValidator(1)],
+    ctime = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(0.00)],
     )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.00)],
+        validators=[MinValueValidator(0.01)],
         blank=True,
         null=True,
     )
@@ -66,9 +67,14 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    nwd = models.CharField(
-        max_length=2,
-        choices=Weekdays.choices,
+    # nwd = models.CharField(
+    #     max_length=2,
+    #     choices=WEEKDAYS,
+    #     blank=True,
+    #     null=True,
+    # )
+    nwd = MultiSelectField(
+        choices=WEEKDAYS,
         blank=True,
         null=True,
     )

@@ -34,12 +34,17 @@
                 max-height: 60px;
                 max-width: 211px;
             }
+            @media (max-width: 360px) {
+                #logo {
+                    display: none;
+                }
+            }
             body {
                 margin: 0;
                 background: radial-gradient(circle, white 0, rgb(202,202,202) 100%);
                 overflow: hidden;
             }
-            #imagemenucontainer {
+            #menucontainer {
                 position: absolute;
                 height: 60px;
                 width: 89px;
@@ -49,14 +54,14 @@
                 left: 0;
                 top: 0;
                 position: absolute;
-                margin-left: 100%;
+                margin-left: calc(100% + 1px);
                 transition: all .2s ease-in-out;
                 width: 89px;
             }
-            #navitems, #navimagemenucontainer {
+            #navitems, #navmenucontainer {
                 transition: box-shadow .2s ease-in-out;
             }
-            #navimagemenucontainer {
+            #navmenucontainer {
                 background: rgb(13,26,38);
                 padding: 5px 0;
                 position: relative;
@@ -68,6 +73,8 @@
             #navitems {
                 position: relative;
                 top: -4px;
+                overflow: auto;
+                max-height: calc(100vh - 70px);
             }
             .navitem {
                 text-decoration: none;
@@ -79,37 +86,56 @@
                 font-size: 12.5px;
                 background: rgb(45,59,71);
             }
-            .navitem:hover {
+            .navitem:hover, .navitem:focus {
                 background: rgb(82,107,130);
             }
-            #imagemenucontainer:hover ~ nav, nav:hover {
+            #menucontainer:hover ~ nav, 
+            #menucontainer:focus ~ nav, 
+            nav:hover,
+            .open nav {
                 transform: translateX(-100%);
             }
-            #imagemenucontainer:hover ~ nav #navitems, nav:hover #navitems {
+            #menucontainer:hover ~ nav #navitems, 
+            nav:hover #navitems, 
+            #menucontainer:focus ~ nav #navitems,
+            .open #navitems {
                 box-shadow: 0 0 4px 2px black;
             }
-            #imagemenucontainer:hover ~ nav #navimagemenucontainer, nav:hover #navimagemenucontainer {
+            #menucontainer:hover ~ nav #navmenucontainer, 
+            nav:hover #navmenucontainer, 
+            #menucontainer:focus ~ nav #navmenucontainer,
+            .open #navmenucontainer {
                 box-shadow: -5px 0 5px -5px gray;
             }
             {% block css %}{% endblock %}
         </style>
+        <script>
+            // Deals with selecting the parent element when tabbing into the menu
+            $(document).keydown(function(event) {
+                setTimeout(function() {
+                    $(document.body).toggleClass("open",
+                        event.key === "Tab" && $(document.activeElement).hasClass("navitem")
+                    );
+                },1);
+            });
+        </script>
         {% block js %}{% endblock %}
     </head>
     <body>
         <div class="animate" id="header">
-            
-            <svg width="89px" height="60px" id="imagemenucontainer">
+            <svg width="89px" height="60px" id="menucontainer" tabindex="2">
                 <rect y="19.75" x="32" width="25" height="4.25"/>
                 <rect y="28" x="32" width="25" height="4.25"/>
                 <rect y="36.25" x="32" width="25" height="4.25"/>
             </svg>
             <nav>
-                <svg width="89px" height="60px" id="navimagemenucontainer">
+                <svg width="89px" height="60px" id="navmenucontainer">
                     <rect y="19.75" x="32" width="25" height="4.25"/>
                     <rect y="28" x="32" width="25" height="4.25"/>
                     <rect y="36.25" x="32" width="25" height="4.25"/>
                 </svg>
                 <div id="navitems">
+                    <a href="#" class="navitem">How to Use</a>
                     <a href="#" class="navitem">Settings</a>
                     <a href="#" class="navitem">Keybinds</a>
                     <a href="#" class="navitem">How Does This Work</a>
@@ -122,17 +148,17 @@
                 </div>
             </nav>
             {% if display_new %}
-                <a href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
-                    <div id="imagenewcontainer">
-                    <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
+                <a tabindex="-1" href="{% url 'new' %}" title="(Shift + N)" id="newassignmentcontainer">
+                    <div id="imagenewcontainer" tabindex="1">
+                        <img height="60" id="imagenew" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
                     </div>
                     <div id="newassignmenttextcontainer">
-                    <p id="newassignmenttext">New Assignment</p>
+                        <p id="newassignmenttext">New Assignment</p>
                     </div>
                 </a>
             {% endif %}
-            <a href="{% url 'home' %}" id="logo">
-                <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" id="logo"/>
+            <a href="{% url 'home' %}">
+                <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" id="logo" tabindex="-1"/>
                 {% comment %} https://fontmeme.com/fonts/alba-font/ {% endcomment %}
                 {% comment %} https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
             </a>
