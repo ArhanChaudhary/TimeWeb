@@ -155,14 +155,17 @@ class TimewebListView(View):
     # However, it still cannot be referanced because 'Deletebutton': [''] is not a good indication
     # So, pass in a value into the button such that the new request.POST will have Deletebutton': ['deleted'] instead
     def post(self,request):
-        pk = request.POST['pk']
-        selected_model = get_object_or_404(TimewebModel, pk=pk)
+        print(request.POST)
         for key, value in request.POST.items():
             if key == "deleted":
+                pk = value
+                selected_model = get_object_or_404(TimewebModel, pk=pk)
                 selected_model.delete()
                 self.logger.debug("Deleted")
             elif key == "skew_ratio":
-                selected_model.skew_ratio = request.POST['skew_ratio']
+                pk = request.POST['pk']
+                selected_model = get_object_or_404(TimewebModel, pk=pk)
+                selected_model.skew_ratio = value
                 selected_model.save()
                 self.logger.debug("Skew ratio saved")
         self.make_list()

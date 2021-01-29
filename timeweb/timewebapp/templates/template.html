@@ -11,6 +11,7 @@
         <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
         <style>
             #header {
                 width: calc(100% - 10px);
@@ -25,7 +26,7 @@
                 border-right: 20px solid gray;
                 border-left: 20px solid gray;
                 height: calc(100vh - 70px);
-                overflow: auto;
+                overflow-y: auto;
             }
             #logo {
                 display: block;
@@ -34,7 +35,7 @@
                 max-height: 60px;
                 max-width: 211px;
             }
-            @media (max-width: 360px) {
+            @media only screen and (max-width: 360px) {
                 #logo {
                     display: none;
                 }
@@ -92,31 +93,32 @@
             #menucontainer:hover ~ nav, 
             #menucontainer:focus ~ nav, 
             nav:hover,
-            .open nav {
-                transform: translateX(-100%);
+            nav.open {
+                transform: translateX(calc(-100% - 1px));
             }
             #menucontainer:hover ~ nav #navitems, 
             nav:hover #navitems, 
             #menucontainer:focus ~ nav #navitems,
-            .open #navitems {
+            nav.open #navitems {
                 box-shadow: 0 0 4px 2px black;
             }
             #menucontainer:hover ~ nav #navmenucontainer, 
             nav:hover #navmenucontainer, 
             #menucontainer:focus ~ nav #navmenucontainer,
-            .open #navmenucontainer {
+            nav.open #navmenucontainer {
                 box-shadow: -5px 0 5px -5px gray;
             }
             {% block css %}{% endblock %}
         </style>
         <script>
             // Deals with selecting the parent element when tabbing into the menu
-            $(document).keydown(function(event) {
-                setTimeout(function() {
-                    $(document.body).toggleClass("open",
-                        event.key === "Tab" && $(document.activeElement).hasClass("navitem")
-                    );
-                },1);
+            $(function() {
+                $(".navitem").focusout(function() {
+                    $("nav").removeClass("open");
+                });
+                $(".navitem").focus(function() {
+                    $("nav").addClass("open");
+                });
             });
         </script>
         {% block js %}{% endblock %}
@@ -124,19 +126,19 @@
     <body>
         <div class="animate" id="header">
             <svg width="89px" height="60px" id="menucontainer" tabindex="2">
-                <rect y="19.75" x="32" width="25" height="4.25"/>
-                <rect y="28" x="32" width="25" height="4.25"/>
-                <rect y="36.25" x="32" width="25" height="4.25"/>
+                <rect y="19.75" x="32" width="25" height="4.25"></rect>
+                <rect y="28" x="32" width="25" height="4.25"></rect>
+                <rect y="36.25" x="32" width="25" height="4.25"></rect>
             </svg>
             <nav>
                 <svg width="89px" height="60px" id="navmenucontainer">
-                    <rect y="19.75" x="32" width="25" height="4.25"/>
-                    <rect y="28" x="32" width="25" height="4.25"/>
-                    <rect y="36.25" x="32" width="25" height="4.25"/>
+                    <rect y="19.75" x="32" width="25" height="4.25"></rect>
+                    <rect y="28" x="32" width="25" height="4.25"></rect>
+                    <rect y="36.25" x="32" width="25" height="4.25"></rect>
                 </svg>
                 <div id="navitems">
-                    <a href="#" class="navitem">How to Use</a>
                     <a href="#" class="navitem">Settings</a>
+                    <a href="#" class="navitem">How to Use</a>
                     <a href="#" class="navitem">Keybinds</a>
                     <a href="#" class="navitem">How Does This Work</a>
                     <a href="#" class="navitem">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}

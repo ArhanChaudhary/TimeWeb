@@ -23,6 +23,7 @@
 }
 #assignmentscontainer {
   transition: all 1.2s cubic-bezier(0.26, 0.74, 0, 1.03);
+  min-width: 200px;
 }
 #assignmentscontainer.animate {
   transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
@@ -56,7 +57,6 @@
   font-family: "Open Sans";
   font-size: 17px;
   margin: 10px 0 0 10px;
-  {% comment %} position:fixed; make this fixed {% endcomment %}
 }
 #hidebutton {
   position: relative;
@@ -66,13 +66,14 @@
 }
 .assignmentcontainer {
   min-height: 40px;
-  min-width: 420px;
   position: relative;
   overflow: visible !important;
 }
 .assignment {
   box-shadow: 0 0 4px rgba(52,52,52,0.5);
-  background: white;rgb(244,141,132);rgb(132,200,65);
+  background: white;
+  background: rgb(226,91,80);
+  {% comment %} background: rgb(132,200,65); {% endcomment %}
   margin: 10px;
   padding: 15px;
   border: 2px solid rgb(80,80,80);
@@ -132,12 +133,19 @@
 .arrowcontainer {
   float: left;
   margin-left: max(5px,calc(-5px + 2vw));
+  overflow: visible;
 }
 .status {
   float: left;
   font-size: min(16.76px,calc(11px + 0.4vw));
   font-family: "Open Sans";
   margin: 0 70px 0 0;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .button {
   position: absolute;
@@ -171,9 +179,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 .deletebuttonimage {
   top: -1px;
+}
+@media (max-width: 275px) {
+    .deletebutton {
+        display: none;
+    }
+}
+@media (max-width: 314px) {
+    .updatebutton {
+        display: none;
+    }
 }
 .graphcontainer {
   position: relative;
@@ -215,9 +234,11 @@ canvas:focus {
 
 <script>
 // Doesn't allow the user to go back and load deleted assignments to avoid a 404
-window.addEventListener('popstate', function() {
+
+// may or may not be needed
+{% comment %} window.addEventListener('popstate', function() {
     history.pushState(null, null, document.URL);
-}());
+}()); {% endcomment %}
 </script>
 
 <script>
@@ -259,7 +280,7 @@ $(function() {
         // Data sent to server pointing to which assignment to delete
         let data = {
           'csrfmiddlewaretoken': '{{ csrf_token }}',
-          'deleted': $(this).attr('name'),
+          'deleted': $(this).val(),
         }
 
         const assignmentcontainer = $(this).parent().parent().parent();
@@ -337,7 +358,7 @@ $(function() {
   let [date_last_closed,warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,display_instructions,autofill,ignore_ends,dark_mode,show_progress_bar,show_past] = dat[0]
   function PreventArrowScroll(event) {
     // arrow keys
-    if ([37, 38, 39, 40].includes(event.keyCode)) {
+    if (event.keyCode >= 37 && event.keyCode <= 40) {
         event.preventDefault();
     }
   }
@@ -349,6 +370,8 @@ $(function() {
       const not_first_click = assignment.data('not_first_click');
       if (graphcontainer.attr("style")) {
         assignment.removeClass("disablehover");
+
+        // Don't check for min-height transitionend because it causes bugs when the assignment is reopened too fast
         assignment.one("transitionend",function() {
           assignment.removeAttr("style");
           graphcontainer.removeAttr("style");
@@ -441,8 +464,8 @@ $(function() {
             let data = {
               'csrfmiddlewaretoken': '{{ csrf_token }}',
               'skew_ratio': skew_ratio,
-              'pk': $(graph).attr('name'),
-            };
+              'pk': $(graph).val(),
+            }
             // send value with skew ratio so it can be reference in backend
             $.ajax({
               type: "POST",
@@ -599,32 +622,28 @@ $(function() {
             } else {
                 var funct_y = ((Math.sqrt(b*b+4*a*y1)-b)/a/2).toFixed(10);
             }
-            
+
             if (funct_round < min_work_time) {
-                cutoff_transition_value = 0;
-                if (a) {
-                    cutoff_to_use_round = ((min_work_time_funct_round-b)/a/2).toFixed(10)-1e-10;
-                    if (funct_zero < cutoff_to_use_round && cutoff_to_use_round < funct_y) {
-                        for (let n of [Math.floor(cutoff_to_use_round),Math.floor(cutoff_to_use_round + 1)]) {
-                            var output = funct(n,false);
-                            if (output > y) {
-                                output = y;
-                            } else if (output < 0) {
-                                output = 0;
-                            }
-                            if (n == Math.floor(cutoff_to_use_round)) {
-                                var prev_output = output;
-                            }
-                        }
-                        if (output - prev_output) {
-                            cutoff_transition_value = min_work_time_funct_round - output + prev_output;
-                        } else {
-                            cutoff_transition_value = 0;
-                        }
-                    } else {
-                        cutoff_transition_value = 0;
+              cutoff_transition_value = 0;
+              if (a) {
+                cutoff_to_use_round = ((min_work_time_funct_round-b)/a/2).toFixed(10)-1e-10;
+                if (funct_zero < cutoff_to_use_round && cutoff_to_use_round < funct_y) {
+                  for (let n of [Math.floor(cutoff_to_use_round),Math.ceil(cutoff_to_use_round)]) {
+                    var output = funct(n,false);
+                    if (output > y) {
+                      output = y;
+                    } else if (output < 0) {
+                      output = 0;
                     }
+                    if (n == Math.floor(cutoff_to_use_round)) {
+                      var prev_output = output;
+                    }
+                  }
+                  if (output - prev_output) {
+                    cutoff_transition_value = min_work_time_funct_round - output + prev_output;
+                  }
                 }
+              }
             }
             if (ignore_ends_mwt) {
                 var y_value_to_cutoff = y1;    
@@ -873,35 +892,35 @@ $(function() {
             const y_axis_scale = Math.pow(10,Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0]/Math.ceil((height-100)/100));
             let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
             if (y >= 10) {
-                const small_y_axis_scale = y_axis_scale / 5;
-                if (font_size < 8.5) {
-                    font_size = 8.5;
-                }
-                screen.font = font_size + 'px Open Sans';
-                const text_height = screen.measureText(0).width * 2,
-                      label_index = text_height < small_y_axis_scale*hCon;
-                screen.textAlign = "right";
-                for (let smaller_index=1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
-                    const displayed_number = smaller_index * small_y_axis_scale;
-                    if (smaller_index % 5) {
-                      screen.fillStyle = "rgb(215,215,215)";
-                      screen.fillRect(50,height-51.5-displayed_number*hCon,width-50,2);
-                      screen.fillStyle = "rgb(80,80,80)";
-                      if (label_index) {
-                          let number_y_pos = height-displayed_number*hCon-54+text_height/2;
-                          if (number_y_pos < 4 + text_height/2) {
-                              number_y_pos = 4 + text_height/2;
-                          }
-                          if (38.5 - screen.measureText(displayed_number).width < 20+label_x_pos) {
-                              screen.textAlign = "left";
-                              screen.fillText(displayed_number,20+label_x_pos,number_y_pos);
-                              screen.textAlign = "right";
-                          } else {
-                              screen.fillText(displayed_number,38.5,number_y_pos);
-                          }
-                      }
-                    }           
-                }
+              const small_y_axis_scale = y_axis_scale / 5;
+              if (font_size < 8.5) {
+                font_size = 8.5;
+              }
+              screen.font = font_size + 'px Open Sans';
+              const text_height = screen.measureText(0).width * 2,
+                    label_index = text_height < small_y_axis_scale*hCon;
+              screen.textAlign = "right";
+              for (let smaller_index=1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
+                const displayed_number = smaller_index * small_y_axis_scale;
+                if (smaller_index % 5) {
+                  screen.fillStyle = "rgb(215,215,215)";
+                  screen.fillRect(50,height-51.5-displayed_number*hCon,width-50,2);
+                  screen.fillStyle = "rgb(80,80,80)";
+                  if (label_index) {
+                    let number_y_pos = height-displayed_number*hCon-54+text_height/2;
+                    if (number_y_pos < 4 + text_height/2) {
+                      number_y_pos = 4 + text_height/2;
+                    }
+                    if (38.5 - screen.measureText(displayed_number).width < 20+label_x_pos) {
+                      screen.textAlign = "left";
+                      screen.fillText(displayed_number,20+label_x_pos,number_y_pos);
+                      screen.textAlign = "right";
+                    } else {
+                      screen.fillText(displayed_number,38.5,number_y_pos);
+                    }
+                  }
+                }           
+              }
             }
             font_size *= 1.2;
             screen.font = font_size + 'px Open Sans';
@@ -915,14 +934,14 @@ $(function() {
                 screen.fillStyle = "black";
                 let number_y_pos = height-bigger_index*hCon-54+text_height/2;
                 if (number_y_pos < 4 + text_height/2) {
-                    number_y_pos = 4 + text_height/2;
+                  number_y_pos = 4 + text_height/2;
                 }
                 if (38.5 - screen.measureText(bigger_index).width < 20+label_x_pos) {
-                    screen.textAlign = "left";
-                    screen.fillText(bigger_index,20+label_x_pos,number_y_pos);
-                    screen.textAlign = "right";
+                  screen.textAlign = "left";
+                  screen.fillText(bigger_index,20+label_x_pos,number_y_pos);
+                  screen.textAlign = "right";
                 } else {
-                    screen.fillText(bigger_index,38.5,number_y_pos);
+                  screen.fillText(bigger_index,38.5,number_y_pos);
                 } 
             }
 
@@ -989,14 +1008,14 @@ $(function() {
             <a class="button updatebutton" href="{% url 'list' obj.pk%}">
               <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
             </a>
-            <button name="{{ obj.pk }}" class="button deletebutton">
+            <button value="{{ obj.pk }}" class="button deletebutton">
               <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
             </button>
           </div>
           <div class="relativepositioningwrapper">
             <div class="graphcontainer">
               <canvas class="fixed-graph"></canvas>
-              <canvas name="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
+              <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <button class="set-skew-ratio-button">Set skew ratio</button>
               <div class="graphfooter">
               </div>
