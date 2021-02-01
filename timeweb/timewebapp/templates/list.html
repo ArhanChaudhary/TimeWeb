@@ -3,7 +3,14 @@
 {% load static %}
 
 {% block css %}
-.relativepositioningwrapper {
+.disable-transition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}
+.relative-positioning-wrapper {
   position: relative;
 }
 #header {
@@ -21,50 +28,24 @@
   height: 115vh;
   transform: translateY(-70px);
 }
-#assignmentscontainer {
+#assignments-container {
   transition: all 1.2s cubic-bezier(0.26, 0.74, 0, 1.03);
   min-width: 200px;
 }
-#assignmentscontainer.animate {
+#assignments-container.animate {
   transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
 }
 
-#imagenew {
-  left: 5px;
-  position: absolute;
-}
-#imagenewcontainer {
-  position: absolute;
-  height: 60px;
-  width: 70px;
-}
-#newassignmenttext {
-  position: absolute;
-  left: 75px;
-  top: 0;
-  color: white;
-  font-size: 20px;
-  font-family: "Open Sans";
-  display: block;
-  max-width: calc(50% - 190px);
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 #info {
-  font-family: "Open Sans";
   font-size: 17px;
   margin: 10px 0 0 10px;
 }
-#hidebutton {
+#hide-button {
   position: relative;
   left: 1px;
   bottom: 0.65px;
-  font-family: "Open Sans";
 }
-.assignmentcontainer {
+.assignment-container {
   min-height: 40px;
   position: relative;
   overflow: visible !important;
@@ -72,7 +53,7 @@
 .assignment {
   box-shadow: 0 0 4px rgba(52,52,52,0.5);
   background: white;
-  background: rgb(226,91,80);
+  {% comment %} background: rgb(226,91,80); {% endcomment %}
   {% comment %} background: rgb(132,200,65); {% endcomment %}
   margin: 10px;
   padding: 15px;
@@ -105,7 +86,7 @@
   box-shadow: 0 0 7px rgba(52,52,52,0.7);
   cursor: pointer;
 }
-.assignmentheader {
+.assignment-header {
   display: flex;
   align-items: center;
   position: relative;
@@ -115,22 +96,19 @@
   min-width: calc(95px + 8vw);
   max-width: calc(95px + 8vw);
   font-size: min(16.76px,calc(11px + 0.4vw));
-  font-family: "Open Sans";
   overflow-wrap: break-word;
 }
 .importance {
   position: absolute;
   font-size: 0.7em;
-  font-family: "Open Sans";
   margin-top: -1em;
 }
 .daysleft {
   position: absolute;
   font-size: 0.7em;
-  font-family: "Open Sans";
   margin-top: -3px;
 }
-.arrowcontainer {
+.arrow-container {
   float: left;
   margin-left: max(5px,calc(-5px + 2vw));
   overflow: visible;
@@ -138,7 +116,6 @@
 .status {
   float: left;
   font-size: min(16.76px,calc(11px + 0.4vw));
-  font-family: "Open Sans";
   margin: 0 70px 0 0;
 
   display: -webkit-box;
@@ -162,17 +139,17 @@
 .button:active {
   background: radial-gradient(circle, white 55%, gray 100%);
 }
-.updatebutton {
+.update-button {
   right: 30px;
   height: 30px;
   width: 30px;
 }
-.updatebuttonimage {
+.update-button-image {
   top: 5px;
   left: 5px;
   position: relative;
 }
-.deletebutton {
+.delete-button {
   right: -10px;
   height: 35px;
   width: 35px;
@@ -181,20 +158,20 @@
   align-items: center;
   overflow: hidden;
 }
-.deletebuttonimage {
+.delete-button-image {
   top: -1px;
 }
 @media (max-width: 275px) {
-    .deletebutton {
+    .delete-button {
         display: none;
     }
 }
 @media (max-width: 314px) {
-    .updatebutton {
+    .update-button {
         display: none;
     }
 }
-.graphcontainer {
+.graph-container {
   position: relative;
   top: 10px;
   display: none;
@@ -206,7 +183,9 @@ canvas {
   width: calc(100% - 34px);
   min-height: 200px;
   max-height: 400px;
+  {% comment %} positioned really weirdly but still works {% endcomment %}
   margin: 5px;
+  margin-left: 13px;
 }
 canvas:focus {
   box-shadow: 0 0 0 2px rgb(0,95,204), 0 0 5px 2px rgb(0,95,204);
@@ -214,17 +193,18 @@ canvas:focus {
 }
 .fixed-graph {
   border: 4px solid rgba(108,108,108,.75); {% comment %} rgb(178,178,178) {% endcomment %}
-  margin-left: 13px;
   position: absolute;
 }
 .graph {
-  margin-left: 13px;
   position: relative;
   border: 4px solid transparent;
 }
 
-.graphfooter {
-  height: 100px;
+.graph-footer {
+  padding: 0 13px;
+}
+.sr-textbox {
+  width: 95px;
 }
 {% endblock %}
 
@@ -243,28 +223,31 @@ canvas:focus {
 
 <script>
 // Starting animation
-$(window).load(function() {
-  // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
-  
-  $("#content").on("transitionend",function(event) {
-    if (event.originalEvent.propertyName === "height") {
-      document.getElementById('content').style.transition = 'none';
-      $("#content").off("transitionend");
-    }
-  });
-  $(".animate").removeClass("animate");
-});
-</script>
 
-<script>
-// Keybinds
-$(document).keypress(function(event) {
-  if (event.shiftKey && event.key == 'N') {
-    window.location.replace("{% url 'new' %}");
-  } else if (event.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON') {
-    document.activeElement.click();
-  }
-});
+if ("hasAnimationRan" in sessionStorage) {
+    disable_transition = true;
+} else {
+    disable_transition = false;
+    sessionStorage.setItem("hasAnimationRan", true);
+}
+if (disable_transition) {
+  $(function() {
+    $("#content, #header, #assignments-container").addClass("disable-transition");
+    $(".animate").removeClass("animate");
+  });
+} else {
+  $(window).load(function() {
+    // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
+    
+    $("#content").on("transitionend",function(event) {
+      if (event.originalEvent.propertyName === "height") {
+        document.getElementById('content').style.transition = 'none';
+        $("#content").off("transitionend");
+      }
+    });
+    $(".animate").removeClass("animate");
+  });
+}
 </script>
 
 <script>
@@ -274,7 +257,7 @@ $(function() {
     $(".title:first").prepend('<p class="importance">Most Important</p>');
     $(".title:last").prepend('<p class="importance">Least Important</p>');
   }
-  $('.deletebutton').click(function() {
+  $('.delete-button').click(function() {
     if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
         // Data sent to server pointing to which assignment to delete
@@ -283,28 +266,28 @@ $(function() {
           'deleted': $(this).val(),
         }
 
-        const assignmentcontainer = $(this).parent().parent().parent();
+        const assignment_container = $(this).parent().parent().parent();
 
         // If the data was successfully sent, delete the assignment
         const success = function() {
           
-          $(assignmentcontainer).css({
+          $(assignment_container).css({
             // CSS doesn't allow transitions without presetting the property
             // So, use JQuery to preset and animate its property
-            "height":$(assignmentcontainer).height()+20+"px",
+            "height":$(assignment_container).height()+20+"px",
 
             "margin-bottom":"-10px",
             "min-height":"0",
           });
-          if (!assignmentcontainer.is(':nth-child(2)')) {
-            $(assignmentcontainer).css("margin-top","-10px");
+          if (!assignment_container.is(':nth-child(2)')) {
+            $(assignment_container).css("margin-top","-10px");
           }
-          $(assignmentcontainer.children(":first-child")).css({
+          $(assignment_container.children(":first-child")).css({
             "position":"absolute",
             "opacity":"0",
           })
-          $(assignmentcontainer).animate({height:"10px"},200,function() {
-            $(assignmentcontainer).remove();
+          $(assignment_container).animate({height:"10px"},200,function() {
+            $(assignment_container).remove();
             if (document.getElementsByClassName("title").length === 1) {
               $(".importance:first").empty();
               $(".importance:last").empty();
@@ -344,7 +327,7 @@ $(function() {
 <script>
 // Hide and show estimated completion time
 $(function() {
-  $("#hidebutton").click(function() {
+  $("#hide-button").click(function() {
     $(this.previousSibling).toggle();
     this.innerHTML = this.innerHTML === 'Hide' ? 'Show' : 'Hide';
   });
@@ -355,7 +338,7 @@ $(function() {
 // Entire graph
 $(function() {
   let dat = JSON.parse(document.getElementById("load-data").textContent);
-  let [date_last_closed,warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,display_instructions,autofill,ignore_ends,dark_mode,show_progress_bar,show_past] = dat[0]
+  let [warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,autofill,ignore_ends,show_progress_bar,show_past,translatez,priority_display] = dat[0]
   function PreventArrowScroll(event) {
     // arrow keys
     if (event.keyCode >= 37 && event.keyCode <= 40) {
@@ -364,20 +347,20 @@ $(function() {
   }
 
   $(".assignment").click(function(event) {
-    if (!["A","IMG","BUTTON","CANVAS"].includes(event.target.tagName)) {
+    if (!["A","IMG","BUTTON","CANVAS","INPUT"].includes(event.target.tagName)) {
       let assignment = $(this);
-      const graphcontainer = assignment.find(".graphcontainer");
+      const graph_container = assignment.find(".graph-container");
       const not_first_click = assignment.data('not_first_click');
-      if (graphcontainer.attr("style")) {
+      if (graph_container.attr("style")) {
         assignment.removeClass("disablehover");
 
         // Don't check for min-height transitionend because it causes bugs when the assignment is reopened too fast
         assignment.one("transitionend",function() {
           assignment.removeAttr("style");
-          graphcontainer.removeAttr("style");
+          graph_container.removeAttr("style");
         });
         assignment.attr("style","overflow: hidden");
-        graphcontainer.attr("style","position: absolute;display: block");
+        graph_container.attr("style","position: absolute;display: block");
         assignment.find(".fallingarrowanimation").get(0).beginElement(); // Maybe make find more efficient
 
         // If no graphs are open, allow auto scroll
@@ -391,7 +374,7 @@ $(function() {
         }
 
         assignment.addClass("disablehover");
-        graphcontainer.attr("style","display: block");
+        graph_container.attr("style","display: block");
         assignment.find(".risingarrowanimation").get(0).beginElement();
 
         let graph = this.querySelector('.graph'),
@@ -400,8 +383,10 @@ $(function() {
 
         selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)],
         [file_sel,ad,x,unit,y,works,dif_assign,skew_ratio,ctime,funct_round,min_work_time,nwd,fixed_mode,dynamic_start,total_mode,remainder_mode] = selected_assignment;
-        ad = new Date(ad);
-        x = Math.floor((Date.parse(x) - ad) / 86400000);
+        console.log(ad);
+        ad = new Date(ad + " 00:00");
+        console.log(ad);
+        x = Math.floor((Date.parse(x + " 00:00") - ad) / 86400000);
         nwd = nwd.map(Number);
         let mods,
         skew_ratio_lim = 10000,
@@ -464,7 +449,7 @@ $(function() {
             let data = {
               'csrfmiddlewaretoken': '{{ csrf_token }}',
               'skew_ratio': skew_ratio,
-              'pk': $(graph).val(),
+              'pk': graph.getAttribute("value"),
             }
             // send value with skew ratio so it can be reference in backend
             $.ajax({
@@ -510,6 +495,8 @@ $(function() {
             UpdateSkewRatio();
             draw();
           }
+
+          // Up/down keybind handler
           $(document).keydown(function(event) {
             if ($(fixed_graph).is(":visible")) {
               const rect = fixed_graph.getBoundingClientRect();
@@ -534,9 +521,10 @@ $(function() {
             }
           });
 
-          // setting and stopping set skew ratio handler
+          // Setting and stopping set skew ratio handler
           let update = false;
           this.querySelector(".set-skew-ratio-button").onclick = function() {
+            this.innerHTML = "Hover the graph";
             graph.addEventListener('mousemove',mousemove); // enable set skew ratio if button is pressed
             update = true;
           }
@@ -544,11 +532,63 @@ $(function() {
           graph.onclick = function() {
             if (update) {
               // stop set skew ratio if canvas is clicked
+              $(this).next().find(".set-skew-ratio-button").html("Set skew ratio");
               graph.removeEventListener("mousemove",mousemove);
               UpdateSkewRatio();
               update = false;
             }
           }
+
+          // Dynamically update skew ratio from textbox
+          let old_skew_ratio;
+          $(".sr-textbox").on("change keyup paste click", function(event) {
+            if (old_skew_ratio === undefined) {
+              old_skew_ratio = skew_ratio;
+            }
+            if (event.target.value) {
+              skew_ratio = event.target.value;
+            } else {
+              skew_ratio = old_skew_ratio;
+              old_skew_ratio = undefined;
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // skew ratio lim for this
+            draw();
+          });
+          $(".sr-textbox").focusout(function(event) {
+            event.target.value = "";
+            if (old_skew_ratio != undefined) {
+              UpdateSkewRatio();
+            }
+            old_skew_ratio = skew_ratio;
+          });
+          $(".sr-textbox").keypress(function(event) {
+            if (event.key == "Enter") {
+              event.target.blur();
+            }
+          });
         }
 
         function pset(x2=NaN,y2=NaN) {
@@ -766,7 +806,13 @@ $(function() {
 
         function mousemove(event) {
           const offset = $(fixed_graph).offset();
-          draw(event.pageX - offset.left,event.pageY - offset.top);
+          let radius = wCon/3; // calculates circle radius
+          if (radius > 3) {
+              radius = 3;
+          } else if (radius < 2) {
+              radius = 2;
+          }
+          draw(event.pageX - offset.left + radius,event.pageY - offset.top - radius);
         }
         
         function draw(x2=NaN,y2=NaN) {
@@ -782,10 +828,9 @@ $(function() {
                 radius = 2;
             }
             
-
             let circle_x,
-                circle_y;
-            const line_end = Math.floor(x+Math.ceil(1/wCon));
+                circle_y,
+                line_end = Math.floor(x+Math.ceil(1/wCon));
             screen.strokeStyle = screen.fillStyle = "rgb(233,68,46)"; // red
             screen.lineWidth = radius;
             screen.beginPath();
@@ -806,7 +851,7 @@ $(function() {
             screen.beginPath();
             radius *= 3/4;
             if (len_works + 1 < line_end) {
-                len_end = len_works + 1;
+                line_end = len_works + 1;
             }
             screen.strokeStyle = "rgb(1,147,255)"; // blue
             screen.lineWidth = radius;
@@ -816,6 +861,39 @@ $(function() {
                     circle_x = width-5
                 }
                 circle_y = Math.round(height-works[point]*hCon-50);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // why
                 screen.lineTo(circle_x-(point==0)*radius/2,circle_y);
                 screen.arc(circle_x,circle_y,radius,0,2 * Math.PI);
                 screen.moveTo(circle_x,circle_y);
@@ -926,23 +1004,23 @@ $(function() {
             screen.font = font_size + 'px Open Sans';
             const text_height = screen.measureText(0).width * 2;
             for (let bigger_index = Math.ceil(y - y % y_axis_scale);bigger_index>0;bigger_index-=y_axis_scale) {
-                if (bigger_index * 2 < y_axis_scale) {
-                  break;
-                }
-                screen.fillStyle = "rgb(205,205,205)";
-                screen.fillRect(50,height-bigger_index*hCon-52.5,width-50,5);
-                screen.fillStyle = "black";
-                let number_y_pos = height-bigger_index*hCon-54+text_height/2;
-                if (number_y_pos < 4 + text_height/2) {
-                  number_y_pos = 4 + text_height/2;
-                }
-                if (38.5 - screen.measureText(bigger_index).width < 20+label_x_pos) {
-                  screen.textAlign = "left";
-                  screen.fillText(bigger_index,20+label_x_pos,number_y_pos);
-                  screen.textAlign = "right";
-                } else {
-                  screen.fillText(bigger_index,38.5,number_y_pos);
-                } 
+              if (bigger_index * 2 < y_axis_scale) {
+                break;
+              }
+              screen.fillStyle = "rgb(205,205,205)";
+              screen.fillRect(50,height-bigger_index*hCon-52.5,width-50,5);
+              screen.fillStyle = "black";
+              let number_y_pos = height-bigger_index*hCon-54+text_height/2;
+              if (number_y_pos < 4 + text_height/2) {
+                number_y_pos = 4 + text_height/2;
+              }
+              if (38.5 - screen.measureText(bigger_index).width < 20+label_x_pos) {
+                screen.textAlign = "left";
+                screen.fillText(bigger_index,20+label_x_pos,number_y_pos);
+                screen.textAlign = "right";
+              } else {
+                screen.fillText(bigger_index,38.5,number_y_pos);
+              }
             }
 
             screen.textBaseline = "top";
@@ -988,36 +1066,62 @@ $(function() {
 {% block body %}
 
 <div id="content" class="animate">
-  <div id="assignmentscontainer" class="animate">
-    <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hidebutton">Hide</button></div>
+  <div id="assignments-container" class="animate">
+    <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hide-button">Hide</button></div>
     {% for obj in objlist %}
-      <div class="assignmentcontainer">
+      <div class="assignment-container">
         <div class="assignment" tabindex="0">
-          <div class="assignmentheader">
+          <div class="assignment-header">
             <span class="title">
               {{ obj.file_sel }}
               <p class="daysleft">1d</p>
             </span>
-            <svg width="30px" height="20px" class="arrowcontainer">
+            <svg width="30px" height="20px" class="arrow-container">
               <polygon class="arrow" points="5,0 5,20 15,10">
                 <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
                 <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-            <a class="button updatebutton" href="{% url 'list' obj.pk%}">
-              <img height="20" src="{% static 'edit.png' %}" alt="delete" class="updatebuttonimage" draggable="false"/>
+            <a class="button update-button" href="{% url 'list' obj.pk%}">
+              <img height="20" src="{% static 'edit.png' %}" alt="delete" class="update-button-image" draggable="false"/>
             </a>
-            <button value="{{ obj.pk }}" class="button deletebutton">
-              <img height="22" src="{% static 'delete.png' %}" alt="edit" class="deletebuttonimage" draggable="false"/>
+            <button value="{{ obj.pk }}" class="button delete-button">
+              <img height="22" src="{% static 'delete.png' %}" alt="edit" class="delete-button-image" draggable="false"/>
             </button>
           </div>
-          <div class="relativepositioningwrapper">
-            <div class="graphcontainer">
+          <div class="relative-positioning-wrapper">
+            <div class="graph-container">
               <canvas class="fixed-graph"></canvas>
               <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
-              <button class="set-skew-ratio-button">Set skew ratio</button>
-              <div class="graphfooter">
+              <div class="graph-footer">
+                <button>
+                  <svg width="10px" height="5px">
+                    <polygon points="10,0 0,0 5,5">
+                    </polygon>
+                  </svg>
+                </button>
+                <button class="set-skew-ratio-button">Set skew ratio</button>
+                <button style="float: right;">fixed mode</button>
+                
+                <br>
+
+                <button>
+                  <svg width="10px" height="5px">
+                    <polygon points="10,5 0,5 5,0">
+                    </polygon>
+                  </svg>
+                </button>
+                <input placeholder="Enter skew ratio" class="sr-textbox"/>
+                {% comment %} use float to get text on left and right {% endcomment %}
+                {% comment %} click again to confirm, 1s window to click {% endcomment %}
+                <button>Delete work input</button>
+                <button>Display entire schedule</button>
+                <button>Remainder mode</button>
+                <br>
+                enter work input:<input/>
+                enter total work input:<input/>
+                <br>
               </div>
             </div>
           </div>

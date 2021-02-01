@@ -4,13 +4,13 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from multiselectfield import MultiSelectField
 
-WEEKDAYS = ((0, "Sunday"),
-                (1,"Monday"),
-                (2,"Tuesday"),
-                (3,"Wednesday"),
-                (4,"Thursday"),
-                (5,"Friday"),
-                (6,"Saturday"))
+WEEKDAYS = (("1","Monday"),
+                ("2","Tuesday"),
+                ("3","Wednesday"),
+                ("4","Thursday"),
+                ("5","Friday"),
+                ("6","Saturday"),
+                ("0","Sunday"))
 
 def default_works():
     return 0
@@ -21,25 +21,30 @@ class TimewebModel(models.Model):
     # fields of the model
     file_sel = models.CharField(
         max_length=40,
-        verbose_name='Name: '
+        verbose_name='Enter the Name of this Assignment',
     )
     ad = models.DateField(
         null=True,
+        verbose_name='Enter the Assignment Date',
     )
     x = models.DateField(
         null=True,
+        verbose_name='Enter the Due Date',
     )
     unit = models.CharField(
         max_length=40,
         default="Minute",
+        verbose_name='Enter the Name of each Unit of Work',
     )
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(1.00)],
+        verbose_name='Enter the Total amount of Units',
     )
     works = models.JSONField(
         default=default_works,
+        verbose_name='Enter the Total amount of Units already Completed',
     )
     dif_assign = models.IntegerField(
         blank=True,
@@ -52,6 +57,7 @@ class TimewebModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(0.00)],
+        verbose_name='Enter the Estimated amount of Time in Minutes to complete each Unit of Work',
     )
     funct_round = models.DecimalField(
         max_digits=15,
@@ -59,6 +65,8 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(0.01)],
         blank=True,
         null=True,
+        verbose_name='Enter the Grouping Value',
+        help_text = "this is a test for help text",
     )
     min_work_time = models.DecimalField(
         max_digits=15,
@@ -66,13 +74,8 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(0.00)],
         blank=True,
         null=True,
+        verbose_name='Enter the Minimum Work Time',
     )
-    # nwd = models.CharField(
-    #     max_length=2,
-    #     choices=WEEKDAYS,
-    #     blank=True,
-    #     null=True,
-    # )
     nwd = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
@@ -83,10 +86,6 @@ class TimewebModel(models.Model):
     )
     dynamic_start = models.IntegerField(
         null=True,
-        blank=True,
-    )
-    total_mode = models.BooleanField(
-        default=False,
         blank=True,
     )
     remainder_mode = models.BooleanField(

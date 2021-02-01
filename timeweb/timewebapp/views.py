@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.http import JsonResponse
+from django.utils import timezone
 from .models import TimewebModel
 from .forms import TimewebForm
 import logging # import the logging library
@@ -22,28 +23,27 @@ class TimewebView(View):
             self.context['submit'] = 'Create Assignment'
         else:
             self.selectedform = get_object_or_404(TimewebModel, pk=pk) # User data from modelform
-            
             # Create a form instance from user data
-            try:
-                works = self.selectedform.works[0]
-            except TypeError:
-                works = self.selectedform.works
-            self.form = TimewebForm(request.POST or None, request.FILES or None,initial={
+            initial = {
                 'file_sel':self.selectedform.file_sel,
                 'ad':self.selectedform.ad,
                 'x':self.selectedform.x,
                 'unit':self.selectedform.unit,
                 'y':self.selectedform.y,
-                'works':works,
+                'works':self.selectedform.works[0],
                 'ctime':self.selectedform.ctime,
-                'funct_round':self.selectedform.funct_round,
-                'min_work_time':round(self.selectedform.min_work_time*self.selectedform.ctime,2), # Decimal module mutiplication adds siginficant figures
                 'nwd':self.selectedform.nwd,
-            })
+            }
+            if self.selectedform.funct_round != 1:
+                initial['funct_round'] = self.selectedform.funct_round
+            if self.selectedform.min_work_time*self.selectedform.ctime:
+                initial['min_work_time'] = round(self.selectedform.min_work_time*self.selectedform.ctime,2) # Decimal module mutiplication adds siginficant figures
+            self.form = TimewebForm(request.POST or None, request.FILES or None,initial=initial)
             self.context['submit'] = 'Update Assignment'
-            
+            self.context['checked_nwd'] = self.selectedform.nwd
+        
         self.context['form'] = self.form
-
+    
     # User makes new assignment
     def get(self,request,pk=None):
         
@@ -52,42 +52,40 @@ class TimewebView(View):
 
     def post(self,request,pk=None):
         self.make_form_instance(request,pk)
-        if self.form.is_valid() and 'Submitbutton' in request.POST:
+        if self.form.is_valid() and 'submit-button' in request.POST:
             if pk == None: # Handle "new"
                 save_data = self.form.save(commit=False)
                 save_data.dif_assign = 0
                 save_data.skew_ratio = 1 # Change to def_skew_ratio
                 save_data.fixed_mode = False
                 save_data.remainder_mode = False
-                save_data.total_mode = False
+                adone = save_data.works
             else: #Handle "Update"
                 # Save the form and convert it back to a model
                 old_data = get_object_or_404(TimewebModel, pk=pk)
                 form_data = self.form.save(commit=False)
-
                 save_data = get_object_or_404(TimewebModel, pk=pk)
                 save_data.file_sel = form_data.file_sel
                 save_data.ad = form_data.ad
                 save_data.x = form_data.x
                 save_data.unit = form_data.unit
                 save_data.y = form_data.y
-                save_data.works = form_data.works
-                save_data.dif_assign = form_data.dif_assign
+                adone = form_data.works
+                # save_data.dif_assign = form_data.dif_assign no reason to define since its null
                 save_data.skew_ratio = form_data.skew_ratio
                 save_data.ctime = form_data.ctime
                 save_data.funct_round = form_data.funct_round
                 save_data.min_work_time = form_data.min_work_time
                 save_data.nwd = form_data.nwd
                 save_data.fixed_mode = form_data.fixed_mode
-                save_data.dynamic_start = old_data.dynamic_start # form data dynamic_start is null (REMOVE WHENTHIS IS DEFINED LATER)
-                save_data.total_mode = form_data.total_mode
+                # save_data.dynamic_start = form_data.dynamic_start no reason to define since its null
                 save_data.remainder_mode = form_data.remainder_mode
             
             if any(save_data.file_sel == obj.file_sel for obj in TimewebModel.objects.all().exclude(pk=pk)):
                 self.context['error'] = 'Name has already been taken!'
                 return render(request, "new.html", self.context)
 
-            date_now = datetime.date.today()
+            date_now = timezone.localtime(timezone.now()).date()
             if save_data.ad == date_now:
                 save_data.dynamic_start = 0 # May not be needed
             else:
@@ -101,18 +99,16 @@ class TimewebView(View):
                     else:
                         save_data.dif_assign = old_data.dif_assign + (old_data.ad-save_data.ad).days
             
-            if save_data.x <= save_data.ad:
+            if save_data.x < save_data.ad:
                 self.context['error'] = 'Assignment date cannot be before due date!'
                 return render(request, "new.html", self.context)
+            elif save_data.x == save_data.ad:
+                self.context['error'] = 'Assignment date cannot be on the due date!'
+                return render(request, "new.html", self.context)
            
-            try:
-                if save_data.works[0] >= save_data.y:
-                    self.context['error'] = 'Adone cannot be greater than or equal to y!'
-                    return render(request, "new.html", self.context)
-            except TypeError:
-                if save_data.works >= save_data.y:
-                    self.context['error'] = 'Adone cannot be greater than or equal to y!'
-                    return render(request, "new.html", self.context)
+            if adone >= save_data.y:
+                self.context['error'] = 'Adone cannot be greater than or equal to y!'
+                return render(request, "new.html", self.context)
             if not save_data.funct_round:
                 save_data.funct_round = 1
 
@@ -121,14 +117,29 @@ class TimewebView(View):
             else:
                 save_data.min_work_time = 0
 
-            if save_data.nwd:
-                save_data.nwd = list(save_data.nwd)
-            else:
-                save_data.nwd = []
-
+            x_num = (save_data.x - save_data.ad).days
             if pk == None:
-                save_data.works = [save_data.works]
-            
+                save_data.works = [adone]
+            else:
+                removed_works_start = (save_data.ad - old_data.ad).days - save_data.dif_assign
+                if removed_works_start < 0:
+                    removed_works_start = 0
+                removed_works_end = len(save_data.works) - 1
+
+                # If the reentered due date cuts off some of the work inputs, remove the work input for the last day because that must complete assignment
+                if removed_works_end >= x_num - save_data.dif_assign:# and x != None:
+                    removed_works_end = x_num - save_data.dif_assign
+                    if save_data.works[removed_works_end] != save_data.y:
+                        removed_works_end -= 1
+                    
+                if removed_works_start <= removed_works_end:
+                    save_data.works = [save_data.works[n] - save_data.works[0] + adone for n in range(removed_works_start,removed_works_end+1)]
+                if save_data.dynamic_start or not old_data.dif_assign:
+                    save_data.dynamic_start += save_data.dif_assign - old_data.dif_assign
+                if save_data.dynamic_start < 0:
+                    save_data.dynamic_start = 0
+            if pk != None and save_data.dynamic_start > x_num - 1:
+                save_data.dynamic_start = x_num - 1
             save_data.save()
             self.logger.debug("Updated/Added Model")
             return redirect('../')
@@ -139,23 +150,22 @@ class TimewebView(View):
 class TimewebListView(View):
     logger = logging.getLogger(__name__)
     def __init__(self):
-        self.context = {'display_new':True}
+        self.context = {}
 
     def make_list(self):
         objlist = TimewebModel.objects.all()
         self.context['objlist'] = objlist
-        self.context['data'] = [[(2021, 1-1, 11, 21, 33), 50, 25, 1, (4,), False, True, True, True, True, True]] + [list(vars(obj).values())[2:] for obj in objlist]
+        self.context['data'] = [[50, 25, 1, (4,), True, True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in objlist]
     def get(self,request):
         self.make_list()
         return render(request, "list.html", self.context)
     
     # An example of request.POST after delete is pressed:
-    # <QueryDict: {'title': ['yyy'], 'description': ['test'], 'Deletebutton': ['']}>
+    # <QueryDict: {'title': ['yyy'], 'description': ['test'], 'delete-button': ['']}>
     # As you can see, the name of the submit button is passed on to request.POST
-    # However, it still cannot be referanced because 'Deletebutton': [''] is not a good indication
-    # So, pass in a value into the button such that the new request.POST will have Deletebutton': ['deleted'] instead
+    # However, it still cannot be referanced because 'delete-button': [''] is not a good indication
+    # So, pass in a value into the button such that the new request.POST will have delete-button': ['deleted'] instead
     def post(self,request):
-        print(request.POST)
         for key, value in request.POST.items():
             if key == "deleted":
                 pk = value

@@ -12,6 +12,10 @@ class DateInput(forms.DateInput):
 class TimewebForm(forms.ModelForm):
 
     # specify the name of model to use
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
     class Meta:
         model = TimewebModel
         fields = "__all__"
@@ -25,10 +29,3 @@ class TimewebForm(forms.ModelForm):
             'total_mode': forms.HiddenInput(),
             'remainder_mode': forms.HiddenInput(),
         }
-        #exclude = ["img", "last_modified"]
-    
-    # Placeholder
-    # def __init__(self, *args, **kwargs):
-    #     super(TimewebForm, self).__init__(*args, **kwargs)
-    #     for k,v in self.fields.items():
-    #         v.widget.attrs['placeholder'] = k.capitalize()
