@@ -10,9 +10,6 @@
   -ms-transition: none !important;
   transition: none !important;
 }
-.relative-positioning-wrapper {
-  position: relative;
-}
 #header {
   transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
 }
@@ -101,12 +98,12 @@
 .importance {
   position: absolute;
   font-size: 0.7em;
-  margin-top: -1em;
+  margin-top: calc(-1em - 2px);
 }
 .daysleft {
   position: absolute;
   font-size: 0.7em;
-  margin-top: -3px;
+  margin-top: -1px;
 }
 .arrow-container {
   float: left;
@@ -119,7 +116,7 @@
   margin: 0 70px 0 0;
 
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -175,6 +172,8 @@
   position: relative;
   top: 10px;
   display: none;
+  {% comment %} firefox acts weirdly without this {% endcomment %}
+  width: 100%;
 }
 canvas {
   padding: 0;
@@ -353,7 +352,7 @@ $(function() {
       const not_first_click = assignment.data('not_first_click');
       if (graph_container.attr("style")) {
         assignment.removeClass("disablehover");
-
+        
         // Don't check for min-height transitionend because it causes bugs when the assignment is reopened too fast
         assignment.one("transitionend",function() {
           assignment.removeAttr("style");
@@ -363,7 +362,7 @@ $(function() {
         graph_container.attr("style","position: absolute;display: block");
         assignment.find(".fallingarrowanimation").get(0).beginElement(); // Maybe make find more efficient
 
-        // If no graphs are open, allow auto scroll
+        // If no graphs are open, allow arrow scroll
         if (!document.getElementsByClassName("disablehover").length) {
           window.removeEventListener("keydown", PreventArrowScroll, false);
         }
@@ -383,10 +382,8 @@ $(function() {
 
         selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)],
         [file_sel,ad,x,unit,y,works,dif_assign,skew_ratio,ctime,funct_round,min_work_time,nwd,fixed_mode,dynamic_start,total_mode,remainder_mode] = selected_assignment;
-        console.log(ad);
         ad = new Date(ad + " 00:00");
-        console.log(ad);
-        x = Math.floor((Date.parse(x + " 00:00") - ad) / 86400000);
+        x = Math.round((Date.parse(x + " 00:00") - ad) / 86400000);
         nwd = nwd.map(Number);
         let mods,
         skew_ratio_lim = 10000,
@@ -412,7 +409,6 @@ $(function() {
           }
         }
         set_mod_days();
-
         function resize(reversescale) {
           if (assignment.hasClass("disablehover") && assignment.is(":visible")) {
             ({width, height} = fixed_graph.getBoundingClientRect());
@@ -524,7 +520,7 @@ $(function() {
           // Setting and stopping set skew ratio handler
           let update = false;
           this.querySelector(".set-skew-ratio-button").onclick = function() {
-            this.innerHTML = "Hover the graph";
+            this.innerHTML = "Hover and click the graph";
             graph.addEventListener('mousemove',mousemove); // enable set skew ratio if button is pressed
             update = true;
           }
@@ -930,8 +926,8 @@ $(function() {
               var text = 'Minutes of Work',
                   label_x_pos = -2;
             } else {
-              var text = unit + 's (' + format_minutes(ctime) + ' per ' + unit + ')',
-                  label_x_pos = -5;
+              var text = `${unit}s (${format_minutes(ctime)} per ${unit})`,
+                  label_x_pos = -4;
             }
             if (screen.measureText(text).width > height - 50) {
               text = unit + 's';
@@ -989,9 +985,9 @@ $(function() {
                     if (number_y_pos < 4 + text_height/2) {
                       number_y_pos = 4 + text_height/2;
                     }
-                    if (38.5 - screen.measureText(displayed_number).width < 20+label_x_pos) {
+                    if (38.5 - screen.measureText(displayed_number).width < 13-label_x_pos) {
                       screen.textAlign = "left";
-                      screen.fillText(displayed_number,20+label_x_pos,number_y_pos);
+                      screen.fillText(displayed_number,13-label_x_pos,number_y_pos);
                       screen.textAlign = "right";
                     } else {
                       screen.fillText(displayed_number,38.5,number_y_pos);
@@ -1014,9 +1010,9 @@ $(function() {
               if (number_y_pos < 4 + text_height/2) {
                 number_y_pos = 4 + text_height/2;
               }
-              if (38.5 - screen.measureText(bigger_index).width < 20+label_x_pos) {
+              if (38.5 - screen.measureText(bigger_index).width < 13-label_x_pos) {
                 screen.textAlign = "left";
-                screen.fillText(bigger_index,20+label_x_pos,number_y_pos);
+                screen.fillText(bigger_index,13-label_x_pos,number_y_pos);
                 screen.textAlign = "right";
               } else {
                 screen.fillText(bigger_index,38.5,number_y_pos);

@@ -3,7 +3,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from multiselectfield import MultiSelectField
-
 WEEKDAYS = (("1","Monday"),
                 ("2","Tuesday"),
                 ("3","Wednesday"),
@@ -20,7 +19,7 @@ class TimewebModel(models.Model):
     
     # fields of the model
     file_sel = models.CharField(
-        max_length=40,
+        max_length=100,
         verbose_name='Enter the Name of this Assignment',
     )
     ad = models.DateField(
@@ -60,13 +59,13 @@ class TimewebModel(models.Model):
         verbose_name='Enter the Estimated amount of Time in Minutes to complete each Unit of Work',
     )
     funct_round = models.DecimalField(
+        default=1,
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)],
+        validators=[MinValueValidator(0.00)],
         blank=True,
         null=True,
         verbose_name='Enter the Grouping Value',
-        help_text = "this is a test for help text",
     )
     min_work_time = models.DecimalField(
         max_digits=15,
@@ -74,7 +73,7 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(0.00)],
         blank=True,
         null=True,
-        verbose_name='Enter the Minimum Work Time',
+        verbose_name='Enter the Minimum Work Time per Day',
     )
     nwd = MultiSelectField(
         choices=WEEKDAYS,
