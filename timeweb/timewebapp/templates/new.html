@@ -1,6 +1,10 @@
 {% extends "template.html" %}
 {% load static %}
 {% block css %}
+input:focus, label:focus {
+    outline: 0;
+    box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204); 
+}
 label[for='id_x']::after {
     content: '(Predicted if left empty)';
     display: block;
@@ -61,9 +65,6 @@ label:not(.nwd-label) {
     border-radius: 5px;
     padding: 4px;
 }
-.nwd-label:hover {
-    background: lightgray;
-}
 .nwd-label:active {
     outline: 0;
     background: gainsboro;
@@ -111,7 +112,7 @@ input {
     height: 73px;
     width: 200px;
     margin-right: 5px;
-    background: #EEEEEE;
+    background: white;
     top: -35px;
     left: calc(100% + 10px);
     visibility: hidden;
@@ -143,7 +144,6 @@ input {
 <script>
 $(function() {
     $('#id_works').val("0.00");
-    $('#id_funct_round').val("1.00");
     if (!$('#id_ad').val()) {
         $('#id_ad').val(new Date().getFullYear() + "-12-31");
     }
@@ -171,7 +171,7 @@ $(function() {
 
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("&#42;");
     $('label[for="id_unit"]').append('<div class="info-button">i<span class="info-button-text">This is how your assignment will be split and divided up<br><br>e.g: If this assignment is a reading a book, enter "Page"<br><br>If you are unsure how to split up your assignment, this is defaulted to "Minute"</span></div>');
-    $('label[for="id_funct_round"]').append('<div class="info-button">i<span class="info-button-text">This is the increment of work you will complete at a time<br><br>e.g: If you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)<br><br>If you wish to skip this field, this is defaulted to 1</span></div>');
+    $('label[for="id_funct_round"]').append('<div class="info-button">i<span class="info-button-text">This is the increment of work you will complete at a time<br><br>e.g: If you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)<br><br>If you do not wish to use the grouping value, this is defaulted to 1</span></div>');
 });
 </script>
 {% endblock %}

@@ -60,6 +60,10 @@
   width: calc(100% - 54px);
   min-height: 0;
 }
+.assignment-container[top] .assignment {
+  box-shadow: 0 0 20px green;
+
+}
 .assignment:focus, .button:focus {
   outline: 0;
   border: 2px solid rgb(0,95,204) !important;
@@ -67,7 +71,7 @@
 }
 .assignment.disablehover {
   display: block;
-  min-height: 65vh;
+{% comment %} min-height: 65vh; {% endcomment %}
   transition: all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
 }
 .assignment:not(.disablehover) {
@@ -95,7 +99,16 @@
   font-size: min(16.76px,calc(11px + 0.4vw));
   overflow-wrap: break-word;
 }
-.importance {
+
+{% comment %} Order of these two below matter because the bottom one will overwrite the first one if there is only one assignment {% endcomment %}
+.assignment-container:nth-last-child(1) .title::before {
+  content: "Least Important";
+  position: absolute;
+  font-size: 0.7em;
+  margin-top: calc(-1em - 2px);
+}
+.assignment-container:nth-child(2) .title::before {
+  content: "Most Important";
   position: absolute;
   font-size: 0.7em;
   margin-top: calc(-1em - 2px);
@@ -223,11 +236,11 @@ canvas:focus {
 <script>
 // Starting animation
 
-if ("hasAnimationRan" in sessionStorage) {
+if ("animation-ran" in sessionStorage) {
     disable_transition = true;
 } else {
     disable_transition = false;
-    sessionStorage.setItem("hasAnimationRan", true);
+    sessionStorage.setItem("animation-ran", true);
 }
 if (disable_transition) {
   $(function() {
@@ -237,7 +250,6 @@ if (disable_transition) {
 } else {
   $(window).load(function() {
     // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
-    
     $("#content").on("transitionend",function(event) {
       if (event.originalEvent.propertyName === "height") {
         document.getElementById('content').style.transition = 'none';
@@ -252,12 +264,8 @@ if (disable_transition) {
 <script>
 // Delete button
 $(function() {
-  if (document.getElementsByClassName("title").length !== 1) {
-    $(".title:first").prepend('<p class="importance">Most Important</p>');
-    $(".title:last").prepend('<p class="importance">Least Important</p>');
-  }
   $('.delete-button').click(function() {
-    if (confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
+    if (open_assignment && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
         // Data sent to server pointing to which assignment to delete
         let data = {
@@ -265,7 +273,7 @@ $(function() {
           'deleted': $(this).val(),
         }
 
-        const assignment_container = $(this).parent().parent().parent();
+        const assignment_container = $(this).parents(".assignment-container");
 
         // If the data was successfully sent, delete the assignment
         const success = function() {
@@ -284,14 +292,8 @@ $(function() {
           $(assignment_container.children(":first-child")).css({
             "position":"absolute",
             "opacity":"0",
-          })
-          $(assignment_container).animate({height:"10px"},200,function() {
-            $(assignment_container).remove();
-            if (document.getElementsByClassName("title").length === 1) {
-              $(".importance:first").empty();
-              $(".importance:last").empty();
-            }
           });
+          $(assignment_container).animate({height:"10px"},200,() => $(assignment_container).remove());
         }
         // Use an ajax POST to avoid a page reload which will replay the starting animation
         $.ajax({
@@ -299,7 +301,7 @@ $(function() {
             data: data,
             success: success,
             error: function(jqXHR, exception) {
-              if (jqXHR.status === 0) {
+              if (jqXHR.status == 0) {
                   alert('Failed to connect');
               } else if (jqXHR.status == 404) {
                   alert('Requested page not found, try again');
@@ -316,8 +318,6 @@ $(function() {
               }
             }
         });
-    } else {
-      return false;
     }
   });
 });
@@ -335,21 +335,21 @@ $(function() {
 
 <script>
 // Entire graph
+open_assignment = true;
 $(function() {
   let dat = JSON.parse(document.getElementById("load-data").textContent);
-  let [warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,autofill,ignore_ends,show_progress_bar,show_past,translatez,priority_display] = dat[0]
+  let [warning_acceptance,def_min_work_time,def_skew_ratio,def_nwd,ignore_ends,show_progress_bar,show_past,translatez,priority_display] = dat[0];
   function PreventArrowScroll(event) {
     // arrow keys
     if (event.keyCode >= 37 && event.keyCode <= 40) {
         event.preventDefault();
     }
   }
-
   $(".assignment").click(function(event) {
-    if (!["A","IMG","BUTTON","CANVAS","INPUT"].includes(event.target.tagName)) {
+    if (open_assignment && !["A","IMG","BUTTON","CANVAS","INPUT"].includes(event.target.tagName)) {
       let assignment = $(this);
-      const graph_container = assignment.find(".graph-container");
-      const not_first_click = assignment.data('not_first_click');
+      const graph_container = assignment.find(".graph-container"),
+            not_first_click = assignment.data('not_first_click');
       if (graph_container.attr("style")) {
         assignment.removeClass("disablehover");
         
@@ -452,7 +452,7 @@ $(function() {
               type: "POST",
               data: data,
               error: function(jqXHR, exception) {
-                if (jqXHR.status === 0) {
+                if (jqXHR.status == 0) {
                   alert('Failed to save');
                 } else if (jqXHR.status == 404) {
                   alert('Requested page not found, try again');
@@ -581,7 +581,7 @@ $(function() {
             old_skew_ratio = skew_ratio;
           });
           $(".sr-textbox").keypress(function(event) {
-            if (event.key == "Enter") {
+            if (event.key === "Enter") {
               event.target.blur();
             }
           });
@@ -671,7 +671,7 @@ $(function() {
                     } else if (output < 0) {
                       output = 0;
                     }
-                    if (n == Math.floor(cutoff_to_use_round)) {
+                    if (n === Math.floor(cutoff_to_use_round)) {
                       var prev_output = output;
                     }
                   }
@@ -683,7 +683,7 @@ $(function() {
             }
             if (ignore_ends_mwt) {
                 var y_value_to_cutoff = y1;    
-            } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (funct_y < cutoff_to_use_round))) {
+            } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (funct_y < cutoff_to_use_round))) {
                 var y_value_to_cutoff = y1 - min_work_time_funct_round / 2;
             } else {
                 var y_value_to_cutoff = y1 - min_work_time_funct_round + funct_round / 2;
@@ -726,7 +726,7 @@ $(function() {
             }
             if (ignore_ends_mwt) {
                 var y_value_to_cutoff = 0;
-            } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (funct_zero < cutoff_to_use_round))) {
+            } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (funct_zero < cutoff_to_use_round))) {
                 var y_value_to_cutoff = min_work_time_funct_round / 2;
             } else {
                 var y_value_to_cutoff = min_work_time_funct_round - funct_round / 2;
@@ -784,7 +784,7 @@ $(function() {
                     return red_line_start_y;
                 }
             }
-            if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) == (n < cutoff_to_use_round))) {
+            if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (n < cutoff_to_use_round))) {
                 var output = min_work_time_funct_round * Math.round(n*(a*n+b)/min_work_time_funct_round);
                 if (a < 0) {
                   output += cutoff_transition_value;
@@ -838,7 +838,7 @@ $(function() {
                 circle_y = Math.round(height-funct(point)*hCon-50);
                 screen.lineTo(circle_x,circle_y);
                 screen.arc(circle_x,circle_y,radius,0,2 * Math.PI);
-                if (point == red_line_start_x) {
+                if (point === red_line_start_x) {
                   screen.fill();
                 }
                 screen.moveTo(circle_x,circle_y);
@@ -890,7 +890,7 @@ $(function() {
 
 
                 // why
-                screen.lineTo(circle_x-(point==0)*radius/2,circle_y);
+                screen.lineTo(circle_x-(point===0)*radius/2,circle_y);
                 screen.arc(circle_x,circle_y,radius,0,2 * Math.PI);
                 screen.moveTo(circle_x,circle_y);
             }
@@ -938,8 +938,6 @@ $(function() {
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
             const x_axis_scale = Math.pow(10,Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0]/Math.ceil((width-100)/100));
-            
-            // Terribly written code, rewrite later
             if (x >= 10) {
               const small_x_axis_scale = x_axis_scale / 5,
                     label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon,
@@ -963,6 +961,7 @@ $(function() {
             }
             
             screen.textBaseline = "alphabetic";
+            screen.textAlign = "right";
             const y_axis_scale = Math.pow(10,Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0]/Math.ceil((height-100)/100));
             let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
             if (y >= 10) {
@@ -973,7 +972,6 @@ $(function() {
               screen.font = font_size + 'px Open Sans';
               const text_height = screen.measureText(0).width * 2,
                     label_index = text_height < small_y_axis_scale*hCon;
-              screen.textAlign = "right";
               for (let smaller_index=1;smaller_index<=Math.floor(y/small_y_axis_scale);smaller_index++) {
                 const displayed_number = smaller_index * small_y_axis_scale;
                 if (smaller_index % 5) {
@@ -996,6 +994,7 @@ $(function() {
                 }           
               }
             }
+
             font_size *= 1.2;
             screen.font = font_size + 'px Open Sans';
             const text_height = screen.measureText(0).width * 2;
@@ -1034,7 +1033,143 @@ $(function() {
               screen.fillText(bigger_index,number_x_pos,height-39);
             }
         }
+        const swap_ms = 20000;
+        swap = function(a1,a2) {
+            // This make-do queue system fails when two tars are queued at the same time
+            const queue = setInterval(function() {
+                if (open_assignment) {
+                    clearInterval(queue);
+                    all = $(".assignment-container");
+                    tar1 = all.eq(a1);
+                    tar2 = all.eq(a2);
+                    open_assignment = false;
+                    const tar1_height = tar1.height() + 10,
+                          tar2_height = tar2.height() + 10;
+                    const dist1 = Math.min(50,(
+                      tar2.offset().top + tar2_height - tar1.offset().top - tar1_height
+                    )/(swap_ms/13)),
+                          dist2 = -Math.min(50,(
+                            tar2.offset().top - tar1.offset().top
+                    )/(swap_ms/13)),
+                          mdist = (tar1_height - tar2_height)/(swap_ms/13);
 
+                    // Deal with existing margin
+                    if (mdist > 0) {
+                      var mbot1 = 0,
+                          mtop2 = 10;
+                    } else {
+                      var mbot1 = 10,
+                          mtop2 = 0;
+                    }
+                    let both_done = false,
+                        top1 = 0;                    
+                    
+                    tar1.css("margin-bottom",mbot1 + "px").animate({
+                      top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height,
+                      marginBottom: "-=" + (tar1_height - tar2_height),
+                    },swap_ms);
+                    console.log(-(tar2.offset().top - tar1.offset().top));
+                    tar2.css("margin-top",mtop2 + "px").animate({
+                      top: tar1.offset().top - tar2.offset().top,
+                      marginTop: "+=" + (tar1_height - tar2_height),
+                    },swap_ms,function() {
+                      tar2.after("<span id='swap-temp' style='display: none;'></span>");
+                      tar2.insertAfter(tar1);
+                      tar1.insertBefore("#swap-temp");
+
+                      // jquery animate height so it isnt instant
+                      // use a dist1 and dist2 because open assignments act weirdly, open assignment 3 and then open another
+                      tar1.removeAttr("style");
+                      tar2.removeAttr("style");
+                      $("#swap-temp").remove();
+                      open_assignment = true;
+                    });
+                    /*
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    ORIGINALLY
+                        top1 += dist1;
+                        if (tar1.offset().top+dist1 + tar1.height() >= tar2.offset().top + tar2.height() - top2) {
+                          top1 -= tar1.offset().top+dist1 + tar1.height() - (tar2.offset().top + tar2.height() - top2);
+                          console.log("ADJUSTED T1");
+                        }
+                        tar1.css("top",top1 + "px");
+                        if (tar1.offset().top + tar1.height() >= tar2.offset().top + tar2.height() - top2) {
+                            clearInterval(animation1);
+                            DOMswap();
+                        }
+                    
+                    
+                    
+                    
+                    let animation1 = setInterval(function() {
+                        
+                        top1 += dist1;
+                        mbot1 -= mdist;
+                        if (tar1.offset().top+dist1 + tar1_height >= tar2.offset().top + tar2_height - top2) {
+                          tar1.css("top",top1 - tar1.offset().top-dist1 - tar1_height + tar2.offset().top + tar2_height - top2 + "px");
+                          clearInterval(animation1);
+                          animation1 = false;
+                          DOMswap();
+                          return;
+                        }
+                        animation2 ?
+                          tar1.css({
+                            "top":top1 + "px",
+                            "margin-bottom":mbot1 + "px",
+                          })
+                        :
+                          tar1.css(
+                            "top",top1 + "px"
+                          );
+                    }, 13);
+
+                    let top2 = 0;
+                    let animation2 = setInterval(function() {
+                        top2 += dist2;
+                        mtop2 += mdist;
+                        if (tar2.offset().top+dist2 <= tar1.offset().top - top1) {
+                          tar2.css("top",top2 + tar1.offset().top - top1 - tar2.offset().top-dist2 + "px");
+                          clearInterval(animation2);
+                          animation2 = false;
+                          DOMswap();
+                          return;
+                        }
+                        animation1 ?
+                          tar2.css({
+                            "top":top2 + "px",
+                            "margin-top":mtop2 + "px",
+                          })
+                        :
+                          tar2.css(
+                            "top",top2 + "px"
+                          );
+                    }, 13);
+
+                    function DOMswap() {
+                        if (both_done) {
+                            tar2.after("<span id='swap-temp' style='display: none;'></span>");
+                            tar2.insertAfter(tar1);
+                            tar1.insertBefore("#swap-temp");
+
+                            // jquery animate height so it isnt instant
+                            // use a dist1 and dist2 because open assignments act weirdly, open assignment 3 and then open another
+                            tar1.removeAttr("style");
+                            tar2.removeAttr("style");
+                            $("#swap-temp").remove();
+                            open_assignment = true;
+                        }
+                        both_done = true;
+                    }*/
+                }
+            }, 13);
+        }
         function format_minutes(total_minutes) {
           const hour = Math.floor(total_minutes / 60),
                 minute = Math.ceil(total_minutes % 60);
@@ -1098,7 +1233,8 @@ $(function() {
                   </svg>
                 </button>
                 <button class="set-skew-ratio-button">Set skew ratio</button>
-                <button style="float: right;">fixed mode</button>
+                {% comment %} float:right breaks everything {% endcomment %}
+                <button>fixed mode</button>
                 
                 <br>
 

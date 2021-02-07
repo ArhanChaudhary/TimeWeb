@@ -59,7 +59,6 @@ class TimewebModel(models.Model):
         verbose_name='Enter the Estimated amount of Time in Minutes to complete each Unit of Work',
     )
     funct_round = models.DecimalField(
-        default=1,
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(0.00)],

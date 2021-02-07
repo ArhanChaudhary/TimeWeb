@@ -109,6 +109,7 @@ class TimewebView(View):
             if adone >= save_data.y:
                 self.context['error'] = 'Adone cannot be greater than or equal to y!'
                 return render(request, "new.html", self.context)
+                
             if not save_data.funct_round:
                 save_data.funct_round = 1
 
@@ -155,7 +156,7 @@ class TimewebListView(View):
     def make_list(self):
         objlist = TimewebModel.objects.all()
         self.context['objlist'] = objlist
-        self.context['data'] = [[50, 25, 1, (4,), True, True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in objlist]
+        self.context['data'] = [[50, 25, 1, (4,), True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in objlist]
     def get(self,request):
         self.make_list()
         return render(request, "list.html", self.context)
