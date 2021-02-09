@@ -11,7 +11,7 @@ label[for='id_x']::after {
     font-style: italic;
     font-size: 10px;
 }
-label[for='id_min_work_time']::after {
+label[for='id_min_work_time']::after, label[for='id_funct_round']::after {
     content: '(Disabled if left empty)';
     display: block;
     font-style: italic;
@@ -22,6 +22,8 @@ label[for='id_min_work_time']::after {
     font-size: 10px;
     margin-bottom: -1em;
     font-style: italic;
+    position: relative;
+    top: 10px;
 }
 #form-wrapper {
     width: 400px;
@@ -67,7 +69,7 @@ label:not(.nwd-label) {
 }
 .nwd-label:active {
     outline: 0;
-    background: gainsboro;
+    background: whitesmoke;
 }
 input {
     box-sizing: border-box; 
@@ -94,6 +96,7 @@ input {
     border-radius: 50%;
     background: rgb(33,163,177);
     font-size: 14px;
+    font-style: italic;
     font-family: "Serif";
 
     color: white;
@@ -106,37 +109,40 @@ input {
 .info-button:hover .info-button-text {
     visibility: visible;
     opacity: 1;
+    left: calc(100% + 9px);
+    transition: all .2s ease-in-out;
 }
 .info-button-text {
     position: absolute;
-    height: 73px;
-    width: 200px;
-    margin-right: 5px;
+    transform: translateY(-50%) translateY(6px);
+    {% comment %} height: 73px; {% endcomment %}
+    width: 265px;
+    left: calc(100% - 10px);
+
     background: white;
-    top: -35px;
-    left: calc(100% + 10px);
+    box-shadow: 0 0 5px rgba(0,0,0,0.75);
+    border-radius: 5px;
+    border: 2px solid black;
     visibility: hidden;
     opacity: 0;
-    box-shadow: 0 0 5px rgb(16,135,148);
-    transition: opacity .2s ease-in-out;
-    border: 2px solid rgb(16,135,148);
-    border-radius: 5px;
+
     text-align: left;
     padding: 3px 6px;
     color: black;
-    font-size: 9.5px;
-    line-height: 9.5px;
+    font-size: 13px;
+    line-height: 13px;
+    font-style: normal;
 }
 {% comment %} cite? {% endcomment %}
 .info-button-text::after {
     content: "";
     position: absolute;
-    margin-top: -10px;
     top: 50%;
-    right: 100%;
+    transform: translateY(-50%);
+    right: calc(100% + 1px);
     border-width: 10px;
     border-style: solid;
-    border-color: transparent rgb(16,135,148) transparent transparent;
+    border-color: transparent black transparent transparent;
 }
 {% endblock %}
 
@@ -164,14 +170,12 @@ $(function() {
             $("label[for='id_ctime']").html("Enter the Estimated amount of Time in Minutes to complete each Unit of Work");
         }
     }
-    if ($("#id_unit").val() !== "Minute") {
-        replaceUnit()
-    } 
+    replaceUnit();
     $("#id_unit").on('input',replaceUnit);
 
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("&#42;");
-    $('label[for="id_unit"]').append('<div class="info-button">i<span class="info-button-text">This is how your assignment will be split and divided up<br><br>e.g: If this assignment is a reading a book, enter "Page"<br><br>If you are unsure how to split up your assignment, this is defaulted to "Minute"</span></div>');
-    $('label[for="id_funct_round"]').append('<div class="info-button">i<span class="info-button-text">This is the increment of work you will complete at a time<br><br>e.g: If you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)<br><br>If you do not wish to use the grouping value, this is defaulted to 1</span></div>');
+    $('label[for="id_unit"]').append('<div class="info-button">i<span class="info-button-text">This is how your assignment will be split and divided up<br><br>e.g: If this assignment is reading a book, enter "Page"<br><br>If you are unsure how to split up your assignment, this is defaulted to "Minute"</span></div>');
+    $('label[for="id_funct_round"]').append('<div class="info-button">i<span class="info-button-text">This is the increment of work you will complete at a time<br><br>e.g: If you enter 3, you will only work in multiples of 3 (e.g: 6 units, 9 units, 15 units, etc)<br><br>If you do not wish to use the grouping value, this is defaulted to 1</span></div>');
 });
 </script>
 {% endblock %}
@@ -181,7 +185,6 @@ $(function() {
         <div id="form-wrapper">
             <form method="POST" autocomplete="off">
                 {% csrf_token %}
-                <div id="note">&#42; can be skipped<br>Tip: keep pressing tab</div>
                 <b>{{ error }}</b>
                 {% for field in form.visible_fields %}
                     <p>
@@ -210,6 +213,7 @@ $(function() {
                     {{ hidden }}
                 {% endfor %}
                 <button type="submit" name="submit-button" id="submit-button" title="(Enter)" tabindex="1">{{submit}}</button>
+                <div id="note">&#42; can be skipped<br>Tip: keep pressing tab</div>
             </form>
         </div>
     </div>

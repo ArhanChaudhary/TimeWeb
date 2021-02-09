@@ -3,7 +3,7 @@
 <html>
 
     <head>
-        <title>{% block title %}TimeWeb{% endblock %}</title>
+        <title>TimeWeb</title>
         <meta charset="UTF-8">
         <meta name="keywords" content="HTML, CSS, JavaScript">
         <meta name="author" content="Arhan Chaudhary">
@@ -95,7 +95,7 @@
                 left: 0;
                 top: 0;
                 position: absolute;
-                margin-left: calc(100% + 1px);
+                margin-left: calc(100% + 2px);
                 transition: all .2s ease-in-out;
                 width: 89px;
             }
@@ -115,7 +115,7 @@
                 position: relative;
                 top: -5px;
                 overflow: auto;
-                max-height: calc(100vh - 70px);
+                max-height: calc(100vh - 65px);
             }
             .nav-item {
                 text-decoration: none;
@@ -134,7 +134,7 @@
             #menu-container:focus ~ nav, 
             nav:hover,
             nav.open {
-                transform: translateX(calc(-100% - 1px));
+                transform: translateX(calc(-100% - 2px));
             }
             #menu-container:hover ~ nav #nav-items, 
             nav:hover #nav-items, 
@@ -153,12 +153,8 @@
         <script>
             // Deals with selecting the parent element when tabbing into the menu
             $(function() {
-                $(".nav-item").focusout(function() {
-                    $("nav").removeClass("open");
-                });
-                $(".nav-item").focus(function() {
-                    $("nav").addClass("open");
-                });
+                $(".nav-item").focusout(() => $("nav").removeClass("open"));
+                $(".nav-item").focus(() => $("nav").addClass("open"););
             });
         </script>
         
@@ -172,7 +168,32 @@
             }
         });
         </script>
-
+        <script>
+            // Starting animation
+            if ("animation-ran" in sessionStorage) {
+                disable_transition = true;
+            } else {
+                disable_transition = false;
+                sessionStorage.setItem("animation-ran", true);
+            }
+            if (disable_transition) {
+                $(function() {
+                    $("#content, #header, #assignments-container").addClass("disable-transition");
+                    $(".animate").removeClass("animate");
+                });
+            } else {
+                $(window).load(function() {
+                    // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
+                    $("#content").on("transitionend",function(e) {
+                    if (e.originalEvent.propertyName === "height") {
+                        document.getElementById('content').style.transition = 'none';
+                        $("#content").off("transitionend");
+                    }
+                    });
+                    $(".animate").removeClass("animate");
+                });
+            }
+        </script>
         {% block js %}{% endblock %}
     </head>
     <body>
@@ -209,7 +230,7 @@
             </a>
             <div id="logo-container">
                 <a href="{% url 'home' %}">
-                    <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" id="logo" tabindex="-1"/>
+                    <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" id="logo" tabindex="-1" draggable="false"/>
                     {% comment %} https://fontmeme.com/fonts/alba-font/ {% endcomment %}
                     {% comment %} https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
                 </a>
