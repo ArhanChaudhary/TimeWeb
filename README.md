@@ -1,1 +1,1 @@
-# timemanage
+A tool designed to help users manage their time by prioritizing, sorting, and listing each of their assignments every day. Once the users input their assignments, their work is graphed over the days until it is due.

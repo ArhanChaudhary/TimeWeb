@@ -1,0 +1,210 @@
+
+.disable-transition {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    -ms-transition: none !important;
+    transition: none !important;
+}
+#header {
+    transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
+}
+#content {
+    transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
+}
+#header.animate {
+    transform: translateY(-70px);
+    height: 80px;
+}
+#content.animate {
+    border-width: 0;
+    height: 115vh;
+    transform: translateY(-70px);
+}
+#assignments-container {
+    transition: all 1.2s cubic-bezier(0.26, 0.74, 0, 1.03);
+    min-width: 200px;
+}
+#assignments-container.animate {
+    transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
+}
+
+#info {
+    font-size: 17px;
+    margin: 10px 0 0 10px;
+}
+#hide-button {
+    position: relative;
+    left: 1px;
+    bottom: 0.65px;
+}
+.assignment-container {
+    min-height: 40px;
+    position: relative;
+    overflow: visible !important;
+}
+.assignment {
+    box-shadow: 0 0 4px rgba(52,52,52,0.5);
+    background: white;
+    /*  background: rgb(226,91,80);
+    background: rgb(132,200,65); */
+    margin: 10px;
+    padding: 15px;
+    border: 2px solid rgb(80,80,80);
+    border-radius: 5px;
+    position: relative;
+    width: calc(100% - 54px);
+    min-height: 0;
+}
+.assignment:focus, .button:focus {
+    outline: 0;
+    border: 2px solid rgb(0,95,204) !important;
+    box-shadow: 0 0 4px rgba(0,95,204,0.5); 
+}
+.assignment.disable-hover {
+    display: block;
+    min-height: min(31rem,65vh);
+    transition: all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
+}
+.assignment:not(.disable-hover) {
+    transition: all .2s ease-in-out, opacity .1s ease-in-out;
+}
+.assignment:not(.disable-hover):hover:focus {
+    box-shadow: 0 0 7px rgba(0,95,204,0.7) !important;
+}
+.assignment:not(.disable-hover):hover {
+    transform: scale(1.05) translateX(2%);
+    width: calc(96.15% - 55px);
+    border-color: rgba(0,0,0,0.7);
+    box-shadow: 0 0 7px rgba(52,52,52,0.7);
+    cursor: pointer;
+}
+.assignment-header {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.title {
+    float:left;
+    min-width: calc(95px + 8vw);
+    max-width: calc(95px + 8vw);
+    font-size: min(16.76px,calc(11px + 0.4vw));
+    overflow-wrap: break-word;
+}
+/* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
+.assignment-container:nth-last-child(1) .title::before {
+    content: "Least Important";
+    position: absolute;
+    font-size: 0.7em;
+    margin-top: calc(-1em - 2px);
+}
+.assignment-container:nth-child(2) .title::before {
+    content: "Most Important";
+    position: absolute;
+    font-size: 0.7em;
+    margin-top: calc(-1em - 1px);
+    }
+.daysleft {
+    position: absolute;
+    font-size: 0.7em;
+    margin-top: -1px;
+}
+.arrow-container {
+    float: left;
+    margin-left: max(5px,calc(-5px + 2vw));
+    overflow: visible;
+}
+.status {
+    float: left;
+    font-size: min(16.76px,calc(11px + 0.4vw));
+    margin: 0 70px 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.button {
+    position: absolute;
+    background: radial-gradient(circle, lightgray 40%, gray 100%);
+    border: 2px solid rgb(80,80,80);
+    border-radius: 50%;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+.button:hover, .button:focus {
+    background: radial-gradient(circle, white 35%, gray 100%);
+}
+.button:active {
+    background: radial-gradient(circle, white 55%, gray 100%);
+}
+.update-button {
+    right: 30px;
+    height: 30px;
+    width: 30px;
+}
+.update-button-image {
+    top: 5px;
+    left: 5px;
+    position: relative;
+}
+.delete-button {
+    right: -10px;
+    height: 35px;
+    width: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.delete-button-image {
+    top: -1px;
+}
+@media (max-width: 275px) {
+    .delete-button {
+        display: none;
+    }
+}
+@media (max-width: 314px) {
+    .update-button {
+        display: none;
+    }
+}
+.graph-container {
+    position: relative;
+    top: 10px;
+    display: none;
+    /* firefox acts weirdly without this */
+    width: 100%;
+}
+canvas {
+    padding: 0;
+    border-radius: 12px;
+    height: clamp(200px,65vh,400px);
+    width: calc(100% - 34px);
+    min-height: 200px;
+    max-height: 400px;
+    /* positioned really weirdly but still works*/
+    margin: 5px;
+    margin-left: 13px;
+}
+canvas:focus {
+    box-shadow: 0 0 0 2px rgb(0,95,204), 0 0 5px 2px rgb(0,95,204);
+    outline: 0;
+}
+.fixed-graph {
+    border: 4px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
+    position: absolute;
+}
+.graph {
+    position: relative;
+    border: 4px solid transparent;
+}
+
+.graph-footer {
+    padding: 0 13px;
+}
+.sr-textbox {
+    width: 95px;
+}
