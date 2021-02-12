@@ -37,3 +37,11 @@ $(function() {
     $(".nav-item").focusout(() => $("nav").removeClass("open"));
     $(".nav-item").focus(() => $("nav").addClass("open"));
 });
+
+(function ($) {
+ 
+    $.fn.info = function(facing,text) {
+        return this.append('<div class="info-button">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
+    };
+ 
+}(jQuery));

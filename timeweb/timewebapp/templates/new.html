@@ -113,17 +113,23 @@ input {
 .info-button:hover {
     background: rgb(16,135,148);
 }
-.info-button:hover .info-button-text {
+.info-button:hover .info-button-text.info-right {
     visibility: visible;
     opacity: 1;
     left: calc(100% + 12px);
+    transition: all .2s ease-in-out;
+}
+.info-button:hover .info-button-text.info-left {
+    visibility: visible;
+    opacity: 1;
+    right: calc(100% + 12px);
     transition: all .2s ease-in-out;
 }
 .info-button-text {
     position: absolute;
     transform: translateY(-50%) translateY(7px);
     width: 265px;
-    left: calc(100% - 7px);
+    z-index:3;
 
     background: white;
     box-shadow: 0 0 5px rgba(0,0,0,0.75);
@@ -133,13 +139,20 @@ input {
     opacity: 0;
 
     text-align: left;
-    padding: 3px 6px;
+    padding: 5px 5px;
     color: black;
     font-size: 13px;
     line-height: 13px;
     font-style: normal;
+    white-space: pre-line;
 }
-.info-button-text::after {
+.info-button-text.info-right {
+    left: calc(100% - 4px);
+}
+.info-button-text.info-left {
+    right: calc(100% - 4px);
+}
+.info-button-text.info-right::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -148,6 +161,16 @@ input {
     border-width: 10px;
     border-style: solid;
     border-color: transparent black transparent transparent;
+}
+.info-button-text.info-left::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: calc(100% + 1px);
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent black;
 }
 </style>
 {% endblock %}
@@ -180,8 +203,27 @@ $(function() {
     $("#id_unit").on('input',replaceUnit);
 
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("&#42;");
-    $('label[for="id_unit"]').append('<div class="info-button">i<span class="info-button-text">This is how your assignment will be split and divided up<br><br>e.g: If this assignment is reading a book, enter "Page"<br><br>If you are unsure how to split up your assignment, this is defaulted to "Minute"</span></div>');
-    $('label[for="id_funct_round"]').append('<div class="info-button">i<span class="info-button-text">This is the increment of work you will complete at a time<br><br>e.g: If you enter 3, you will only work in multiples of 3 (e.g: 6 units, 9 units, 15 units, etc)<br><br>If you do not wish to use the grouping value, this is defaulted to 1</span></div>');
+    $('label[for="id_unit"]').info('right',
+        `This is how your assignment will be split and divided up
+        
+        e.g: If this assignment is reading a book, enter "Page"
+        
+        If you are unsure how to split up your assignment, this is defaulted to "Minute"`
+    );
+    $('label[for="id_works"]').info('right',
+        `The following is only relevant if you are re-entering this field
+
+        This value is also the y-coordinate of the initial work input, or the y-coordinate of the first point on the blue line
+        
+        Changing this initial value will vertically translate all of your other work inputs accordingly`
+    );
+    $('label[for="id_funct_round"]').info('right',
+        `This is the increment of work you will complete at a time
+        
+        For example, if you enter 3, you will only work in multiples of 3 (e.g: 6 units, 9 units, 15 units, etc)
+        
+        If you do not wish to use the grouping value, this is defaulted to 1`
+    );
 });
 </script>
 {% endblock %}

@@ -31,7 +31,7 @@ $(function() {
                 });
                 $(assignment_container).animate({
                     height: "10px"
-                }, 200, () => $(assignment_container).remove());
+                }, 500, () => $(assignment_container).remove());
             }
             // Use an ajax POST to avoid a page reload which will replay the starting animation
             $.ajax({
@@ -64,8 +64,7 @@ $(function() {
         $(this.previousSibling).toggle();
         this.innerHTML = this.innerHTML === 'Hide' ? 'Show' : 'Hide';
     });
-
-
+    
     // Entire graph
     let dat = JSON.parse(document.getElementById("load-data").textContent);
     let [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0],
@@ -148,12 +147,9 @@ $(function() {
 
                 function resize(reversescale) {
                     if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
-                        ({
-                            width,
-                            height
-                        } = fixed_graph.getBoundingClientRect());
+                        ({width, height} = fixed_graph.getBoundingClientRect());
                         if (reversescale) {
-                            width /= 1.01;
+                            width /= 1.005;
                             height /= 1.05;
                         }
                         scale = window.devicePixelRatio;
@@ -180,45 +176,48 @@ $(function() {
                         resize(false);
                     }
                 });
-                let ajax;
-
-                function UpdateSkewRatio() {
-                    clearTimeout(ajax);
-                    ajax = setTimeout(function() {
-                        let data = {
-                            'csrfmiddlewaretoken': csrf_token,
-                            'skew_ratio': skew_ratio,
-                            'pk': graph.getAttribute("value"),
-                        }
-                        // send value with skew ratio so it can be reference in backend
-                        $.ajax({
-                            type: "POST",
-                            data: data,
-                            error: function(jqXHR, exception) {
-                                if (jqXHR.status == 0) {
-                                    alert('Failed to save');
-                                } else if (jqXHR.status == 404) {
-                                    alert('Requested page not found, try again');
-                                } else if (jqXHR.status == 500) {
-                                    alert('Internal server error. Please contact me if you see this');
-                                } else if (exception === 'parsererror') {
-                                    alert('Requested JSON parse failed');
-                                } else if (exception === 'timeout') {
-                                    alert('Timeout error');
-                                } else if (exception === 'abort') {
-                                    alert('Request aborted');
-                                } else {
-                                    console.log('Uncaught Error, \n' + jqXHR.responseText);
-                                }
-                            }
-                        });
-                    }, 1000);
-                }
+                
                 // Sets event handlers only on the assignment's first click
                 if (!not_first_click) {
-
                     // Graph resize event handler
                     $(window).resize(() => resize(false));
+
+                    let ajax,
+                        old_skew_ratio;
+                    function AjaxSkewRatio() {
+                        clearTimeout(ajax);
+                        selected_assignment[7] = skew_ratio;
+                        old_skew_ratio = skew_ratio;
+                        ajax = setTimeout(function() {
+                            const data = {
+                                'csrfmiddlewaretoken': csrf_token,
+                                'skew_ratio': skew_ratio,
+                                'pk': graph.getAttribute("value"),
+                            }
+                            // send value with skew ratio so it can be reference in backend
+                            $.ajax({
+                                type: "POST",
+                                data: data,
+                                error: function(response, exception) {
+                                    if (response.status == 0) {
+                                        alert('Failed to save');
+                                    } else if (response.status == 404) {
+                                        alert('Requested page not found, try again');
+                                    } else if (response.status == 500) {
+                                        alert('Internal server error. Please contact me if you see this');
+                                    } else if (exception === 'parsererror') {
+                                        alert('Requested JSON parse failed');
+                                    } else if (exception === 'timeout') {
+                                        alert('Timeout error');
+                                    } else if (exception === 'abort') {
+                                        alert('Request aborted');
+                                    } else {
+                                        alert('Uncaught Error, \n' + response.responseText);
+                                    }
+                                }
+                            });
+                        }, 1000);
+                    }
 
                     // Up and down arrow event handler
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
@@ -236,7 +235,7 @@ $(function() {
                         if (funct(1, false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor((x - red_line_start_x) / 7) * len_nwd - mods[(x - red_line_start_x) % 7] - 1 : x - red_line_start_x - 1, false) && whichkey === "ArrowDown") {
                             skew_ratio = 2 - skew_ratio;
                         }
-                        UpdateSkewRatio();
+                        AjaxSkewRatio();
                         draw();
                     }
 
@@ -280,13 +279,12 @@ $(function() {
                             // stop set skew ratio if canvas is clicked
                             $(this).next().find(".set-skew-ratio-button").html("Set skew ratio");
                             graph.removeEventListener("mousemove", mousemove);
-                            UpdateSkewRatio();
+                            AjaxSkewRatio();
                             update = false;
                         }
                     }
 
                     // Dynamically update skew ratio from textbox
-                    let old_skew_ratio;
                     $(".sr-textbox").on("change keyup paste click", function(e) {
                         var e = e || window.event;
                         if (old_skew_ratio === undefined) {
@@ -309,7 +307,7 @@ $(function() {
                         var e = e || window.event;
                         e.target.value = "";
                         if (old_skew_ratio !== undefined) {
-                            UpdateSkewRatio();
+                            AjaxSkewRatio();
                         }
                         old_skew_ratio = skew_ratio;
                     });
