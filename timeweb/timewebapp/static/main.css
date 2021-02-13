@@ -7,7 +7,7 @@
     transition: none !important;
 }
 #header {
-    transition: all 1.2s cubic-bezier(.14,.34,.06,1.31);
+    transition: all 1.2s cubic-bezier(.29,.81,.37,.99);
 }
 #content {
     transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
@@ -22,13 +22,12 @@
     transform: translateY(-70px);
 }
 #assignments-container {
-    transition: all 1.2s cubic-bezier(0.26, 0.74, 0, 1.03);
+    transition: all 1.2s cubic-bezier(.29,.81,.37,.99);
     min-width: 200px;
 }
 #assignments-container.animate {
     transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
 }
-
 #info {
     font-size: 17px;
     margin: 10px 0 0 10px;
@@ -63,11 +62,11 @@
 }
 .assignment.disable-hover {
     display: block;
-    min-height: min(31rem,65vh);
-    transition: all .2s ease-in-out, opacity .1s ease-in-out, min-height 0s;
+    min-height: calc(min(31rem,65vh) + 200px);
+    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 1s cubic-bezier(.29,.81,.37,.99) 0.15s, min-height 0s;
 }
 .assignment:not(.disable-hover) {
-    transition: all .2s ease-in-out, opacity .1s ease-in-out, min-height 0.5s;
+    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 1s cubic-bezier(.29,.81,.37,.99) 0.15s, min-height 0.75s cubic-bezier(.29,.81,.37,.99);
 }
 .assignment:not(.disable-hover):hover:focus {
     box-shadow: 0 0 7px rgba(0,95,204,0.7) !important;
@@ -96,18 +95,18 @@
     content: "Least Important";
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 2px);
+    margin-top: calc(-1em - 2.5px);
 }
 .assignment-container:nth-child(2) .title::before {
     content: "Most Important";
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 1px);
+    margin-top: calc(-1em - 2.5px);
     }
 .daysleft {
     position: absolute;
     font-size: 0.7em;
-    margin-top: -1px;
+    margin-top: -0.75px;
 }
 .arrow-container {
     float: left;
@@ -213,6 +212,7 @@ canvas:focus {
 
 .graph-footer {
     padding: 0 13px;
+    height: 200px;
 }
 .sr-textbox {
     width: 95px;

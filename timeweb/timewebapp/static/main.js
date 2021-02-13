@@ -1,4 +1,19 @@
 $(function() {
+    function color(p) {
+        return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
+    }
+    setTimeout(function() {
+        k = [1,0.9,0.7,0.7,0.5,0.2,0,0];
+        const all_assignment = document.getElementsByClassName("assignment");
+        (function assignmentLoop(i) {
+            setTimeout(function() {
+                all_assignment[all_assignment.length-i].style.background = color(k[all_assignment.length-i]);
+                if (--i) {
+                    assignmentLoop(i);
+                }
+            }, 50);
+        })(all_assignment.length);
+    }, !disable_transition * 400)
     // Delete button
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
@@ -131,7 +146,17 @@ $(function() {
                     ignore_ends_mwt = ignore_ends && min_work_time,
                     len_nwd = nwd.length,
                     set_skew_ratio = false,
-                    min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round;
+                    min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round,
+                    width,
+                    height,
+                    wCon,
+                    hCon,
+                    a,
+                    b,
+                    cutoff_transition_value,
+                    cutoff_to_use_round,
+                    return_y_cutoff,
+                    return_0_cutoff;
 
                 function set_mod_days() {
                     mods = [0];
@@ -318,7 +343,6 @@ $(function() {
                         }
                     });
                 }
-
                 function pset(x2 = NaN, y2 = NaN) {
                     try {
                         var x1 = x - red_line_start_x,
@@ -597,7 +621,7 @@ $(function() {
                     // bg gradient
                     let screen = fixed_graph.getContext("2d");
                     screen.scale(scale, scale);
-                    gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
+                    let gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
                     gradient.addColorStop(0, "white");
                     gradient.addColorStop(1, "lightgray");
                     screen.fillStyle = gradient;
@@ -634,13 +658,15 @@ $(function() {
                     screen.textBaseline = "top";
                     const x_axis_scale = Math.pow(10, Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0] / Math.ceil((width - 100) / 100));
                     if (x >= 10) {
+                        gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
+                        gradient.addColorStop(0, "gainsboro");
+                        gradient.addColorStop(1, "silver");
                         const small_x_axis_scale = x_axis_scale / 5,
-                            label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon,
-                            font_size = 13.75;
+                            label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
                         for (let smaller_index = 1; smaller_index <= Math.floor(x / small_x_axis_scale); smaller_index++) {
                             if (smaller_index % 5) {
                                 const displayed_number = smaller_index * small_x_axis_scale;
-                                screen.fillStyle = "rgb(215,215,215)"; // Line color
+                                screen.fillStyle = gradient; // Line color
                                 screen.fillRect(displayed_number * wCon + 48.5, 0, 2, height - 50); // Draws line index
                                 screen.fillStyle = "rgb(80,80,80)"; // Number color
                                 if (label_index) {
