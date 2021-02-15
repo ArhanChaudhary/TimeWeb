@@ -26,7 +26,7 @@
               </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-            <a class="button update-button" href="{% url 'list' obj.pk%}">
+            <a class="button update-button" href="{% url 'list' obj.pk %}">
               <img height="20" src="{% static 'edit.png' %}" alt="delete" class="update-button-image" draggable="false"/>
             </a>
             <button value="{{ obj.pk }}" class="button delete-button">
@@ -44,9 +44,9 @@
                     </polygon>
                   </svg>
                 </button>
-                <button class="set-skew-ratio-button">Set skew ratio</button>
+                <button class="set-skew-ratio-button">Set skew ratio using graph</button>
                 {% comment %} float:right breaks everything {% endcomment %}
-                <button>fixed mode</button>
+                <button>Switch to fixed mode</button>
                 
                 <br>
 
@@ -59,13 +59,11 @@
                 <input placeholder="Enter skew ratio" class="sr-textbox"/>
                 {% comment %} use float to get text on left and right {% endcomment %}
                 {% comment %} click again to confirm, 1s window to click {% endcomment %}
-                <button>Delete work input</button>
-                <button>Display entire schedule</button>
-                <button>Remainder mode</button>
-                <br>
-                enter work input:<input/>
-                enter total work input:<input/>
-                <br>
+                <button>Delete latest work input</button>
+                <button>Display entire work schedule</button>
+                <button>Enable remainder mode</button>
+                Enter work input:<input/>
+                Enter total work input:<input/>
               </div>
             </div>
           </div>

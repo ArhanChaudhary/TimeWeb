@@ -4,16 +4,11 @@ $(function() {
     }
     setTimeout(function() {
         k = [1,0.9,0.7,0.7,0.5,0.2,0,0];
-        const all_assignment = document.getElementsByClassName("assignment");
-        (function assignmentLoop(i) {
-            setTimeout(function() {
-                all_assignment[all_assignment.length-i].style.background = color(k[all_assignment.length-i]);
-                if (--i) {
-                    assignmentLoop(i);
-                }
-            }, 50);
-        })(all_assignment.length);
-    }, !disable_transition * 400)
+        const all_assignment = $(".assignment");
+        $(".assignment").each(function(index) {
+            $(this).css("background",color(k[index]));
+        });
+    }, !disable_transition * 300)
     // Delete button
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
@@ -24,29 +19,29 @@ $(function() {
                 'deleted': $(this).val(),
             }
 
-            const assignment_container = $(this).parents(".assignment-container");
+            const assignment_container = $($(this).parents(".assignment-container"));
 
             // If the data was successfully sent, delete the assignment
             const success = function() {
 
-                $(assignment_container).css({
+                assignment_container.css({
                     // CSS doesn't allow transitions without presetting the property
                     // So, use JQuery to preset and animate its property
-                    "height": $(assignment_container).height() + 20 + "px",
+                    "height": assignment_container.height() + 20 + "px",
 
                     "margin-bottom": "-10px",
                     "min-height": "0",
                 });
                 if (!assignment_container.is(':nth-child(2)')) {
-                    $(assignment_container).css("margin-top", "-10px");
+                    assignment_container.css("margin-top", "-10px");
                 }
-                $(assignment_container.children(":first-child")).css({
+                assignment_container.children(":first-child").css({
                     "position": "absolute",
                     "opacity": "0",
                 });
-                $(assignment_container).animate({
+                assignment_container.animate({
                     height: "10px"
-                }, 500, () => $(assignment_container).remove());
+                }, 350, () => assignment_container.remove());
             }
             // Use an ajax POST to avoid a page reload which will replay the starting animation
             $.ajax({
@@ -310,7 +305,24 @@ $(function() {
                     }
 
                     // Dynamically update skew ratio from textbox
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    // are all these really needde VVV
                     $(".sr-textbox").on("change keyup paste click", function(e) {
+                        console.log(e.originalEvent)
                         var e = e || window.event;
                         if (old_skew_ratio === undefined) {
                             old_skew_ratio = skew_ratio;
@@ -321,6 +333,11 @@ $(function() {
                             skew_ratio = old_skew_ratio;
                             old_skew_ratio = undefined;
                         }
+
+
+
+
+
 
 
 

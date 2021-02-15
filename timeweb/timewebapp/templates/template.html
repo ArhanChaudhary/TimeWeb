@@ -15,7 +15,12 @@
         {% block css %}{% endblock css %}
         <script src="{% static 'jquery.js' %}"></script>
         <script src="{% static 'template.js' %}"></script>
-        <script>csrf_token = "{{ csrf_token }}"</script>
+        <script>
+            csrf_token = "{{ csrf_token }}";
+            {% block clear_pr_form %}
+            localStorage.removeItem('form_fields');
+            {% endblock clear_pr_form %}
+        </script>
         {% block js %}{% endblock js %}
     </head>
     <body>

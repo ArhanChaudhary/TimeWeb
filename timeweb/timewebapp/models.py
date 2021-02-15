@@ -21,6 +21,8 @@ class TimewebModel(models.Model):
     file_sel = models.CharField(
         max_length=100,
         verbose_name='Enter the Name of this Assignment',
+        unique=True,
+        error_messages={'unique': 'An assignment with this name already exists'},
     )
     ad = models.DateField(
         null=True,

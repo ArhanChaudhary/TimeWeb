@@ -1,20 +1,9 @@
-# import form class from django
 from django import forms
-
-# import TimewebModel from models.py
 from .models import TimewebModel
-
-# create a ModelForm
-
 class DateInput(forms.DateInput):
     input_type = 'date'
 
 class TimewebForm(forms.ModelForm):
-
-    # specify the name of model to use
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.label_suffix = ""
 
     class Meta:
         model = TimewebModel
@@ -29,3 +18,29 @@ class TimewebForm(forms.ModelForm):
             'total_mode': forms.HiddenInput(),
             'remainder_mode': forms.HiddenInput(),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+    
+    # Override form.is_valid in views
+    def clean(self):
+        cleaned_data = super().clean()
+        x = cleaned_data.get("x")
+        ad = cleaned_data.get("ad")
+        works = cleaned_data.get("works")
+        y = cleaned_data.get("y")
+        file_sel = cleaned_data.get("file_sel")
+        unit = cleaned_data.get("unit")
+        if works >= y:
+            self.add_error("works",
+                forms.ValidationError("This field's value of %(value)g cannot be " + ("equal to" if works == y else "greater than") + " %(y)g",code='invalid',params={
+                    'value':works,
+                    'y':y,
+                })
+            )
+        if x <= ad:
+            self.add_error("x",
+                forms.ValidationError("The due date cannot be " + ("on" if x == ad else "before") + " the assignment date",code='invalid')
+            )
+        return cleaned_data

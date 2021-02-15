@@ -63,10 +63,10 @@
 .assignment.disable-hover {
     display: block;
     min-height: calc(min(31rem,65vh) + 200px);
-    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 1s cubic-bezier(.29,.81,.37,.99) 0.15s, min-height 0s;
+    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 1s cubic-bezier(.29,.81,.37,.99), min-height 0s;
 }
 .assignment:not(.disable-hover) {
-    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 1s cubic-bezier(.29,.81,.37,.99) 0.15s, min-height 0.75s cubic-bezier(.29,.81,.37,.99);
+    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 1s cubic-bezier(.29,.81,.37,.99), min-height 0.75s cubic-bezier(.29,.81,.37,.99);
 }
 .assignment:not(.disable-hover):hover:focus {
     box-shadow: 0 0 7px rgba(0,95,204,0.7) !important;

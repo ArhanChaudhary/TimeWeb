@@ -19,7 +19,7 @@ class TimewebView(View):
 
         # Creates form after user enters "New" 
         if pk == None:
-            self.form = TimewebForm(request.POST or None, request.FILES or None)
+            self.form = TimewebForm(request.POST or None)
             self.context['submit'] = 'Create Assignment'
         else:
             self.selectedform = get_object_or_404(TimewebModel, pk=pk) # User data from modelform
@@ -38,7 +38,7 @@ class TimewebView(View):
                 initial['funct_round'] = self.selectedform.funct_round
             if self.selectedform.min_work_time*self.selectedform.ctime:
                 initial['min_work_time'] = round(self.selectedform.min_work_time*self.selectedform.ctime,2) # Decimal module mutiplication adds siginficant figures
-            self.form = TimewebForm(request.POST or None, request.FILES or None,initial=initial)
+            self.form = TimewebForm(request.POST or None,initial=initial)
             self.context['submit'] = 'Update Assignment'
             self.context['checked_nwd'] = self.selectedform.nwd
         
@@ -71,19 +71,13 @@ class TimewebView(View):
                 save_data.unit = form_data.unit
                 save_data.y = form_data.y
                 adone = form_data.works
-                # save_data.dif_assign = form_data.dif_assign no reason to define since its null
                 save_data.skew_ratio = form_data.skew_ratio
                 save_data.ctime = form_data.ctime
                 save_data.funct_round = form_data.funct_round
                 save_data.min_work_time = form_data.min_work_time
                 save_data.nwd = form_data.nwd
                 save_data.fixed_mode = form_data.fixed_mode
-                # save_data.dynamic_start = form_data.dynamic_start no reason to define since its null
                 save_data.remainder_mode = form_data.remainder_mode
-            
-            if any(save_data.file_sel == obj.file_sel for obj in TimewebModel.objects.all().exclude(pk=pk)):
-                self.context['error'] = 'Name has already been taken!'
-                return render(request, "new.html", self.context)
 
             date_now = timezone.localtime(timezone.now()).date()
             if save_data.ad == date_now:
@@ -98,17 +92,6 @@ class TimewebView(View):
                         save_data.dif_assign = 0
                     else:
                         save_data.dif_assign = old_data.dif_assign + (old_data.ad-save_data.ad).days
-            
-            if save_data.x < save_data.ad:
-                self.context['error'] = 'Assignment date cannot be before due date!'
-                return render(request, "new.html", self.context)
-            elif save_data.x == save_data.ad:
-                self.context['error'] = 'Assignment date cannot be on the due date!'
-                return render(request, "new.html", self.context)
-           
-            if adone >= save_data.y:
-                self.context['error'] = 'Adone cannot be greater than or equal to y!'
-                return render(request, "new.html", self.context)
                 
             if not save_data.funct_round:
                 save_data.funct_round = 1

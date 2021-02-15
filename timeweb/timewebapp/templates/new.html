@@ -33,13 +33,32 @@ label[for='id_ad']::after {
     top: 10px;
 }
 #form-wrapper {
-    width: 400px;
+    width: 410px;
     background: white;
     box-shadow: 0 0 8px black;
     margin: 1em auto;
     border: 1px solid black;
     border-radius: 15px;
     padding-bottom: 25px;
+    position: relative;
+}
+#new-title-line {
+    width: 390px;
+    position: absolute;
+    margin-top: 1.25em;
+    left: 10px;
+    border: 3px groove lightgray;
+}
+#new-title {
+    display: inline-block;
+    font-size: 27px;
+    margin-bottom: -0.25em;
+    position: relative;
+    z-index: 1;
+    background: white;
+    padding: 0 4px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 .field {
     width: calc(100% - 50px);
@@ -51,7 +70,7 @@ label, #nwd-label-title {
     position: relative;
 }
 label:not(.nwd-label) {
-    margin: 0 25px;
+    margin: 0 49px;
 }
 #nwd-wrapper {
     display: flex;
@@ -59,24 +78,25 @@ label:not(.nwd-label) {
     flex-wrap: wrap;
     margin: -1em 50px 0;
 }
-.nwd-input {
+#nwd-wrapper input {
     display: none;
 }
-.nwd-input:checked + .nwd-label {
-    background: darkgray;
+#nwd-wrapper input:checked + .nwd-label {
+    border-color: red;
+    background: rgba(255,0,0,0.5);
 }
 .nwd-label {
-    background: white;
+    background: rgba(0,255,0,0.5);
     display: inline-block;
-    margin-right: 2px;
+    margin-right: 4px;
     margin-bottom: 4px;
-    border: 1px solid gray;
+    border: 1px solid green;
     border-radius: 5px;
     padding: 4px;
+    transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
 }
-.nwd-label:active {
-    outline: 0;
-    background: whitesmoke;
+.nwd-label:hover, .nwd-label:focus {
+    transform: scale(1.04);
 }
 input {
     box-sizing: border-box; 
@@ -172,21 +192,56 @@ input {
     border-style: solid;
     border-color: transparent transparent transparent black;
 }
+.invalid {
+    border: 2px solid rgb(226,30,54);
+}
+.error-note {
+    text-align: center;
+    font-size: 13px;
+    margin-top: -15px;
+    color: rgb(226,30,54);
+}
 </style>
-{% endblock %}
+{% endblock css %}
+
+{% block clear_pr_form %}{% endblock clear_pr_form %}
 
 {% block js %}
 <script>
 $(function() {
-    $('#id_works').val("0.00");
-    if (!$('#id_ad').val()) {
-        $('#id_ad').val("{% now 'Y-m-d' %}");
-    }
-    if (!$('#id_x').val()) {
-        $('#id_x').val("{% now 'Y-m-d' %}");
+
+    if ("form_fields" in localStorage) {
+
+        // Restore form on refresh and error handling
+        const pr_data = JSON.parse(localStorage.getItem("form_fields"));
+        localStorage.removeItem('form_fields');
+        $("form input:visible").each(function(index) {
+            this.value = pr_data[index];
+        });
+        $("#nwd-wrapper input").each(function(index) {
+            this.checked = pr_data[9][index];
+        });
+    } else {
+        
+        // Input fields formatting
+        $('#id_works').val("0.00");
+        if (!$('#id_ad').val()) {
+            $('#id_ad').val("{% now 'Y-m-d' %}");
+        }
+        if (!$('#id_x').val()) {
+            $('#id_x').val("{% now 'Y-m-d' %}");
+        }
     }
     $("#id_works").attr({"step":"0.01","type":"number"});
     $("input").attr("tabindex","1");
+    $(".error-note").each(function() {
+        $(this).prev().children().eq(1).addClass("invalid");
+        if (this.id === "error_id_x" || this.id === "error_id_works") {
+            $(this).prev().prev().children().eq(1).addClass("invalid");
+        }
+    });
+
+    // Replace text with unit field
     function replaceUnit() {
         const val = $("#id_unit").val();
         if (val) {
@@ -202,6 +257,7 @@ $(function() {
     replaceUnit();
     $("#id_unit").on('input',replaceUnit);
 
+    // Add info buttons (defined in template.js)
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("&#42;");
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
@@ -213,7 +269,7 @@ $(function() {
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field
 
-        This value is also the y-coordinate of the initial work input, or the y-coordinate of the first point on the blue line
+        This value is also the y-coordinate of the first point on the blue line, or the initial work input
         
         Changing this initial value will vertically translate all of your other work inputs accordingly`
     );
@@ -224,24 +280,34 @@ $(function() {
         
         If you do not wish to use the grouping value, this is defaulted to 1`
     );
+
+    // Save form data to localStorage
+    $(window).unload(function() {
+        localStorage.setItem("form_fields", JSON.stringify([
+                ...$("form input:visible").toArray().map(field => field.value),
+                $("#nwd-wrapper input").toArray().map(nwd_field => nwd_field.checked),
+            ])
+        );
+    });
 });
 </script>
-{% endblock %}
+{% endblock js %}
 
 {% block body %}
     <div id="content" class="animate">
         <div id="form-wrapper">
             <form method="POST" autocomplete="off">
+                <div id="new-title-line"></div>
+                <div id="new-title">New Assignment</div>
                 {% csrf_token %}
-                <b>{{ error }}</b>
+                <b>{{ form.non_field_errors }}</b>
                 {% for field in form.visible_fields %}
                     <p>
-                        {{ field.errors }}
                         {% if field.name == "nwd" %}
                             <label id="nwd-label-title">Select the Weekdays you will Not work on this Assignment</label>
                             <div id="nwd-wrapper">
                                 {% for value, text in field.field.choices %}
-                                    <input class="nwd-input" id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
+                                    <input {% if field.errors %}class="invalid"{% endif %} id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
                                     <label tabindex="1" class="nwd-label" for="id_nwd_{{ forloop.counter0 }}">{{ text }}</label>
                                 {% endfor %}
                             </div>
@@ -252,8 +318,10 @@ $(function() {
                             {{ field.label_tag }}
                             {{ field }}
                         {% endif %}
-                        {% if field.help_text %}
-                            <p class="help">{{ field.help_text|safe }}</p>
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <p class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</p>
+                            {% endfor %}
                         {% endif %}
                     </p>
                 {% endfor %}
@@ -265,5 +333,4 @@ $(function() {
             </form>
         </div>
     </div>
-    <div class="headerfooter animate" id="footer"></div>
-{% endblock %}
+{% endblock body %}
