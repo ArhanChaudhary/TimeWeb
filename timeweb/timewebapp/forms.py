@@ -31,7 +31,6 @@ class TimewebForm(forms.ModelForm):
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
         file_sel = cleaned_data.get("file_sel")
-        unit = cleaned_data.get("unit")
         if works >= y:
             self.add_error("works",
                 forms.ValidationError("This field's value of %(value)g cannot be " + ("equal to" if works == y else "greater than") + " %(y)g",code='invalid',params={

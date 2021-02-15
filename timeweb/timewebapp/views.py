@@ -79,6 +79,13 @@ class TimewebView(View):
                 save_data.fixed_mode = form_data.fixed_mode
                 save_data.remainder_mode = form_data.remainder_mode
 
+            # Can't use "unique=True" because it doesnt work on reenter
+            if any(save_data.file_sel == obj.file_sel for obj in TimewebModel.objects.all().exclude(pk=pk)):
+                self.form.add_error("file_sel",
+                    forms.ValidationError('An assignment with this name already exists')
+                )
+                self.logger.debug("Invalid Form")
+                return render(request, "new.html", self.context)
             date_now = timezone.localtime(timezone.now()).date()
             if save_data.ad == date_now:
                 save_data.dynamic_start = 0 # May not be needed

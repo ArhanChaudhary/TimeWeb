@@ -26,7 +26,8 @@
     min-width: 200px;
 }
 #assignments-container.animate {
-    transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
+    transform: translateY(max(calc(-50vh + 70px),calc(-100% - 20px)));
+    /* transform:translateY(min(calc(50vh - 70px),calc(100% + 20px))); */
 }
 #info {
     font-size: 17px;

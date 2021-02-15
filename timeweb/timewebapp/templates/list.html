@@ -38,25 +38,10 @@
               <canvas class="fixed-graph"></canvas>
               <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
-                <button>
-                  <svg width="10px" height="5px">
-                    <polygon points="10,0 0,0 5,5">
-                    </polygon>
-                  </svg>
-                </button>
                 <button class="set-skew-ratio-button">Set skew ratio using graph</button>
                 {% comment %} float:right breaks everything {% endcomment %}
                 <button>Switch to fixed mode</button>
-                
-                <br>
-
-                <button>
-                  <svg width="10px" height="5px">
-                    <polygon points="10,5 0,5 5,0">
-                    </polygon>
-                  </svg>
-                </button>
-                <input placeholder="Enter skew ratio" class="sr-textbox"/>
+                <input type="number" step="0.1" placeholder="Enter skew ratio" class="sr-textbox"/>
                 {% comment %} use float to get text on left and right {% endcomment %}
                 {% comment %} click again to confirm, 1s window to click {% endcomment %}
                 <button>Delete latest work input</button>

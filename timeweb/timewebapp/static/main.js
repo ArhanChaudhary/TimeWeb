@@ -81,7 +81,7 @@ $(function() {
         scale = window.devicePixelRatio;
 
     function PreventArrowScroll(e) {
-        // arrow keys
+        // Prevent arrow keys from scrolling
         var e = e || window.event;
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
             e.preventDefault();
@@ -262,25 +262,23 @@ $(function() {
                     // Up/down keybind handler
                     $(document).keydown(function(e) {
                         var e = e || window.event;
-                        if ($(fixed_graph).is(":visible")) {
+                        if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("sr-textbox")) {
                             const rect = fixed_graph.getBoundingClientRect();
                             if (rect.bottom - rect.height / 5 > 70 && rect.y + rect.height / 5 < window.innerHeight && !fired) {
                                 fired = true;
-                                if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-                                    whichkey = e.key;
-                                    ChangeSkewRatio()
-                                    graphtimeout = setTimeout(function() {
-                                        clearInterval(graphinterval);
-                                        graphinterval = setInterval(ChangeSkewRatio, 13); // Draws every frame
-                                    }, 500);
-                                }
+                                whichkey = e.key;
+                                ChangeSkewRatio()
+                                graphtimeout = setTimeout(function() {
+                                    clearInterval(graphinterval);
+                                    graphinterval = setInterval(ChangeSkewRatio, 13); // Draws every frame
+                                }, 500);
                             }
                         }
                     });
                     $(document).keyup(function(e) {
                         var e = e || window.event;
-                        fired = false;
                         if (e.key === whichkey) {
+                            fired = false;
                             clearTimeout(graphtimeout);
                             clearInterval(graphinterval);
                         }
@@ -305,24 +303,8 @@ $(function() {
                     }
 
                     // Dynamically update skew ratio from textbox
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    // are all these really needde VVV
-                    $(".sr-textbox").on("change keyup paste click", function(e) {
-                        console.log(e.originalEvent)
+                    // keydown for normal sr and keyup for delete
+                    $(".sr-textbox").on("keydown paste click keyup", function(e) {
                         var e = e || window.event;
                         if (old_skew_ratio === undefined) {
                             old_skew_ratio = skew_ratio;
