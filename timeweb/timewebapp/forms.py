@@ -1,5 +1,6 @@
 from django import forms
 from .models import TimewebModel
+from django.utils.translation import ugettext_lazy as _
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -33,13 +34,13 @@ class TimewebForm(forms.ModelForm):
         file_sel = cleaned_data.get("file_sel")
         if works >= y:
             self.add_error("works",
-                forms.ValidationError("This field's value of %(value)g cannot be " + ("equal to" if works == y else "greater than") + " %(y)g",code='invalid',params={
+                forms.ValidationError(_("This field's value of %(value)g cannot be " + ("equal to" if works == y else "greater than") + " %(y)g"),code='invalid',params={
                     'value':works,
                     'y':y,
                 })
             )
         if x <= ad:
             self.add_error("x",
-                forms.ValidationError("The due date cannot be " + ("on" if x == ad else "before") + " the assignment date",code='invalid')
+                forms.ValidationError(_("The due date cannot be " + ("on" if x == ad else "before") + " the assignment date",code='invalid'))
             )
         return cleaned_data

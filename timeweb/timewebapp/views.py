@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.translation import ugettext as _
 from django.views import View
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import TimewebModel
 from .forms import TimewebForm
-import logging # import the logging library
+import logging
 from django import forms
 import datetime
 class TimewebView(View):
@@ -20,7 +21,7 @@ class TimewebView(View):
         # Creates form after user enters "New" 
         if pk == None:
             self.form = TimewebForm(request.POST or None)
-            self.context['submit'] = 'Create Assignment'
+            self.context['submit'] = _('Create Assignment')
         else:
             self.selectedform = get_object_or_404(TimewebModel, pk=pk) # User data from modelform
             # Create a form instance from user data
@@ -39,7 +40,7 @@ class TimewebView(View):
             if self.selectedform.min_work_time*self.selectedform.ctime:
                 initial['min_work_time'] = round(self.selectedform.min_work_time*self.selectedform.ctime,2) # Decimal module mutiplication adds siginficant figures
             self.form = TimewebForm(request.POST or None,initial=initial)
-            self.context['submit'] = 'Update Assignment'
+            self.context['submit'] = _('Update Assignment')
             self.context['checked_nwd'] = self.selectedform.nwd
         
         self.context['form'] = self.form
@@ -82,7 +83,7 @@ class TimewebView(View):
             # Can't use "unique=True" because it doesnt work on reenter
             if any(save_data.file_sel == obj.file_sel for obj in TimewebModel.objects.all().exclude(pk=pk)):
                 self.form.add_error("file_sel",
-                    forms.ValidationError('An assignment with this name already exists')
+                    forms.ValidationError(_('An assignment with this name already exists'))
                 )
                 self.logger.debug("Invalid Form")
                 return render(request, "new.html", self.context)
