@@ -293,44 +293,42 @@ $(function() {
 </script>
 {% endblock js %}
 
-{% block body %}
-    <div id="content" class="animate">
-        <div id="form-wrapper">
-            <form method="POST" autocomplete="off">
-                <div id="new-title-line"></div>
-                <div id="new-title">New Assignment</div>
-                {% csrf_token %}
-                <b>{{ form.non_field_errors }}</b>
-                {% for field in form.visible_fields %}
-                    <p>
-                        {% if field.name == "nwd" %}
-                            <label id="nwd-label-title">Select the Weekdays you will Not work on this Assignment</label>
-                            <div id="nwd-wrapper">
-                                {% for value, text in field.field.choices %}
-                                    <input {% if field.errors %}class="invalid"{% endif %} id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
-                                    <label tabindex="1" class="nwd-label" for="id_nwd_{{ forloop.counter0 }}">{{ text }}</label>
-                                {% endfor %}
-                            </div>
-                        {% elif field.name == "works" %}
-                            {{ field.label_tag }}
-                            {{ field.as_text }}
-                        {% else %}
-                            {{ field.label_tag }}
-                            {{ field }}
-                        {% endif %}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                <p class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</p>
+{% block content %}
+    <div id="form-wrapper">
+        <form method="POST" autocomplete="off">
+            <div id="new-title-line"></div>
+            <div id="new-title">New Assignment</div>
+            {% csrf_token %}
+            <b>{{ form.non_field_errors }}</b>
+            {% for field in form.visible_fields %}
+                <p>
+                    {% if field.name == "nwd" %}
+                        <label id="nwd-label-title">Select the Weekdays you will Not work on this Assignment</label>
+                        <div id="nwd-wrapper">
+                            {% for value, text in field.field.choices %}
+                                <input {% if field.errors %}class="invalid"{% endif %} id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
+                                <label tabindex="1" class="nwd-label" for="id_nwd_{{ forloop.counter0 }}">{{ text }}</label>
                             {% endfor %}
-                        {% endif %}
-                    </p>
-                {% endfor %}
-                {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
-                {% endfor %}
-                <button type="submit" name="submit-button" id="submit-button" title="(Enter)" tabindex="1">{{submit}}</button>
-                <div id="note">&#42; can be skipped<br>Tip: keep pressing tab</div>
-            </form>
-        </div>
+                        </div>
+                    {% elif field.name == "works" %}
+                        {{ field.label_tag }}
+                        {{ field.as_text }}
+                    {% else %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                    {% endif %}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <p class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </p>
+            {% endfor %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            <button type="submit" name="submit-button" id="submit-button" title="(Enter)" tabindex="1">{{submit}}</button>
+            <div id="note">&#42; can be skipped<br>Tip: keep pressing tab</div>
+        </form>
     </div>
-{% endblock body %}
+{% endblock content %}

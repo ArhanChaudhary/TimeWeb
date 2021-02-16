@@ -7,8 +7,7 @@
 {{ data|json_script:"load-data" }}
 <script src="{% static 'main.js' %}"></script>
 {% endblock js %}
-{% block body %}
-<div id="content" class="animate">
+{% block content %}
   <div id="assignments-container" class="animate">
     <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hide-button">Hide</button></div>
     {% for obj in objlist %}
@@ -56,6 +55,4 @@
       </div>
     {% endfor %}
   </div>
-</div>
-
-{% endblock body %}
+{% endblock content %}

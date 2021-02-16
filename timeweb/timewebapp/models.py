@@ -14,8 +14,6 @@ def default_works():
     return 0
 
 class TimewebModel(models.Model):
-    
-    # fields of the model
     file_sel = models.CharField(
         max_length=100,
         verbose_name=_('Enter the Name of this Assignment'),

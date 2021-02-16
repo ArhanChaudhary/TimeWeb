@@ -32,7 +32,7 @@
 #new-assignment-text {
     position: absolute;
     left: 75px;
-    top: 0;
+    top: 1.5px;
     color: white;
     font-size: 20px;
     font-family: "Open Sans";
@@ -70,6 +70,26 @@ body {
     background: radial-gradient(circle, white 0, rgb(202,202,202) 100%);
     overflow: hidden;
 }
+#user-greeting {
+    right: 94px;
+    position: absolute;
+    font-size: 20px;
+    top: 1.5px;
+}
+#user-greeting a {
+    text-decoration: none;
+    color: white;
+}
+#user-greeting span {
+    border: 2px solid rgb(22, 177, 185);
+    border-radius: 4px;
+    padding-right: 4px;
+    padding-left: 4px;
+    background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 #menu-container {
     position: absolute;
     height: 60px;
@@ -102,7 +122,7 @@ rect {
     overflow: auto;
     max-height: calc(100vh - 65px);
 }
-.nav-item {
+#nav-items a {
     text-decoration: none;
     text-align: center;
     display: block;
@@ -112,7 +132,7 @@ rect {
     font-size: 12.5px;
     background: rgb(45,59,71);
 }
-.nav-item:hover, .nav-item:focus {
+#nav-items a:hover, #nav-items a:focus {
     background: rgb(82,107,130);
 }
 #menu-container:hover ~ nav, 

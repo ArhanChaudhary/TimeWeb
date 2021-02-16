@@ -3,12 +3,15 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.http import JsonResponse
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import TimewebModel
 from .forms import TimewebForm
 import logging
 from django import forms
 import datetime
-class TimewebView(View):
+class TimewebView(LoginRequiredMixin, View):
+    login_url = '/login/login/'
+    redirect_field_name = 'redirect_to'
 
     # Get an instance of a logger
     logger = logging.getLogger(__name__)
@@ -139,7 +142,10 @@ class TimewebView(View):
             self.logger.debug("Invalid Form")
             return render(request, "new.html", self.context)
 
-class TimewebListView(View):
+class TimewebListView(LoginRequiredMixin, View):
+    login_url = '/login/login/'
+    redirect_field_name = 'redirect_to'
+    
     logger = logging.getLogger(__name__)
     def __init__(self):
         self.context = {}

@@ -37,18 +37,24 @@
                     <rect y="36.25" x="32" width="25" height="4.25"></rect>
                 </svg>
                 <div id="nav-items">
-                    <a href="#" class="nav-item">Settings</a>
-                    <a href="#" class="nav-item">How to Use</a>
-                    <a href="#" class="nav-item">Keybinds</a>
-                    <a href="#" class="nav-item">How Does This Work</a>
-                    <a href="#" class="nav-item">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                    <a href="#" class="nav-item">Changelog</a>
-                    <a href="#" class="nav-item">Terms of Service</a>
-                    <a href="#" class="nav-item">Privacy Policy</a>
-                    <a href="#" class="nav-item">Licenses</a>
-                    <a href="#" class="nav-item">Contact Me</a>
+                    <a href="#">Settings</a>
+                    <a href="#">How to Use</a>
+                    <a href="#">Keybinds</a>
+                    <a href="#">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
+                    <a href="#">Changelog</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Licenses</a>
+                    <a href="#">Contact Me</a>
                 </div>
             </nav>
+            {% if user.is_authenticated %}
+                <p id="user-greeting">
+                    <a href="{% url 'logout'%}?next={{request.path}}">
+                    Welcome, <span>{{ user.get_username }}</span>
+                    </a>
+                </p>
+            {% endif %}
             <a tabindex="-1" href="{% url 'new' %}" title="(Shift + N)">
                 <div id="image-new-container" tabindex="2">
                     <img height="60" id="image-new" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
@@ -58,11 +64,12 @@
             <div id="logo-container">
                 <a href="{% url 'home' %}">
                     <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" id="logo" tabindex="-1" draggable="false"/>
-                    {% comment %} https://fontmeme.com/fonts/alba-font/ {% endcomment %}
-                    {% comment %} https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
+                    {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
                 </a>
             </div>
         </div>
-        {% block body %}{% endblock %}
+        <div id="content" class="animate">
+        {% block content %}{% endblock content %}
+        </div>
     </body>
 </html>
