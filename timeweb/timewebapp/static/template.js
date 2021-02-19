@@ -1,7 +1,7 @@
 $(function() {
     // Deals with selecting the parent element when tabbing into the menu
-    $(".nav-item").focusout(() => $("nav").removeClass("open"));
-    $(".nav-item").focus(() => $("nav").addClass("open"));
+    $("#nav-items a").focusout(() => $("nav").removeClass("open"));
+    $("#nav-items a").focus(() => $("nav").addClass("open"));
 
     // Starting animation
     if ("animation-ran" in sessionStorage) {

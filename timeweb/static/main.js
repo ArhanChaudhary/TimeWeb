@@ -1,19 +1,15 @@
-// Cite later
-$.easing.easeOutCubic = function (x, t, b, c, d) {
-    return c*((t=t/d-1)*t*t + 1) + b;
-},
 $(function() {
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
     }
     setTimeout(function() {
-        k = [1,0.9,0.7,0.7,0.5,0.2,0,0];
-        const all_assignment = $(".assignment");
+        k = [1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05,0,0,0];
         $(".assignment").each(function(index) {
             $(this).css("background",color(k[index]));
         });
     }, !disable_transition * 300)
-    // Delete button
+    // Delete and update button
+    $('.update-button').click(() => $(document).queue().length === 0);
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
@@ -47,7 +43,7 @@ $(function() {
                     height: "10px"
                 }, 350, "easeOutCubic", () => assignment_container.remove());
             }
-            // Use an ajax POST to avoid a page reload which will replay the starting animation
+            // Use ajax to avoid a page reload
             $.ajax({
                 type: "POST",
                 data: data,
@@ -103,7 +99,7 @@ $(function() {
                 graph_container.animate({marginBottom:-graph_container.height()}, 750, "easeOutCubic", () => {
                     // Hide assignment when transition ends
                     assignment.css("overflow", "");
-                    graph_container.css({"display": "","margin-bottom": ""});
+                    graph_container.removeAttr("style");
                 });
                 this.querySelector(".fallingarrowanimation").beginElement();
 
@@ -156,56 +152,13 @@ $(function() {
                     cutoff_to_use_round,
                     return_y_cutoff,
                     return_0_cutoff;
-
-                function set_mod_days() {
-                    mods = [0];
-                    let mod_counter = 0;
-                    for (let mod_day = 0; mod_day < 6; mod_day++) {
-                        if (nwd.includes((assign_day_of_week + red_line_start_x + mod_day) % 7)) {
-                            mod_counter++;
-                        }
-                        mods.push(mod_counter);
-                    }
-                }
-                set_mod_days();
-
-                function resize(reversescale) {
-                    if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
-                        ({width, height} = fixed_graph.getBoundingClientRect());
-                        if (reversescale) {
-                            width /= 1.005;
-                            height /= 1.05;
-                        }
-                        scale = window.devicePixelRatio;
-                        graph.width = width * scale;
-                        graph.height = height * scale;
-                        fixed_graph.width = width * scale;
-                        fixed_graph.height = height * scale;
-                        wCon = (width - 55) / x;
-                        hCon = (height - 55) / y;
-                        drawfixed();
-                        draw();
-                    }
-                }
-
-                resize(true);
-
-                // calling getBoundingClientRect() returns the scale(1.05) height and width
-                assignment.on("transitionend", function(e) {
-
-                    // Resize again when width transition ends
-                    var e = e || window.event;
-                    if (e.originalEvent.propertyName === "width") {
-                        // Don't remove this event listener because it might mess up the above event listener also on .assignment
-                        resize(false);
-                    }
-                });
                 
                 // Sets event handlers only on the assignment's first click
                 if (!not_first_click) {
                     // Graph resize event handler
                     $(window).resize(() => resize(false));
 
+                    // XML skew ratio when it is saved
                     let ajax,
                         old_skew_ratio;
                     function AjaxSkewRatio() {
@@ -244,26 +197,6 @@ $(function() {
                     }
 
                     // Up and down arrow event handler
-                    let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
-                        fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
-                        graphinterval, // set the interval to a variable so it can be cleared
-                        whichkey // Determines if the user is holding up or down arrow
-                    function ChangeSkewRatio() {
-
-                        skew_ratio = whichkey === "ArrowDown" ? (skew_ratio - 0.1).toFixed(1) : (+skew_ratio /* Force addition instead of concatination */ + 0.1).toFixed(1);
-
-
-
-
-                        // skew ratio lim
-                        if (funct(1, false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor((x - red_line_start_x) / 7) * len_nwd - mods[(x - red_line_start_x) % 7] - 1 : x - red_line_start_x - 1, false) && whichkey === "ArrowDown") {
-                            skew_ratio = 2 - skew_ratio;
-                        }
-                        AjaxSkewRatio();
-                        draw();
-                    }
-
-                    // Up/down keybind handler
                     $(document).keydown(function(e) {
                         var e = e || window.event;
                         if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("sr-textbox")) {
@@ -287,24 +220,53 @@ $(function() {
                             clearInterval(graphinterval);
                         }
                     });
+                    let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
+                        fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
+                        graphinterval,
+                        whichkey;
+                    function ChangeSkewRatio() {
 
-                    // Setting and stopping set skew ratio handler
+                        skew_ratio = whichkey === "ArrowDown" ? (skew_ratio - 0.1).toFixed(1) : (+skew_ratio /* Force addition instead of concatination */ + 0.1).toFixed(1);
+
+
+
+
+                        // skew ratio lim
+                        if (funct(1, false) === y && whichkey === "ArrowUp" || !funct(len_nwd ? x - red_line_start_x - Math.floor((x - red_line_start_x) / 7) * len_nwd - mods[(x - red_line_start_x) % 7] - 1 : x - red_line_start_x - 1, false) && whichkey === "ArrowDown") {
+                            skew_ratio = 2 - skew_ratio;
+                        }
+                        AjaxSkewRatio();
+                        draw();
+                    }
+                    
+                    // Setting and stopping set skew ratio using graph
+                    function mousemove(e) {
+                        var e = e || window.event;
+                        const offset = $(fixed_graph).offset();
+                        let radius = wCon / 3;
+                        if (radius > 3) {
+                            radius = 3;
+                        } else if (radius < 2) {
+                            radius = 2;
+                        }
+                        draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
+                    }
                     let update = false;
-                    this.querySelector(".set-skew-ratio-button").onclick = function() {
-                        this.innerHTML = "Hover and click the graph";
+                    assignment.find(".set-skew-ratio-button").click(function() {
+                        $(this).html("Hover and click the graph");
                         $(graph).on('mousemove', mousemove); // enable set skew ratio if button is pressed
                         update = true;
-                    }
+                    });
 
-                    graph.onclick = function() {
+                    $(graph).click(function() {
                         if (update) {
                             // stop set skew ratio if canvas is clicked
-                            $(this).next().find(".set-skew-ratio-button").html("Set skew ratio using graph");
-                            $(graph).off("mousemove", mousemove);
+                            $(this).off("mousemove", mousemove)
+                                    .next().find(".set-skew-ratio-button").html("Set skew ratio using graph");
                             AjaxSkewRatio();
                             update = false;
                         }
-                    }
+                    });
 
                     // Dynamically update skew ratio from textbox
                     // keydown for normal sr and keyup for delete
@@ -346,426 +308,466 @@ $(function() {
                         }
                     });
                 }
-                function pset(x2 = NaN, y2 = NaN) {
-                    try {
-                        var x1 = x - red_line_start_x,
-                            y1 = y - red_line_start_y;
-                        if (len_nwd) {
-                            x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7];
-                        }
-                        if (isNaN(x2)) {
-                            // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-                            a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
-                            b = (y1 - x1 * x1 * a) / x1;
 
-                        } else {
-                            x2 = (x2 - 50) / wCon - red_line_start_x;
-                            y2 = (height - y2 - 50) / hCon - red_line_start_y;
-                            if (x2 < 0) {
-                                skew_ratio = skew_ratio_lim;
-                                throw "definevars";
-                            }
+                // Graph logic
+                // Very math heavy, contact me personally if you wish to know how this works
+                {
+                    function pset(x2 = NaN, y2 = NaN) {
+                        try {
+                            var x1 = x - red_line_start_x,
+                                y1 = y - red_line_start_y;
                             if (len_nwd) {
-                                const floorx2 = Math.floor(x2);
-                                if (nwd.includes((assign_day_of_week + floorx2 + red_line_start_x) % 7)) {
-                                    x2 = floorx2;
-                                }
-                                x2 -= Math.floor(x2 / 7) * len_nwd + mods[floorx2 % 7];
+                                x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7];
                             }
-                            if (x2 >= x1) {
+                            if (isNaN(x2)) {
                                 // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-                                a = y1 / x1;
-                                b = a * (1 - x1);
-
-                                skew_ratio = 2 - skew_ratio_lim;
-                            } else {
-                                if (remainder_mode) {
-                                    y2 -= y_fremainder;
-                                }
-                                // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-                                a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
+                                a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
                                 b = (y1 - x1 * x1 * a) / x1;
 
-                                skew_ratio = (a + b) * x1 / y1;
-                                if (skew_ratio > skew_ratio_lim) {
+                            } else {
+                                x2 = (x2 - 50) / wCon - red_line_start_x;
+                                y2 = (height - y2 - 50) / hCon - red_line_start_y;
+                                if (x2 < 0) {
                                     skew_ratio = skew_ratio_lim;
-                                } else if (skew_ratio < 2 - skew_ratio_lim) {
+                                    throw "definevars";
+                                }
+                                if (len_nwd) {
+                                    const floorx2 = Math.floor(x2);
+                                    if (nwd.includes((assign_day_of_week + floorx2 + red_line_start_x) % 7)) {
+                                        x2 = floorx2;
+                                    }
+                                    x2 -= Math.floor(x2 / 7) * len_nwd + mods[floorx2 % 7];
+                                }
+                                if (x2 >= x1) {
+                                    // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                                    a = y1 / x1;
+                                    b = a * (1 - x1);
+
                                     skew_ratio = 2 - skew_ratio_lim;
-                                } else if (0.975 < skew_ratio && skew_ratio < 1.025) {
-                                    if (!x1) {
-                                        throw "zerodivision1";
+                                } else {
+                                    if (remainder_mode) {
+                                        y2 -= y_fremainder;
                                     }
-                                    skew_ratio = 1;
-                                    a = 0;
-                                    b = y1 / x1;
-                                }
-                                console.log("Skew ratio: " + skew_ratio);
-                            }
-                        }
-                        if (!Number.isFinite(a)) {
-                            throw "zerodivision2";
-                        }
-                    } catch {
-                        a = 0;
-                        b = y1;
-                        return_y_cutoff = x1 ? 0 : -1;
-                        return_0_cutoff = 1;
-                        cutoff_transition_value = 0;
-                        return;
-                    }
-                    if (a <= 0 || a * b > 0) {
-                        var funct_zero = 0;
-                    } else {
-                        var funct_zero = -b / a;
-                    }
-                    if (a >= 0) {
-                        var funct_y = x1;
-                    } else {
-                        var funct_y = ((Math.sqrt(b * b + 4 * a * y1) - b) / a / 2).toFixed(10);
-                    }
-                    if (funct_round < min_work_time) {
-                        cutoff_transition_value = 0;
-                        if (a) {
-                            cutoff_to_use_round = ((min_work_time_funct_round - b) / a / 2).toFixed(10) - 1e-10;
-                            if (funct_zero < cutoff_to_use_round && cutoff_to_use_round < funct_y) {
-                                let n = Math.floor(cutoff_to_use_round),
-                                    prev_output;
-                                for (n of [n, ++n]) {
-                                    var output = funct(n, false);
-                                    if (output > y) {
-                                        output = y;
-                                    } else if (output < 0) {
-                                        output = 0;
+                                    // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                                    a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
+                                    b = (y1 - x1 * x1 * a) / x1;
+
+                                    skew_ratio = (a + b) * x1 / y1;
+                                    if (skew_ratio > skew_ratio_lim) {
+                                        skew_ratio = skew_ratio_lim;
+                                    } else if (skew_ratio < 2 - skew_ratio_lim) {
+                                        skew_ratio = 2 - skew_ratio_lim;
+                                    } else if (0.975 < skew_ratio && skew_ratio < 1.025) {
+                                        if (!x1) {
+                                            throw "zerodivision1";
+                                        }
+                                        skew_ratio = 1;
+                                        a = 0;
+                                        b = y1 / x1;
                                     }
-                                    prev_output = prev_output || output;
-                                }
-                                if (output - prev_output) {
-                                    cutoff_transition_value = min_work_time_funct_round - output + prev_output;
+                                    console.log("Skew ratio: " + skew_ratio);
                                 }
                             }
+                            if (!Number.isFinite(a)) {
+                                throw "zerodivision2";
+                            }
+                        } catch {
+                            a = 0;
+                            b = y1;
+                            return_y_cutoff = x1 ? 0 : -1;
+                            return_0_cutoff = 1;
+                            cutoff_transition_value = 0;
+                            return;
                         }
-                    }
-                    if (ignore_ends_mwt) {
-                        var y_value_to_cutoff = y1;
-                    } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (funct_y < cutoff_to_use_round))) {
-                        var y_value_to_cutoff = y1 - min_work_time_funct_round / 2;
-                    } else {
-                        var y_value_to_cutoff = y1 - min_work_time_funct_round + funct_round / 2;
-                    }
-                    if (y_value_to_cutoff > 0 && y > red_line_start_y && (a || b)) {
-                        return_y_cutoff = (a ? (Math.sqrt(b * b + 4 * a * y_value_to_cutoff) - b) / a / 2 : y_value_to_cutoff / b).toFixed(10) - 1e-10;
-                    } else {
-                        return_y_cutoff = 0;
-                    }
-                    if (return_y_cutoff < 1000) {
-                        if (return_y_cutoff < 1) {
-                            var output = 0;
+                        if (a <= 0 || a * b > 0) {
+                            var funct_zero = 0;
                         } else {
-                            for (let n = Math.floor(return_y_cutoff); n > 0; n--) {
-                                var output = funct(n, false);
-                                if (output <= y - min_work_time_funct_round) {
-                                    break;
+                            var funct_zero = -b / a;
+                        }
+                        if (a >= 0) {
+                            var funct_y = x1;
+                        } else {
+                            var funct_y = ((Math.sqrt(b * b + 4 * a * y1) - b) / a / 2).toFixed(10);
+                        }
+                        if (funct_round < min_work_time) {
+                            cutoff_transition_value = 0;
+                            if (a) {
+                                cutoff_to_use_round = ((min_work_time_funct_round - b) / a / 2).toFixed(10) - 1e-10;
+                                if (funct_zero < cutoff_to_use_round && cutoff_to_use_round < funct_y) {
+                                    let n = Math.floor(cutoff_to_use_round),
+                                        prev_output;
+                                    for (n of [n, ++n]) {
+                                        var output = funct(n, false);
+                                        if (output > y) {
+                                            output = y;
+                                        } else if (output < 0) {
+                                            output = 0;
+                                        }
+                                        prev_output = prev_output || output;
+                                    }
+                                    if (output - prev_output) {
+                                        cutoff_transition_value = min_work_time_funct_round - output + prev_output;
+                                    }
                                 }
-                                return_y_cutoff--;
                             }
                         }
                         if (ignore_ends_mwt) {
-                            const lower = [return_y_cutoff, y - red_line_start_y - output];
-
-                            let did_loop = false;
-                            for (let n = Math.ceil(return_y_cutoff); n < x1; n++) {
-                                const pre_output = funct(n, false);
-                                if (pre_output >= y) {
-                                    break;
-                                }
-                                did_loop = true;
-                                var output = pre_output;
-                                return_y_cutoff++;
-                            }
-                            if (did_loop) {
-                                const upper = [return_y_cutoff, y - red_line_start_y - output];
-                                return_y_cutoff = [upper, lower][+(min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
-                            }
-                        }
-                    }
-                    if (ignore_ends_mwt) {
-                        var y_value_to_cutoff = 0;
-                    } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (funct_zero < cutoff_to_use_round))) {
-                        var y_value_to_cutoff = min_work_time_funct_round / 2;
-                    } else {
-                        var y_value_to_cutoff = min_work_time_funct_round - funct_round / 2;
-                    }
-                    if (y_value_to_cutoff < y1 && y > red_line_start_y && (a || b)) {
-                        return_0_cutoff = (a ? (Math.sqrt(b * b + 4 * a * y_value_to_cutoff) - b) / a / 2 : y_value_to_cutoff / b).toFixed(10) - 1e-10;
-                        // -1e-10 makes this negative
-                        if (return_0_cutoff < 0) {
-                            return_0_cutoff++;
-                        }
-                    } else {
-                        return_0_cutoff = 1;
-                    }
-                    if (x1 - return_0_cutoff < 1000) {
-                        if (x1 - return_0_cutoff < 1) {
-                            var output = 0;
+                            var y_value_to_cutoff = y1;
+                        } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (funct_y < cutoff_to_use_round))) {
+                            var y_value_to_cutoff = y1 - min_work_time_funct_round / 2;
                         } else {
-                            for (let n = Math.ceil(return_0_cutoff); n < x1; n++) {
-                                var output = funct(n, false);
-                                if (output >= min_work_time_funct_round + red_line_start_y) {
-                                    break;
+                            var y_value_to_cutoff = y1 - min_work_time_funct_round + funct_round / 2;
+                        }
+                        if (y_value_to_cutoff > 0 && y > red_line_start_y && (a || b)) {
+                            return_y_cutoff = (a ? (Math.sqrt(b * b + 4 * a * y_value_to_cutoff) - b) / a / 2 : y_value_to_cutoff / b).toFixed(10) - 1e-10;
+                        } else {
+                            return_y_cutoff = 0;
+                        }
+                        if (return_y_cutoff < 1000) {
+                            if (return_y_cutoff < 1) {
+                                var output = 0;
+                            } else {
+                                for (let n = Math.floor(return_y_cutoff); n > 0; n--) {
+                                    var output = funct(n, false);
+                                    if (output <= y - min_work_time_funct_round) {
+                                        break;
+                                    }
+                                    return_y_cutoff--;
                                 }
+                            }
+                            if (ignore_ends_mwt) {
+                                const lower = [return_y_cutoff, y - red_line_start_y - output];
+
+                                let did_loop = false;
+                                for (let n = Math.ceil(return_y_cutoff); n < x1; n++) {
+                                    const pre_output = funct(n, false);
+                                    if (pre_output >= y) {
+                                        break;
+                                    }
+                                    did_loop = true;
+                                    var output = pre_output;
+                                    return_y_cutoff++;
+                                }
+                                if (did_loop) {
+                                    const upper = [return_y_cutoff, y - red_line_start_y - output];
+                                    return_y_cutoff = [upper, lower][+(min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
+                                }
+                            }
+                        }
+                        if (ignore_ends_mwt) {
+                            var y_value_to_cutoff = 0;
+                        } else if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (funct_zero < cutoff_to_use_round))) {
+                            var y_value_to_cutoff = min_work_time_funct_round / 2;
+                        } else {
+                            var y_value_to_cutoff = min_work_time_funct_round - funct_round / 2;
+                        }
+                        if (y_value_to_cutoff < y1 && y > red_line_start_y && (a || b)) {
+                            return_0_cutoff = (a ? (Math.sqrt(b * b + 4 * a * y_value_to_cutoff) - b) / a / 2 : y_value_to_cutoff / b).toFixed(10) - 1e-10;
+                            // -1e-10 makes this negative
+                            if (return_0_cutoff < 0) {
                                 return_0_cutoff++;
                             }
-                        }
-                        if (ignore_ends_mwt) {
-                            const upper = [return_0_cutoff, output];
-
-                            let did_loop = false;
-                            for (let n = Math.floor(return_0_cutoff); n > 0; n--) {
-                                const pre_output = funct(n, false);
-                                if (pre_output <= red_line_start_y) {
-                                    break;
-                                }
-                                did_loop = true;
-                                var output = pre_output;
-                                return_0_cutoff--;
-                            }
-                            if (did_loop) {
-                                const lower = [return_0_cutoff, output];
-                                return_0_cutoff = [lower, upper][+(min_work_time_funct_round * 2 - upper[1] > lower[1])][0];
-                            }
-                        }
-                    }
-                }
-
-                function funct(n, translate = true) {
-                    if (translate) {
-                        n -= red_line_start_x;
-                        if (len_nwd) {
-                            n -= Math.floor(n / 7) * len_nwd + mods[n % 7];
-                        }
-                        if (n > return_y_cutoff) {
-                            return y;
-                        } else if (n < return_0_cutoff) {
-                            return red_line_start_y;
-                        }
-                    }
-                    if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (n < cutoff_to_use_round))) {
-                        var output = min_work_time_funct_round * Math.round(n * (a * n + b) / min_work_time_funct_round);
-                        if (a < 0) {
-                            output += cutoff_transition_value;
                         } else {
-                            output -= cutoff_transition_value;
+                            return_0_cutoff = 1;
                         }
-                    } else {
-                        var output = funct_round * Math.round(n * (a * n + b) / funct_round);
-                    }
-                    if (remainder_mode && output) {
-                        output += y_fremainder;
-                    }
-                    return output + red_line_start_y;
-                }
-
-                function mousemove(e) {
-                    var e = e || window.event;
-                    const offset = $(fixed_graph).offset();
-                    let radius = wCon / 3;
-                    if (radius > 3) {
-                        radius = 3;
-                    } else if (radius < 2) {
-                        radius = 2;
-                    }
-                    draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
-                }
-
-                function draw(x2 = NaN, y2 = NaN) {
-                    const screen = graph.getContext("2d");
-                    screen.scale(scale, scale);
-                    screen.clearRect(0, 0, width, height);
-                    pset(x2, y2);
-                    let radius = wCon / 3;
-                    if (radius > 3) {
-                        radius = 3;
-                    } else if (radius < 2) {
-                        radius = 2;
-                    }
-
-                    let circle_x,
-                        circle_y,
-                        line_end = Math.floor(x + Math.ceil(1 / wCon));
-                    screen.strokeStyle = "rgb(233,68,46)"; // red
-                    screen.lineWidth = radius;
-                    screen.beginPath();
-                    for (let point = red_line_start_x; point < line_end; point += Math.ceil(1 / wCon)) {
-                        circle_x = Math.round(point * wCon + 50);
-                        if (circle_x > width - 5) {
-                            circle_x = width - 5;
-                        }
-                        circle_y = Math.round(height - funct(point) * hCon - 50);
-                        screen.lineTo(circle_x - (point === red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
-                        screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
-                        screen.moveTo(circle_x, circle_y);
-                    }
-                    screen.stroke();
-                    screen.beginPath();
-                    radius *= 3 / 4;
-                    if (len_works + 1 < line_end) {
-                        line_end = len_works + 1;
-                    }
-                    screen.strokeStyle = "rgb(1,147,255)"; // blue
-                    screen.lineWidth = radius;
-                    for (let point = 0; point < line_end; point += Math.ceil(1 / wCon)) {
-                        circle_x = Math.round((point + dif_assign) * wCon + 50);
-                        if (circle_x > width - 5) {
-                            circle_x = width - 5
-                        }
-                        circle_y = Math.round(height - works[point] * hCon - 50);
-                        screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
-                        screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
-                        screen.moveTo(circle_x, circle_y);
-                    }
-                    screen.stroke();
-                    screen.scale(1 / scale, 1 / scale);
-                }
-
-                function drawfixed() {
-                    // bg gradient
-                    let screen = fixed_graph.getContext("2d");
-                    screen.scale(scale, scale);
-                    let gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
-                    gradient.addColorStop(0, "white");
-                    gradient.addColorStop(1, "lightgray");
-                    screen.fillStyle = gradient;
-                    screen.fillRect(0, 0, width, height * 4 / 3);
-
-                    // x and y axis rectangles
-                    screen.fillStyle = "rgb(185,185,185)";
-                    screen.fillRect(40, 0, 10, height);
-                    screen.fillRect(0, height - 50, width, 10);
-
-                    // x axis label
-                    screen.fillStyle = "black";
-                    screen.textAlign = "center";
-                    screen.font = '17.1875px Open Sans';
-                    screen.fillText("Days", (width - 50) / 2 + 50, height - 5);
-
-                    // y axis label
-                    screen.rotate(Math.PI / 2);
-                    screen.measureText(Math.floor(x))
-                    if (unit === "Minute") {
-                        var text = 'Minutes of Work',
-                            label_x_pos = -2;
-                    } else {
-                        var text = `${unit}s (${format_minutes(ctime)} per ${unit})`,
-                            label_x_pos = -4;
-                    }
-                    if (screen.measureText(text).width > height - 50) {
-                        text = unit + 's';
-                    }
-                    screen.fillText(text, (height - 50) / 2, label_x_pos);
-                    screen.rotate(-Math.PI / 2);
-
-                    screen.font = '13.75px Open Sans';
-                    screen.textBaseline = "top";
-                    const x_axis_scale = Math.pow(10, Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0] / Math.ceil((width - 100) / 100));
-                    if (x >= 10) {
-                        gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
-                        gradient.addColorStop(0, "gainsboro");
-                        gradient.addColorStop(1, "silver");
-                        const small_x_axis_scale = x_axis_scale / 5,
-                            label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
-                        for (let smaller_index = 1; smaller_index <= Math.floor(x / small_x_axis_scale); smaller_index++) {
-                            if (smaller_index % 5) {
-                                const displayed_number = smaller_index * small_x_axis_scale;
-                                screen.fillStyle = gradient; // Line color
-                                screen.fillRect(displayed_number * wCon + 48.5, 0, 2, height - 50); // Draws line index
-                                screen.fillStyle = "rgb(80,80,80)"; // Number color
-                                if (label_index) {
-                                    const numberwidth = screen.measureText(displayed_number).width;
-                                    let number_x_pos = displayed_number * wCon + 50;
-                                    if (number_x_pos + numberwidth / 2 > width - 1) {
-                                        number_x_pos = width - numberwidth / 2 - 1;
+                        if (x1 - return_0_cutoff < 1000) {
+                            if (x1 - return_0_cutoff < 1) {
+                                var output = 0;
+                            } else {
+                                for (let n = Math.ceil(return_0_cutoff); n < x1; n++) {
+                                    var output = funct(n, false);
+                                    if (output >= min_work_time_funct_round + red_line_start_y) {
+                                        break;
                                     }
-                                    screen.fillText(displayed_number, number_x_pos, height - 39);
+                                    return_0_cutoff++;
+                                }
+                            }
+                            if (ignore_ends_mwt) {
+                                const upper = [return_0_cutoff, output];
+
+                                let did_loop = false;
+                                for (let n = Math.floor(return_0_cutoff); n > 0; n--) {
+                                    const pre_output = funct(n, false);
+                                    if (pre_output <= red_line_start_y) {
+                                        break;
+                                    }
+                                    did_loop = true;
+                                    var output = pre_output;
+                                    return_0_cutoff--;
+                                }
+                                if (did_loop) {
+                                    const lower = [return_0_cutoff, output];
+                                    return_0_cutoff = [lower, upper][+(min_work_time_funct_round * 2 - upper[1] > lower[1])][0];
                                 }
                             }
                         }
                     }
 
-                    screen.textBaseline = "alphabetic";
-                    screen.textAlign = "right";
-                    const y_axis_scale = Math.pow(10, Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0] / Math.ceil((height - 100) / 100));
-                    let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
-                    if (y >= 10) {
-                        const small_y_axis_scale = y_axis_scale / 5;
-                        if (font_size < 8.5) {
-                            font_size = 8.5;
+                    function funct(n, translate = true) {
+                        if (translate) {
+                            n -= red_line_start_x;
+                            if (len_nwd) {
+                                n -= Math.floor(n / 7) * len_nwd + mods[n % 7];
+                            }
+                            if (n > return_y_cutoff) {
+                                return y;
+                            } else if (n < return_0_cutoff) {
+                                return red_line_start_y;
+                            }
                         }
+                        if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (n < cutoff_to_use_round))) {
+                            var output = min_work_time_funct_round * Math.round(n * (a * n + b) / min_work_time_funct_round);
+                            if (a < 0) {
+                                output += cutoff_transition_value;
+                            } else {
+                                output -= cutoff_transition_value;
+                            }
+                        } else {
+                            var output = funct_round * Math.round(n * (a * n + b) / funct_round);
+                        }
+                        if (remainder_mode && output) {
+                            output += y_fremainder;
+                        }
+                        return output + red_line_start_y;
+                    }
+
+                    function set_mod_days() {
+                        mods = [0];
+                        let mod_counter = 0;
+                        for (let mod_day = 0; mod_day < 6; mod_day++) {
+                            if (nwd.includes((assign_day_of_week + red_line_start_x + mod_day) % 7)) {
+                                mod_counter++;
+                            }
+                            mods.push(mod_counter);
+                        }
+                    }
+                    set_mod_days();
+                }
+                // End graph logic
+
+                // Draw graph
+                {
+                    resize(true);
+                    // calling getBoundingClientRect() returns the scale(1.05) height and width
+                    assignment.on("transitionend", function(e) {
+
+                        // Resize again when width transition ends
+                        var e = e || window.event;
+                        if (e.originalEvent.propertyName === "width") {
+                            resize(false);
+                            assignment.off("transitionend");
+                        }
+                    });
+                    function draw(x2 = NaN, y2 = NaN) {
+                        const screen = graph.getContext("2d");
+                        screen.scale(scale, scale);
+                        screen.clearRect(0, 0, width, height);
+                        pset(x2, y2);
+                        let radius = wCon / 3;
+                        if (radius > 3) {
+                            radius = 3;
+                        } else if (radius < 2) {
+                            radius = 2;
+                        }
+
+                        let circle_x,
+                            circle_y,
+                            line_end = Math.floor(x + Math.ceil(1 / wCon));
+                        screen.strokeStyle = "rgb(233,68,46)"; // red
+                        screen.lineWidth = radius;
+                        screen.beginPath();
+                        for (let point = red_line_start_x; point < line_end; point += Math.ceil(1 / wCon)) {
+                            circle_x = Math.round(point * wCon + 50);
+                            if (circle_x > width - 5) {
+                                circle_x = width - 5;
+                            }
+                            circle_y = Math.round(height - funct(point) * hCon - 50);
+                            screen.lineTo(circle_x - (point === red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
+                            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+                            screen.moveTo(circle_x, circle_y);
+                        }
+                        screen.stroke();
+                        screen.beginPath();
+                        radius *= 3 / 4;
+                        if (len_works + 1 < line_end) {
+                            line_end = len_works + 1;
+                        }
+                        screen.strokeStyle = "rgb(1,147,255)"; // blue
+                        screen.lineWidth = radius;
+                        for (let point = 0; point < line_end; point += Math.ceil(1 / wCon)) {
+                            circle_x = Math.round((point + dif_assign) * wCon + 50);
+                            if (circle_x > width - 5) {
+                                circle_x = width - 5
+                            }
+                            circle_y = Math.round(height - works[point] * hCon - 50);
+                            screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
+                            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+                            screen.moveTo(circle_x, circle_y);
+                        }
+                        screen.stroke();
+                        screen.scale(1 / scale, 1 / scale);
+                    }
+
+                    function drawfixed() {
+                        // bg gradient
+                        let screen = fixed_graph.getContext("2d");
+                        screen.scale(scale, scale);
+                        let gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
+                        gradient.addColorStop(0, "white");
+                        gradient.addColorStop(1, "lightgray");
+                        screen.fillStyle = gradient;
+                        screen.fillRect(0, 0, width, height * 4 / 3);
+
+                        // x and y axis rectangles
+                        screen.fillStyle = "rgb(185,185,185)";
+                        screen.fillRect(40, 0, 10, height);
+                        screen.fillRect(0, height - 50, width, 10);
+
+                        // x axis label
+                        screen.fillStyle = "black";
+                        screen.textAlign = "center";
+                        screen.font = '17.1875px Open Sans';
+                        screen.fillText("Days", (width - 50) / 2 + 50, height - 5);
+
+                        // y axis label
+                        screen.rotate(Math.PI / 2);
+                        screen.measureText(Math.floor(x))
+                        if (unit === "Minute") {
+                            var text = 'Minutes of Work',
+                                label_x_pos = -2;
+                        } else {
+                            var text = `${unit}s (${format_minutes(ctime)} per ${unit})`,
+                                label_x_pos = -4;
+                        }
+                        if (screen.measureText(text).width > height - 50) {
+                            text = unit + 's';
+                        }
+                        screen.fillText(text, (height - 50) / 2, label_x_pos);
+                        screen.rotate(-Math.PI / 2);
+
+                        screen.font = '13.75px Open Sans';
+                        screen.textBaseline = "top";
+                        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0] / Math.ceil((width - 100) / 100));
+                        if (x >= 10) {
+                            gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
+                            gradient.addColorStop(0, "gainsboro");
+                            gradient.addColorStop(1, "silver");
+                            const small_x_axis_scale = x_axis_scale / 5,
+                                label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
+                            for (let smaller_index = 1; smaller_index <= Math.floor(x / small_x_axis_scale); smaller_index++) {
+                                if (smaller_index % 5) {
+                                    const displayed_number = smaller_index * small_x_axis_scale;
+                                    screen.fillStyle = gradient; // Line color
+                                    screen.fillRect(displayed_number * wCon + 48.5, 0, 2, height - 50); // Draws line index
+                                    screen.fillStyle = "rgb(80,80,80)"; // Number color
+                                    if (label_index) {
+                                        const numberwidth = screen.measureText(displayed_number).width;
+                                        let number_x_pos = displayed_number * wCon + 50;
+                                        if (number_x_pos + numberwidth / 2 > width - 1) {
+                                            number_x_pos = width - numberwidth / 2 - 1;
+                                        }
+                                        screen.fillText(displayed_number, number_x_pos, height - 39);
+                                    }
+                                }
+                            }
+                        }
+
+                        screen.textBaseline = "alphabetic";
+                        screen.textAlign = "right";
+                        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0] / Math.ceil((height - 100) / 100));
+                        let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
+                        if (y >= 10) {
+                            const small_y_axis_scale = y_axis_scale / 5;
+                            if (font_size < 8.5) {
+                                font_size = 8.5;
+                            }
+                            screen.font = font_size + 'px Open Sans';
+                            const text_height = screen.measureText(0).width * 2,
+                                label_index = text_height < small_y_axis_scale * hCon;
+                            for (let smaller_index = 1; smaller_index <= Math.floor(y / small_y_axis_scale); smaller_index++) {
+                                const displayed_number = smaller_index * small_y_axis_scale;
+                                if (smaller_index % 5) {
+                                    screen.fillStyle = "rgb(215,215,215)";
+                                    screen.fillRect(50, height - 51.5 - displayed_number * hCon, width - 50, 2);
+                                    screen.fillStyle = "rgb(80,80,80)";
+                                    if (label_index) {
+                                        let number_y_pos = height - displayed_number * hCon - 54 + text_height / 2;
+                                        if (number_y_pos < 4 + text_height / 2) {
+                                            number_y_pos = 4 + text_height / 2;
+                                        }
+                                        if (38.5 - screen.measureText(displayed_number).width < 13 - label_x_pos) {
+                                            screen.textAlign = "left";
+                                            screen.fillText(displayed_number, 13 - label_x_pos, number_y_pos);
+                                            screen.textAlign = "right";
+                                        } else {
+                                            screen.fillText(displayed_number, 38.5, number_y_pos);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        font_size *= 1.2;
                         screen.font = font_size + 'px Open Sans';
-                        const text_height = screen.measureText(0).width * 2,
-                            label_index = text_height < small_y_axis_scale * hCon;
-                        for (let smaller_index = 1; smaller_index <= Math.floor(y / small_y_axis_scale); smaller_index++) {
-                            const displayed_number = smaller_index * small_y_axis_scale;
-                            if (smaller_index % 5) {
-                                screen.fillStyle = "rgb(215,215,215)";
-                                screen.fillRect(50, height - 51.5 - displayed_number * hCon, width - 50, 2);
-                                screen.fillStyle = "rgb(80,80,80)";
-                                if (label_index) {
-                                    let number_y_pos = height - displayed_number * hCon - 54 + text_height / 2;
-                                    if (number_y_pos < 4 + text_height / 2) {
-                                        number_y_pos = 4 + text_height / 2;
-                                    }
-                                    if (38.5 - screen.measureText(displayed_number).width < 13 - label_x_pos) {
-                                        screen.textAlign = "left";
-                                        screen.fillText(displayed_number, 13 - label_x_pos, number_y_pos);
-                                        screen.textAlign = "right";
-                                    } else {
-                                        screen.fillText(displayed_number, 38.5, number_y_pos);
-                                    }
-                                }
+                        const text_height = screen.measureText(0).width * 2;
+                        for (let bigger_index = Math.ceil(y - y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
+                            if (bigger_index * 2 < y_axis_scale) {
+                                break;
+                            }
+                            screen.fillStyle = "rgb(205,205,205)";
+                            screen.fillRect(50, height - bigger_index * hCon - 52.5, width - 50, 5);
+                            screen.fillStyle = "black";
+                            let number_y_pos = height - bigger_index * hCon - 54 + text_height / 2;
+                            if (number_y_pos < 4 + text_height / 2) {
+                                number_y_pos = 4 + text_height / 2;
+                            }
+                            if (38.5 - screen.measureText(bigger_index).width < 13 - label_x_pos) {
+                                screen.textAlign = "left";
+                                screen.fillText(bigger_index, 13 - label_x_pos, number_y_pos);
+                                screen.textAlign = "right";
+                            } else {
+                                screen.fillText(bigger_index, 38.5, number_y_pos);
                             }
                         }
-                    }
 
-                    font_size *= 1.2;
-                    screen.font = font_size + 'px Open Sans';
-                    const text_height = screen.measureText(0).width * 2;
-                    for (let bigger_index = Math.ceil(y - y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
-                        if (bigger_index * 2 < y_axis_scale) {
-                            break;
-                        }
-                        screen.fillStyle = "rgb(205,205,205)";
-                        screen.fillRect(50, height - bigger_index * hCon - 52.5, width - 50, 5);
-                        screen.fillStyle = "black";
-                        let number_y_pos = height - bigger_index * hCon - 54 + text_height / 2;
-                        if (number_y_pos < 4 + text_height / 2) {
-                            number_y_pos = 4 + text_height / 2;
-                        }
-                        if (38.5 - screen.measureText(bigger_index).width < 13 - label_x_pos) {
-                            screen.textAlign = "left";
-                            screen.fillText(bigger_index, 13 - label_x_pos, number_y_pos);
-                            screen.textAlign = "right";
-                        } else {
-                            screen.fillText(bigger_index, 38.5, number_y_pos);
+                        screen.textBaseline = "top";
+                        screen.textAlign = "center";
+                        screen.font = '16.5px Open Sans';
+                        for (let bigger_index = Math.ceil(x - x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
+                            screen.fillStyle = "rgb(205,205,205)";
+                            screen.fillRect(bigger_index * wCon + 47.5, 0, 5, height - 50);
+                            screen.fillStyle = "black";
+                            const numberwidth = screen.measureText(bigger_index).width;
+                            let number_x_pos = bigger_index * wCon + 50;
+                            if (number_x_pos + numberwidth / 2 > width - 1) {
+                                number_x_pos = width - numberwidth / 2 - 1;
+                            }
+                            screen.fillText(bigger_index, number_x_pos, height - 39);
                         }
                     }
 
-                    screen.textBaseline = "top";
-                    screen.textAlign = "center";
-                    screen.font = '16.5px Open Sans';
-                    for (let bigger_index = Math.ceil(x - x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
-                        screen.fillStyle = "rgb(205,205,205)";
-                        screen.fillRect(bigger_index * wCon + 47.5, 0, 5, height - 50);
-                        screen.fillStyle = "black";
-                        const numberwidth = screen.measureText(bigger_index).width;
-                        let number_x_pos = bigger_index * wCon + 50;
-                        if (number_x_pos + numberwidth / 2 > width - 1) {
-                            number_x_pos = width - numberwidth / 2 - 1;
+                    function resize(reversescale) {
+                        if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
+                            ({width, height} = fixed_graph.getBoundingClientRect());
+                            if (reversescale) {
+                                width /= 1.005;
+                                height /= 1.05;
+                            }
+                            scale = window.devicePixelRatio;
+                            graph.width = width * scale;
+                            graph.height = height * scale;
+                            fixed_graph.width = width * scale;
+                            fixed_graph.height = height * scale;
+                            wCon = (width - 55) / x;
+                            hCon = (height - 55) / y;
+                            drawfixed();
+                            draw();
                         }
-                        screen.fillText(bigger_index, number_x_pos, height - 39);
                     }
                 }
-                const swap_ms = 2000;
+                // End draw graph
 
+                const swap_ms = 2000;
                 function swap(a1, a2) {
                     $(document).queue(function() {
                         const all = $(".assignment-container");
@@ -788,16 +790,16 @@ $(function() {
                         }, {
                             queue: false,
                             duration: swap_ms,
-                            easing: "easeOutCubic",
+                            easing: "easeInOutQuad",
                         });
 
                         tar2.animate({
-                            top: tar1.offset().top - tar2.offset().top,
+                            bottom: tar2.offset().top - tar1.offset().top,
                             marginTop: "+=" + (tar1_height - tar2_height),
                         }, {
                             queue: false,
                             duration: swap_ms,
-                            easing: "easeOutCubic",
+                            easing: "easeInOutQuad",
                             complete: () => {
                                 tar2.after("<span id='swap-temp' style='display: none;'></span>");
                                 tar2.insertAfter(tar1);
@@ -810,7 +812,7 @@ $(function() {
                         });
                     });
                 }
-
+                swap(0,-1);
                 function format_minutes(total_minutes) {
                     const hour = Math.floor(total_minutes / 60),
                         minute = Math.ceil(total_minutes % 60);

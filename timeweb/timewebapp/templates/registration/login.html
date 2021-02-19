@@ -20,6 +20,9 @@
       <tr>
         <td>{{ form.username.label_tag }}</td>
         <td>{{ form.username }}</td>
+        <script>
+          $("#id_username").attr("maxlength","20");
+        </script>
       </tr>
       <tr>
         <td>{{ form.password.label_tag }}</td>

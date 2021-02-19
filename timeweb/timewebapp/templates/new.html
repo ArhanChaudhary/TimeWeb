@@ -33,7 +33,7 @@ label[for='id_ad']::after {
     top: 10px;
 }
 #form-wrapper {
-    width: 410px;
+    width: 397px;
     background: white;
     box-shadow: 0 0 8px black;
     margin: 1em auto;
@@ -43,7 +43,7 @@ label[for='id_ad']::after {
     position: relative;
 }
 #new-title-line {
-    width: 390px;
+    width: 377px;
     position: absolute;
     margin-top: 1.25em;
     left: 10px;
@@ -113,85 +113,6 @@ input {
     padding: 20px 60px;
     font-size: 19px;
 }
-.info-button {
-    display: inline-block;
-    position: relative;
-    bottom: 1px;
-    left: 4px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: rgb(33,163,177);
-    font-size: 14px;
-    font-style: italic;
-    font-family: "Serif";
-
-    color: white;
-    text-align: center;
-    line-height: 15px;
-}
-.info-button:hover {
-    background: rgb(16,135,148);
-}
-.info-button:hover .info-button-text.info-right {
-    visibility: visible;
-    opacity: 1;
-    left: calc(100% + 12px);
-    transition: all .2s ease-in-out;
-}
-.info-button:hover .info-button-text.info-left {
-    visibility: visible;
-    opacity: 1;
-    right: calc(100% + 12px);
-    transition: all .2s ease-in-out;
-}
-.info-button-text {
-    position: absolute;
-    transform: translateY(-50%) translateY(7px);
-    width: 265px;
-    z-index: 3;
-
-    background: white;
-    box-shadow: 0 0 5px rgba(0,0,0,0.75);
-    border-radius: 5px;
-    border: 2px solid black;
-    visibility: hidden;
-    opacity: 0;
-
-    text-align: left;
-    padding: 5px 5px;
-    color: black;
-    font-size: 13px;
-    line-height: 13px;
-    font-style: normal;
-    white-space: pre-line;
-}
-.info-button-text.info-right {
-    left: calc(100% - 4px);
-}
-.info-button-text.info-left {
-    right: calc(100% - 4px);
-}
-.info-button-text.info-right::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: calc(100% + 1px);
-    border-width: 10px;
-    border-style: solid;
-    border-color: transparent black transparent transparent;
-}
-.info-button-text.info-left::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: calc(100% + 1px);
-    border-width: 10px;
-    border-style: solid;
-    border-color: transparent transparent transparent black;
-}
 .invalid {
     border: 2px solid rgb(226,30,54);
 }
@@ -247,11 +168,11 @@ $(function() {
         if (val) {
             $("label[for='id_y']").text("Enter the Total amount of " + val + "s");
             $("label[for='id_works']").text("Enter the Total amount of " + val + "s already Completed");
-            $("label[for='id_ctime']").text("Enter the Estimated amount of Time in Minutes to complete each " + val);
+            $("label[for='id_ctime']").text("Enter the Estimated amount of Time to complete each " + val + " in Minutes");
         } else {
             $("label[for='id_y']").html("Enter the Total amount of Units");
             $("label[for='id_works']").html("Enter the Total amount of Units already Completed");
-            $("label[for='id_ctime']").html("Enter the Estimated amount of Time in Minutes to complete each Unit of Work");
+            $("label[for='id_ctime']").html("Enter the Estimated amount of Time to complete each Unit of Work in Minutes");
         }
     }
     replaceUnit();

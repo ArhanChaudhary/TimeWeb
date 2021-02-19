@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{% static 'main.css' %}"></link>
 {% endblock css %}
 {% block js %}
+<script src="{% static 'jquery.easing.js' %}"></script>
 {{ data|json_script:"load-data" }}
 <script src="{% static 'main.js' %}"></script>
 {% endblock js %}
@@ -26,10 +27,10 @@
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
             <a class="button update-button" href="{% url 'list' obj.pk %}">
-              <img height="20" src="{% static 'edit.png' %}" alt="delete" class="update-button-image" draggable="false"/>
+              <img height="20" src="{% static 'edit.png' %}" alt="delete" draggable="false"/>
             </a>
             <button value="{{ obj.pk }}" class="button delete-button">
-              <img height="22" src="{% static 'delete.png' %}" alt="edit" class="delete-button-image" draggable="false"/>
+              <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
             </button>
           </div>
           <div class="relative-positioning-wrapper">

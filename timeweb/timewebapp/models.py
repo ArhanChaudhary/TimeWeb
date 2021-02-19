@@ -52,7 +52,7 @@ class TimewebModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(0.00)],
-        verbose_name=_('Enter the Estimated amount of Time in Minutes to complete each Unit of Work'),
+        verbose_name=_('Enter the Estimated amount of Time to complete each Unit of Work in Minutes'),
     )
     funct_round = models.DecimalField(
         max_digits=15,
@@ -68,7 +68,7 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(0.00)],
         blank=True,
         null=True,
-        verbose_name=_('Enter the Minimum Work Time per Day'),
+        verbose_name=_('Enter the Minimum Work Time per Day in Minutes'),
     )
     nwd = MultiSelectField(
         choices=WEEKDAYS,

@@ -41,6 +41,6 @@ class TimewebForm(forms.ModelForm):
             )
         if x <= ad:
             self.add_error("x",
-                forms.ValidationError(_("The due date cannot be " + ("on" if x == ad else "before") + " the assignment date",code='invalid'))
+                forms.ValidationError(_("The due date cannot be " + ("on" if x == ad else "before") + " the assignment date"),code='invalid')
             )
         return cleaned_data

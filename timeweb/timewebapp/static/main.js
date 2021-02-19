@@ -1,19 +1,15 @@
-// Cite later
-$.easing.easeOutCubic = function (x, t, b, c, d) {
-    return c*((t=t/d-1)*t*t + 1) + b;
-},
 $(function() {
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
     }
     setTimeout(function() {
         k = [1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05,0,0,0];
-        const all_assignment = $(".assignment");
         $(".assignment").each(function(index) {
             $(this).css("background",color(k[index]));
         });
     }, !disable_transition * 300)
-    // Delete button
+    // Delete and update button
+    $('.update-button').click(() => $(document).queue().length === 0);
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
@@ -47,7 +43,7 @@ $(function() {
                     height: "10px"
                 }, 350, "easeOutCubic", () => assignment_container.remove());
             }
-            // Use an ajax POST to avoid a page reload which will replay the starting animation
+            // Use ajax to avoid a page reload
             $.ajax({
                 type: "POST",
                 data: data,
@@ -257,7 +253,7 @@ $(function() {
                     }
                     let update = false;
                     assignment.find(".set-skew-ratio-button").click(function() {
-                        this.innerHTML = "Hover and click the graph";
+                        $(this).html("Hover and click the graph");
                         $(graph).on('mousemove', mousemove); // enable set skew ratio if button is pressed
                         update = true;
                     });
@@ -794,16 +790,16 @@ $(function() {
                         }, {
                             queue: false,
                             duration: swap_ms,
-                            easing: "easeOutCubic",
+                            easing: "easeInOutQuad",
                         });
 
                         tar2.animate({
-                            top: tar1.offset().top - tar2.offset().top,
+                            bottom: tar2.offset().top - tar1.offset().top,
                             marginTop: "+=" + (tar1_height - tar2_height),
                         }, {
                             queue: false,
                             duration: swap_ms,
-                            easing: "easeOutCubic",
+                            easing: "easeInOutQuad",
                             complete: () => {
                                 tar2.after("<span id='swap-temp' style='display: none;'></span>");
                                 tar2.insertAfter(tar1);
@@ -816,7 +812,7 @@ $(function() {
                         });
                     });
                 }
-
+                swap(0,-1);
                 function format_minutes(total_minutes) {
                     const hour = Math.floor(total_minutes / 60),
                         minute = Math.ceil(total_minutes % 60);

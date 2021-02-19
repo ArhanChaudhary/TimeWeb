@@ -6,10 +6,10 @@
     transition: none !important;
 }
 #header {
-    transition: all 1.2s cubic-bezier(.29,.81,.37,.99);
+    transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #content {
-    transition: all 1.25s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
+    transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
 }
 #header.animate {
     transform: translateY(-70px);
@@ -21,7 +21,7 @@
     transform: translateY(-70px);
 }
 #assignments-container {
-    transition: all 1.2s cubic-bezier(.29,.81,.37,.99);
+    transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
     min-width: 200px;
 }
 #assignments-container.animate {
@@ -67,7 +67,7 @@
     transform: scale(1.05) translateX(2%);
     width: calc(96.15% - 55px);
     border-color: rgba(0,0,0,0.7);
-    box-shadow: 0 0 7px rgba(52,52,52,0.7);
+    box-shadow: 0 0 7px rgb(52,52,52);
     cursor: pointer;
 }
 .assignment-header {
@@ -147,22 +147,19 @@
     height: 30px;
     width: 30px;
 }
-.update-button-image {
+.update-button img {
     top: 5px;
     left: 5px;
     position: relative;
 }
 .delete-button {
     right: -10px;
-    height: 35px;
-    width: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    height: 36px;
+    cursor: pointer;
 }
-.delete-button-image {
-    top: -1px;
+.delete-button img {
+    top: 1.25px;
+    position: relative;
 }
 @media (max-width: 275px) {
     .delete-button {
