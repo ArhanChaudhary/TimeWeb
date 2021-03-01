@@ -1,15 +1,175 @@
 $(function() {
+    function showForm(show_instantly=false) {
+        if (show_instantly) {
+            $('#overlay').show().addClass("transition-form");
+        } else {
+            $("#overlay").fadeIn(300).addClass("transition-form");
+        }
+        $('#id_works').val((+$('#id_works').val()).toFixed(2));
+        if (!$('#id_ad').val()) {
+            $('#id_ad').val(today_date_str);
+        }
+        if (!$('#id_x').val()) {
+            $('#id_x').val(today_date_str);
+        }
+        $(".assignment, .graph, #menu-container, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1")
+    }
+
+    function hideForm(hide_instantly=false) {
+        if (hide_instantly) {
+            $("#overlay").hide().removeClass("transition-form");
+        } else {
+            $("#overlay").fadeOut(300).removeClass("transition-form");
+        }
+        $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
+        $("#menu-container").attr("tabindex","2");
+        $("#image-new-container, #user-greeting a").attr("tabindex","1");
+        $(".assignment, .graph").attr("tabindex","0");
+    }
+
+    if (form_invalid) {
+        showForm(true);
+    } else {
+        hideForm(true);
+    }
+
+    function error(response, exception) {
+        if (response.status == 0) {
+            alert('Failed to connect');
+        } else if (response.status == 404) {
+            alert('Requested page not found, try again');
+        } else if (response.status == 500) {
+            alert('Internal server error. Please contact me if you see this')
+        } else if (exception === 'parsererror') {
+            alert('Requested JSON parse failed');
+        } else if (exception === 'timeout') {
+            alert('Timeout error');
+        } else if (exception === 'abort') {
+            alert('Request aborted');
+        } else {
+            console.log('Uncaught Error, \n' + response.responseText);
+        }
+    }
+
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
     }
     setTimeout(function() {
         k = [1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05,0,0,0];
         $(".assignment").each(function(index) {
-            $(this).css("background",color(k[index]));
+            const selected_assignment = $(this);
+            if (selected_assignment.is("#animate-color")) {
+                selected_assignment.css("transition","all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99)");
+            }
+            selected_assignment.css("background",color(k[index]));
         });
     }, !disable_transition * 300)
+
     // Delete and update button
-    $('.update-button').click(() => $(document).queue().length === 0);
+    $("#id_works").attr({"step":"0.01","type":"number"});
+    $("#form-wrapper .error-note").each(function() {
+        $(this).prev().children().eq(1).addClass("invalid");
+        if (this.id === "error_id_x" || this.id === "error_id_works") {
+            $(this).prev().prev().children().eq(1).addClass("invalid");
+        }
+    });
+
+    // Replace text with unit field
+    function replaceUnit() {
+        const val = $("#id_unit").val();
+        if (val) {
+            $("label[for='id_y']").text("Enter the Total amount of " + pluralize(val));
+            $("label[for='id_works']").text("Enter the Total amount of " + pluralize(val) + " already Completed");
+            $("label[for='id_ctime']").text("Enter the Estimated amount of Time to complete each " + pluralize(val,1) + " in Minutes");
+        } else {
+            $("label[for='id_y']").html("Enter the Total amount of Units");
+            $("label[for='id_works']").html("Enter the Total amount of Units already Completed");
+            $("label[for='id_ctime']").html("Enter the Estimated amount of Time to complete each Unit of Work in Minutes");
+        }
+    }
+    replaceUnit();
+    $("#id_unit").on('input',replaceUnit);
+
+    // Add info buttons (defined in template.js)
+    $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("&#42;");
+    $('label[for="id_unit"]').info('right',
+        `This is how your assignment will be split and divided up
+        
+        e.g. If this assignment is reading a book, enter "Page"
+        
+        If you are unsure how to split up your assignment, this is defaulted to "Minute"`
+    );
+    $('label[for="id_works"]').info('right',
+        `The following is only relevant if you are re-entering this field
+
+        This value is also the y-coordinate of the first point on the blue line, or the initial work input
+        
+        Changing this initial value will vertically translate all of your other work inputs accordingly`
+    );
+    $('label[for="id_funct_round"]').info('right',
+        `This is the increment of work you will complete at a time
+        
+        For example, if you enter 3, you will only work in multiples of 3 (e.g: 6 units, 9 units, 15 units, etc)
+        
+        If you do not wish to use the grouping value, this is defaulted to 1`
+    );
+    if ("form_fields" in localStorage) {
+        
+        // Restore form on refresh and error handling
+        const pr_data = JSON.parse(localStorage.getItem("form_fields"));
+        localStorage.removeItem('form_fields');
+        $("#form-wrapper input:visible").each(function(index) {
+            this.value = pr_data[index];
+        });
+        $("#form-wrapper #nwd-wrapper input").each(function(index) {
+            this.checked = pr_data[9][index];
+        });
+    }
+    // Save form data to localStorage
+    $(window).unload(function() {
+        if ($("#form-wrapper").is(":visible")) {
+            localStorage.setItem("form_fields", 
+                JSON.stringify([
+                    ...$("#form-wrapper input:visible").toArray().map(field => field.value),
+                    $("#form-wrapper #nwd-wrapper input").toArray().map(nwd_field => nwd_field.checked),
+                ])
+            );
+        }
+    });
+    $("#overlay").on("click",function(e) {
+        if (e.target !== this) {
+            return
+        }
+        hideForm();
+    });
+    $("#image-new-container").click(() => showForm());
+    $('.update-button').click(function() {
+        if ($(document).queue().length === 0) {
+            showForm();
+            const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
+            $("#form-wrapper input:visible").each(function(index, element) {
+                if (index === 4) {
+                    $(element).val(selected_assignment[4][0]);
+                } else {
+                    $(element).val(selected_assignment[index+2*(index>5)]);
+                }
+            });
+            /* ^ Same thing as: 
+            $("#id_file_sel").val(selected_assignment[0]);
+            $("#id_ad").val(selected_assignment[1]);
+            $("#id_x").val(selected_assignment[2]);
+            $("#id_unit").val(selected_assignment[3]);
+            $("#id_y").val(selected_assignment[4][0]);
+            $("#id_works").val(selected_assignment[5]);
+            $("#id_ctime").val(selected_assignment[8]);
+            $("#id_funct_round").val(selected_assignment[9]);
+            $("#id_min_work_time").val(selected_assignment[10]); */
+            selected_assignment[11].forEach(function(nwd) {
+                $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true);
+            });
+            $("#form-wrapper button").val($(this).val());
+        }
+    });
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
 
@@ -48,23 +208,7 @@ $(function() {
                 type: "POST",
                 data: data,
                 success: success,
-                error: (response, exception) => {
-                    if (response.status == 0) {
-                        alert('Failed to connect');
-                    } else if (response.status == 404) {
-                        alert('Requested page not found, try again');
-                    } else if (response.status == 500) {
-                        alert('Internal server error. Please contact me if you see this')
-                    } else if (exception === 'parsererror') {
-                        alert('Requested JSON parse failed');
-                    } else if (exception === 'timeout') {
-                        alert('Timeout error');
-                    } else if (exception === 'abort') {
-                        alert('Request aborted');
-                    } else {
-                        alert('Uncaught Error, \n' + response.responseText);
-                    }
-                }
+                error: error,
             });
         }
     });
@@ -89,7 +233,7 @@ $(function() {
     }
     $(".assignment").click(function(e) {
         var e = e || window.event;
-        if ($(document).queue().length === 0 && !["A", "IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName)) {
+        if ($(document).queue().length === 0 && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName)) {
             let assignment = $(this);
             const graph_container = assignment.find(".graph-container"),
                 not_first_click = assignment.data('not_first_click');
@@ -124,7 +268,7 @@ $(function() {
                 let graph = this.querySelector('.graph'),
                     fixed_graph = this.querySelector('.fixed-graph'),
 
-                    selected_assignment = dat[Array.prototype.indexOf.call(this.parentNode.parentNode.children, this.parentNode)],
+                    selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))],
                     [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, total_mode, remainder_mode] = selected_assignment;
                 ad = new Date(ad + " 00:00");
                 x = Math.round((Date.parse(x + " 00:00") - ad) / 86400000);
@@ -175,23 +319,7 @@ $(function() {
                             $.ajax({
                                 type: "POST",
                                 data: data,
-                                error: function(response, exception) {
-                                    if (response.status == 0) {
-                                        alert('Failed to save');
-                                    } else if (response.status == 404) {
-                                        alert('Requested page not found, try again');
-                                    } else if (response.status == 500) {
-                                        alert('Internal server error. Please contact me if you see this');
-                                    } else if (exception === 'parsererror') {
-                                        alert('Requested JSON parse failed');
-                                    } else if (exception === 'timeout') {
-                                        alert('Timeout error');
-                                    } else if (exception === 'abort') {
-                                        alert('Request aborted');
-                                    } else {
-                                        alert('Uncaught Error, \n' + response.responseText);
-                                    }
-                                }
+                                error: error,
                             });
                         }, 1000);
                     }
@@ -201,7 +329,7 @@ $(function() {
                         var e = e || window.event;
                         if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("sr-textbox")) {
                             const rect = fixed_graph.getBoundingClientRect();
-                            if (rect.bottom - rect.height / 5 > 70 && rect.y + rect.height / 5 < window.innerHeight && !fired) {
+                            if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
                                 fired = true;
                                 whichkey = e.key;
                                 ChangeSkewRatio()
@@ -310,7 +438,6 @@ $(function() {
                 }
 
                 // Graph logic
-                // Very math heavy, contact me personally if you wish to know how this works
                 {
                     function pset(x2 = NaN, y2 = NaN) {
                         try {
@@ -588,7 +715,7 @@ $(function() {
                         }
                         screen.stroke();
                         screen.beginPath();
-                        radius *= 3 / 4;
+                        radius *= 0.75;
                         if (len_works + 1 < line_end) {
                             line_end = len_works + 1;
                         }
@@ -636,11 +763,11 @@ $(function() {
                             var text = 'Minutes of Work',
                                 label_x_pos = -2;
                         } else {
-                            var text = `${unit}s (${format_minutes(ctime)} per ${unit})`,
-                                label_x_pos = -4;
+                            var text = `${pluralize(unit)} (${format_minutes(ctime)} per ${pluralize(unit,1)})`,
+                                label_x_pos = -5;
                         }
                         if (screen.measureText(text).width > height - 50) {
-                            text = unit + 's';
+                            text = pluralize(unit);
                         }
                         screen.fillText(text, (height - 50) / 2, label_x_pos);
                         screen.rotate(-Math.PI / 2);
@@ -687,7 +814,8 @@ $(function() {
                             for (let smaller_index = 1; smaller_index <= Math.floor(y / small_y_axis_scale); smaller_index++) {
                                 const displayed_number = smaller_index * small_y_axis_scale;
                                 if (smaller_index % 5) {
-                                    screen.fillStyle = "rgb(215,215,215)";
+                                    const gradient_percent = 1-(displayed_number * hCon)/(height-50);
+                                    screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
                                     screen.fillRect(50, height - 51.5 - displayed_number * hCon, width - 50, 2);
                                     screen.fillStyle = "rgb(80,80,80)";
                                     if (label_index) {
@@ -801,18 +929,17 @@ $(function() {
                             duration: swap_ms,
                             easing: "easeInOutQuad",
                             complete: () => {
-                                tar2.after("<span id='swap-temp' style='display: none;'></span>");
-                                tar2.insertAfter(tar1);
-                                tar1.insertBefore("#swap-temp");
+                                const swap_temp = $("<span></span>").insertAfter(tar2);
+                                tar1.after(tar2);
+                                swap_temp.after(tar1);
                                 tar1.removeAttr("style");
                                 tar2.removeAttr("style");
-                                $("#swap-temp").remove();
+                                swap_temp.remove();
                                 $(document).dequeue();
                             },
                         });
                     });
                 }
-                swap(0,-1);
                 function format_minutes(total_minutes) {
                     const hour = Math.floor(total_minutes / 60),
                         minute = Math.ceil(total_minutes % 60);

@@ -9,7 +9,7 @@
     transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #content {
-    transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 0.75s cubic-bezier(.25,.57,.51,.97);
+    transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 1.5s cubic-bezier(.32,1.01,.55,1.28);
 }
 #header.animate {
     transform: translateY(-70px);
@@ -21,7 +21,7 @@
     transform: translateY(-70px);
 }
 #assignments-container {
-    transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
+    transition: all 1.5s cubic-bezier(.29,.81,.37,.99);
     min-width: 200px;
 }
 #assignments-container.animate {
@@ -53,7 +53,7 @@
     border-radius: 5px;
     position: relative;
     width: calc(100% - 54px);
-    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 2s cubic-bezier(.29,.81,.37,.99);
+    transition: all .2s ease-in-out, opacity .1s ease-in-out;
 }
 .assignment:focus, .button:focus {
     outline: 0;
@@ -135,6 +135,8 @@
     top: 0;
     bottom: 0;
     margin: auto;
+    cursor: pointer;
+    height: 36px;
 }
 .button:hover, .button:focus {
     background: radial-gradient(circle, white 35%, gray 100%);
@@ -144,18 +146,13 @@
 }
 .update-button {
     right: 30px;
-    height: 30px;
-    width: 30px;
 }
 .update-button img {
-    top: 5px;
-    left: 5px;
+    top: 2px;
     position: relative;
 }
 .delete-button {
     right: -10px;
-    height: 36px;
-    cursor: pointer;
 }
 .delete-button img {
     top: 1.25px;
@@ -208,4 +205,142 @@ canvas:focus {
 }
 .sr-textbox {
     width: 95px;
+}
+
+
+
+#form-wrapper input:focus, #form-wrapper label:focus {
+    outline: 0;
+    box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204); 
+}
+label[for='id_x']::after {
+    content: '(Predicted if left empty)';
+    display: block;
+    font-style: italic;
+    font-size: 10px;
+}
+label[for='id_min_work_time']::after, label[for='id_funct_round']::after {
+    content: '(Disabled if left empty)';
+    display: block;
+    font-style: italic;
+    font-size: 10px;
+}
+label[for='id_ad']::after {
+    content: "(Enter today if you don't remember)";
+    display: block;
+    font-style: italic;
+    font-size: 10px;
+}
+#form-wrapper #note {
+    text-align: center;
+    font-size: 10px;
+    margin-bottom: -1em;
+    font-style: italic;
+    position: relative;
+    top: 10px;
+}
+#form-wrapper {
+    width: 402px;
+    background: white;
+    box-shadow: 0 0 8px black;
+    margin: 5px auto 45px;
+    border: 1px solid black;
+    border-radius: 15px;
+    padding-bottom: 25px;
+    transition: transform .3s ease-in-out;
+    position: relative;
+}
+#overlay.transition-form #form-wrapper {
+    transform: translateY(15px);
+}
+#form-wrapper #new-title-line {
+    width: 377px;
+    position: absolute;
+    margin-top: 1.25em;
+    left: 10px;
+    border: 1px solid lightgray;
+}
+#form-wrapper #new-title {
+    display: inline-block;
+    font-size: 27px;
+    margin-bottom: -0.25em;
+    position: relative;
+    z-index: 1;
+    background: white;
+    padding: 0 4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+#form-wrapper .field {
+    width: calc(100% - 50px);
+    margin: 5px;
+}
+#form-wrapper label, #form-wrapper #nwd-label-title {
+    text-align: center;
+    display: block;
+    position: relative;
+}
+#form-wrapper label:not(.nwd-label) {
+    margin: 0 49px;
+}
+#form-wrapper #nwd-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: -1em 50px 0;
+}
+#form-wrapper #nwd-wrapper input {
+    display: none;
+}
+#form-wrapper #nwd-wrapper input:checked + .nwd-label {
+    border-color: red;
+    background: rgba(255,0,0,0.5);
+}
+#form-wrapper .nwd-label {
+    background: rgba(0,255,0,0.5);
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border: 1px solid green;
+    border-radius: 5px;
+    padding: 4px;
+    transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
+}
+#form-wrapper .nwd-label:hover, #form-wrapper  .nwd-label:focus {
+    transform: scale(1.04);
+}
+#form-wrapper input {
+    box-sizing: border-box; 
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: calc(100% - 20px);
+    border: 1px solid black;
+    border-radius: 3px;
+}
+#form-wrapper button {
+    margin: 0 auto;
+    display: block;
+    padding: 20px 60px;
+    font-size: 19px;
+}
+#form-wrapper .invalid {
+    border: 2px solid rgb(226,30,54);
+}
+#form-wrapper .error-note {
+    text-align: center;
+    font-size: 13px;
+    margin-top: -15px;
+    color: rgb(226,30,54);
+}
+#overlay {
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 4;
+    display: none;
 }

@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
+from django.conf import settings
 WEEKDAYS = (("1",_("Monday")),
                 ("2",_("Tuesday")),
                 ("3",_("Wednesday")),
@@ -84,6 +85,12 @@ class TimewebModel(models.Model):
     )
     remainder_mode = models.BooleanField(
         default=False,
+        blank=True,
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
         blank=True,
     )
     # Return assignment name when calling instance of model

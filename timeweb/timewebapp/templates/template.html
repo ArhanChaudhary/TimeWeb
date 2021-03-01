@@ -5,7 +5,7 @@
     <head>
         <title>TimeWeb</title>
         <meta charset="UTF-8">
-        <meta name="keywords" content="Timeweb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their assignments every day.">
+        <meta name="keywords" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their assignments every day.">
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -13,59 +13,32 @@
         <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
         <link rel="stylesheet" href="{% static 'template.css' %}"></style>
         {% block css %}{% endblock css %}
+        <script src="{% static 'pluralize.js' %}"></script>
         <script src="{% static 'jquery.js' %}"></script>
         <script src="{% static 'template.js' %}"></script>
         <script>
             csrf_token = "{{ csrf_token }}";
-            {% block clear_pr_form %}localStorage.removeItem('form_fields');{% endblock clear_pr_form %}
-            {% if user.is_authenticated %}
-                $(function() {
-                    // Header responsiveness
-                    const username = $("#user-greeting a"),
-                            container = $("#user-greeting"),
-                            welcome = $("#user-greeting span"),
-                            logo = $("#logo-container"),
-                            newassignmenttext = $("#new-assignment-text");
-                    let currentlyHidingWelcome = container.width() <= username[0].getBoundingClientRect().width+33;
-                    function resize() {
-                        if (container.width() <= username[0].getBoundingClientRect().width+33) {
-                            if (!currentlyHidingWelcome) { /* if statement not needed, just to make things more efficient */
-                                container.addClass("logo-hidden");
-                                username.after(welcome);
-                                logo.hide();
-                                newassignmenttext.css("max-width","calc(100vw - " + (username[0].scrollWidth+180) + "px)");
-                                currentlyHidingWelcome = true;
-                            }
-                        } else if (currentlyHidingWelcome) {
-                            container.removeClass("logo-hidden");
-                            username.before(welcome);
-                            logo.show();
-                            newassignmenttext.css("max-width","");
-                            currentlyHidingWelcome = false;
-                        }
-                    }
-                    resize();
-                    document.fonts.ready.then(function() {
-                        if (currentlyHidingWelcome) {
-                            container.addClass("logo-hidden");
-                            username.after(welcome);
-                            logo.hide();
-                            newassignmenttext.css("max-width","calc(100vw - " + (username[0].scrollWidth+180) + "px)");
-                        }
-                        $(window).resize(resize);
-                    });
-                });
-            {% endif %}
+            {% if user.is_authenticated %}user_authenticated = true;{% endif %}
         </script>
         {% block js %}{% endblock js %}
     </head>
     <body>
         <div class="animate" id="header">
-            <svg width="89px" height="70px" id="menu-container" tabindex="3">
+            <div id="image-new-container" tabindex="1">
+                <img height="60" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
+                <div id="new-assignment-text">New Assignment</div>
+            </div>
+            <svg width="89px" height="70px" id="menu-container" tabindex="2">
                 <rect y="24.75" x="32" width="25" height="4.25"></rect>
                 <rect y="33" x="32" width="25" height="4.25"></rect>
                 <rect y="41.25" x="32" width="25" height="4.25"></rect>
             </svg>
+            {% if user.is_authenticated %}
+                <div id="user-greeting">
+                    <a tabindex="1" href="{% url 'logout'%}?next={{request.path}}">{{ user.get_username }}</a>
+                    <span>,Welcome </span>
+                </div>
+            {% endif %}
             <nav>
                 <svg width="89px" height="70px" id="nav-menu-container">
                     <rect y="24.75" x="32" width="25" height="4.25"></rect>
@@ -84,21 +57,8 @@
                     <a href="#">Contact Me</a>
                 </div>
             </nav>
-            
-            <a href="{% url 'new' %}" title="(Shift + N)">
-                <div id="image-new-container" tabindex="2">
-                    <img height="60" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
-                    <div id="new-assignment-text">New Assignment</div>
-                </div>
-            </a>
-            {% if user.is_authenticated %}
-                <div id="user-greeting">
-                    <span>Welcome, </span>
-                    <a tabindex="2" href="{% url 'logout'%}?next={{request.path}}">{{ user.get_username }}</a>
-                </div>
-            {% endif %}
             <a href="{% url 'home' %}"  id="logo-container">
-                <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" tabindex="-1" draggable="false"/>
+                <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
                 {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
             </a>
         </div>

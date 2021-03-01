@@ -64,9 +64,7 @@ body {
 #user-greeting {
     float: right;
     font-size: 20px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    height: 60px;
+    height: 45.4px;
     color: white;
     white-space: nowrap;
     direction: rtl;
@@ -74,9 +72,10 @@ body {
     text-overflow: ellipsis;
     /* width: calc(50vw - 106px(half width of logo) - 89px(nav width) - 5px(nav margin) - 24px(logo margin));*/
     max-width: calc(50vw - 229px);
-    line-height: 58px; /* 60 - 2 because of border */
+    padding-top: 14.6px;
 }
 #user-greeting a {
+    display: inline-block;
     border: 2px solid rgb(22, 177, 185);
     border-radius: 4px;
     padding-right: 4px;
@@ -95,15 +94,11 @@ body {
 }
 #user-greeting.logo-hidden {
     overflow: visible;
-    padding-top: 0;
 }
 #user-greeting.logo-hidden a {
     overflow: hidden;
-    display: inline-block;
-
     max-width: calc(100vw - 181px);
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
 }
 #user-greeting.logo-hidden span {

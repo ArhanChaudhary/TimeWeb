@@ -1,2 +1,3 @@
 from django.forms.fields import Field
-Field.default_error_messages['required'] = 'This field cannot be a space'
+from django.utils.translation import gettext_lazy as _
+Field.default_error_messages['required'] = _('This field cannot be a space')

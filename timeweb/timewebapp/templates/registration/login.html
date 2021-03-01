@@ -21,7 +21,8 @@
         <td>{{ form.username.label_tag }}</td>
         <td>{{ form.username }}</td>
         <script>
-          $("#id_username").attr("maxlength","20");
+          $("#id_username").attr("maxlength","10");
+          {% comment %} ABSTRACTBASEUSER {% endcomment %}
         </script>
       </tr>
       <tr>

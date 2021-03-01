@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -120,7 +120,6 @@ STATIC_URL = '/static/'
 
 # Django Logging config
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

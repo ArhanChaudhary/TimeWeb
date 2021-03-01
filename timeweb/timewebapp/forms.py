@@ -18,11 +18,12 @@ class TimewebForm(forms.ModelForm):
             'dynamic_start': forms.HiddenInput(),
             'total_mode': forms.HiddenInput(),
             'remainder_mode': forms.HiddenInput(),
+            'user': forms.HiddenInput(),
         }
     
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.label_suffix = ""
+        super().__init__(*args, **kwargs)
     
     # Override form.is_valid in views
     def clean(self):
@@ -32,7 +33,7 @@ class TimewebForm(forms.ModelForm):
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
         file_sel = cleaned_data.get("file_sel")
-        if works >= y:
+        if works >= y >= 0:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)g cannot be " + ("equal to" if works == y else "greater than") + " %(y)g"),code='invalid',params={
                     'value':works,

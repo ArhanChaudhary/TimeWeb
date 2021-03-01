@@ -7,13 +7,50 @@
 <script src="{% static 'jquery.easing.js' %}"></script>
 {{ data|json_script:"load-data" }}
 <script src="{% static 'main.js' %}"></script>
+<script>form_invalid = {% if form.errors %}true{% else %}false{% endif %};today_date_str = "{% now 'Y-m-d' %}"</script>
 {% endblock js %}
 {% block content %}
+  <div id="overlay">
+    <div id="form-wrapper">
+      <form method="POST" autocomplete="off">
+        <div id="new-title-line"></div>
+        <div id="new-title">New Assignment</div>
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+          <p>
+            {% if field.name == "nwd" %}
+              <label id="nwd-label-title">Select the Weekdays you will Not work on this Assignment</label>
+              <div id="nwd-wrapper">
+                {% for value, text in field.field.choices %}
+                  <input {% if field.errors %}class="invalid"{% endif %} id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
+                  <label tabindex="0" class="nwd-label" for="id_nwd_{{ forloop.counter0 }}">{{ text }}</label>
+                {% endfor %}
+              </div>
+            {% elif field.name == "works" %}
+              {{ field.label_tag }}
+              {{ field.as_text }}
+            {% else %}
+              {{ field.label_tag }}
+              {{ field }}
+            {% endif %}
+            {% for error in field.errors %}
+              <p class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</p>
+            {% endfor %}
+          </p>
+        {% endfor %}
+        {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+        {% endfor %}
+        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %} type="submit" name="submit-button" title="(Enter)">{{submit}}</button>
+        <div id="note">&#42; can be skipped<br>Tip: keep pressing tab</div>
+      </form>
+    </div>
+  </div>
   <div id="assignments-container" class="animate">
     <div id="info">Estimated total Completion time: <span>1h 24m</span><button id="hide-button">Hide</button></div>
     {% for obj in objlist %}
       <div class="assignment-container">
-        <div class="assignment" tabindex="0">
+        <div class="assignment" tabindex="0" {% if obj.file_sel == request.session.added_assignment %}id="animate-in"{% elif obj.file_sel == request.session.reentered_assignment %}id="animate-color"{% endif %}>
           <div class="assignment-header">
             <span class="title">
               {{ obj.file_sel }}
@@ -26,9 +63,9 @@
               </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-            <a class="button update-button" href="{% url 'list' obj.pk %}">
+            <button value="{{ obj.pk }}" class="button update-button">
               <img height="20" src="{% static 'edit.png' %}" alt="delete" draggable="false"/>
-            </a>
+            </button>
             <button value="{{ obj.pk }}" class="button delete-button">
               <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
             </button>
