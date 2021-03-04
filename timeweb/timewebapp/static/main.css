@@ -1,18 +1,15 @@
-.disable-transition {
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    -ms-transition: none !important;
-    transition: none !important;
-}
-#header {
+#header:not(.animate) {
     transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
 }
-#content {
+#content:not(.animate) { /*dontmakethistransitiionresize*/
     transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 1.5s cubic-bezier(.32,1.01,.55,1.28);
+}
+#assignments-container:not(.animate) {
+    transition: all 1.5s cubic-bezier(.29,.81,.37,.99);
 }
 #header.animate {
     transform: translateY(-70px);
+    position: relative;
     height: 80px;
 }
 #content.animate {
@@ -21,7 +18,6 @@
     transform: translateY(-70px);
 }
 #assignments-container {
-    transition: all 1.5s cubic-bezier(.29,.81,.37,.99);
     min-width: 200px;
 }
 #assignments-container.animate {
@@ -53,7 +49,7 @@
     border-radius: 5px;
     position: relative;
     width: calc(100% - 54px);
-    transition: all .2s ease-in-out, opacity .1s ease-in-out;
+    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
 }
 .assignment:focus, .button:focus {
     outline: 0;
@@ -343,4 +339,7 @@ label[for='id_ad']::after {
     width: 100%;
     z-index: 4;
     display: none;
+}
+#animate-color {
+    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
 }

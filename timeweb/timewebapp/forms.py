@@ -22,8 +22,8 @@ class TimewebForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
-        self.label_suffix = ""
         super().__init__(*args, **kwargs)
+        self.label_suffix = ""
     
     # Override form.is_valid in views
     def clean(self):

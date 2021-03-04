@@ -18,21 +18,34 @@ $(function() {
     function hideForm(hide_instantly=false) {
         if (hide_instantly) {
             $("#overlay").hide().removeClass("transition-form");
+            $(".error-note, .invalid").remove();
         } else {
-            $("#overlay").fadeOut(300).removeClass("transition-form");
+            $("#overlay").fadeOut(300,function() {
+                $(".invalid").removeClass("invalid");
+                $(".error-note").remove();
+            }).removeClass("transition-form");
         }
         $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
         $("#menu-container").attr("tabindex","2");
         $("#image-new-container, #user-greeting a").attr("tabindex","1");
         $(".assignment, .graph").attr("tabindex","0");
     }
-
+    
+    // Can't use #form-wrapper input:visible because form is initially hidden
+    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
+    const old_form_values = form_inputs.map(function() {
+        return $(this).val();
+    }).get();
     if (form_invalid) {
         showForm(true);
     } else {
         hideForm(true);
     }
-
+    $(document).keydown(function(e) {
+        if (e.key === "Escape") {
+            hideForm();
+        }
+    });
     function error(response, exception) {
         if (response.status == 0) {
             alert('Failed to connect');
@@ -54,16 +67,36 @@ $(function() {
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
     }
-    setTimeout(function() {
-        k = [1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05,0,0,0];
-        $(".assignment").each(function(index) {
-            const selected_assignment = $(this);
-            if (selected_assignment.is("#animate-color")) {
-                selected_assignment.css("transition","all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99)");
-            }
-            selected_assignment.css("background",color(k[index]));
-        });
-    }, !disable_transition * 300)
+    const k = [1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05,0,0,0];
+    
+    let scrollTimeout, resolver;
+    function scroll() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(function() {
+            $("#content").off('scroll');
+            resolver();
+        }, 100);
+    }
+    $(".assignment").each(function(index) {
+        const color_assignment = () => $(this).css("background",color(k[index]));
+        if ($(this).is("#animate-color")) {
+            new Promise(function(resolve) {
+                $(window).load(function() {
+                    if ($("#animate-color").length) {
+                        $("#animate-color")[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest',
+                        });
+                        resolver = resolve;
+                        $("#content").scroll(scroll);
+                        scroll();
+                    }
+                });
+            }).then(color_assignment);
+        } else {
+            color_assignment();
+        }
+    });
 
     // Delete and update button
     $("#id_works").attr({"step":"0.01","type":"number"});
@@ -118,36 +151,45 @@ $(function() {
         // Restore form on refresh and error handling
         const pr_data = JSON.parse(localStorage.getItem("form_fields"));
         localStorage.removeItem('form_fields');
-        $("#form-wrapper input:visible").each(function(index) {
+        form_inputs.each(function(index) {
             this.value = pr_data[index];
         });
         $("#form-wrapper #nwd-wrapper input").each(function(index) {
             this.checked = pr_data[9][index];
         });
     }
-    // Save form data to localStorage
+    // Save form data to localStorage if user refreshes but not if the user submits
+    let user_refreshed = true;
+    $("#form-wrapper button").click(function() {
+        user_refreshed = false;
+    });
     $(window).unload(function() {
-        if ($("#form-wrapper").is(":visible")) {
+        if ($("#form-wrapper").is(":visible") && user_refreshed) {
             localStorage.setItem("form_fields", 
                 JSON.stringify([
-                    ...$("#form-wrapper input:visible").toArray().map(field => field.value),
+                    ...form_inputs.toArray().map(field => field.value),
                     $("#form-wrapper #nwd-wrapper input").toArray().map(nwd_field => nwd_field.checked),
                 ])
             );
         }
     });
-    $("#overlay").on("click",function(e) {
+    $("#overlay").click(function(e) {
         if (e.target !== this) {
             return
         }
         hideForm();
     });
-    $("#image-new-container").click(() => showForm());
+    $("#image-new-container").click(function() {
+        old_form_values.forEach((field_value, index) => $(form_inputs.toArray()[index]).val(field_value));
+        $("#new-title").html("New Assignment");
+        showForm();
+    });
     $('.update-button').click(function() {
         if ($(document).queue().length === 0) {
+            $("#new-title").html("Re-enter Assignment");
             showForm();
             const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
-            $("#form-wrapper input:visible").each(function(index, element) {
+            form_inputs.each(function(index, element) {
                 if (index === 4) {
                     $(element).val(selected_assignment[4][0]);
                 } else {
@@ -172,43 +214,49 @@ $(function() {
     });
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
-
-            // Data sent to server pointing to which assignment to delete
-            let data = {
-                'csrfmiddlewaretoken': csrf_token,
-                'deleted': $(this).val(),
-            }
-
-            const assignment_container = $($(this).parents(".assignment-container"));
-
-            // If the data was successfully sent, delete the assignment
-            const success = function() {
-
-                assignment_container.css({
-                    // CSS doesn't allow transitions without presetting the property
-                    // So, use JQuery to preset and animate its property
-                    "height": assignment_container.height() + 20 + "px",
-
-                    "margin-bottom": "-10px",
-                    "min-height": "0",
+            const selected_element = this;
+            const assignment_container = $($(selected_element).parents(".assignment-container"));
+            new Promise(function(resolve) {
+                assignment_container[0].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
                 });
-                if (!assignment_container.is(':nth-child(2)')) {
-                    assignment_container.css("margin-top", "-10px");
+                resolver = resolve;
+                $("#content").scroll(scroll);
+                scroll();
+            }).then(function() {
+                // Data sent to server pointing to which assignment to delete
+                let data = {
+                    'csrfmiddlewaretoken': csrf_token,
+                    'deleted': $(selected_element).val(),
                 }
-                assignment_container.children(":first-child").css({
-                    "position": "absolute",
-                    "opacity": "0",
+                // If the data was successfully sent, delete the assignment
+                const success = function() {
+                    assignment_container.css({
+                        // CSS doesn't allow transitions without presetting the property
+                        // So, use JQuery to preset and animate its property
+                        "height": assignment_container.height() + 20 + "px",
+                        "margin-bottom": "-10px",
+                        "min-height": "0",
+                    });
+                    if (!assignment_container.is(':nth-child(2)')) {
+                        assignment_container.css("margin-top", "-10px");
+                    }
+                    assignment_container.children(":first-child").css({
+                        "position": "absolute",
+                        "opacity": "0",
+                    });
+                    assignment_container.animate({
+                        height: "10px"
+                    }, 750, "easeOutCubic", () => assignment_container.remove());
+                }
+                // Use ajax to avoid a page reload
+                $.ajax({
+                    type: "POST",
+                    data: data,
+                    success: success,
+                    error: error,
                 });
-                assignment_container.animate({
-                    height: "10px"
-                }, 350, "easeOutCubic", () => assignment_container.remove());
-            }
-            // Use ajax to avoid a page reload
-            $.ajax({
-                type: "POST",
-                data: data,
-                success: success,
-                error: error,
             });
         }
     });
@@ -249,7 +297,7 @@ $(function() {
 
                 // If no graphs are open, allow arrow scroll
                 if ($(".disable-hover").length === 0) {
-                    $(window).on("keydown", PreventArrowScroll);
+                    $(document).off("keydown", PreventArrowScroll);
                 }
             } else {
                 // Stop closing animation
@@ -259,7 +307,7 @@ $(function() {
 
                 // Prevents auto scroll if a graph is open
                 if ($(".disable-hover").length === 0) {
-                    $(window).on("keydown", PreventArrowScroll);
+                    $(document).keydown(PreventArrowScroll);
                 }
                 assignment.addClass("disable-hover");
                 graph_container.css("display", "block");

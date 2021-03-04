@@ -16,14 +16,11 @@
         <script src="{% static 'pluralize.js' %}"></script>
         <script src="{% static 'jquery.js' %}"></script>
         <script src="{% static 'template.js' %}"></script>
-        <script>
-            csrf_token = "{{ csrf_token }}";
-            {% if user.is_authenticated %}user_authenticated = true;{% endif %}
-        </script>
+        <script>csrf_token = "{{ csrf_token }}";user_authenticated = {{ user.is_authenticated|lower }}</script>
         {% block js %}{% endblock js %}
     </head>
     <body>
-        <div class="animate" id="header">
+        <div id="header">
             <div id="image-new-container" tabindex="1">
                 <img height="60" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
                 <div id="new-assignment-text">New Assignment</div>
@@ -62,7 +59,7 @@
                 {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
             </a>
         </div>
-        <div id="content" class="animate">
+        <div id="content">
         {% block content %}{% endblock content %}
         </div>
     </body>

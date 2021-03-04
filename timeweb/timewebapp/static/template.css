@@ -8,6 +8,12 @@
     -o-user-select: none;
     user-select: none;
 }
+input {
+    -webkit-user-select: text; /* Chrome, Opera, Safari */
+    -moz-user-select: text; /* Firefox 2+ */
+    -ms-user-select: text; /* IE 10+ */
+    user-select: text; /* Standard syntax */
+}
 .relative-positioning-wrapper {
     position: relative;
 }
@@ -113,8 +119,8 @@ nav {
     left: 0;
     top: 0;
     position: absolute;
-    margin-left: calc(100% + 2px);
-    transition: all .2s ease-in-out;
+    margin-left: calc(100vw + 2px);
+    transition: transform .2s ease-in-out;
     width: 89px;
 }
 #nav-items, #nav-menu-container {
