@@ -2,7 +2,6 @@
     font-family: "Open Sans";
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     -o-user-select: none;
@@ -24,7 +23,8 @@ input {
     padding: 5px;
     position: relative;
     z-index: 2;
-    box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
+    -webkit-box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
+            box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
 }
 #image-new-container {
     display: inline-block;
@@ -45,7 +45,8 @@ input {
     max-width: calc(50vw - 190px);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+       text-overflow: ellipsis;
 }
 #content {
     border-right: 20px solid gray;
@@ -57,13 +58,16 @@ input {
     display: inline-block;
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+            transform: translateX(-50%);
 }
 #logo-container img {
     max-height: 60px;
 }
 body {
     margin: 0;
+    background: -o-radial-gradient(circle, white 0, rgb(202,202,202) 100%);
     background: radial-gradient(circle, white 0, rgb(202,202,202) 100%);
     overflow: hidden;
 }
@@ -75,7 +79,8 @@ body {
     white-space: nowrap;
     direction: rtl;
     overflow: hidden;
-    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+       text-overflow: ellipsis;
     /* width: calc(50vw - 106px(half width of logo) - 89px(nav width) - 5px(nav margin) - 24px(logo margin));*/
     max-width: calc(50vw - 229px);
     padding-top: 14.6px;
@@ -86,6 +91,8 @@ body {
     border-radius: 4px;
     padding-right: 4px;
     padding-left: 4px;
+    background: -webkit-gradient(linear,left top, left bottom,color-stop(20%, rgb(72, 227, 235)),color-stop(80%, rgb(83,127,163)));
+    background: -o-linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -105,7 +112,8 @@ body {
     overflow: hidden;
     max-width: calc(100vw - 181px);
     white-space: nowrap;
-    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+       text-overflow: ellipsis;
 }
 #user-greeting.logo-hidden span {
     visibility: hidden;
@@ -120,11 +128,19 @@ nav {
     top: 0;
     position: absolute;
     margin-left: calc(100vw + 2px);
+    -webkit-transition: -webkit-transform .2s ease-in-out;
+    transition: -webkit-transform .2s ease-in-out;
+    -o-transition: transform .2s ease-in-out;
     transition: transform .2s ease-in-out;
+    transition: transform .2s ease-in-out, -webkit-transform .2s ease-in-out;
     width: 89px;
 }
 #nav-items, #nav-menu-container {
+    -webkit-transition: -webkit-box-shadow .2s ease-in-out;
+    transition: -webkit-box-shadow .2s ease-in-out;
+    -o-transition: box-shadow .2s ease-in-out;
     transition: box-shadow .2s ease-in-out;
+    transition: box-shadow .2s ease-in-out, -webkit-box-shadow .2s ease-in-out;
 }
 #nav-menu-container {
     background: rgb(13,26,38);
@@ -157,19 +173,23 @@ rect {
 #menu-container:focus ~ nav, 
 nav:hover,
 nav.open {
-    transform: translateX(calc(-100% - 2px));
+    -webkit-transform: translateX(calc(-100% - 2px));
+        -ms-transform: translateX(calc(-100% - 2px));
+            transform: translateX(calc(-100% - 2px));
 }
 #menu-container:hover ~ nav #nav-items, 
 nav:hover #nav-items, 
 #menu-container:focus ~ nav #nav-items,
 nav.open #nav-items {
-    box-shadow: 0 0 4px 2px black;
+    -webkit-box-shadow: 0 0 4px 2px black;
+            box-shadow: 0 0 4px 2px black;
 }
 #menu-container:hover ~ nav #nav-menu-container, 
 nav:hover #nav-menu-container, 
 #menu-container:focus ~ nav #nav-menu-container,
 nav.open #nav-menu-container {
-    box-shadow: -5px 0 5px -5px gray;
+    -webkit-box-shadow: -5px 0 5px -5px gray;
+            box-shadow: -5px 0 5px -5px gray;
 }
 
 
@@ -198,22 +218,29 @@ nav.open #nav-menu-container {
     visibility: visible;
     opacity: 1;
     left: calc(100% + 12px);
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
 }
 .info-button:hover .info-button-text.info-left {
     visibility: visible;
     opacity: 1;
     right: calc(100% + 12px);
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
 }
 .info-button-text {
     position: absolute;
-    transform: translateY(-50%) translateY(7px);
+    -webkit-transform: translateY(-50%) translateY(7px);
+        -ms-transform: translateY(-50%) translateY(7px);
+            transform: translateY(-50%) translateY(7px);
     width: 265px;
     z-index: 3;
 
     background: white;
-    box-shadow: 0 0 5px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.75);
+            box-shadow: 0 0 5px rgba(0,0,0,0.75);
     border-radius: 5px;
     border: 2px solid black;
     visibility: hidden;
@@ -237,7 +264,9 @@ nav.open #nav-menu-container {
     content: "";
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
     right: calc(100% + 1px);
     border-width: 10px;
     border-style: solid;
@@ -247,7 +276,9 @@ nav.open #nav-menu-container {
     content: "";
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
     left: calc(100% + 1px);
     border-width: 10px;
     border-style: solid;

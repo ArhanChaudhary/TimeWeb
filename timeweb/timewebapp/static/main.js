@@ -1,21 +1,21 @@
 $(function() {
+    let dat = JSON.parse(document.getElementById("load-data").textContent);
+    let [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0]
+    def_minute_gv = def_minute_gv||'';
     function showForm(show_instantly=false) {
+        old_ctime_val = $('#id_ctime').val();
         if (show_instantly) {
             $('#overlay').show().addClass("transition-form");
         } else {
             $("#overlay").fadeIn(300).addClass("transition-form");
         }
+        $(".assignment, .graph, #menu-container, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
+        replaceUnit();
         $('#id_works').val((+$('#id_works').val()).toFixed(2));
-        if (!$('#id_ad').val()) {
-            $('#id_ad').val(today_date_str);
-        }
-        if (!$('#id_x').val()) {
-            $('#id_x').val(today_date_str);
-        }
-        $(".assignment, .graph, #menu-container, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1")
     }
 
     function hideForm(hide_instantly=false) {
+        old_ctime_val = '';
         if (hide_instantly) {
             $("#overlay").hide().removeClass("transition-form");
             $(".error-note, .invalid").remove();
@@ -31,12 +31,15 @@ $(function() {
         $(".assignment, .graph").attr("tabindex","0");
     }
     
-    // Can't use #form-wrapper input:visible because form is initially hidden
+    // Can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
-    const old_form_values = form_inputs.map(function() {
-        return $(this).val();
-    }).get();
-    if (form_invalid) {
+    form_inputs.focus(function() {
+        this.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+        });
+    });
+    if ($(".error-note").length) {
         showForm(true);
     } else {
         hideForm(true);
@@ -77,29 +80,49 @@ $(function() {
             resolver();
         }, 100);
     }
+    function color_or_animate_assignment(jelement, index, is_element_submitted=false) {
+        if ($("#animate-in").length && is_element_submitted) {
+            jelement.parent().animate({
+                top: "0", 
+                opacity: "1", 
+                marginBottom: "0",
+            }, 1500, "easeOutCubic");
+        }
+        jelement.css("background",color(k[index]));
+    }
     $(".assignment").each(function(index) {
-        const color_assignment = () => $(this).css("background",color(k[index]));
-        if ($(this).is("#animate-color")) {
+        const assignment_container = $(this).parent();
+        if (assignment_container.is("#animate-color, #animate-in")) {
+            if ($("#animate-in").length) {
+                assignment_container.css({
+                    "top": 20+$("#assignments-container").offset().top + $("#assignments-container").height() - assignment_container.offset().top,
+                    "opacity": "0",
+                    "margin-bottom": -assignment_container.height()-10,
+                });
+            }
             new Promise(function(resolve) {
                 $(window).load(function() {
-                    if ($("#animate-color").length) {
-                        $("#animate-color")[0].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'nearest',
-                        });
-                        resolver = resolve;
-                        $("#content").scroll(scroll);
-                        scroll();
+                    let assignment_to_scroll = $("#animate-in").next();
+                    if (!assignment_to_scroll.length) {
+                        assignment_to_scroll = $("#animate-color, #animate-in");
                     }
+                    // If #animate-in, choose next assignment to scroll to, but choose itself if there is no next assignment
+                    // If #animate-color, choose self to scroll to
+                    assignment_to_scroll[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                    });
+                    resolver = resolve;
+                    $("#content").scroll(scroll);
+                    scroll();
                 });
-            }).then(color_assignment);
+            }).then(() => color_or_animate_assignment($(this), index, true)); // Arrow function to preserve "this"
         } else {
-            color_assignment();
+            color_or_animate_assignment($(this), index);
         }
     });
 
     // Delete and update button
-    $("#id_works").attr({"step":"0.01","type":"number"});
     $("#form-wrapper .error-note").each(function() {
         $(this).prev().children().eq(1).addClass("invalid");
         if (this.id === "error_id_x" || this.id === "error_id_works") {
@@ -108,23 +131,37 @@ $(function() {
     });
 
     // Replace text with unit field
+    var old_ctime_val;
     function replaceUnit() {
         const val = $("#id_unit").val();
+        const plural = pluralize(val),
+              singular = pluralize(val,1);
         if (val) {
-            $("label[for='id_y']").text("Enter the Total amount of " + pluralize(val));
-            $("label[for='id_works']").text("Enter the Total amount of " + pluralize(val) + " already Completed");
-            $("label[for='id_ctime']").text("Enter the Estimated amount of Time to complete each " + pluralize(val,1) + " in Minutes");
+            $("label[for='id_y']").text("Enter the Total amount of " + plural);
+            $("label[for='id_works']").text("Enter the Total amount of " + plural + " already Completed");
+            $("label[for='id_ctime']").text("Enter the Estimated amount of Time to complete each " + singular + " in Minutes");
         } else {
             $("label[for='id_y']").html("Enter the Total amount of Units");
             $("label[for='id_works']").html("Enter the Total amount of Units already Completed");
             $("label[for='id_ctime']").html("Enter the Estimated amount of Time to complete each Unit of Work in Minutes");
+        }
+        if (singular.toUpperCase() === 'MINUTE') {
+            if (!$("#id_funct_round").val()) {
+                $("#id_funct_round").val(def_minute_gv);
+            }
+            old_ctime_val = $('#id_ctime').val();
+            $("#id_ctime").val("1.00").prop("disabled",true).addClass("disabled-field");
+            $("label[for='id_ctime']").addClass("disabled-field");
+        } else {
+            $("#id_ctime").val((+old_ctime_val).toFixed(2)).prop("disabled",false).removeClass("disabled-field");
+            $("label[for='id_ctime']").removeClass("disabled-field");
         }
     }
     replaceUnit();
     $("#id_unit").on('input',replaceUnit);
 
     // Add info buttons (defined in template.js)
-    $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("&#42;");
+    $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
@@ -158,14 +195,10 @@ $(function() {
             this.checked = pr_data[9][index];
         });
     }
-    // Save form data to localStorage if user refreshes but not if the user submits
-    let user_refreshed = true;
-    $("#form-wrapper button").click(function() {
-        user_refreshed = false;
-    });
+    // Save form data to localStorage
     $(window).unload(function() {
-        if ($("#form-wrapper").is(":visible") && user_refreshed) {
-            localStorage.setItem("form_fields", 
+        if ($("#form-wrapper").is(":visible")) {
+            localStorage.setItem("form_fields",
                 JSON.stringify([
                     ...form_inputs.toArray().map(field => field.value),
                     $("#form-wrapper #nwd-wrapper input").toArray().map(nwd_field => nwd_field.checked),
@@ -173,6 +206,7 @@ $(function() {
             );
         }
     });
+    $("form").submit(() => $("#id_ctime").removeAttr("disabled"));
     $("#overlay").click(function(e) {
         if (e.target !== this) {
             return
@@ -180,36 +214,53 @@ $(function() {
         hideForm();
     });
     $("#image-new-container").click(function() {
-        old_form_values.forEach((field_value, index) => $(form_inputs.toArray()[index]).val(field_value));
+        const today = new Date();
+        let tomorrow = new Date();
+        tomorrow.setDate(today.getDate()+1);
+        ['',
+        
+        [
+            today.getFullYear(),
+            ('0' + (today.getMonth() + 1)).slice(-2),
+            ('0' + today.getDate()).slice(-2),
+        ].join('-'),
+
+        [
+            tomorrow.getFullYear(),
+            ('0' + (tomorrow.getMonth() + 1)).slice(-2),
+            ('0' + tomorrow.getDate()).slice(-2),
+        ].join('-'),
+
+        'Minute','','0.00','1',def_minute_gv,def_min_work_time].forEach(function(element, index) {
+            $(form_inputs[index]).val(element);
+        });
+        for (let nwd of Array(7).keys()) {
+            $("#id_nwd_"+((nwd+6)%7)).prop("checked",def_nwd.includes(nwd));
+        }
         $("#new-title").html("New Assignment");
+        $("#form-wrapper button").html("Create Assignment");
         showForm();
     });
     $('.update-button').click(function() {
         if ($(document).queue().length === 0) {
             $("#new-title").html("Re-enter Assignment");
-            showForm();
+            $("#form-wrapper button").html("Modify Assignment");
             const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
-            form_inputs.each(function(index, element) {
-                if (index === 4) {
-                    $(element).val(selected_assignment[4][0]);
-                } else {
-                    $(element).val(selected_assignment[index+2*(index>5)]);
-                }
-            });
-            /* ^ Same thing as: 
-            $("#id_file_sel").val(selected_assignment[0]);
-            $("#id_ad").val(selected_assignment[1]);
-            $("#id_x").val(selected_assignment[2]);
-            $("#id_unit").val(selected_assignment[3]);
-            $("#id_y").val(selected_assignment[4][0]);
-            $("#id_works").val(selected_assignment[5]);
-            $("#id_ctime").val(selected_assignment[8]);
-            $("#id_funct_round").val(selected_assignment[9]);
-            $("#id_min_work_time").val(selected_assignment[10]); */
-            selected_assignment[11].forEach(function(nwd) {
-                $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true);
-            });
+            const form_data = [
+                selected_assignment[0],
+                selected_assignment[1],
+                selected_assignment[2],
+                selected_assignment[3],
+                selected_assignment[4],
+                selected_assignment[5][0],
+                selected_assignment[8],
+                selected_assignment[9]-1 ? selected_assignment[9] : '', // grouping value displays as self if it isn't 1, else display nothing
+                +selected_assignment[10] ? (selected_assignment[10]*selected_assignment[8]).toFixed(2) : '', // minimum work time displays self if it isn't 0, else display nothing
+            ];
+            form_inputs.each((index, element) => $(element).val(form_data[index]));
+            selected_assignment[11].forEach(nwd => $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true));
             $("#form-wrapper button").val($(this).val());
+            showForm();
         }
     });
     $('.delete-button').click(function() {
@@ -234,21 +285,16 @@ $(function() {
                 const success = function() {
                     assignment_container.css({
                         // CSS doesn't allow transitions without presetting the property
-                        // So, use JQuery to preset and animate its property
-                        "height": assignment_container.height() + 20 + "px",
+                        // So, use jQuery.animate to preset and animate its property
+                        "height": assignment_container.height() + 20,
                         "margin-bottom": "-10px",
+                        "margin-top": "-10px",
                         "min-height": "0",
-                    });
-                    if (!assignment_container.is(':nth-child(2)')) {
-                        assignment_container.css("margin-top", "-10px");
-                    }
-                    assignment_container.children(":first-child").css({
+                    }).children(":first-child").css({
                         "position": "absolute",
                         "opacity": "0",
                     });
-                    assignment_container.animate({
-                        height: "10px"
-                    }, 750, "easeOutCubic", () => assignment_container.remove());
+                    assignment_container.animate({height: "10px"}, 750, "easeOutCubic", () => assignment_container.remove());
                 }
                 // Use ajax to avoid a page reload
                 $.ajax({
@@ -264,14 +310,11 @@ $(function() {
     // Hide and show estimated completion time
     $("#hide-button").click(function() {
         $(this.previousSibling).toggle();
-        this.innerHTML = this.innerHTML === 'Hide' ? 'Show' : 'Hide';
+        $(this).html($(this).html() === 'Hide' ? 'Show' : 'Hide');
     });
     
     // Entire graph
-    let dat = JSON.parse(document.getElementById("load-data").textContent);
-    let [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0],
-        scale = window.devicePixelRatio;
-
+    let scale;
     function PreventArrowScroll(e) {
         // Prevent arrow keys from scrolling
         var e = e || window.event;
@@ -325,7 +368,7 @@ $(function() {
                     skew_ratio_lim = 10000,
 
                     red_line_start_x = fixed_mode ? 0 : dynamic_start,
-                    red_line_start_y = fixed_mode ? 0 : works[red_line_start_x - dif_assign],
+                    red_line_start_y = fixed_mode ? 0 : parseFloat(works[red_line_start_x - dif_assign]),
                     assign_day_of_week = ad.getDay(),
                     len_works = works.length,
                     draw_point = false,
@@ -581,7 +624,7 @@ $(function() {
                                         prev_output = prev_output || output;
                                     }
                                     if (output - prev_output) {
-                                        cutoff_transition_value = min_work_time_funct_round - output + prev_output;
+                                        cutoff_transition_value = parseInt(min_work_time_funct_round - output) + parseInt(prev_output);
                                     }
                                 }
                             }
@@ -705,7 +748,6 @@ $(function() {
                         }
                         return output + red_line_start_y;
                     }
-
                     function set_mod_days() {
                         mods = [0];
                         let mod_counter = 0;

@@ -10,7 +10,6 @@ WEEKDAYS = (("1",_("Monday")),
                 ("5",_("Friday")),
                 ("6",_("Saturday")),
                 ("0",_("Sunday")))
-
 def default_works():
     return 0
 
@@ -25,6 +24,7 @@ class TimewebModel(models.Model):
     )
     x = models.DateField(
         null=True,
+        blank=True,
         verbose_name=_('Enter the Due Date'),
     )
     unit = models.CharField(
@@ -35,7 +35,7 @@ class TimewebModel(models.Model):
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(1.00)],
+        validators=[MinValueValidator(1.00,_("This value cannot be less than %(limit_value)s"))],
         verbose_name=_('Enter the Total amount of Units'),
     )
     works = models.JSONField(
@@ -52,13 +52,13 @@ class TimewebModel(models.Model):
     ctime = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.00)],
+        validators=[MinValueValidator(0.01,_("This value must be positive"))],
         verbose_name=_('Enter the Estimated amount of Time to complete each Unit of Work in Minutes'),
     )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.00)],
+        validators=[MinValueValidator(0.01,_("The grouping value must be positive"))],
         blank=True,
         null=True,
         verbose_name=_('Enter the Grouping Value'),
@@ -66,7 +66,7 @@ class TimewebModel(models.Model):
     min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.00)],
+        validators=[MinValueValidator(0.01,_("The minimum work time must be positive"))],
         blank=True,
         null=True,
         verbose_name=_('Enter the Minimum Work Time per Day in Minutes'),
@@ -85,7 +85,6 @@ class TimewebModel(models.Model):
     )
     remainder_mode = models.BooleanField(
         default=False,
-        blank=True,
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

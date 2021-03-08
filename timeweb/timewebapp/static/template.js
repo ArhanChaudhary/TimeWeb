@@ -4,7 +4,9 @@ $(function() {
     $("#nav-items a").focus(() => $("nav").addClass("open"));
 
     // Starting animation
-    if (!("animation-ran" in sessionStorage)) {
+    if ("animation-ran" in sessionStorage) {
+        $("#content")[0].style.transition = 'none';
+    } else {
         $("#content, #header, #assignments-container").addClass("animate");
         sessionStorage.setItem("animation-ran", true);
         $(window).load(function() {
