@@ -8,10 +8,10 @@
     user-select: none;
 }
 input {
-    -webkit-user-select: text; /* Chrome, Opera, Safari */
-    -moz-user-select: text; /* Firefox 2+ */
-    -ms-user-select: text; /* IE 10+ */
-    user-select: text; /* Standard syntax */
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 .relative-positioning-wrapper {
     position: relative;

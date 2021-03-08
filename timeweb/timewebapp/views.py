@@ -29,16 +29,16 @@ class TimewebListView(LoginRequiredMixin, View):
         try:
             try:
                 request.session['added_assignment']
-                h = render(request, "main.html", self.context)
+                h = render(request, "index.html", self.context)
                 del request.session['added_assignment']
                 return h
             except:
                 request.session['reentered_assignment']
-                h = render(request, "main.html", self.context)
+                h = render(request, "index.html", self.context)
                 del request.session['reentered_assignment']
                 return h
         except:
-            return render(request, "main.html", self.context)
+            return render(request, "index.html", self.context)
     
     def form_invalid(self):
         if self.created_new_assignment:
@@ -254,4 +254,4 @@ class TimewebListView(LoginRequiredMixin, View):
                     self.logger.debug("Skew ratio saved")
                     break
         self.make_list(request)
-        return render(request, "main.html", self.context)
+        return render(request, "index.html", self.context)
