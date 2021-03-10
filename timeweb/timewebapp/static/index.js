@@ -543,7 +543,7 @@ $(function() {
                         graphinterval,
                         whichkey;
                     function ChangeSkewRatio() {
-                        // Roundoff error is too negligible too be relevant
+                        // Change skew ratio by +- 0.1 or cap it
                         if (whichkey === "ArrowDown") {
                             skew_ratio = (skew_ratio - 0.1).toFixed(1);
                             if (skew_ratio < 2 - skew_ratio_lim) {
