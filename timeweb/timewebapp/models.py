@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
+from decimal import Decimal as d
 WEEKDAYS = (("1",_("Monday")),
                 ("2",_("Tuesday")),
                 ("3",_("Wednesday")),
@@ -35,8 +36,8 @@ class TimewebModel(models.Model):
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(1.00,_("This value cannot be less than %(limit_value)s"))],
-        verbose_name=_('Enter the Total amount of Units'),
+        validators=[MinValueValidator(1,_("This value cannot be less than %(limit_value)s"))],
+        verbose_name=_('Enter the Total amount of Units in this Assignment'),
     )
     works = models.JSONField(
         default=default_works,
@@ -46,19 +47,23 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    skew_ratio = models.TextField(
-        default=1,
+    skew_ratio = models.DecimalField(
+        max_digits=17,
+        decimal_places=10,
+        verbose_name=_('Enter the Estimated amount of Time to complete each Unit of Work in Minutes'),
+        blank=True,
+        null=True,
     )
     ctime = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01,_("This value must be positive"))],
+        validators=[MinValueValidator(d(0.01),_("This value must be positive"))],
         verbose_name=_('Enter the Estimated amount of Time to complete each Unit of Work in Minutes'),
     )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01,_("The grouping value must be positive"))],
+        validators=[MinValueValidator(d(0.01),_("The grouping value must be positive"))],
         blank=True,
         null=True,
         verbose_name=_('Enter the Grouping Value'),
@@ -66,7 +71,7 @@ class TimewebModel(models.Model):
     min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01,_("The minimum work time must be positive"))],
+        validators=[MinValueValidator(d(0.01),_("The minimum work time must be positive"))],
         blank=True,
         null=True,
         verbose_name=_('Enter the Minimum Work Time per Day in Minutes'),

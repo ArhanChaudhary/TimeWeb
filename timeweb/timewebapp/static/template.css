@@ -1,11 +1,5 @@
 * {
     font-family: "Open Sans";
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
 }
 input {
     -webkit-user-select: text;
@@ -27,6 +21,7 @@ input {
             box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
 }
 #image-new-container {
+    cursor: pointer;
     display: inline-block;
     height: 60px;
     position: absolute;
@@ -86,6 +81,7 @@ body {
     padding-top: 14.6px;
 }
 #user-greeting a {
+    text-decoration: none;
     display: inline-block;
     border: 2px solid rgb(22, 177, 185);
     border-radius: 4px;

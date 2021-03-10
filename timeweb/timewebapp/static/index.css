@@ -107,18 +107,18 @@
     content: "Least Important";
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 2.5px);
+    margin-top: calc(-1em - 3px);
 }
 .assignment-container:nth-child(2) .title::before {
     content: "Most Important";
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 2.5px);
+    margin-top: calc(-1em - 3px);
 }
 .daysleft {
     position: absolute;
     font-size: 0.7em;
-    margin-top: -0.75px;
+    margin-top: -1px;
 }
 .arrow-container {
     float: left;
@@ -161,6 +161,8 @@
     margin: auto;
     cursor: pointer;
     height: 36px;
+    width: 36px;
+    padding: 0; /* Firefox */
 }
 .button:hover, .button:focus {
     background: -o-radial-gradient(circle, white 35%, gray 100%);
@@ -183,16 +185,6 @@
 .delete-button img {
     top: 1.25px;
     position: relative;
-}
-@media (max-width: 275px) {
-    .delete-button {
-        display: none;
-    }
-}
-@media (max-width: 314px) {
-    .update-button {
-        display: none;
-    }
 }
 .graph-container {
     position: relative;
@@ -241,6 +233,9 @@ canvas:focus {
     -webkit-box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204);
             box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204); 
 }
+#form-wrapper input:required {
+    box-shadow: none; /* Firefox */
+}
 label[for='id_x']::after {
     content: '(Predicted if left empty)';
     display: block;
@@ -259,20 +254,24 @@ label[for='id_ad']::after {
     font-style: italic;
     font-size: 10px;
 }
-#form-wrapper #note {
+#form-wrapper #top-note {
+    font-size: 11px;
+    font-style: italic;
+    position: absolute;
+    left: 7px;
+    top: 2px;
+}
+#form-wrapper #bottom-note {
     text-align: center;
     font-size: 10px;
-    margin-bottom: -1em;
     font-style: italic;
-    position: relative;
-    top: 10px;
 }
 #form-wrapper {
     width: 402px;
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
-    margin: 5px auto 45px;
+    margin: 5px auto 35px;
     border: 1px solid black;
     border-radius: 15px;
     padding-bottom: 25px;
@@ -390,6 +389,7 @@ label[for='id_ad']::after {
     border-width: 2px;
     padding: 0;
     padding-left: 1px;
+    color: black;
 }
 #form-wrapper button {
     margin: 0 auto;
