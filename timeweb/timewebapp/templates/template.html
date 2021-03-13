@@ -13,8 +13,8 @@
         <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
         <link rel="stylesheet" href="{% static 'template.css' %}"></style>
         {% block css %}{% endblock css %}
-        <script src="{% static 'pluralize.js' %}"></script>
-        <script src="{% static 'jquery.js' %}"></script>
+        <script src="{% static 'vendor/pluralize.js' %}"></script>
+        <script src="{% static 'vendor/jquery.js' %}"></script>
         <script src="{% static 'template.js' %}"></script>
         <script>csrf_token = "{{ csrf_token }}";user_authenticated = {{ user.is_authenticated|lower }}</script>
         {% block js %}{% endblock js %}

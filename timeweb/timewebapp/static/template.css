@@ -15,7 +15,7 @@ input {
     background: rgb(13,26,38);
     height: 60px;
     padding: 5px;
-    position: relative;
+    position: absolute;
     z-index: 2;
     -webkit-box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
             box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
@@ -44,10 +44,10 @@ input {
        text-overflow: ellipsis;
 }
 #content {
-    border-right: 20px solid gray;
-    border-left: 20px solid gray;
-    height: calc(100vh - 70px);
     overflow-y: auto;
+    height: 100vh;
+    padding: 80px 30px 0 30px;
+    box-shadow: inset 0 -20px 0 20px gray;
 }
 #logo-container {
     display: inline-block;
@@ -132,6 +132,7 @@ nav {
     width: 89px;
 }
 #nav-items, #nav-menu-container {
+    /**/
     -webkit-transition: -webkit-box-shadow .2s ease-in-out;
     transition: -webkit-box-shadow .2s ease-in-out;
     -o-transition: box-shadow .2s ease-in-out;
@@ -177,6 +178,7 @@ nav.open {
 nav:hover #nav-items, 
 #menu-container:focus ~ nav #nav-items,
 nav.open #nav-items {
+    /**/
     -webkit-box-shadow: 0 0 4px 2px black;
             box-shadow: 0 0 4px 2px black;
 }

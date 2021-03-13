@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{% static 'index.css' %}"></link>
 {% endblock css %}
 {% block js %}
-<script src="{% static 'jquery.easing.js' %}"></script>
+<script src="{% static 'vendor/jquery.easing.js' %}"></script>
 {{ data|json_script:"load-data" }}
 <script src="{% static 'index.js' %}"></script>
 {% endblock js %}
@@ -93,4 +93,5 @@
       </div>
     {% endfor %}
   </div>
+  <style id="assignment-hover-width"></style>
 {% endblock content %}

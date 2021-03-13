@@ -1,34 +1,25 @@
+#assignments-container {
+    min-width: 200px;
+    position: relative;
+}
+
+#content:not(.animate) {
+    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.55,1.28);
+}
 #header:not(.animate) {
-    -webkit-transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
-    -o-transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
     transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
 }
-#content:not(.animate) { /*dontmakethistransitiionresize*/
-    -webkit-transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 1.5s cubic-bezier(.32,1.01,.55,1.28);
-    -o-transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 1.5s cubic-bezier(.32,1.01,.55,1.28);
-    transition: all 1.75s cubic-bezier(.25,.57,.51,.97), border-width 1.5s cubic-bezier(.32,1.01,.55,1.28);
-}
 #assignments-container:not(.animate) {
-    -webkit-transition: all 1.5s cubic-bezier(.29,.81,.37,.99);
-    -o-transition: all 1.5s cubic-bezier(.29,.81,.37,.99);
-    transition: all 1.5s cubic-bezier(.29,.81,.37,.99);
+    transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
+}
+#content.animate {
+    box-shadow: inset 0 -20px 0 0 gray;
 }
 #header.animate {
     -webkit-transform: translateY(-70px);
         -ms-transform: translateY(-70px);
             transform: translateY(-70px);
-    position: relative;
     height: 80px;
-}
-#content.animate {
-    border-width: 0;
-    height: 115vh;
-    -webkit-transform: translateY(-70px);
-        -ms-transform: translateY(-70px);
-            transform: translateY(-70px);
-}
-#assignments-container {
-    min-width: 200px;
 }
 #assignments-container.animate {
     -webkit-transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
@@ -36,9 +27,9 @@
             transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
     /* transform:translateY(min(calc(100vh - 70px),calc(100% + 20px))); */
 }
+
 #info {
     font-size: 17px;
-    margin: 10px;
 }
 #hide-button {
     position: relative;
@@ -50,19 +41,21 @@
     position: relative;
     overflow: visible !important;
     scroll-margin: 20px;
+    user-select: none;
 }
 .assignment {
     -webkit-box-shadow: 0 0 4px rgba(52,52,52,0.5);
             box-shadow: 0 0 4px rgba(52,52,52,0.5);
+    /**/
     background: white;
     /*  background: rgb(226,91,80);
     background: rgb(132,200,65); */
-    margin: 10px;
+    margin: 10px 0;
     padding: 15px;
     border: 2px solid rgb(80,80,80);
     border-radius: 5px;
     position: relative;
-    width: calc(100% - 54px);
+    width: calc(100vw - 94px);
     -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
     -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
@@ -81,7 +74,7 @@
     -webkit-transform: scale(1.05) translateX(2%);
         -ms-transform: scale(1.05) translateX(2%);
             transform: scale(1.05) translateX(2%);
-    width: calc(96.15% - 55px);
+            width: calc(96.1vw - 94px);
     border-color: rgba(0,0,0,0.7);
     -webkit-box-shadow: 0 0 7px rgb(52,52,52);
             box-shadow: 0 0 7px rgb(52,52,52);
@@ -271,6 +264,7 @@ label[for='id_ad']::after {
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
+    /**/
     margin: 5px auto 35px;
     border: 1px solid black;
     border-radius: 15px;

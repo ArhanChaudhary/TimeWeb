@@ -11,7 +11,7 @@ import logging
 from django import forms
 from datetime import timedelta
 from decimal import Decimal as d
-from math import ceil
+from math import ceil, floor
 MAX_NUMBER_ASSIGNMENTS = 25
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
@@ -47,7 +47,6 @@ class TimewebListView(LoginRequiredMixin, View):
     # However, it still cannot be referanced because 'delete-button': [''] is not a good indication
     # So, pass in a value into the button such that the new request.POST will have delete-button': [obj.pk] instead
     def post(self,request):
-
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
             pk = request.POST['submit-button']
@@ -62,7 +61,7 @@ class TimewebListView(LoginRequiredMixin, View):
                 self.form = TimewebForm(request.POST)
             else:
                 selected_model = get_object_or_404(TimewebModel, pk=pk) # Corresponding model
-                # Ensure the user didn't change the html value in the front end to delete other users' assignments
+                # Ensure the user didn't change the html pk value to delete other users' assignments
                 if request.user != selected_model.user:
                     return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
                 # Create a form instance from user data
@@ -166,10 +165,10 @@ class TimewebListView(LoginRequiredMixin, View):
                             x_num = (selected_model.y - adone)/selected_model.funct_round
                     else:
                         if selected_model.min_work_time:
-                            x_num = (selected_model.y - old_data.works[removed_works_start] + old_data.works[0] - adone)/ceil(ceil(selected_model.min_work_time/selected_model.funct_round)*selected_model.funct_round)
+                            x_num = (selected_model.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - adone)/ceil(ceil(selected_model.min_work_time/selected_model.funct_round)*selected_model.funct_round)
                         else:
-                            x_num = (selected_model.y - old_data.works[removed_works_start] + old_data.works[0] - adone)/selected_model.funct_round
-                    x_num = int(x_num)
+                            x_num = (selected_model.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - adone)/selected_model.funct_round
+                    x_num = floor(x_num)
                     if selected_model.nwd:
                         if len_nwd == 7:
                             x_num = 1
@@ -190,14 +189,15 @@ class TimewebListView(LoginRequiredMixin, View):
 
                             while 1:
                                 guess_x += 1
-                                if guess_x - guess_x // 7 * len_nwd - mods[guess_x % 7] == ceil(x):
+                                if guess_x - guess_x // 7 * len_nwd - mods[guess_x % 7] == x_num:
                                     x_num = guess_x
                                     break
+                    elif not x_num:
+                        # x can sometimes be zero
+                        x_num = 1
                 else:
                     x_num = (selected_model.x - selected_model.ad).days
                 if create_assignment:
-                    # Defines the work inputs
-                    # adone serves as the 0th or the starting work value of the assignment
                     selected_model.works = [str(selected_model.works)] # Same as str(adone)
                 else:
                     # If the reentered assign date cuts off some of the work inputs, adjust the work inputs accordingly

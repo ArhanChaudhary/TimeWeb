@@ -191,7 +191,7 @@ $(function() {
     });
 
     // Custom form validity
-    $("#form-wrapper input[required]").on("input",function() {
+    form_inputs.on("input",function() {
         // Reset custom form validity, without this the form invalid error shows up when there is no error
         this.setCustomValidity('');
         // Don't allow "e" in number input
@@ -206,7 +206,7 @@ $(function() {
         }
     });
     // Sets custom error message
-    $("#form-wrapper input[required]").on("invalid",function() {
+    form_inputs.on("invalid",function() {
         let message;
         switch ($(this).attr("id")) {
             case "id_file_sel":
@@ -216,7 +216,11 @@ $(function() {
                 message = 'The assignment date is either out of range or invalid';
                 break;
             case "id_x":
-                message = 'The due date is either out of range or invalid';
+                if ($(this).val()) {
+                    message = 'The due date is either out of range or invalid';
+                } else {
+                    return; // Allow blank field
+                }
                 break;
             case "id_unit":
                 message = 'Please enter a name';
@@ -406,8 +410,7 @@ $(function() {
 
     // Hide and show estimated completion time
     $("#hide-button").click(function() {
-        $(this.previousSibling).toggle();
-        $(this).html($(this).html() === 'Hide' ? 'Show' : 'Hide');
+        $(this).html($(this).html() === 'Hide' ? 'Show' : 'Hide').prev().toggle();
     });
     
     // Entire graph
@@ -459,7 +462,7 @@ $(function() {
                     selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))],
                     [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, total_mode, remainder_mode] = selected_assignment;
                 ad = new Date(ad + " 00:00");
-                x = Math.round((Date.parse(x + " 00:00") - ad) / 86400000);
+                x = Math.round((Date.parse(x + " 00:00") - ad) / 86400000); // Round to account for DST
                 nwd = nwd.map(Number);
                 let mods,
                     skew_ratio_lim,

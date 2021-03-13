@@ -5,19 +5,11 @@ $(function() {
 
     // Starting animation
     if ("animation-ran" in sessionStorage) {
-        $("#content")[0].style.transition = 'none';
+        $("#content").css("transition",'none');
     } else {
         $("#content, #header, #assignments-container").addClass("animate");
         sessionStorage.setItem("animation-ran", true);
-        $(window).load(function() {
-            // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
-            $("#content, #header, #assignments-container").removeClass("animate");
-            $("#content").on("transitionend",function(e) {
-                if (e.originalEvent.propertyName === "height") {
-                    $(this).off("transitionend")[0].style.transition = 'none';
-                }
-            });    
-        });
+        $(window).load(() => $("#content, #header, #assignments-container").removeClass("animate")); // Use $(window).load(function() { instead because $(function() { sometimes fires too early and lags the animation a bit
     }
 
     // Keybinds
