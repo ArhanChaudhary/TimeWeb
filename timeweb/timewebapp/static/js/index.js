@@ -309,7 +309,7 @@ $(function() {
             resolver();
         }, 200);
     }
-    // Set assignment width for transition on resize, cannot use vw or % because they aren't permormant
+    // Set assignment width for transition on resize, cannot use vw or % because they aren't performant
     let widthTimeout;
     $(window).resize(function() {
         $(".assignment").css("width",window.innerWidth-60).addClass("disable-assignment-transition");
@@ -431,7 +431,9 @@ $(function() {
         $(this).html($(this).html() === 'Hide' ? 'Show' : 'Hide').prev().toggle();
     });
     
+    //
     // Entire graph
+    //
     let scale,
         font_size;
     function PreventArrowScroll(e) {
@@ -919,6 +921,7 @@ $(function() {
                 }
                 // End graph logic
 
+                // Draw graph
                 function draw(x2 = false, y2 = false) {
                     const actually_draw_point = draw_point && x2 !== false;
                     if (actually_draw_point) {
@@ -1202,14 +1205,12 @@ $(function() {
                         screen.fillText(bigger_index, number_x_pos, height - 39);
                     }
                 }
-
                 function resize(reversescale) {
                     if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
                         drawfixed(reversescale);
                         draw();
                     }
                 }
-                // Draw graph
                 resize(true);
                 // calling getBoundingClientRect() returns the scale(1.05) height and width
                 assignment.on("transitionend", function(e) {

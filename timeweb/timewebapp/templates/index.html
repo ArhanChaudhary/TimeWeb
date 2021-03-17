@@ -1,12 +1,12 @@
 {% extends "template.html" %}
 {% load static %}
 {% block css %}
-<link rel="stylesheet" href="{% static 'index.css' %}"></link>
+<link rel="stylesheet" href="{% static 'css/index.css' %}"></link>
 {% endblock css %}
 {% block js %}
 <script src="{% static 'vendor/jquery.easing.js' %}"></script>
 {{ data|json_script:"load-data" }}
-<script src="{% static 'index.js' %}"></script>
+<script src="{% static 'js/index.js' %}"></script>
 {% endblock js %}
 {% block content %}
   <div id="overlay">
@@ -64,10 +64,10 @@
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
             <button value="{{ obj.pk }}" class="button update-button">
-              <img height="20" src="{% static 'edit.png' %}" alt="delete" draggable="false"/>
+              <img height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </button>
             <button value="{{ obj.pk }}" class="button delete-button">
-              <img height="22" src="{% static 'delete.png' %}" alt="edit" draggable="false"/>
+              <img height="22" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
             </button>
           </div>
           <div class="relative-positioning-wrapper">

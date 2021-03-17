@@ -9,20 +9,19 @@
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
-        <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
-        <link rel="stylesheet" href="{% static 'template.css' %}"></style>
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
+        <link rel="stylesheet" href="{% static 'css/template.css' %}"></style>
         {% block css %}{% endblock css %}
         <script src="{% static 'vendor/pluralize.js' %}"></script>
-        <script src="{% static 'vendor/jquery.js' %}"></script>
-        <script src="{% static 'template.js' %}"></script>
+        <script src="{% static 'vendor/jquery.min.js' %}"></script>
+        <script src="{% static 'js/template.js' %}"></script>
         <script>csrf_token = "{{ csrf_token }}";user_authenticated = {{ user.is_authenticated|lower }}</script>
         {% block js %}{% endblock js %}
     </head>
     <body>
         <div id="header">
             <div id="image-new-container" tabindex="1">
-                <img height="60" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
+                <img height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
                 <div id="new-assignment-text">New Assignment</div>
             </div>
             <div id="menu">
@@ -34,7 +33,7 @@
             </div>
             {% if user.is_authenticated %}
                 <div id="user-greeting">
-                    <a tabindex="1" href="{% url 'logout'%}?next={{request.path}}">{{ user.get_username }}</a>
+                    <a tabindex="1" href="{% url 'logout' %}?next={{request.path}}">{{ user.get_username }}</a>
                     <span>,Welcome </span>
                 </div>
             {% endif %}
@@ -59,7 +58,7 @@
                 </div>
             </nav>
             <a href="{% url 'home' %}"  id="logo-container">
-                <img src="{% static 'timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
+                <img src="{% static 'images/timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
                 {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
             </a>
         </div>
