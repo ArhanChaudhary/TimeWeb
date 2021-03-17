@@ -3,7 +3,9 @@ $(function() {
     let dat = JSON.parse(document.getElementById("load-data").textContent);
     let [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0];
     def_minute_gv = def_minute_gv||'';
+    //
     // Form functionality
+    //
     function showForm(show_instantly=false) {
         if (show_instantly) {
             $('#overlay').show().addClass("transition-form");
@@ -11,7 +13,7 @@ $(function() {
             $("#overlay").fadeIn(300).addClass("transition-form");
         }
         // Make rest of page untabbable
-        $(".assignment, .graph, #menu-container, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
+        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
         $('#id_works').val((+$('#id_works').val()).toFixed(2)); // Ensure #id_works has two decimal places because 0 displays as 0.0
     }
     function hideForm(hide_instantly=false) {
@@ -26,7 +28,7 @@ $(function() {
         }
         // Make rest of page retabbable
         $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
-        $("#menu-container").attr("tabindex","2");
+        $("#menu").attr("tabindex","2");
         $("#image-new-container, #user-greeting a").attr("tabindex","1");
         $(".assignment, .graph").attr("tabindex","0");
     }
@@ -288,6 +290,10 @@ $(function() {
             $(this).prev().prev().children().eq(1).addClass("invalid");
         }
     });
+    //
+    // End Form Functionality
+    //
+
     // Returns color rgb from priority percentage
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
@@ -303,15 +309,26 @@ $(function() {
             resolver();
         }, 200);
     }
-    function color_or_animate_assignment(jelement, index, is_element_submitted=false) {
+    // Set assignment width for transition on resize, cannot use vw or % because they aren't permormant
+    let widthTimeout;
+    $(window).resize(function() {
+        $(".assignment").css("width",window.innerWidth-60).addClass("disable-assignment-transition");
+        clearTimeout(widthTimeout);
+        widthTimeout = setTimeout(function() {
+            $(".assignment").removeClass("disable-assignment-transition");
+        }, 200);
+    });
+    $(".assignment").css("width",window.innerWidth-60);
+
+    function color_or_animate_assignment($element, index, is_element_submitted=false) {
         if ($("#animate-in").length && is_element_submitted) {
-            jelement.parent().animate({
+            $element.parent().animate({
                 top: "0", 
                 opacity: "1", 
                 marginBottom: "0",
             }, 1500, "easeOutCubic");
         }
-        jelement.css("background",color(k[index]));
+        $element.css("background",color(k[index]));
     }
     $(".assignment").each(function(index) {
         const assignment_container = $(this).parent();
@@ -366,8 +383,8 @@ $(function() {
 
     $('.delete-button').click(function() {
         if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
-            const selected_element = this;
-            const assignment_container = $($(selected_element).parents(".assignment-container"));
+            const $this = $(this);
+            const assignment_container = $($this.parents(".assignment-container"));
             new Promise(function(resolve) {
                 assignment_container[0].scrollIntoView({
                     behavior: 'smooth',
@@ -380,7 +397,7 @@ $(function() {
                 // Data sent to server pointing to which assignment to delete
                 let data = {
                     'csrfmiddlewaretoken': csrf_token,
-                    'deleted': $(selected_element).val(),
+                    'deleted': $this.val(),
                 }
                 // If the data was successfully sent, delete the assignment
                 const success = function() {
@@ -395,6 +412,7 @@ $(function() {
                         "position": "absolute",
                         "opacity": "0",
                     });
+                    dat.splice($("#assignments-container").children().index($this.parents(".assignment-container")),1);
                     assignment_container.animate({height: "10px"}, 750, "easeOutCubic", () => assignment_container.remove());
                 }
                 // Use ajax to avoid a page reload
@@ -414,7 +432,8 @@ $(function() {
     });
     
     // Entire graph
-    let scale;
+    let scale,
+        font_size;
     function PreventArrowScroll(e) {
         // Prevent arrow keys from scrolling
         var e = e || window.event;
@@ -429,15 +448,13 @@ $(function() {
             const graph_container = assignment.find(".graph-container"),
                 not_first_click = assignment.data('not_first_click');
             if (graph_container.attr("style") && assignment.hasClass("disable-hover") /* Allow assignment to be open while it's closing */ ) {
-                assignment.removeClass("disable-hover");
-                assignment.css("overflow", "hidden");
-                graph_container.animate({marginBottom:-graph_container.height()}, 750, "easeOutCubic", () => {
+                graph_container.animate({marginBottom:-graph_container.height()}, 750, "easeOutCubic", function() {
                     // Hide assignment when transition ends
                     assignment.css("overflow", "");
                     graph_container.removeAttr("style");
                 });
                 this.querySelector(".fallingarrowanimation").beginElement();
-
+                assignment.removeClass("disable-hover").css("overflow", "hidden");
                 // If no graphs are open, allow arrow scroll
                 if ($(".disable-hover").length === 0) {
                     $(document).off("keydown", PreventArrowScroll);
@@ -460,10 +477,11 @@ $(function() {
                     fixed_graph = this.querySelector('.fixed-graph'),
 
                     selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))],
-                    [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, total_mode, remainder_mode] = selected_assignment;
+                    [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
                 ad = new Date(ad + " 00:00");
                 x = Math.round((Date.parse(x + " 00:00") - ad) / 86400000); // Round to account for DST
                 nwd = nwd.map(Number);
+                y = +y;
                 let mods,
                     skew_ratio_lim,
                     red_line_start_x = fixed_mode ? 0 : dynamic_start,
@@ -476,16 +494,22 @@ $(function() {
                     len_nwd = nwd.length,
                     set_skew_ratio = false,
                     min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round,
-                    width,
-                    height,
-                    wCon,
-                    hCon,
                     a,
                     b,
                     cutoff_transition_value,
                     cutoff_to_use_round,
                     return_y_cutoff,
-                    return_0_cutoff;
+                    return_0_cutoff,
+                    last_mouse_x = -1,
+                    last_mouse_y = false;
+                let due_date = new Date(x),
+                    disyear;
+                due_date.setDate(due_date.getDate() + x);
+                if (ad.getFullYear() !== due_date.getFullYear()) {
+                    disyear = ', %Y';
+                } else {
+                    disyear = '';
+                }
                 if (nwd.length) {
                     set_mod_days();
                 }
@@ -497,10 +521,10 @@ $(function() {
 
                     // XML skew ratio when it is saved
                     let ajax,
-                        old_skew_ratio;
+                        old_skew_ratio = skew_ratio;
                     function AjaxSkewRatio() {
                         clearTimeout(ajax);
-                        selected_assignment[7] = skew_ratio;
+                        selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
                         old_skew_ratio = skew_ratio;
                         ajax = setTimeout(function() {
                             const data = {
@@ -574,20 +598,35 @@ $(function() {
                         }
                         draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
                     }
-                    let update = false;
-                    assignment.find(".set-skew-ratio-button").click(function() {
-                        $(this).html("Hover and click the graph");
-                        $(graph).on('mousemove', mousemove); // enable set skew ratio if button is pressed
-                        update = true;
+                    function sr_button_clicked() {
+                        $(this).html("Set skew ratio using graph");
+                        set_skew_ratio = false;
+                        skew_ratio = old_skew_ratio;
+                        draw();
+                        // No need to ajax since skew ratio is the same
+                    }
+                    assignment.find(".sr-button").click(function() {
+                        debugger;
+                        $(this).html("Hover and click the graph (click this again to cancel)").one("click", sr_button_clicked);
+                        $(graph).mousemove(mousemove); // enable set skew ratio if button is pressed
+                        set_skew_ratio = true;
                     });
-
-                    $(graph).click(function() {
-                        if (update) {
+                    
+                    $(graph).click(function(e) {
+                        if (set_skew_ratio) {
+                            set_skew_ratio = false;
                             // stop set skew ratio if canvas is clicked
-                            $(this).off("mousemove", mousemove)
-                                    .next().find(".set-skew-ratio-button").html("Set skew ratio using graph");
+                            $(this).next().find(".sr-button").html("Set skew ratio using graph").off("click", sr_button_clicked);
                             AjaxSkewRatio();
-                            update = false;
+                        } else if (draw_point) {
+                            $(this).off("mousemove");
+                            draw_point = false;
+                            last_mouse_x = -1;
+                            draw();
+                        } else {
+                            draw_point = true;
+                            $(this).mousemove(mousemove);
+                            mousemove(e);
                         }
                     });
 
@@ -628,18 +667,13 @@ $(function() {
                 }
 
                 // Graph logic
-                function pset(x2 = NaN, y2 = NaN) {
+                function pset(x2 = false, y2 = false) {
                     let x1 = x - red_line_start_x,
                         y1 = y - red_line_start_y;
                     if (len_nwd) {
                         x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7];
                     }
-                    if (isNaN(x2)) {
-                        // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-                        a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
-                        b = (y1 - x1 * x1 * a) / x1;
-
-                    } else {
+                    if (set_skew_ratio && x2 !== false) {
                         x2 = (x2 - 50) / wCon - red_line_start_x;
                         y2 = (height - y2 - 50) / hCon - red_line_start_y;
                         if (x2 < 0) {
@@ -692,6 +726,10 @@ $(function() {
                             }
                             console.log("Skew ratio: " + skew_ratio);
                         }
+                    } else {
+                        // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                        a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
+                        b = (y1 - x1 * x1 * a) / x1;
                     }
                     if (!Number.isFinite(a)) {
                         a = 0;
@@ -881,30 +919,44 @@ $(function() {
                 }
                 // End graph logic
 
-                // Draw graph
-                resize(true);
-                // calling getBoundingClientRect() returns the scale(1.05) height and width
-                assignment.on("transitionend", function(e) {
+                function draw(x2 = false, y2 = false) {
+                    const actually_draw_point = draw_point && x2 !== false;
+                    if (actually_draw_point) {
+                        // Cant pass in mouse_x and mouse_y as x2 and y2 because mouse_y becomes a bool
+                        mouse_x = Math.round((x2-50)/wCon);
+                        mouse_y = (y2-50)/hCon;
 
-                    // Resize again when width transition ends
-                    var e = e || window.event;
-                    if (e.originalEvent.propertyName === "width") {
-                        resize(false);
-                        assignment.off("transitionend");
+                        if (mouse_x < Math.min(red_line_start_x,dif_assign)) {
+                            mouse_x = Math.min(red_line_start_x,dif_assign);
+                        } else if (mouse_x > x) {
+                            mouse_x = x;
+                        }
+                        if (dif_assign <= mouse_x && mouse_x <= len_works + dif_assign) {
+                            if (mouse_x < red_line_start_x) {
+                                mouse_y = true;
+                            } else {
+                                mouse_y = Math.abs(mouse_y - funct(mouse_x)) > Math.abs(mouse_y - works[mouse_x - dif_assign]);
+                            }
+                        } else {
+                            mouse_y = false;
+                        }
+                        if (!set_skew_ratio && last_mouse_x === mouse_x && last_mouse_y === mouse_y) {
+                            return;
+                        }
+                        last_mouse_x = mouse_x;
+                        last_mouse_y = mouse_y;
                     }
-                });
-                function draw(x2 = NaN, y2 = NaN) {
+                    pset(x2, y2);
+
                     const screen = graph.getContext("2d");
                     screen.scale(scale, scale);
                     screen.clearRect(0, 0, width, height);
-                    pset(x2, y2);
                     let radius = wCon / 3;
                     if (radius > 3) {
                         radius = 3;
                     } else if (radius < 2) {
                         radius = 2;
                     }
-
                     let circle_x,
                         circle_y,
                         line_end = Math.floor(x + Math.ceil(1 / wCon));
@@ -912,11 +964,11 @@ $(function() {
                     screen.lineWidth = radius;
                     screen.beginPath();
                     for (let point = red_line_start_x; point < line_end; point += Math.ceil(1 / wCon)) {
-                        circle_x = Math.round(point * wCon + 50);
+                        circle_x = point * wCon + 50;
                         if (circle_x > width - 5) {
                             circle_x = width - 5;
                         }
-                        circle_y = Math.round(height - funct(point) * hCon - 50);
+                        circle_y = height - funct(point) * hCon - 50;
                         screen.lineTo(circle_x - (point === red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
                         screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
                         screen.moveTo(circle_x, circle_y);
@@ -930,29 +982,99 @@ $(function() {
                     screen.strokeStyle = "rgb(1,147,255)"; // blue
                     screen.lineWidth = radius;
                     for (let point = 0; point < line_end; point += Math.ceil(1 / wCon)) {
-                        circle_x = Math.round((point + dif_assign) * wCon + 50);
+                        circle_x = (point + dif_assign) * wCon + 50;
                         if (circle_x > width - 5) {
                             circle_x = width - 5
                         }
-                        circle_y = Math.round(height - works[point] * hCon - 50);
+                        circle_y = height - works[point] * hCon - 50;
                         screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
                         screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
                         screen.moveTo(circle_x, circle_y);
                     }
+                    radius /= 0.75;
                     screen.stroke();
+                    screen.textBaseline = "top";
+                    screen.textAlign = "start";
+                    screen.font = font_size + 'px Open Sans';
+                    if (actually_draw_point) {
+                        
+                        let funct_mouse_x;
+                        if (mouse_y) {
+                            funct_mouse_x = works[mouse_x - dif_assign];
+                        } else {
+                            funct_mouse_x = funct(mouse_x).toFixed(6).replace(/\.?0*$/,'');
+                        }
+                        let str_mouse_x = new Date(ad);
+                        str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
+                        if (disyear) {
+                            str_mouse_x = `${('0' + (str_mouse_x.getMonth() + 1)).slice(-2)}/${('0' + str_mouse_x.getDate()).slice(-2)}/${str_mouse_x.getFullYear()}`;
+                        } else {
+                            str_mouse_x = `${('0' + (str_mouse_x.getMonth() + 1)).slice(-2)}/${('0' + str_mouse_x.getDate()).slice(-2)}`;
+                        }
+                        if (mouse_x > left_adjust_cutoff) {
+                            screen.textAlign = "end";
+                        }
+                        if (funct_mouse_x < up_adjust_cutoff) {
+                            screen.textBaseline = "bottom";
+                        }
+                        screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(unit,1)}: ${funct_mouse_x}) `, wCon*mouse_x+50, height-funct_mouse_x*hCon-50);
+                        screen.fillStyle = "lime";
+                        screen.strokeStyle = "lime";
+                        screen.beginPath();
+                        screen.arc(wCon*mouse_x+50, height-funct_mouse_x*hCon-50, radius, 0, 2 * Math.PI);
+                        screen.stroke();
+                        screen.fill();
+                        screen.fillStyle = "black";
+                    }
                     screen.scale(1 / scale, 1 / scale);
                 }
 
-                function drawfixed() {
-                    // bg gradient
+                let width,
+                    height,
+                    wCon,
+                    hCon,
+                    left_adjust_cutoff,
+                    up_adjust_cutoff;
+                function drawfixed(reversescale) {
+                    // init
+                    ({width, height} = fixed_graph.getBoundingClientRect());
+                    if (reversescale) {
+                        width /= 1.005;
+                        height /= 1.05;
+                    }
+                    
+                    // These only really need to be executed once since this function is run for every assignment but doesnt matter
+                    if (width > 748) {
+                        font_size = 17.1875;
+                    } else {
+                        font_size = Math.round((width+450)/47*0.6875);
+                    }
+                    scale = window.devicePixelRatio;
+
+                    graph.width = width * scale;
+                    graph.height = height * scale;
+                    fixed_graph.width = width * scale;
+                    fixed_graph.height = height * scale;
+                    wCon = (width - 55) / x;
+                    hCon = (height - 55) / y;
+
                     let screen = fixed_graph.getContext("2d");
                     screen.scale(scale, scale);
+                    const point_text = `(Day: 00/00/0000, ${pluralize(unit,1)}: ${"0".repeat(Math.abs(Math.floor(Math.log10(y)))+1 + Math.abs(Math.floor(Math.log10(funct_round))))})`;
+                    screen.font = font_size + 'px Open Sans';
+                    const point_text_width = screen.measureText(point_text).width,
+                        point_text_height = screen.measureText("0").width * 2;
+                    left_adjust_cutoff = (width - 50 - point_text_width)/wCon;
+                    up_adjust_cutoff = point_text_height/hCon;
+
+                    // bg gradient
                     let gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
                     gradient.addColorStop(0, "white");
                     gradient.addColorStop(1, "lightgray");
                     screen.fillStyle = gradient;
                     screen.fillRect(0, 0, width, height * 4 / 3);
 
+                    
                     // x and y axis rectangles
                     screen.fillStyle = "rgb(185,185,185)";
                     screen.fillRect(40, 0, 10, height);
@@ -966,7 +1088,6 @@ $(function() {
 
                     // y axis label
                     screen.rotate(Math.PI / 2);
-                    screen.measureText(Math.floor(x))
                     if (unit === "Minute") {
                         var text = 'Minutes of Work',
                             label_x_pos = -2;
@@ -1010,13 +1131,13 @@ $(function() {
                     screen.textBaseline = "alphabetic";
                     screen.textAlign = "right";
                     const y_axis_scale = Math.pow(10, Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0] / Math.ceil((height - 100) / 100));
-                    let font_size = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
+                    let font_size5 = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
                     if (y >= 10) {
                         const small_y_axis_scale = y_axis_scale / 5;
-                        if (font_size < 8.5) {
-                            font_size = 8.5;
-                        }
-                        screen.font = font_size + 'px Open Sans';
+                        if (font_size5 < 8.5) {
+                            font_size5 = 8.5;
+                        } 
+                        screen.font = font_size5 + 'px Open Sans';
                         const text_height = screen.measureText(0).width * 2,
                             label_index = text_height < small_y_axis_scale * hCon;
                         for (let smaller_index = 1; smaller_index <= Math.floor(y / small_y_axis_scale); smaller_index++) {
@@ -1043,8 +1164,8 @@ $(function() {
                         }
                     }
 
-                    font_size *= 1.2;
-                    screen.font = font_size + 'px Open Sans';
+                    font_size5 *= 1.2;
+                    screen.font = font_size5 + 'px Open Sans';
                     const text_height = screen.measureText(0).width * 2;
                     for (let bigger_index = Math.ceil(y - y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
                         if (bigger_index * 2 < y_axis_scale) {
@@ -1084,22 +1205,22 @@ $(function() {
 
                 function resize(reversescale) {
                     if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
-                        ({width, height} = fixed_graph.getBoundingClientRect());
-                        if (reversescale) {
-                            width /= 1.005;
-                            height /= 1.05;
-                        }
-                        scale = window.devicePixelRatio;
-                        graph.width = width * scale;
-                        graph.height = height * scale;
-                        fixed_graph.width = width * scale;
-                        fixed_graph.height = height * scale;
-                        wCon = (width - 55) / x;
-                        hCon = (height - 55) / y;
-                        drawfixed();
+                        drawfixed(reversescale);
                         draw();
                     }
                 }
+                // Draw graph
+                resize(true);
+                // calling getBoundingClientRect() returns the scale(1.05) height and width
+                assignment.on("transitionend", function(e) {
+
+                    // Resize again when width transition ends
+                    var e = e || window.event;
+                    if (e.originalEvent.propertyName === "width") {
+                        resize(false);
+                        assignment.off("transitionend");
+                    }
+                });
                 // End draw graph
 
                 const swap_ms = 2000;
@@ -1135,7 +1256,7 @@ $(function() {
                             queue: false,
                             duration: swap_ms,
                             easing: "easeInOutQuad",
-                            complete: () => {
+                            complete: function() {
                                 const swap_temp = $("<span></span>").insertAfter(tar2);
                                 tar1.after(tar2);
                                 swap_temp.after(tar1);

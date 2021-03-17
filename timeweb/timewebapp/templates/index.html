@@ -75,17 +75,19 @@
               <canvas class="fixed-graph"></canvas>
               <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
-                <button class="set-skew-ratio-button">Set skew ratio using graph</button>
+                <button class="sr-button">Set skew ratio using graph</button>
+                <input class="work-input" placeholder="Enter work done"/>
                 {% comment %} float:right breaks everything {% endcomment %}
-                <button>Switch to fixed mode</button>
+                <button class="fixed-mode-button">Switch to fixed mode</button>
+                <br>
                 <input type="number" step="0.1" placeholder="Enter skew ratio" class="sr-textbox"/>
-                {% comment %} use float to get text on left and right {% endcomment %}
+                <input class="total-work-input" placeholder="Enter total work done"/>
+                <button class="remainder-mode-button">Enable remainder mode</button>
+                <br>
+                <button class="next-assignment-button">Hide assignment</button>
+                <button class="display-button">Display work schedule in text</button>
                 {% comment %} click again to confirm, 1s window to click {% endcomment %}
-                <button>Delete latest work input</button>
-                <button>Display entire work schedule</button>
-                <button>Enable remainder mode</button>
-                Enter work input:<input/>
-                Enter total work input:<input/>
+                <button class="delete-input-button">Delete latest work input</button>
               </div>
             </div>
           </div>

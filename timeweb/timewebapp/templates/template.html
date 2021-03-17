@@ -25,11 +25,13 @@
                 <img height="60" src="{% static 'plus.png' %}" alt="new" draggable="false"/>
                 <div id="new-assignment-text">New Assignment</div>
             </div>
-            <svg width="89px" height="70px" id="menu-container" tabindex="2">
-                <rect y="24.75" x="32" width="25" height="4.25"></rect>
-                <rect y="33" x="32" width="25" height="4.25"></rect>
-                <rect y="41.25" x="32" width="25" height="4.25"></rect>
-            </svg>
+            <div id="menu">
+                <svg width="89px" height="70px" tabindex="2">
+                    <rect y="24.75" x="32" width="25" height="4.25"></rect>
+                    <rect y="33" x="32" width="25" height="4.25"></rect>
+                    <rect y="41.25" x="32" width="25" height="4.25"></rect>
+                </svg>
+            </div>
             {% if user.is_authenticated %}
                 <div id="user-greeting">
                     <a tabindex="1" href="{% url 'logout'%}?next={{request.path}}">{{ user.get_username }}</a>
@@ -37,11 +39,13 @@
                 </div>
             {% endif %}
             <nav>
-                <svg width="89px" height="70px" id="nav-menu-container">
-                    <rect y="24.75" x="32" width="25" height="4.25"></rect>
-                    <rect y="33" x="32" width="25" height="4.25"></rect>
-                    <rect y="41.25" x="32" width="25" height="4.25"></rect>
-                </svg>
+                <div id="nav-menu">
+                    <svg width="89px" height="70px">
+                        <rect y="24.75" x="32" width="25" height="4.25"></rect>
+                        <rect y="33" x="32" width="25" height="4.25"></rect>
+                        <rect y="41.25" x="32" width="25" height="4.25"></rect>
+                    </svg>
+                </div>
                 <div id="nav-items">
                     <a href="#">Settings</a>
                     <a href="#">How to Use</a>

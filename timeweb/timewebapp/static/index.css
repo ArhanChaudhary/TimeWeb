@@ -13,13 +13,13 @@
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
 #content.animate {
-    box-shadow: inset 0 -20px 0 0 gray;
+    box-shadow: inset 0 20px 0 0 gray;
 }
 #header.animate {
     -webkit-transform: translateY(-70px);
         -ms-transform: translateY(-70px);
             transform: translateY(-70px);
-    height: 80px;
+    height: 90px;
 }
 #assignments-container.animate {
     -webkit-transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
@@ -30,6 +30,7 @@
 
 #info {
     font-size: 17px;
+    margin-bottom: 10px;
 }
 #hide-button {
     position: relative;
@@ -43,10 +44,12 @@
     scroll-margin: 20px;
     user-select: none;
 }
+.disable-assignment-transition {
+    transition: none !important;
+}
 .assignment {
-    -webkit-box-shadow: 0 0 4px rgba(52,52,52,0.5);
-            box-shadow: 0 0 4px rgba(52,52,52,0.5);
-    /**/
+    -webkit-box-shadow: 0 0 4px rgb(115,115,115);
+            box-shadow: 0 0 4px rgb(115,115,115);
     background: white;
     /*  background: rgb(226,91,80);
     background: rgb(132,200,65); */
@@ -55,30 +58,41 @@
     border: 2px solid rgb(80,80,80);
     border-radius: 5px;
     position: relative;
-    width: calc(100vw - 94px);
-    -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
-    -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
+    box-sizing: border-box;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
 }
 .assignment:focus, .button:focus {
     outline: 0;
     border: 2px solid rgb(0,95,204) !important;
-    -webkit-box-shadow: 0 0 4px rgba(0,95,204,0.5);
-            box-shadow: 0 0 4px rgba(0,95,204,0.5); 
-}
-.assignment:not(.disable-hover):hover:focus {
-    -webkit-box-shadow: 0 0 7px rgba(0,95,204,0.7) !important;
-            box-shadow: 0 0 7px rgba(0,95,204,0.7) !important;
 }
 .assignment:not(.disable-hover):hover {
     -webkit-transform: scale(1.05) translateX(2%);
         -ms-transform: scale(1.05) translateX(2%);
             transform: scale(1.05) translateX(2%);
-            width: calc(96.1vw - 94px);
+    width: 96% !important;
     border-color: rgba(0,0,0,0.7);
-    -webkit-box-shadow: 0 0 7px rgb(52,52,52);
-            box-shadow: 0 0 7px rgb(52,52,52);
     cursor: pointer;
+}
+.assignment::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 5px;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    transition: opacity .2s ease-in-out;
+}
+.assignment:not(.disable-hover):hover::after {
+    box-shadow: 0 0 7px rgb(52,52,52);
+}
+.assignment:focus::after {
+    box-shadow: 0 0 1px 4px rgb(0,95,204) !important;
+}
+.assignment:not(.disable-hover):hover::after, .assignment:focus::after {
+    opacity: 1;
 }
 .assignment-header {
     display: -webkit-box;
@@ -198,8 +212,8 @@ canvas {
     margin-left: 13px;
 }
 canvas:focus {
-    -webkit-box-shadow: 0 0 0 2px rgb(0,95,204), 0 0 5px 2px rgb(0,95,204);
-            box-shadow: 0 0 0 2px rgb(0,95,204), 0 0 5px 2px rgb(0,95,204);
+    -webkit-box-shadow: 0 0 0 3px rgb(0,95,204);
+            box-shadow: 0 0 0 3px rgb(0,95,204);
     outline: 0;
 }
 .fixed-graph {
@@ -210,16 +224,38 @@ canvas:focus {
     position: relative;
     border: 4px solid transparent;
 }
-
 .graph-footer {
     padding: 0 13px;
-    height: 200px;
 }
-.sr-textbox {
-    width: 95px;
+.graph-footer * {
+    border-radius: 20px;
+    border: none;
+    padding: 3px 6px;
+    background: rgba(239,239,239,0.75);
+    box-shadow: 0 0 2px 2px rgba(239,239,239,0.75);
 }
-
-
+.graph-footer *:focus {
+    border-radius: 20px;
+    outline: 0;
+    border-color: rgb(0,95,204);
+    box-shadow: 0 0 0 3px rgb(0,95,204);
+}
+.work-input, .total-work-input, .display-button {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.sr-button, .sr-textbox, .next-assignment-button {
+    position: absolute;
+    left: 0;
+}
+.fixed-mode-button, .remainder-mode-button, .delete-input-button {
+    position: absolute;
+    right: 0;
+}
+.sr-textbox, .total-work-input, .remainder-mode-button {
+    margin: 7px 0;
+}
 
 #form-wrapper input:focus, #form-wrapper label:focus {
     outline: 0;
@@ -229,23 +265,19 @@ canvas:focus {
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
 }
-label[for='id_x']::after {
-    content: '(Predicted if left empty)';
+#form-wrapper label::after {
     display: block;
     font-style: italic;
     font-size: 10px;
+}
+label[for='id_x']::after {
+    content: '(Predicted if left empty)';
 }
 label[for='id_min_work_time']::after, label[for='id_funct_round']::after {
     content: '(Disabled if left empty)';
-    display: block;
-    font-style: italic;
-    font-size: 10px;
 }
 label[for='id_ad']::after {
     content: "(Enter today if you don't remember)";
-    display: block;
-    font-style: italic;
-    font-size: 10px;
 }
 #form-wrapper #top-note {
     font-size: 11px;
@@ -264,7 +296,6 @@ label[for='id_ad']::after {
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
-    /**/
     margin: 5px auto 35px;
     border: 1px solid black;
     border-radius: 15px;

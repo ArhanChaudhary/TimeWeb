@@ -11,14 +11,14 @@ input {
     position: relative;
 }
 #header {
-    width: calc(100% - 10px);
+    width: 100%;
     background: rgb(13,26,38);
-    height: 60px;
+    height: 70px;
     padding: 5px;
     position: absolute;
     z-index: 2;
-    -webkit-box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
-            box-shadow: 0 3px 7px rgb(52,52,52), 0 -5px 0 rgb(13,26,38);
+    box-shadow: 0 3px 7px rgb(13,26,38);
+    box-sizing: border-box;
 }
 #image-new-container {
     cursor: pointer;
@@ -47,7 +47,8 @@ input {
     overflow-y: auto;
     height: 100vh;
     padding: 80px 30px 0 30px;
-    box-shadow: inset 0 -20px 0 20px gray;
+    box-shadow: inset 0 20px 0 20px gray;
+    box-sizing: border-box;
 }
 #logo-container {
     display: inline-block;
@@ -114,7 +115,7 @@ body {
 #user-greeting.logo-hidden span {
     visibility: hidden;
 }
-#menu-container {
+#menu {
     float: right;
     margin: -5px;
     margin-left: 10px;
@@ -123,7 +124,7 @@ nav {
     left: 0;
     top: 0;
     position: absolute;
-    margin-left: calc(100vw + 2px);
+    margin-left: calc(100vw + 3px);
     -webkit-transition: -webkit-transform .2s ease-in-out;
     transition: -webkit-transform .2s ease-in-out;
     -o-transition: transform .2s ease-in-out;
@@ -131,15 +132,24 @@ nav {
     transition: transform .2s ease-in-out, -webkit-transform .2s ease-in-out;
     width: 89px;
 }
-#nav-items, #nav-menu-container {
-    /**/
-    -webkit-transition: -webkit-box-shadow .2s ease-in-out;
-    transition: -webkit-box-shadow .2s ease-in-out;
-    -o-transition: box-shadow .2s ease-in-out;
-    transition: box-shadow .2s ease-in-out;
-    transition: box-shadow .2s ease-in-out, -webkit-box-shadow .2s ease-in-out;
+#nav-items::after, #nav-menu::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity .2s ease-in-out;
+    z-index: -1;
 }
-#nav-menu-container {
+#nav-items::after {
+    box-shadow: 0 0 4px 2px black;
+}
+#nav-menu::after {
+    box-shadow: -5px 0 5px -5px gray;
+}
+#nav-menu {
     background: rgb(13,26,38);
     position: relative;
     z-index: 1;
@@ -148,8 +158,6 @@ rect {
     fill: white;
 }
 #nav-items {
-    position: relative;
-    top: -5px;
     overflow: auto;
     max-height: calc(100vh - 65px);
 }
@@ -166,28 +174,28 @@ rect {
 #nav-items a:hover, #nav-items a:focus {
     background: rgb(82,107,130);
 }
-#menu-container:hover ~ nav, 
-#menu-container:focus ~ nav, 
+#nav-menu svg {
+    display: block;
+}
+#menu:hover ~ nav, 
+#menu:focus ~ nav, 
 nav:hover,
 nav.open {
-    -webkit-transform: translateX(calc(-100% - 2px));
-        -ms-transform: translateX(calc(-100% - 2px));
-            transform: translateX(calc(-100% - 2px));
+    -webkit-transform: translateX(calc(-100% - 3px));
+        -ms-transform: translateX(calc(-100% - 3px));
+            transform: translateX(calc(-100% - 3px));
 }
-#menu-container:hover ~ nav #nav-items, 
-nav:hover #nav-items, 
-#menu-container:focus ~ nav #nav-items,
-nav.open #nav-items {
-    /**/
-    -webkit-box-shadow: 0 0 4px 2px black;
-            box-shadow: 0 0 4px 2px black;
+#menu:hover ~ nav #nav-items::after, 
+nav:hover #nav-items::after, 
+#menu:focus ~ nav #nav-items::after,
+nav.open #nav-items::after {
+    opacity: 1;
 }
-#menu-container:hover ~ nav #nav-menu-container, 
-nav:hover #nav-menu-container, 
-#menu-container:focus ~ nav #nav-menu-container,
-nav.open #nav-menu-container {
-    -webkit-box-shadow: -5px 0 5px -5px gray;
-            box-shadow: -5px 0 5px -5px gray;
+#menu:hover ~ nav #nav-menu::after, 
+nav:hover #nav-menu::after, 
+#menu:focus ~ nav #nav-menu::after,
+nav.open #nav-menu::after {    
+    opacity: 1;
 }
 
 
@@ -212,21 +220,18 @@ nav.open #nav-menu-container {
 .info-button:hover {
     background: rgb(16,135,148);
 }
-.info-button:hover .info-button-text.info-right {
+.info-button:hover .info-button-text {
     visibility: visible;
     opacity: 1;
-    left: calc(100% + 12px);
     -webkit-transition: all .2s ease-in-out;
     -o-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
 }
+.info-button:hover .info-button-text.info-right {
+    left: calc(100% + 12px);
+}
 .info-button:hover .info-button-text.info-left {
-    visibility: visible;
-    opacity: 1;
     right: calc(100% + 12px);
-    -webkit-transition: all .2s ease-in-out;
-    -o-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
 }
 .info-button-text {
     position: absolute;
@@ -258,27 +263,22 @@ nav.open #nav-menu-container {
 .info-button-text.info-left {
     right: calc(100% - 4px);
 }
-.info-button-text.info-right::after {
-    content: "";
+.info-button-text::after {
     position: absolute;
     top: 50%;
     -webkit-transform: translateY(-50%);
         -ms-transform: translateY(-50%);
             transform: translateY(-50%);
-    right: calc(100% + 1px);
     border-width: 10px;
     border-style: solid;
+}
+.info-button-text.info-right::after {
+    content: "";
+    right: calc(100% + 1px);
     border-color: transparent black transparent transparent;
 }
 .info-button-text.info-left::after {
     content: "";
-    position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
     left: calc(100% + 1px);
-    border-width: 10px;
-    border-style: solid;
     border-color: transparent transparent transparent black;
 }
