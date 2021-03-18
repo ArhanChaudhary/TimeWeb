@@ -47,7 +47,7 @@ input {
     overflow-y: auto;
     height: 100vh;
     padding: 80px 30px 0 30px;
-    box-shadow: inset 0 20px 0 20px gray;
+    box-shadow: inset 0 20px 0 20px gray, inset 0 0 6px rgba(0,0,0,0.5);
     box-sizing: border-box;
 }
 #logo-container {
@@ -78,35 +78,49 @@ body {
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
     /* width: calc(50vw - 106px(half width of logo) - 89px(nav width) - 5px(nav margin) - 24px(logo margin));*/
-    max-width: calc(50vw - 229px);
+    max-width: calc(50vw - 219px);
+    margin-right: -10px;
     padding-top: 14.6px;
 }
 #user-greeting a {
     text-decoration: none;
     display: inline-block;
-    border: 2px solid rgb(22, 177, 185);
-    border-radius: 4px;
-    padding-right: 4px;
-    padding-left: 4px;
+    padding: 2px 2px 0 6px;
+    margin-right: 14px;
     background: -webkit-gradient(linear,left top, left bottom,color-stop(20%, rgb(72, 227, 235)),color-stop(80%, rgb(83,127,163)));
     background: -o-linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    position: relative;
 }
-#user-greeting a:hover {
-    border-color: rgba(22, 177, 185,0.8);
+#user-greeting a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    border: 2px solid rgb(22, 177, 185);
+    border-radius: 4px;
+    transition: transform .2s cubic-bezier(.5,-3,.5,4);
 }
 #user-greeting a:focus {
     outline: 0;
-    border-color: rgba(22, 177, 185,0.7);
+}
+#user-greeting a:focus::after {
+    filter: brightness(1.25);
+    transform: scale(1.04);
+}
+#user-greeting a:hover::after {
+    transform: scale(1.04);
 }
 #user-greeting.logo-hidden {
     overflow: visible;
 }
 #user-greeting.logo-hidden a {
-    overflow: hidden;
     max-width: calc(100vw - 181px);
     white-space: nowrap;
     -o-text-overflow: ellipsis;
@@ -119,6 +133,9 @@ body {
     float: right;
     margin: -5px;
     margin-left: 10px;
+}
+#menu svg {
+    display: block;
 }
 nav {
     left: 0;

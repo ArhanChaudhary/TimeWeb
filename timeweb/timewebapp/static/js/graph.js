@@ -1,443 +1,83 @@
+/* 
+This file includes the code for:
+
+Transitioning the opening and closing of assignments
+Swapping assignments in real time
+The graph logic
+The graph style
+All nine graph buttons and inputs
+*/
 $(function() {
-    // Load in load data
-    let dat = JSON.parse(document.getElementById("load-data").textContent);
-    let [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0];
+    // Load in assignment data
+    dat = JSON.parse(document.getElementById("load-data").textContent);
+    [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0];
     def_minute_gv = def_minute_gv||'';
-    //
-    // Form functionality
-    //
-    function showForm(show_instantly=false) {
-        if (show_instantly) {
-            $('#overlay').show().addClass("transition-form");
-        } else {
-            $("#overlay").fadeIn(300).addClass("transition-form");
-        }
-        // Make rest of page untabbable
-        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
-        $('#id_works').val((+$('#id_works').val()).toFixed(2)); // Ensure #id_works has two decimal places because 0 displays as 0.0
-    }
-    function hideForm(hide_instantly=false) {
-        if (hide_instantly) {
-            $("#overlay").hide().removeClass("transition-form");
-            $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
-        } else {
-            $("#overlay").fadeOut(300,function() {
-                $(".invalid").removeClass("invalid");
-                $(".error-note").remove();
-            }).removeClass("transition-form"); // Remove all error notes when form is exited
-        }
-        // Make rest of page retabbable
-        $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
-        $("#menu").attr("tabindex","2");
-        $("#image-new-container, #user-greeting a").attr("tabindex","1");
-        $(".assignment, .graph").attr("tabindex","0");
-    }
+    // Swaps two assignments in real time when work inputs are created or deletedt
+    const swap_ms = 2000;
+    function swap(a1, a2) {
+        // Queues each swap
+        $(document).queue(function() {
+            const all = $(".assignment-container"),
+                tar1 = all.eq(a1),
+                tar2 = all.eq(a2),
+                tar1_height = tar1.height() + 10,
+                tar2_height = tar2.height() + 10;
 
-    // Show new form on new assignment
-    $("#image-new-container").click(function() {
-        const today = new Date();
-        let tomorrow = new Date();
-        tomorrow.setDate(today.getDate()+1);
-        // Set default values
-        ['',
-        
-        [
-            today.getFullYear(),
-            ('0' + (today.getMonth() + 1)).slice(-2),
-            ('0' + today.getDate()).slice(-2),
-        ].join('-'),
-
-        [
-            tomorrow.getFullYear(),
-            ('0' + (tomorrow.getMonth() + 1)).slice(-2),
-            ('0' + tomorrow.getDate()).slice(-2),
-        ].join('-'),
-
-        'Minute','','0.00','','',def_min_work_time].forEach(function(element, index) {
-            $(form_inputs[index]).val(element);
-        });
-        for (let nwd of Array(7).keys()) {
-            $("#id_nwd_"+((nwd+6)%7)).prop("checked",def_nwd.includes(nwd));
-        }
-        // Set form text
-        $("#new-title").html("New Assignment");
-        $("#form-wrapper button").html("Create Assignment").val('');
-        // Show form
-        showForm();
-        replaceUnit();
-    });
-
-    // Populate reentered form on modify
-    $('.update-button').click(function() {
-        // Set form text
-        $("#new-title").html("Re-enter Assignment");
-        $("#form-wrapper button").html("Modify Assignment");
-        // Find which assignment in dat was clicked
-        const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
-        // Define reented form fields, could have been written more efficient but it's more readable like this
-        const form_data = [
-            selected_assignment[0],
-            selected_assignment[1],
-            selected_assignment[2],
-            selected_assignment[3],
-            selected_assignment[4],
-            selected_assignment[5][0],
-            selected_assignment[8],
-            selected_assignment[9]-1 ? selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
-            +selected_assignment[10] ? (selected_assignment[10]*selected_assignment[8]).toFixed(2) : '', // Minimum work time displays self if it isn't 0, else display nothing
-        ];
-        // Set reeneted form fields
-        form_inputs.each((index, element) => $(element).val(form_data[index]));
-        selected_assignment[11].forEach(nwd => $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true));
-        // Set button pk
-        $("#form-wrapper button").val($(this).val());
-        // Define old field values
-        old_ctime_val = $('#id_ctime').val();
-        old_funct_round_val = $('#id_funct_round').val();
-        // Show form
-        showForm();
-    });
-
-    // Hide form when overlay is clicked
-    $("#overlay").click(function(e) {
-        if (e.target !== this) {
-            return
-        }
-        hideForm();
-    });
-
-    // Replace fields with unit when unit is "Minute"
-    var old_ctime_val, old_funct_round_val;
-    function replaceUnit() {
-        const val = $("#id_unit").val();
-        const plural = pluralize(val),
-            singular = pluralize(val,1);
-            
-        // Replace fields
-        if (val) {
-            $("label[for='id_y']").text("Enter the Total amount of " + plural + " in this Assignment");
-            $("label[for='id_works']").text("Enter the Total amount of " + plural + " already Completed");
-            $("label[for='id_ctime']").text("Enter the Estimated amount of Time to complete each " + singular + " in Minutes");
-        } else {
-            $("label[for='id_y']").html("Enter the Total amount of Units in this Assignment");
-            $("label[for='id_works']").html("Enter the Total amount of Units already Completed");
-            $("label[for='id_ctime']").html("Enter the Estimated amount of Time to complete each Unit of Work in Minutes");
-        }
-        if (singular.toUpperCase() === 'MINUTE') {
-            // Old values for the field when unit==="Minute" and their values are replaced with another
-            old_ctime_val = $('#id_ctime').val();
-            old_funct_round_val = $('#id_funct_round').val();
-            // Replace with new values
-            $("#id_funct_round").val(def_minute_gv);
-            $("#id_ctime").val("1.00")
-            // Disable field
-            .prop("disabled",true).addClass("disabled-field");
-            $("label[for='id_ctime']").addClass("disabled-field");
-        } else {
-            // Restore old values and re-enable the field
-            $("#id_funct_round").val(old_funct_round_val ? (+old_funct_round_val).toFixed(2) : '');
-            $("#id_ctime").val(old_ctime_val ? (+old_ctime_val).toFixed(2) : '').prop("disabled",false).removeClass("disabled-field");
-            $("label[for='id_ctime']").removeClass("disabled-field");
-        }
-    }
-    $("#id_unit").on('input',replaceUnit);
-
-    // Add info buttons ($.info defined in template.js)
-    $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
-    $('label[for="id_unit"]').info('right',
-        `This is how your assignment will be split and divided up
-        
-        e.g. If this assignment is reading a book, enter "Page"
-        Try changing this name to something else if you're still confused
-
-        If you are unsure how to split up your assignment, this is defaulted to "Minute"`
-    );
-    $('label[for="id_works"]').info('right',
-        `The following is only relevant if you are re-entering this field
-
-        This value is also the y-coordinate of the first point on the blue line, or the initial work input
-        
-        Changing this initial value will vertically translate all of your other work inputs accordingly`
-    );
-    $('label[for="id_funct_round"]').info('right',
-        `This is the increment of work you will complete at a time
-        
-        For example, if you enter 3, you will only work in multiples of 3 (e.g: 6 units, 9 units, 15 units, etc)
-        
-        If you do not wish to use the grouping value, this is defaulted to 1`
-    );
-    // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
-    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
-
-    // Auto field scrolling
-    form_inputs.focus(function() {
-        this.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-        });
-    });
-
-    // "$(".error-note").length" is the same thing as {% field.errors %} in the template
-    if ($(".error-note").length) {
-        showForm(true); // Show instantly
-        replaceUnit();
-    } else {
-        hideForm(true); // Hide instantly
-    }
-
-    // Keybind
-    $(document).keydown(function(e) {
-        if (e.key === "Escape") {
-            hideForm();
-        }
-    });
-
-    // Custom form validity
-    form_inputs.on("input",function() {
-        // Reset custom form validity, without this the form invalid error shows up when there is no error
-        this.setCustomValidity('');
-        // Don't allow "e" in number input
-        switch ($(this).attr("id")) {
-            case "id_works":
-            case "id_y":
-            case "id_ctime":
-            case "id_funct_round":
-            case "id_min_work_time":
-                this.validity.valid||($(this).val(''));
-                break;
-        }
-    });
-    // Sets custom error message
-    form_inputs.on("invalid",function() {
-        let message;
-        switch ($(this).attr("id")) {
-            case "id_file_sel":
-                message = 'Please enter an assignment name';
-                break;
-            case "id_ad":
-                message = 'The assignment date is either out of range or invalid';
-                break;
-            case "id_x":
-                if ($(this).val()) {
-                    message = 'The due date is either out of range or invalid';
-                } else {
-                    return; // Allow blank field
-                }
-                break;
-            case "id_unit":
-                message = 'Please enter a name';
-                break;
-            case "id_y":
-            case "id_works":
-            case "id_ctime":
-                message = 'Please enter a value';
-                break;
-        }
-        this.setCustomValidity(message);
-    });
-
-    // Redefine old field values when they are changed
-    $("#id_ctime").on("input",function() {
-        old_ctime_val = $(this).val();
-    });
-    $("#id_funct_round").on("input",function() {
-        old_funct_round_val = $(this).val();
-    });
-
-    // Handles unloading and reloading of form
-    $(window).unload(function() {
-        if ($("#form-wrapper").is(":visible")) {
-            // Save form data to localStorage before unload
-            localStorage.setItem("form_fields",
-                JSON.stringify([
-                    ...form_inputs.toArray().map(field => field.value),
-                    $("#form-wrapper #nwd-wrapper input").toArray().map(nwd_field => nwd_field.checked),
-                ])
-            );
-        }
-    });
-    if ("form_fields" in localStorage) {
-        
-        // Restore form on refresh or invalid
-        const pr_data = JSON.parse(localStorage.getItem("form_fields"));
-        localStorage.removeItem('form_fields');
-        form_inputs.each(function(index) {
-            $(this).val(pr_data[index]);
-        });
-        $("#form-wrapper #nwd-wrapper input").each(function(index) {
-            $(this).prop('checked',pr_data[9][index]);
-        });
-        // Define old field values if unit === "Minute"
-        old_ctime_val = $('#id_ctime').val();
-        old_funct_round_val = $('#id_funct_round').val();
-    }
-    if ("scroll" in localStorage) {
-        $(window).load(function() {
-            $("#content").scrollTop(localStorage.getItem("scroll"));
-            localStorage.removeItem("scroll");
-        });
-    }
-    // Enable disabled field on submit so it's sent with post
-    $("#form-wrapper form").submit(function() {
-        $("#id_ctime").removeAttr("disabled");
-        localStorage.setItem("scroll",$("#content").scrollTop());
-    });
-
-    // Style errors if form is invalid
-    $("#form-wrapper .error-note").each(function() {
-        $(this).prev().children().eq(1).addClass("invalid");
-        if (this.id === "error_id_x" || this.id === "error_id_works") {
-            $(this).prev().prev().children().eq(1).addClass("invalid");
-        }
-    });
-    //
-    // End Form Functionality
-    //
-
-    // Returns color rgb from priority percentage
-    function color(p) {
-        return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
-    }
-    const k = [1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05,0,0,0];
-    
-    // Resolve promise when scroll is finished
-    let scrollTimeout, resolver;
-    function scroll() {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(function() {
-            $("#content").off('scroll');
-            resolver();
-        }, 200);
-    }
-    // Set assignment width for transition on resize, cannot use vw or % because they aren't performant
-    let widthTimeout;
-    $(window).resize(function() {
-        $(".assignment").css("width",window.innerWidth-60).addClass("disable-assignment-transition");
-        clearTimeout(widthTimeout);
-        widthTimeout = setTimeout(function() {
-            $(".assignment").removeClass("disable-assignment-transition");
-        }, 200);
-    });
-    $(".assignment").css("width",window.innerWidth-60);
-
-    function color_or_animate_assignment($element, index, is_element_submitted=false) {
-        if ($("#animate-in").length && is_element_submitted) {
-            $element.parent().animate({
-                top: "0", 
-                opacity: "1", 
-                marginBottom: "0",
-            }, 1500, "easeOutCubic");
-        }
-        $element.css("background",color(k[index]));
-    }
-    $(".assignment").each(function(index) {
-        const assignment_container = $(this).parent();
-        if (assignment_container.is("#animate-color, #animate-in")) {
-            if ($("#animate-in").length) {
-                assignment_container.css({
-                    "top": 20+$("#assignments-container").offset().top + $("#assignments-container").height() - assignment_container.offset().top,
-                    "opacity": "0",
-                    "margin-bottom": -assignment_container.height()-10,
-                });
+            // Deal with existing assingment margin
+            // Don't really know how this works but it makes the swap transition more smooth
+            if (tar1_height > tar2_height) {
+                tar2.css("margin-top", "10px");
+            } else {
+                tar1.css("margin-bottom", "10px");
             }
-            new Promise(function(resolve) {
-                $(window).load(function() {
-                    let assignment_to_scroll = $("#animate-in").next();
-                    if (!assignment_to_scroll.length) {
-                        assignment_to_scroll = $("#animate-color, #animate-in");
-                    }
-                    // If #animate-in, choose next assignment to scroll to, but choose itself if there is no next assignment
-                    // If #animate-color, choose self to scroll to
-                    assignment_to_scroll[0].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'nearest',
-                    });
-                    resolver = resolve;
-                    $("#content").scroll(scroll);
-                    scroll();
-                });
-            }).then(() => color_or_animate_assignment($(this), index, true)); // Arrow function to preserve "this"
-        } else {
-            color_or_animate_assignment($(this), index);
-        }
-    });
 
-    // Ajax error function
-    function error(response, exception) {
-        if (response.status == 0) {
-            alert('Failed to connect');
-        } else if (response.status == 404) {
-            alert('Requested page not found, try again');
-        } else if (response.status == 500) {
-            alert('Internal server error. Please contact me if you see this')
-        } else if (exception === 'parsererror') {
-            alert('Requested JSON parse failed');
-        } else if (exception === 'timeout') {
-            alert('Timeout error');
-        } else if (exception === 'abort') {
-            alert('Request aborted');
+            tar1.animate({
+                top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height,
+                marginBottom: "-=" + (tar1_height - tar2_height),
+            }, {
+                queue: false,
+                duration: swap_ms,
+                easing: "easeInOutQuad",
+            });
+
+            tar2.animate({
+                bottom: tar2.offset().top - tar1.offset().top,
+                marginTop: "+=" + (tar1_height - tar2_height),
+            }, {
+                queue: false,
+                duration: swap_ms,
+                easing: "easeInOutQuad",
+                complete: function() {
+                    const swap_temp = $("<span></span>").insertAfter(tar2);
+                    tar1.after(tar2);
+                    swap_temp.after(tar1);
+                    tar1.removeAttr("style");
+                    tar2.removeAttr("style");
+                    swap_temp.remove();
+                    $(document).dequeue();
+                },
+            });
+        });
+    }
+    function format_minutes(total_minutes) {
+        const hour = Math.floor(total_minutes / 60),
+            minute = Math.ceil(total_minutes % 60);
+        if (hour === 0) {
+            if (total_minutes && total_minutes < 1) {
+                return "<1m";
+            }
+            return minute + "m";
+        } else if (minute === 0) {
+            return hour + "h";
         } else {
-            alert('Uncaught Error, \n' + response.responseText);
+            return hour + "h " + minute + "m";
         }
     }
-
-    $('.delete-button').click(function() {
-        if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
-            const $this = $(this);
-            const assignment_container = $($this.parents(".assignment-container"));
-            new Promise(function(resolve) {
-                assignment_container[0].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                });
-                resolver = resolve;
-                $("#content").scroll(scroll);
-                scroll();
-            }).then(function() {
-                // Data sent to server pointing to which assignment to delete
-                let data = {
-                    'csrfmiddlewaretoken': csrf_token,
-                    'deleted': $this.val(),
-                }
-                // If the data was successfully sent, delete the assignment
-                const success = function() {
-                    assignment_container.css({
-                        // CSS doesn't allow transitions without presetting the property
-                        // So, use jQuery.animate to preset and animate its property
-                        "height": assignment_container.height() + 20,
-                        "margin-bottom": "-10px",
-                        "margin-top": "-10px",
-                        "min-height": "0",
-                    }).children(":first-child").css({
-                        "position": "absolute",
-                        "opacity": "0",
-                    });
-                    dat.splice($("#assignments-container").children().index($this.parents(".assignment-container")),1);
-                    assignment_container.animate({height: "10px"}, 750, "easeOutCubic", () => assignment_container.remove());
-                }
-                // Use ajax to avoid a page reload
-                $.ajax({
-                    type: "POST",
-                    data: data,
-                    success: success,
-                    error: error,
-                });
-            });
-        }
-    });
-
-    // Hide and show estimated completion time
-    $("#hide-button").click(function() {
-        $(this).html($(this).html() === 'Hide' ? 'Show' : 'Hide').prev().toggle();
-    });
-    
-    //
-    // Entire graph
-    //
-    let scale,
-        font_size;
+    // scale and font_size is the same for every graph
+    let scale, // resolution of the graph
+        font_size; // font size of the central text in the graph
     function PreventArrowScroll(e) {
-        // Prevent arrow keys from scrolling
+        // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
         var e = e || window.event;
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
             e.preventDefault();
@@ -446,23 +86,29 @@ $(function() {
     $(".assignment").click(function(e) {
         var e = e || window.event;
         if ($(document).queue().length === 0 && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName)) {
+            // Runs if no assignments are swapping and the element clicked was the assignment background
             let assignment = $(this);
             const graph_container = assignment.find(".graph-container"),
                 not_first_click = assignment.data('not_first_click');
-            if (graph_container.attr("style") && assignment.hasClass("disable-hover") /* Allow assignment to be open while it's closing */ ) {
+            if (graph_container.attr("style") && assignment.hasClass("disable-hover")) {
+                // Runs when assignment is clicked while open
+
+                // Animate the graph's margin bottom to close the assignment
                 graph_container.animate({marginBottom:-graph_container.height()}, 750, "easeOutCubic", function() {
-                    // Hide assignment when transition ends
+                    // Hide graph when transition ends
                     assignment.css("overflow", "");
                     graph_container.removeAttr("style");
                 });
+                // Begin arrow animation
                 this.querySelector(".fallingarrowanimation").beginElement();
+                // Make assignment overflow hidden 
                 assignment.removeClass("disable-hover").css("overflow", "hidden");
                 // If no graphs are open, allow arrow scroll
                 if ($(".disable-hover").length === 0) {
                     $(document).off("keydown", PreventArrowScroll);
                 }
             } else {
-                // Stop closing animation
+                // If the assignment was opened while it was closing, stop the closing animation and open it
                 graph_container.stop();
                 assignment.css("overflow", "");
                 graph_container.css({"display": "","margin-bottom": ""});
@@ -471,70 +117,127 @@ $(function() {
                 if ($(".disable-hover").length === 0) {
                     $(document).keydown(PreventArrowScroll);
                 }
+                // Disable hover
                 assignment.addClass("disable-hover");
+                // Make graph visible
                 graph_container.css("display", "block");
+                // Animate arrow
                 this.querySelector(".risingarrowanimation").beginElement();
 
                 let graph = this.querySelector('.graph'),
                     fixed_graph = this.querySelector('.fixed-graph'),
+                    // Select the assignment data in dat
 
-                    selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    // dat[0] is the settings and "HASHTAGassignments-container :first child" is the info div, these cancel each other out when indexing
+                    selected_assignment = dat[$("HASHTAGassignments-container").children().index($(this).parents(".assignment-container"))],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    // Load in data
                     [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
+                // Type conversions
                 ad = new Date(ad + " 00:00");
                 x = Math.round((Date.parse(x + " 00:00") - ad) / 86400000); // Round to account for DST
                 nwd = nwd.map(Number);
+                // Ideally these should be strings, but the original program which I wrote in python had all the logic implemented as numbers
+                // Maybe in the future make these strings, but numbers work for the most part
                 y = +y;
-                let mods,
-                    skew_ratio_lim,
-                    red_line_start_x = fixed_mode ? 0 : dynamic_start,
-                    red_line_start_y = fixed_mode ? 0 : parseFloat(works[red_line_start_x - dif_assign]),
-                    assign_day_of_week = ad.getDay(),
+                min_work_time = +min_work_time;
+                funct_round = +funct_round;
+                ctime = +ctime;
+                let mods, // Handles not working days, explained later
+                    assign_day_of_week = ad.getDay(), // Used with mods
+                    skew_ratio_lim, // Top and bottom caps for skew ratio
+                    red_line_start_x = fixed_mode ? 0 : dynamic_start, // X-coordinate of the start of the red line
+                    red_line_start_y = fixed_mode ? 0 : parseFloat(works[red_line_start_x - dif_assign]), // Y-coordinate of the start of the red line
                     len_works = works.length,
-                    draw_point = false,
-                    y_fremainder = (y - red_line_start_y) % funct_round,
-                    ignore_ends_mwt = ignore_ends && min_work_time,
+                    draw_point = false, // Bool to draw mouse point on the graph
+                    y_fremainder = (y - red_line_start_y) % funct_round, // funct_round remainder
+                    ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only works when min_work_time is also enabled
                     len_nwd = nwd.length,
-                    set_skew_ratio = false,
-                    min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round,
-                    a,
-                    b,
-                    cutoff_transition_value,
-                    cutoff_to_use_round,
-                    return_y_cutoff,
-                    return_0_cutoff,
-                    last_mouse_x = -1,
-                    last_mouse_y = false;
+                    set_skew_ratio = false, // Bool to manually set skew ratio on graph
+                    min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round, // LCM of min_work_time and funct_round
+                    a, // "a" part of parabola
+                    b, // "b" part of parabola
+                    cutoff_transition_value, // Handles minimum_work_time, explained later
+                    cutoff_to_use_round, // Handles minimum_work_time, explained later
+                    return_y_cutoff, // X-coordinate to start returning y
+                    return_0_cutoff, // X-coordinate to start returning 0
+                    last_mouse_x, // 
+                    last_mouse_y;
                 let due_date = new Date(x),
                     disyear;
                 due_date.setDate(due_date.getDate() + x);
-                if (ad.getFullYear() !== due_date.getFullYear()) {
-                    disyear = ', %Y';
-                } else {
+                // Whether or not to display the year
+                if (ad.getFullYear() === due_date.getFullYear()) {
                     disyear = '';
+                } else {
+                    disyear = ', %Y';
                 }
+                // Handles not working days, explained later
                 if (nwd.length) {
                     set_mod_days();
                 }
+                // Sets the upper and lower caps for skew_ratio
                 set_skew_ratio_lim();
                 // Sets event handlers only on the assignment's first click
                 if (!not_first_click) {
                     // Graph resize event handler
                     $(window).resize(() => resize(false));
 
-                    // XML skew ratio when it is saved
-                    let ajax,
-                        old_skew_ratio = skew_ratio;
+                    // Ajax skew ratio
+                    let ajaxTimeout,
+                        old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
                     function AjaxSkewRatio() {
-                        clearTimeout(ajax);
                         selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
                         old_skew_ratio = skew_ratio;
-                        ajax = setTimeout(function() {
+                        clearTimeout(ajaxTimeout);
+                        ajaxTimeout = setTimeout(function() {
+                            // Send new skew ratio along with the assignment's primary key
                             const data = {
                                 'csrfmiddlewaretoken': csrf_token,
                                 'skew_ratio': skew_ratio,
-                                'pk': graph.getAttribute("value"),
+                                'pk': $(graph).attr("value"),
                             }
-                            // send value with skew ratio so it can be reference in backend
                             $.ajax({
                                 type: "POST",
                                 data: data,
@@ -542,37 +245,12 @@ $(function() {
                             });
                         }, 1000);
                     }
-
-                    // Up and down arrow event handler
-                    $(document).keydown(function(e) {
-                        var e = e || window.event;
-                        if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("sr-textbox")) {
-                            const rect = fixed_graph.getBoundingClientRect();
-                            if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
-                                fired = true;
-                                whichkey = e.key;
-                                ChangeSkewRatio()
-                                graphtimeout = setTimeout(function() {
-                                    clearInterval(graphinterval);
-                                    graphinterval = setInterval(ChangeSkewRatio, 13); // Draws every frame
-                                }, 500);
-                            }
-                        }
-                    });
-                    $(document).keyup(function(e) {
-                        var e = e || window.event;
-                        if (e.key === whichkey) {
-                            fired = false;
-                            clearTimeout(graphtimeout);
-                            clearInterval(graphinterval);
-                        }
-                    });
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
                         fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
                         graphinterval,
                         whichkey;
                     function ChangeSkewRatio() {
-                        // Change skew ratio by +- 0.1 or cap it
+                        // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
                             skew_ratio = (skew_ratio - 0.1).toFixed(1);
                             if (skew_ratio < 2 - skew_ratio_lim) {
@@ -584,12 +262,46 @@ $(function() {
                                 skew_ratio = 2 - skew_ratio_lim;
                             }
                         }
+                        // Save skew ratio and draw
                         AjaxSkewRatio();
                         draw();
                     }
+                    // Up and down arrow event handler
+                    $(document).keydown(function(e) {
+                        var e = e || window.event;
+                        // $(fixed_graph).is(":visible") to make sure it doesnt change when the assignment is closed
+                        // !$(document.activeElement).hasClass("sr-textbox") prevents double dipping
+                        if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible")) {
+                            const rect = fixed_graph.getBoundingClientRect();
+                            // Makes sure graph is on screen
+                            if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
+                                // "fired" makes .keydown fire only when a key is pressed, not repeatedly
+                                fired = true;
+                                // Which key was pressed
+                                whichkey = e.key;
+                                // Change skew ratio
+                                ChangeSkewRatio()
+                                // Add delay to change skew ratio internal
+                                graphtimeout = setTimeout(function() {
+                                    clearInterval(graphinterval);
+                                    graphinterval = setInterval(ChangeSkewRatio, 13); // Changes skew ratio
+                                }, 500);
+                            }
+                        }
+                    });
+                    $(document).keyup(function(e) {
+                        var e = e || window.event;
+                        if (e.key === whichkey) {
+                            // If the keyup was the same key that was just pressed stop change skew ratio
+                            fired = false;
+                            clearTimeout(graphtimeout);
+                            clearInterval(graphinterval);
+                        }
+                    });
                     
-                    // Setting and stopping set skew ratio using graph
+                    // Redraw graph every mousemove when set skew ratio or draw point is enabled
                     function mousemove(e) {
+                        console.log(5);
                         var e = e || window.event;
                         const offset = $(fixed_graph).offset();
                         let radius = wCon / 3;
@@ -598,8 +310,43 @@ $(function() {
                         } else if (radius < 2) {
                             radius = 2;
                         }
+                        // Passes in mouse x and y to draw, explained later
                         draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
                     }
+                    // Enable mousemove and set_skew_ratio when set skew ratio button is clicked
+                    assignment.find(".sr-button").click(function() {
+                        $(this).html("Hover and click the graph (click this again to cancel)").one("click", sr_button_clicked);
+                        $(graph).mousemove(mousemove);
+                        set_skew_ratio = true;
+                    });
+                    $(graph).click(function(e) {
+                        if (set_skew_ratio) {
+                            // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
+                            set_skew_ratio = false;
+                            // stop set skew ratio if canvas is clicked
+                            $(this).next().find(".sr-button").html("Set skew ratio using graph").off("click", sr_button_clicked);
+                            // Save skew ratio
+                            AjaxSkewRatio();
+                            if (!draw_point) {
+                                $(this).off("mousemove");
+                            }
+                        } else if (draw_point) {
+                            // Runs if (!set_skew_ratio && draw_point)
+                            // Disable draw point
+                            $(this).off("mousemove");
+                            draw_point = false;
+                            last_mouse_x = -1;
+                            draw();
+                        } else {
+                            // Runs if (!set_skew_ratio && !draw_point)
+                            // Enable draw point
+                            draw_point = true;
+                            $(this).mousemove(mousemove);
+                            // Pass in e because $.trigger makes e.pageX undefined
+                            mousemove(e);
+                        }
+                    });
+                    // Cancel set skew ratio
                     function sr_button_clicked() {
                         $(this).html("Set skew ratio using graph");
                         set_skew_ratio = false;
@@ -607,39 +354,16 @@ $(function() {
                         draw();
                         // No need to ajax since skew ratio is the same
                     }
-                    assignment.find(".sr-button").click(function() {
-                        debugger;
-                        $(this).html("Hover and click the graph (click this again to cancel)").one("click", sr_button_clicked);
-                        $(graph).mousemove(mousemove); // enable set skew ratio if button is pressed
-                        set_skew_ratio = true;
-                    });
-                    
-                    $(graph).click(function(e) {
-                        if (set_skew_ratio) {
-                            set_skew_ratio = false;
-                            // stop set skew ratio if canvas is clicked
-                            $(this).next().find(".sr-button").html("Set skew ratio using graph").off("click", sr_button_clicked);
-                            AjaxSkewRatio();
-                        } else if (draw_point) {
-                            $(this).off("mousemove");
-                            draw_point = false;
-                            last_mouse_x = -1;
-                            draw();
-                        } else {
-                            draw_point = true;
-                            $(this).mousemove(mousemove);
-                            mousemove(e);
-                        }
-                    });
 
                     // Dynamically update skew ratio from textbox
-                    // keydown for normal sr and keyup for delete
-                    $(".sr-textbox").on("keydown paste click keyup", function(e) {
+                    $(".sr-textbox").on("keydown paste click keyup", function(e) { // keydown for normal sr and keyup for delete
                         var e = e || window.event;
                         if (old_skew_ratio === undefined) {
+                            // Sets old_skew_ratio
                             old_skew_ratio = skew_ratio;
                         }
                         if (e.target.value) {
+                            // Sets and caps skew ratio
                             skew_ratio = e.target.value;
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
@@ -647,38 +371,82 @@ $(function() {
                                 skew_ratio = skew_ratio_lim;
                             }
                         } else {
+                            // Reset skew ratio to old value if blank
                             skew_ratio = old_skew_ratio;
                             old_skew_ratio = undefined;
                         }
                         draw();
                     });
+                    $(".sr-textbox").keypress(function(e) {
+                        var e = e || window.event;
+                        // Saves skew ratio on enter
+                        if (e.key === "Enter") {
+                            // focusout event
+                            e.target.blur();
+                        }
+                    });
                     $(".sr-textbox").focusout(function(e) {
                         var e = e || window.event;
                         e.target.value = "";
                         if (old_skew_ratio !== undefined) {
+                            // Save skew ratio
                             AjaxSkewRatio();
                         }
+                        // Update old skew ratio
                         old_skew_ratio = skew_ratio;
-                    });
-                    $(".sr-textbox").keypress(function(e) {
-                        var e = e || window.event;
-                        if (e.key === "Enter") {
-                            e.target.blur();
-                        }
                     });
                 }
 
+                //
                 // Graph logic
+                //
+
+                /* 
+                The red line for all of the assignments follow a parabola
+                The first part of the pset() function calculates the a and b values, and the second part handles the minimum work time and the return cutoffs
+                funct(n) returns the output of an^2 + bn (with no c variable because it is always translated to go through the origin)
+                set_mod_days() helps integrate not working days into the schedule 
+                */
                 function pset(x2 = false, y2 = false) {
+                    /*
+                    The purpose of this function is to calculate these eight variables:
+                    a
+                    b
+                    skew_ratio
+                    cutoff_transition_value
+                    cutoff_to_use_round
+                    return_y_cutoff
+                    return_0_cutoff
+
+
+                    This part calculates a, b, and skew_ratio
+
+                    Three points are defined, one of which is (0,0), to generate a and b variables such that the parabola passes through all three of them
+                    This works because there is a parabola that exists that passes through the three chosen points (with different x coordinates)
+                    Notice how the parabola passes through the origin, meaning it does not use a c variable
+                    If the start of the line is moved and doesn't pass through (0,0) anymore, translate the parabola back to the origin instead of using a c variable
+
+                    The second point is (x1,y1), where x1 is the amount of days and y1 is the amount of units
+
+                    If set skew ratio is enabled, the third point is (x2,y2). skew_ratio will also be redefined
+                    If set skew ratio is not enabled, the third point is now (1,x1/y1 * skew_ratio)
+                    Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
+                    */
+
+                    // Define (x1, y1)
                     let x1 = x - red_line_start_x,
                         y1 = y - red_line_start_y;
                     if (len_nwd) {
-                        x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7];
+                        x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7]; // Handles not working day, explained later
                     }
+                    // If set skew ratio is enabled, make the third point (x2,y2), which was passed as a parameter
                     if (set_skew_ratio && x2 !== false) {
+                        // (x2,y2) are the raw coordinates of the graoh
+                        // This converts the raw coordinates to the graph coordinates that match the steps on the x and y axes
                         x2 = (x2 - 50) / wCon - red_line_start_x;
                         y2 = (height - y2 - 50) / hCon - red_line_start_y;
                         if (x2 < 0) {
+                            // If the mouse is outside the graph to the left, make a line with the slope of y1
                             skew_ratio = skew_ratio_lim;
                             a = 0;
                             b = y1;
@@ -687,6 +455,7 @@ $(function() {
                             cutoff_transition_value = 0;
                             return;
                         }
+                        // Handles not working days, explained later
                         if (len_nwd) {
                             const floorx2 = Math.floor(x2);
                             if (nwd.includes((assign_day_of_week + floorx2 + red_line_start_x) % 7)) {
@@ -695,26 +464,33 @@ $(function() {
                             x2 -= Math.floor(x2 / 7) * len_nwd + mods[floorx2 % 7];
                         }
                         if (x2 >= x1) {
+                            // If the mouse is outside the graph to the right, connect the points (0,0), (x1-1,0), (x1,y1)
                             // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                             a = y1 / x1;
                             b = a * (1 - x1);
 
                             skew_ratio = 2 - skew_ratio_lim;
                         } else {
+                            // Adjusts for remainder mode
                             if (remainder_mode) {
                                 y2 -= y_fremainder;
                             }
+                            // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
                             // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                             a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
                             b = (y1 - x1 * x1 * a) / x1;
 
+                            // Redefine skew ratio
                             skew_ratio = (a + b) * x1 / y1;
+                            // Cap skew ratio
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = skew_ratio_lim;
                             } else if (skew_ratio < 2 - skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             } else if (0.975 < skew_ratio && skew_ratio < 1.025) {
+                                // Snap skew ratio to linear
                                 if (!x1) {
+                                    // Zero division
                                     a = 0;
                                     b = y1;
                                     return_y_cutoff = x1 ? 0 : -1;
@@ -733,7 +509,8 @@ $(function() {
                         a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
                         b = (y1 - x1 * x1 * a) / x1;
                     }
-                    if (!Number.isFinite(a)) {
+                    if (a === Infinity || a === -Infinity) {
+                        // If there was a zero division somewhere, where x2 === 1 or something else happened, make a line with the slope of y1
                         a = 0;
                         b = y1;
                         return_y_cutoff = x1 ? 0 : -1;
@@ -741,7 +518,7 @@ $(function() {
                         cutoff_transition_value = 0;
                         return;
                     }
-                    if (a <= 0 || a * b > 0) {
+                    if (a <= 0 || b > 0) {
                         var funct_zero = 0;
                     } else {
                         var funct_zero = -b / a;
@@ -919,9 +696,13 @@ $(function() {
                         skew_ratio_lim = 0;
                     }
                 }
+                //
                 // End graph logic
+                //
 
+                //
                 // Draw graph
+                //
                 function draw(x2 = false, y2 = false) {
                     const actually_draw_point = draw_point && x2 !== false;
                     if (actually_draw_point) {
@@ -1223,66 +1004,6 @@ $(function() {
                     }
                 });
                 // End draw graph
-
-                const swap_ms = 2000;
-                function swap(a1, a2) {
-                    $(document).queue(function() {
-                        const all = $(".assignment-container");
-                        const tar1 = all.eq(a1),
-                            tar2 = all.eq(a2);
-                        const tar1_height = tar1.height() + 10,
-                            tar2_height = tar2.height() + 10;
-
-                        // Deal with existing assingment margin
-                        // Don't really know how this works but it makes the swap transition more smooth
-                        if (tar1_height > tar2_height) {
-                            tar2.css("margin-top", "10px");
-                        } else {
-                            tar1.css("margin-bottom", "10px");
-                        }
-
-                        tar1.animate({
-                            top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height,
-                            marginBottom: "-=" + (tar1_height - tar2_height),
-                        }, {
-                            queue: false,
-                            duration: swap_ms,
-                            easing: "easeInOutQuad",
-                        });
-
-                        tar2.animate({
-                            bottom: tar2.offset().top - tar1.offset().top,
-                            marginTop: "+=" + (tar1_height - tar2_height),
-                        }, {
-                            queue: false,
-                            duration: swap_ms,
-                            easing: "easeInOutQuad",
-                            complete: function() {
-                                const swap_temp = $("<span></span>").insertAfter(tar2);
-                                tar1.after(tar2);
-                                swap_temp.after(tar1);
-                                tar1.removeAttr("style");
-                                tar2.removeAttr("style");
-                                swap_temp.remove();
-                                $(document).dequeue();
-                            },
-                        });
-                    });
-                }
-                function format_minutes(total_minutes) {
-                    const hour = Math.floor(total_minutes / 60),
-                        minute = Math.ceil(total_minutes % 60);
-                    if (hour === 0) {
-                        if (total_minutes && total_minutes < 1) {
-                            return "<1m";
-                        }
-                        return minute + "m";
-                    } else if (minute === 0) {
-                        return hour + "h";
-                    } else {
-                        return hour + "h " + minute + "m";
-                    }
-                }
             }
             assignment.data('not_first_click', true);
         }

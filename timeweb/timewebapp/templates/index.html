@@ -6,7 +6,10 @@
 {% block js %}
 <script src="{% static 'vendor/jquery.easing.js' %}"></script>
 {{ data|json_script:"load-data" }}
-<script src="{% static 'js/index.js' %}"></script>
+<script src="{% static 'js/priority.js' %}"></script>
+<script src="{% static 'js/graph.js' %}"></script>
+<script src="{% static 'js/form.js' %}"></script>
+<script src="{% static 'js/utils.js' %}"></script>
 {% endblock js %}
 {% block content %}
   <div id="overlay">
