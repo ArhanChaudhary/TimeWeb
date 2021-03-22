@@ -38,7 +38,7 @@ $(function() {
         if (response.status == 0) {
             alert('Failed to connect');
         } else if (response.status == 404) {
-            alert('Requested page not found, try again');
+            alert('Page not found, try again');
         } else if (response.status == 500) {
             alert('Internal server error. Please contact me if you see this')
         } else if (exception === 'parsererror') {
@@ -48,7 +48,7 @@ $(function() {
         } else if (exception === 'abort') {
             alert('Request aborted');
         } else {
-            alert('Uncaught Error, \n' + response.responseText);
+            document.write(response.responseText);
         }
     }
     // Hide and show estimated completion time

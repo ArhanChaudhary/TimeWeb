@@ -5,16 +5,10 @@
 \margl1440\margr1440\vieww27560\viewh8400\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\fs24 \cf0 hide/show button save to localstorage\
-\
-close assignment after swapped if status value of 4+\
-why /= 1.005 instead of 1.05\
-frogue bug with unit === minute might be fixed\
-\
+\f0\fs24 \cf0 why /= 1.005 instead of 1.05\
 fmake graph buttons work; hold delete work input to remove a % of work inputs based on x, fin automatically go to next assignment; display work schedule replace canvas, display \'930\'94 on x and y axis, test (bimplement x = none on backend reenetr, add  x to initial variable when x is left empty (view.py)) (2h)\
 ^^^^ PREVENT SPAM CLICKING AJAX FOR EVERY BUTTON\
-\{\
-	order: \{\
+order: \
 		remainder\
 		fixed mode\
 		enter work\
@@ -23,9 +17,8 @@ fmake graph buttons work; hold delete work input to remove a % of work inputs ba
 		display work schedule\
 		enter skew ratio\
 		hide\
-	\}\
-\}\
 fimplement priority, hide assignment  (3hr)\
+close assignment after swapped if status value of 4+\
 fadvanced options (\'93clear all completed asignments\'94,"change a property for all assignments" (skew_ratio, nwd, fixed_mode, total mode, min_work_time), close all, open all)\
 \
 bsettings modelform, go back button because timeweb may be hidden, (translateZ, priority (colorblind), If your unit is \'93Minute,\'94 the recommended value is \'935\'94 for this field as you will work in multiples of 5 minutes, priority overflow [CAP AT 100, SET ALL TO 0, USE 100 AS NEW RELATIVE AND IGNORE MOST TO LEAST IMPORTANT], first time intro, default skew ratio) (2hr)\
@@ -39,11 +32,9 @@ bwebscraper https://youtu.be/EAjhZsjTkqg\
 bi18n\
 # assignment tags\
 # +/- to zoom in and out\
-# AI to predict how much you overestimate or underestimate for REAL estimated completion time\
 # next_day (make it values 0,1,2,3,etc), function to set date_now that takes into account "next_day" variable; make it so that BEFORE "next" it automatically set to fixed mode (with an input to undo that) (DO NOT do this on SP, do something like: lw == funct(len_works) with fixed_mode on), THEN display "next"; also put second estimated completion time (showing if every assignment was fixed_mode); make todo linear then y if all assignments completed\
 # go over ##\
 # Good job, you are ahead of schedule\
-# custom nwd using binary search https://www.geeksforgeeks.org/count-smaller-equal-elements-sorted-array/\
 # daily assignments (x and y will change with the assignment, x will always be (DUE TOMORROW!!!), todo will always be the min_work_time); UI: "Enter asdaily assignment" and show more to explain what they are if display_instructions is true \
 # maximum work time (with "would you like y to change?" option)\
 # multiple points to hit (piecewise) (combining assignments into one big graph)\

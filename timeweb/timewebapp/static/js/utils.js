@@ -27,8 +27,8 @@ $(function() {
             hideForm();
         }
     });
-    // width * percent = width+14
-    // percent = 1 + 14/width
+    // width * percent = width+10
+    // percent = 1 + 10/width
     $(window).resize(function() {
         $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(document.querySelector(".assignment")).width()}`);
     });
@@ -38,7 +38,7 @@ $(function() {
         if (response.status == 0) {
             alert('Failed to connect');
         } else if (response.status == 404) {
-            alert('Requested page not found, try again');
+            alert('Page not found, try again');
         } else if (response.status == 500) {
             alert('Internal server error. Please contact me if you see this')
         } else if (exception === 'parsererror') {
@@ -48,11 +48,20 @@ $(function() {
         } else if (exception === 'abort') {
             alert('Request aborted');
         } else {
-            alert('Uncaught Error, \n' + response.responseText);
+            document.write(response.responseText);
         }
     }
     // Hide and show estimated completion time
     $("#hide-button").click(function() {
-        $(this).html($(this).html() === 'Hide' ? 'Show' : 'Hide').prev().toggle();
+        if ($(this).html() === "Hide") {
+            $(this).html("Show").prev().toggle();
+            localStorage.setItem("hide-button",true);
+        } else {
+            $(this).html("Hide").prev().toggle();
+            localStorage.removeItem("hide-button");
+        }
     });
+    if ("hide-button" in localStorage) {
+        $("#hide-button").html("Show").prev().toggle();
+    }
 });
