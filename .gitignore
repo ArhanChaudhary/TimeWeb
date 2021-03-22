@@ -63,7 +63,8 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-SECRET_KEY.py
+env_variables.yaml
+gcldeployment.md
 
 # Flask stuff:
 instance/

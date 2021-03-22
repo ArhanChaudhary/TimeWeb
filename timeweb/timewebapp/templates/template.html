@@ -8,7 +8,6 @@
         <meta name="keywords" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their assignments every day.">
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preconnect" href="https://fonts.gstatic.com">
         <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
         <link rel="stylesheet" href="{% static 'css/template.css' %}"></style>
         {% block css %}{% endblock css %}
@@ -20,10 +19,12 @@
     </head>
     <body>
         <div id="header">
-            <div id="image-new-container" tabindex="1">
-                <img height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
-                <div id="new-assignment-text">New Assignment</div>
-            </div>
+            {% if user.is_authenticated %}
+                <div id="image-new-container" tabindex="1">
+                    <img height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
+                    <div id="new-assignment-text">New Assignment</div>
+                </div>
+            {% endif %}
             <div id="menu" tabindex="2">
                 <svg width="89px" height="70px">
                     <rect y="24.75" x="32" width="25" height="4.25"></rect>
@@ -46,11 +47,11 @@
                     </svg>
                 </div>
                 <div id="nav-items">
-                    <a href="#">Settings</a>
+                    {% if user.is_authenticated %}<a href="#">Settings</a>{% endif %}
                     <a href="#">How to Use</a>
                     <a href="#">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
                     <a href="#">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                    <a href="#">Changelog</a>
+                    <a href="#">How Does This Work</a>
                     <a href="#">Terms of Service</a>
                     <a href="#">Privacy Policy</a>
                     <a href="#">Licenses</a>
