@@ -51,6 +51,8 @@ $(function() {
     error = function(response, exception) {
         if (response.status == 0) {
             alert('Failed to connect');
+        } else if (response.status == 403) {
+            alert(response.responseText);
         } else if (response.status == 404) {
             alert('Page not found, try again');
         } else if (response.status == 500) {

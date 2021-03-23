@@ -6,7 +6,6 @@ $(function() {
             $(document.activeElement).click();
         }
     });
-
     // Header responiveness, really messy spaghetti code but whatever
     if (user_authenticated) {
         const username = $("#user-greeting a"),
@@ -47,7 +46,6 @@ $(function() {
     $("#nav-items a").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a").focus(() => $("nav").addClass("open"));
 });
-
 // Info tooltip
 (function($) {
     $.fn.info = function(facing,text) {
