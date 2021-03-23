@@ -75,7 +75,13 @@ $(function() {
     }
     // scale and font_size is the same for every graph
     let scale, // resolution of the graph
-        font_size; // font size of the central text in the graph
+        font_size, // font size of the central text in the graph
+        width, // Dimensions of each assignment
+        height, // Dimensions of each assignment
+        wCon,
+        hCon,
+        left_adjust_cutoff,
+        up_adjust_cutoff;
     function PreventArrowScroll(e) {
         // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
         var e = e || window.event;
@@ -85,6 +91,7 @@ $(function() {
     }
     // Cite later
     // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
+    // Date parser for safari
     function parseDate(date) {
         const parsed = Date.parse(date);
         if (!isNaN(parsed)) {
@@ -121,21 +128,23 @@ $(function() {
                 graph_container.stop();
                 assignment.css("overflow", "");
                 graph_container.css({"display": "","margin-bottom": ""});
-
                 // Prevents auto scroll if a graph is open
                 if ($(".disable-hover").length === 0) {
                     $(document).keydown(PreventArrowScroll);
                 }
-                // Disable hover
-                assignment.addClass("disable-hover");
                 // Make graph visible
                 graph_container.css("display", "block");
+                let graph = this.querySelector('.graph'),
+                    fixed_graph = this.querySelector('.fixed-graph');
+                // Gets unscaled width and height
+                width = fixed_graph.getBoundingClientRect().width/$("#assignments-container")[0].style.getPropertyValue("--scale-percent");
+                height = fixed_graph.getBoundingClientRect().height/1.05;
+                // Disable hover
+                assignment.addClass("disable-hover");
                 // Animate arrow
                 this.querySelector(".risingarrowanimation").beginElement();
 
-                let graph = this.querySelector('.graph'),
-                    fixed_graph = this.querySelector('.fixed-graph'),
-                    // Select the assignment data in dat
+                // Select the assignment data in dat
 
 
 
@@ -155,12 +164,8 @@ $(function() {
 
 
 
-                    // dat[0] is the settings and "HASHTAGassignments-container :first child" is the info div, these cancel each other out when indexing
-                    selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))],
-
-
-
-
+                // dat[0] is the settings and "HASHTAGassignments-container :first child" is the info div, these cancel each other out when indexing
+                selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))],
 
 
 
@@ -181,8 +186,12 @@ $(function() {
 
 
 
-                    // Load in data
-                    [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
+
+
+
+
+                // Load in data
+                [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
@@ -237,7 +246,7 @@ $(function() {
                 // Sets event handlers only on the assignment's first click
                 if (!not_first_click) {
                     // Graph resize event handler
-                    $(window).resize(() => resize(false));
+                    $(window).resize(() => resize(true));
 
                     // Ajax skew ratio
                     let ajaxTimeout,
@@ -316,7 +325,6 @@ $(function() {
                     
                     // Redraw graph every mousemove when set skew ratio or draw point is enabled
                     function mousemove(e) {
-                        console.log(5);
                         var e = e || window.event;
                         const offset = $(fixed_graph).offset();
                         let radius = wCon / 3;
@@ -827,38 +835,28 @@ $(function() {
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }
-
-                let width,
-                    height,
-                    wCon,
-                    hCon,
-                    left_adjust_cutoff,
-                    up_adjust_cutoff;
-                function drawfixed(reversescale) {
-                    // init
-                    ({width, height} = fixed_graph.getBoundingClientRect());
-                    if (reversescale) {
-                        width /= 1.005;
-                        height /= 1.05;
-                    }
-                    
+                function drawfixed(definedimensions) {
                     // These only really need to be executed once since this function is run for every assignment but doesnt matter
+                    if (definedimensions) {
+                        ({width, height} = fixed_graph.getBoundingClientRect());
+                    }
                     if (width > 748) {
                         font_size = 17.1875;
                     } else {
                         font_size = Math.round((width+450)/47*0.6875);
                     }
                     scale = window.devicePixelRatio;
+                    wCon = (width - 55) / x;
+                    hCon = (height - 55) / y;
 
                     graph.width = width * scale;
                     graph.height = height * scale;
                     fixed_graph.width = width * scale;
                     fixed_graph.height = height * scale;
-                    wCon = (width - 55) / x;
-                    hCon = (height - 55) / y;
-
+                    
                     let screen = fixed_graph.getContext("2d");
                     screen.scale(scale, scale);
+                    // These only really need to be executed once since this function is run for every assignment but doesnt matter
                     const point_text = `(Day: 00/00/0000, ${pluralize(unit,1)}: ${"0".repeat(Math.abs(Math.floor(Math.log10(y)))+1 + Math.abs(Math.floor(Math.log10(funct_round))))})`;
                     screen.font = font_size + 'px Open Sans';
                     const point_text_width = screen.measureText(point_text).width,
@@ -873,7 +871,6 @@ $(function() {
                     screen.fillStyle = gradient;
                     screen.fillRect(0, 0, width, height * 4 / 3);
 
-                    
                     // x and y axis rectangles
                     screen.fillStyle = "rgb(185,185,185)";
                     screen.fillRect(40, 0, 10, height);
@@ -1001,20 +998,19 @@ $(function() {
                         screen.fillText(bigger_index, number_x_pos, height - 39);
                     }
                 }
-                function resize(reversescale) {
+                function resize(definedimensions) {
                     if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
-                        drawfixed(reversescale);
+                        drawfixed(definedimensions);
                         draw();
                     }
                 }
-                resize(true);
-                // calling getBoundingClientRect() returns the scale(1.05) height and width
+                resize(false);
                 assignment.on("transitionend", function(e) {
 
                     // Resize again when width transition ends
                     var e = e || window.event;
-                    if (e.originalEvent.propertyName === "width") {
-                        resize(false);
+                    if (e.originalEvent.propertyName === "transform") {
+                        resize(true);
                         assignment.off("transitionend");
                     }
                 });

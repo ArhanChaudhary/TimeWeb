@@ -8,6 +8,20 @@ Ajax error function
 Other minor utilities
 */
 $(function() {
+    csrf_token = $("form input:first-of-type").val();
+    // Hide and show estimated completion time
+    $("#hide-button").click(function() {
+        if ($(this).html() === "Hide") {
+            $(this).html("Show").prev().toggle();
+            localStorage.setItem("hide-button",true);
+        } else {
+            $(this).html("Hide").prev().toggle();
+            localStorage.removeItem("hide-button");
+        }
+    });
+    if ("hide-button" in localStorage) {
+        $("#hide-button").html("Show").prev().toggle();
+    }
     // Do starting animation
     if (!("animation-ran" in sessionStorage)) {
         // If the animation has not already been run, add the class "animate" to the elements that will be animated
@@ -50,18 +64,5 @@ $(function() {
         } else {
             document.write(response.responseText);
         }
-    }
-    // Hide and show estimated completion time
-    $("#hide-button").click(function() {
-        if ($(this).html() === "Hide") {
-            $(this).html("Show").prev().toggle();
-            localStorage.setItem("hide-button",true);
-        } else {
-            $(this).html("Hide").prev().toggle();
-            localStorage.removeItem("hide-button");
-        }
-    });
-    if ("hide-button" in localStorage) {
-        $("#hide-button").html("Show").prev().toggle();
     }
 });
