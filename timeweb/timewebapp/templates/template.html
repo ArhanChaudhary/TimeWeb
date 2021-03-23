@@ -5,20 +5,20 @@
     <head>
         <title>TimeWeb</title>
         <meta name="title" content="TimeWeb">
-        <meta name="description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments. Once users input their assignments, each of their work is graphed over the days until it is due.">
+        <meta name="description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://timeweb.io/">
         <meta property="og:title" content="TimeWeb">
-        <meta property="og:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments. Once users input their assignments, each of their work is graphed over the days until it is due.">
+        <meta property="og:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
         <meta property="og:image" content="{% static 'images/favicon.ico' %}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="https://timeweb.io/">
         <meta property="twitter:title" content="TimeWeb">
-        <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments. Once users input their assignments, each of their work is graphed over the days until it is due.">
+        <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
         <meta property="twitter:image" content="{% static 'images/favicon.ico' %}">
 
         <meta charset="UTF-8">
@@ -29,7 +29,6 @@
         {% block css %}{% endblock css %}
         <script src="{% static 'vendor/jquery.min.js' %}"></script>
         <script src="{% static 'js/template.js' %}"></script>
-        <script>user_authenticated = {{ user.is_authenticated|lower }}</script>
         {% block js %}{% endblock js %}
     </head>
     <body>

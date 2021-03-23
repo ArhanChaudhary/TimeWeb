@@ -13,20 +13,22 @@ from datetime import timedelta
 from decimal import Decimal as d
 from math import ceil, floor
 MAX_NUMBER_ASSIGNMENTS = 25
+logger = logging.getLogger('django')
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
-    
-    logger = logging.getLogger(__name__)
+
     def __init__(self):
         self.context = {}
     def make_list(self, request):
         self.context['objlist'] = self.objlist
         self.context['data'] = [[50, "25.00", 1, (), "5.00", True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in self.objlist]
     def get(self,request):
+        logger.info(f'Recieved GET from user {request.user}')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         self.make_list(request)
         self.context['form'] = TimewebForm(None)
+        logger.info(f'User {request.user} is now viewing the home page\n---------------------------------------------------')
         try:
             try:
                 request.session['added_assignment']
@@ -47,6 +49,7 @@ class TimewebListView(LoginRequiredMixin, View):
     # However, it still cannot be referanced because 'delete-button': [''] is not a good indication
     # So, pass in a value into the button such that the new request.POST will have delete-button': [obj.pk] instead
     def post(self,request):
+        logger.info(f'Recieved POST from user {request.user}')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
             pk = request.POST['submit-button']
@@ -63,6 +66,7 @@ class TimewebListView(LoginRequiredMixin, View):
                 selected_model = get_object_or_404(TimewebModel, pk=pk) # Corresponding model
                 # Ensure the user didn't change the html pk value to delete other users' assignments
                 if request.user != selected_model.user:
+                    logger.warning(f"User {request.user} cannot modify an assignment that isn't theirs")
                     return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
                 # Create a form instance from user data
                 initial = {
@@ -88,16 +92,13 @@ class TimewebListView(LoginRequiredMixin, View):
                     forms.ValidationError(_('An assignment with this name already exists'))
                 )
                 form_is_valid = False
-                self.logger.debug("Name not unique")
             if self.objlist.count() > MAX_NUMBER_ASSIGNMENTS:
                 self.form.add_error("file_sel",
                     forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS})
                 )
                 form_is_valid = False
-                self.logger.debug("Too many assignments")
             if not self.form.is_valid():
                 form_is_valid = False
-                self.logger.debug("Invalid Form")
 
             if form_is_valid:
                 if create_assignment: # Handle "new"
@@ -230,13 +231,14 @@ class TimewebListView(LoginRequiredMixin, View):
 
                 if create_assignment:
                     request.session['added_assignment'] = selected_model.file_sel
+                    logger.info(f'User {request.user} added model "{selected_model.file_sel}"')
                 else:
-                    request.session['reentered_assignment'] = selected_model.file_sel
-                    
-                self.logger.debug("Updated/Added Model")
+                    request.session['reentered_assignment'] = selected_model.file_sel    
+                    logger.info(f'User {request.user} updated model "{selected_model.file_sel}"')
                 self.make_list(request)
                 return redirect(request.path_info)
             else:
+                logger.info(f"User {request.user} submitted an invalid form\n---------------------------------------------------")
                 if create_assignment:
                     self.context['submit'] = 'Create Assignment'
                 else:
@@ -248,17 +250,19 @@ class TimewebListView(LoginRequiredMixin, View):
                 if key == "deleted":
                     selected_model = get_object_or_404(TimewebModel, pk=value)
                     if request.user != selected_model.user:
+                        logger.warning(f"User {request.user} cannot delete an assignment that isn't their's\n---------------------------------------------------")
                         return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
                     selected_model.delete()
-                    self.logger.debug("Deleted")
+                    logger.info(f'User {request.user} deleted assignment "{selected_model.file_sel}"\n---------------------------------------------------')
                     break
                 elif key == "skew_ratio":
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
+                        logger.warning(f"User {request.user} cannot update the skew ratio for an assignment that isn't their's\n---------------------------------------------------")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
                     selected_model.skew_ratio = value
                     selected_model.save()
-                    self.logger.debug("Skew ratio saved")
+                    logger.info(f'User {request.user} saved skew ratio for assignment "{selected_model.file_sel}"\n---------------------------------------------------')
                     break
         self.make_list(request)
         return render(request, "index.html", self.context)

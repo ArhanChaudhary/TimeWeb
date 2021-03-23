@@ -743,6 +743,7 @@ $(function() {
                                 mouse_y = true;
                             } else {
                                 mouse_y = Math.abs(mouse_y - funct(mouse_x)) > Math.abs(mouse_y - works[mouse_x - dif_assign]);
+                                console.log(mouse_y);
                             }
                         } else {
                             mouse_y = false;

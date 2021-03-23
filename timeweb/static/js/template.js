@@ -7,7 +7,7 @@ $(function() {
         }
     });
     // Header responiveness, really messy spaghetti code but whatever
-    if (user_authenticated) {
+    if ($("#user-greeting").length) { // Run if user is authenticated
         const username = $("#user-greeting a"),
                 container = $("#user-greeting"),
                 welcome = $("#user-greeting span"),

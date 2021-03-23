@@ -166,6 +166,16 @@ LOGGING = {
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
+        'django.request': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
+            'propagate': False,
+        },
     },
     'formatters': {
         'verbose': {
@@ -173,7 +183,7 @@ LOGGING = {
             'style': '{',
         },
         'simple': {
-            'format': '{asctime} {levelname} {module} {message}',
+            'format': '{asctime} {levelname} {message}',
             'style': '{',
         },
     },
