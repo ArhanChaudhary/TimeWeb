@@ -158,32 +158,29 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',
+        'level': 'DEBUG' if DEBUG else 'INFO',
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
         },
         'django.request': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-            'propagate': False,
         },
         'django.server': {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-            'propagate': False,
         },
     },
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d}>> {message}',
             'style': '{',
         },
         'simple': {
-            'format': '{asctime} {levelname} {message}',
+            'format': '{asctime} <<{levelname}>> {message}',
             'style': '{',
         },
     },
