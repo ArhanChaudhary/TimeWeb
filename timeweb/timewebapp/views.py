@@ -257,22 +257,26 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model = get_object_or_404(TimewebModel, pk=value)
                     if request.user != selected_model.user:
                         logger.warning(f"User {request.user} cannot delete an assignment that isn't their's")
-                        print("-------------------------------------------------------------")
                         return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
                     selected_model.delete()
                     logger.info(f'User {request.user} deleted assignment "{selected_model.file_sel}"')
-                    print("-------------------------------------------------------------")
-                    break
                 elif key == "skew_ratio":
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
                         logger.warning(f"User {request.user} cannot update the skew ratio for an assignment that isn't their's")
-                        print("-------------------------------------------------------------")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
                     selected_model.skew_ratio = value
                     selected_model.save()
                     logger.info(f'User {request.user} saved skew ratio for assignment "{selected_model.file_sel}"')
-                    print("-------------------------------------------------------------")
-                    break
+                elif key == "remainder_mode":
+                    selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
+                    if request.user != selected_model.user:
+                        logger.warning(f"User {request.user} cannot update the remainder mode for an assignment that isn't their's")
+                        print("-------------------------------------------------------------")
+                        return HttpResponseForbidden("The assignment you are trying to update isn't yours")
+                    selected_model.remainder_mode = value == "true"
+                    selected_model.save()
+                    logger.info(f'User {request.user} saved remainder mode for assignment "{selected_model.file_sel}"')
+            print("-------------------------------------------------------------")
         self.make_list(request)
         return render(request, "index.html", self.context)

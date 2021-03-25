@@ -4,9 +4,9 @@
 <link rel="stylesheet" href="{% static 'css/index.css' %}"></link>
 {% endblock css %}
 {% block js %}
+{{ data|json_script:"load-data" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.js' %}"></script>
-{{ data|json_script:"load-data" }}
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
 <script src="{% static 'js/form.js' %}"></script>
@@ -79,14 +79,14 @@
               <canvas class="fixed-graph"></canvas>
               <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
-                <button class="sr-button">Set skew ratio using graph</button>
+                <button class="skew-ratio-button">Set skew ratio using graph</button>
                 <input class="work-input" placeholder="Enter work done"/>
                 {% comment %} float:right breaks everything {% endcomment %}
                 <button class="fixed-mode-button">Switch to fixed mode</button>
                 <br>
-                <input type="number" step="0.1" placeholder="Enter skew ratio" class="sr-textbox"/>
+                <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
                 <input class="total-work-input" placeholder="Enter total work done"/>
-                <button class="remainder-mode-button">Enable remainder mode</button>
+                <button class="remainder-mode-button"></button>
                 <br>
                 <button class="next-assignment-button">Hide assignment</button>
                 <button class="display-button">Display work schedule in text</button>
