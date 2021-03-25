@@ -1,4 +1,6 @@
 fdisplay “0” on x and y axis
+fdont send ajax if ALL key's values are the same
+fgo back button because timeweb may be hidden
 
 fixed mode AJAX UPDATE TEXT ON CLICK
 enter work               (combine with bottom) AJAX
@@ -11,11 +13,14 @@ fimplement priority, hide assignment  (3hr)
 fclose assignment after swapped if status value of 4+
 fadvanced options (“clear all completed asignments”, close all, open all)
 
-bsettings modelform, go back button because timeweb may be hidden, (translateZ, priority (colorblind), If your unit is “Minute,” the recommended value is “5” for this field as you will work in multiples of 5 minutes, priority overflow [CAP AT 100, SET ALL TO 0, USE 100 AS NEW RELATIVE AND IGNORE MOST TO LEAST IMPORTANT], first time intro, default skew ratio) (2hr)
+bsettings modelform, (translateZ, priority (colorblind), If your unit is “Minute,” the recommended value is “5” for this field as you will work in multiples of 5 minutes, priority overflow [CAP AT 100, SET ALL TO 0, USE 100 AS NEW RELATIVE AND IGNORE MOST TO LEAST IMPORTANT], first time intro, default skew ratio) (2hr)
 ffirst visit tutorial (docent work in IE, dont use safari, dark mode(?), feel free to zoom out, enable local storage and session storage)
 bcustom user model, lowercase username,  email
 
 after done:
+
+ffavicons
+
 daily assignments (x and y will change with the assignment, x will always be (DUE TOMORROW!!!), todo will always be the min_work_time); UI: "Enter asdaily assignment" and show more to explain what they are if display_instructions is true 
 ,"change a property for all assignments" (skew_ratio, nwd, fixed_mode, total mode, min_work_time), next assignment
 bwebscraper https://youtu.be/EAjhZsjTkqg

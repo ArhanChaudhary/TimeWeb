@@ -23,7 +23,7 @@
 
         <meta charset="UTF-8">
         <meta name="author" content="Arhan Chaudhary">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
         <link rel="stylesheet" href="{% static 'css/template.css' %}"></style>
         {% block css %}{% endblock css %}
@@ -31,54 +31,56 @@
         <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
     </head>
-    <body>
-        <div id="header">
-            {% if user.is_authenticated %}
-                <div id="image-new-container" tabindex="1">
-                    <img height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
-                    <div id="new-assignment-text">New Assignment</div>
-                </div>
-            {% endif %}
-            <div id="menu" tabindex="2">
-                <svg width="89px" height="70px">
-                    <rect y="24.75" x="32" width="25" height="4.25"></rect>
-                    <rect y="33" x="32" width="25" height="4.25"></rect>
-                    <rect y="41.25" x="32" width="25" height="4.25"></rect>
-                </svg>
-            </div>
-            {% if user.is_authenticated %}
-                <div id="user-greeting">
-                    <a tabindex="1" href="{% url 'logout' %}?next={{request.path}}">{{ user.get_username }}</a>
-                    <span>,Welcome </span>
-                </div>
-            {% endif %}
-            <nav>
-                <div id="nav-menu">
+    <body tabindex="-1">
+        <div id="site">
+            <div id="header">
+                {% if user.is_authenticated %}
+                    <div id="image-new-container" tabindex="1">
+                        <img height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
+                        <div id="new-assignment-text">New Assignment</div>
+                    </div>
+                {% endif %}
+                <div id="menu" tabindex="2">
                     <svg width="89px" height="70px">
                         <rect y="24.75" x="32" width="25" height="4.25"></rect>
                         <rect y="33" x="32" width="25" height="4.25"></rect>
                         <rect y="41.25" x="32" width="25" height="4.25"></rect>
                     </svg>
                 </div>
-                <div id="nav-items">
-                    {% if user.is_authenticated %}<a href="#">Settings</a>{% endif %}
-                    <a href="#">How to Use</a>
-                    <a href="#">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
-                    <a href="#">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                    <a href="#">How Does This Work</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Licenses</a>
-                    <a href="#">Contact Me</a>
-                </div>
-            </nav>
-            <a href="{% url 'home' %}"  id="logo-container">
-                <img src="{% static 'images/timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
-                {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
-            </a>
-        </div>
-        <div id="content">
-            {% block content %}{% endblock content %}
+                {% if user.is_authenticated %}
+                    <div id="user-greeting">
+                        <a tabindex="1" href="{% url 'logout' %}?next={{request.path}}">{{ user.get_username }}</a>
+                        <span>,Welcome </span>
+                    </div>
+                {% endif %}
+                <nav>
+                    <div id="nav-menu">
+                        <svg width="89px" height="70px">
+                            <rect y="24.75" x="32" width="25" height="4.25"></rect>
+                            <rect y="33" x="32" width="25" height="4.25"></rect>
+                            <rect y="41.25" x="32" width="25" height="4.25"></rect>
+                        </svg>
+                    </div>
+                    <div id="nav-items">
+                        {% if user.is_authenticated %}<a href="#">Settings</a>{% endif %}
+                        <a href="#">Usage</a>
+                        <a href="#">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
+                        <a href="#">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
+                        <a href="#">How Does This Work</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Licenses</a>
+                        <a href="#">Contact Me</a>
+                    </div>
+                </nav>
+                <a href="{% url 'home' %}"  id="logo-container">
+                    <img src="{% static 'images/timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
+                    {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
+                </a>
+            </div>
+            <div id="content">
+                {% block content %}{% endblock content %}
+            </div>
         </div>
     </body>
 </html>

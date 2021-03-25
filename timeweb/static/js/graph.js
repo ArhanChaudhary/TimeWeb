@@ -136,9 +136,6 @@ $(function() {
                 graph_container.css("display", "block");
                 let graph = this.querySelector('.graph'),
                     fixed_graph = this.querySelector('.fixed-graph');
-                // Gets unscaled width and height
-                width = fixed_graph.getBoundingClientRect().width/$("#assignments-container")[0].style.getPropertyValue("--scale-percent");
-                height = fixed_graph.getBoundingClientRect().height/1.05;
                 // Disable hover
                 assignment.addClass("disable-hover");
                 // Animate arrow
@@ -744,6 +741,8 @@ $(function() {
                 //
                 // Draw graph
                 //
+                let width,
+                    height;
                 function draw(x2 = false, y2 = false) {
                     const actually_draw_point = draw_point && x2 !== false;
                     if (actually_draw_point) {
@@ -853,11 +852,11 @@ $(function() {
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }
-                function drawfixed(definedimensions) {
+                function drawfixed() {
                     // These only really need to be executed once since this function is run for every assignment but doesnt matter
-                    if (definedimensions) {
-                        ({width, height} = fixed_graph.getBoundingClientRect());
-                    }
+                    width = $(fixed_graph).width();
+                    height = $(fixed_graph).height();
+                    console.log($(fixed_graph).width());
                     if (width > 748) {
                         font_size = 17.1875;
                     } else {
