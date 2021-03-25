@@ -27,11 +27,11 @@ $(function() {
         // If the animation has not already been run, add the class "animate" to the elements that will be animated
         // The animation will happen instantly, because the transitions are only applied to :not(.animate)
         // Then, when the window loads, remove ".animate". This will cause the actual transition
-        $("#content, #header, #assignments-container").addClass("animate");
+        $("main, header, #assignments-container").addClass("animate");
         // Animation has ran
         sessionStorage.setItem("animation-ran", true);
         // Use "$(window).load(function() {"" of "$(function) { "instead because "$(function() {" fires too early
-        $(window).load(() => $("#content, #header, #assignments-container").removeClass("animate"));
+        $(window).load(() => $("main, header, #assignments-container").removeClass("animate"));
     }
     // Keybinds
     $(document).keydown(function(e) {

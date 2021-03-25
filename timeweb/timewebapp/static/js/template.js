@@ -6,36 +6,36 @@ $(function() {
             $(document.activeElement).click();
         }
     });
-    // Header responiveness, really messy spaghetti code but whatever
+    // Header responiveness
     if ($("#user-greeting").length) { // Run if user is authenticated
         const username = $("#user-greeting a"),
                 container = $("#user-greeting"),
-                welcome = $("#user-greeting span"),
                 logo = $("#logo-container"),
                 newassignmenttext = $("#new-assignment-text");
-        let currentlyHidingWelcome = container.width() <= username[0].getBoundingClientRect().width+33;
+        let currentlyHidingLogo = container.width() <= username.width()+33;
         function resize() {
-            if (container.width() <= username[0].getBoundingClientRect().width+33) {
-                if (!currentlyHidingWelcome) { // if statement not needed, just to make things more efficient
+            // Checks whether to hide the logo 
+            if (container.width() <= username.width()+33) {
+                if (!currentlyHidingLogo) { // if statement not needed, just to make things more efficient
                     container.addClass("logo-hidden");
                     logo.hide();
-                    newassignmenttext.css("max-width","calc(100vw - " + (username[0].scrollWidth+180) + "px)");
-                    currentlyHidingWelcome = true;
+                    newassignmenttext.css("max-width",`calc(100vw - ${username[0].scrollWidth+180}px)`); // Use scrollwidth insted of $.width() because it takes into account the overflown text
+                    currentlyHidingLogo = true;
                 }
-            } else if (currentlyHidingWelcome) {
+            } else if (currentlyHidingLogo) {
                 container.removeClass("logo-hidden");
                 logo.show();
                 newassignmenttext.css("max-width","");
-                currentlyHidingWelcome = false;
+                currentlyHidingLogo = false;
             }
         }
         resize();
-        document.fonts.ready.then(function() {
-            if (currentlyHidingWelcome) {
+        $(window).load(function() {
+            // Run the if statement part of resize()
+            if (currentlyHidingLogo) {
                 container.addClass("logo-hidden");
-                username.after(welcome);
                 logo.hide();
-                newassignmenttext.css("max-width","calc(100vw - " + (username[0].scrollWidth+180) + "px)");
+                newassignmenttext.css("max-width",`calc(100vw - ${username[0].scrollWidth+180}px)`); // Use scrollwidth insted of $.width() because it takes into account the overflown text
             } else {
                 logo.show();
             }

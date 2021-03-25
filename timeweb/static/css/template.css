@@ -10,7 +10,7 @@ input {
 .relative-positioning-wrapper {
     position: relative;
 }
-#header {
+header {
     width: 100%;
     background: rgb(13,26,38);
     height: 70px;
@@ -43,7 +43,7 @@ input {
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
 }
-#content {
+main {
     overflow-y: auto;
     height: 100vh;
     padding: 80px 30px 0 30px;
