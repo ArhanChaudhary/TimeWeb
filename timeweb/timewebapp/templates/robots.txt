@@ -2,4 +2,4 @@
 # ummm its like 2 am rn and i have a test tmrw and i need to stop coding but oh well
 
 User-agent: *
-Disallow: /admin/
+Disallow:

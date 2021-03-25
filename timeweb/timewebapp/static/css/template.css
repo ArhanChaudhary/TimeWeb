@@ -65,6 +65,9 @@ body {
     margin: 0;
     background: -o-radial-gradient(circle, white 0, rgb(202,202,202) 100%);
     background: radial-gradient(circle, white 0, rgb(202,202,202) 100%);
+}
+#site {
+    position: relative;
     overflow: hidden;
 }
 #user-greeting {
