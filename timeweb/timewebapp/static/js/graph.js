@@ -209,7 +209,6 @@ $(function() {
                     red_line_start_x = fixed_mode ? 0 : dynamic_start, // X-coordinate of the start of the red line
                     red_line_start_y = fixed_mode ? 0 : parseFloat(works[red_line_start_x - dif_assign]), // Y-coordinate of the start of the red line
                     len_works = works.length,
-                    draw_point = false, // Bool to draw mouse point on the graph
                     y_fremainder = (y - red_line_start_y) % funct_round, // funct_round remainder
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only works when min_work_time is also enabled
                     len_nwd = nwd.length,
@@ -232,6 +231,22 @@ $(function() {
                 } else {
                     disyear = ', %Y';
                 }
+                // Enable draw_point by default, determines whether to draw the point on the graph
+                let draw_point = true;
+                // Redraw graph every mousemove when set skew ratio or draw point is enabled
+                function mousemove(e) {
+                    var e = e || window.event;
+                    const offset = $(fixed_graph).offset();
+                    let radius = wCon / 3;
+                    if (radius > 3) {
+                        radius = 3;
+                    } else if (radius < 2) {
+                        radius = 2;
+                    }
+                    // Passes in mouse x and y to draw, explained later
+                    draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
+                }
+                $(graph).mousemove(mousemove);
                 // Handles not working days, explained later
                 if (nwd.length) {
                     set_mod_days();
@@ -247,32 +262,36 @@ $(function() {
                 if (!not_first_click) {
                     // Graph resize event handler
                     $(window).resize(() => resize(true));
-
                     // Ajax skew ratio
                     let ajaxTimeout,
-                        old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
-                    function AjaxSkewRatio() {
-                        selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
-                        old_skew_ratio = skew_ratio;
+                        data = {
+                            'csrfmiddlewaretoken': csrf_token,
+                            'pk': $(graph).attr("value"),
+                        };
+                    function SendButtonAjax(key, value) {
+                        // Add key and value the data going to be sent
+                        // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
+                        data[key] = value;
                         clearTimeout(ajaxTimeout);
                         ajaxTimeout = setTimeout(function() {
-                            // Send new skew ratio along with the assignment's primary key
-                            const data = {
-                                'csrfmiddlewaretoken': csrf_token,
-                                'skew_ratio': skew_ratio,
-                                'pk': $(graph).attr("value"),
-                            }
+                            // Send data along with the assignment's primary key
                             $.ajax({
                                 type: "POST",
                                 data: data,
                                 error: error,
                             });
+                            // Reset data
+                            data = {
+                                'csrfmiddlewaretoken': csrf_token,
+                                'pk': $(graph).attr("value"),
+                            }
                         }, 1000);
                     }
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
                         fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
                         graphinterval,
-                        whichkey;
+                        whichkey,
+                        old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
@@ -287,14 +306,16 @@ $(function() {
                             }
                         }
                         // Save skew ratio and draw
-                        AjaxSkewRatio();
+                        selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                        old_skew_ratio = skew_ratio;
+                        SendButtonAjax('skew_ratio',skew_ratio);
                         draw();
                     }
                     // Up and down arrow event handler
                     $(document).keydown(function(e) {
                         var e = e || window.event;
                         // $(fixed_graph).is(":visible") to make sure it doesnt change when the assignment is closed
-                        // !$(document.activeElement).hasClass("sr-textbox") prevents double dipping
+                        // !$(document.activeElement).hasClass("skew-ratio-textbox") prevents double dipping
                         if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible")) {
                             const rect = fixed_graph.getBoundingClientRect();
                             // Makes sure graph is on screen
@@ -304,7 +325,7 @@ $(function() {
                                 // Which key was pressed
                                 whichkey = e.key;
                                 // Change skew ratio
-                                ChangeSkewRatio()
+                                ChangeSkewRatio();
                                 // Add delay to change skew ratio internal
                                 graphtimeout = setTimeout(function() {
                                     clearInterval(graphinterval);
@@ -322,22 +343,8 @@ $(function() {
                             clearInterval(graphinterval);
                         }
                     });
-                    
-                    // Redraw graph every mousemove when set skew ratio or draw point is enabled
-                    function mousemove(e) {
-                        var e = e || window.event;
-                        const offset = $(fixed_graph).offset();
-                        let radius = wCon / 3;
-                        if (radius > 3) {
-                            radius = 3;
-                        } else if (radius < 2) {
-                            radius = 2;
-                        }
-                        // Passes in mouse x and y to draw, explained later
-                        draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
-                    }
                     // Enable mousemove and set_skew_ratio when set skew ratio button is clicked
-                    assignment.find(".sr-button").click(function() {
+                    assignment.find(".skew-ratio-button").click(function() {
                         $(this).html("Hover and click the graph (click this again to cancel)").one("click", sr_button_clicked);
                         $(graph).mousemove(mousemove);
                         set_skew_ratio = true;
@@ -347,9 +354,11 @@ $(function() {
                             // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
                             set_skew_ratio = false;
                             // stop set skew ratio if canvas is clicked
-                            $(this).next().find(".sr-button").html("Set skew ratio using graph").off("click", sr_button_clicked);
+                            $(this).next().find(".skew-ratio-button").html("Set skew ratio using graph").off("click", sr_button_clicked);
                             // Save skew ratio
-                            AjaxSkewRatio();
+                            selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                            old_skew_ratio = skew_ratio;
+                            SendButtonAjax('skew_ratio',skew_ratio);
                             if (!draw_point) {
                                 $(this).off("mousemove");
                             }
@@ -377,17 +386,16 @@ $(function() {
                         draw();
                         // No need to ajax since skew ratio is the same
                     }
-
                     // Dynamically update skew ratio from textbox
-                    $(".sr-textbox").on("keydown paste click keyup", function(e) { // keydown for normal sr and keyup for delete
+                    assignment.find(".skew-ratio-textbox").on("keydown paste click keyup", function(e) { // keydown for normal sr and keyup for delete
                         var e = e || window.event;
                         if (old_skew_ratio === undefined) {
                             // Sets old_skew_ratio
                             old_skew_ratio = skew_ratio;
                         }
-                        if (e.target.value) {
+                        if ($(e.target).val()) {
                             // Sets and caps skew ratio
-                            skew_ratio = e.target.value;
+                            skew_ratio = $(e.target).val();
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             } else if (skew_ratio < 2 - skew_ratio_lim) {
@@ -399,25 +407,33 @@ $(function() {
                             old_skew_ratio = undefined;
                         }
                         draw();
-                    });
-                    $(".sr-textbox").keypress(function(e) {
+                    }).keypress(function(e) {
                         var e = e || window.event;
                         // Saves skew ratio on enter
                         if (e.key === "Enter") {
                             // focusout event
                             e.target.blur();
                         }
-                    });
-                    $(".sr-textbox").focusout(function(e) {
+                    }).focusout(function(e) {
                         var e = e || window.event;
-                        e.target.value = "";
+                        $(e.target).val('');
                         if (old_skew_ratio !== undefined) {
                             // Save skew ratio
-                            AjaxSkewRatio();
+                            selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                            old_skew_ratio = skew_ratio;
+                            SendButtonAjax('skew_ratio',skew_ratio);
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
                     });
+
+                    assignment.find(".remainder-mode-button").click(function() {
+                        $(this).html($(this).html() === "Remainder: Last" ? "Remainder: First" : "Remainder: Last");
+                        remainder_mode = !remainder_mode;
+                        selected_assignment[14] = remainder_mode; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                        SendButtonAjax('remainder_mode',remainder_mode);
+                        draw();
+                    }).html(remainder_mode ? "Remainder: First" : "Remainder: Last"); // Initially set html for remainder mode
                 }
 
                 //
@@ -445,9 +461,10 @@ $(function() {
                     This part calculates a, b, and skew_ratio
 
                     Three points are defined, one of which is (0,0), to generate a and b variables such that the parabola passes through all three of them
-                    This works because there is a parabola that exists that passes through the three chosen points (with different x coordinates)
+                    This works because there is a parabola that exists that passes through any three chosen points (with different x coordinates)
                     Notice how the parabola passes through the origin, meaning it does not use a c variable
                     If the start of the line is moved and doesn't pass through (0,0) anymore, translate the parabola back to the origin instead of using a c variable
+                    Once the a and b variables are calculated, the assignment is retranslated accordingly
 
                     The second point is (x1,y1), where x1 is the amount of days and y1 is the amount of units
 
@@ -463,6 +480,7 @@ $(function() {
                         x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7]; // Handles not working day, explained later
                     }
                     // If set skew ratio is enabled, make the third point (x2,y2), which was passed as a parameter
+                    // x2 !== false is necessary because the user can resize the window for example and call this function while set skew ratio is true but without passing any coordinates
                     if (set_skew_ratio && x2 !== false) {
                         // (x2,y2) are the raw coordinates of the graoh
                         // This converts the raw coordinates to the graph coordinates that match the steps on the x and y axes
@@ -731,7 +749,7 @@ $(function() {
                     if (actually_draw_point) {
                         // Cant pass in mouse_x and mouse_y as x2 and y2 because mouse_y becomes a bool
                         mouse_x = Math.round((x2-50)/wCon);
-                        mouse_y = (y2-50)/hCon;
+                        mouse_y = (height-y2-50)/hCon;
 
                         if (mouse_x < Math.min(red_line_start_x,dif_assign)) {
                             mouse_x = Math.min(red_line_start_x,dif_assign);
@@ -743,7 +761,6 @@ $(function() {
                                 mouse_y = true;
                             } else {
                                 mouse_y = Math.abs(mouse_y - funct(mouse_x)) > Math.abs(mouse_y - works[mouse_x - dif_assign]);
-                                console.log(mouse_y);
                             }
                         } else {
                             mouse_y = false;

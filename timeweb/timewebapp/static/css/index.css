@@ -130,27 +130,14 @@
 .status {
     float: left;
     font-size: min(16.76px,calc(11px + 0.4vw));
-    margin: 0 calc(70px + 4.05%) 0 0;
+    margin: 0;
+    margin-right: 70px;
     overflow: hidden;
-    -webkit-transition: margin-right .2s ease-in-out;
-    -o-transition: margin-right .2s ease-in-out;
-    transition: margin-right .2s ease-in-out;
-
-    /* Works on everything except IE */
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
     -webkit-line-clamp: 3;
-}
-.assignment:not(.disable-hover):hover .status {
-    margin-right: 70px;
-}
-@supports not (-webkit-line-clamp: 3) {
-    .status {
-        /* If IE, use max-height */
-        max-height: 4.2em; /*1.4em * 3*/
-    }
 }
 .button {
     position: absolute;
@@ -240,7 +227,7 @@ canvas:focus {
     left: 50%;
     transform: translateX(-50%);
 }
-.sr-button, .sr-textbox, .next-assignment-button {
+.skew-ratio-button, .skew-ratio-textbox, .next-assignment-button {
     position: absolute;
     left: 0;
 }
@@ -248,7 +235,7 @@ canvas:focus {
     position: absolute;
     right: 0;
 }
-.sr-textbox, .total-work-input, .remainder-mode-button {
+.skew-ratio-textbox, .total-work-input, .remainder-mode-button {
     margin: 7px 0;
 }
 

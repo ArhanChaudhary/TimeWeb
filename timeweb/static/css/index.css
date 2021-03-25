@@ -240,7 +240,7 @@ canvas:focus {
     left: 50%;
     transform: translateX(-50%);
 }
-.sr-button, .sr-textbox, .next-assignment-button {
+.skew-ratio-button, .skew-ratio-textbox, .next-assignment-button {
     position: absolute;
     left: 0;
 }
@@ -248,7 +248,7 @@ canvas:focus {
     position: absolute;
     right: 0;
 }
-.sr-textbox, .total-work-input, .remainder-mode-button {
+.skew-ratio-textbox, .total-work-input, .remainder-mode-button {
     margin: 7px 0;
 }
 
