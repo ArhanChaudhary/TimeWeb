@@ -44,7 +44,7 @@ $(function() {
         clearTimeout(scrollTimeout);
         // Runs when scroll ends
         scrollTimeout = setTimeout(function() {
-            $("#content").off('scroll');
+            $("main").off('scroll');
             // Resolves promise from the scope it is called in
             resolver();
         }, 200);
@@ -79,7 +79,7 @@ $(function() {
                     });
                     // Define resolver to be called in scroll()
                     resolver = resolve;
-                    $("#content").scroll(_scroll);
+                    $("main").scroll(_scroll);
                     _scroll();
                 });
             }).then(() => color_or_animate_assignment($(this), index, true)); // Arrow function to preserve "this"

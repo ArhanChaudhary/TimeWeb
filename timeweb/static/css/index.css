@@ -3,19 +3,19 @@
     position: relative;
 }
 
-#content:not(.animate) {
+main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.55,1.28);
 }
-#header:not(.animate) {
+header:not(.animate) {
     transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #assignments-container:not(.animate) {
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
-#content.animate {
+main.animate {
     box-shadow: inset 0 20px 0 0 gray;
 }
-#header.animate {
+header.animate {
     -webkit-transform: translateY(-70px);
         -ms-transform: translateY(-70px);
             transform: translateY(-70px);
@@ -130,27 +130,14 @@
 .status {
     float: left;
     font-size: min(16.76px,calc(11px + 0.4vw));
-    margin: 0 calc(70px + 4.05%) 0 0;
+    margin: 0;
+    margin-right: 70px;
     overflow: hidden;
-    -webkit-transition: margin-right .2s ease-in-out;
-    -o-transition: margin-right .2s ease-in-out;
-    transition: margin-right .2s ease-in-out;
-
-    /* Works on everything except IE */
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
     -webkit-line-clamp: 3;
-}
-.assignment:not(.disable-hover):hover .status {
-    margin-right: 70px;
-}
-@supports not (-webkit-line-clamp: 3) {
-    .status {
-        /* If IE, use max-height */
-        max-height: 4.2em; /*1.4em * 3*/
-    }
 }
 .button {
     position: absolute;

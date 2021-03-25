@@ -260,7 +260,7 @@ $(function() {
     }
     if ("scroll" in localStorage) {
         $(window).load(function() {
-            $("#content").scrollTop(localStorage.getItem("scroll"));
+            $("main").scrollTop(localStorage.getItem("scroll"));
             localStorage.removeItem("scroll");
         });
     }
@@ -269,7 +269,7 @@ $(function() {
         // Enable disabled field on submit so it's sent with post
         $("#id_ctime").removeAttr("disabled");
         // Save scroll when post loads to make it seamless
-        localStorage.setItem("scroll",$("#content").scrollTop());
+        localStorage.setItem("scroll",$("main").scrollTop());
         // Prevent button spam clicking
         $("#form-wrapper button").css("pointer-events", "none");
     });
@@ -296,7 +296,7 @@ $(function() {
                 });
                 // Same promise resolver logic as in priority.js
                 resolver = resolve;
-                $("#content").scroll(_scroll);
+                $("main").scroll(_scroll);
                 _scroll();
             }).then(function() {
                 // Once the assignment, is done, this sends the data to the backend and animates its deletion

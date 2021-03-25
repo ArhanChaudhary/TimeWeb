@@ -1,16 +1,16 @@
 {% extends "template.html" %}
 {% load static %}
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/index.css' %}"></link>
+<link rel="stylesheet" href="{% static 'css/index.css' %}" defer></link>
 {% endblock css %}
 {% block js %}
 {{ data|json_script:"load-data" }}
-<script src="{% static 'vendor/pluralize.js' %}"></script>
-<script src="{% static 'vendor/jquery.easing.js' %}"></script>
-<script src="{% static 'js/priority.js' %}"></script>
-<script src="{% static 'js/graph.js' %}"></script>
-<script src="{% static 'js/form.js' %}"></script>
-<script src="{% static 'js/utils.js' %}"></script>
+<script src="{% static 'vendor/pluralize.js' %}" defer></script>
+<script src="{% static 'vendor/jquery.easing.js' %}" defer></script>
+<script src="{% static 'js/priority.js' %}" defer></script>
+<script src="{% static 'js/graph.js' %}" defer></script>
+<script src="{% static 'js/form.js' %}" defer></script>
+<script src="{% static 'js/utils.js' %}" defer></script>
 {% endblock js %}
 {% block content %}
   <div id="overlay">
@@ -68,10 +68,10 @@
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
             <button value="{{ obj.pk }}" class="button update-button">
-              <img height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
+              <img width="20" height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </button>
             <button value="{{ obj.pk }}" class="button delete-button">
-              <img height="22" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
+              <img width="18.61" height="22" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
             </button>
           </div>
           <div class="relative-positioning-wrapper">

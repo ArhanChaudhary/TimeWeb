@@ -162,7 +162,7 @@ $(function() {
 
 
                 // dat[0] is the settings and "HASHTAGassignments-container :first child" is the info div, these cancel each other out when indexing
-                selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))],
+                selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))];
 
 
 
@@ -188,7 +188,7 @@ $(function() {
 
 
                 // Load in data
-                [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
+                let [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
@@ -258,7 +258,7 @@ $(function() {
                 // Sets event handlers only on the assignment's first click
                 if (!not_first_click) {
                     // Graph resize event handler
-                    $(window).resize(() => resize(true));
+                    $(window).resize(resize);
                     // Ajax skew ratio
                     let ajaxTimeout,
                         data = {
@@ -272,6 +272,11 @@ $(function() {
                         clearTimeout(ajaxTimeout);
                         ajaxTimeout = setTimeout(function() {
                             // Send data along with the assignment's primary key
+
+                            // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
+                            // However, I decided to skip this check and still send the ajax
+                            // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button
+                            // Plus, a pointless ajax of this sort doesn't happen frequently, and will have a minimal impact on the server's performance
                             $.ajax({
                                 type: "POST",
                                 data: data,
@@ -856,7 +861,6 @@ $(function() {
                     // These only really need to be executed once since this function is run for every assignment but doesnt matter
                     width = $(fixed_graph).width();
                     height = $(fixed_graph).height();
-                    console.log($(fixed_graph).width());
                     if (width > 748) {
                         font_size = 17.1875;
                     } else {
@@ -999,6 +1003,7 @@ $(function() {
                             screen.fillText(bigger_index, 38.5, number_y_pos);
                         }
                     }
+                    screen.fillText(0, 39, height-52);
 
                     screen.textBaseline = "top";
                     screen.textAlign = "center";
@@ -1014,20 +1019,21 @@ $(function() {
                         }
                         screen.fillText(bigger_index, number_x_pos, height - 39);
                     }
+                    screen.fillText(0, 55.5, height-38.5);
                 }
-                function resize(definedimensions) {
+                function resize() {
                     if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
-                        drawfixed(definedimensions);
+                        drawfixed();
                         draw();
                     }
                 }
-                resize(false);
+                resize();
                 assignment.on("transitionend", function(e) {
 
                     // Resize again when width transition ends
                     var e = e || window.event;
                     if (e.originalEvent.propertyName === "transform") {
-                        resize(true);
+                        resize();
                         assignment.off("transitionend");
                     }
                 });

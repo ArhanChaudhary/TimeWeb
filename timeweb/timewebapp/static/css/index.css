@@ -3,19 +3,19 @@
     position: relative;
 }
 
-#content:not(.animate) {
+main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.55,1.28);
 }
-#header:not(.animate) {
+header:not(.animate) {
     transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #assignments-container:not(.animate) {
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
-#content.animate {
+main.animate {
     box-shadow: inset 0 20px 0 0 gray;
 }
-#header.animate {
+header.animate {
     -webkit-transform: translateY(-70px);
         -ms-transform: translateY(-70px);
             transform: translateY(-70px);
