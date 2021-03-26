@@ -64,7 +64,7 @@ $(function() {
                 });
             }
             new Promise(function(resolve) {
-                $(window).load(function() {
+                $(window).on('load', function() {
                     // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                     // So, scroll to the next assignment instead
                     let assignment_to_scroll = $("#animate-in").next();

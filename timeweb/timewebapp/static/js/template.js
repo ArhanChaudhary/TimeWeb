@@ -1,6 +1,6 @@
 // Code to be run on every page
 $(function() {
-    // Accessibility keybind when pressing enter
+    // Click element when enter is pressed
     $(document).keypress(function(e) {
         if (e.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
             $(document.activeElement).click();
@@ -12,10 +12,10 @@ $(function() {
                 container = $("#user-greeting"),
                 logo = $("#logo-container"),
                 newassignmenttext = $("#new-assignment-text");
-        let currentlyHidingLogo = container.width() <= username.width()+33;
+        let currentlyHidingLogo = container.width() <= username.width()+78;
         function resize() {
             // Checks whether to hide the logo 
-            if (container.width() <= username.width()+33) {
+            if (container.width() <= username.width()+78) {
                 if (!currentlyHidingLogo) { // if statement not needed, just to make things more efficient
                     container.addClass("logo-hidden");
                     logo.hide();
@@ -30,7 +30,7 @@ $(function() {
             }
         }
         resize();
-        $(window).load(function() {
+        $(window).on('load', function() {
             // Run the if statement part of resize()
             if (currentlyHidingLogo) {
                 container.addClass("logo-hidden");
