@@ -5,17 +5,17 @@
     height: auto;
 }
 
-.login #header {
+.login header {
     height: auto;
     padding: 15px 16px;
     justify-content: center;
 }
 
-.login #header h1 {
+.login header h1 {
     font-size: 18px;
 }
 
-.login #header h1 a {
+.login header h1 a {
     color: #fff;
 }
 

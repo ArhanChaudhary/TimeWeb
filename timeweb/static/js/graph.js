@@ -1028,15 +1028,6 @@ $(function() {
                     }
                 }
                 resize();
-                assignment.on("transitionend", function(e) {
-
-                    // Resize again when width transition ends
-                    var e = e || window.event;
-                    if (e.originalEvent.propertyName === "transform") {
-                        resize();
-                        assignment.off("transitionend");
-                    }
-                });
                 // End draw graph
             }
             assignment.data('not_first_click', true);

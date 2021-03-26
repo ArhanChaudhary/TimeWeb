@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 {% load static %}
-<html>
-
+{% comment %} Only supports English right now {% endcomment %}
+<html lang="en">
     <head>
         <title>TimeWeb</title>
         <meta name="title" content="TimeWeb">
         <meta name="description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
 
-        <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://timeweb.io/">
         <meta property="og:title" content="TimeWeb">
         <meta property="og:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
-        <meta property="og:image" content="{% static 'images/favicon.ico' %}">
+        <meta property="og:image" content="{% static 'images/favicon32.ico' %}">
 
-        <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="https://timeweb.io/">
         <meta property="twitter:title" content="TimeWeb">
         <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
-        <meta property="twitter:image" content="{% static 'images/favicon.ico' %}">
+        <meta property="twitter:image" content="{% static 'images/favicon32.ico' %}">
 
-        <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff2' %}" as="font" type="font/woff2">
-        <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff' %}" as="font" type="font/woff">
+        <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff2' %}" as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff' %}" as="font" type="font/woff" crossorigin="anonymous">
+
         <meta charset="UTF-8">
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}">
-        <link rel="stylesheet" href="{% static 'css/template.css' %}" defer></style>
+        <meta name="theme-color" content="#2196F3">
+        <!-- Don't use defer or async because it causes the first past to be before DOMContentLoaded and mess up the transition -->
+        <link rel="shortcut icon" href="{% static 'images/favicon32.ico' %}" type="image/x-icon">
+        <link rel="stylesheet" href="{% static 'css/template.css' %}">
+        <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
         {% block css %}{% endblock css %}
-        <script src="{% static 'vendor/jquery.min.js' %}" defer></script>
-        <script src="{% static 'js/template.js' %}" defer></script>
+        <script src="{% static 'vendor/jquery-latest.min.js' %}"></script>
+        <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
     </head>
     <body tabindex="-1">
@@ -76,7 +78,7 @@
                     </div>
                 </nav>
                 <a href="{% url 'home' %}"  id="logo-container">
-                    <img width="211.17" height="60" src="{% static 'images/timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
+                    <img width="211" height="60" src="{% static 'images/timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
                     {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
                 </a>
             </header>

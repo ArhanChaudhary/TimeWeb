@@ -7,13 +7,15 @@ Setting assignment width on resize
 Ajax error function
 Other minor utilities
 */
-$(function() {
+
+// Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
+document.addEventListener("DOMContentLoaded", function() {
     csrf_token = $("form input:first-of-type").val();
     // Hide and show estimated completion time
     $("#hide-button").click(function() {
         if ($(this).html() === "Hide") {
             $(this).html("Show").prev().toggle();
-            localStorage.setItem("hide-button",true);
+            localStorage.setItem("hide-button", true);
         } else {
             $(this).html("Hide").prev().toggle();
             localStorage.removeItem("hide-button");
@@ -30,8 +32,8 @@ $(function() {
         $("main, header, #assignments-container").addClass("animate");
         // Animation has ran
         sessionStorage.setItem("animation-ran", true);
-        // Use "$(window).load(function() {"" of "$(function) { "instead because "$(function() {" fires too early
-        $(window).load(() => $("main, header, #assignments-container").removeClass("animate"));
+        // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
+        $(window).on('load', () => $("main, header, #assignments-container").removeClass("animate"));
     }
     // Keybinds
     $(document).keydown(function(e) {
@@ -56,7 +58,7 @@ $(function() {
         } else if (response.status == 404) {
             alert('Page not found, try again');
         } else if (response.status == 500) {
-            alert('Internal server error. Please contact me if you see this')
+            alert('Internal server error. Please contact me if you see this');
         } else if (exception === 'parsererror') {
             alert('Requested JSON parse failed');
         } else if (exception === 'timeout') {

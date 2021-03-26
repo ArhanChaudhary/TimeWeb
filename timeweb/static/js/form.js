@@ -232,7 +232,8 @@ $(function() {
         old_funct_round_val = $(this).val();
     });
     // Handles unloading and reloading of form
-    $(window).unload(function() {
+    // lighthouse says to use onpagehide instead of unload
+    $(window).on('onpagehide' in self ? 'pagehide' : 'unload',function() {
         if ($("#form-wrapper").is(":visible")) {
             // Save form data to localStorage before unload
             localStorage.setItem("form_fields",
@@ -259,7 +260,7 @@ $(function() {
         old_funct_round_val = $('#id_funct_round').val();
     }
     if ("scroll" in localStorage) {
-        $(window).load(function() {
+        $(window).on('load', function() {
             $("main").scrollTop(localStorage.getItem("scroll"));
             localStorage.removeItem("scroll");
         });

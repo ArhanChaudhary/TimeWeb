@@ -65,6 +65,7 @@ db.sqlite3
 db.sqlite3-journal
 env_variables.yaml
 gcldeployment.md
+original_favicon.ico
 
 # Flask stuff:
 instance/

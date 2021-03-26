@@ -241,8 +241,8 @@ canvas:focus {
 
 #form-wrapper input:focus, #form-wrapper label:focus {
     outline: 0;
-    -webkit-box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204);
-            box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204); 
+    -webkit-box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important;
+            box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
 }
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
