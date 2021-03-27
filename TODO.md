@@ -1,4 +1,6 @@
-maskable icon and replace splash text
+maskable icon and replace splash text and https://css-tricks.com/snippets/css/orientation-lock/
+
+add help for safari deferprompt, "add to home page"
 
 fixed mode AJAX, UPDATE TEXT ON CLICK
 enter work               (combine with bottom) AJAX
