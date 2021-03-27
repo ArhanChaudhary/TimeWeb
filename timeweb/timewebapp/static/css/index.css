@@ -1,5 +1,4 @@
 #assignments-container {
-    min-width: 200px;
     position: relative;
 }
 
@@ -131,7 +130,7 @@ header.animate {
     float: left;
     font-size: min(16.76px,calc(11px + 0.4vw));
     margin: 0;
-    margin-right: 70px;
+    margin-right: 80px;
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;

@@ -10,7 +10,6 @@ handlers:
   - url: /.*
     secure: always
     script: auto
-
 includes:
   # gitignored file with sensitive information
   - env_variables.yaml

@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('timewebapp.urls')),
     path('login/', include('django.contrib.auth.urls')),
+    path('', include('pwa.urls')),
 ]

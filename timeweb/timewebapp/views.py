@@ -25,13 +25,11 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context['objlist'] = self.objlist
         self.context['data'] = [[50, "25.00", 1, (), "5.00", True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in self.objlist]
     def get(self,request):
-        print("-------------------------------------------------------------")
         logger.info(f'Recieved GET from user {request.user}')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         self.make_list(request)
         self.context['form'] = TimewebForm(None)
         logger.info(f'User {request.user} is now viewing the home page')
-        print("-------------------------------------------------------------")
         try:
             try:
                 request.session['added_assignment']
@@ -52,7 +50,6 @@ class TimewebListView(LoginRequiredMixin, View):
     # However, it still cannot be referanced because 'delete-button': [''] is not a good indication
     # So, pass in a value into the button such that the new request.POST will have delete-button': [obj.pk] instead
     def post(self,request):
-        print("-------------------------------------------------------------")
         logger.info(f'Recieved POST from user {request.user}')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
@@ -71,7 +68,6 @@ class TimewebListView(LoginRequiredMixin, View):
                 # Ensure the user didn't change the html pk value to delete other users' assignments
                 if request.user != selected_model.user:
                     logger.warning(f"User {request.user} cannot modify an assignment that isn't theirs")
-                    print("-------------------------------------------------------------")
                     return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
                 # Create a form instance from user data
                 initial = {
@@ -244,7 +240,6 @@ class TimewebListView(LoginRequiredMixin, View):
                 return redirect(request.path_info)
             else:
                 logger.info(f"User {request.user} submitted an invalid form")
-                print("-------------------------------------------------------------")
                 if create_assignment:
                     self.context['submit'] = 'Create Assignment'
                 else:
@@ -272,11 +267,9 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
                         logger.warning(f"User {request.user} cannot update the remainder mode for an assignment that isn't their's")
-                        print("-------------------------------------------------------------")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
                     selected_model.remainder_mode = value == "true"
                     selected_model.save()
                     logger.info(f'User {request.user} saved remainder mode for assignment "{selected_model.file_sel}"')
-            print("-------------------------------------------------------------")
         self.make_list(request)
         return render(request, "index.html", self.context)

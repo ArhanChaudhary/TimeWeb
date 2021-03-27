@@ -14,7 +14,104 @@ from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+PWA_APP_NAME = "Timeweb"
+PWA_APP_DESCRIPTION = "Timeweb"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'minimal-ui'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+   {
+       "src": "/static/images/icons/icon-72x72.png", 
+       "sizes": "72x72"
+    }, 
+    {
+        "src": "/static/images/icons/icon-96x96.png", 
+        "sizes": "96x96",
+    }, 
+    {
+        "src": "/static/images/icons/icon-128x128.png", 
+        "sizes": "128x128"
+    }, 
+    {
+        "src": "/static/images/icons/icon-144x144.png",
+        "sizes": "144x144"
+    }, 
+    {
+        "src": "/static/images/icons/icon-152x152.png", 
+        "sizes": "152x152"
+    }, 
+    {
+        "src": "/static/images/icons/icon-192x192.png", 
+        "sizes": "192x192"
+    },
+    {
+        "src": "/static/images/icons/icon-384x384.png", 
+        "sizes": "384x384"
+    }, 
+    {
+        "src": "/static/images/icons/icon-512x512.png", 
+        "sizes": "512x512"
+    }
+]
+PWA_APP_SPLASH_SCREEN = [
+    {
+        'src': '/static/images/icons/splash-640x1136.png',
+        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "640x1136"
+    },
+    {
+        'src': '/static/images/icons/splash-750x1334.png',
+        'media': '(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "750x1334"
+    },
+    {
+        'src': '/static/images/icons/splash-1242x2208.png',
+        'media': '(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)',
+        "sizes": "1242x2208"
+    },
+    {
+        'src': '/static/images/icons/splash-1125x2436.png',
+        'media': '(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)',
+        "sizes": "1125x2436"
+    },
+    {
+        'src': '/static/images/icons/splash-828x1792.png',
+        'media': '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "838x1792"
+    },
+    {
+        'src': '/static/images/icons/splash-1242x2688.png',
+        'media': '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)',
+        "sizes": "1242x2688"
+    },
+    {
+        'src': '/static/images/icons/splash-1536x2048.png',
+        'media': '(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "1536x2048"
+    },
+    {
+        'src': '/static/images/icons/splash-1668x2224.png',
+        'media': '(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "1668x2224"
+    },
+    {
+        'src': '/static/images/icons/splash-1668x2388.png',
+        'media': '(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "1668x2388"
+    },
+    {
+        'src': '/static/images/icons/splash-2048x2732.png',
+        'media': '(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)',
+        "sizes": "2048x2732"
+    }
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'en-US'
 SECRET_KEY = os.environ['SECRETKEY']
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -32,7 +129,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'timewebapp',
     'multiselectfield',
+    # Admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'django.contrib.admin',
+    'pwa',
 ]
 
 MIDDLEWARE = [
