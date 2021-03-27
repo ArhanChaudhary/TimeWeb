@@ -2,8 +2,11 @@
 {% load static %}
 {% comment %} Only supports English right now {% endcomment %}
 <html lang="en">
+    {% load pwa %}
     <head>
         <title>TimeWeb</title>
+        <meta charset="UTF-8">
+        {% progressive_web_app_meta %}
         <meta name="title" content="TimeWeb">
         <meta name="description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
 
@@ -11,27 +14,24 @@
         <meta property="og:url" content="https://timeweb.io/">
         <meta property="og:title" content="TimeWeb">
         <meta property="og:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
-        <meta property="og:image" content="{% static 'images/favicon32.ico' %}">
+        <meta property="og:image" content="{% static 'images/favicon.ico' %}">
 
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="https://timeweb.io/">
         <meta property="twitter:title" content="TimeWeb">
         <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
-        <meta property="twitter:image" content="{% static 'images/favicon32.ico' %}">
+        <meta property="twitter:image" content="{% static 'images/favicon.ico' %}">
 
         <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff2' %}" as="font" type="font/woff2" crossorigin="anonymous">
         <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff' %}" as="font" type="font/woff" crossorigin="anonymous">
 
-        <meta charset="UTF-8">
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#2196F3">
         <!-- Don't use defer or async because it causes the first past to be before DOMContentLoaded and mess up the transition -->
-        <link rel="shortcut icon" href="{% static 'images/favicon32.ico' %}" type="image/x-icon">
+        <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
-        <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
         {% block css %}{% endblock css %}
-        <script src="{% static 'vendor/jquery-latest.min.js' %}"></script>
+        <script src="{% static 'vendor/jquery.min.js' %}"></script>
         <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
     </head>
