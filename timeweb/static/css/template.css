@@ -181,7 +181,7 @@ rect {
     overflow: auto;
     max-height: calc(100vh - 65px);
 }
-#nav-items a {
+#nav-items * {
     text-decoration: none;
     text-align: center;
     display: block;
@@ -191,7 +191,7 @@ rect {
     font-size: 12.5px;
     background: rgb(45,59,71);
 }
-#nav-items a:hover, #nav-items a:focus {
+#nav-items *:hover, #nav-items *:focus {
     background: rgb(82,107,130);
 }
 #nav-menu svg {

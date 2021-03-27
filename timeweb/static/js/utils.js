@@ -69,4 +69,32 @@ document.addEventListener("DOMContentLoaded", function() {
             document.write(response.responseText);
         }
     }
+    // cite later
+    // https://web.dev/customize-install/
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+        console.log(e);
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+    });
+    $("#nav-items span").click(function() {
+        if (deferredPrompt) {
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then(choiceResult => {
+                if (choiceResult.outcome === 'accepted') {
+                    alert("Thanks for installing the app. Please check your home page to see it. Note: offline access doesn't work and is still in development")
+                }
+            });
+        } else {
+            alert("Progressive web apps are not supported on your browswer.")
+        }
+    });
 });
+// Lock to landscape
+// Does not work in Safari...
+try {screen.orientation.lock('landscape');} catch {}

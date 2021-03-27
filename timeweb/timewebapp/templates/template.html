@@ -22,9 +22,6 @@
         <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
         <meta property="twitter:image" content="{% static 'images/favicon.ico' %}">
 
-        <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff2' %}" as="font" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" href="{% static 'fonts/open-sans-v18-latin-600.woff' %}" as="font" type="font/woff" crossorigin="anonymous">
-
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Don't use defer or async because it causes the first past to be before DOMContentLoaded and mess up the transition -->
@@ -66,6 +63,7 @@
                         </svg>
                     </div>
                     <div id="nav-items">
+                        <span>Download the App</span>
                         {% if user.is_authenticated %}<a href="#">Settings</a>{% endif %}
                         <a href="#">Usage</a>
                         <a href="#">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
