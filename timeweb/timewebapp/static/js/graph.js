@@ -78,8 +78,6 @@ $(function() {
         font_size, // font size of the central text in the graph
         width, // Dimensions of each assignment
         height, // Dimensions of each assignment
-        wCon,
-        hCon,
         left_adjust_cutoff,
         up_adjust_cutoff;
     function PreventArrowScroll(e) {
@@ -162,7 +160,7 @@ $(function() {
 
 
                 // dat[0] is the settings and "HASHTAGassignments-container :first child" is the info div, these cancel each other out when indexing
-                selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))];
+                let selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))],
 
 
 
@@ -187,8 +185,8 @@ $(function() {
 
 
 
-                // Load in data
-                let [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
+                    // Load in data
+                    [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
@@ -218,7 +216,9 @@ $(function() {
                     return_y_cutoff, // X-coordinate to start returning y
                     return_0_cutoff, // X-coordinate to start returning 0
                     last_mouse_x, // 
-                    last_mouse_y;
+                    last_mouse_y,
+                    wCon,
+                    hCon;
                 let due_date = new Date(x),
                     disyear;
                 due_date.setDate(due_date.getDate() + x);
@@ -746,14 +746,12 @@ $(function() {
                 //
                 // Draw graph
                 //
-                let width,
-                    height;
                 function draw(x2 = false, y2 = false) {
                     const actually_draw_point = draw_point && x2 !== false;
                     if (actually_draw_point) {
                         // Cant pass in mouse_x and mouse_y as x2 and y2 because mouse_y becomes a bool
-                        mouse_x = Math.round((x2-50)/wCon);
-                        mouse_y = (height-y2-50)/hCon;
+                        var mouse_x = Math.round((x2-50)/wCon),
+                            mouse_y = (height-y2-50)/hCon;
 
                         if (mouse_x < Math.min(red_line_start_x,dif_assign)) {
                             mouse_x = Math.min(red_line_start_x,dif_assign);
@@ -775,7 +773,7 @@ $(function() {
                         last_mouse_x = mouse_x;
                         last_mouse_y = mouse_y;
                     }
-                    pset(x2, y2);
+                    pset(x2,y2);
 
                     const screen = graph.getContext("2d");
                     screen.scale(scale, scale);

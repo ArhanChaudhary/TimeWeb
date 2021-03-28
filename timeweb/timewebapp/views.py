@@ -15,6 +15,10 @@ from math import ceil, floor
 MAX_NUMBER_ASSIGNMENTS = 25
 logger = logging.getLogger('django')
 logger.propagate = False
+
+administrator_users = ['Arhan']
+get_requests = 0
+administrator_get_requests = 0
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
@@ -25,11 +29,16 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context['objlist'] = self.objlist
         self.context['data'] = [[50, "25.00", 1, (), "5.00", True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in self.objlist]
     def get(self,request):
+        global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user {request.user}')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         self.make_list(request)
         self.context['form'] = TimewebForm(None)
         logger.info(f'User {request.user} is now viewing the home page')
+        get_requests += 1
+        if request.user.username in administrator_users:
+            administrator_get_requests += 1
+        print(f"TOTAL_GET: {get_requests}, USER_GET: {get_requests-administrator_get_requests}")
         try:
             try:
                 request.session['added_assignment']

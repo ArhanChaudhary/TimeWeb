@@ -1,7 +1,3 @@
-maskable icon and replace splash text and https://css-tricks.com/snippets/css/orientation-lock/
-
-add help for safari deferprompt, "add to home page"
-
 fixed mode AJAX, UPDATE TEXT ON CLICK
 enter work               (combine with bottom) AJAX
 enter total work, command f lw != works[-2],day = len_works; if len_works + dif_assign == x: day -= 1
@@ -17,6 +13,10 @@ ffirst visit tutorial (docent work in IE, dont use safari, dark mode(?), feel fr
 fwrite nav, fgo back button because timeweb may be hidden
 bcustom user model, lowercase username,  email
 
+btest pwa for edge
+
+breplace splash text
+
 UPDATE DEFUALT EXPIRATION APP.YAML
 
 after done:
@@ -24,7 +24,7 @@ after done:
 offline pwa
 
 daily assignments (x and y will change with the assignment, x will always be (DUE TOMORROW!!!), todo will always be the min_work_time); UI: "Enter asdaily assignment" and show more to explain what they are if display_instructions is true 
-,"change a property for all assignments" (skew_ratio, nwd, fixed_mode, total mode, min_work_time), next assignment
+,"change a property for all assignments" (skew_ratio, nwd, fixed_mode, total mode, min_work_time), click timeweb logo for next assignment
 bwebscraper https://youtu.be/EAjhZsjTkqg
 assignment tags
 +/- to zoom in and out

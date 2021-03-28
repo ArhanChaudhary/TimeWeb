@@ -15,8 +15,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
-PWA_APP_NAME = "Timeweb"
-PWA_APP_DESCRIPTION = "Timeweb"
+PWA_APP_NAME = "TimeWeb"
+PWA_APP_DESCRIPTION = "TimeWeb"
 PWA_APP_THEME_COLOR = '#000000'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_DISPLAY = 'minimal-ui'
@@ -25,13 +25,13 @@ PWA_APP_ORIENTATION = 'landscape'
 PWA_APP_START_URL = '/'
 PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
-   {
-       "src": "/static/images/icons/icon-72x72.png", 
-       "sizes": "72x72"
+    {
+        "src": "/static/images/icons/icon-72x72.png",
+        "sizes": "72x72"
     }, 
     {
         "src": "/static/images/icons/icon-96x96.png", 
-        "sizes": "96x96",
+        "sizes": "96x96"
     }, 
     {
         "src": "/static/images/icons/icon-128x128.png", 
@@ -56,6 +56,36 @@ PWA_APP_ICONS = [
     {
         "src": "/static/images/icons/icon-512x512.png", 
         "sizes": "512x512"
+    }
+]
+PWA_APP_ICONS_APPLE = [
+    {
+        "src": "/static/images/icons/icon-72x72.png",
+        "size": "72x72"
+    }, 
+    {
+        "src": "/static/images/icons/icon-96x96.png", 
+        "size": "96x96"
+    }, 
+    {
+        "src": "/static/images/icons/icon-128x128.png", 
+        "size": "128x128"
+    }, 
+    {
+        "src": "/static/images/icons/icon-144x144.png",
+        "size": "144x144"
+    }, 
+    {
+        "src": "/static/images/icons/icon-152x152.png", 
+        "size": "152x152"
+    }, 
+    {
+        "src": "/static/images/icons/icon-192x192.png", 
+        "size": "192x192"
+    },
+    {
+        "src": "/static/images/icons/icon-384x384.png", 
+        "size": "384x384"
     }
 ]
 PWA_APP_SPLASH_SCREEN = [
