@@ -287,8 +287,6 @@ $(function() {
             // $(document).queue().length === 0 only runs this if no assignment is swapping; deleting while swapping is buggy
             const $this = $(this);
             const assignment_container = $this.parents(".assignment-container");
-            // Prevent deleteing or updating when animating deletion
-            assignment_container.css("pointer-events", "none");
             new Promise(function(resolve) {
                 // Scroll to assignment before it is deleted if out of view
                 assignment_container[0].scrollIntoView({
@@ -314,6 +312,7 @@ $(function() {
                         "margin-bottom": "-10px",
                         "margin-top": "-10px",
                         "min-height": "0",
+                        "pointer-events": "none",
                     }).children(":first-child").css({
                         // Absolutely position itself
                         "position": "absolute",

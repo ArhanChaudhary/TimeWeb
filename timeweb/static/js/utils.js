@@ -71,30 +71,35 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     // cite later
     // https://web.dev/customize-install/
-    let deferredPrompt;
-
+    let prompt;
     window.addEventListener('beforeinstallprompt', function(e) {
-        console.log(e);
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
         // Stash the event so it can be triggered later.
-        deferredPrompt = e;
+        prompt = e;
     });
     $("#nav-items span").click(function() {
-        if (deferredPrompt) {
+        if (prompt) {
             // Show the install prompt
-            deferredPrompt.prompt();
+            prompt.prompt();
             // Wait for the user to respond to the prompt
-            deferredPrompt.userChoice.then(choiceResult => {
+            prompt.userChoice.then(choiceResult => {
                 if (choiceResult.outcome === 'accepted') {
-                    alert("Thanks for installing the app. Please check your home page to see it. Note: offline access doesn't work and is still in development")
+                    alert("Thanks for installing the app. Note: offline access is not yet supported and in development")
                 }
             });
         } else {
-            alert("Progressive web apps are not supported on your browswer.")
+            // cite later
+            // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
+            if (/iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                alert('To install the progressive web app, click the share icon near the top right (up arrow in a box) and click "Add to Home Screen"\nPlease use the Safari browser if this is not an option');
+            } else {
+                alert("Progressive web apps are not supported on your web browser\nPlease use Google Chrome or Microsoft Edge\nIgnore this if you already have this downloaded")
+            }
         }
     });
 });
 // Lock to landscape
-// Does not work in Safari...
-try {screen.orientation.lock('landscape');} catch {}
+if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape');
+}
