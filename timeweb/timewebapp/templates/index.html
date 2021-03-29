@@ -49,7 +49,7 @@
   </div>
   <div id="assignments-container">
     <div id="info">
-      Estimated total Completion time: <span>1h 24m</span>
+      Estimated completion time: <span>1h 24m</span>
       <button id="hide-button">Hide</button>
     </div>
     {% for obj in objlist %}
@@ -81,17 +81,15 @@
               <div class="graph-footer">
                 <button class="skew-ratio-button">Set skew ratio using graph</button>
                 <input class="work-input" placeholder="Enter work done"/>
-                {% comment %} float:right breaks everything {% endcomment %}
-                <button class="fixed-mode-button">Switch to fixed mode</button>
+                <button class="fixed-mode-button"></button>
                 <br>
                 <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
                 <input class="total-work-input" placeholder="Enter total work done"/>
                 <button class="remainder-mode-button"></button>
                 <br>
-                <button class="next-assignment-button">Hide assignment</button>
+                <button class="hide-assignment-button">Hide assignment</button>
                 <button class="display-button">Display work schedule in text</button>
-                {% comment %} click again to confirm, 1s window to click {% endcomment %}
-                <button class="delete-input-button">Delete latest work input</button>
+                <button class="delete-input-button">Delete last work input</button>
               </div>
             </div>
           </div>

@@ -1,7 +1,14 @@
-fixed mode AJAX, UPDATE TEXT ON CLICK
+fadeIn for safari
+
+boptimize ajax and save and delete all at once
+
+rogue bug: first enter a lot of positive work inputs, enter negative inputs, move skew ratio, hover over graph; newly added inputs don't show up with dynamic mode
+
+bug: fixed mode not working
+
 enter work               (combine with bottom) AJAX
 enter total work, command f lw != works[-2],day = len_works; if len_works + dif_assign == x: day -= 1
-delete latest work, hold delete work input to remove a % of work inputs based on x AJAX
+delete latest work, click again to confirm (1s delay), hold delete work input to remove a % of work inputs based on x AJAX
 display work schedule, replace canvas
 
 fimplement priority, hide assignment  (3hr)

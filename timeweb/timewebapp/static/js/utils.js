@@ -92,9 +92,9 @@ document.addEventListener("DOMContentLoaded", function() {
             // cite later
             // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
             if (/iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-                alert('To install the progressive web app, click the share icon near the top right (up arrow in a box) and click "Add to Home Screen"\nPlease use the Safari browser if this is not an option');
+                alert('Click the share icon on your screen (up arrow in a square) and press "Add to Home Screen"\n\nPlease use the Safari browser if this is not an option');
             } else {
-                alert("Progressive web apps are not supported on your web browser\nPlease use Google Chrome or Microsoft Edge\nIgnore this if you already have this downloaded")
+                alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this downloaded")
             }
         }
     });

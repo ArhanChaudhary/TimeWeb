@@ -99,7 +99,7 @@ $(function() {
     }
     $(".assignment").click(function(e) {
         var e = e || window.event;
-        if ($(document).queue().length === 0 && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName)) {
+        if ($(document).queue().length === 0 && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
             // Runs if no assignments are swapping and the element clicked was the assignment background
             let assignment = $(this);
             const graph_container = assignment.find(".graph-container"),
@@ -203,7 +203,7 @@ $(function() {
                     skew_ratio_lim, // Top and bottom caps for skew ratio
                     red_line_start_x = fixed_mode ? 0 : dynamic_start, // X-coordinate of the start of the red line
                     red_line_start_y = fixed_mode ? 0 : parseFloat(works[red_line_start_x - dif_assign]), // Y-coordinate of the start of the red line
-                    len_works = works.length,
+                    len_works = works.length - 1,
                     y_fremainder = (y - red_line_start_y) % funct_round, // funct_round remainder
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only works when min_work_time is also enabled
                     len_nwd = nwd.length,
@@ -215,20 +215,14 @@ $(function() {
                     cutoff_to_use_round, // Handles minimum_work_time, explained later
                     return_y_cutoff, // X-coordinate to start returning y
                     return_0_cutoff, // X-coordinate to start returning 0
-                    last_mouse_x, // 
+                    last_mouse_x,
                     last_mouse_y,
                     wCon,
                     hCon;
-                let due_date = new Date(x),
-                    disyear;
+                // Due date
+                let due_date = new Date(x);
                 due_date.setDate(due_date.getDate() + x);
-                // Whether or not to display the year
-                if (ad.getFullYear() === due_date.getFullYear()) {
-                    disyear = '';
-                } else {
-                    disyear = ', %Y';
-                }
-                // Enable draw_point by default, determines whether to draw the point on the graph
+                // Enable draw_point by default, which determines whether to draw the point on the graph
                 let draw_point = true;
                 // Redraw graph every mousemove when set skew ratio or draw point is enabled
                 function mousemove(e) {
@@ -255,11 +249,29 @@ $(function() {
                 } else if (skew_ratio < 2 - skew_ratio_lim) {
                     skew_ratio = 2 - skew_ratio_lim;
                 }
+                // Whether or not to display the year
+                let disyear;
+                if (ad.getFullYear() === due_date.getFullYear()) {
+                    disyear = '';
+                } else {
+                    disyear = ', %Y';
+                }
+                let date_assignment_created = ad;
+                date_assignment_created.setDate(date_assignment_created.getDate() + dif_assign);
+                // Days between today and date_assignment_created
+                let today_minus_dac = Math.round((new Date() - date_assignment_created) / 86400000),
+                // Days between today and the assignment date
+                    today_minus_ad = Math.round((new Date() - ad) / 86400000),
+                    day = len_works,
+                    lw = +works[len_works];
+                if (today_minus_dac === len_works - 1 && funct(len_works+dif_assign) > lw && lw != works[-2] && !(new Date().getDay() in nwd)) {
+                    day--;
+                }
                 // Sets event handlers only on the assignment's first click
                 if (!not_first_click) {
                     // Graph resize event handler
                     $(window).resize(resize);
-                    // Ajax skew ratio
+                    // Ajax any button
                     let ajaxTimeout,
                         data = {
                             'csrfmiddlewaretoken': csrf_token,
@@ -268,14 +280,27 @@ $(function() {
                     function SendButtonAjax(key, value) {
                         // Add key and value the data going to be sent
                         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-                        data[key] = value;
+                        if (key === 'works') {
+                            if ('works' in data) {
+                                // if (value === -1) {
+                                //     data['works'].pop();
+                                // } else {
+                                    data['works'].push(value);
+                                // }
+                            } else {
+                                data['works'] = [value];
+                            }
+                        } else {
+                            data[key] = value;
+                        }
+                        console.log(data);
                         clearTimeout(ajaxTimeout);
                         ajaxTimeout = setTimeout(function() {
                             // Send data along with the assignment's primary key
 
                             // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
                             // However, I decided to skip this check and still send the ajax
-                            // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button
+                            // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
                             // Plus, a pointless ajax of this sort doesn't happen frequently, and will have a minimal impact on the server's performance
                             $.ajax({
                                 type: "POST",
@@ -290,7 +315,7 @@ $(function() {
                         }, 1000);
                     }
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
-                        fired = false, // $(document).keydown( fires for every frame a key is held down. This fires it only once
+                        fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
                         graphinterval,
                         whichkey,
                         old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
@@ -308,7 +333,7 @@ $(function() {
                             }
                         }
                         // Save skew ratio and draw
-                        selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                        selected_assignment[7] = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         old_skew_ratio = skew_ratio;
                         SendButtonAjax('skew_ratio',skew_ratio);
                         draw();
@@ -345,6 +370,11 @@ $(function() {
                             clearInterval(graphinterval);
                         }
                     });
+
+                    //
+                    // Nine buttons event listeners
+                    //
+
                     // Enable mousemove and set_skew_ratio when set skew ratio button is clicked
                     assignment.find(".skew-ratio-button").click(function() {
                         $(this).html("Hover and click the graph (click this again to cancel)").one("click", sr_button_clicked);
@@ -358,7 +388,7 @@ $(function() {
                             // stop set skew ratio if canvas is clicked
                             $(this).next().find(".skew-ratio-button").html("Set skew ratio using graph").off("click", sr_button_clicked);
                             // Save skew ratio
-                            selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                            selected_assignment[7] = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
                             SendButtonAjax('skew_ratio',skew_ratio);
                             if (!draw_point) {
@@ -389,15 +419,15 @@ $(function() {
                         // No need to ajax since skew ratio is the same
                     }
                     // Dynamically update skew ratio from textbox
-                    assignment.find(".skew-ratio-textbox").on("keydown paste click keyup", function(e) { // keydown for normal sr and keyup for delete
+                    assignment.find(".skew-ratio-textbox").on("keydown paste click keyup", function() { // keydown for normal sr and keyup for delete
                         var e = e || window.event;
                         if (old_skew_ratio === undefined) {
                             // Sets old_skew_ratio
                             old_skew_ratio = skew_ratio;
                         }
-                        if ($(e.target).val()) {
+                        if ($(this).val()) {
                             // Sets and caps skew ratio
-                            skew_ratio = $(e.target).val();
+                            skew_ratio = $(this).val();
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             } else if (skew_ratio < 2 - skew_ratio_lim) {
@@ -414,28 +444,117 @@ $(function() {
                         // Saves skew ratio on enter
                         if (e.key === "Enter") {
                             // focusout event
-                            e.target.blur();
+                            this.blur();
                         }
-                    }).focusout(function(e) {
-                        var e = e || window.event;
-                        $(e.target).val('');
+                    }).focusout(function() {
+                        $(this).val('');
                         if (old_skew_ratio !== undefined) {
                             // Save skew ratio
-                            selected_assignment[7] = skew_ratio; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                            selected_assignment[7] = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
                             SendButtonAjax('skew_ratio',skew_ratio);
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
                     });
-
+                    // Remainder mode
                     assignment.find(".remainder-mode-button").click(function() {
-                        $(this).html($(this).html() === "Remainder: Last" ? "Remainder: First" : "Remainder: Last");
                         remainder_mode = !remainder_mode;
-                        selected_assignment[14] = remainder_mode; // Change this so it is saved when the assignment is closed and then loaded in and reopened
+                        selected_assignment[14] = remainder_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+                        $(this).html($(this).html() === "Remainder: Last" ? "Remainder: First" : "Remainder: Last");
                         SendButtonAjax('remainder_mode',remainder_mode);
                         draw();
                     }).html(remainder_mode ? "Remainder: First" : "Remainder: Last"); // Initially set html for remainder mode
+                    // Fixed/dynamic mode
+                    assignment.find(".fixed-mode-button").click(function() {                    
+                        fixed_mode = !fixed_mode;
+                        selected_assignment[12] = fixed_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+                        $(this).html($(this).html() === "Switch to fixed mode" ? "Switch to dynamic mode" : "Switch to fixed mode");
+                        SendButtonAjax('fixed_mode',fixed_mode);
+                        draw();
+                    }).html(fixed_mode ? "Switch to dynamic mode" : "Switch to fixed mode");
+                    assignment.find(".work-input, .total-work-input").keypress(function(e) {
+                        var e = e || window.event;
+                        if (e.key === "Enter") {
+                            if (lw >= y) {
+                                alert("You have already finished this assignment");
+                            } else if (today_minus_dac > -1) {
+                                if ((assign_day_of_week + dif_assign + day) % 7 in nwd) {
+                                    var todo = 0;
+                                } else {
+                                    var todo = funct(day+dif_assign+1) - lw;
+                                }
+                                const rem_work = today_minus_dac === len_works - 1 && funct(len_works+dif_assign) > lw && lw != works[-2] && !(new Date().getDay() in nwd),
+                                    total_mode = $(this).is(".total-work-input");
+                                let input_done = $(this).val().trim().toLowerCase();
+                                switch (input_done) {
+                                    case "remember":
+                                        if (today_minus_dac - day > 1) {
+
+                                        }
+                                        break;
+                                    case "fin": {
+                                        break;
+                                    }
+                                    case "none": {
+                                        break;
+                                    }
+                                    default: {
+                                        input_done = input_done - lw * total_mode;
+                                        if (isNaN(input_done)) {
+                                            return alert("Value is not a number or keyword");
+                                        }
+                                    }
+                                }
+                                if (len_works+dif_assign === x-1 && (!input_done || x-1 !== today_minus_ad && input_done + lw < y && !rem_work)) {
+                                    return alert("Your last work input must complete the assignment");
+                                }
+                                let total_done = input_done + lw;
+                                if (total_done < 0) {
+                                    total_done = 0;
+                                }
+                                if (rem_work) {
+                                    works[len_works] = total_done;
+                                    len_works -= 1;
+                                } else {
+                                    works.push(total_done);
+                                }
+                                lw = total_done;
+                                len_works++;
+                                if (input_done != todo) {
+                                    if (len_works + dif_assign === x) {
+                                        dynamic_start = len_works + dif_assign - 1;
+                                    } else {
+                                        dynamic_start = len_works + dif_assign;
+                                    }
+                                    selected_assignment[13] = dynamic_start;
+                                    SendButtonAjax("dynamic_start", dynamic_start);
+                                    if (!fixed_mode) {
+                                        red_line_start_x = dynamic_start;
+                                        red_line_start_y = works[dynamic_start - dif_assign];
+                                        y_fremainder = (y - red_line_start_y) % funct_round;
+                                        if (nwd.length) {
+                                            set_mod_days();
+                                        }
+                                        set_skew_ratio_lim();
+                                        pset();
+                                    }
+                                }
+                                SendButtonAjax("works", total_done);
+                                $(this).val('');
+                                day = len_works;
+                                if (today_minus_dac === len_works - 1 && funct(len_works+dif_assign) > lw && lw != works[-2] && !(new Date().getDate() in nwd)) {
+                                    day--;
+                                }
+                                draw();
+                                if (lw >= y) {
+                                    alert("Finish!\nYou have completed this assignment, good job!");
+                                }
+                            } else {
+                                alert("Please wait until this is assigned");
+                            }
+                        }
+                    });
                 }
 
                 //
@@ -450,7 +569,7 @@ $(function() {
                 */
                 function pset(x2 = false, y2 = false) {
                     /*
-                    The purpose of this function is to calculate these eight variables:
+                    The purpose of this function is to calculate these seven variables:
                     a
                     b
                     skew_ratio
@@ -475,7 +594,7 @@ $(function() {
                     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
                     */
 
-                    // Define (x1, y1)
+                    // Define (x1, y1) and translate both variables to (0,0)
                     let x1 = x - red_line_start_x,
                         y1 = y - red_line_start_y;
                     if (len_nwd) {
@@ -687,6 +806,7 @@ $(function() {
 
                 function funct(n, translate = true) {
                     if (translate) {
+                        // Translate x coordinate 
                         n -= red_line_start_x;
                         if (len_nwd) {
                             n -= Math.floor(n / 7) * len_nwd + mods[n % 7];
@@ -698,6 +818,7 @@ $(function() {
                         }
                     }
                     if (funct_round < min_work_time && (!a && b < min_work_time_funct_round || a && (a > 0) === (n < cutoff_to_use_round))) {
+                        // Get translated y coordinate
                         var output = min_work_time_funct_round * Math.round(n * (a * n + b) / min_work_time_funct_round);
                         if (a < 0) {
                             output += cutoff_transition_value;
@@ -710,6 +831,7 @@ $(function() {
                     if (remainder_mode && output) {
                         output += y_fremainder;
                     }
+                    // Return untranslate y coordinate
                     return output + red_line_start_y;
                 }
                 function set_mod_days() {

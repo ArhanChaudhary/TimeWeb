@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
-{% comment %} Only supports English right now {% endcomment %}
+<!-- Only supports English -->
 <html lang="en">
     {% load pwa %}
     <head>
@@ -65,6 +65,7 @@
                     <div id="nav-items">
                         {% if user.is_authenticated %}
                         <a href="#">Settings</a>
+                        <!-- Prompt for installing only fires after logging in -->
                         <span>Install on Home Screen</span>
                         {% endif %}
                         <a href="#">Usage</a>
