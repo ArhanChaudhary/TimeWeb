@@ -24,9 +24,10 @@ $(function() {
             $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
         } else {
             $("#overlay").fadeOut(300,function() {
+                // Remove all error notes when form is exited
                 $(".invalid").removeClass("invalid");
                 $(".error-note").remove();
-            }).removeClass("transition-form"); // Remove all error notes when form is exited
+            }).removeClass("transition-form");
         }
         // Make rest of page retabbable
         $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
@@ -146,7 +147,7 @@ $(function() {
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
-        e.g. If this assignment is reading a book, enter "Page"
+        e.g: If this assignment is reading a book, enter "Page"
         Try changing this name to something else if you're still confused
 
         If you are unsure how to split up your assignment, this is defaulted to "Minute"`
@@ -161,7 +162,7 @@ $(function() {
     $('label[for="id_funct_round"]').info('right',
         `This is the increment of work you will complete at a time
         
-        For example, if you enter 3, you will only work in multiples of 3 (e.g: 6 units, 9 units, 15 units, etc)
+        For example, if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)
         
         If you do not wish to use the grouping value, this is defaulted to 1`
     );

@@ -136,7 +136,7 @@ header.animate {
     -webkit-box-orient: vertical;
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
 }
 .button {
     position: absolute;
@@ -221,16 +221,16 @@ canvas:focus {
     border-color: rgb(0,95,204);
     box-shadow: 0 0 0 3px rgb(0,95,204);
 }
-.work-input, .total-work-input, .display-button {
+.work-input, .total-work-input, .delete-input-button  {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
 }
-.skew-ratio-button, .skew-ratio-textbox, .next-assignment-button {
+.skew-ratio-button, .skew-ratio-textbox, .display-button {
     position: absolute;
     left: 0;
 }
-.fixed-mode-button, .remainder-mode-button, .delete-input-button {
+.fixed-mode-button, .remainder-mode-button, .hide-assignment-button {
     position: absolute;
     right: 0;
 }

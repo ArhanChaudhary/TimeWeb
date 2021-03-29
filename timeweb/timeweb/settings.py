@@ -16,14 +16,13 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 PWA_APP_NAME = "TimeWeb"
-PWA_APP_DESCRIPTION = "TimeWeb"
+PWA_APP_DESCRIPTION = "TimeWeb App"
 PWA_APP_THEME_COLOR = '#000000'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_DISPLAY = 'minimal-ui'
 PWA_APP_SCOPE = '/'
 PWA_APP_ORIENTATION = 'landscape'
 PWA_APP_START_URL = '/'
-PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
         "src": "/static/images/icons/icon-72x72.png",
@@ -294,14 +293,14 @@ LOGGING = {
             'handlers': ['console'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
-        'django.request': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-        },
-        'django.server': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-        },
+        # 'django.request': {
+        #     'handlers': ['console'],
+        #     'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
+        # },
+        # 'django.server': {
+        #     'handlers': ['console'],
+        #     'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
+        # },
     },
     'formatters': {
         'verbose': {
