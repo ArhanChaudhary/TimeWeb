@@ -17,31 +17,31 @@ def default_works():
 class TimewebModel(models.Model):
     file_sel = models.CharField(
         max_length=100,
-        verbose_name=_('Enter the Name of this Assignment'),
+        verbose_name=_('Name of this Assignment'),
     )
     ad = models.DateField(
         null=True,
-        verbose_name=_('Enter the Assignment Date'),
+        verbose_name=_('Assignment Date'),
     )
     x = models.DateField(
         null=True,
         blank=True,
-        verbose_name=_('Enter the Due Date'),
+        verbose_name=_('Due Date'),
     )
     unit = models.CharField(
         max_length=40,
         default=_("Minute"),
-        verbose_name=_('Enter the Name of each Unit of Work'),
+        verbose_name=_('Name of each Unit of Work'),
     )
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(1,_("This value cannot be less than %(limit_value)s"))],
-        verbose_name=_('Enter the Total amount of Units in this Assignment'),
+        verbose_name=_('Total number of Units in this Assignment'),
     )
     works = models.JSONField(
         default=default_works,
-        verbose_name=_('Enter the Total amount of Units already Completed'),
+        verbose_name=_('Total number of Units already Completed'),
     )
     dif_assign = models.IntegerField(
         blank=True,
@@ -50,31 +50,31 @@ class TimewebModel(models.Model):
     skew_ratio = models.DecimalField(
         max_digits=17,
         decimal_places=10,
-        verbose_name=_('Enter the Estimated amount of Time to complete each Unit of Work in Minutes'),
+        verbose_name=_('Estimated amount of Time to complete each Unit of Work in Minutes'),
         blank=True,
         null=True,
     )
     ctime = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(d(0.01),_("This value must be positive"))],
-        verbose_name=_('Enter the Estimated amount of Time to complete each Unit of Work in Minutes'),
+        validators=[MinValueValidator(0.01,_("This value must be positive"))],
+        verbose_name=_('Estimated amount of Time to complete each Unit of Work in Minutes'),
     )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(d(0.01),_("The grouping value must be positive"))],
+        validators=[MinValueValidator(0.01,_("This value must be positive"))],
         blank=True,
         null=True,
-        verbose_name=_('Enter the Grouping Value'),
+        verbose_name=_('Number of Units you will Work at a Time'),
     )
     min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(d(0.01),_("The minimum work time must be positive"))],
+        validators=[MinValueValidator(0.01,_("The minimum work time must be positive"))],
         blank=True,
         null=True,
-        verbose_name=_('Enter the Minimum Work Time per Day in Minutes'),
+        verbose_name=_('Minimum Work Time per Day in Minutes'),
     )
     nwd = MultiSelectField(
         choices=WEEKDAYS,
@@ -82,14 +82,12 @@ class TimewebModel(models.Model):
         null=True,
     )
     fixed_mode = models.BooleanField(
-        default=False,
     )
     dynamic_start = models.IntegerField(
         null=True,
         blank=True,
     )
     remainder_mode = models.BooleanField(
-        default=False,
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

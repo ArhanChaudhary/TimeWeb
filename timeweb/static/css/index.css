@@ -1,24 +1,26 @@
 #assignments-container {
     position: relative;
 }
-
+/* Only perform box-shadow and transform transitions */
 main:not(.animate) {
-    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.55,1.28);
+    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
 }
-header:not(.animate) {
-    transition: all 1.7s cubic-bezier(.29,.81,.37,.99);
+header:not(.animate), header:not(.animate)::after {
+    transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #assignments-container:not(.animate) {
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
 main.animate {
-    box-shadow: inset 0 20px 0 0 gray;
+    box-shadow: none;
 }
 header.animate {
     -webkit-transform: translateY(-70px);
         -ms-transform: translateY(-70px);
             transform: translateY(-70px);
-    height: 90px;
+}
+header.animate::after {
+    transform: translateY(0);
 }
 #assignments-container.animate {
     -webkit-transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
@@ -26,7 +28,6 @@ header.animate {
             transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
     /* transform:translateY(min(calc(100vh - 70px),calc(100% + 20px))); */
 }
-
 #info {
     font-size: 17px;
     margin-bottom: 10px;
@@ -34,12 +35,10 @@ header.animate {
 #hide-button {
     position: relative;
     left: 1px;
-    bottom: 0.65px;
+    bottom: 1px;
 }
 .assignment-container {
-    min-height: 40px;
     position: relative;
-    overflow: visible !important;
     scroll-margin: 20px;
     user-select: none;
 }
@@ -66,6 +65,10 @@ header.animate {
     transform: scale(var(--scale-percent),1.05);
     border-color: rgba(0,0,0,0.7);
     cursor: pointer;
+    box-shadow: 0 0 7px rgb(52,52,52);
+}
+.assignment:focus {
+    box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
 }
 .assignment::after {
     content: '';
@@ -79,13 +82,8 @@ header.animate {
     z-index: -1;
     transition: opacity .2s ease-in-out;
 }
-.assignment:not(.disable-hover):hover::after {
+.assignment:not(:focus):not(.disable-hover):hover::after {
     box-shadow: 0 0 7px rgb(52,52,52);
-}
-.assignment:focus::after {
-    box-shadow: 0 0 1px 4px rgb(0,95,204) !important;
-}
-.assignment:not(.disable-hover):hover::after, .assignment:focus::after {
     opacity: 1;
 }
 .assignment-header {
@@ -98,8 +96,8 @@ header.animate {
     position: relative;
 }
 .title {
-    min-width: calc(95px + 8vw);
-    max-width: calc(95px + 8vw);
+    min-width: calc(20px + 13vw);
+    max-width: calc(20px + 13vw);
     font-size: min(16.76px,calc(11px + 0.4vw));
     overflow-wrap: break-word;
 }
@@ -186,8 +184,6 @@ canvas {
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
     width: calc(100% - 34px);
-    min-height: 200px;
-    max-height: 400px;
     /* positioned really weirdly but still works */
     margin: 5px;
     margin-left: 13px;
@@ -221,7 +217,7 @@ canvas:focus {
     border-color: rgb(0,95,204);
     box-shadow: 0 0 0 3px rgb(0,95,204);
 }
-.work-input, .total-work-input, .delete-input-button  {
+.work-input-button, .total-work-input-button, .delete-work-input-button  {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -234,7 +230,7 @@ canvas:focus {
     position: absolute;
     right: 0;
 }
-.skew-ratio-textbox, .total-work-input, .remainder-mode-button {
+.skew-ratio-textbox, .total-work-input-button, .remainder-mode-button {
     margin: 7px 0;
 }
 
@@ -273,7 +269,7 @@ label[for='id_ad']::after {
     font-style: italic;
 }
 #form-wrapper {
-    width: 402px;
+    width: 465px;
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
@@ -281,20 +277,10 @@ label[for='id_ad']::after {
     border: 1px solid black;
     border-radius: 15px;
     padding-bottom: 25px;
-    -webkit-transition: -webkit-transform .3s ease-in-out;
-    transition: -webkit-transform .3s ease-in-out;
-    -o-transition: transform .3s ease-in-out;
-    transition: transform .3s ease-in-out;
-    transition: transform .3s ease-in-out, -webkit-transform .3s ease-in-out;
     position: relative;
 }
-#overlay.transition-form #form-wrapper {
-    -webkit-transform: translateY(15px);
-        -ms-transform: translateY(15px);
-            transform: translateY(15px);
-}
 #form-wrapper #new-title-line {
-    width: 377px;
+    width: calc(100% - 20px);
     position: absolute;
     margin-top: 1.25em;
     left: 10px;
@@ -362,6 +348,9 @@ label[for='id_ad']::after {
         -ms-transform: scale(1.04);
             transform: scale(1.04);
 }
+#form-wrapper .nwd-label:active {
+    transform: translateY(1px);
+}
 #form-wrapper input {
     -webkit-box-sizing: border-box;
             box-sizing: border-box; 
@@ -372,6 +361,10 @@ label[for='id_ad']::after {
     border: 1px solid black;
     border-radius: 3px;
     scroll-margin: 20px;
+}
+#form-wrapper input[type="date"] {
+    /* IOS */
+    min-width: calc(100% - 30px);
 }
 #form-wrapper #id_ctime.disabled-field, #form-wrapper label.disabled-field {
     opacity: 1;

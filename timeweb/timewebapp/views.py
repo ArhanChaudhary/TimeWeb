@@ -12,6 +12,7 @@ from django import forms
 from datetime import timedelta
 from decimal import Decimal as d
 from math import ceil, floor
+
 MAX_NUMBER_ASSIGNMENTS = 25
 logger = logging.getLogger('django')
 logger.propagate = False
@@ -27,7 +28,7 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context = {}
     def make_list(self, request):
         self.context['objlist'] = self.objlist
-        self.context['data'] = [[50, "25.00", 1, (), "5.00", True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in self.objlist]
+        self.context['data'] = [[50, "25", 1, (), "5", True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in self.objlist]
     def get(self,request):
         global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user {request.user}')
@@ -71,30 +72,7 @@ class TimewebListView(LoginRequiredMixin, View):
             else:
                 create_assignment = False
                 update_assignment = True
-            if create_assignment:
-                self.form = TimewebForm(request.POST)
-            else:
-                selected_model = get_object_or_404(TimewebModel, pk=pk)
-                if request.user != selected_model.user:
-                    logger.warning(f"User {request.user} cannot modify an assignment that isn't theirs")
-                    return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
-                # Create a form instance from user data
-                initial = {
-                    'file_sel':selected_model.file_sel,
-                    'ad':selected_model.ad,
-                    'x':selected_model.x,
-                    'unit':selected_model.unit,
-                    'y':selected_model.y,
-                    'works':selected_model.works[0],
-                    'ctime':selected_model.ctime,
-                    'nwd':selected_model.nwd,
-                }
-                if selected_model.funct_round != 1:
-                    initial['funct_round'] = selected_model.funct_round
-                if selected_model.min_work_time*selected_model.ctime:
-                    initial['min_work_time'] = selected_model.min_work_time*selected_model.ctime
-                self.form = TimewebForm(request.POST,initial=initial)
-
+            self.form = TimewebForm(request.POST)
             # Parts of the form that can only validate in views
             form_is_valid = True
             if self.objlist.exclude(pk=pk).filter(file_sel=request.POST['file_sel'].strip()).exists(): # Can't use "unique=True" because it doesnt work on reenter
@@ -113,13 +91,17 @@ class TimewebListView(LoginRequiredMixin, View):
             if form_is_valid:
                 if create_assignment: # Handle "new"
                     selected_model = self.form.save(commit=False)
-                    selected_model.skew_ratio = d("1") # Change to def_skew_ratio
+                    selected_model.skew_ratio = d("1.0000000000") # Change to def_skew_ratio
                     selected_model.fixed_mode = False
                     selected_model.remainder_mode = False
                     adone = d(str(selected_model.works))
                     selected_model.user = get_user_model().objects.get(username=request.user)
                 else: # Handle "update"
                     # Save the form and convert it back to a model
+                    selected_model = get_object_or_404(TimewebModel, pk=pk)
+                    if request.user != selected_model.user:
+                        logger.warning(f"User {request.user} cannot modify an assignment that isn't theirs")
+                        return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
                     old_data = get_object_or_404(TimewebModel, pk=pk)
                     form_data = self.form.save(commit=False)
                     selected_model.file_sel = form_data.file_sel
@@ -128,13 +110,10 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.unit = form_data.unit
                     selected_model.y = form_data.y
                     adone = d(str(form_data.works))
-                    selected_model.skew_ratio = form_data.skew_ratio
                     selected_model.ctime = form_data.ctime
                     selected_model.funct_round = form_data.funct_round
                     selected_model.min_work_time = form_data.min_work_time
                     selected_model.nwd = form_data.nwd
-                    selected_model.fixed_mode = form_data.fixed_mode
-                    selected_model.remainder_mode = form_data.remainder_mode
                 date_now = timezone.localtime(timezone.now()).date()
                 if create_assignment:
                     if date_now >= selected_model.ad:
@@ -291,24 +270,24 @@ class TimewebListView(LoginRequiredMixin, View):
                     if request.user != selected_model.user:
                         logger.warning(f"User {request.user} cannot update the fixed mode for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
-                    selected_model.remainder_mode = value == "true"
+                    selected_model.fixed_mode = value == "true"
                     selected_model.save()
                     logger.info(f'User {request.user} saved fixed mode for assignment "{selected_model.file_sel}"')
                 elif key == 'works[]':
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
                         logger.warning(f"User {request.user} cannot add work inputs for an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying to add work inputs to isn't yours")
-                    selected_model.works.extend(request.POST.getlist(key))
+                        return HttpResponseForbidden("The assignment you are trying to add work inputs isn't yours")
+                    selected_model.works = request.POST.getlist(key)
                     selected_model.save()
                     logger.info(f'User {request.user} added work input for assignment "{selected_model.file_sel}"')
                 elif key == 'dynamic_start':
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot change the start of the red line for an assignment that isn't their's")
+                        logger.warning(f"User {request.user} cannot change the dynamic start for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying change the start of the red line isn't yours")
                     selected_model.dynamic_start = value
-                    logger.info(f'User {request.user} changed the start of the red line for assignment "{selected_model.file_sel}"')
+                    logger.info(f'User {request.user} changed the dynamic start for assignment "{selected_model.file_sel}"')
                     selected_model.save()
         self.make_list(request)
         return render(request, "index.html", self.context)

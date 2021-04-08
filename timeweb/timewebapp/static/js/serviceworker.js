@@ -2,6 +2,7 @@
 
 var staticCacheName = "django-pwa-v" + new Date().getTime();
 var filesToCache = [
+    // Only cache static files and not templates because they don't get updated
     '/offline',
     '/static/css/django-pwa-app.css',
     '/static/images/icons/icon-72x72.png',
@@ -54,6 +55,7 @@ self.addEventListener("fetch", event => {
     event.respondWith(
         caches.match(event.request)
             .then(response => {
+                // Template cache will fail because it wasn't cached
                 return response || fetch(event.request);
             })
             .catch(() => {

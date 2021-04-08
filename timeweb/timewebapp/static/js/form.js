@@ -10,30 +10,40 @@ Deleting assignments
 $(function() {
    function showForm(show_instantly=false) {
         if (show_instantly) {
-            $('#overlay').show().addClass("transition-form");
+            $('#overlay').show().children().first().css("top", 15);
         } else {
-            $("#overlay").fadeIn(300).addClass("transition-form");
+            $("#overlay").fadeIn(300).children().first().animate({top: 15}, 300);
+            if (!isMobile) {
+                // Focus on first field
+                $("#id_file_sel").focus();
+            }
+            // Mobile
+            $("#image-new-container").blur();
         }
+        // Used in utils.js for handling the user typing "N" when showing the form via shift + N
+        form_is_showing = true;
         // Make rest of page untabbable
         $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
-        $('#id_works').val((+$('#id_works').val()).toFixed(2)); // Ensure #id_works has two decimal places because 0 displays as 0.0
     }
-    function hideForm(hide_instantly=false) {
+    // Globally define hideForm so it can be used in utils.js
+    hideForm = function(hide_instantly=false) {
         if (hide_instantly) {
-            $("#overlay").hide().removeClass("transition-form");
+            $("#overlay").hide().children().first();
             $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
         } else {
             $("#overlay").fadeOut(300,function() {
                 // Remove all error notes when form is exited
                 $(".invalid").removeClass("invalid");
                 $(".error-note").remove();
-            }).removeClass("transition-form");
+            }).children().first().animate({top: "0"}, 300);
         }
         // Make rest of page retabbable
         $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
         $("#menu").attr("tabindex","2");
         $("#image-new-container, #user-greeting a").attr("tabindex","1");
         $(".assignment, .graph").attr("tabindex","0");
+        // Used in utils.js for handling the user typing "N" when showing the form via shift + N
+        form_is_showing = false;
     }
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
@@ -55,7 +65,7 @@ $(function() {
             ('0' + tomorrow.getDate()).slice(-2),
         ].join('-'),
 
-        'Minute','','0.00','','',def_min_work_time].forEach(function(element, index) {
+        'Minute','','0','','',def_min_work_time].forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let nwd of Array(7).keys()) {
@@ -77,17 +87,19 @@ $(function() {
         $("#form-wrapper button").html("Modify Assignment");
         // Find which assignment in dat was clicked
         const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
-        // Define reented form fields, could have been written more efficient but it's more readable like this
+        // Reented form fields
         const form_data = [
             selected_assignment[0],
             selected_assignment[1],
             selected_assignment[2],
             selected_assignment[3],
-            selected_assignment[4],
-            selected_assignment[5][0],
-            selected_assignment[8],
-            selected_assignment[9]-1 ? selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
-            +selected_assignment[10] ? (selected_assignment[10]*selected_assignment[8]).toFixed(2) : '', // Minimum work time displays self if it isn't 0, else display nothing
+            +selected_assignment[4],
+            +selected_assignment[5][0],
+            +selected_assignment[8],
+            selected_assignment[9]-1 ? +selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
+            selected_assignment[10]*selected_assignment[8]||'', // Minimum work time displays self if it isn't 0, else display nothing
+            // Note: the minimum work time is stored as the original value divided by the completion time per unit, as it is easier to do calculations
+            // This multiplies it back to the original value so the user sees the same thing they inputted
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
@@ -99,6 +111,8 @@ $(function() {
         old_funct_round_val = $('#id_funct_round').val();
         // Show form
         showForm();
+        // Replace text accordingly to unit but don't override them with default values
+        replaceUnit(false);
     });
     // Hide form when overlay is clicked
     $("#overlay").mousedown(function(e) {
@@ -109,39 +123,49 @@ $(function() {
     });
     // Replace fields with unit when unit is "Minute"
     var old_ctime_val, old_funct_round_val;
-    function replaceUnit() {
-        const val = $("#id_unit").val();
+    function replaceUnit(replace_field_values=true) {
+        const val = $("#id_unit").val().trim();
         const plural = pluralize(val),
             singular = pluralize(val,1);
-        // Replace fields
-        if (val) {
-            $("label[for='id_y']").text("Enter the Total amount of " + plural + " in this Assignment");
-            $("label[for='id_works']").text("Enter the Total amount of " + plural + " already Completed");
-            $("label[for='id_ctime']").text("Enter the Estimated amount of Time to complete each " + singular + " in Minutes");
-        } else {
-            $("label[for='id_y']").html("Enter the Total amount of Units in this Assignment");
-            $("label[for='id_works']").html("Enter the Total amount of Units already Completed");
-            $("label[for='id_ctime']").html("Enter the Estimated amount of Time to complete each Unit of Work in Minutes");
+        if (['second','hour','day','week','month','year'].some(unit_of_time => singular.toLowerCase().includes(unit_of_time))) {
+            return alert(`You seem to be entering in "${val}," which is a unit of time. Please enter in "Minute" instead. Although this is not invalid, it's simpler using "Minute"`);
         }
-        if (singular.toUpperCase() === 'MINUTE') {
+        // Replace fields
+        // onlyText is defined at the bottom
+        if (val) {
+            $("label[for='id_y']").text("Total amount of " + plural + " in this Assignment");
+            $("label[for='id_works']").onlyText("Total amount of " + plural + " already Completed");
+            $("label[for='id_ctime']").text("Estimated amount of Time to complete each " + singular + " in Minutes");
+            $("label[for='id_funct_round']").onlyText("Amount of " + plural + " you will Work at a Time");
+        } else {
+            $("label[for='id_y']").html("Total amount of Units in this Assignment");
+            $("label[for='id_works']").onlyText("Total amount of Units already Completed");
+            $("label[for='id_ctime']").html("Estimated amount of Time to complete each Unit of Work in Minutes");
+            $("label[for='id_funct_round']").onlyText("Amount of Units you will Work at a Time");
+        }
+        if (singular.toLowerCase() === 'minute') {
             // Old values for the field when unit==="Minute" and their values are replaced with another
             old_ctime_val = $('#id_ctime').val();
             old_funct_round_val = $('#id_funct_round').val();
             // Replace with new values
-            $("#id_funct_round").val(def_minute_gv);
-            $("#id_ctime").val("1.00")
+            if (replace_field_values) {
+                $("#id_funct_round").val(def_minute_gv);
+                $("#id_ctime").val("1");
+            }
             // Disable field
-            .prop("disabled",true).addClass("disabled-field");
+            $("#id_ctime").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_ctime']").addClass("disabled-field");
         } else {
-            // Restore old values and re-enable the field
-            $("#id_funct_round").val(old_funct_round_val ? (+old_funct_round_val).toFixed(2) : '');
-            $("#id_ctime").val(old_ctime_val ? (+old_ctime_val).toFixed(2) : '').prop("disabled",false).removeClass("disabled-field");
+            if (replace_field_values) {
+                // Restore old values and re-enable the field
+                $("#id_funct_round").val(old_funct_round_val||'');
+                $("#id_ctime").val(old_ctime_val||'');
+            }
+            $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_ctime']").removeClass("disabled-field");
         }
     }
-    $("#id_unit").on('input',replaceUnit);
-
+    $("#id_unit").on('input', replaceUnit);
     // Add info buttons ($.info defined in template.js)
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
     $('label[for="id_unit"]').info('right',
@@ -160,11 +184,9 @@ $(function() {
         Changing this initial value will vertically translate all of your other work inputs accordingly`
     );
     $('label[for="id_funct_round"]').info('right',
-        `This is the increment of work you will complete at a time
+        `e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)
         
-        For example, if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)
-        
-        If you do not wish to use the grouping value, this is defaulted to 1`
+        This is useful if your unit is "Minute" as entering a number like 5 will cause you to work in clean multiples of 5 minutes`
     );
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
@@ -272,7 +294,7 @@ $(function() {
         $("#id_ctime").removeAttr("disabled");
         // Save scroll when post loads to make it seamless
         localStorage.setItem("scroll",$("main").scrollTop());
-        // Prevent button spam clicking
+        // Prevent submit button spam clicking
         $("#form-wrapper button").css("pointer-events", "none");
     });
     // Style errors if form is invalid
@@ -282,56 +304,81 @@ $(function() {
             $(this).prev().prev().children().eq(1).addClass("invalid");
         }
     });
+    // Focus on first invalid field
+    $("#form-wrapper .error-note").first().prev().children().eq(1).focus();
     // Delete assignment
     $('.delete-button').click(function() {
-        if ($(document).queue().length === 0 && confirm('Are you sure you want to delete this assignment? (Press Enter)')) {
-            // $(document).queue().length === 0 only runs this if no assignment is swapping; deleting while swapping is buggy
-            const $this = $(this);
-            const assignment_container = $this.parents(".assignment-container");
+        const $this = $(this),
+            assignment_container = $this.parents(".assignment-container");
+        if (confirm(isMobile ? 'Are you sure you want to delete this assignment?' : 'Are you sure you want to delete this assignment? (Press Enter)')) {
+            // Unfocus to prevent pressing enter to click again
+            $this.blur();
             new Promise(function(resolve) {
                 // Scroll to assignment before it is deleted if out of view
-                assignment_container[0].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                });
-                // Same promise resolver logic as in priority.js
-                resolver = resolve;
-                $("main").scroll(_scroll);
-                _scroll();
-            }).then(function() {
-                // Once the assignment, is done, this sends the data to the backend and animates its deletion
-                let data = {
-                    'csrfmiddlewaretoken': csrf_token,
-                    'deleted': $this.val(), // Primary key value
-                }
-                const success = function() {
-                    // If the data was successfully sent, delete the assignment
-                    assignment_container.css({
-                        // CSS doesn't allow transitions without presetting the property
-                        // So, use $.animate to preset and animate its property, in this case is the height
-                        "height": assignment_container.height() + 20,
-                        "margin-bottom": "-10px",
-                        "margin-top": "-10px",
-                        "min-height": "0",
-                        "pointer-events": "none",
-                    }).children(":first-child").css({
-                        // Absolutely position itself
-                        "position": "absolute",
-                        "opacity": "0",
+                setTimeout(function() {
+                    // Sometimes doesn't scroll without setTimeout
+                    assignment_container[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
                     });
-                    // Remove assignment data from dat
-                    dat.splice($("#assignments-container").children().index($this.parents(".assignment-container")),1);
-                    // Animate height
-                    assignment_container.animate({height: "10px"}, 750, "easeOutCubic", () => assignment_container.remove());
-                }
-                // Avoids page reload
-                $.ajax({
-                    type: "POST",
-                    data: data,
-                    success: success,
-                    error: error,
+                }, 0);
+                // The scroll function determines when the page has stopped scrolling and internally resolves the promise via "resolver"
+                resolver = resolve;
+                $("main").scroll(scroll);
+                scroll();
+            }).then(function() {
+                // Deny updating or deleting again after queued
+                assignment_container.css("pointer-events", "none");
+                $(document).queue(function() {
+                    // Once the assignment, is done, this sends the data to the backend and animates its deletion
+                    let data = {
+                        'csrfmiddlewaretoken': csrf_token,
+                        'deleted': $this.val(), // Primary key value
+                    }
+                    const success = function() {
+                        const assignment = assignment_container.children().first();
+                        new Promise(function(resolve) {
+                            if (assignment.hasClass("disable-hover")) {
+                                ignore_queue = true;
+                                assignment.click().find(".graph-container").one("transitionend", resolve);
+                                ignore_queue = false;
+                            } else {
+                                resolve();
+                            }
+                        }).then(function() {
+                            // Opacity CSS transition
+                            assignment.css("opacity", "0");
+                            // Animate height
+                            assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
+                                // Remove assignment data from dat
+                                dat.splice($("#assignments-container").children().index(assignment_container),1);
+                                // Remove from DOM
+                                assignment_container.remove();
+                                // Dequeue it
+                                $(document).dequeue();
+                            });
+                        });
+                    }
+                    // Send ajax to avoid a page reload
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        success: success,
+                        error: function(response, exception) {
+                            // If ajax failed, allow updating or deleting again
+                            assignment_container.css("pointer-events", "auto");
+                            error(response, exception);
+                        }
+                    });
                 });
             });
         }
     });
 });
+// Only change text of form label
+(function($) {
+    $.fn.onlyText = function(text) {
+        this[0].firstChild.nodeValue = text
+        return $(this);
+    };
+}(jQuery));

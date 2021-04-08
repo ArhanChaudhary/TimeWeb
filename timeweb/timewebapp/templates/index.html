@@ -19,7 +19,7 @@
         <div id="new-title-line"></div>
         <div id="new-title">New Assignment</div>
         <div id="top-note">* optional</div>
-        <div id="bottom-note">Tip: press enter to submit or keep pressing tab</div>
+        <div id="bottom-note">Tip: keep pressing tab</div>
         {% csrf_token %}
         {% for field in form.visible_fields %}
           <p>
@@ -80,16 +80,16 @@
               <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
                 <button class="skew-ratio-button">Set skew ratio using graph</button>
-                <input class="work-input" placeholder="Enter work done"/>
+                <input class="work-input-button" placeholder="Enter work done"/>
                 <button class="fixed-mode-button"></button>
                 <br>
                 <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
-                <input class="total-work-input" placeholder="Enter total work done"/>
+                <input class="total-work-input-button" placeholder="Enter total work done"/>
                 <button class="remainder-mode-button"></button>
                 <br>
-                <button class="hide-assignment-button">Hide assignment</button>
                 <button class="display-button">Display work schedule in text</button>
-                <button class="delete-input-button">Delete last work input</button>
+                <button class="delete-work-input-button">Delete last work input</button>
+                <button class="hide-assignment-button">Hide assignment</button>
               </div>
             </div>
           </div>

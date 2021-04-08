@@ -1,5 +1,0 @@
-# hellllloooooo anyone who reads this idk what to put here lol
-# ummm its like 2 am rn and i have a test tmrw and i need to stop coding but oh well
-
-User-agent: *
-Disallow:

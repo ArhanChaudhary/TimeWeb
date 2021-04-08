@@ -19,7 +19,7 @@ class TimewebForm(forms.ModelForm):
             'dynamic_start': forms.HiddenInput(),
             'remainder_mode': forms.HiddenInput(),
             'user': forms.HiddenInput(),
-            'works': forms.NumberInput(attrs={"min":"0","step":"0.01","value":"0.00"}),
+            'works': forms.NumberInput(attrs={"min":"0","step":"0.01","value":"0"}),
             'y': forms.NumberInput(attrs={"min":"1"}),
             'ctime': forms.NumberInput(attrs={"min":"0"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
