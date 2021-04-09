@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
     // 
-    // Handles coloring and animating assignments that were just created or modified
+    // Handles animating assignments that were just created or modified and coloring
     //
 
     // A bit of context: the backend puts "#animate-in" to an assignment that was just created and "#animate-color" to an assignment that was just modified
@@ -80,7 +80,12 @@ document.addEventListener("DOMContentLoaded", function() {
             }, 1500, "easeOutCubic");
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-        $assignment.css("background",color(k[index]));
+        if (color_priority) {
+            $assignment.css("background", color(k[index]));
+        }
+        if (text_priority) {
+            $assignment.find(".title").attr("data-priority",`Priority: ${k[index]*100}%`);
+        }
     }
     // The rest of the code auto scrolls to the assignment and then runs color_or_animate_assignment() on it only when it finishes scrolling
     $(".assignment").each(function(index) {

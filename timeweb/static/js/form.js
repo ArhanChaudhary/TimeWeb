@@ -1,9 +1,10 @@
 /*
 This file includes the code for:
 
+Swapping assignments in real time
 Showing and hiding the new assignment form
 Form utilities to make inputs more convenient
-Upading assignments
+Updating assignments
 Deleting assignments
 */
 // Note: submitted assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
@@ -24,6 +25,8 @@ $(function() {
         form_is_showing = true;
         // Make rest of page untabbable
         $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
+        // Explained later
+        replaceUnit();
     }
     // Globally define hideForm so it can be used in utils.js
     hideForm = function(hide_instantly=false) {
@@ -76,10 +79,7 @@ $(function() {
         $("#form-wrapper button").html("Create Assignment").val('');
         // Show form
         showForm();
-        // replaceUnit is explained later
-        replaceUnit();
     });
-
     // Populate reentered form on modify
     $('.update-button').click(function() {
         // Set form text
@@ -106,13 +106,8 @@ $(function() {
         selected_assignment[11].forEach(nwd => $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true));
         // Set button pk
         $("#form-wrapper button").val($(this).val());
-        // Define old field values
-        old_ctime_val = $('#id_ctime').val();
-        old_funct_round_val = $('#id_funct_round').val();
         // Show form
         showForm();
-        // Replace text accordingly to unit but don't override them with default values
-        replaceUnit(false);
     });
     // Hide form when overlay is clicked
     $("#overlay").mousedown(function(e) {
@@ -122,8 +117,7 @@ $(function() {
         hideForm();
     });
     // Replace fields with unit when unit is "Minute"
-    var old_ctime_val, old_funct_round_val;
-    function replaceUnit(replace_field_values=true) {
+    function replaceUnit() {
         const val = $("#id_unit").val().trim();
         const plural = pluralize(val),
             singular = pluralize(val,1);
@@ -133,34 +127,26 @@ $(function() {
         // Replace fields
         // onlyText is defined at the bottom
         if (val) {
-            $("label[for='id_y']").text("Total amount of " + plural + " in this Assignment");
-            $("label[for='id_works']").onlyText("Total amount of " + plural + " already Completed");
+            $("label[for='id_y']").text("Total number of " + plural + " in this Assignment");
+            $("label[for='id_works']").onlyText("Total number of " + plural + " already Completed");
             $("label[for='id_ctime']").text("Estimated amount of Time to complete each " + singular + " in Minutes");
-            $("label[for='id_funct_round']").onlyText("Amount of " + plural + " you will Work at a Time");
+            $("label[for='id_funct_round']").onlyText("Number of " + plural + " you will Work at a Time");
         } else {
-            $("label[for='id_y']").html("Total amount of Units in this Assignment");
-            $("label[for='id_works']").onlyText("Total amount of Units already Completed");
+            $("label[for='id_y']").html("Total number of Units in this Assignment");
+            $("label[for='id_works']").onlyText("Total number of Units already Completed");
             $("label[for='id_ctime']").html("Estimated amount of Time to complete each Unit of Work in Minutes");
-            $("label[for='id_funct_round']").onlyText("Amount of Units you will Work at a Time");
+            $("label[for='id_funct_round']").onlyText("Number of Units you will Work at a Time");
         }
         if (singular.toLowerCase() === 'minute') {
-            // Old values for the field when unit==="Minute" and their values are replaced with another
-            old_ctime_val = $('#id_ctime').val();
-            old_funct_round_val = $('#id_funct_round').val();
             // Replace with new values
-            if (replace_field_values) {
-                $("#id_funct_round").val(def_minute_gv);
-                $("#id_ctime").val("1");
+            if (def_minute_gv) {
+                $("#id_funct_round").val($("#id_funct_round").val()||5);
             }
+            $("#id_ctime").val("1");
             // Disable field
             $("#id_ctime").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_ctime']").addClass("disabled-field");
         } else {
-            if (replace_field_values) {
-                // Restore old values and re-enable the field
-                $("#id_funct_round").val(old_funct_round_val||'');
-                $("#id_ctime").val(old_ctime_val||'');
-            }
             $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_ctime']").removeClass("disabled-field");
         }
@@ -174,7 +160,7 @@ $(function() {
         e.g: If this assignment is reading a book, enter "Page"
         Try changing this name to something else if you're still confused
 
-        If you are unsure how to split up your assignment, this is defaulted to "Minute"`
+        If you are unsure how to split up your assignment, please enter "Minute"`
     );
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field
@@ -194,31 +180,15 @@ $(function() {
     form_inputs.focus(function() {
         this.scrollIntoView({
             behavior: 'smooth',
-            block: 'center',
+            block: 'nearest',
         });
     });
     // "$(".error-note").length" is the same thing as {% field.errors %} in the template
     if ($(".error-note").length) {
         showForm(true); // Show instantly
-        replaceUnit();
     } else {
         hideForm(true); // Hide instantly
     }
-    // Custom form validity
-    form_inputs.on("input",function() {
-        // Reset custom form validity, without this the form invalid error shows up when there is no error
-        this.setCustomValidity('');
-        // Don't allow "e" in number input
-        switch ($(this).attr("id")) {
-            case "id_works":
-            case "id_y":
-            case "id_ctime":
-            case "id_funct_round":
-            case "id_min_work_time":
-                this.validity.valid||($(this).val(''));
-                break;
-        }
-    });
     // Sets custom error message
     form_inputs.on("invalid",function() {
         let message;
@@ -247,13 +217,6 @@ $(function() {
         }
         this.setCustomValidity(message);
     });
-    // Redefine old field values when they are changed
-    $("#id_ctime").on("input",function() {
-        old_ctime_val = $(this).val();
-    });
-    $("#id_funct_round").on("input",function() {
-        old_funct_round_val = $(this).val();
-    });
     // Handles unloading and reloading of form
     // lighthouse says to use onpagehide instead of unload
     $(window).on('onpagehide' in self ? 'pagehide' : 'unload',function() {
@@ -278,22 +241,11 @@ $(function() {
         $("#form-wrapper #nwd-wrapper input").each(function(index) {
             $(this).prop('checked',pr_data[9][index]);
         });
-        // Define old field values if unit === "Minute"
-        old_ctime_val = $('#id_ctime').val();
-        old_funct_round_val = $('#id_funct_round').val();
-    }
-    if ("scroll" in localStorage) {
-        $(window).on('load', function() {
-            $("main").scrollTop(localStorage.getItem("scroll"));
-            localStorage.removeItem("scroll");
-        });
     }
     // Form submission
     $("#form-wrapper form").submit(function() {
         // Enable disabled field on submit so it's sent with post
         $("#id_ctime").removeAttr("disabled");
-        // Save scroll when post loads to make it seamless
-        localStorage.setItem("scroll",$("main").scrollTop());
         // Prevent submit button spam clicking
         $("#form-wrapper button").css("pointer-events", "none");
     });

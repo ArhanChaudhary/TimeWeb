@@ -1,5 +1,5 @@
 from django import forms
-from .models import TimewebModel
+from .models import TimewebModel, SettingsModel
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from datetime import timedelta
@@ -85,3 +85,11 @@ class TimewebForm(forms.ModelForm):
                 })
             )
         return cleaned_data
+
+class SettingsForm(forms.ModelForm):
+    class Meta:
+        model = SettingsModel
+        fields = "__all__"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""

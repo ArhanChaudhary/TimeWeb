@@ -22,8 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CSP_SCRIPT_SRC = ("'self'", )
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
-# Add nonce b64 value to header
-CSP_INCLUDE_NONCE_IN = ("script-src", )
+# Add nonce b64 value to header, use for inline scripts
+# CSP_INCLUDE_NONCE_IN = ("script-src", )
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False

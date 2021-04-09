@@ -316,6 +316,49 @@ nav.open #nav-menu::after {
 }
 
 
+
+#nwd-wrapper {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    margin: -1em 50px 0;
+}
+#nwd-wrapper input {
+    display: none !important;
+}
+#nwd-wrapper input:checked + .nwd-label {
+    border-color: rgb(128,0,0);
+    background: rgb(255,127,127);
+}
+#nwd-wrapper .nwd-label {
+    background: rgb(127,255,127);
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border: 1px solid green;
+    border-radius: 5px;
+    padding: 4px;
+    -webkit-transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
+    transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
+    -o-transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
+    transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
+    transition: transform .3s cubic-bezier(.23,.77,.11,1.94), -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
+}
+#nwd-wrapper .nwd-label:hover, #nwd-wrapper .nwd-label:focus {
+    -webkit-transform: scale(1.04);
+        -ms-transform: scale(1.04);
+            transform: scale(1.04);
+}
+#nwd-wrapper .nwd-label:active {
+    transform: translateY(1px);
+}
+
+
 /* cite later */
 /* open-sans-600 - latin */
 @font-face {

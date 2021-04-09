@@ -3,14 +3,16 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
-from decimal import Decimal as d
-WEEKDAYS = (("1",_("Monday")),
-                ("2",_("Tuesday")),
-                ("3",_("Wednesday")),
-                ("4",_("Thursday")),
-                ("5",_("Friday")),
-                ("6",_("Saturday")),
-                ("0",_("Sunday")))
+from decimal import Decimal
+WEEKDAYS = (
+    ("1",_("Monday")),
+    ("2",_("Tuesday")),
+    ("3",_("Wednesday")),
+    ("4",_("Thursday")),
+    ("5",_("Friday")),
+    ("6",_("Saturday")),
+    ("0",_("Sunday"))
+)
 def default_works():
     return 0
 
@@ -37,11 +39,9 @@ class TimewebModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(1,_("This value cannot be less than %(limit_value)s"))],
-        verbose_name=_('Total number of Units in this Assignment'),
     )
     works = models.JSONField(
         default=default_works,
-        verbose_name=_('Total number of Units already Completed'),
     )
     dif_assign = models.IntegerField(
         blank=True,
@@ -50,28 +50,25 @@ class TimewebModel(models.Model):
     skew_ratio = models.DecimalField(
         max_digits=17,
         decimal_places=10,
-        verbose_name=_('Estimated amount of Time to complete each Unit of Work in Minutes'),
         blank=True,
         null=True,
     )
     ctime = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01,_("This value must be positive"))],
-        verbose_name=_('Estimated amount of Time to complete each Unit of Work in Minutes'),
+        validators=[MinValueValidator(Decimal("0.01"),_("This value must be positive"))],
     )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01,_("This value must be positive"))],
+        validators=[MinValueValidator(Decimal("0.01"),_("This value must be positive"))],
         blank=True,
         null=True,
-        verbose_name=_('Number of Units you will Work at a Time'),
     )
     min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(0.01,_("The minimum work time must be positive"))],
+        validators=[MinValueValidator(Decimal("0.01"),_("The minimum work time must be positive"))],
         blank=True,
         null=True,
         verbose_name=_('Minimum Work Time per Day in Minutes'),
@@ -81,14 +78,12 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    fixed_mode = models.BooleanField(
-    )
+    fixed_mode = models.BooleanField()
     dynamic_start = models.IntegerField(
         null=True,
         blank=True,
     )
-    remainder_mode = models.BooleanField(
-    )
+    remainder_mode = models.BooleanField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -99,3 +94,36 @@ class TimewebModel(models.Model):
     def __str__(self):
         return self.file_sel
 
+class SettingsModel(models.Model):
+    warning_acceptance = models.IntegerField(default=50)
+    def_min_work_time = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"),_("The minimum work time must be positive"))],
+        blank=True,
+        null=True,
+    )
+    def_skew_ratio = models.DecimalField(
+        max_digits=17,
+        decimal_places=10,
+        default=1,
+    )
+    def_nwd = MultiSelectField(
+        choices=WEEKDAYS,
+        blank=True,
+        null=True,
+    )
+    def_gv_minute = models.BooleanField(default=False)
+    ignore_ends = models.BooleanField(default=False)
+    show_progress_bar = models.BooleanField(default=True)
+    show_past = models.BooleanField(default=True)
+    color_priority = models.BooleanField(default=True)
+    text_priority = models.BooleanField(default=False)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    def __str__(self):
+        return self.user.username

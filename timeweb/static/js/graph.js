@@ -2,19 +2,11 @@
 This file includes the code for:
 
 Transitioning the opening and closing of assignments
-Swapping assignments in real time
-The graph logic
-The graph style
+The entire graph logic
 All nine graph buttons and inputs
 */
-// THIS FILE HAS BEEN FULLY DOCUMENTED
+// THIS FILE HAS NOT BEEN FULLY DOCUMENTED
 $(function() {
-    // Load in assignment data
-    dat = JSON.parse(document.getElementById("load-data").textContent);
-    [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, translatez, priority_display] = dat[0];
-    def_minute_gv = def_minute_gv || '';
-    // Swaps two assignments in real time when work inputs are created or deletedt
-
     function format_minutes(total_minutes) {
         const hour = Math.floor(total_minutes / 60),
             minute = Math.ceil(total_minutes % 60);
@@ -283,7 +275,7 @@ $(function() {
                         var e = e || window.event;
                         // $(fixed_graph).is(":visible") to make sure it doesnt change when the assignment is closed
                         // !$(document.activeElement).hasClass("skew-ratio-textbox") prevents double dipping
-                        if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible")) {
+                        if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("skew-ratio-textbox")) {
                             const rect = fixed_graph.getBoundingClientRect();
                             // Makes sure graph is on screen
                             if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
@@ -384,7 +376,8 @@ $(function() {
                         }
                         if ($(this).val()) {
                             // Sets and caps skew ratio
-                            skew_ratio = $(this).val();
+                            // The skew ratio in the code is 1 more than the displayed skew ratio
+                            skew_ratio = +$(this).val()+1;
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             } else if (skew_ratio < 2 - skew_ratio_lim) {
@@ -545,7 +538,7 @@ $(function() {
                                 // Wrap in function so the outer loop can be broken out of
                                 (function() {
                                     // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                    for (red_line_start_x = Math.max(0, red_line_start_x-2); red_line_start_x >= 0; red_line_start_x--) {
+                                    for (red_line_start_x = Math.max(0, red_line_start_x-2); red_line_start_x > 0; red_line_start_x--) {
                                         red_line_start_y = works[red_line_start_x - dif_assign];
                                         y_fremainder = (y - red_line_start_y) % funct_round;
                                         if (len_nwd) {

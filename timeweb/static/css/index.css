@@ -114,6 +114,12 @@ header.animate::after {
     font-size: 0.7em;
     margin-top: calc(-1em - 3px);
 }
+.title[data-priority]::before {
+    content: attr(data-priority) !important;
+    position: absolute;
+    font-size: 0.7em;
+    margin-top: calc(-1em - 3px);
+}
 .daysleft {
     position: absolute;
     font-size: 0.7em;
@@ -209,12 +215,13 @@ canvas:focus {
     border: none;
     padding: 3px 6px;
     background: rgba(219,219,219,0.9);
-    box-shadow: 0 0 2px 2px rgba(219,219,219,0.9);
+    box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
 .graph-footer *:focus {
     border-radius: 20px;
     outline: 0;
     border-color: rgb(0,95,204);
+    background: white;
     box-shadow: 0 0 0 3px rgb(0,95,204);
 }
 .work-input-button, .total-work-input-button, .delete-work-input-button  {
@@ -310,46 +317,6 @@ label[for='id_ad']::after {
 }
 #form-wrapper label:not(.nwd-label) {
     margin: 0 49px;
-}
-#form-wrapper #nwd-wrapper {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
-    -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-    margin: -1em 50px 0;
-}
-#form-wrapper #nwd-wrapper input {
-    display: none;
-}
-#form-wrapper #nwd-wrapper input:checked + .nwd-label {
-    border-color: rgb(128,0,0);
-    background: rgb(255,127,127);
-}
-#form-wrapper .nwd-label {
-    background: rgb(127,255,127);
-    display: inline-block;
-    margin-right: 4px;
-    margin-bottom: 4px;
-    border: 1px solid green;
-    border-radius: 5px;
-    padding: 4px;
-    -webkit-transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
-    transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
-    -o-transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
-    transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
-    transition: transform .3s cubic-bezier(.23,.77,.11,1.94), -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
-}
-#form-wrapper .nwd-label:hover, #form-wrapper .nwd-label:focus {
-    -webkit-transform: scale(1.04);
-        -ms-transform: scale(1.04);
-            transform: scale(1.04);
-}
-#form-wrapper .nwd-label:active {
-    transform: translateY(1px);
 }
 #form-wrapper input {
     -webkit-box-sizing: border-box;

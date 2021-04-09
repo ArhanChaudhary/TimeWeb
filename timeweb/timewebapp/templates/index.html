@@ -4,13 +4,13 @@
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 {% endblock css %}
 {% block js %}
+{{ data|json_script:"load-data" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
 <script src="{% static 'js/form.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
-{{ data|json_script:"load-data" }}
 {% endblock js %}
 {% block content %}
   <div id="overlay">

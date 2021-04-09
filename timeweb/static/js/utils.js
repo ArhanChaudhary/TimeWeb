@@ -1,13 +1,35 @@
 /* 
 This file includes the code for:
 
+Setting up the service worker
 Starting animation
 Keybinds
 Setting assignment width on resize
 Ajax error function
 Other minor utilities
 */
+// Initialize the service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/serviceworker.js', {
+        scope: '/'
+    }).then(function (registration) {
+        // Registration was successful
+        
+    }, function (err) {
+        // registration failed :(
 
+    });
+}
+// Prevents submitting form on refresh
+// cite later 
+// https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
+if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+}
+// Load in assignment data
+dat = JSON.parse(document.getElementById("load-data").textContent);
+[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, color_priority, text_priority] = dat[0];
+def_nwd = def_nwd.map(Number);
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -129,6 +151,41 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+    // Saves current open assignments to localstorage if refreshed or redirected
+    // lighthouse says to use onpagehide instead of unload
+    $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() {
+        // Save current open assignments
+        sessionStorage.setItem("open_assignments", JSON.stringify(
+            $(".assignment.disable-hover").map(function() {
+                return $("#assignments-container").children().index($(this).parent())
+            }).toArray()
+        ));
+        // Save scroll position
+        localStorage.setItem("scroll", $("main").scrollTop());
+    });
+    // $(function() { is needed because the click event listener is set in graph.js, which uses $(function() {
+    $(function() {
+        // Reopen closed assignments
+        if ("open_assignments" in sessionStorage) {
+            JSON.parse(sessionStorage.getItem("open_assignments")).forEach(index => 
+                // Pretends created assignment isn't there to preserve index
+                $("#assignments-container").children().filter(function() { 
+                    return !$(this).is("#animate-in")
+                }).eq(index).children().first().click()
+            );
+        }
+        // Scroll to original position
+        if ("scroll" in localStorage) {
+            $("main").scrollTop(localStorage.getItem("scroll"));
+            localStorage.removeItem("scroll");
+        }
+    });
+    // Don't allow "e" in number input
+    $("input[type='number']").on("input",function() {
+        // Reset custom form validity, without this the form invalid error shows up when there is no error
+        this.setCustomValidity('');
+        this.validity.valid||($(this).val(''));
+    });
 });
 // Lock to landscape
 if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {

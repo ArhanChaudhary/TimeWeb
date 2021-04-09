@@ -13,6 +13,6 @@
         "**/vendor": true,
         "**/serviceworker.js": true,
         "**/migrations": true,
-        // "**/__init__.py": true,
+        "**/__init__.py": true,
     }
 }

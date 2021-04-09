@@ -4,14 +4,25 @@ from django.views import View
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
-from .models import TimewebModel
+from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
-from .forms import TimewebForm
+from .forms import TimewebForm, SettingsForm
 import logging
 from django import forms
 from datetime import timedelta
 from decimal import Decimal as d
 from math import ceil, floor
+
+# THIS FILE HAS NOT BEEN COMPLETELY DOCUMENTED
+
+# Automatically creates settings model when user is created
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+@receiver(post_save, sender=get_user_model())
+def create_settings_model(sender, instance, created, **kwargs):
+    logger.info(f'Created settings model for user "{instance.username}"')
+    if created:
+        SettingsModel.objects.create(user=instance)
 
 MAX_NUMBER_ASSIGNMENTS = 25
 logger = logging.getLogger('django')
@@ -20,6 +31,45 @@ logger.propagate = False
 administrator_users = ['Arhan']
 get_requests = 0
 administrator_get_requests = 0
+class SettingsView(LoginRequiredMixin, View):
+    login_url = '/login/login/'
+    redirect_field_name = 'redirect_to'
+
+    def __init__(self):
+        self.context = {}
+    def get(self,request):
+        settings_model = SettingsModel.objects.get(user__username=request.user)
+        initial = {
+            'warning_acceptance': settings_model.warning_acceptance,
+            'def_min_work_time': settings_model.def_min_work_time,
+            'def_skew_ratio': settings_model.def_skew_ratio,
+            'def_nwd': settings_model.def_nwd,
+            'def_gv_minute': settings_model.def_gv_minute,
+            'ignore_ends': settings_model.ignore_ends,
+            'show_progress_bar': settings_model.show_progress_bar,
+            'show_past': settings_model.show_past,
+            'color_priority': settings_model.color_priority,
+            'text_priority': settings_model.text_priority,
+        }
+        self.context['form'] = SettingsForm(None, initial=initial)
+        return render(request, "settings.html", self.context)
+    def post(self, request):
+        self.form = SettingsForm(request.POST)
+        if self.form.is_valid():
+            settings_model = SettingsModel.objects.get(user__username=request.user)
+            form_data = self.form.save(commit=False)
+            settings_model.warning_acceptance = form_data.warning_acceptance
+            settings_model.def_min_work_time = form_data.def_min_work_time
+            settings_model.def_skew_ratio = form_data.def_skew_ratio+1
+            settings_model.def_nwd = form_data.def_nwd
+            settings_model.def_gv_minute = form_data.def_gv_minute
+            settings_model.ignore_ends = form_data.ignore_ends
+            settings_model.show_progress_bar = form_data.show_progress_bar
+            settings_model.show_past = form_data.show_past
+            settings_model.color_priority = form_data.color_priority
+            settings_model.text_priority = form_data.text_priority
+            settings_model.save()
+        return redirect("home")
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
@@ -28,7 +78,7 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context = {}
     def make_list(self, request):
         self.context['objlist'] = self.objlist
-        self.context['data'] = [[50, "25", 1, (), "5", True, True, True, False, 0]] + [list(vars(obj).values())[2:] for obj in self.objlist]
+        self.context['data'] = [list(vars(SettingsModel.objects.get(user__username=request.user)).values())[2:]] + [list(vars(obj).values())[2:] for obj in self.objlist]
     def get(self,request):
         global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user {request.user}')
@@ -91,7 +141,7 @@ class TimewebListView(LoginRequiredMixin, View):
             if form_is_valid:
                 if create_assignment: # Handle "new"
                     selected_model = self.form.save(commit=False)
-                    selected_model.skew_ratio = d("1.0000000000") # Change to def_skew_ratio
+                    selected_model.skew_ratio = SettingsModel.objects.get(user__username=request.user).def_skew_ratio
                     selected_model.fixed_mode = False
                     selected_model.remainder_mode = False
                     adone = d(str(selected_model.works))

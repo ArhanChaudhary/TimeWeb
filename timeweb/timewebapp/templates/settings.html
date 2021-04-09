@@ -1,0 +1,14 @@
+{% extends "template.html" %}
+{% load static %}
+
+{% block js %}
+<script src="{% static 'js/settings.js' %}"></script>
+{% endblock js %}
+
+{% block content %}
+<form method="POST" autocomplete="off">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+{% endblock content %}
