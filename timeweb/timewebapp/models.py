@@ -38,7 +38,7 @@ class TimewebModel(models.Model):
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(1,_("This value cannot be less than %(limit_value)s"))],
+        validators=[MinValueValidator(1,_("This field's value cannot be less than %(limit_value)s"))],
     )
     works = models.JSONField(
         default=default_works,
@@ -56,12 +56,12 @@ class TimewebModel(models.Model):
     ctime = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"),_("This value must be positive"))],
+        validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
     )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"),_("This value must be positive"))],
+        validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
         blank=True,
         null=True,
     )
@@ -95,30 +95,54 @@ class TimewebModel(models.Model):
         return self.file_sel
 
 class SettingsModel(models.Model):
-    warning_acceptance = models.IntegerField(default=50)
+    warning_acceptance = models.IntegerField(
+        default=50,
+        validators=[MinValueValidator(1,_("This field's value must be an integer from 1 to 100")), MaxValueValidator(100,_("This field's value must be an integer from 1 to 100"))],
+        verbose_name=_('Warning Threshold in Percent'),
+    )
     def_min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"),_("The minimum work time must be positive"))],
+        validators=[MinValueValidator(Decimal("0.01"),_("The default minimum work time must be positive"))],
         blank=True,
         null=True,
+        verbose_name=_('Default Minimum Work Time per Day in Minutes'),
     )
     def_skew_ratio = models.DecimalField(
         max_digits=17,
         decimal_places=10,
         default=1,
+        verbose_name=_('Default Skew Ratio'),
     )
     def_nwd = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True,
+        verbose_name=_('Default Not Working Days'),
     )
-    def_gv_minute = models.BooleanField(default=False)
-    ignore_ends = models.BooleanField(default=False)
-    show_progress_bar = models.BooleanField(default=True)
-    show_past = models.BooleanField(default=True)
-    color_priority = models.BooleanField(default=True)
-    text_priority = models.BooleanField(default=False)
+    def_funct_round_minute = models.BooleanField(
+        default=False,
+        verbose_name=_('Round to Multiples of 5 Minutes'),
+    )
+    ignore_ends = models.BooleanField(
+        default=False,
+        verbose_name=_('Ignore Minimum Work Time Ends'),
+    )
+    show_progress_bar = models.BooleanField(
+        default=True,
+    )
+    show_past = models.BooleanField(
+        default=True,
+        verbose_name=_('Show Past Work Inputs in Text Schedule'),
+    )
+    color_priority = models.BooleanField(
+        default=True,
+        verbose_name=_('Display Priority with Color'),
+    )
+    text_priority = models.BooleanField(
+        default=False,
+        verbose_name=_('Display Priority with Text'),
+    )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

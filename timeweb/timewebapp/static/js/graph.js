@@ -577,8 +577,11 @@ $(function() {
                         }
                     });
                     assignment.find(".display-button").click(function() {
-                        alert("This has not been implented in yet");
-                    });
+                        alert("This feature has not yet been implented");
+                    }).css("text-decoration","line-through");
+                    assignment.find(".hide-assignment-button").click(function() {
+                        alert("This feature has not yet been implented");
+                    }).css("text-decoration","line-through");
                 }
 
                 //

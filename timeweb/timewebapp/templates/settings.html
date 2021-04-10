@@ -8,7 +8,9 @@
 {% block content %}
 <form method="POST" autocomplete="off">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input type="submit" value="Save">
 </form>
 {% endblock content %}

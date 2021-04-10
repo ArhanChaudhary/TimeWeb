@@ -2,7 +2,6 @@
 This file includes the code for:
 
 Setting up the service worker
-Starting animation
 Keybinds
 Setting assignment width on resize
 Ajax error function
@@ -28,7 +27,7 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("load-data").textContent);
-[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_minute_gv, ignore_ends, show_progress_bar, show_past, color_priority, text_priority] = dat[0];
+[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_past, color_priority, text_priority] = dat[0];
 def_nwd = def_nwd.map(Number);
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
@@ -47,37 +46,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if ("hide-button" in localStorage) {
         $("#hide-button").html("Show").prev().toggle();
     }
-    if ("animation-ran" in sessionStorage) {
-        // Position content so that the scrollbar doesn't clip into the header
-        $("main").css({
-            overflowY: "auto",
-            height: "calc(100vh - 70px)",
-            padding: "10px 30px",
-            marginTop: 70,
-        });
-    // Do starting animation
-    } else {
-        // If the animation has not already been run, add the class "animate" to the elements that will be animated
-        // The animation will happen instantly, because the transitions are only applied to :not(.animate)
-        // Then, when the window loads, remove ".animate". This will cause the actual transition
-        $("main, header, #assignments-container").addClass("animate");
-        // Animation has ran
-        sessionStorage.setItem("animation-ran", true);
-        // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
-        $(window).on('load', function() {
-            $("main, header, #assignments-container").removeClass("animate");
-            // Run when the header animation completely ends since the header animation takes the longest
-            $("header").one("transitionend", function() {
-                // Position content so that the scrollbar doesn't clip into the header
-                $("main").css({
-                    overflowY: "auto",
-                    height: "calc(100vh - 70px)",
-                    padding: "10px 30px",
-                    marginTop: 70,
-                });
-            });
-        });
-    }
+    $("#open-assignments").click(() => $(".assignment:not(.disable-hover)").click());
+    $("#close-assignments").click(() => $(".assignment.disable-hover").click());
+    $("#re-enable-tutorial").click(function() {
+        alert("This feature has not yet been implented");
+    }).css("text-decoration","line-through");
     // Keybinds
     form_is_showing = false;
     $(document).keydown(function(e) {
@@ -163,8 +136,8 @@ document.addEventListener("DOMContentLoaded", function() {
         // Save scroll position
         localStorage.setItem("scroll", $("main").scrollTop());
     });
-    // $(function() { is needed because the click event listener is set in graph.js, which uses $(function() {
-    $(function() {
+    // Ensure fonts load for the graph
+    document.fonts.ready.then(function () {
         // Reopen closed assignments
         if ("open_assignments" in sessionStorage) {
             JSON.parse(sessionStorage.getItem("open_assignments")).forEach(index => 
@@ -175,16 +148,11 @@ document.addEventListener("DOMContentLoaded", function() {
             );
         }
         // Scroll to original position
+        // Needs to be here so it scrolls after assignments are opened
         if ("scroll" in localStorage) {
             $("main").scrollTop(localStorage.getItem("scroll"));
             localStorage.removeItem("scroll");
         }
-    });
-    // Don't allow "e" in number input
-    $("input[type='number']").on("input",function() {
-        // Reset custom form validity, without this the form invalid error shows up when there is no error
-        this.setCustomValidity('');
-        this.validity.valid||($(this).val(''));
     });
 });
 // Lock to landscape

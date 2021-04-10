@@ -45,6 +45,38 @@ $(function() {
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a").focus(() => $("nav").addClass("open"));
+    // Position content so that the scrollbar doesn't clip into the header
+    if ("animation-ran" in sessionStorage) {
+        // Position content so that the scrollbar doesn't clip into the header
+        $("main").css({
+            overflowY: "auto",
+            height: "calc(100vh - 70px)",
+            padding: "10px 30px",
+            marginTop: 70,
+        });
+    // Do starting animation
+    } else {
+        // If the animation has not already been run, add the class "animate" to the elements that will be animated
+        // The animation will happen instantly, because the transitions are only applied to :not(.animate)
+        // Then, when the window loads, remove ".animate". This will cause the actual transition
+        $("main, header, #assignments-container").addClass("animate");
+        // Animation has ran
+        sessionStorage.setItem("animation-ran", true);
+        // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
+        $(window).on('load', function() {
+            $("main, header, #assignments-container").removeClass("animate");
+            // Run when the header animation completely ends since the header animation takes the longest
+            $("header").one("transitionend", function() {
+                // Position content so that the scrollbar doesn't clip into the header
+                $("main").css({
+                    overflowY: "auto",
+                    height: "calc(100vh - 70px)",
+                    padding: "10px 30px",
+                    marginTop: 70,
+                });
+            });
+        });
+    }
 });
 // Info tooltip
 (function($) {

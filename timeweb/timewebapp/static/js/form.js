@@ -139,7 +139,7 @@ $(function() {
         }
         if (singular.toLowerCase() === 'minute') {
             // Replace with new values
-            if (def_minute_gv) {
+            if (def_funct_round_minute) {
                 $("#id_funct_round").val($("#id_funct_round").val()||5);
             }
             $("#id_ctime").val("1");
@@ -190,30 +190,34 @@ $(function() {
         hideForm(true); // Hide instantly
     }
     // Sets custom error message
-    form_inputs.on("invalid",function() {
+    form_inputs.on("input invalid",function(e) {
         let message;
-        switch ($(this).attr("id")) {
-            case "id_file_sel":
-                message = 'Please enter an assignment name';
-                break;
-            case "id_ad":
-                message = 'The assignment date is either out of range or invalid';
-                break;
-            case "id_x":
-                if ($(this).val()) {
-                    message = 'The due date is either out of range or invalid';
-                } else {
-                    return; // Allow blank field
-                }
-                break;
-            case "id_unit":
-                message = 'Please enter a name';
-                break;
-            case "id_y":
-            case "id_works":
-            case "id_ctime":
-                message = 'Please enter a value';
-                break;
+        if (e.type === "invalid") {
+            switch ($(this).attr("id")) {
+                case "id_file_sel":
+                    message = 'Please enter an assignment name';
+                    break;
+                case "id_ad":
+                    message = 'The assignment date is either out of range or invalid';
+                    break;
+                case "id_x":
+                    if ($(this).val()) {
+                        message = 'The due date is either out of range or invalid';
+                    } else {
+                        return; // Allow blank field
+                    }
+                    break;
+                case "id_unit":
+                    message = 'Please enter a name';
+                    break;
+                case "id_y":
+                case "id_works":
+                case "id_ctime":
+                    message = 'Please enter a value';
+                    break;
+            }
+        } else {
+            message = '';
         }
         this.setCustomValidity(message);
     });
@@ -248,11 +252,16 @@ $(function() {
         $("#id_ctime").removeAttr("disabled");
         // Prevent submit button spam clicking
         $("#form-wrapper button").css("pointer-events", "none");
+        // JSON fields are picky with their number inputs, convert them to standard form
+        if (+$("#id_works").val()) {
+            $("#id_works").val(+$("#id_works").val());
+        }
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
         $(this).prev().children().eq(1).addClass("invalid");
-        if (this.id === "error_id_x" || this.id === "error_id_works") {
+        // Give the previous field an error if appropriate
+        if (this.id === "error_id_x" || this.id === "error_id_works" && $(this).text().includes("of")) {
             $(this).prev().prev().children().eq(1).addClass("invalid");
         }
     });
@@ -330,7 +339,7 @@ $(function() {
 // Only change text of form label
 (function($) {
     $.fn.onlyText = function(text) {
-        this[0].firstChild.nodeValue = text
+        this[0].firstChild.nodeValue = text;
         return $(this);
     };
 }(jQuery));

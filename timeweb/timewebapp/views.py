@@ -44,7 +44,7 @@ class SettingsView(LoginRequiredMixin, View):
             'def_min_work_time': settings_model.def_min_work_time,
             'def_skew_ratio': settings_model.def_skew_ratio,
             'def_nwd': settings_model.def_nwd,
-            'def_gv_minute': settings_model.def_gv_minute,
+            'def_funct_round_minute': settings_model.def_funct_round_minute,
             'ignore_ends': settings_model.ignore_ends,
             'show_progress_bar': settings_model.show_progress_bar,
             'show_past': settings_model.show_past,
@@ -56,20 +56,21 @@ class SettingsView(LoginRequiredMixin, View):
     def post(self, request):
         self.form = SettingsForm(request.POST)
         if self.form.is_valid():
-            settings_model = SettingsModel.objects.get(user__username=request.user)
-            form_data = self.form.save(commit=False)
-            settings_model.warning_acceptance = form_data.warning_acceptance
-            settings_model.def_min_work_time = form_data.def_min_work_time
-            settings_model.def_skew_ratio = form_data.def_skew_ratio+1
-            settings_model.def_nwd = form_data.def_nwd
-            settings_model.def_gv_minute = form_data.def_gv_minute
-            settings_model.ignore_ends = form_data.ignore_ends
-            settings_model.show_progress_bar = form_data.show_progress_bar
-            settings_model.show_past = form_data.show_past
-            settings_model.color_priority = form_data.color_priority
-            settings_model.text_priority = form_data.text_priority
+            settings_model = SettingsModel.objects.get(user__username=request.user)]
+            settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
+            settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
+            settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1
+            settings_model.def_nwd = self.form.cleaned_data.get("def_nwd")
+            settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
+            settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
+            settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
+            settings_model.show_past = self.form.cleaned_data.get("show_past")
+            settings_model.color_priority = self.form.cleaned_data.get("color_priority")
+            settings_model.text_priority = self.form.cleaned_data.get("text_priority")
             settings_model.save()
-        return redirect("home")
+            return redirect("home")
+        self.context['form'] = self.form
+        return render(request, "settings.html", self.context)
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
@@ -130,7 +131,7 @@ class TimewebListView(LoginRequiredMixin, View):
                     forms.ValidationError(_('An assignment with this name already exists'))
                 )
                 form_is_valid = False
-            if self.objlist.count() > MAX_NUMBER_ASSIGNMENTS:
+            if create_assignment and self.objlist.count() > MAX_NUMBER_ASSIGNMENTS:
                 self.form.add_error("file_sel",
                     forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS})
                 )
@@ -153,6 +154,7 @@ class TimewebListView(LoginRequiredMixin, View):
                         logger.warning(f"User {request.user} cannot modify an assignment that isn't theirs")
                         return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
                     old_data = get_object_or_404(TimewebModel, pk=pk)
+                    # Use cleaned_data instead of form.save
                     form_data = self.form.save(commit=False)
                     selected_model.file_sel = form_data.file_sel
                     selected_model.ad = form_data.ad

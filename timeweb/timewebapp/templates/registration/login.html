@@ -20,10 +20,10 @@
       <tr>
         <td>{{ form.username.label_tag }}</td>
         <td>{{ form.username }}</td>
-        <script>
+        {% comment %} <script>
           $("#id_username").attr("maxlength","10");
-          {% comment %} ABSTRACTBASEUSER {% endcomment %}
-        </script>
+          ABSTRACTBASEUSER
+        </script> {% endcomment %}
       </tr>
       <tr>
         <td>{{ form.password.label_tag }}</td>
@@ -33,6 +33,6 @@
     <input type="submit" value="login" />
     <input type="hidden" name="next" value="{{ next }}" />
   </form>
-  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-  <p><a target="_blank" href="mailto:arhan.ch@gmail.com?subject=Requesting%20Beta%20Access%20to%20TimeWeb&body=Please%20create%20my%20account%20for%20beta%20access">Need access? I'm interested in beta-testing this website!</a></p>
+  {% comment %} <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+  <p><a target="_blank" href="mailto:arhan.ch@gmail.com?subject=Requesting%20Beta%20Access%20to%20TimeWeb&body=Please%20create%20my%20account%20for%20beta%20access">Need access? I'm interested in beta-testing this website!</a></p> {% endcomment %}
 {% endblock content %}

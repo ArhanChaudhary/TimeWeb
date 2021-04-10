@@ -806,7 +806,7 @@ table#change-history tbody th {
 
 /* HEADER */
 
-header {
+#header {
     width: auto;
     height: auto;
     display: flex;
@@ -818,11 +818,11 @@ header {
     overflow: hidden;
 }
 
-header a:link, header a:visited {
+#header a:link, #header a:visited {
     color: #fff;
 }
 
-header a:focus , header a:hover {
+#header a:focus , #header a:hover {
     text-decoration: underline;
 }
 
@@ -961,6 +961,6 @@ header a:focus , header a:hover {
     min-width: 0;
 }
 
-.popup header {
+.popup #header {
     padding: 10px 20px;
 }

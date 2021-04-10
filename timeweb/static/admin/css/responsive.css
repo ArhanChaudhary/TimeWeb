@@ -37,7 +37,7 @@ input[type="submit"], button {
 
     /* Header */
 
-    header {
+    #header {
         flex-direction: column;
         padding: 15px 30px;
         justify-content: flex-start;
@@ -431,7 +431,7 @@ input[type="submit"], button {
 
     /* Login */
 
-    .login header {
+    .login #header {
         padding: 15px 20px;
     }
 
@@ -467,7 +467,7 @@ input[type="submit"], button {
 @media (max-width: 767px) {
     /* Layout */
 
-    header, #content, #footer {
+    #header, #content, #footer {
         padding: 15px;
     }
 
@@ -867,7 +867,7 @@ input[type="submit"], button {
         margin: 50px auto;
     }
 
-    .login header,
+    .login #header,
     .login #content {
         padding: 15px;
     }

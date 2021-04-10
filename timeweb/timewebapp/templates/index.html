@@ -48,9 +48,24 @@
     </div>
   </div>
   <div id="assignments-container">
-    <div id="info">
-      Estimated completion time: <span>1h 24m</span>
-      <button id="hide-button">Hide</button>
+    <div id="assignments-header">
+      <div id="info">
+        Estimated completion time: <span>1h 24m</span>
+        <button id="hide-button">Hide</button>
+      </div>
+      <div id="advanced" tabindex="0">
+        Advanced
+        <svg width="15px" height="10px">
+          <polygon class="arrow" points="10,2.5 0,2.5 5,7.5">
+          </polygon>
+        </svg>
+        <div id="advanced-options">
+          <span id="open-assignments">Open all assignments</span>
+          <span id="close-assignments">Close all assignments</span>
+          <span id="delete-assignments">Delete all finished assignments</span>
+          <span id="re-enable-tutorial">Re-enable tutorial</span>
+        </div>
+      </div>
     </div>
     {% for obj in objlist %}
       <div class="assignment-container" {% if obj.file_sel == request.session.added_assignment %}id="animate-in"{% elif obj.file_sel == request.session.reentered_assignment %}id="animate-color"{% endif %}>
