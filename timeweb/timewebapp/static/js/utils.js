@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     $("#open-assignments").click(() => $(".assignment:not(.disable-hover)").click());
     $("#close-assignments").click(() => $(".assignment.disable-hover").click());
-    $("#re-enable-tutorial").click(function() {
+    $("#re-enable-tutorial, #delete-assignments").click(function() {
         alert("This feature has not yet been implented");
     }).css("text-decoration","line-through");
     // Keybinds
@@ -117,9 +117,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             } else {
                 if (isMobile) {
-                    alert('Click the share icon on your screen (up arrow in a square) and press "Add to Home Screen"\n\nPlease use the Safari browser if this is not an option');
+                    alert('Click the share icon on your screen (up arrow in a square) and scroll to "Add to Home Screen"\n\nPlease use the Safari browser if this is not an option');
                 } else {
-                    alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge");
+                    alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed");
                 }
             }
         });

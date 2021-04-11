@@ -8,6 +8,7 @@
 {% block content %}
 <form method="POST" autocomplete="off">
     {% csrf_token %}
+    These are applied to all assignments
     <table>
         {{ form.as_table }}
     </table>

@@ -20,9 +20,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 @receiver(post_save, sender=get_user_model())
 def create_settings_model(sender, instance, created, **kwargs):
-    logger.info(f'Created settings model for user "{instance.username}"')
     if created:
         SettingsModel.objects.create(user=instance)
+        logger.info(f'Created settings model for user "{instance.username}"')
 
 MAX_NUMBER_ASSIGNMENTS = 25
 logger = logging.getLogger('django')
@@ -56,7 +56,7 @@ class SettingsView(LoginRequiredMixin, View):
     def post(self, request):
         self.form = SettingsForm(request.POST)
         if self.form.is_valid():
-            settings_model = SettingsModel.objects.get(user__username=request.user)]
+            settings_model = SettingsModel.objects.get(user__username=request.user)
             settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
             settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
             settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1
@@ -82,12 +82,12 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context['data'] = [list(vars(SettingsModel.objects.get(user__username=request.user)).values())[2:]] + [list(vars(obj).values())[2:] for obj in self.objlist]
     def get(self,request):
         global get_requests, administrator_get_requests
-        logger.info(f'Recieved GET from user {request.user}')
+        logger.info(f'Recieved GET from user \"{request.user}\"')
         # Get all of user's assignments
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         self.make_list(request)
         self.context['form'] = TimewebForm(None)
-        logger.info(f'User {request.user} is now viewing the home page')
+        logger.info(f'User \"{request.user}\" is now viewing the home page')
         get_requests += 1
         if request.user.username in administrator_users:
             administrator_get_requests += 1
@@ -112,7 +112,7 @@ class TimewebListView(LoginRequiredMixin, View):
     # However, it still cannot be referanced because 'delete-button': [''] is not a good indication
     # So, pass in a value into the button such that the new request.POST will have delete-button': [obj.pk] instead
     def post(self,request):
-        logger.info(f'Recieved POST from user {request.user}')
+        logger.info(f'Recieved POST from user \"{request.user}\"')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
             pk = request.POST['submit-button']
@@ -145,27 +145,25 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.skew_ratio = SettingsModel.objects.get(user__username=request.user).def_skew_ratio
                     selected_model.fixed_mode = False
                     selected_model.remainder_mode = False
-                    adone = d(str(selected_model.works))
+                    adone = d(selected_model.works)
                     selected_model.user = get_user_model().objects.get(username=request.user)
                 else: # Handle "update"
                     # Save the form and convert it back to a model
                     selected_model = get_object_or_404(TimewebModel, pk=pk)
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot modify an assignment that isn't theirs")
+                        logger.warning(f"User \"{request.user}\" cannot modify an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
                     old_data = get_object_or_404(TimewebModel, pk=pk)
-                    # Use cleaned_data instead of form.save
-                    form_data = self.form.save(commit=False)
-                    selected_model.file_sel = form_data.file_sel
-                    selected_model.ad = form_data.ad
-                    selected_model.x = form_data.x
-                    selected_model.unit = form_data.unit
-                    selected_model.y = form_data.y
-                    adone = d(str(form_data.works))
-                    selected_model.ctime = form_data.ctime
-                    selected_model.funct_round = form_data.funct_round
-                    selected_model.min_work_time = form_data.min_work_time
-                    selected_model.nwd = form_data.nwd
+                    selected_model.file_sel = self.form.cleaned_data.get("file_sel")
+                    selected_model.ad = self.form.cleaned_data.get("ad")
+                    selected_model.x = self.form.cleaned_data.get("x")
+                    selected_model.unit = self.form.cleaned_data.get("unit")
+                    selected_model.y = self.form.cleaned_data.get("y")
+                    adone = d(self.form.cleaned_data.get("works"))
+                    selected_model.ctime = self.form.cleaned_data.get("ctime")
+                    selected_model.funct_round = self.form.cleaned_data.get("funct_round")
+                    selected_model.min_work_time = self.form.cleaned_data.get("min_work_time")
+                    selected_model.nwd = self.form.cleaned_data.get("nwd")
                 date_now = timezone.localtime(timezone.now()).date()
                 if create_assignment:
                     if date_now >= selected_model.ad:
@@ -251,7 +249,7 @@ class TimewebListView(LoginRequiredMixin, View):
                         removed_works_end = x_num - selected_model.dif_assign
                         if old_data.works[removed_works_end] != selected_model.y:
                             removed_works_end -= 1
-                    if removed_works_start <= removed_works_end and form_data.works != old_data.works[0]: # form_data.works[0] is adone
+                    if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(adone)
                         selected_model.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + adone) for n in range(removed_works_start,removed_works_end+1)]
 
                     # Adjust dynamic_start and fixed_start in the same manner as above
@@ -272,14 +270,14 @@ class TimewebListView(LoginRequiredMixin, View):
 
                 if create_assignment:
                     request.session['added_assignment'] = selected_model.file_sel
-                    logger.info(f'User {request.user} added model "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" added model "{selected_model.file_sel}"')
                 else:
                     request.session['reentered_assignment'] = selected_model.file_sel    
-                    logger.info(f'User {request.user} updated model "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" updated model "{selected_model.file_sel}"')
                 self.make_list(request)
                 return redirect(request.path_info)
             else:
-                logger.info(f"User {request.user} submitted an invalid form")
+                logger.info(f"User \"{request.user}\" submitted an invalid form")
                 if create_assignment:
                     self.context['submit'] = 'Create Assignment'
                 else:
@@ -294,52 +292,52 @@ class TimewebListView(LoginRequiredMixin, View):
                 if key == "deleted":
                     selected_model = get_object_or_404(TimewebModel, pk=value)
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot delete an assignment that isn't their's")
+                        logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
                     selected_model.delete()
-                    logger.info(f'User {request.user} deleted assignment "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" deleted assignment "{selected_model.file_sel}"')
                 # User updated skew ratio for assignment
                 elif key == "skew_ratio":
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot update the skew ratio for an assignment that isn't their's")
+                        logger.warning(f"User \"{request.user}\" cannot update the skew ratio for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
                     selected_model.skew_ratio = value
                     selected_model.save()
-                    logger.info(f'User {request.user} saved skew ratio for assignment "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" saved skew ratio for assignment "{selected_model.file_sel}"')
                 # User updated remainder mode for assignment
                 elif key == "remainder_mode":
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot update the remainder mode for an assignment that isn't their's")
+                        logger.warning(f"User \"{request.user}\" cannot update the remainder mode for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
                     selected_model.remainder_mode = value == "true"
                     selected_model.save()
-                    logger.info(f'User {request.user} saved remainder mode for assignment "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" saved remainder mode for assignment "{selected_model.file_sel}"')
                 # User updated fixed mode for an assignment               
                 elif key == 'fixed_mode':
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot update the fixed mode for an assignment that isn't their's")
+                        logger.warning(f"User \"{request.user}\" cannot update the fixed mode for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to update isn't yours")
                     selected_model.fixed_mode = value == "true"
                     selected_model.save()
-                    logger.info(f'User {request.user} saved fixed mode for assignment "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" saved fixed mode for assignment "{selected_model.file_sel}"')
                 elif key == 'works[]':
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot add work inputs for an assignment that isn't their's")
+                        logger.warning(f"User \"{request.user}\" cannot add work inputs for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying to add work inputs isn't yours")
                     selected_model.works = request.POST.getlist(key)
                     selected_model.save()
-                    logger.info(f'User {request.user} added work input for assignment "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" added work input for assignment "{selected_model.file_sel}"')
                 elif key == 'dynamic_start':
                     selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
                     if request.user != selected_model.user:
-                        logger.warning(f"User {request.user} cannot change the dynamic start for an assignment that isn't their's")
+                        logger.warning(f"User \"{request.user}\" cannot change the dynamic start for an assignment that isn't their's")
                         return HttpResponseForbidden("The assignment you are trying change the start of the red line isn't yours")
                     selected_model.dynamic_start = value
-                    logger.info(f'User {request.user} changed the dynamic start for assignment "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" changed the dynamic start for assignment "{selected_model.file_sel}"')
                     selected_model.save()
         self.make_list(request)
         return render(request, "index.html", self.context)

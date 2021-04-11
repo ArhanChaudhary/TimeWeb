@@ -71,7 +71,7 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(Decimal("0.01"),_("The minimum work time must be positive"))],
         blank=True,
         null=True,
-        verbose_name=_('Minimum Work Time per Day in Minutes'),
+        verbose_name=_('Minimum Daily Work Time in Minutes'),
     )
     nwd = MultiSelectField(
         choices=WEEKDAYS,
@@ -106,7 +106,7 @@ class SettingsModel(models.Model):
         validators=[MinValueValidator(Decimal("0.01"),_("The default minimum work time must be positive"))],
         blank=True,
         null=True,
-        verbose_name=_('Default Minimum Work Time per Day in Minutes'),
+        verbose_name=_('Default Minimum Daily Work Time in Minutes'),
     )
     def_skew_ratio = models.DecimalField(
         max_digits=17,
@@ -118,7 +118,7 @@ class SettingsModel(models.Model):
         choices=WEEKDAYS,
         blank=True,
         null=True,
-        verbose_name=_('Default Not Working Days'),
+        verbose_name=_("Default Weekdays you won't work"),
     )
     def_funct_round_minute = models.BooleanField(
         default=False,
@@ -130,6 +130,7 @@ class SettingsModel(models.Model):
     )
     show_progress_bar = models.BooleanField(
         default=True,
+        verbose_name=_('Show Graph Progress Bar'),
     )
     show_past = models.BooleanField(
         default=True,

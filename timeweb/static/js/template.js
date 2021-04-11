@@ -7,7 +7,8 @@ $(function() {
         }
     });
     // Header responiveness
-    if ($("#user-greeting").length) { // Run if user is authenticated
+    // Terribly written but unimportant for now
+    if ($("#image-new-container").length) { // Run if user is authenticated and on home screen
         const username = $("#user-greeting a"),
                 container = $("#user-greeting"),
                 logo = $("#logo-container"),
@@ -41,12 +42,61 @@ $(function() {
             }
             $(window).resize(resize);
         });
+    } else if ($("#user-greeting").length) { // Run if user is authenticated and on settings screen
+        const username = $("#user-greeting a"),
+                container = $("#user-greeting"),
+                logo = $("#logo-container");
+        function resize() {
+            // Checks whether to hide the logo 
+            if (container.width() <= username.width()+78) {
+                container.addClass("logo-hidden");
+                $("#logo-container").css({
+                    left: 5,
+                    transform: "none",
+                });
+            } else {
+                container.removeClass("logo-hidden");
+                $("#logo-container").css({
+                    left: '',
+                    transform: '',
+                });
+            }
+            if (logo.width()+25 > username.offset().left) {
+                $("#logo-container").css("opacity", "0");
+            } else {
+                $("#logo-container").css("opacity", '');
+            }
+        }
+        username.css("max-width", "calc(100vw - 132px)");
+        resize();
+        $(window).resize(resize);
+    } else { // Run if user is on the login screen
+        function resize() {
+            if (window.innerWidth < 410) {
+                $("#logo-container").css({
+                    left: 5,
+                    transform: "none",
+                });
+            } else {
+                $("#logo-container").css({
+                    left: '',
+                    transform: '',
+                });
+            }
+            if (window.innerWidth < 320) {
+                $("#logo-container").css("opacity", "0");
+            } else {
+                $("#logo-container").css("opacity", '');
+            }
+        }
+        resize();
+        $(window).resize(resize);
     }
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a").focus(() => $("nav").addClass("open"));
     // Position content so that the scrollbar doesn't clip into the header
-    if ("animation-ran" in sessionStorage) {
+    if ("animation-ran" in sessionStorage || !$("#user-greeting").length) {
         // Position content so that the scrollbar doesn't clip into the header
         $("main").css({
             overflowY: "auto",

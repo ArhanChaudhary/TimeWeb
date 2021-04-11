@@ -106,30 +106,33 @@ if os.getenv('GAE_APPLICATION', None):
         }
     }
 else:
-    # If running locally, use a sqlite database
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+    proxy = os.environ['PROXY'] == "True"
+    if proxy:
+        # If running locally and connecting to server database, connect via the proxy.
+        #
+        #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
+        #
+        # See https://cloud.google.com/sql/docs/mysql-connect-proxy for more info
+        # 
+        # 
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'HOST': '127.0.0.1',
+                'PORT': '3306',
+                'NAME': 'timewebdb',
+                'USER': 'postgres',
+                'PASSWORD': os.environ['PASSWORD'],
+            }
         }
-    }
-    # If running locally and connecting to server database, connect via the proxy.
-    #
-    #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
-    #
-    # See https://cloud.google.com/sql/docs/mysql-connect-proxy for more info
-    # 
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.postgresql',
-    #         'HOST': '127.0.0.1',
-    #         'PORT': '3306',
-    #         'NAME': 'timewebdb',
-    #         'USER': 'postgres',
-    #         'PASSWORD': os.environ['PASSWORD'],
-    #     }
-    # }
-
+    else:
+        # If running locally, use a sqlite database
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

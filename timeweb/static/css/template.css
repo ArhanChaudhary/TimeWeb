@@ -265,11 +265,11 @@ nav.open #nav-menu::after {
 .info-button:hover .info-button-text.info-left {
     right: calc(100% + 12px);
 }
+.info-button:hover .info-button-text.info-bottom {
+    top: calc(100% + 12px);
+}
 .info-button-text {
     position: absolute;
-    -webkit-transform: translateY(-50%) translateY(7px);
-        -ms-transform: translateY(-50%) translateY(7px);
-            transform: translateY(-50%) translateY(7px);
     width: 265px;
     z-index: 3;
 
@@ -291,30 +291,42 @@ nav.open #nav-menu::after {
 }
 .info-button-text.info-right {
     left: calc(100% - 4px);
+    transform: translateY(-50%) translateY(7px);
 }
 .info-button-text.info-left {
     right: calc(100% - 4px);
+    transform: translateY(-50%) translateY(7px);
+}
+.info-button-text.info-bottom {
+    top: calc(100% - 4px);
+    transform: translateX(-50%) translateX(-2px);
 }
 .info-button-text::after {
     position: absolute;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-            transform: translateY(-50%);
     border-width: 10px;
     border-style: solid;
 }
 .info-button-text.info-right::after {
     content: "";
     right: calc(100% + 1px);
+    top: 50%;
+    transform: translateY(-50%);
     border-color: transparent black transparent transparent;
 }
 .info-button-text.info-left::after {
     content: "";
     left: calc(100% + 1px);
+    top: 50%;
+    transform: translateY(-50%);
     border-color: transparent transparent transparent black;
 }
-
+.info-button-text.info-bottom::after {
+    content: "";
+    bottom: calc(100% + 1px);
+    right: 50%;
+    transform: translateX(50%);
+    border-color: transparent transparent black transparent;
+}
 
 
 #nwd-wrapper {

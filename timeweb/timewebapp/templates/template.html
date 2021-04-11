@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
 {% load pwa %}
-<!-- Only supports English -->
 <html lang="en">
     <head>
         <title>TimeWeb</title>
@@ -14,13 +13,13 @@
         <meta property="og:url" content="https://timeweb.io/">
         <meta property="og:title" content="TimeWeb">
         <meta property="og:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
-        <meta property="og:image" content="{% static 'images/icons/favicon.ico' %}">
+        <meta property="og:image" content="{% static 'images/icons/og.png' %}">
 
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="https://timeweb.io/">
         <meta property="twitter:title" content="TimeWeb">
         <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
-        <meta property="twitter:image" content="{% static 'images/icons/favicon.ico' %}">
+        <meta property="twitter:image" content="{% static 'images/icons/og.png' %}">
 
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +36,7 @@
     <body tabindex="-1">
         <div id="site">
             <header>
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and request.path != "/settings" %}
                     <div id="image-new-container" tabindex="1">
                         <img width="60" height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
                         <div id="new-assignment-text">New Assignment</div>

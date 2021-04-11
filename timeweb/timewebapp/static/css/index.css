@@ -20,7 +20,7 @@ header.animate {
             transform: translateY(-70px);
 }
 header.animate::after {
-    transform: translateY(0);
+    transform: none;
 }
 #assignments-container.animate {
     -webkit-transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
@@ -52,7 +52,7 @@ header.animate::after {
     background: gray;
     display: none;
     color: white;
-    border: 2px solid rgb(80,80,80);
+    border: 2px solid rgba(0,0,0,0.05);
 }
 #advanced-options::before {
     content: '';
@@ -274,6 +274,7 @@ canvas:focus {
 .skew-ratio-button, .skew-ratio-textbox, .display-button {
     position: absolute;
     left: 0;
+    z-index: 1;
 }
 .fixed-mode-button, .remainder-mode-button, .hide-assignment-button {
     position: absolute;
@@ -318,7 +319,7 @@ label[for='id_ad']::after {
     font-style: italic;
 }
 #form-wrapper {
-    width: 465px;
+    width: min(100vw, 489px);
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
@@ -375,7 +376,7 @@ label[for='id_ad']::after {
     /* IOS */
     min-width: calc(100% - 30px);
 }
-#form-wrapper #id_ctime.disabled-field, #form-wrapper label.disabled-field {
+#form-wrapper input.disabled-field, #form-wrapper label.disabled-field {
     opacity: 1;
 }
 #form-wrapper label.disabled-field {
@@ -384,10 +385,10 @@ label[for='id_ad']::after {
     -o-transition: opacity .25s ease-out;
     transition: opacity .25s ease-out;
 }
-#form-wrapper #id_ctime:not(.disabled-field) {
+#form-wrapper input:not(.disabled-field) {
     padding: 1px;
 }
-#form-wrapper #id_ctime.disabled-field {
+#form-wrapper input.disabled-field {
     opacity: 0.75 !important;
     -webkit-transition: all .25s ease-out, border-width 0s, padding 0s;
     -o-transition: all .25s ease-out, border-width 0s, padding 0s;

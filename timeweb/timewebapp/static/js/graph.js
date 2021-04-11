@@ -25,9 +25,7 @@ $(function() {
     let scale, // resolution of the graph
         font_size, // font size of the central text in the graph
         width, // Dimensions of each assignment
-        height, // Dimensions of each assignment
-        left_adjust_cutoff,
-        up_adjust_cutoff;
+        height; // Dimensions of each assignment
 
     function PreventArrowScroll(e) {
         // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
@@ -36,7 +34,7 @@ $(function() {
             e.preventDefault();
         }
     }
-    // Cite later
+    // cite later
     // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
     // Date parser for safari
     function parseDate(date) {
@@ -101,30 +99,23 @@ $(function() {
                 this.querySelector(".risingarrowanimation").beginElement();
 
                 // Select the assignment data in dat
-
-
-
-
-                // dat[0] is the settings and "HASHTAGassignments-container :first child" is the info div, these cancel each other out when indexing
+                // dat[0] is the settings and "$assignments-container :first child" is the assignments-container-header div, these cancel each other out when indexing
                 let selected_assignment = dat[$("#assignments-container").children().index(assignment.parents(".assignment-container"))],
-
-
-
-
                     // Load in data
                     [file_sel, ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode] = selected_assignment;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
                 ad = new Date(ad);
-                works = works.map(Number);
-                nwd = nwd.map(Number);
-                // Ideally these should be strings, but the original program which I wrote in python had all the logic implemented as numbers
-                // Maybe in the future make these strings, but numbers work for the most part
                 y = +y;
-                min_work_time = +min_work_time;
-                funct_round = +funct_round;
+                works = works.map(Number);
+                // dif assign is already an int
+                skew_ratio = +skew_ratio;
                 ctime = +ctime;
+                funct_round = +funct_round;
+                min_work_time = +min_work_time;
+                nwd = nwd.map(Number);
+                // dynamic start is already an into
                 let mods, // Handles not working days, explained later
                     assign_day_of_week = ad.getDay(), // Used with mods
                     skew_ratio_lim, // Top and bottom caps for skew ratio
@@ -145,7 +136,9 @@ $(function() {
                     last_mouse_x,
                     last_mouse_y,
                     wCon,
-                    hCon;
+                    hCon,
+                    left_adjust_cutoff,
+                    up_adjust_cutoff;
                 // Due date
                 let due_date = new Date(x);
                 due_date.setDate(due_date.getDate() + x);
@@ -164,7 +157,6 @@ $(function() {
                     // Passes in mouse x and y to draw, explained later
                     draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
                 }
-                $(graph).mousemove(mousemove);
                 // Handles not working days, explained later
                 if (len_nwd) {
                     set_mod_days();
@@ -191,12 +183,14 @@ $(function() {
                     today_minus_ad = Math.round((new Date() - ad) / 86400000),
                     day = len_works,
                     lw = works[len_works];
-                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !(new Date().getDay() in nwd)) {
+                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay())) {
                     day--;
                 }
                 // Sets event handlers only on the assignment's first click
                 // It may make more sense to skip this entire part for now and focus on the graph logic
                 if (!not_first_click) {
+                    // Turn off mousemove to ensure there is only one mousemove handler at a time
+                    $(graph).off("mousemove").mousemove(mousemove);
                     // Graph resize event handler
                     $(window).resize(resize);
                     // Ajax any button
@@ -217,7 +211,7 @@ $(function() {
                             // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
                             // However, I decided to skip this check and still send the ajax
                             // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
-                            // Plus, a pointless ajax of this sort doesn't happen frequently, and will have a minimal impact on the server's performance
+                            // Plus, a pointless ajax of this sort won't happen frequently, and will have a minimal impact on the server's performance
                             $.ajax({
                                 type: "POST",
                                 data: data,
@@ -238,8 +232,8 @@ $(function() {
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
-                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !(new Date().getDay() in nwd);
-                            skew_ratio = (skew_ratio - 0.1).toFixed(1);
+                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay());
+                            skew_ratio = +(skew_ratio - 0.1).toFixed(1);
                             if (skew_ratio < 2 - skew_ratio_lim) {
                                 skew_ratio = skew_ratio_lim;
                             }
@@ -251,8 +245,8 @@ $(function() {
                                 }
                             }
                         } else {
-                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) <= lw && lw !== works[-2] && !(new Date().getDay() in nwd);
-                            skew_ratio = (+skew_ratio + 0.1).toFixed(1);
+                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) <= lw && lw !== works[-2] && !nwd.includes(new Date().getDay());
+                            skew_ratio = +(skew_ratio + 0.1).toFixed(1);
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             }
@@ -311,13 +305,14 @@ $(function() {
                     let change_day_mouse, change_day_upper;
                     assignment.find(".skew-ratio-button").click(function() {
                         // Determines whether or not to change the day after skew ratio is set
-                        change_day_mouse = today_minus_dac === len_works - 1 && lw !== works[-2] && !(new Date().getDay() in nwd);
+                        change_day_mouse = today_minus_dac === len_works - 1 && lw !== works[-2] && !nwd.includes(new Date().getDay());
                         // Have no idea how this works but it does
                         if (change_day_mouse) {
                             change_day_upper = lw >= funct(len_works+dif_assign);
                         }
                         $(this).html("Hover and click the graph (click this again to cancel)").one("click", cancel_sr);
-                        $(graph).mousemove(mousemove);
+                        // Turn off mousemove to ensure there is only one mousemove handler at a time
+                        $(graph).off("mousemove").mousemove(mousemove);
                         set_skew_ratio = true;
                     });
                     $(graph).click(function(e) {
@@ -354,7 +349,8 @@ $(function() {
                             // Runs if (!set_skew_ratio && !draw_point)
                             // Enable draw point
                             draw_point = true;
-                            $(this).mousemove(mousemove);
+                            // Turn off mousemove to ensure there is only one mousemove handler at a time
+                            $(this).off("mousemove").mousemove(mousemove);
                             // Pass in e because $.trigger makes e.pageX undefined
                             mousemove(e);
                         }
@@ -429,7 +425,7 @@ $(function() {
                             // Day needs to be set in case it was subtracted by one
                             day = len_works;
                             // Subtract day by one if assignment is in progress
-                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !(new Date().getDay() in nwd)) {
+                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay())) {
                                 day--;
                             }
                         } else {
@@ -450,16 +446,16 @@ $(function() {
                     }).html(fixed_mode ? "Switch to dynamic mode" : "Switch to fixed mode");
                     assignment.find(".work-input-button, .total-work-input-button").keypress(function(e) {
                         var e = e || window.event;
-                        if (e.key === "Enter") {
+                        if (e.key === "Enter" && $(this).val() /* Blank inputs are interpreted as 0 */) {
                             if (lw >= y) {
                                 alert("You have already finished this assignment");
                             } else if (today_minus_dac > -1) {
-                                if ((assign_day_of_week + dif_assign + day) % 7 in nwd) {
+                                if (nwd.includes((assign_day_of_week + dif_assign + day) % 7)) {
                                     var todo = 0;
                                 } else {
                                     var todo = funct(day + dif_assign + 1) - lw;
                                 }
-                                const rem_work = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !(new Date().getDay() in nwd),
+                                const rem_work = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay()),
                                     total_mode = $(this).hasClass("total-work-input-button");
                                 let input_done = $(this).val().trim().toLowerCase();
                                 switch (input_done) {
@@ -510,7 +506,7 @@ $(function() {
                                 SendButtonAjax("works", works);
                                 $(this).val('');
                                 day = len_works;
-                                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !(new Date().getDate() in nwd)) {
+                                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay())) {
                                     day--;
                                 }
                                 draw();
@@ -525,7 +521,7 @@ $(function() {
                     assignment.find(".delete-work-input-button").click(function() {
                         if (len_works > 0) {
                             // Change day if assignment is not in progress
-                            if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !(new Date().getDay() in nwd))) {
+                            if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay()))) {
                                 day--;
                             }
                             works.pop();
@@ -538,7 +534,7 @@ $(function() {
                                 // Wrap in function so the outer loop can be broken out of
                                 (function() {
                                     // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                    for (red_line_start_x = Math.max(0, red_line_start_x-2); red_line_start_x > 0; red_line_start_x--) {
+                                    for (red_line_start_x = red_line_start_x-2; red_line_start_x > dif_assign-1; red_line_start_x--) {
                                         red_line_start_y = works[red_line_start_x - dif_assign];
                                         y_fremainder = (y - red_line_start_y) % funct_round;
                                         if (len_nwd) {
@@ -560,6 +556,9 @@ $(function() {
                                                 return;
                                             }
                                         }
+                                    }
+                                    if (red_line_start_x < 0) {
+                                        red_line_start_x = 0;
                                     }
                                 })();
                                 red_line_start_y = works[red_line_start_x - dif_assign];
@@ -590,8 +589,8 @@ $(function() {
 
                 /* 
                 The red line for all of the assignments follow a parabola
-                The first part of the pset() function calculates the a and b values, and the second part handles the minimum work time and the return cutoffs
-                funct(n) returns the output of an^2 + bn (with no c variable because it is always translated to go through the origin)
+                The first part of the pset() function calculates the a and b values, and the second part handles the minimum work time and return cutoffs
+                funct(n) returns the output of an^2 + bn (with no c variable because it is translated to go through the origin)
                 set_mod_days() helps integrate not working days into the schedule 
                 */
                 function pset(x2 = false, y2 = false) {
@@ -765,7 +764,7 @@ $(function() {
                             }
                         }
                         if (ignore_ends_mwt) {
-                            const lower = [return_y_cutoff, y - red_line_start_y - output];
+                            const lower = [return_y_cutoff, y - output];
 
                             let did_loop = false;
                             for (let n = Math.ceil(return_y_cutoff); n < x1; n++) {
@@ -774,11 +773,11 @@ $(function() {
                                     break;
                                 }
                                 did_loop = true;
-                                var output = pre_output;
+                                output = pre_output;
                                 return_y_cutoff++;
                             }
                             if (did_loop) {
-                                const upper = [return_y_cutoff, y - red_line_start_y - output];
+                                const upper = [return_y_cutoff, y - output];
                                 return_y_cutoff = [upper, lower][+(min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
                             }
                         }
@@ -859,7 +858,7 @@ $(function() {
                     if (remainder_mode && output) {
                         output += y_fremainder;
                     }
-                    // Return untranslate y coordinate
+                    // Return untranslated y coordinate
                     return output + red_line_start_y;
                 }
 
@@ -930,6 +929,16 @@ $(function() {
                     const screen = graph.getContext("2d");
                     screen.scale(scale, scale);
                     screen.clearRect(0, 0, width, height);
+                    let move_info_down = 0;
+                    if (show_progress_bar) {
+                        move_info_down = 0;
+                        let should_be_done_x = width - 153 + funct(today_minus_ad+1)/y*145;
+                        // bar move left
+                        screen.fillStyle = "rgb(55,55,55)";
+
+                    } else {
+                        move_info_down = 70
+                    }
                     let radius = wCon / 3;
                     if (radius > 3) {
                         radius = 3;
@@ -977,7 +986,6 @@ $(function() {
                     screen.textAlign = "start";
                     screen.font = font_size + 'px Open Sans';
                     if (actually_draw_point) {
-
                         let funct_mouse_x;
                         if (mouse_y) {
                             funct_mouse_x = works[mouse_x - dif_assign];
@@ -1026,10 +1034,8 @@ $(function() {
                     graph.height = height * scale;
                     fixed_graph.width = width * scale;
                     fixed_graph.height = height * scale;
-
                     let screen = fixed_graph.getContext("2d");
                     screen.scale(scale, scale);
-                    // These only really need to be executed once since this function is run for every assignment but doesnt matter
                     const point_text = `(Day: 00/00/0000, ${pluralize(unit,1)}: ${"0".repeat(Math.abs(Math.floor(Math.log10(y)))+1 + Math.abs(Math.floor(Math.log10(funct_round))))})`;
                     screen.font = font_size + 'px Open Sans';
                     const point_text_width = screen.measureText(point_text).width,
@@ -1132,7 +1138,6 @@ $(function() {
                             }
                         }
                     }
-
                     font_size5 *= 1.2;
                     screen.font = font_size5 + 'px Open Sans';
                     const text_height = screen.measureText(0).width * 2;
@@ -1181,7 +1186,9 @@ $(function() {
                     }
                 }
                 resize();
+                //
                 // End draw graph
+                //
             }
             assignment.data('not_first_click', true);
         }

@@ -68,7 +68,7 @@ $(function() {
             ('0' + tomorrow.getDate()).slice(-2),
         ].join('-'),
 
-        'Minute','','0','','',def_min_work_time].forEach(function(element, index) {
+        '','','0','','',def_min_work_time].forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let nwd of Array(7).keys()) {
@@ -127,38 +127,44 @@ $(function() {
         // Replace fields
         // onlyText is defined at the bottom
         if (val) {
-            $("label[for='id_y']").text("Total number of " + plural + " in this Assignment");
-            $("label[for='id_works']").onlyText("Total number of " + plural + " already Completed");
-            $("label[for='id_ctime']").text("Estimated amount of Time to complete each " + singular + " in Minutes");
-            $("label[for='id_funct_round']").onlyText("Number of " + plural + " you will Work at a Time");
+            $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
+            $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
+            $("label[for='id_ctime']").text(`Estimated amount of Time to complete each ${singular} in Minutes`);
+            $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
+            $("label[for='id_funct_round'] .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         } else {
             $("label[for='id_y']").html("Total number of Units in this Assignment");
             $("label[for='id_works']").onlyText("Total number of Units already Completed");
             $("label[for='id_ctime']").html("Estimated amount of Time to complete each Unit of Work in Minutes");
-            $("label[for='id_funct_round']").onlyText("Number of Units you will Work at a Time");
+            $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
+            $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
         }
         if (singular.toLowerCase() === 'minute') {
-            // Replace with new values
-            if (def_funct_round_minute) {
-                $("#id_funct_round").val($("#id_funct_round").val()||5);
-            }
-            $("#id_ctime").val("1");
-            // Disable field
+            // Disable fields
+            $("#id_ctime").val(1);
             $("#id_ctime").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_ctime']").addClass("disabled-field");
+            if (def_funct_round_minute) {
+                $("#id_funct_round").val(5);
+                $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
+                $("label[for='id_funct_round']").addClass("disabled-field");
+            }
         } else {
             $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_ctime']").removeClass("disabled-field");
+            if (def_funct_round_minute) {
+                $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
+                $("label[for='id_funct_round']").removeClass("disabled-field");
+            }
         }
     }
-    $("#id_unit").on('input', replaceUnit);
+    $("#id_unit").on('input', replaceUnit).attr("placeholder", "Ex: Page, Paragraph, Question");
     // Add info buttons ($.info defined in template.js)
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
         e.g: If this assignment is reading a book, enter "Page"
-        Try changing this name to something else if you're still confused
 
         If you are unsure how to split up your assignment, please enter "Minute"`
     );
@@ -170,9 +176,7 @@ $(function() {
         Changing this initial value will vertically translate all of your other work inputs accordingly`
     );
     $('label[for="id_funct_round"]').info('right',
-        `e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)
-        
-        This is useful if your unit is "Minute" as entering a number like 5 will cause you to work in clean multiples of 5 minutes`
+        "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     );
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");

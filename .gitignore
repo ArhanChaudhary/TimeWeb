@@ -63,9 +63,11 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+
 env_variables.yaml
 gcldeployment.md
 original_favicon.png
+Original splash screens
 
 # Flask stuff:
 instance/
@@ -115,6 +117,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+timeweb_env
 
 # Spyder project settings
 .spyderproject
