@@ -12,7 +12,7 @@ from django import forms
 from datetime import timedelta
 from decimal import Decimal as d
 from math import ceil, floor
-
+import json
 # THIS FILE HAS NOT BEEN COMPLETELY DOCUMENTED
 
 # Automatically creates settings model when user is created
@@ -79,7 +79,7 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context = {}
     def make_list(self, request):
         self.context['objlist'] = self.objlist
-        self.context['data'] = [list(vars(SettingsModel.objects.get(user__username=request.user)).values())[2:]] + [list(vars(obj).values())[2:] for obj in self.objlist]
+        self.context['data'] = [list(vars(SettingsModel.objects.get(user__username=request.user)).values())[2:-1]] + [list(vars(obj).values())[2:-1] for obj in self.objlist]
     def get(self,request):
         global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user \"{request.user}\"')

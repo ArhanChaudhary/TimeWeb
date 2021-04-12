@@ -1,5 +1,5 @@
 runtime: python39
-default_expiration: "1m"
+default_expiration: "30m"
 entrypoint: gunicorn -b :$PORT timeweb.wsgi
 handlers:
   # This configures Google App Engine to serve the files in the app's static directory

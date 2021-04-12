@@ -370,8 +370,6 @@ nav.open #nav-menu::after {
     transform: translateY(1px);
 }
 
-
-/* cite later */
 /* open-sans-600 - latin */
 @font-face {
     font-family: 'Open Sans';

@@ -41,7 +41,7 @@ header.animate::after {
     border-bottom: 1px solid;
     cursor: pointer;
 }
-#advanced:focus #advanced-options {
+#advanced:focus #advanced-options, #advanced-options:hover {
     display: block;
 }
 #advanced-options {
@@ -319,14 +319,14 @@ label[for='id_ad']::after {
     font-style: italic;
 }
 #form-wrapper {
-    width: min(100vw, 489px);
+    width: min(100vw, 490px);
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
     margin: 5px auto 35px;
     border: 1px solid black;
     border-radius: 15px;
-    padding-bottom: 25px;
+    padding: 5px 5px 25px 5px;
     position: relative;
 }
 #form-wrapper #new-title-line {

@@ -7,20 +7,18 @@
         <meta charset="UTF-8">
         {% progressive_web_app_meta %}
         <meta name="title" content="TimeWeb">
-        <meta name="description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
+        <meta name="description" content="TimeWeb -- An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments.">
 
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://timeweb.io/">
         <meta property="og:title" content="TimeWeb">
-        <meta property="og:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
+        <meta property="og:description" content="TimeWeb -- An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments.">
         <meta property="og:image" content="{% static 'images/icons/og.png' %}">
-
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="https://timeweb.io/">
         <meta property="twitter:title" content="TimeWeb">
-        <meta property="twitter:description" content="TimeWeb is a tool designed to help users manage their time by prioritizing, sorting, and listing each of their daily school or work assignments.">
+        <meta property="twitter:description" content="TimeWeb -- An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments.">
         <meta property="twitter:image" content="{% static 'images/icons/og.png' %}">
-
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Don't use defer or async because it causes the first paint to be before DOMContentLoaded and mess up the transition -->
@@ -31,12 +29,12 @@
         <script src="{% static 'vendor/jquery.min.js' %}"></script>
         <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
-        <noscript>Your browser does not support or has disabled javascript. This page is currently unable to become interactive</noscript>
+        <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
     <body tabindex="-1">
         <div id="site">
             <header>
-                {% if user.is_authenticated and request.path != "/settings" %}
+                {% if user.is_authenticated and request.path == "/" %}
                     <div id="image-new-container" tabindex="1">
                         <img width="60" height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
                         <div id="new-assignment-text">New Assignment</div>
@@ -75,7 +73,7 @@
                         <a href="#">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
                         <a href="#">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
                         <a href="#">How Does This Work</a>
-                        <a href="#">Terms of Service</a>
+                        <a href="{% static 'nav/terms.html' %}">Terms of Service</a>
                         <a href="#">Privacy Policy</a>
                         <a href="#">Licenses</a>
                         <a href="#">Changelog</a>

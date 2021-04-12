@@ -91,6 +91,9 @@ $(function() {
         }
         resize();
         $(window).resize(resize);
+        // Reset storages
+        sessionStorage.removeItem("open_assignments");
+        localStorage.removeItem("scroll");
     }
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a").focusout(() => $("nav").removeClass("open"));

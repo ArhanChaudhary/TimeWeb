@@ -34,7 +34,7 @@ $(function() {
             e.preventDefault();
         }
     }
-    // cite later
+    // Cite later
     // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
     // Date parser for safari
     function parseDate(date) {
@@ -51,7 +51,7 @@ $(function() {
         // There is no other assignment being animated (ignored with ignore_queue=true)
         // The background of the assignment was clicked
         // The footer wasn't clicked (to prevent accidental closing)
-        if ((ignore_queue||$(document).queue().length === 0) && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
+        if ((ignore_queue || $(document).queue().length === 0) && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
             // Runs if no assignments are swapping and the element clicked was the assignment background
             let assignment = $(this);
             const graph_container = assignment.find(".graph-container"),
@@ -66,8 +66,8 @@ $(function() {
                     // Hide graph when transition ends
                     assignment.css("overflow", "");
                     graph_container.removeAttr("style")
-                    // Used in form.js to resolve a promise to transition deleting the assignment
-                    .trigger("transitionend");
+                        // Used in form.js to resolve a promise to transition deleting the assignment
+                        .trigger("transitionend");
                 });
                 // Begin arrow animation
                 this.querySelector(".fallingarrowanimation").beginElement();
@@ -148,14 +148,8 @@ $(function() {
                 function mousemove(e) {
                     var e = e || window.event;
                     const offset = $(fixed_graph).offset();
-                    let radius = wCon / 3;
-                    if (radius > 3) {
-                        radius = 3;
-                    } else if (radius < 2) {
-                        radius = 2;
-                    }
                     // Passes in mouse x and y to draw, explained later
-                    draw(e.pageX - offset.left + radius, e.pageY - offset.top - radius);
+                    draw(e.pageX - offset.left, e.pageY - offset.top);
                 }
                 // Handles not working days, explained later
                 if (len_nwd) {
@@ -253,7 +247,7 @@ $(function() {
                             // Changes the day if the original todo before the skew ratio is added becomes greater than the actual work input
                             if (change_day) {
                                 pset();
-                                if (funct(len_works+dif_assign) > lw) {
+                                if (funct(len_works + dif_assign) > lw) {
                                     day--;
                                 }
                             }
@@ -308,7 +302,7 @@ $(function() {
                         change_day_mouse = today_minus_dac === len_works - 1 && lw !== works[-2] && !nwd.includes(new Date().getDay());
                         // Have no idea how this works but it does
                         if (change_day_mouse) {
-                            change_day_upper = lw >= funct(len_works+dif_assign);
+                            change_day_upper = lw >= funct(len_works + dif_assign);
                         }
                         $(this).html("Hover and click the graph (click this again to cancel)").one("click", cancel_sr);
                         // Turn off mousemove to ensure there is only one mousemove handler at a time
@@ -327,9 +321,9 @@ $(function() {
                             if (change_day_mouse) {
                                 pset();
                                 if (change_day_upper) {
-                                    day -= lw < funct(len_works+dif_assign);
+                                    day -= lw < funct(len_works + dif_assign);
                                 } else {
-                                    day += lw >= funct(len_works+dif_assign);
+                                    day += lw >= funct(len_works + dif_assign);
                                 }
                                 change_day_mouse = false;
                             }
@@ -373,7 +367,7 @@ $(function() {
                         if ($(this).val()) {
                             // Sets and caps skew ratio
                             // The skew ratio in the code is 1 more than the displayed skew ratio
-                            skew_ratio = +$(this).val()+1;
+                            skew_ratio = +$(this).val() + 1;
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             } else if (skew_ratio < 2 - skew_ratio_lim) {
@@ -407,15 +401,15 @@ $(function() {
                     assignment.find(".remainder-mode-button").click(function() {
                         remainder_mode = !remainder_mode;
                         selected_assignment[14] = remainder_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        $(this).html($(this).html() === "Remainder: Last" ? "Remainder: First" : "Remainder: Last");
+                        $(this).html($(this).html() === "Switch to Remainder: First" ? "Switch to Remainder: Last" : "Switch to Remainder: First");
                         SendButtonAjax('remainder_mode', remainder_mode);
                         draw();
-                    }).html(remainder_mode ? "Remainder: First" : "Remainder: Last"); // Initially set html for remainder mode
+                    }).html(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First"); // Initially set html for remainder mode
                     // Fixed/dynamic mode
                     assignment.find(".fixed-mode-button").click(function() {
                         fixed_mode = !fixed_mode;
                         selected_assignment[12] = fixed_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        $(this).html($(this).html() === "Switch to fixed mode" ? "Switch to dynamic mode" : "Switch to fixed mode");
+                        $(this).html($(this).html() === "Switch to Fixed mode" ? "Switch to Dynamic mode" : "Switch to Fixed mode");
                         SendButtonAjax('fixed_mode', fixed_mode);
                         if (fixed_mode) {
                             // Set start of red line and pset()
@@ -446,7 +440,7 @@ $(function() {
                     }).html(fixed_mode ? "Switch to dynamic mode" : "Switch to fixed mode");
                     assignment.find(".work-input-button, .total-work-input-button").keypress(function(e) {
                         var e = e || window.event;
-                        if (e.key === "Enter" && $(this).val() /* Blank inputs are interpreted as 0 */) {
+                        if (e.key === "Enter" && $(this).val() /* Blank inputs are interpreted as 0 */ ) {
                             if (lw >= y) {
                                 alert("You have already finished this assignment");
                             } else if (today_minus_dac > -1) {
@@ -534,7 +528,7 @@ $(function() {
                                 // Wrap in function so the outer loop can be broken out of
                                 (function() {
                                     // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                    for (red_line_start_x = red_line_start_x-2; red_line_start_x > dif_assign-1; red_line_start_x--) {
+                                    for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign - 1; red_line_start_x--) {
                                         red_line_start_y = works[red_line_start_x - dif_assign];
                                         y_fremainder = (y - red_line_start_y) % funct_round;
                                         if (len_nwd) {
@@ -544,12 +538,12 @@ $(function() {
                                         pset();
                                         // The inner for loop checks if every work input is the same as the red line for all work inputs greater than that red_line_start_x
                                         let next_funct = funct(red_line_start_x),
-                                            next_work = works[red_line_start_x - dif_assign];                        
+                                            next_work = works[red_line_start_x - dif_assign];
                                         for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
                                             const this_funct = next_funct,
                                                 this_work = next_work;
-                                            next_funct = funct(i+1),
-                                            next_work = works[i-dif_assign+1];
+                                            next_funct = funct(i + 1),
+                                                next_work = works[i - dif_assign + 1];
                                             // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
                                             if (next_funct - this_funct !== next_work - this_work) {
                                                 red_line_start_x++;
@@ -577,10 +571,10 @@ $(function() {
                     });
                     assignment.find(".display-button").click(function() {
                         alert("This feature has not yet been implented");
-                    }).css("text-decoration","line-through");
+                    }).css("text-decoration", "line-through");
                     assignment.find(".hide-assignment-button").click(function() {
                         alert("This feature has not yet been implented");
-                    }).css("text-decoration","line-through");
+                    }).css("text-decoration", "line-through");
                 }
 
                 //
@@ -631,19 +625,9 @@ $(function() {
                     if (set_skew_ratio && x2 !== false) {
                         // (x2,y2) are the raw coordinates of the graoh
                         // This converts the raw coordinates to the graph coordinates that match the steps on the x and y axes
-                        // -57 and -48 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-                        x2 = (x2 - 57) / wCon - red_line_start_x;
-                        y2 = (height - y2 - 48) / hCon - red_line_start_y;
-                        if (x2 < 0) {
-                            // If the mouse is outside the graph to the left, make a line with the slope of y1
-                            skew_ratio = skew_ratio_lim;
-                            a = 0;
-                            b = y1;
-                            return_y_cutoff = x1 ? 0 : -1;
-                            return_0_cutoff = 1;
-                            cutoff_transition_value = 0;
-                            return;
-                        }
+                        // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
+                        x2 = (x2 - 53.7) / wCon - red_line_start_x;
+                        y2 = (height - y2 - 44.5) / hCon - red_line_start_y;
                         // Handles not working days, explained later
                         if (len_nwd) {
                             const floorx2 = Math.floor(x2);
@@ -652,7 +636,17 @@ $(function() {
                             }
                             x2 -= Math.floor(x2 / 7) * len_nwd + mods[floorx2 % 7];
                         }
-                        if (x2 >= x1) {
+                        // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph sometimes. This ensures that NaN passes the below if statement
+                        if (!(x2 > 0)) {
+                            // If the mouse is outside the graph to the left, make a line with the slope of y1
+                            skew_ratio = skew_ratio_lim;
+                            a = 0;
+                            b = y1;
+                            return_y_cutoff = x1 ? 0 : -1;
+                            return_0_cutoff = 1;
+                            cutoff_transition_value = 0;
+                            return;
+                        } else if (x2 >= x1) {
                             // If the mouse is outside the graph to the right, connect the points (0,0), (x1-1,0), (x1,y1)
                             // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                             a = y1 / x1;
@@ -691,7 +685,6 @@ $(function() {
                                 a = 0;
                                 b = y1 / x1;
                             }
-                            console.log("Skew ratio: " + skew_ratio);
                         }
                     } else {
                         // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
@@ -751,7 +744,7 @@ $(function() {
                     } else {
                         return_y_cutoff = 0;
                     }
-                    if (return_y_cutoff < 5000) {
+                    if (return_y_cutoff < 2500) {
                         if (return_y_cutoff < 1) {
                             var output = 0;
                         } else {
@@ -798,7 +791,7 @@ $(function() {
                     } else {
                         return_0_cutoff = 1;
                     }
-                    if (x1 - return_0_cutoff < 5000) {
+                    if (x1 - return_0_cutoff < 2500) {
                         if (x1 - return_0_cutoff < 1) {
                             var output = 0;
                         } else {
@@ -901,9 +894,9 @@ $(function() {
                     const actually_draw_point = draw_point && x2 !== false;
                     if (actually_draw_point) {
                         // Cant pass in mouse_x and mouse_y as x2 and y2 because mouse_y becomes a bool
-                        // -57 and -48 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-                        var mouse_x = Math.round((x2 - 57) / wCon),
-                            mouse_y = (height - y2 - 48) / hCon;
+                        // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
+                        var mouse_x = Math.round((x2 - 53.7) / wCon),
+                            mouse_y = (height - y2 - 44.5) / hCon;
                         if (mouse_x < Math.min(red_line_start_x, dif_assign)) {
                             mouse_x = Math.min(red_line_start_x, dif_assign);
                         } else if (mouse_x > x) {
@@ -921,23 +914,78 @@ $(function() {
                         if (!set_skew_ratio && last_mouse_x === mouse_x && last_mouse_y === mouse_y) {
                             return;
                         }
-                        last_mouse_x = mouse_x;
-                        last_mouse_y = mouse_y;
+                        last_mouse_x = mouse_x; last_mouse_y = mouse_y;
                     }
+                    console.log(x2, y2);
                     pset(x2, y2);
 
                     const screen = graph.getContext("2d");
                     screen.scale(scale, scale);
                     screen.clearRect(0, 0, width, height);
-                    let move_info_down = 0;
+                    let move_info_down,
+                        todo = funct(day+dif_assign+1);
                     if (show_progress_bar) {
                         move_info_down = 0;
-                        let should_be_done_x = width - 153 + funct(today_minus_ad+1)/y*145;
+                        let should_be_done_x = width - 155 + todo / y * 146,
+                            bar_move_left = should_be_done_x - width + 17;
+                        if (bar_move_left < 0 || x <= today_minus_ad || lw >= y) {
+                            bar_move_left = 0
+                        } else if (should_be_done_x > width - 8) {
+                            bar_move_left = width - 8;
+                        }
                         // bar move left
                         screen.fillStyle = "rgb(55,55,55)";
+                        screen.fillRect(width-155-bar_move_left,height-121,148,50);
+                        screen.fillStyle = "lime";
+                        screen.fillRect(width-153-bar_move_left,height-119,144,46);
 
+                        screen.fillStyle = "rgb(0,128,0)";
+                        const slash_x = width - 142 - bar_move_left;
+                        screen.beginPath();
+                        screen.moveTo(slash_x,height-119);
+                        screen.lineTo(slash_x+15,height-119);
+                        screen.lineTo(slash_x+52.5,height-73);
+                        screen.lineTo(slash_x+37.5,height-73);
+                        screen.fill();
+                        screen.beginPath();
+                        screen.moveTo(slash_x+35,height-119);
+                        screen.lineTo(slash_x+50,height-119);
+                        screen.lineTo(slash_x+87.5,height-73);
+                        screen.lineTo(slash_x+72.5,height-73);
+                        screen.fill();
+                        screen.beginPath();
+                        screen.moveTo(slash_x+70,height-119);
+                        screen.lineTo(slash_x+85,height-119);
+                        screen.lineTo(slash_x+122.5,height-73);
+                        screen.lineTo(slash_x+107.5,height-73);
+                        screen.fill();
+
+                        screen.textAlign = "center";
+                        screen.fillStyle = "black";
+                        screen.font = '13.75px Open Sans';
+                        screen.textBaseline = "top";
+                        if (x > today_minus_ad && lw < y) {
+                            screen.fillText(`Your Progress: ${Math.floor(lw/y*100)}%`, width-81, height-68);
+                            const done_x = width-153+lw/y*144-bar_move_left;
+                            screen.fillStyle = "white";
+                            screen.fillRect(done_x, height-119, width-9-bar_move_left-done_x, 46);
+                            if (should_be_done_x >= width - 153) {
+                                screen.fillStyle = "black";
+                                if (should_be_done_x > width - 17) {
+                                    should_be_done_x = width - 17;
+                                }
+                                screen.rotate(Math.PI / 2);
+                                // Since rotate, swap x and y, make x negative
+                                screen.fillText("Goal", height-95, -should_be_done_x-14);
+                                screen.rotate(-Math.PI / 2);
+                                screen.fillStyle = "rgb(55,55,55)";
+                                screen.fillRect(should_be_done_x, height-119, 2, 46);
+                            }
+                        } else {
+                            screen.fillText("Completed!", width-81-bar_move_left, height-68);
+                        }
                     } else {
-                        move_info_down = 70
+                        move_info_down = 72;
                     }
                     let radius = wCon / 3;
                     if (radius > 3) {
@@ -1005,6 +1053,7 @@ $(function() {
                         if (funct_mouse_x < up_adjust_cutoff) {
                             screen.textBaseline = "bottom";
                         }
+                        screen.fillStyle = "black";
                         screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(unit,1)}: ${funct_mouse_x}) `, wCon * mouse_x + 50, height - funct_mouse_x * hCon - 50);
                         screen.fillStyle = "lime";
                         screen.strokeStyle = "lime";
@@ -1014,6 +1063,19 @@ $(function() {
                         screen.fill();
                         screen.fillStyle = "black";
                     }
+                    const rounded_skew_ratio = Math.round(1000*(skew_ratio-1))/1000;
+                    screen.textAlign = "end";
+                    screen.fillStyle = "black";
+                    screen.textBaseline = "top";
+                    if (((y - red_line_start_y) / funct_round) % 1) {
+                        screen.font = '13.75px Open Sans';
+                        screen.fillText(remainder_mode ? "Remainder: First" : "Remainder: Last", width-2, height-155+move_info_down);
+                        screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-172+move_info_down);
+                    } else {
+                        screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
+                    }
+                    screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, width-2, height-138+move_info_down);
+                    // from above: todo = funct(day+dif_assign+1);
                     screen.scale(1 / scale, 1 / scale);
                 }
 
