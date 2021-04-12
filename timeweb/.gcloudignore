@@ -17,3 +17,12 @@
 __pycache__/
 # Ignored by the build system
 /setup.cfg
+
+.DS_Store
+original_favicon.png
+.vscode
+Original splash screens
+cloud_sql_proxy
+db.sqlite3
+migrations
+timewebapp/static
