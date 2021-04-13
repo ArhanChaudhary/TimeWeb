@@ -1,3 +1,2 @@
-timeweb/static/* linguist-vendored
-timeweb/timewebapp/migrations/* linguist-vendored
+timeweb/timewebapp/migrations/** linguist-vendored
 terms.html linguist-vendored
