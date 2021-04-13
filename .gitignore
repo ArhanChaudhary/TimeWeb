@@ -64,7 +64,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-.vscode
+.vscode/**
 timeweb/static/**
 env_variables.yaml
 gcldeployment.md
