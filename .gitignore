@@ -65,7 +65,7 @@ db.sqlite3
 db.sqlite3-journal
 
 .vscode
-timeweb/static
+timeweb/static/**
 env_variables.yaml
 gcldeployment.md
 original_favicon.png

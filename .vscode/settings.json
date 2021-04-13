@@ -6,7 +6,7 @@
         "timeweb/timewebapp/admin.py": true,
         "timeweb/timewebapp/apps.py": true,
         "timeweb/timewebapp/tests.py": true,
-        "timeweb/static": true,
+        // "timeweb/static": true,
         "timeweb/.vscode": true,
         "**/__pycache__": true,
         "**/fonts": true,
