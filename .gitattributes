@@ -1,0 +1,3 @@
+timeweb/static/* lingust-vendored
+timeweb/timewebapp/migrations/* lingust-vendored
+timeweb/timewebapp/static/nav/* lingust-vendored
