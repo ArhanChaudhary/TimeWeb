@@ -126,6 +126,7 @@ $(function() {
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only works when min_work_time is also enabled
                     len_nwd = nwd.length,
                     set_skew_ratio = false, // Bool to manually set skew ratio on graph
+                    unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute",
                     min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round, // LCM of min_work_time and funct_round
                     a, // "a" part of parabola
                     b, // "b" part of parabola
@@ -136,11 +137,9 @@ $(function() {
                     last_mouse_x,
                     last_mouse_y,
                     wCon,
-                    hCon,
-                    left_adjust_cutoff,
-                    up_adjust_cutoff;
+                    hCon;
                 // Due date
-                let due_date = new Date(x);
+                let due_date = new Date(ad.valueOf());
                 due_date.setDate(due_date.getDate() + x);
                 // Enable draw_point by default, which determines whether to draw the point on the graph
                 let draw_point = true;
@@ -163,13 +162,13 @@ $(function() {
                     skew_ratio = 2 - skew_ratio_lim;
                 }
                 // Whether or not to display the year
-                let disyear;
+                let date_string_options;
                 if (ad.getFullYear() === due_date.getFullYear()) {
-                    disyear = '';
+                    date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
                 } else {
-                    disyear = ', %Y';
+                    date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
                 }
-                let date_assignment_created = ad;
+                let date_assignment_created = new Date(ad.valueOf());
                 date_assignment_created.setDate(date_assignment_created.getDate() + dif_assign);
                 // Days between today and date_assignment_created
                 let today_minus_dac = Math.round((new Date() - date_assignment_created) / 86400000),
@@ -177,7 +176,7 @@ $(function() {
                     today_minus_ad = Math.round((new Date() - ad) / 86400000),
                     day = len_works,
                     lw = works[len_works];
-                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay())) {
+                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
                     day--;
                 }
                 // Sets event handlers only on the assignment's first click
@@ -226,7 +225,7 @@ $(function() {
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
-                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay());
+                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay());
                             skew_ratio = +(skew_ratio - 0.1).toFixed(1);
                             if (skew_ratio < 2 - skew_ratio_lim) {
                                 skew_ratio = skew_ratio_lim;
@@ -239,7 +238,7 @@ $(function() {
                                 }
                             }
                         } else {
-                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) <= lw && lw !== works[-2] && !nwd.includes(new Date().getDay());
+                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) <= lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay());
                             skew_ratio = +(skew_ratio + 0.1).toFixed(1);
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
@@ -299,7 +298,7 @@ $(function() {
                     let change_day_mouse, change_day_upper;
                     assignment.find(".skew-ratio-button").click(function() {
                         // Determines whether or not to change the day after skew ratio is set
-                        change_day_mouse = today_minus_dac === len_works - 1 && lw !== works[-2] && !nwd.includes(new Date().getDay());
+                        change_day_mouse = today_minus_dac === len_works - 1 && lw !== works[len_works-1] && !nwd.includes(new Date().getDay());
                         // Have no idea how this works but it does
                         if (change_day_mouse) {
                             change_day_upper = lw >= funct(len_works + dif_assign);
@@ -419,7 +418,7 @@ $(function() {
                             // Day needs to be set in case it was subtracted by one
                             day = len_works;
                             // Subtract day by one if assignment is in progress
-                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay())) {
+                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
                                 day--;
                             }
                         } else {
@@ -449,7 +448,7 @@ $(function() {
                                 } else {
                                     var todo = funct(day + dif_assign + 1) - lw;
                                 }
-                                const rem_work = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay()),
+                                const rem_work = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay()),
                                     total_mode = $(this).hasClass("total-work-input-button");
                                 let input_done = $(this).val().trim().toLowerCase();
                                 switch (input_done) {
@@ -500,7 +499,7 @@ $(function() {
                                 SendButtonAjax("works", works);
                                 $(this).val('');
                                 day = len_works;
-                                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay())) {
+                                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
                                     day--;
                                 }
                                 draw();
@@ -515,7 +514,7 @@ $(function() {
                     assignment.find(".delete-work-input-button").click(function() {
                         if (len_works > 0) {
                             // Change day if assignment is not in progress
-                            if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[-2] && !nwd.includes(new Date().getDay()))) {
+                            if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay()))) {
                                 day--;
                             }
                             works.pop();
@@ -543,7 +542,7 @@ $(function() {
                                             const this_funct = next_funct,
                                                 this_work = next_work;
                                             next_funct = funct(i + 1),
-                                                next_work = works[i - dif_assign + 1];
+                                            next_work = works[i - dif_assign + 1];
                                             // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
                                             if (next_funct - this_funct !== next_work - this_work) {
                                                 red_line_start_x++;
@@ -636,7 +635,7 @@ $(function() {
                             }
                             x2 -= Math.floor(x2 / 7) * len_nwd + mods[floorx2 % 7];
                         }
-                        // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph sometimes. This ensures that NaN passes the below if statement
+                        // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph, caused by negative indexing by floorx2. This ensures that NaN passes the below if statement
                         if (!(x2 > 0)) {
                             // If the mouse is outside the graph to the left, make a line with the slope of y1
                             skew_ratio = skew_ratio_lim;
@@ -916,7 +915,6 @@ $(function() {
                         }
                         last_mouse_x = mouse_x; last_mouse_y = mouse_y;
                     }
-                    console.log(x2, y2);
                     pset(x2, y2);
 
                     const screen = graph.getContext("2d");
@@ -1042,15 +1040,11 @@ $(function() {
                         }
                         let str_mouse_x = new Date(ad);
                         str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
-                        if (disyear) {
-                            str_mouse_x = `${('0' + (str_mouse_x.getMonth() + 1)).slice(-2)}/${('0' + str_mouse_x.getDate()).slice(-2)}/${str_mouse_x.getFullYear()}`;
-                        } else {
-                            str_mouse_x = `${('0' + (str_mouse_x.getMonth() + 1)).slice(-2)}/${('0' + str_mouse_x.getDate()).slice(-2)}`;
-                        }
-                        if (mouse_x > left_adjust_cutoff) {
+                        str_mouse_x = str_mouse_x.toLocaleDateString("en-US", date_string_options);
+                        if (wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(unit,1)}: ${funct_mouse_x})`).width > width - 5) {
                             screen.textAlign = "end";
                         }
-                        if (funct_mouse_x < up_adjust_cutoff) {
+                        if (height - funct_mouse_x * hCon - 50 + screen.measureText(0).width*2> height - 50) {
                             screen.textBaseline = "bottom";
                         }
                         screen.fillStyle = "black";
@@ -1067,15 +1061,90 @@ $(function() {
                     screen.textAlign = "end";
                     screen.fillStyle = "black";
                     screen.textBaseline = "top";
+                    screen.font = '13.75px Open Sans';
                     if (((y - red_line_start_y) / funct_round) % 1) {
-                        screen.font = '13.75px Open Sans';
                         screen.fillText(remainder_mode ? "Remainder: First" : "Remainder: Last", width-2, height-155+move_info_down);
                         screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-172+move_info_down);
                     } else {
                         screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
                     }
                     screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, width-2, height-138+move_info_down);
-                    // from above: todo = funct(day+dif_assign+1);
+
+                    const daysleft = x - today_minus_ad;
+                    let strdaysleft = '';
+                    if (daysleft < -1) {
+                        strdaysleft = ` (${-daysleft} Days Ago)`;
+                    } else {
+                        switch (daysleft) {
+                            case -1:
+                                strdaysleft = " (Yesterday)";
+                                break
+                            case 0:
+                                strdaysleft = " (Today)";
+                                break;
+                            case 1:
+                                strdaysleft = " (TOMORROW!!!)";
+                                break;
+                        }
+                    }
+                    screen.textAlign = "center";
+                    screen.textBaseline = "bottom";
+                    screen.font = font_size + 'px Open Sans';
+                    const row_height = screen.measureText(0).width * 2;
+                    screen.fillText(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 50+(width-50)/2, row_height);
+                    if (lw < y && daysleft > 0) {
+                        todo -= lw;
+                        let reach_deadline = "";
+                        if (todo <= 0 || nwd.includes((assign_day_of_week+dif_assign+day) % 7)) {
+                            todo = 0;
+                            reach_deadline = " (Deadline Reached)";
+                        } else if (!unit_is_minute) {
+                            screen.fillText(`Estimated Completion Time: ${format_minutes(todo*ctime)}`, 50+(width-50)/2, row_height*6);
+                        } else if (todo*ctime >= 60) {
+                            reach_deadline = ` (${format_minutes(todo*ctime)})`;
+                        }
+                        let displayed_day = new Date(date_assignment_created.valueOf());
+                        displayed_day.setDate(displayed_day.getDate() + day);
+                        distance_today_from_displayed_day = today_minus_dac - day;
+
+                        let str_day = displayed_day.toLocaleDateString("en-US", date_string_options);
+                        switch (distance_today_from_displayed_day) {
+                            case -1:
+                                str_day += ' (Tomorrow)';
+                                break;
+                            case 0:
+                                str_day += ' (Today)';
+                                break;
+                            case 1:
+                                str_day += ' (Yesterday)';
+                                break;
+                        }
+                        str_day += ':';
+                        screen.fillText(str_day, 50+(width-50)/2, row_height*3);
+                        let todo_message;
+                        if (displayed_day.toDateString() !== new Date().toDateString()) {
+                            todo_message = `${pluralize(unit)} to Complete for this Day: ${todo}${reach_deadline}`;
+                        } else if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
+                            todo_message = `Remaining ${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
+                        } else {
+                            todo_message = `${pluralize(unit)} to Complete for this Day: ${todo}${reach_deadline}`;
+                        }
+                        screen.fillText(todo_message, 50+(width-50)/2, row_height*4);
+                        screen.fillText(`${pluralize(unit)} already Completed: ${lw}/${y}`, 50+(width-50)/2, row_height*5);
+                        if (today_minus_ad < 0) {
+                            screen.fillText("This Assignment has Not Yet been Assigned!", 50+(width-50)/2, row_height*11);
+                        } else if (distance_today_from_displayed_day > 0) {
+                            screen.fillText("You have not Entered in your Work from Previous Days!", 50+(width-50)/2, row_height*11);
+                            screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*12);
+                        } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || new Date(displayed_day.toDateString()) > new Date(new Date().toDateString())) {
+                            screen.fillText("You have Completed your Work for Today!", 50+(width-50)/2, row_height*12);
+                        } else if (len_works && !(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) && (lw - works[len_works-1]) / warning_acceptance * 100 < funct(len_works + dif_assign) - works[len_works-1]) {
+                            screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*11);
+                            screen.fillText("You are BEHIND Schedule!", 50+(width-50)/2, row_height*12);
+                        }
+                    } else {
+                        screen.fillText('Amazing Effort! You have Finished this Assignment!', 50+(width-50)/2, row_height*10);
+                    }
                     screen.scale(1 / scale, 1 / scale);
                 }
 
@@ -1083,8 +1152,8 @@ $(function() {
                     // These only really need to be executed once since this function is run for every assignment but doesnt matter
                     width = $(fixed_graph).width();
                     height = $(fixed_graph).height();
-                    if (width > 748) {
-                        font_size = 17.1875;
+                    if (width > 500) {
+                        font_size = 13.9;
                     } else {
                         font_size = Math.round((width + 450) / 47 * 0.6875);
                     }
@@ -1098,12 +1167,6 @@ $(function() {
                     fixed_graph.height = height * scale;
                     let screen = fixed_graph.getContext("2d");
                     screen.scale(scale, scale);
-                    const point_text = `(Day: 00/00/0000, ${pluralize(unit,1)}: ${"0".repeat(Math.abs(Math.floor(Math.log10(y)))+1 + Math.abs(Math.floor(Math.log10(funct_round))))})`;
-                    screen.font = font_size + 'px Open Sans';
-                    const point_text_width = screen.measureText(point_text).width,
-                        point_text_height = screen.measureText("0").width * 2;
-                    left_adjust_cutoff = (width - 50 - point_text_width) / wCon;
-                    up_adjust_cutoff = point_text_height / hCon;
 
                     // bg gradient
                     let gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
@@ -1125,7 +1188,7 @@ $(function() {
 
                     // y axis label
                     screen.rotate(Math.PI / 2);
-                    if (unit === "Minute") {
+                    if (unit_is_minute) {
                         var text = 'Minutes of Work',
                             label_x_pos = -2;
                     } else {
@@ -1239,6 +1302,18 @@ $(function() {
                         screen.fillText(bigger_index, number_x_pos, height - 39);
                     }
                     screen.fillText(0, 55.5, height - 38.5);
+                    if (today_minus_ad > -1) {
+                        const today_x = today_minus_ad*wCon+47.5;
+                        screen.fillStyle = "rgb(150,150,150)";
+                        screen.fillRect(today_x, 0, 5, height-50);
+                        screen.fillStyle = "black";
+                        screen.rotate(Math.PI / 2);
+                        screen.textAlign = "center";
+                        screen.textBaseline = "middle";
+                        screen.font = '17.1875px Open Sans';
+                        screen.fillText("Today Line", (height-50)/2, -today_x-2.5)
+                        screen.rotate(-Math.PI / 2);
+                    }
                 }
 
                 function resize() {

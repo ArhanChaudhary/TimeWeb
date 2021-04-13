@@ -96,8 +96,8 @@ $(function() {
         localStorage.removeItem("scroll");
     }
     // Deals with selecting the parent element when tabbing into the nav
-    $("#nav-items a").focusout(() => $("nav").removeClass("open"));
-    $("#nav-items a").focus(() => $("nav").addClass("open"));
+    $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
+    $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
     // Position content so that the scrollbar doesn't clip into the header
     if ("animation-ran" in sessionStorage || !$("#user-greeting").length) {
         // Position content so that the scrollbar doesn't clip into the header
