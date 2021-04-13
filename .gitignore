@@ -64,10 +64,13 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+.vscode
+timeweb/static
 env_variables.yaml
 gcldeployment.md
 original_favicon.png
 Original splash screens
+
 
 # Flask stuff:
 instance/
