@@ -9,8 +9,10 @@
     background: inherit;
     backdrop-filter: blur(2px);
     box-sizing: border-box;
+    padding: 0 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 #login::before {
     content: '';
