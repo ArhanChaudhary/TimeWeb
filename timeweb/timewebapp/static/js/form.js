@@ -265,7 +265,7 @@ $(function() {
     $("#form-wrapper .error-note").each(function() {
         $(this).prev().children().eq(1).addClass("invalid");
         // Give the previous field an error if appropriate
-        if (this.id === "error_id_x" || this.id === "error_id_works" && $(this).text().includes("of")) {
+        if (this.id === "error_id_x" && $(this).text().includes("assignment") || this.id === "error_id_works" && $(this).text().includes("of")) {
             $(this).prev().prev().children().eq(1).addClass("invalid");
         }
     });

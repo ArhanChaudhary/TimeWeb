@@ -25,7 +25,7 @@ CSP_BASE_URI = ("'none'", )
 # Add nonce b64 value to header, use for inline scripts
 # CSP_INCLUDE_NONCE_IN = ("script-src", )
 
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
 PWA_APP_NAME = "TimeWeb PS" if DEBUG else  "TimeWeb"
 PWA_APP_DESCRIPTION = "TimeWeb PS APP" if DEBUG else "TimeWeb App"

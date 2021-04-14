@@ -1,6 +1,13 @@
 {% extends "template.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock css %}
 
 {% block content %}
+  <div id="beta-message">Interested in beta testing? Contact me through Gmail or Facebook</div>
+  <div id="image"></div>
   {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
   {% endif %}
@@ -13,26 +20,18 @@
       <p>Please login to see this page.</p>
     {% endif %}
   {% endif %}
-
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-      <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-        {% comment %} <script>
-          $("#id_username").attr("maxlength","10");
-          ABSTRACTBASEUSER
-        </script> {% endcomment %}
-      </tr>
-      <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
+  <div id="login">
+    <span>Managing your time<br>Made easy</span>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      {{ form.username.label_tag }}</td>
+      {{ form.username }}
+      {{ form.password.label_tag }}
+      {{ form.password }}
+      <input type="submit" value="login" />
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+  </div>
   {% comment %} <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
   <p><a target="_blank" href="mailto:arhan.ch@gmail.com?subject=Requesting%20Beta%20Access%20to%20TimeWeb&body=Please%20create%20my%20account%20for%20beta%20access">Need access? I'm interested in beta-testing this website!</a></p> {% endcomment %}
 {% endblock content %}

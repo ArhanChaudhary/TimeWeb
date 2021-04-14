@@ -162,18 +162,20 @@ $(function() {
                     skew_ratio = 2 - skew_ratio_lim;
                 }
                 // Whether or not to display the year
-                let date_string_options;
+                let date_string_options, date_string_options_no_weekday;
                 if (ad.getFullYear() === due_date.getFullYear()) {
                     date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
+                    date_string_options_no_weekday = {month: 'long', day: 'numeric'};
                 } else {
                     date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
+                    date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
                 }
                 let date_assignment_created = new Date(ad.valueOf());
                 date_assignment_created.setDate(date_assignment_created.getDate() + dif_assign);
                 // Days between today and date_assignment_created
-                let today_minus_dac = Math.round((new Date() - date_assignment_created) / 86400000),
+                let today_minus_dac = Math.round((new Date(new Date().toDateString()) - date_assignment_created) / 86400000),
                     // Days between today and the assignment date
-                    today_minus_ad = Math.round((new Date() - ad) / 86400000),
+                    today_minus_ad = Math.round((new Date(new Date().toDateString()) - ad) / 86400000),
                     day = len_works,
                     lw = works[len_works];
                 if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
@@ -851,6 +853,7 @@ $(function() {
                         output += y_fremainder;
                     }
                     // Return untranslated y coordinate
+                    // No point in untranslating x coordinate
                     return output + red_line_start_y;
                 }
 
@@ -1040,7 +1043,7 @@ $(function() {
                         }
                         let str_mouse_x = new Date(ad);
                         str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
-                        str_mouse_x = str_mouse_x.toLocaleDateString("en-US", date_string_options);
+                        str_mouse_x = str_mouse_x.toLocaleDateString("en-US", date_string_options_no_weekday);
                         if (wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(unit,1)}: ${funct_mouse_x})`).width > width - 5) {
                             screen.textAlign = "end";
                         }

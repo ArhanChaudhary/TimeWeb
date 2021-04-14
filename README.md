@@ -22,11 +22,13 @@ cd TimeWeb
 ```
 pip install virtualenv
 virtualenv timeweb_env
+source timeweb_env/bin/activate
 ```
 
 5. Install all project dependencies
 
 ```
+cd timeweb
 pip install -r requirements.txt
 ```
 
