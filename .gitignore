@@ -71,7 +71,7 @@ env_variables.yaml
 gcldeployment.md
 original_favicon.png
 Original splash screens
-
+.gcloudignore
 
 # Flask stuff:
 instance/
