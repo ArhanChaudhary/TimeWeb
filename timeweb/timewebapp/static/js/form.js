@@ -70,7 +70,7 @@ $(function() {
             ('0' + tomorrow.getDate()).slice(-2),
         ].join('-'),
 
-        '','','0','','',+def_min_work_time].forEach(function(element, index) {
+        '','','0','','',+def_min_work_time||''].forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let nwd of Array(7).keys()) {

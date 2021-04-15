@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (response.status == 0) {
             alert('Failed to connect');
         } else if (response.status == 403) {
-            alert(response.responseText);
+            $("html").html(response.responseText);
         } else if (response.status == 404) {
             alert('Not found, try again');
         } else if (response.status == 500) {
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (exception === 'abort') {
             alert('Request aborted, try again');
         } else {
-            document.write(response.responseText);
+            $("html").html(response.responseText);
         }
     }
     // Hides "Press enter" on mobile

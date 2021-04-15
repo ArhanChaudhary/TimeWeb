@@ -38,7 +38,7 @@ $(function() {
     if ($("#image-new-container").length) {
         const username = $("#user-greeting #username"),
                 logo = $("#logo-container"),
-                welcome = $("#user-greeting span"),
+                welcome = $("#welcome"),
                 newassignmenttext = $("#new-assignment-text");
         function resize() {
             // Checks if "Welcome, " protrudes into the logo
@@ -62,8 +62,8 @@ $(function() {
         }
         $(window).resize(resize).one("load", resize);
     } else if ($("#user-greeting").length) { // Run if user is authenticated and not on home screen
-        const username = $("#user-greeting #username"),
-                welcome = $("#user-greeting span"),
+        const username = $("#username"),
+                welcome = $("#welcome"),
                 logo = $("#logo-container");
         function resize() {
             // Checks if "Welcome, " protrudes into the logo

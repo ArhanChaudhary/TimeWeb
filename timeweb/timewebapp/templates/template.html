@@ -49,7 +49,7 @@
                 </div>
                 {% if user.is_authenticated %}
                     <div id="user-greeting">
-                        <span>Welcome, </span>
+                        <span id="welcome">Welcome, </span>
                         <div tabindex="1" id="username">
                             {{ user.get_username }}
                             <div id="account-dropdown">
