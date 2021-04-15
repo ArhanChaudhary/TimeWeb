@@ -341,3 +341,11 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.save()
         self.make_list(request)
         return render(request, "index.html", self.context)
+
+class ContactView(View):
+    def get(self, request):
+        return render(request, "contact.html", {})
+
+class ChangelogView(View):
+    def get(self, request):
+        return render(request, "changelog.html", {})

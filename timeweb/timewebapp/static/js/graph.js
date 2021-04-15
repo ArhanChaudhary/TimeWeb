@@ -34,7 +34,7 @@ $(function() {
             e.preventDefault();
         }
     }
-    // Cite later
+    // cite
     // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
     // Date parser for safari
     function parseDate(date) {
@@ -649,7 +649,7 @@ $(function() {
                             return;
                         } else if (x2 >= x1) {
                             // If the mouse is outside the graph to the right, connect the points (0,0), (x1-1,0), (x1,y1)
-                            // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                            // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                             a = y1 / x1;
                             b = a * (1 - x1);
 
@@ -660,7 +660,7 @@ $(function() {
                                 y2 -= y_fremainder;
                             }
                             // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
-                            // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                            // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                             a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
                             b = (y1 - x1 * x1 * a) / x1;
 
@@ -688,7 +688,7 @@ $(function() {
                             }
                         }
                     } else {
-                        // cite later http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                        // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                         a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
                         b = (y1 - x1 * x1 * a) / x1;
                     }

@@ -65,22 +65,23 @@
                         {% if user.is_authenticated %}
                         <a href="{% url 'settings' %}">Settings</a>
                         {% endif %}
-                        <a href="#">Usage</a>      
+                        <a href="#" id="nav-usage">Usage</a>      
                         {% if user.is_authenticated %}
                         <!-- Prompt for installing only fires after logging in -->
                         <span>Install on Home Screen</span>
                         {% endif %}
-                        <a href="#">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
-                        <a href="#">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                        <a href="#">How Does This Work</a>
+                        <a href="#" id="nav-keybinds">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
+                        <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
+                        <a href="#" id="nav-how">How Does This Work</a>
                         <a href="{% static 'nav/terms.html' %}">Terms of Service</a>
                         <a href="{% static 'nav/privacy.html' %}">Privacy Policy</a>
-                        <a href="#">Changelog</a>
+                        <a href="/changelog">Changelog</a>
+                        <a href="/contact">Contact Me</a>
                     </div>
                 </nav>
                 <a href="{% url 'home' %}"  id="logo-container">
                     <img width="211" height="60" src="{% static 'images/timeweb.png' %}" alt="TimeWeb" border="0" draggable="false"/>
-                    {% comment %} cite later https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png {% endcomment %}
+                    <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
                     {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
                 </a>
             </header>

@@ -1,4 +1,17 @@
 // Code to be run on every page
+
+// Initialize the service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/serviceworker.js', {
+        scope: '/'
+    }).then(function (registration) {
+        // Registration was successful
+        
+    }, function (err) {
+        // registration failed :(
+
+    });
+}
 $(function() {
     // Click element when enter is pressed
     $(document).keypress(function(e) {
@@ -42,7 +55,7 @@ $(function() {
             }
             $(window).resize(resize);
         });
-    } else if ($("#user-greeting").length) { // Run if user is authenticated and on settings screen
+    } else if ($("#user-greeting").length) { // Run if user is authenticated and not on home screen
         const username = $("#user-greeting a"),
                 container = $("#user-greeting"),
                 logo = $("#logo-container");
@@ -70,31 +83,9 @@ $(function() {
         username.css("max-width", "calc(100vw - 132px)");
         resize();
         $(window).resize(resize);
-    } else { // Run if user is on the login screen
-        function resize() {
-            if (window.innerWidth < 410) {
-                $("#logo-container").css({
-                    left: 5,
-                    transform: "none",
-                });
-            } else {
-                $("#logo-container").css({
-                    left: '',
-                    transform: '',
-                });
-            }
-            if (window.innerWidth < 320) {
-                $("#logo-container").css("opacity", "0");
-            } else {
-                $("#logo-container").css("opacity", '');
-            }
-        }
-        resize();
-        $(window).resize(resize);
-        // Reset storages
-        sessionStorage.removeItem("open_assignments");
-        localStorage.removeItem("scroll");
     }
+    $("#nav-usage, #nav-about, #nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
+    $("#nav-keybinds").click(() => alert("This feature has not yet been implemented")).css("text-decoration", "line-through");
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));

@@ -7,20 +7,9 @@ Setting assignment width on resize
 Ajax error function
 Other minor utilities
 */
-// Initialize the service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/serviceworker.js', {
-        scope: '/'
-    }).then(function (registration) {
-        // Registration was successful
-        
-    }, function (err) {
-        // registration failed :(
 
-    });
-}
 // Prevents submitting form on refresh
-// cite later 
+// cite 
 // https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
@@ -87,13 +76,13 @@ document.addEventListener("DOMContentLoaded", function() {
             document.write(response.responseText);
         }
     }
-    // cite later
+    // cite
     // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
     isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if (isMobile) {
         $("#form-wrapper #bottom-note").hide();
     }
-    // cite later
+    // cite
     // https://web.dev/customize-install/
     let prompt;
     window.addEventListener('beforeinstallprompt', function(e) {

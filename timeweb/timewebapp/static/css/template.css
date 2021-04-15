@@ -369,8 +369,7 @@ nav.open #nav-menu::after {
 #nwd-wrapper .nwd-label:active {
     transform: translateY(1px);
 }
-
-/* open-sans-600 - latin */
+/* open-sans 600 */
 @font-face {
     font-family: 'Open Sans';
     font-style: normal;
