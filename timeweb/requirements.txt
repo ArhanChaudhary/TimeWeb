@@ -2,7 +2,7 @@ asgiref==3.3.1
 Django==3.1.8
 django-csp==3.7
 django-multiselectfield==0.1.12
-django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@5a95c3524f6c0cfd293c5066bc5d0d3191ad309e
+django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@50f355b143511b32405c53e5d7276bcc37977366
 gunicorn==20.0.4
 psycopg2-binary==2.8.6
 pytz==2021.1
