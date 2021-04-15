@@ -2,10 +2,14 @@
 This file includes the code for:
 
 Setting up the service worker
+Loading in load data
+Advanced options
 Keybinds
-Setting assignment width on resize
 Ajax error function
+Installing the app on home screen
 Other minor utilities
+
+This only runs on index.html
 */
 
 // Prevents submitting form on refresh
@@ -76,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
             document.write(response.responseText);
         }
     }
+    // Hides "Press enter" on mobile
     // cite
     // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
     isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

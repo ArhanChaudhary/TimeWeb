@@ -1,0 +1,6 @@
+input {
+    -webkit-appearance: auto;
+}
+tr {
+    border-bottom: 1px solid gray;
+}

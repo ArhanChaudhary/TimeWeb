@@ -1,11 +1,11 @@
+/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 #login {
+    user-select: none;
     position: relative;
     width: max(290px, calc(100vw - 160px));
     height: max(440px, calc(100vh - 310px));
     border-radius: 25px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: 107px auto;
     background: inherit;
     backdrop-filter: blur(2px);
     box-sizing: border-box;
@@ -13,7 +13,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* animation: 1s ease-out 0s 1 scaleX; */
+    opacity: 0;
+    animation: 1s cubic-bezier(.29,.81,.37,.99) 1s 1 scale;
+    animation-fill-mode: forwards;
 }
 #login::before {
     content: '';
@@ -44,9 +46,17 @@
     display: none;
 }
 #first-smallvw {
-    top: 60px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 154px;
+    margin: 0 30px;
 }
 #second-smallvw {
+    text-align: center;
     bottom: 60px;
 }
 @media screen and (max-width: 790px) {
@@ -57,7 +67,7 @@
         justify-content: center;
     }
     #first-smallvw, #second-smallvw {
-        display: block !important;
+        display: flex !important;
     }
 }
 #image {
@@ -68,8 +78,10 @@
     background-image: url(/static/images/scroller.png);
     background-size: 100%;
     z-index: -2;
-    opacity: 0.75;
-    animation: slide 400s linear infinite;
+    opacity: 0;
+    transform: translateY(-100%) translateY(100vh);
+    animation: slide 200s linear 1.8s infinite, 1s ease-out 1.8s 1 fade;
+    animation-fill-mode: forwards;
 }
 #login span {
     font-size: 40px;
@@ -100,11 +112,24 @@ label {
     box-shadow: inset 0 0 0 2px rgb(0,95,204);
     outline: 0;
 }
+#error-message {
+    text-align: center;
+    position: absolute;
+    margin-top: -35px;
+    font-size: 9.75px;
+    text-align: center;
+    width: 100%;
+    color: rgb(226,30,54);
+}
 #beta-message {
     position: absolute;
     text-decoration: none;
     font-size: 10px;
     text-align: center;
+}
+#beta-message a:visited {
+    text-decoration: none;
+    color: blue;
 }
 #submit-button {
     width: 100%;
@@ -113,6 +138,7 @@ label {
     color: white;
     border: none;
     height: 25px;
+    cursor: pointer;
 }
 #submit-button:focus, #submit-button:hover {
     background: rgba(0, 150, 255, 0.75);
@@ -124,6 +150,7 @@ label {
 #form-wrapper {
     margin-left: 15px;
     width: 300px;
+    position: relative;
 }
 @keyframes slide {
     0% {
@@ -133,20 +160,22 @@ label {
         transform: none;
     }
 }
-@keyframes scaleX {
+@keyframes scale {
     0% {
-        transform: scale(0);
+        transform: scale(0.45);
+        opacity: 0;
     }
     100% {
-        transform: scale(1,0.2);
+        transform: none;
+        opacity: 1;
     }
 }
-@keyframes scaleY {
+@keyframes fade {
     0% {
-        transform: scaleY(0.2);
+        opacity: 0;
     }
     100% {
-        transform: scaleY(1);
+        opacity: 0.75;
     }
 }
 /* VarelaRound-Regular */

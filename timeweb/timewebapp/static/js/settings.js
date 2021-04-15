@@ -1,3 +1,12 @@
+/* 
+This file includes the code for:
+
+Trimming trailing zeros on form fields
+Crossing out an unfinished setting
+Adding info buttons
+
+This only runs on settings.html
+*/
 $(function() {
     $("#id_def_skew_ratio").val(+($("#id_def_skew_ratio").val()-1).toFixed(10));
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
@@ -5,9 +14,8 @@ $(function() {
     $("label[for='id_show_past']").css("text-decoration", "line-through");
     $("#id_show_past").click(() => alert("This feature has not yet been implented"));
 
-
     $("#id_warning_acceptance").parent().info('bottom',
-        `This determines when to display a warning on an assignment if you fall behind on its work schedule
+        `This determines when to display a warning on an assignment if you fall behind on an assignment's work schedule
 
         e.g: If you enter 75, then you have to complete less than 75% of an assignment's work on any day to trigger a warning
 

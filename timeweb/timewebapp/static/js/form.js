@@ -6,8 +6,10 @@ Showing and hiding the new assignment form
 Form utilities to make inputs more convenient
 Updating assignments
 Deleting assignments
+
+This only runs on index.html
 */
-// Note: submitted assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
+// Note: modified assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
 $(function() {
    function showForm(show_instantly=false) {
         if (show_instantly) {
@@ -43,7 +45,7 @@ $(function() {
         // Make rest of page retabbable
         $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
         $("#menu").attr("tabindex","2");
-        $("#image-new-container, #user-greeting a").attr("tabindex","1");
+        $("#image-new-container, #user-greeting #username").attr("tabindex","1");
         $(".assignment, .graph").attr("tabindex","0");
         // Used in utils.js for handling the user typing "N" when showing the form via shift + N
         form_is_showing = false;
@@ -68,7 +70,7 @@ $(function() {
             ('0' + tomorrow.getDate()).slice(-2),
         ].join('-'),
 
-        '','','0','','',def_min_work_time].forEach(function(element, index) {
+        '','','0','','',+def_min_work_time].forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let nwd of Array(7).keys()) {

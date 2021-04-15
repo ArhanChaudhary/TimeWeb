@@ -49,8 +49,14 @@
                 </div>
                 {% if user.is_authenticated %}
                     <div id="user-greeting">
-                        <a tabindex="1" href="{% url 'logout' %}?next={{request.path}}">{{ user.get_username }}</a>
-                        <span>,Welcome </span>
+                        <span>Welcome, </span>
+                        <div tabindex="1" id="username">
+                            {{ user.get_username }}
+                            <div id="account-dropdown">
+                                <span id="account-settings">Account settings</span>
+                                <a href="{% url 'logout' %}?next={{request.path}}">Log out</a>
+                            </div>
+                        </div>
                     </div>
                 {% endif %}
                 <nav>

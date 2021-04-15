@@ -1,4 +1,16 @@
-// Code to be run on every page
+/* 
+This file includes the code for:
+
+Initializing the service worker
+Loading in load data
+Advanced options
+Keybinds
+Ajax error function
+Installing the app on home screen
+Other minor utilities
+
+This runs on every template
+*/
 
 // Initialize the service worker
 if ('serviceWorker' in navigator) {
@@ -20,78 +32,79 @@ $(function() {
         }
     });
     // Header responiveness
-    // Terribly written but unimportant for now
-    if ($("#image-new-container").length) { // Run if user is authenticated and on home screen
-        const username = $("#user-greeting a"),
-                container = $("#user-greeting"),
+    // Could be written better but unimportant for now
+    
+    // Checks if user is authenticated and on home page
+    if ($("#image-new-container").length) {
+        const username = $("#user-greeting #username"),
                 logo = $("#logo-container"),
+                welcome = $("#user-greeting span"),
                 newassignmenttext = $("#new-assignment-text");
-        let currentlyHidingLogo = container.width() <= username.width()+78;
         function resize() {
-            // Checks whether to hide the logo 
-            if (container.width() <= username.width()+78) {
-                if (!currentlyHidingLogo) { // if statement not needed, just to make things more efficient
-                    container.addClass("logo-hidden");
+            // Checks if "Welcome, " protrudes into the logo
+            if (username.offset().left-10 - 100 < window.innerWidth/2+115) {
+                // If it does, hide welcome
+                welcome.hide();
+                // If it does, checks if the username protrudes into the logo
+                if (username.offset().left-10 < window.innerWidth/2+115) {
                     logo.hide();
-                    newassignmenttext.css("max-width",`calc(100vw - ${username[0].scrollWidth+180}px)`); // Use scrollwidth insted of $.width() because it takes into account the overflown text
-                    currentlyHidingLogo = true;
+                    // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the username protrudes into it
+                    newassignmenttext.css("max-width",Math.max(0, username.offset().left-69-10));
+                } else {
+                    logo.show();
+                    // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the logo protrudes into it
+                    newassignmenttext.css("max-width",window.innerWidth/2-115-69);
                 }
-            } else if (currentlyHidingLogo) {
-                container.removeClass("logo-hidden");
-                logo.show();
+            } else {
                 newassignmenttext.css("max-width","");
-                currentlyHidingLogo = false;
+                welcome.show();
             }
         }
-        resize();
-        $(window).on('load', function() {
-            // Run the if statement part of resize()
-            if (currentlyHidingLogo) {
-                container.addClass("logo-hidden");
-                logo.hide();
-                newassignmenttext.css("max-width",`calc(100vw - ${username[0].scrollWidth+180}px)`); // Use scrollwidth insted of $.width() because it takes into account the overflown text
-            } else {
-                logo.show();
-            }
-            $(window).resize(resize);
-        });
+        $(window).resize(resize).one("load", resize);
     } else if ($("#user-greeting").length) { // Run if user is authenticated and not on home screen
-        const username = $("#user-greeting a"),
-                container = $("#user-greeting"),
+        const username = $("#user-greeting #username"),
+                welcome = $("#user-greeting span"),
                 logo = $("#logo-container");
         function resize() {
-            // Checks whether to hide the logo 
-            if (container.width() <= username.width()+78) {
-                container.addClass("logo-hidden");
-                $("#logo-container").css({
-                    left: 5,
-                    transform: "none",
-                });
+            // Checks if "Welcome, " protrudes into the logo
+            if (username.offset().left-10 - 100 < window.innerWidth/2+115) {
+                // If it does, hide welcome
+                welcome.hide();
+                // If it does, checks if the username protrudes into the logo
+                if (username.offset().left-10 < window.innerWidth/2+115) {
+                    // If it does, float the logo left
+                    $("#logo-container").css({
+                        left: 5,
+                        transform: "none",
+                    });
+                    // If it does, checks if the username protrudes into the logo (after floated left)
+                    if (username.offset().left-20 < 211+5) {
+                        // If it does, hide the logo
+                        logo.hide();
+                    } else {
+                        logo.show();
+                    }
+                } else {
+                    // If it does not, reset css
+                    $("#logo-container").css({
+                        left: '',
+                        transform: '',
+                    });
+                }
             } else {
-                container.removeClass("logo-hidden");
-                $("#logo-container").css({
-                    left: '',
-                    transform: '',
-                });
-            }
-            if (logo.width()+25 > username.offset().left) {
-                $("#logo-container").css("opacity", "0");
-            } else {
-                $("#logo-container").css("opacity", '');
+                welcome.show();
             }
         }
-        username.css("max-width", "calc(100vw - 132px)");
-        resize();
-        $(window).resize(resize);
+        $(window).resize(resize).one("load", resize);
     }
     $("#nav-usage, #nav-about, #nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#nav-keybinds").click(() => alert("This feature has not yet been implemented")).css("text-decoration", "line-through");
+    $("#account-settings").click(() => alert("Please contact me to change your account settings"));
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
     // Position content so that the scrollbar doesn't clip into the header
     if ("animation-ran" in sessionStorage || !$("#user-greeting").length) {
-        // Position content so that the scrollbar doesn't clip into the header
         $("main").css({
             overflowY: "auto",
             height: "calc(100vh - 70px)",
@@ -107,7 +120,7 @@ $(function() {
         // Animation has ran
         sessionStorage.setItem("animation-ran", true);
         // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
-        $(window).on('load', function() {
+        $(window).one('load', function() {
             $("main, header, #assignments-container").removeClass("animate");
             // Run when the header animation completely ends since the header animation takes the longest
             $("header").one("transitionend", function() {

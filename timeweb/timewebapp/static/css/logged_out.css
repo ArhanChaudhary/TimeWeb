@@ -1,0 +1,11 @@
+@media screen and (max-width: 410px) {
+    #logo-container {
+        left: 5px;
+        transform: none;
+    }
+}
+@media screen and (max-width: 320px) {
+    #logo-container {
+        opacity: 0;
+    }
+}

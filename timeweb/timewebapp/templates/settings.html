@@ -1,6 +1,10 @@
 {% extends "template.html" %}
 {% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock css %}
+
 {% block js %}
 <script src="{% static 'js/settings.js' %}"></script>
 {% endblock js %}

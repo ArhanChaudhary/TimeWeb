@@ -2,27 +2,16 @@
 {% load static %}
 
 {% block js %}
-<script src="{% static 'js/logged_out.js' %}"></script>
+<script src="{% static 'js/login.js' %}"></script>
 {% endblock js %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/#user-greeting #username.css' %}">
 {% endblock css %}
 
 {% block content %}
   <div id="image"></div>
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
-
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
-    {% endif %}
-  {% endif %}
   <div id="login">
     <span>Managing your time.<br><br>Made easy.</span>
     <span id="first-smallvw">Managing your time.</span>
@@ -32,11 +21,14 @@
         {{ form.username }}
         <br>
         {{ form.password }}
+        {% if form.errors %}
+          <p id="error-message">Your username or password didn't match. Please try again</p>
+        {% endif %}
         <br>
         <input type="submit" value="Log in" id="submit-button"/>
         <input type="hidden" name="next" value="{{ next }}" />
       </form>
-      <div id="beta-message">Interested in beta testing? <a href="/contact">Contact me</a></div>
+      <p id="beta-message">Interested in beta testing? <a href="/contact">Contact me</a></p>
     </div>
     <span id="second-smallvw">Made easy.</span>
   </div>

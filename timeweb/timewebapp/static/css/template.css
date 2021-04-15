@@ -1,3 +1,4 @@
+/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 * {
     font-family: "Open Sans", sans-serif;
 }
@@ -7,6 +8,7 @@ input {
     -ms-user-select: text;
     user-select: text;
     /* Mobile */
+    -webkit-appearance: none;
     padding: 1px 2px
 }
 .relative-positioning-wrapper {
@@ -49,8 +51,7 @@ header::after {
     font-size: 20px;
     font-family: "Open Sans";
     line-height: 60px;
-
-    max-width: calc(50vw - 190px);
+    
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -85,23 +86,15 @@ body {
 #user-greeting {
     float: right;
     font-size: 20px;
-    height: 45.4px;
     color: white;
-    white-space: nowrap;
-    direction: rtl;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-       text-overflow: ellipsis;
-    /* width: calc(50vw - 106px(half width of logo) - 89px(nav width) - 5px(nav margin) - 24px(logo margin));*/
-    max-width: calc(50vw - 219px);
-    margin-right: -10px;
     padding-top: 14.6px;
+    margin-right: 5px;
+    cursor: pointer;
 }
-#user-greeting a {
+#user-greeting #username {
     text-decoration: none;
     display: inline-block;
     padding: 2px 2px 0 6px;
-    margin-right: 14px;
     background: -webkit-gradient(linear,left top, left bottom,color-stop(20%, rgb(72, 227, 235)),color-stop(80%, rgb(83,127,163)));
     background: -o-linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
@@ -110,7 +103,7 @@ body {
     -webkit-text-fill-color: transparent;
     position: relative;
 }
-#user-greeting a::after {
+#user-greeting #username::after {
     content: '';
     position: absolute;
     top: 0;
@@ -122,27 +115,54 @@ body {
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
 }
-#user-greeting a:focus {
+#user-greeting #username:focus {
     outline: 0;
 }
-#user-greeting a:focus::after {
+#user-greeting #username:focus::after {
     filter: brightness(1.25);
     transform: scale(1.04);
 }
-#user-greeting a:hover::after {
+#user-greeting #username:hover::after {
     transform: scale(1.04);
 }
-#user-greeting.logo-hidden {
-    overflow: visible;
+
+
+#username:focus #account-dropdown, #account-dropdown:hover {
+    display: block;
 }
-#user-greeting.logo-hidden a {
-    max-width: calc(100vw - 181px);
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-       text-overflow: ellipsis;
+#account-dropdown {
+    transform: translate(50%, 16px);
+    right: 50%;
+    width: 150px;
+    position: absolute;
+    background: rgb(43, 56, 68);
+    display: none;
+    color: white;
+    border: 2px solid transparent;
+    -webkit-text-fill-color: currentcolor;
 }
-#user-greeting.logo-hidden span {
-    visibility: hidden;
+#account-dropdown::before {
+    content: '';
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent rgb(43, 56, 68) transparent;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+}
+#account-dropdown * {
+    display: block;
+    text-align: center;
+    padding: 6px;
+    font-size: 15px;
+}
+#account-dropdown *:hover {
+    background: rgb(73, 86, 98);
+}
+#account-dropdown a {
+    color: white;
+    text-decoration: none;
 }
 #menu {
     float: right;

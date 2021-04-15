@@ -3,9 +3,11 @@ This file includes the code for:
 
 Transitioning the opening and closing of assignments
 The entire graph logic
-All nine graph buttons and inputs
+All graph buttons and inputs
+
+This only runs on index.html
 */
-// THIS FILE HAS NOT BEEN FULLY DOCUMENTED
+// THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 $(function() {
     function format_minutes(total_minutes) {
         const hour = Math.floor(total_minutes / 60),
@@ -334,12 +336,14 @@ $(function() {
                                 $(this).off("mousemove");
                             }
                         } else if (draw_point) {
-                            // Runs if (!set_skew_ratio && draw_point)
-                            // Disable draw point
-                            $(this).off("mousemove");
-                            draw_point = false;
-                            last_mouse_x = -1;
-                            draw();
+                            if (!isMobile) {
+                                // Runs if (!set_skew_ratio && draw_point) and not on mobile
+                                // Disable draw point
+                                $(this).off("mousemove");
+                                draw_point = false;
+                                last_mouse_x = -1;
+                                draw();
+                            }
                         } else {
                             // Runs if (!set_skew_ratio && !draw_point)
                             // Enable draw point
@@ -1135,18 +1139,18 @@ $(function() {
                         screen.fillText(todo_message, 50+(width-50)/2, row_height*4);
                         screen.fillText(`${pluralize(unit)} already Completed: ${lw}/${y}`, 50+(width-50)/2, row_height*5);
                         if (today_minus_ad < 0) {
-                            screen.fillText("This Assignment has Not Yet been Assigned!", 50+(width-50)/2, row_height*11);
+                            screen.fillText("This Assignment has Not Yet been Assigned!", 50+(width-50)/2, row_height*8);
                         } else if (distance_today_from_displayed_day > 0) {
-                            screen.fillText("You have not Entered in your Work from Previous Days!", 50+(width-50)/2, row_height*11);
-                            screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*12);
+                            screen.fillText("You have not Entered in your Work from Previous Days!", 50+(width-50)/2, row_height*8);
+                            screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*9);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || new Date(displayed_day.toDateString()) > new Date(new Date().toDateString())) {
                             screen.fillText("You have Completed your Work for Today!", 50+(width-50)/2, row_height*12);
                         } else if (len_works && !(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) && (lw - works[len_works-1]) / warning_acceptance * 100 < funct(len_works + dif_assign) - works[len_works-1]) {
-                            screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*11);
-                            screen.fillText("You are BEHIND Schedule!", 50+(width-50)/2, row_height*12);
+                            screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*8);
+                            screen.fillText("You are BEHIND Schedule!", 50+(width-50)/2, row_height*9);
                         }
                     } else {
-                        screen.fillText('Amazing Effort! You have Finished this Assignment!', 50+(width-50)/2, row_height*10);
+                        screen.fillText('Amazing Effort! You have Finished this Assignment!', 50+(width-50)/2, row_height*7);
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }

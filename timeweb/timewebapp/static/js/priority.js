@@ -4,7 +4,9 @@ This file includes the code for:
 Prioritizing and coloring assignments,
 Animating assignments that were just created or modified
 
+This only runs on index.html
 */
+// THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
     // Returns color rgb from priority percentage
     function color(p) {
@@ -102,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             }
             new Promise(function(resolve) {
-                $(window).on('load', function() {
+                $(window).one('load', function() {
                     // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                     // So, scroll to the next assignment instead
                     let assignment_to_scroll_to = $("#animate-in").next();

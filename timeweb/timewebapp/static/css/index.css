@@ -1,3 +1,4 @@
+/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 #assignments-container {
     position: relative;
 }
@@ -49,16 +50,16 @@ header.animate::after {
     right: -5px;
     z-index: 1;
     position: absolute;
-    background: gray;
+    background: rgb(100,100,100);
     display: none;
     color: white;
-    border: 2px solid rgba(0,0,0,0.05);
+    border: 2px solid transparent;
 }
 #advanced-options::before {
     content: '';
     border-width: 10px;
     border-style: solid;
-    border-color: transparent transparent gray transparent;
+    border-color: transparent transparent rgb(100,100,100) transparent;
     bottom: 100%;
     right: 40px;
     position: absolute;
@@ -69,7 +70,7 @@ header.animate::after {
     font-size: 15px;
 }
 #advanced-options *:hover {
-    background: rgb(170,170,170);
+    background: gray;
 }
 #hide-button {
     position: relative;

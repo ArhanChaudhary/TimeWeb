@@ -1,9 +1,12 @@
 {% extends "template.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/logged_out.css' %}">
+{% endblock css %}
 
 {% block content %}
-Contact me through my Gmail: arhan.ch@gmail.com
+Contact me through my G-mail: arhan.ch@gmail.com
 <br>
 Or, through <a href="https://www.facebook.com/profile.php?id=100010619859485">Facebook</a>
-<br>
-<br>
 {% endblock content %}

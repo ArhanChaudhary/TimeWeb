@@ -19,7 +19,6 @@ DEBUG = os.environ['DEBUG'] == "True"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSP_SCRIPT_SRC = ("'self'", )
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
 # Add nonce b64 value to header, use for inline scripts

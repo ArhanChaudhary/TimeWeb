@@ -1,3 +1,4 @@
+# THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
@@ -13,7 +14,6 @@ from datetime import timedelta
 from decimal import Decimal as d
 from math import ceil, floor
 import json
-# THIS FILE HAS NOT BEEN COMPLETELY DOCUMENTED
 
 # Automatically creates settings model when user is created
 from django.db.models.signals import post_save
@@ -52,6 +52,7 @@ class SettingsView(LoginRequiredMixin, View):
             'text_priority': settings_model.text_priority,
         }
         self.context['form'] = SettingsForm(None, initial=initial)
+        logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return render(request, "settings.html", self.context)
     def post(self, request):
         self.form = SettingsForm(request.POST)
@@ -70,6 +71,7 @@ class SettingsView(LoginRequiredMixin, View):
             settings_model.save()
             return redirect("home")
         self.context['form'] = self.form
+        logger.info(f'User \"{request.user}\" updated the settings page')
         return render(request, "settings.html", self.context)
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
