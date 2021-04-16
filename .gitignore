@@ -65,8 +65,10 @@ db.sqlite3
 db.sqlite3-journal
 
 cloud_sql_proxy
-.vscode/**
+.vscode
 timeweb/static/**
+app.yaml
+main.py
 env_variables.yaml
 gcldeployment.md
 original_favicon.png

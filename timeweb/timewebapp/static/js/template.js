@@ -2,10 +2,7 @@
 This file includes the code for:
 
 Initializing the service worker
-Loading in load data
-Advanced options
-Keybinds
-Ajax error function
+Header responsiveness
 Installing the app on home screen
 Other minor utilities
 
@@ -96,6 +93,43 @@ $(function() {
             }
         }
         $(window).resize(resize).one("load", resize);
+    }
+    // cite
+    // https://web.dev/customize-install/
+    let prompt;
+    window.addEventListener('beforeinstallprompt', function(e) {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        prompt = e;
+    });
+    // cite
+    // https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
+    function isPwa() {
+        var displayModes = ["fullscreen", "standalone", "minimal-ui"];
+        return displayModes.some((displayMode) => window.matchMedia('(display-mode: ' + displayMode + ')').matches); 
+    }
+    if (isPwa()) {
+        $("#nav-items span").hide();
+    } else {
+        $("#nav-items span").click(function() {
+            if (prompt) {
+                // Show the install prompt
+                prompt.prompt();
+                // Wait for the user to respond to the prompt
+                prompt.userChoice.then(choiceResult => {
+                    if (choiceResult.outcome === 'accepted') {
+                        alert("Thanks for installing the app");
+                    }
+                });
+            } else {
+                if (isMobile) {
+                    alert('Click the share icon on your screen (up arrow in a square) and scroll to "Add to Home Screen"\n\nPlease use the Safari browser if this is not an option');
+                } else {
+                    alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed");
+                }
+            }
+        });
     }
     $("#nav-usage, #nav-about, #nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#nav-keybinds").click(() => alert("This feature has not yet been implemented")).css("text-decoration", "line-through");

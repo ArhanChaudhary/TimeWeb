@@ -1,12 +1,10 @@
 /* 
 This file includes the code for:
 
-Setting up the service worker
 Loading in load data
 Advanced options
 Keybinds
 Ajax error function
-Installing the app on home screen
 Other minor utilities
 
 This only runs on index.html
@@ -86,37 +84,6 @@ document.addEventListener("DOMContentLoaded", function() {
     isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if (isMobile) {
         $("#form-wrapper #bottom-note").hide();
-    }
-    // cite
-    // https://web.dev/customize-install/
-    let prompt;
-    window.addEventListener('beforeinstallprompt', function(e) {
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        prompt = e;
-    });
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        $("#nav-items span").hide();
-    } else {
-        $("#nav-items span").click(function() {
-            if (prompt) {
-                // Show the install prompt
-                prompt.prompt();
-                // Wait for the user to respond to the prompt
-                prompt.userChoice.then(choiceResult => {
-                    if (choiceResult.outcome === 'accepted') {
-                        alert("Thanks for installing the app");
-                    }
-                });
-            } else {
-                if (isMobile) {
-                    alert('Click the share icon on your screen (up arrow in a square) and scroll to "Add to Home Screen"\n\nPlease use the Safari browser if this is not an option');
-                } else {
-                    alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed");
-                }
-            }
-        });
     }
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
