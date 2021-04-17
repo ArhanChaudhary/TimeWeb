@@ -307,7 +307,7 @@ $(function() {
                         if (change_day_mouse) {
                             change_day_upper = lw >= funct(len_works + dif_assign);
                         }
-                        $(this).html("Hover and click the graph (click this again to cancel)").one("click", cancel_sr);
+                        $(this).html("Hover and click the graph (Click this to cancel)").one("click", cancel_sr);
                         // Turn off mousemove to ensure there is only one mousemove handler at a time
                         $(graph).off("mousemove").mousemove(mousemove);
                         set_skew_ratio = true;
@@ -530,36 +530,33 @@ $(function() {
                             // If the deleted work input cut the dynamic start, run this
                             // Reverses the logic of work inputs in and recursively decreases red_line_start_x
                             if (red_line_start_x > len_works + dif_assign) {
-                                // Wrap in function so the outer loop can be broken out of
-                                (function() {
-                                    // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                    for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign - 1; red_line_start_x--) {
-                                        red_line_start_y = works[red_line_start_x - dif_assign];
-                                        y_fremainder = (y - red_line_start_y) % funct_round;
-                                        if (len_nwd) {
-                                            set_mod_days();
-                                        }
-                                        set_skew_ratio_lim();
-                                        pset();
-                                        // The inner for loop checks if every work input is the same as the red line for all work inputs greater than that red_line_start_x
-                                        let next_funct = funct(red_line_start_x),
-                                            next_work = works[red_line_start_x - dif_assign];
-                                        for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
-                                            const this_funct = next_funct,
-                                                this_work = next_work;
-                                            next_funct = funct(i + 1),
-                                            next_work = works[i - dif_assign + 1];
-                                            // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
-                                            if (next_funct - this_funct !== next_work - this_work) {
-                                                red_line_start_x++;
-                                                return;
-                                            }
+                                // The outer for loop decrements red_line_start_x if the inner for loop didn't break
+                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign - 1; red_line_start_x--) {
+                                    red_line_start_y = works[red_line_start_x - dif_assign];
+                                    y_fremainder = (y - red_line_start_y) % funct_round;
+                                    if (len_nwd) {
+                                        set_mod_days();
+                                    }
+                                    set_skew_ratio_lim();
+                                    pset();
+                                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than that red_line_start_x
+                                    let next_funct = funct(red_line_start_x),
+                                        next_work = works[red_line_start_x - dif_assign];
+                                    for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
+                                        const this_funct = next_funct,
+                                            this_work = next_work;
+                                        next_funct = funct(i + 1),
+                                        next_work = works[i - dif_assign + 1];
+                                        // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
+                                        if (next_funct - this_funct !== next_work - this_work) {
+                                            red_line_start_x++;
+                                            return outer;
                                         }
                                     }
-                                    if (red_line_start_x < 0) {
-                                        red_line_start_x = 0;
-                                    }
-                                })();
+                                }
+                                if (red_line_start_x < 0) {
+                                    red_line_start_x = 0;
+                                }
                                 red_line_start_y = works[red_line_start_x - dif_assign];
                                 y_fremainder = (y - red_line_start_y) % funct_round;
                                 if (len_nwd) {

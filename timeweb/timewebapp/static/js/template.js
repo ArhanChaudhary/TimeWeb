@@ -95,6 +95,13 @@ $(function() {
         $(window).resize(resize).one("load", resize);
     }
     // cite
+    // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
+    isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    // Hides "Press enter" on mobile
+    if (isMobile) {
+        $("#form-wrapper #bottom-note").hide();
+    }
+    // cite
     // https://web.dev/customize-install/
     let prompt;
     window.addEventListener('beforeinstallprompt', function(e) {
@@ -131,7 +138,9 @@ $(function() {
             }
         });
     }
-    $("#nav-usage, #nav-about, #nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
+    $("#nav-how").click(() => alert("This has not yet been written, please contact me directly if you want to know how this works")).css("text-decoration", "line-through");
+    $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly on how to use this website")).css("text-decoration", "line-through");
+    $("#nav-about").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#nav-keybinds").click(() => alert("This feature has not yet been implemented")).css("text-decoration", "line-through");
     $("#account-settings").click(() => alert("Please contact me to change your account settings"));
     // Deals with selecting the parent element when tabbing into the nav

@@ -14,7 +14,7 @@
     align-items: center;
     justify-content: space-between;
     opacity: 0;
-    animation: 1s cubic-bezier(.29,.81,.37,.99) 1s 1 scale;
+    animation: 1s cubic-bezier(.29,.81,.37,.99) 0.5s 1 scale;
     animation-fill-mode: forwards;
 }
 #login::before {
@@ -80,7 +80,7 @@
     z-index: -2;
     opacity: 0;
     transform: translateY(-100%) translateY(100vh);
-    animation: slide 200s linear 1.8s infinite, 1s ease-out 1.8s 1 fade;
+    animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
     animation-fill-mode: forwards;
 }
 #login span {
@@ -156,16 +156,16 @@ label {
     0% {
         transform: translateY(-100%) translateY(100vh);
     }
-    100% {
+    to {
         transform: none;
     }
 }
 @keyframes scale {
     0% {
-        transform: scale(0.45);
+        transform: scale(0.85);
         opacity: 0;
     }
-    100% {
+    to {
         transform: none;
         opacity: 1;
     }
@@ -174,7 +174,7 @@ label {
     0% {
         opacity: 0;
     }
-    100% {
+    to {
         opacity: 0.75;
     }
 }

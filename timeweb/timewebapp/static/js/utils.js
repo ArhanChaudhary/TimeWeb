@@ -78,13 +78,6 @@ document.addEventListener("DOMContentLoaded", function() {
             $("html").html(response.responseText);
         }
     }
-    // Hides "Press enter" on mobile
-    // cite
-    // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
-    isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (isMobile) {
-        $("#form-wrapper #bottom-note").hide();
-    }
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
     $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() {
