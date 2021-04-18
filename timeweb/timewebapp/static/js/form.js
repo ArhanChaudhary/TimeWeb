@@ -99,7 +99,7 @@ $(function() {
             +selected_assignment[5][0],
             +selected_assignment[8],
             selected_assignment[9]-1 ? +selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
-            selected_assignment[10]*selected_assignment[8]||'', // Minimum work time displays self if it isn't 0, else display nothing
+            +selected_assignment[10]||'', // Minimum work time displays self if it isn't 0, else display nothing
             // Note: the minimum work time is stored as the original value divided by the completion time per unit, as it is easier to do calculations
             // This multiplies it back to the original value so the user sees the same thing they inputted
         ];

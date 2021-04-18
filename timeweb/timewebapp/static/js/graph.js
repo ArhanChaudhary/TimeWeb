@@ -116,7 +116,7 @@ $(function() {
                 skew_ratio = +skew_ratio;
                 ctime = +ctime;
                 funct_round = +funct_round;
-                min_work_time = +min_work_time;
+                min_work_time /= ctime;
                 nwd = nwd.map(Number);
                 // dynamic start is already an into
                 let mods, // Handles not working days, explained later
@@ -555,7 +555,7 @@ $(function() {
                         }
                     });
                     assignment.find(".work-input-button").info("right",
-                        `Enter the amount of work done since your last input on the graph's displayed date and press return
+                        `Enter the amount of work done on the graph's displayed date and press return
                         
                         Keyword: enter "fin" if you have completed an assignment's work for its day`,"after").css({
                         left: "calc(50% + 55px)",

@@ -243,6 +243,7 @@ class TimewebListView(LoginRequiredMixin, View):
                         x_num = 1
                 else:
                     x_num = (selected_model.x - selected_model.ad).days
+                selected_model.min_work_time *= selected_model.ctime
                 if create_assignment:
                     selected_model.works = [str(selected_model.works)] # Same as str(adone)
                 else:
