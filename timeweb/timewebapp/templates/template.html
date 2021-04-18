@@ -54,7 +54,7 @@
                             {{ user.get_username }}
                             <div id="account-dropdown">
                                 <span id="account-settings">Account settings</span>
-                                <a href="{% url 'logout' %}?next={{request.path}}">Log out</a>
+                                <a href="{% url 'logout' %}?redirect_to={{request.path}}">Log out</a>
                             </div>
                         </div>
                     </div>

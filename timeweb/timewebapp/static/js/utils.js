@@ -18,7 +18,7 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("load-data").textContent);
-[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_past, color_priority, text_priority] = dat[0];
+[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_past, color_priority, text_priority, first_login] = dat[0];
 def_nwd = def_nwd.map(Number);
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
@@ -39,9 +39,15 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     $("#open-assignments").click(() => $(".assignment:not(.disable-hover)").click());
     $("#close-assignments").click(() => $(".assignment.disable-hover").click());
-    $("#re-enable-tutorial, #delete-assignments").click(function() {
+    $("#re-enable-tutorial").click(function() {
+        sessionStorage.setItem("first_login", true);
+        sessionStorage.removeItem("open_assignments");
+        location.reload();
+    });
+    $("#delete-assignments").click(function() {
         alert("This feature has not yet been implented");
     }).css("text-decoration","line-through");
+    $("#autofill-assignments").css("text-decoration","line-through").info('left',`Autofills no work done for every assignment with incomplete past work inputs until today`);
     // Keybinds
     form_is_showing = false;
     $(document).keydown(function(e) {
@@ -78,20 +84,24 @@ document.addEventListener("DOMContentLoaded", function() {
             $("html").html(response.responseText);
         }
     }
+    // Fix bug where the nav can be visible despite overflow: hidden
+    window.scrollTo(0, 0);
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
     $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() {
-        // Save current open assignments
-        sessionStorage.setItem("open_assignments", JSON.stringify(
-            $(".assignment.disable-hover").map(function() {
-                return $("#assignments-container").children().index($(this).parent())
-            }).toArray()
-        ));
+        if (!("first_login" in sessionStorage)) {
+            // Save current open assignments
+            sessionStorage.setItem("open_assignments", JSON.stringify(
+                $(".assignment.disable-hover").map(function() {
+                    return $("#assignments-container").children().index($(this).parent())
+                }).toArray()
+            ));
+        }
         // Save scroll position
         localStorage.setItem("scroll", $("main").scrollTop());
     });
     // Ensure fonts load for the graph
-    document.fonts.ready.then(function () {
+    document.fonts.ready.then(function() {
         // Reopen closed assignments
         if ("open_assignments" in sessionStorage) {
             JSON.parse(sessionStorage.getItem("open_assignments")).forEach(index => 
@@ -108,6 +118,16 @@ document.addEventListener("DOMContentLoaded", function() {
             localStorage.removeItem("scroll");
         }
     });
+    if (first_login) {
+        sessionStorage.setItem("first_login", true);
+    }
+    if ("first_login" in sessionStorage) {
+        if ($(".assignment-container").length) {
+            $(".assignment-container").first().append("<span>Click your assignment<br></span>")
+        } else {
+            $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this tool.<br><br>Create your first school or work assignment to get started");
+        }
+    }
 });
 // Lock to landscape
 if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {

@@ -76,8 +76,8 @@ main {
 }
 body {
     margin: 0;
-    background: -o-radial-gradient(circle, white 0, rgb(202,202,202) 100%);
-    background: radial-gradient(circle, white 0, rgb(202,202,202) 100%);
+    background: -o-radial-gradient(circle, rgb(245,245,245) 0, rgb(192,192,192) 100%);
+    background: radial-gradient(circle, rgb(245,245,245) 0, rgb(192,192,192) 100%);
 }
 #site {
     position: relative;
@@ -89,7 +89,6 @@ body {
     color: white;
     padding-top: 14.6px;
     margin-right: 5px;
-    cursor: pointer;
 }
 #user-greeting #username {
     text-decoration: none;
@@ -102,6 +101,7 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     position: relative;
+    cursor: pointer;
 }
 #user-greeting #username::after {
     content: '';
@@ -260,7 +260,7 @@ nav.open #nav-menu::after {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: rgb(33,163,177);
+    background: rgb(33,163,177) !important;
     font-size: 14px;
     font-style: italic;
     font-family: "Serif";
@@ -269,40 +269,38 @@ nav.open #nav-menu::after {
     text-align: center;
     line-height: 15px;
 }
-.info-button:hover {
-    background: rgb(16,135,148);
+.info-button:focus {
+    background: rgb(16,135,148) !important;
+    outline: 0;
 }
-.info-button:hover .info-button-text {
-    visibility: visible;
-    opacity: 1;
-    -webkit-transition: all .2s ease-in-out;
-    -o-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
+.info-button:focus .info-button-text {
+    display: block;
+    animation: .2s ease-in-out 1 fadeIn;
 }
-.info-button:hover .info-button-text.info-right {
-    left: calc(100% + 12px);
-}
-.info-button:hover .info-button-text.info-left {
-    right: calc(100% + 12px);
-}
-.info-button:hover .info-button-text.info-bottom {
-    top: calc(100% + 12px);
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+        
+    }
 }
 .info-button-text {
     position: absolute;
     width: 265px;
     z-index: 3;
 
-    background: white;
+    background: white !important;
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.75);
             box-shadow: 0 0 5px rgba(0,0,0,0.75);
-    border-radius: 5px;
+    border-radius: 5px !important;
+    box-shadow: none !important;
     border: 2px solid black;
-    visibility: hidden;
-    opacity: 0;
+    display: none;
 
     text-align: left;
-    padding: 5px 5px;
+    padding: 5px 5px !important;
     color: black;
     font-size: 13px;
     line-height: 13px;
@@ -311,11 +309,11 @@ nav.open #nav-menu::after {
 }
 .info-button-text.info-right {
     left: calc(100% - 4px);
-    transform: translateY(-50%) translateY(7px);
+    transform: translateY(-50%) translateY(-7px);
 }
 .info-button-text.info-left {
-    right: calc(100% - 4px);
-    transform: translateY(-50%) translateY(7px);
+    right: calc(100% + 14px);
+    transform: translateY(-50%) translateY(-7px);
 }
 .info-button-text.info-bottom {
     top: calc(100% - 4px);
@@ -349,17 +347,6 @@ nav.open #nav-menu::after {
 }
 
 
-#nwd-wrapper {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
-    -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-    margin: -1em 50px 0;
-}
 #nwd-wrapper input {
     display: none !important;
 }
@@ -375,6 +362,7 @@ nav.open #nav-menu::after {
     border: 1px solid green;
     border-radius: 5px;
     padding: 4px;
+    user-select: none;
     -webkit-transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
     transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
     -o-transition: transform .3s cubic-bezier(.23,.77,.11,1.94);

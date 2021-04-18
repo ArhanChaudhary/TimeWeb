@@ -4,6 +4,7 @@ This file includes the code for:
 Initializing the service worker
 Header responsiveness
 Installing the app on home screen
+Starting animation on index.html
 Other minor utilities
 
 This runs on every template
@@ -21,6 +22,40 @@ if ('serviceWorker' in navigator) {
 
     });
 }
+// Use "document.addEventListener("DOMContentLoaded", function() {" instead of "$(function() {" because "$(function() {" runs after first paint, messing up the initial transition
+document.addEventListener("DOMContentLoaded", function() {
+    // Position content so that the scrollbar doesn't clip into the header
+    if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
+        $("main").css({
+            overflowY: "auto",
+            height: "calc(100vh - 70px)",
+            padding: "10px 30px",
+            marginTop: 70,
+        });
+    // Do starting animation
+    } else {
+        // If the animation has not already been run, add the class "animate" to the elements that will be animated
+        // The animation will happen instantly, because the transitions are only applied to :not(.animate)
+        // Then, when the window loads, remove ".animate". This will cause the actual transition
+        // Note: I have tried using keyframes instead of this, but that still required this same process, so I found this way to be the fastest
+        $("main, header, #assignments-container").addClass("animate");
+        sessionStorage.setItem("animation-ran", true);
+        // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
+        $(window).one('load', function() {
+            $("main, header, #assignments-container").removeClass("animate");
+            // Run when the header animation completely ends since the header animation takes the longest
+            $("header").one("transitionend", function() {
+                // Position content so that the scrollbar doesn't clip into the header
+                $("main").css({
+                    overflowY: "auto",
+                    height: "calc(100vh - 70px)",
+                    padding: "10px 30px",
+                    marginTop: 70,
+                });
+            });
+        });
+    }
+});
 $(function() {
     // Click element when enter is pressed
     $(document).keypress(function(e) {
@@ -47,6 +82,7 @@ $(function() {
                     logo.hide();
                     // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the username protrudes into it
                     newassignmenttext.css("max-width",Math.max(0, username.offset().left-69-10));
+                    // If it does, checks if 
                 } else {
                     logo.show();
                     // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the logo protrudes into it
@@ -138,49 +174,26 @@ $(function() {
             }
         });
     }
-    $("#nav-how").click(() => alert("This has not yet been written, please contact me directly if you want to know how this works")).css("text-decoration", "line-through");
-    $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly on how to use this website")).css("text-decoration", "line-through");
+    $("#nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
+    $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly"));
     $("#nav-about").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#nav-keybinds").click(() => alert("This feature has not yet been implemented")).css("text-decoration", "line-through");
     $("#account-settings").click(() => alert("Please contact me to change your account settings"));
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
-    // Position content so that the scrollbar doesn't clip into the header
-    if ("animation-ran" in sessionStorage || !$("#user-greeting").length) {
-        $("main").css({
-            overflowY: "auto",
-            height: "calc(100vh - 70px)",
-            padding: "10px 30px",
-            marginTop: 70,
-        });
-    // Do starting animation
-    } else {
-        // If the animation has not already been run, add the class "animate" to the elements that will be animated
-        // The animation will happen instantly, because the transitions are only applied to :not(.animate)
-        // Then, when the window loads, remove ".animate". This will cause the actual transition
-        $("main, header, #assignments-container").addClass("animate");
-        // Animation has ran
-        sessionStorage.setItem("animation-ran", true);
-        // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
-        $(window).one('load', function() {
-            $("main, header, #assignments-container").removeClass("animate");
-            // Run when the header animation completely ends since the header animation takes the longest
-            $("header").one("transitionend", function() {
-                // Position content so that the scrollbar doesn't clip into the header
-                $("main").css({
-                    overflowY: "auto",
-                    height: "calc(100vh - 70px)",
-                    padding: "10px 30px",
-                    marginTop: 70,
-                });
-            });
-        });
-    }
 });
 // Info tooltip
 (function($) {
-    $.fn.info = function(facing,text) {
-        return this.append('<div class="info-button">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
-    };
+    $.fn.info = function(facing,text,position) {
+        const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
+        switch (position) {
+            case "prepend":
+                return info_button.prependTo(this);
+            case "after":
+                return info_button.insertAfter(this);
+            default:
+                return info_button.appendTo(this);
+        }
+    }
 }(jQuery));

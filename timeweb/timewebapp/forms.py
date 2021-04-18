@@ -11,6 +11,7 @@ class TimewebForm(forms.ModelForm):
         model = TimewebModel
         fields = "__all__"
         widgets = {
+            'file_sel': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'ad': DateInput(),
             'x': DateInput(),
             'dif_assign': forms.HiddenInput(),
@@ -19,6 +20,7 @@ class TimewebForm(forms.ModelForm):
             'dynamic_start': forms.HiddenInput(),
             'remainder_mode': forms.HiddenInput(),
             'user': forms.HiddenInput(),
+            'unit': forms.TextInput(attrs={"placeholder": "Ex: Page, Paragraph, Question"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
             'y': forms.NumberInput(attrs={"min":"1"}),
             'ctime': forms.NumberInput(attrs={"min":"0"}),
@@ -73,8 +75,7 @@ class TimewebForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
-    
-    # Override form.is_valid in views
+
     def clean(self):
         cleaned_data = super().clean()
         x = cleaned_data.get("x")
@@ -121,6 +122,7 @@ class SettingsForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "user": forms.HiddenInput(),
+            "first_login": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'warning_acceptance': forms.NumberInput(attrs={"min":"1","max":"100"}),
         }
@@ -138,10 +140,6 @@ class SettingsForm(forms.ModelForm):
                 'invalid': _("The default skew ratio is invalid"),
             }
         }
-    # def_skew_ratio = models.DecimalField(
-    #     max_digits=17,
-    #     decimal_places=10,
-       
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

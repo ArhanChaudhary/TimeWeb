@@ -98,7 +98,7 @@ class SettingsModel(models.Model):
     warning_acceptance = models.IntegerField(
         default=50,
         validators=[MinValueValidator(1,_("This field's value must be an integer from 1 to 100")), MaxValueValidator(100,_("This field's value must be an integer from 1 to 100"))],
-        verbose_name=_('Warning Threshold in Percent'),
+        verbose_name=_('Warning Threshold'),
     )
     def_min_work_time = models.DecimalField(
         max_digits=15,
@@ -117,8 +117,7 @@ class SettingsModel(models.Model):
     def_nwd = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
-        null=True,
-        verbose_name=_("Default Weekdays you won't work"),
+        null=True
     )
     def_funct_round_minute = models.BooleanField(
         default=False,
@@ -129,7 +128,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
     show_progress_bar = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name=_('Show Graph Progress Bar'),
     )
     show_past = models.BooleanField(
@@ -144,6 +143,7 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Display Priority with Text'),
     )
+    first_login = models.BooleanField(default=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

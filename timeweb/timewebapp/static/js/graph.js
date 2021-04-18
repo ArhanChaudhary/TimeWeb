@@ -110,7 +110,8 @@ $(function() {
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
                 ad = new Date(ad);
                 y = +y;
-                works = works.map(Number);
+                selected_assignment[5] = selected_assignment[5].map(Number);
+                works = selected_assignment[5];
                 // dif assign is already an int
                 skew_ratio = +skew_ratio;
                 ctime = +ctime;
@@ -180,6 +181,7 @@ $(function() {
                     today_minus_ad = Math.round((new Date(new Date().toDateString()) - ad) / 86400000),
                     day = len_works,
                     lw = works[len_works];
+                pset();
                 if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
                     day--;
                 }
@@ -307,17 +309,22 @@ $(function() {
                         if (change_day_mouse) {
                             change_day_upper = lw >= funct(len_works + dif_assign);
                         }
-                        $(this).html("Hover and click the graph (Click this to cancel)").one("click", cancel_sr);
+                        $(this).onlyText("(Click again to cancel)").one("click", cancel_sr);
                         // Turn off mousemove to ensure there is only one mousemove handler at a time
                         $(graph).off("mousemove").mousemove(mousemove);
                         set_skew_ratio = true;
-                    });
+                    }).info("right", 
+                        `The skew ratio determines the work distribution of the graph
+
+                        Click this button and hover over the graph and click it to save
+                        
+                        Note: this has no effect on assignments due tomorrow`);
                     $(graph).click(function(e) {
                         if (set_skew_ratio) {
                             // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
                             set_skew_ratio = false;
                             // stop set skew ratio if canvas is clicked
-                            $(this).next().find(".skew-ratio-button").html("Set skew ratio using graph").off("click", cancel_sr);
+                            $(this).next().find(".skew-ratio-button").onlyText("Set skew ratio using graph").off("click", cancel_sr);
                             // Save skew ratio
                             selected_assignment[7] = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
@@ -335,6 +342,7 @@ $(function() {
                             if (!draw_point) {
                                 $(this).off("mousemove");
                             }
+                            draw();
                         } else if (draw_point) {
                             if (!isMobile) {
                                 // Runs if (!set_skew_ratio && draw_point) and not on mobile
@@ -356,7 +364,7 @@ $(function() {
                     });
                     // Cancel set skew ratio
                     function cancel_sr() {
-                        $(this).html("Set skew ratio using graph");
+                        $(this).onlyText("Set skew ratio using graph");
                         set_skew_ratio = false;
                         skew_ratio = old_skew_ratio;
                         draw();
@@ -401,20 +409,32 @@ $(function() {
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
+                    }).info("right", "Enter skew ratio as a number. Leave this blank to cancel or press enter to save",'after').css({
+                        left: 134,
+                        position: "absolute",
+                        bottom: 36,
+                        zIndex: "2",
                     });
                     // Remainder mode
                     assignment.find(".remainder-mode-button").click(function() {
                         remainder_mode = !remainder_mode;
                         selected_assignment[14] = remainder_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        $(this).html($(this).html() === "Switch to Remainder: First" ? "Switch to Remainder: Last" : "Switch to Remainder: First");
+                        $(this).onlyText(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First");
                         SendButtonAjax('remainder_mode', remainder_mode);
                         draw();
-                    }).html(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First"); // Initially set html for remainder mode
+                    }).html(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First") // Initially set html for remainder mode
+                    .info('left',
+                    `Ignore this if you do not see a "Remainder: First" or "Remainder: Last" on your graph
+                    
+                    If the total number of units of work is not divisible by the number of them you will complete at a time, this determines whether to complete the remainder of work on the first or last working day of this assignment`,'prepend').css({
+                        left: -3,
+                        marginRight: 3,
+                    });
                     // Fixed/dynamic mode
                     assignment.find(".fixed-mode-button").click(function() {
                         fixed_mode = !fixed_mode;
                         selected_assignment[12] = fixed_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        $(this).html($(this).html() === "Switch to Fixed mode" ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+                        $(this).onlyText(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
                         SendButtonAjax('fixed_mode', fixed_mode);
                         if (fixed_mode) {
                             // Set start of red line and pset()
@@ -442,7 +462,24 @@ $(function() {
                             set_mod_days();
                         }
                         draw();
-                    }).html(fixed_mode ? "Switch to dynamic mode" : "Switch to fixed mode");
+                    }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode").info("left",
+                    `Fixed mode:
+                    In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked in progress and you will have to make up the remainder of the work later that day. If you still don't finish its work, you will have to make it up on the next day.
+                    Exception: entering in no work done always the marks the assignment as completed for that day
+
+                    This mode is recommended for self-discipline or if the assignment is important
+
+
+                    Dynamic mode:
+                    In this mode, if you fail to complete the specified amount of work for any day, the graph will change itself to start at your last work input, adapting to your work schedule
+
+                    Use this if you cannot keep up with an assignment's work schedule. It's easy to fall behind with dynamic mode, so be careful`,"prepend").css({
+                        left: -3,
+                        marginRight: 3,
+                    }).children().first().css({
+                        "font-size": 11,
+                        "line-height": "11px",
+                    });
                     assignment.find(".work-input-button, .total-work-input-button").keypress(function(e) {
                         var e = e || window.event;
                         if (e.key === "Enter" && $(this).val() /* Blank inputs are interpreted as 0 */ ) {
@@ -483,7 +520,7 @@ $(function() {
                                 }
                                 lw = total_done;
                                 len_works++;
-                                if (input_done != todo) {
+                                if (input_done !== todo) {
                                     if (len_works + dif_assign === x) {
                                         dynamic_start = len_works + dif_assign - 1;
                                     } else {
@@ -517,6 +554,24 @@ $(function() {
                             }
                         }
                     });
+                    assignment.find(".work-input-button").info("right",
+                        `Enter the amount of work done since your last input on the graph's displayed date and press return
+                        
+                        Keyword: enter "fin" if you have completed an assignment's work for its day`,"after").css({
+                        left: "calc(50% + 55px)",
+                        top: 3,
+                        position: "absolute",
+                    });
+                    assignment.find(".total-work-input-button").info("right",
+                        `Enter the total amount of work done on the graph's displayed date and press return
+                        
+                        This is useful for assignments with a total unit count (e.g: use this input for a book that shows the total page number on every page)
+                        
+                        Keyword: enter "fin" if you have completed an assignment's work for its day`,"after").css({
+                        left: "calc(50% + 63px)",
+                        top: 34,
+                        position: "absolute",
+                    })
                     assignment.find(".delete-work-input-button").click(function() {
                         if (len_works > 0) {
                             // Change day if assignment is not in progress
@@ -550,7 +605,7 @@ $(function() {
                                         // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
                                         if (next_funct - this_funct !== next_work - this_work) {
                                             red_line_start_x++;
-                                            return outer;
+                                            break outer;
                                         }
                                     }
                                 }
@@ -577,6 +632,7 @@ $(function() {
                     assignment.find(".hide-assignment-button").click(function() {
                         alert("This feature has not yet been implented");
                     }).css("text-decoration", "line-through");
+                    assignment.find(".info-button").click(() => false);
                 }
 
                 //
@@ -1131,7 +1187,7 @@ $(function() {
                         } else if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
                             todo_message = `Remaining ${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
                         } else {
-                            todo_message = `${pluralize(unit)} to Complete for this Day: ${todo}${reach_deadline}`;
+                            todo_message = `${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
                         }
                         screen.fillText(todo_message, 50+(width-50)/2, row_height*4);
                         screen.fillText(`${pluralize(unit)} already Completed: ${lw}/${y}`, 50+(width-50)/2, row_height*5);
@@ -1330,6 +1386,21 @@ $(function() {
                 //
                 // End draw graph
                 //
+                assignment.next().remove();
+                setTimeout(function() {
+                    if ("first_login" in sessionStorage) {
+                        alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
+                        alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
+                        alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
+                        alert("The blue line will be your daily work inputs for the assignment. This is not yet visible because you have not entered any work inputs");
+                        if (x < 4) {
+                            alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are better for this visualization`);
+                        }
+                        alert("Once you add more assignments, they are prioritized based on their estimated completion times");
+                        alert("Now that you have finished reading this, hover over the info icons next to each of the buttons and check out the settings to set your preferences");
+                        sessionStorage.removeItem("first_login");
+                    }
+                }, 200);
             }
             assignment.data('not_first_click', true);
         }

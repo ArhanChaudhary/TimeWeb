@@ -8,7 +8,7 @@ Adding info buttons
 This only runs on settings.html
 */
 $(function() {
-    $("#id_def_skew_ratio").val(+($("#id_def_skew_ratio").val()-1).toFixed(10));
+    $("#id_def_skew_ratio").val(+($("#id_def_skew_ratio").val()-1).toFixed(10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
 
     $("label[for='id_show_past']").css("text-decoration", "line-through");
@@ -35,4 +35,7 @@ $(function() {
         
         This is recommended to be enabled`
     );
+    $("form").submit(function() {
+        $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val()||0);
+    });
 });

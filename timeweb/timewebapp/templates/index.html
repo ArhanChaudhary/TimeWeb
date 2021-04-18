@@ -27,7 +27,7 @@
               <label id="nwd-label-title">Select the Weekdays you won't work on this Assignment</label>
               <div id="nwd-wrapper">
                 {% for value, text in field.field.choices %}
-                  <input {% if field.errors %}class="invalid"{% endif %} id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
+                  <input id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
                   <label tabindex="0" class="nwd-label" for="id_nwd_{{ forloop.counter0 }}">{{ text }}</label>
                 {% endfor %}
               </div>
@@ -62,7 +62,8 @@
         <div id="advanced-options">
           <span id="open-assignments" tabindex="0">Open all assignments</span>
           <span id="close-assignments" tabindex="0">Close all assignments</span>
-          <span id="delete-assignments" tabindex="0">Delete all finished assignments</span>
+          {% comment %} <span id="autofill-assignments" tabindex="0">Autofill no work done</span> {% endcomment %}
+          <span id="delete-assignments" tabindex="0">Delete all completed assignments</span>
           <span id="re-enable-tutorial" tabindex="0">Re-enable tutorial</span>
         </div>
       </div>

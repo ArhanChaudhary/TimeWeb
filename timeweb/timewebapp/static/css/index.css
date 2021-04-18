@@ -24,10 +24,8 @@ header.animate::after {
     transform: none;
 }
 #assignments-container.animate {
-    -webkit-transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
-        -ms-transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
-            transform: translateY(max(calc(-100vh + 70px),calc(-100% - 20px)));
-    /* transform:translateY(min(calc(100vh - 70px),calc(100% + 20px))); */
+    transform: translateY(max(-400px, calc(-100% - 20px)));
+    /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
 #assignments-header {
     display: flex;
@@ -42,6 +40,9 @@ header.animate::after {
     border-bottom: 1px solid;
     cursor: pointer;
 }
+#advanced:focus {
+    outline: 0;
+}
 #advanced:focus #advanced-options, #advanced-options:hover {
     display: block;
 }
@@ -50,16 +51,16 @@ header.animate::after {
     right: -5px;
     z-index: 1;
     position: absolute;
-    background: rgb(100,100,100);
+    background: rgb(155,155,155);
     display: none;
-    color: white;
-    border: 2px solid transparent;
+    color: black;
+    border: 2px solid rgb(140,140,140);
 }
 #advanced-options::before {
     content: '';
     border-width: 10px;
     border-style: solid;
-    border-color: transparent transparent rgb(100,100,100) transparent;
+    border-color: transparent transparent rgb(155,155,155) transparent;
     bottom: 100%;
     right: 40px;
     position: absolute;
@@ -69,7 +70,7 @@ header.animate::after {
     padding: 6px;
     font-size: 15px;
 }
-#advanced-options *:hover {
+#advanced-options *:hover, #advanced-options *:focus {
     background: gray;
 }
 #hide-button {
@@ -250,8 +251,21 @@ canvas:focus {
     position: relative;
     border: 4px solid transparent;
 }
+.graph-footer .info-button {
+    /* Prevent graph buttons from oversizing */
+    margin-bottom: -1px;
+    width: 22px;
+    height: 17px;
+    font-size: 15px;
+    padding: 0;
+    line-height: 17px;
+}
+.graph-footer .info-button:focus {
+    box-shadow: none;
+}
 .graph-footer {
     padding: 0 13px;
+    position: relative;
 }
 .graph-footer * {
     border-radius: 20px;
@@ -266,6 +280,9 @@ canvas:focus {
     border-color: rgb(0,95,204);
     background: white;
     box-shadow: 0 0 0 3px rgb(0,95,204);
+}
+.total-work-input-button {
+    width: 163px;
 }
 .work-input-button, .total-work-input-button, .delete-work-input-button  {
     position: relative;
@@ -431,4 +448,35 @@ label[for='id_ad']::after {
     -webkit-transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
     -o-transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
     transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
+}
+
+
+#nwd-wrapper {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    margin: -1em 50px 0;
+}
+
+
+.info-button:focus {
+    background: rgb(16,135,148) !important;
+    outline: 0;
+}
+.info-button:focus .info-button-text {
+    opacity: 1;
+    height: auto;
+    padding: 5px 5px !important;
+    border: 2px solid black !important;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+.info-button:focus .info-button-text.info-right {
+    left: calc(100% + 12px);
 }

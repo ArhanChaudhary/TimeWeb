@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DEBUG'] == "True"
+DEBUG = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -86,6 +86,7 @@ TEMPLATES = [
 ]
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 
 

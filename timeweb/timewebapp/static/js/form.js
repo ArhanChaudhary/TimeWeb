@@ -160,7 +160,7 @@ $(function() {
             }
         }
     }
-    $("#id_unit").on('input', replaceUnit).attr("placeholder", "Ex: Page, Paragraph, Question");
+    $("#id_unit").on('input', replaceUnit);
     // Add info buttons ($.info defined in template.js)
     $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
     $('label[for="id_unit"]').info('right',
@@ -273,6 +273,8 @@ $(function() {
     });
     // Focus on first invalid field
     $("#form-wrapper .error-note").first().prev().children().eq(1).focus();
+    // Prevent label from stealing focus from info button
+    $("#form-wrapper .info-button").click(() => false);
     // Delete assignment
     $('.delete-button').click(function() {
         const $this = $(this),
@@ -345,7 +347,9 @@ $(function() {
 // Only change text of form label
 (function($) {
     $.fn.onlyText = function(text) {
-        this[0].firstChild.nodeValue = text;
+        $(this).contents().filter(function() {
+            return this.nodeType === Node.TEXT_NODE;
+        }).first()[0].nodeValue = text
         return $(this);
     };
 }(jQuery));

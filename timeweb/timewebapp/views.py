@@ -80,8 +80,12 @@ class TimewebListView(LoginRequiredMixin, View):
     def __init__(self):
         self.context = {}
     def make_list(self, request):
+        settings_model = SettingsModel.objects.get(user__username=request.user)
         self.context['objlist'] = self.objlist
-        self.context['data'] = [list(vars(SettingsModel.objects.get(user__username=request.user)).values())[2:-1]] + [list(vars(obj).values())[2:-1] for obj in self.objlist]
+        self.context['data'] = [list(vars(settings_model).values())[2:-1]] + [list(vars(obj).values())[2:-1] for obj in self.objlist]
+        if settings_model.first_login == True:
+            settings_model.first_login = False
+            settings_model.save()
     def get(self,request):
         global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user \"{request.user}\"')
