@@ -18,7 +18,7 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("load-data").textContent);
-[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_past, color_priority, text_priority, first_login] = dat[0];
+[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login] = dat[0];
 def_nwd = def_nwd.map(Number);
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
             localStorage.removeItem("scroll");
         }
     });
+    // First login tutorial
     if (first_login) {
         sessionStorage.setItem("first_login", true);
     }
@@ -127,6 +128,10 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this tool.<br><br>Create your first school or work assignment to get started");
         }
+    }
+    // Makes input bigger for info button
+    if (show_info_buttons || "first_login" in sessionStorage) {
+        $(".total-work-input-button").css("width", 163);
     }
 });
 // Lock to landscape

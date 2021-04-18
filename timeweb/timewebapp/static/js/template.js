@@ -167,7 +167,7 @@ $(function() {
                 });
             } else {
                 if (isMobile) {
-                    alert('Click the share icon on your screen (up arrow in a square) and scroll to "Add to Home Screen"\n\nPlease use the Safari browser if this is not an option');
+                    alert('Click the share icon on your screen (up arrow in a square) and scroll to "Add to Home Screen"\n\nPlease use the Safari browser if this isn\'t an option');
                 } else {
                     alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed");
                 }
@@ -187,6 +187,9 @@ $(function() {
 (function($) {
     $.fn.info = function(facing,text,position) {
         const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
+        if (window.show_info_buttons === false && !("first_login" in sessionStorage)) {
+            info_button.css("display", "none");
+        }
         switch (position) {
             case "prepend":
                 return info_button.prependTo(this);

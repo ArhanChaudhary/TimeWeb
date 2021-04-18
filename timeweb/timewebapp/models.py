@@ -38,7 +38,7 @@ class TimewebModel(models.Model):
     y = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(1,_("This field's value cannot be less than %(limit_value)s"))],
+        validators=[MinValueValidator(1,_("This field's value can't be less than %(limit_value)s"))],
     )
     works = models.JSONField(
         default=default_works,
@@ -130,6 +130,10 @@ class SettingsModel(models.Model):
     show_progress_bar = models.BooleanField(
         default=False,
         verbose_name=_('Show Graph Progress Bar'),
+    )
+    show_info_buttons = models.BooleanField(
+        default=True,
+        verbose_name=_('Show Info Buttons'),
     )
     show_past = models.BooleanField(
         default=True,

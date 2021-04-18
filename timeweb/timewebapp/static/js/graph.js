@@ -424,9 +424,9 @@ $(function() {
                         draw();
                     }).html(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First") // Initially set html for remainder mode
                     .info('left',
-                    `Ignore this if you do not see a "Remainder: First" or "Remainder: Last" on your graph
+                    `Ignore this if you don't see a "Remainder: First" or "Remainder: Last" on your graph
                     
-                    If the total number of units of work is not divisible by the number of them you will complete at a time, this determines whether to complete the remainder of work on the first or last working day of this assignment`,'prepend').css({
+                    If the total number of units of work isn't divisible by the number of them you will complete at a time, this determines whether to complete the remainder of work on the first or last working day of this assignment`,'prepend').css({
                         left: -3,
                         marginRight: 3,
                     });
@@ -464,16 +464,16 @@ $(function() {
                         draw();
                     }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode").info("left",
                     `Fixed mode:
-                    In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked in progress and you will have to make up the remainder of the work later that day. If you still don't finish its work, you will have to make it up on the next day.
+                    In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress" and you will have to make up the remainder of the work later that day. If you still don't finish its work, you will have to make it up on the next day.
                     Exception: entering in no work done always the marks the assignment as completed for that day
 
-                    This mode is recommended for self-discipline or if the assignment is important
+                    This mode is recommended for discipline or if the assignment is important
 
 
                     Dynamic mode:
                     In this mode, if you fail to complete the specified amount of work for any day, the graph will change itself to start at your last work input, adapting to your work schedule
 
-                    Use this if you cannot keep up with an assignment's work schedule. It's easy to fall behind with dynamic mode, so be careful`,"prepend").css({
+                    Use this if you can't keep up with an assignment's work schedule. It's easy to fall behind with dynamic mode, so be careful`,"prepend").css({
                         left: -3,
                         marginRight: 3,
                     }).children().first().css({
@@ -501,7 +501,7 @@ $(function() {
                                     default: {
                                         input_done = input_done - lw * total_mode;
                                         if (isNaN(input_done)) {
-                                            return alert("Value is not a number or keyword");
+                                            return alert("Value isn't a number or keyword");
                                         }
                                     }
                                 }
@@ -574,7 +574,7 @@ $(function() {
                     })
                     assignment.find(".delete-work-input-button").click(function() {
                         if (len_works > 0) {
-                            // Change day if assignment is not in progress
+                            // Change day if assignment isn't in progress
                             if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay()))) {
                                 day--;
                             }
@@ -668,7 +668,7 @@ $(function() {
                     The second point is (x1,y1), where x1 is the amount of days and y1 is the amount of units
 
                     If set skew ratio is enabled, the third point is (x2,y2). skew_ratio will also be redefined
-                    If set skew ratio is not enabled, the third point is now (1,x1/y1 * skew_ratio)
+                    If set skew ratio isn't enabled, the third point is now (1,x1/y1 * skew_ratio)
                     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
                     */
 
@@ -1392,7 +1392,7 @@ $(function() {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
                         alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
                         alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
-                        alert("The blue line will be your daily work inputs for the assignment. This is not yet visible because you have not entered any work inputs");
+                        alert("The blue line will be your daily work inputs for the assignment. This isn't yet visible because you have not entered any work inputs");
                         if (x < 4) {
                             alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are better for this visualization`);
                         }

@@ -281,9 +281,6 @@ canvas:focus {
     background: white;
     box-shadow: 0 0 0 3px rgb(0,95,204);
 }
-.total-work-input-button {
-    width: 163px;
-}
 .work-input-button, .total-work-input-button, .delete-work-input-button  {
     position: relative;
     left: 50%;

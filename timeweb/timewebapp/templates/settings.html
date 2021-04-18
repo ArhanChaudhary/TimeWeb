@@ -8,7 +8,7 @@
 {% block js %}
 <script src="{% static 'js/settings.js' %}"></script>
 {% endblock js %}
-{{ form.initial|get_def_nwd }}
+
 {% block content %}
 <form method="POST" autocomplete="off">
     {% csrf_token %}
