@@ -116,6 +116,7 @@ $(function() {
                 skew_ratio = +skew_ratio;
                 ctime = +ctime;
                 funct_round = +funct_round;
+                // Converts min_work_time to int if string or null
                 min_work_time /= ctime;
                 nwd = nwd.map(Number);
                 // dynamic start is already an into
@@ -205,6 +206,9 @@ $(function() {
                         data[key] = value;
                         clearTimeout(ajaxTimeout);
                         ajaxTimeout = setTimeout(function() {
+                            const success = function() {
+                                gtag("event","save_assignment");
+                            }
                             // Send data along with the assignment's primary key
 
                             // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
@@ -214,6 +218,7 @@ $(function() {
                             $.ajax({
                                 type: "POST",
                                 data: data,
+                                success: success,
                                 error: error,
                             });
                             // Reset data
@@ -318,7 +323,7 @@ $(function() {
 
                         Click this button and hover over the graph and click it to save
                         
-                        Note: this has no effect on assignments due tomorrow`);
+                        Note: this has no effect on assignments with only one working day`);
                     $(graph).click(function(e) {
                         if (set_skew_ratio) {
                             // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
@@ -462,15 +467,15 @@ $(function() {
                             set_mod_days();
                         }
                         draw();
-                    }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode").info("left",
+                    }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode").info("top",
                     `Fixed mode:
-                    In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress" and you will have to make up the remainder of the work later that day. If you still don't finish its work, you will have to make it up on the next day.
+                    In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress," and you will have to make up the remainder of its work later that day. If you still don't finish its work, you will have to make it up on the next day.
                     Exception: entering in no work done always the marks the assignment as completed for that day
 
                     This mode is recommended for discipline or if the assignment is important
 
 
-                    Dynamic mode:
+                    Dynamic mode (default):
                     In this mode, if you fail to complete the specified amount of work for any day, the graph will change itself to start at your last work input, adapting to your work schedule
 
                     Use this if you can't keep up with an assignment's work schedule. It's easy to fall behind with dynamic mode, so be careful`,"prepend").css({
@@ -554,7 +559,7 @@ $(function() {
                             }
                         }
                     });
-                    assignment.find(".work-input-button").info("right",
+                    assignment.find(".work-input-button").info("top",
                         `Enter the amount of work done on the graph's displayed date and press return
                         
                         Keyword: enter "fin" if you have completed an assignment's work for its day`,"after").css({
@@ -562,7 +567,7 @@ $(function() {
                         top: 3,
                         position: "absolute",
                     });
-                    assignment.find(".total-work-input-button").info("right",
+                    assignment.find(".total-work-input-button").info("top",
                         `Enter the total amount of work done on the graph's displayed date and press return
                         
                         This is useful for assignments with a total unit count (e.g: use this input for a book that shows the total page number on every page)
@@ -632,7 +637,19 @@ $(function() {
                     assignment.find(".hide-assignment-button").click(function() {
                         alert("This feature has not yet been implented");
                     }).css("text-decoration", "line-through");
-                    assignment.find(".info-button").click(() => false);
+                    let previous;
+                    assignment.find(".info-button").click(function() {
+                        if (previous && !previous.is(this)) {
+                            previous.data("is_showing", false);
+                        }
+                        previous = $(this);
+                        if (previous.data("is_showing")) {
+                            previous.data("is_showing", false).blur();
+                        } else {
+                            previous.data("is_showing", true);
+                        }
+                        return false;
+                    });
                 }
 
                 //
@@ -1397,7 +1414,7 @@ $(function() {
                             alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are better for this visualization`);
                         }
                         alert("Once you add more assignments, they are prioritized based on their estimated completion times");
-                        alert("Now that you have finished reading this, hover over the info icons next to each of the buttons and check out the settings to set your preferences");
+                        alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");
                         sessionStorage.removeItem("first_login");
                     }
                 }, 200);

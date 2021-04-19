@@ -19,6 +19,10 @@ DEBUG = os.environ['DEBUG'] == "True"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com')
+CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com') # Needs to be set so nonce can be added
+CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com')
+CSP_INCLUDE_NONCE_IN = ('script-src', )
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
 # Add nonce b64 value to header, use for inline scripts

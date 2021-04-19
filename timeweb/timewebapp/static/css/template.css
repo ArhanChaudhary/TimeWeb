@@ -308,16 +308,20 @@ nav.open #nav-menu::after {
     white-space: pre-line;
 }
 .info-button-text.info-right {
-    left: calc(100% - 4px);
+    left: calc(100% + 14px);
     transform: translateY(-50%) translateY(-7px);
 }
 .info-button-text.info-left {
     right: calc(100% + 14px);
     transform: translateY(-50%) translateY(-7px);
 }
+.info-button-text.info-top {
+    bottom: calc(100% + 14px);
+    transform: translateX(-50%) translateX(11px);
+}
 .info-button-text.info-bottom {
-    top: calc(100% - 4px);
-    transform: translateX(-50%) translateX(-2px);
+    top: calc(100% + 14px);
+    transform: translateX(-50%) translateX(7px);
 }
 .info-button-text::after {
     position: absolute;
@@ -337,6 +341,13 @@ nav.open #nav-menu::after {
     top: 50%;
     transform: translateY(-50%);
     border-color: transparent transparent transparent black;
+}
+.info-button-text.info-top::after {
+    content: "";
+    top: calc(100% + 1px);
+    right: 50%;
+    transform: translateX(50%);
+    border-color: black transparent transparent transparent;
 }
 .info-button-text.info-bottom::after {
     content: "";

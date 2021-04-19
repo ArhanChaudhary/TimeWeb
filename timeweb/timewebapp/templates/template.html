@@ -3,6 +3,15 @@
 {% load pwa %}
 <html lang="en">
     <head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
+        <script nonce="{{request.csp_nonce}}">
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-3K1HRD42V7');
+        </script>
         <title>TimeWeb</title>
         <meta charset="UTF-8">
         {% progressive_web_app_meta %}
@@ -77,8 +86,7 @@
                         <a href="#" id="nav-keybinds">Keybinds</a> {% comment %} +- to zoom {% endcomment %}
                         <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
                         <a href="#" id="nav-how">How Does This Work</a>
-                        <a href="{% static 'nav/terms.html' %}">Terms of Service</a>
-                        <a href="{% static 'nav/privacy.html' %}">Privacy Policy</a>
+                        <a href="{% static 'policies/policies.html' %}">Policies</a>
                         <a href="/changelog">Changelog</a>
                         <a href="/contact">Contact Me</a>
                     </div>

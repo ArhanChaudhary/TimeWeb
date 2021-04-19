@@ -188,10 +188,8 @@ class TimewebListView(LoginRequiredMixin, View):
                 if not selected_model.funct_round:
                     selected_model.funct_round = 1
 
-                if selected_model.min_work_time:
+                if selected_model.min_work_time != None:
                     selected_model.min_work_time /= selected_model.ctime
-                else:
-                    selected_model.min_work_time = 0
 
                 if update_assignment:
                     removed_works_start = (selected_model.ad - old_data.ad).days - selected_model.dif_assign
@@ -245,7 +243,8 @@ class TimewebListView(LoginRequiredMixin, View):
                         x_num = 1
                 else:
                     x_num = (selected_model.x - selected_model.ad).days
-                selected_model.min_work_time *= selected_model.ctime
+                if selected_model.min_work_time != None:
+                    selected_model.min_work_time *= selected_model.ctime
                 if create_assignment:
                     selected_model.works = [str(selected_model.works)] # Same as str(adone)
                 else:

@@ -262,6 +262,7 @@ $(function() {
         if (+$("#id_works").val()) {
             $("#id_works").val(+$("#id_works").val());
         }
+        gtag("event","modify_assignment");
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
@@ -327,6 +328,7 @@ $(function() {
                                 $(document).dequeue();
                             });
                         });
+                        gtag("event","delete_assignment");
                     }
                     // Send ajax to avoid a page reload
                     $.ajax({

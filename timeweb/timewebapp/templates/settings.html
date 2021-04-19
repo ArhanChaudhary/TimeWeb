@@ -26,7 +26,12 @@
                     </td>
                 {% else %}
                     <th>{{ field.label_tag }}</th>
-                    <td>{{ field }}</td>
+                    <td>
+                        {% for error in field.errors %}
+                            <h3>{{ error|escape }}</h3>
+                        {% endfor %}
+                        {{ field }}
+                    </td>
                 {% endif %}
             </tr>
         {% endfor %}

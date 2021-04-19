@@ -3,11 +3,12 @@ This file includes the code for:
 
 Trimming trailing zeros on form fields
 Crossing out an unfinished setting
-Adding info buttons
+Info buttons
 
 This only runs on settings.html
 */
 $(function() {
+    gtag("event","settings_view");
     $("#id_def_skew_ratio").val(+($("#id_def_skew_ratio").val()-1).toFixed(10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
 
@@ -35,6 +36,19 @@ $(function() {
         
         This is recommended to be enabled`
     );
+    let previous;
+    $(".info-button").click(function() {
+        if (previous && !previous.is(this)) {
+            previous.data("is_showing", false);
+        }
+        previous = $(this);
+        if (previous.data("is_showing")) {
+            previous.data("is_showing", false).blur();
+        } else {
+            previous.data("is_showing", true);
+        }
+        return false;
+    });
     $("form").submit(function() {
         $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val()||0);
     });

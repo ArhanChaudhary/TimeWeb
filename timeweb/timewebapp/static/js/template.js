@@ -1,6 +1,7 @@
 /* 
 This file includes the code for:
 
+Setting up Google Analytics
 Initializing the service worker
 Header responsiveness
 Installing the app on home screen
