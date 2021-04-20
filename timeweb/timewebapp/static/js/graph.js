@@ -147,23 +147,16 @@ $(function() {
                 due_date.setDate(due_date.getDate() + x);
                 // Enable draw_point by default, which determines whether to draw the point on the graph
                 let draw_point = true;
-                // Redraw graph every mousemove when set skew ratio or draw point is enabled
-                function mousemove(e) {
-                    var e = e || window.event;
-                    const offset = $(fixed_graph).offset();
-                    // Passes in mouse x and y to draw, explained later
-                    draw(e.pageX - offset.left, e.pageY - offset.top);
-                }
                 // Handles not working days, explained later
                 if (len_nwd) {
                     set_mod_days();
                 }
                 // Sets the upper and lower caps for skew_ratio
                 set_skew_ratio_lim();
-                if (skew_ratio > skew_ratio_lim) {
-                    skew_ratio = skew_ratio_lim;
-                } else if (skew_ratio < 2 - skew_ratio_lim) {
-                    skew_ratio = 2 - skew_ratio_lim;
+                if (skew_ratio > skew_ratio_lim - 1) {
+                    skew_ratio = skew_ratio_lim - 1;
+                } else if (skew_ratio < 1 - skew_ratio_lim) {
+                    skew_ratio = 1 - skew_ratio_lim;
                 }
                 // Whether or not to display the year
                 let date_string_options, date_string_options_no_weekday;
@@ -183,12 +176,27 @@ $(function() {
                     day = len_works,
                     lw = works[len_works];
                 pset();
-                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
+                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) {
                     day--;
                 }
                 // Sets event handlers only on the assignment's first click
                 // It may make more sense to skip this entire part for now and focus on the graph logic
                 if (!not_first_click) {
+                    // Redraw graph every mousemove when set skew ratio or draw point is enabled
+                    function mousemove(e) {
+                        var e = e || window.event;
+                        const offset = $(fixed_graph).offset();
+                        if (set_skew_ratio) {
+                            pset(e.pageX - offset.left, e.pageY - offset.top);
+                            day = len_works;
+                            // Subtract day by one if assignment is in progress
+                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) {
+                                day--;
+                            }
+                        }
+                        // Passes in mouse x and y to draw, explained later
+                        draw(e.pageX - offset.left, e.pageY - offset.top);
+                    }
                     // Turn off mousemove to ensure there is only one mousemove handler at a time
                     $(graph).off("mousemove").mousemove(mousemove);
                     // Graph resize event handler
@@ -236,31 +244,20 @@ $(function() {
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
-                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay());
                             skew_ratio = +(skew_ratio - 0.1).toFixed(1);
-                            if (skew_ratio < 2 - skew_ratio_lim) {
-                                skew_ratio = skew_ratio_lim;
-                            }
-                            // Changes the day if the original todo before the skew ratio is added becomes less than the actual work input
-                            if (change_day) {
-                                pset();
-                                if (funct(len_works + dif_assign) <= lw) {
-                                    day++;
-                                }
+                            if (skew_ratio < 1 - skew_ratio_lim) {
+                                skew_ratio = skew_ratio_lim - 1;
                             }
                         } else {
-                            const change_day = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) <= lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay());
                             skew_ratio = +(skew_ratio + 0.1).toFixed(1);
-                            if (skew_ratio > skew_ratio_lim) {
-                                skew_ratio = 2 - skew_ratio_lim;
+                            if (skew_ratio > skew_ratio_lim - 1) {
+                                skew_ratio = 1 - skew_ratio_lim;
                             }
-                            // Changes the day if the original todo before the skew ratio is added becomes greater than the actual work input
-                            if (change_day) {
-                                pset();
-                                if (funct(len_works + dif_assign) > lw) {
-                                    day--;
-                                }
-                            }
+                        }
+                        pset();
+                        day = len_works;
+                        if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) {
+                            day--;
                         }
                         // Save skew ratio and draw
                         selected_assignment[7] = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
@@ -306,14 +303,7 @@ $(function() {
                     //
 
                     // Enable mousemove and set_skew_ratio when set skew ratio button is clicked
-                    let change_day_mouse, change_day_upper;
                     assignment.find(".skew-ratio-button").click(function() {
-                        // Determines whether or not to change the day after skew ratio is set
-                        change_day_mouse = today_minus_dac === len_works - 1 && lw !== works[len_works-1] && !nwd.includes(new Date().getDay());
-                        // Have no idea how this works but it does
-                        if (change_day_mouse) {
-                            change_day_upper = lw >= funct(len_works + dif_assign);
-                        }
                         $(this).onlyText("(Click again to cancel)").one("click", cancel_sr);
                         // Turn off mousemove to ensure there is only one mousemove handler at a time
                         $(graph).off("mousemove").mousemove(mousemove);
@@ -333,15 +323,6 @@ $(function() {
                             // Save skew ratio
                             selected_assignment[7] = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            if (change_day_mouse) {
-                                pset();
-                                if (change_day_upper) {
-                                    day -= lw < funct(len_works + dif_assign);
-                                } else {
-                                    day += lw >= funct(len_works + dif_assign);
-                                }
-                                change_day_mouse = false;
-                            }
                             SendButtonAjax('skew_ratio', skew_ratio);
                             // Disable mousemove
                             if (!draw_point) {
@@ -386,10 +367,10 @@ $(function() {
                             // Sets and caps skew ratio
                             // The skew ratio in the code is 1 more than the displayed skew ratio
                             skew_ratio = +$(this).val() + 1;
-                            if (skew_ratio > skew_ratio_lim) {
-                                skew_ratio = 2 - skew_ratio_lim;
-                            } else if (skew_ratio < 2 - skew_ratio_lim) {
-                                skew_ratio = skew_ratio_lim;
+                            if (skew_ratio > skew_ratio_lim - 1) {
+                                skew_ratio = 1 - skew_ratio_lim;
+                            } else if (skew_ratio < 1 - skew_ratio_lim) {
+                                skew_ratio = skew_ratio_lim - 1;
                             }
                         } else {
                             // Reset skew ratio to old value if blank
@@ -449,7 +430,7 @@ $(function() {
                             // Day needs to be set in case it was subtracted by one
                             day = len_works;
                             // Subtract day by one if assignment is in progress
-                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
+                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) {
                                 day--;
                             }
                         } else {
@@ -470,7 +451,6 @@ $(function() {
                     }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode").info("top",
                     `Fixed mode:
                     In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress," and you will have to make up the remainder of its work later that day. If you still don't finish its work, you will have to make it up on the next day.
-                    Exception: entering in no work done always the marks the assignment as completed for that day
 
                     This mode is recommended for discipline or if the assignment is important
 
@@ -485,102 +465,87 @@ $(function() {
                         "font-size": 11,
                         "line-height": "11px",
                     });
-                    assignment.find(".work-input-button, .total-work-input-button").keypress(function(e) {
-                        var e = e || window.event;
-                        if (e.key === "Enter" && $(this).val() /* Blank inputs are interpreted as 0 */ ) {
-                            if (lw >= y) {
-                                alert("You have already finished this assignment");
-                            } else if (today_minus_dac > -1) {
-                                if (nwd.includes((assign_day_of_week + dif_assign + day) % 7)) {
-                                    var todo = 0;
-                                } else {
-                                    var todo = funct(day + dif_assign + 1) - lw;
-                                }
-                                const rem_work = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay()),
-                                    total_mode = $(this).hasClass("total-work-input-button");
-                                let input_done = $(this).val().trim().toLowerCase();
-                                switch (input_done) {
-                                    case "fin":
-                                        input_done = Math.max(0, funct(day + dif_assign + 1) - lw);
-                                        break;
-                                    default: {
-                                        input_done = input_done - lw * total_mode;
-                                        if (isNaN(input_done)) {
-                                            return alert("Value isn't a number or keyword");
-                                        }
-                                    }
-                                }
-                                if (len_works + dif_assign === x - 1 && (!input_done || x - 1 !== today_minus_ad && input_done + lw < y && !rem_work)) {
-                                    return alert("Your last work input must complete the assignment");
-                                }
-                                let total_done = input_done + lw;
-                                if (total_done < 0) {
-                                    total_done = 0;
-                                }
-                                if (rem_work) {
-                                    works[len_works] = total_done;
-                                    len_works -= 1;
-                                } else {
-                                    works.push(total_done);
-                                }
-                                lw = total_done;
-                                len_works++;
-                                if (input_done !== todo) {
-                                    if (len_works + dif_assign === x) {
-                                        dynamic_start = len_works + dif_assign - 1;
-                                    } else {
-                                        dynamic_start = len_works + dif_assign;
-                                    }
-                                    selected_assignment[13] = dynamic_start;
-                                    SendButtonAjax("dynamic_start", dynamic_start);
-                                    if (!fixed_mode) {
-                                        red_line_start_x = dynamic_start;
-                                        red_line_start_y = works[dynamic_start - dif_assign];
-                                        y_fremainder = (y - red_line_start_y) % funct_round;
-                                        if (len_nwd) {
-                                            set_mod_days();
-                                        }
-                                        set_skew_ratio_lim();
-                                        pset();
-                                    }
-                                }
-                                SendButtonAjax("works", works);
-                                $(this).val('');
-                                day = len_works;
-                                if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
-                                    day--;
-                                }
-                                draw();
-                                if (lw >= y) {
-                                    alert("Finish!\nYou have completed this assignment, good job!");
-                                }
+                    const total_work_input_button = assignment.find(".total-work-input-button");
+                    assignment.find(".submit-work-button").click(function() {
+                        if (lw >= y) {
+                            alert("You have already finished this assignment");
+                        } else if (today_minus_dac > -1) {
+                            if (nwd.includes((assign_day_of_week + dif_assign + day) % 7)) {
+                                var todo = 0;
                             } else {
-                                alert("Please wait until this is assigned");
+                                var todo = funct(day + dif_assign + 1) - lw;
                             }
+                            const rem_work = today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay());
+                            let input_done = total_work_input_button.val().trim().toLowerCase();
+                            switch (input_done) {
+                                case "fin":
+                                    input_done = funct(day + dif_assign + 1);
+                                    break;
+                                default: {
+                                    input_done = +input_done;
+                                    if (isNaN(input_done)) {
+                                        return alert("Value isn't a number or keyword");
+                                    }
+                                }
+                            }
+                            if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done < y && !rem_work) {
+                                return alert("Your last work input must complete the assignment");
+                            }
+                            if (input_done < 0) {
+                                input_done = 0;
+                            }
+                            if (rem_work) {
+                                works[len_works] = input_done;
+                                len_works -= 1;
+                            } else {
+                                works.push(input_done);
+                            }
+                            lw = input_done;
+                            len_works++;
+                            if (input_done !== todo) {
+                                if (len_works + dif_assign === x) {
+                                    dynamic_start = len_works + dif_assign - 1;
+                                } else {
+                                    dynamic_start = len_works + dif_assign;
+                                }
+                                selected_assignment[13] = dynamic_start;
+                                SendButtonAjax("dynamic_start", dynamic_start);
+                                if (!fixed_mode) {
+                                    red_line_start_x = dynamic_start;
+                                    red_line_start_y = works[dynamic_start - dif_assign];
+                                    y_fremainder = (y - red_line_start_y) % funct_round;
+                                    if (len_nwd) {
+                                        set_mod_days();
+                                    }
+                                    set_skew_ratio_lim();
+                                    pset();
+                                }
+                            }
+                            SendButtonAjax("works", works);
+                            day = len_works;
+                            if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) {
+                                day--;
+                            }
+                            draw();
+                            if (lw >= y) {
+                                alert("Finish!\nYou have completed this assignment, good job!");
+                            }
+                        } else {
+                            alert("Please wait until this is assigned");
                         }
                     });
-                    assignment.find(".work-input-button").info("top",
-                        `Enter the amount of work done on the graph's displayed date and press return
+                    total_work_input_button.info("top",
+                        `Enter the total number of units done on the graph's displayed date and submit
                         
-                        Keyword: enter "fin" if you have completed an assignment's work for its day`,"after").css({
-                        left: "calc(50% + 55px)",
+                        Keyword: enter "fin" if you have completed an assignment's work for its displayed date`,"after").css({
+                        left: "calc(50% + 63px)",
                         top: 3,
                         position: "absolute",
                     });
-                    assignment.find(".total-work-input-button").info("top",
-                        `Enter the total amount of work done on the graph's displayed date and press return
-                        
-                        This is useful for assignments with a total unit count (e.g: use this input for a book that shows the total page number on every page)
-                        
-                        Keyword: enter "fin" if you have completed an assignment's work for its day`,"after").css({
-                        left: "calc(50% + 63px)",
-                        top: 34,
-                        position: "absolute",
-                    })
                     assignment.find(".delete-work-input-button").click(function() {
                         if (len_works > 0) {
                             // Change day if assignment isn't in progress
-                            if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay()))) {
+                            if (!(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay()))) {
                                 day--;
                             }
                             works.pop();
@@ -637,19 +602,17 @@ $(function() {
                     assignment.find(".hide-assignment-button").click(function() {
                         alert("This feature has not yet been implented");
                     }).css("text-decoration", "line-through");
-                    let previous;
-                    assignment.find(".info-button").click(function() {
-                        if (previous && !previous.is(this)) {
-                            previous.data("is_showing", false);
-                        }
-                        previous = $(this);
-                        if (previous.data("is_showing")) {
-                            previous.data("is_showing", false).blur();
-                        } else {
-                            previous.data("is_showing", true);
+                    function info_button_handler(_, run=true) {
+                        if (run) {
+                            if ($(this).data("is_showing")) {
+                                $(this).data("is_showing", false).trigger('blur', false);
+                            } else {
+                                $(this).data("is_showing", true);
+                            }
                         }
                         return false;
-                    });
+                    }
+                    assignment.find(".info-button").on('click blur', info_button_handler);
                 }
 
                 //
@@ -714,7 +677,7 @@ $(function() {
                         // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph, caused by negative indexing by floorx2. This ensures that NaN passes the below if statement
                         if (!(x2 > 0)) {
                             // If the mouse is outside the graph to the left, make a line with the slope of y1
-                            skew_ratio = skew_ratio_lim;
+                            skew_ratio = skew_ratio_lim - 1;
                             a = 0;
                             b = y1;
                             return_y_cutoff = x1 ? 0 : -1;
@@ -727,7 +690,7 @@ $(function() {
                             a = y1 / x1;
                             b = a * (1 - x1);
 
-                            skew_ratio = 2 - skew_ratio_lim;
+                            skew_ratio = 1 - skew_ratio_lim;
                         } else {
                             // Adjusts for remainder mode
                             if (remainder_mode) {
@@ -741,24 +704,16 @@ $(function() {
                             // Redefine skew ratio
                             skew_ratio = (a + b) * x1 / y1;
                             // Cap skew ratio
-                            if (skew_ratio > skew_ratio_lim) {
-                                skew_ratio = skew_ratio_lim;
-                            } else if (skew_ratio < 2 - skew_ratio_lim) {
-                                skew_ratio = 2 - skew_ratio_lim;
-                            } else if (0.975 < skew_ratio && skew_ratio < 1.025) {
-                                // Snap skew ratio to linear
-                                if (!x1) {
-                                    // Zero division
-                                    a = 0;
-                                    b = y1;
-                                    return_y_cutoff = x1 ? 0 : -1;
-                                    return_0_cutoff = 1;
-                                    cutoff_transition_value = 0;
-                                    return;
-                                }
-                                skew_ratio = 1;
-                                a = 0;
-                                b = y1 / x1;
+                            if (skew_ratio > skew_ratio_lim - 1) {
+                                skew_ratio = skew_ratio_lim - 1;
+                            } else if (skew_ratio < 1 - skew_ratio_lim) {
+                                skew_ratio = 1 - skew_ratio_lim;
+                            } else if (-0.05 < skew_ratio % 1 && skew_ratio % 1 < 0.05) {
+                                // Snap skew ratio to whole numbers
+                                skew_ratio = Math.round(skew_ratio);
+                                // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                                a = y1 * (1 - skew_ratio) / ((x1 - 1) * x1);
+                                b = (y1 - x1 * x1 * a) / x1;
                             }
                         }
                     } else {
@@ -958,6 +913,10 @@ $(function() {
                     } else {
                         skew_ratio_lim = 0;
                     }
+                    assignment.find(".skew-ratio-textbox").attr({
+                        min: 1 - skew_ratio_lim,
+                        max: skew_ratio_lim - 1,
+                    });
                 }
                 //
                 // End graph logic
@@ -1201,7 +1160,7 @@ $(function() {
                         let todo_message;
                         if (displayed_day.toDateString() !== new Date().toDateString()) {
                             todo_message = `${pluralize(unit)} to Complete for this Day: ${todo}${reach_deadline}`;
-                        } else if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) {
+                        } else if (today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) {
                             todo_message = `Remaining ${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
                         } else {
                             todo_message = `${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
@@ -1215,7 +1174,7 @@ $(function() {
                             screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*9);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || new Date(displayed_day.toDateString()) > new Date(new Date().toDateString())) {
                             screen.fillText("You have Completed your Work for Today!", 50+(width-50)/2, row_height*12);
-                        } else if (len_works && !(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && lw !== works[len_works-1] && !nwd.includes(new Date().getDay())) && (lw - works[len_works-1]) / warning_acceptance * 100 < funct(len_works + dif_assign) - works[len_works-1]) {
+                        } else if (len_works && !(today_minus_dac === len_works - 1 && funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay())) && (lw - works[len_works-1]) / warning_acceptance * 100 < funct(len_works + dif_assign) - works[len_works-1]) {
                             screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*8);
                             screen.fillText("You are BEHIND Schedule!", 50+(width-50)/2, row_height*9);
                         }
@@ -1409,9 +1368,10 @@ $(function() {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
                         alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
                         alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
-                        alert("The blue line will be your daily work inputs for the assignment. This isn't yet visible because you have not entered any work inputs");
+                        alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress");
+                        alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you have not entered any work inputs");
                         if (x < 4) {
-                            alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are better for this visualization`);
+                            alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are more effective for this visualization`);
                         }
                         alert("Once you add more assignments, they are prioritized based on their estimated completion times");
                         alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");

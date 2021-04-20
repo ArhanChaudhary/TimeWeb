@@ -14,19 +14,21 @@ from pathlib import Path
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DEBUG'] == "True"
+try:
+    DEBUG = os.environ['DEBUG'] == "True"  
+except KeyError:
+    DEBUG = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com')
-CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com') # Needs to be set so nonce can be added
-CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com')
-CSP_INCLUDE_NONCE_IN = ('script-src', )
+# Dont sent to google analytics in debug
+if not DEBUG:
+    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com')
+    CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com') # Needs to be set so nonce can be added
+    CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com')
+    CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
-# Add nonce b64 value to header, use for inline scripts
-# CSP_INCLUDE_NONCE_IN = ("script-src", )
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
@@ -40,12 +42,19 @@ PWA_APP_ORIENTATION = 'landscape'
 PWA_APP_START_URL = '/'
 PWA_APP_DIR = 'ltr'
 PWA_APP_LANG = 'en-US'
-SECRET_KEY = os.environ['SECRETKEY']
+try:
+    SECRET_KEY = os.environ['SECRETKEY']
+except KeyError:
+    from django.core.management.utils import get_random_secret_key
+    SECRET_KEY = get_random_secret_key()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 ALLOWED_HOSTS = ['*']
 # Application definition
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     'django.contrib.auth',

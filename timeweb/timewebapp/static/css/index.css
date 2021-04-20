@@ -259,6 +259,7 @@ canvas:focus {
     font-size: 15px;
     padding: 0;
     line-height: 17px;
+    cursor: pointer;
 }
 .graph-footer .info-button:focus {
     box-shadow: none;
@@ -281,7 +282,7 @@ canvas:focus {
     background: white;
     box-shadow: 0 0 0 3px rgb(0,95,204);
 }
-.work-input-button, .total-work-input-button, .delete-work-input-button  {
+.total-work-input-button, .submit-work-button, .delete-work-input-button  {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -291,11 +292,23 @@ canvas:focus {
     left: 0;
     z-index: 1;
 }
+.skew-ratio-textbox {
+    width: 146px;
+}
+input[type=number]::-webkit-inner-spin-button {
+    cursor: pointer;
+    opacity: 1 !important;
+    border-left: 1px solid #d8d8d8;
+    height: 20px;
+}
+input[type=number].translate-left::-webkit-inner-spin-button {
+    transform: translateX(-23px);
+}
 .fixed-mode-button, .remainder-mode-button, .hide-assignment-button {
     position: absolute;
     right: 0;
 }
-.skew-ratio-textbox, .total-work-input-button, .remainder-mode-button {
+.skew-ratio-textbox, .submit-work-button, .remainder-mode-button {
     margin: 7px 0;
 }
 
@@ -420,6 +433,15 @@ label[for='id_ad']::after {
     display: block;
     padding: 20px 60px;
     font-size: 19px;
+    -webkit-appearance: none;
+    border-radius: 3px;
+    border: 1px solid rgb(79, 79, 79);
+}
+#form-wrapper button:hover {
+    background: rgb(229, 229, 229);
+}
+#form-wrapper button:active {
+    background: rgb(245, 245, 245);
 }
 #form-wrapper .invalid {
     border: 2px solid rgb(226,30,54);

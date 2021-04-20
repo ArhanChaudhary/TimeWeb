@@ -41,4 +41,11 @@ $(function() {
             });
         });
     }
+    // Position login
+    $("main").css({
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    });
+    gtag("event","logged_out");
 });

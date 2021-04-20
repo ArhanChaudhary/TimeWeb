@@ -5,7 +5,6 @@
     width: clamp(290px, calc(100vw - 160px), 1500px);
     height: clamp(440px, calc(100vh - 310px), 500px);
     border-radius: 25px;
-    margin: 107px auto;
     background: inherit;
     backdrop-filter: blur(2px);
     box-sizing: border-box;
@@ -154,10 +153,10 @@ label {
 }
 @keyframes slide {
     from {
-        transform: translateY(-100%) translateY(100vh);
+        transform: none;
     }
     to {
-        transform: none;
+        transform: translateY(100%);
     }
 }
 @keyframes scale {

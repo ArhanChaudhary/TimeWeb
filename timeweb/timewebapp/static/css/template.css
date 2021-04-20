@@ -298,7 +298,7 @@ nav.open #nav-menu::after {
     box-shadow: none !important;
     border: 2px solid black;
     display: none;
-
+    cursor: auto;
     text-align: left;
     padding: 5px 5px !important;
     color: black;
@@ -327,6 +327,7 @@ nav.open #nav-menu::after {
     position: absolute;
     border-width: 10px;
     border-style: solid;
+    cursor: pointer;
 }
 .info-button-text.info-right::after {
     content: "";

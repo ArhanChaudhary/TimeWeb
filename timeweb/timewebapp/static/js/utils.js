@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#delete-assignments").click(function() {
         alert("This feature has not yet been implented");
     }).css("text-decoration","line-through");
-    $("#autofill-assignments").css("text-decoration","line-through").info('left',`Autofills no work done for every assignment with incomplete past work inputs until today`);
+    $("#autofill-assignments")//.info('left',`Autofills no work done for every assignment with incomplete past work inputs until today`);
     // Keybinds
     form_is_showing = false;
     $(document).keydown(function(e) {
@@ -132,6 +132,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // Makes input bigger for info button
     if (show_info_buttons || "first_login" in sessionStorage) {
         $(".total-work-input-button").css("width", 163);
+        // Position up/down input scroller
+        $(".skew-ratio-textbox").addClass("translate-left");
     }
 });
 // Lock to landscape

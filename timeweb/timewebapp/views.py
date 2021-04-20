@@ -278,10 +278,10 @@ class TimewebListView(LoginRequiredMixin, View):
 
                 if create_assignment:
                     request.session['added_assignment'] = selected_model.file_sel
-                    logger.info(f'User \"{request.user}\" added model "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" added assignment "{selected_model.file_sel}"')
                 else:
                     request.session['reentered_assignment'] = selected_model.file_sel    
-                    logger.info(f'User \"{request.user}\" updated model "{selected_model.file_sel}"')
+                    logger.info(f'User \"{request.user}\" updated assignment "{selected_model.file_sel}"')
                 self.make_list(request)
                 return redirect(request.path_info)
             else:

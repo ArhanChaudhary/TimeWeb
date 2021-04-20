@@ -63,7 +63,7 @@
           <span id="open-assignments" tabindex="0">Open all assignments</span>
           <span id="close-assignments" tabindex="0">Close all assignments</span>
           {% comment %} <span id="autofill-assignments" tabindex="0">Autofill no work done</span> {% endcomment %}
-          <span id="delete-assignments" tabindex="0">Delete all completed assignments</span>
+          <span id="delete-assignments" tabindex="0">Delete all completed<br>assignments</span>
           <span id="re-enable-tutorial" tabindex="0">Re-enable tutorial</span>
         </div>
       </div>
@@ -96,11 +96,11 @@
               <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
                 <button class="skew-ratio-button">Set skew ratio using graph</button>
-                <input class="work-input-button" placeholder="Enter work done"/>
+                <input class="total-work-input-button" placeholder="Enter total units done"/>
                 <button class="fixed-mode-button"></button>
                 <br>
                 <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
-                <input class="total-work-input-button" placeholder="Enter total work done"/>
+                <button class="submit-work-button">Submit work input</button>
                 <button class="remainder-mode-button"></button>
                 <br>
                 <button class="display-button">Display work schedule in text</button>

@@ -26,7 +26,7 @@ $(function() {
         // Used in utils.js for handling the user typing "N" when showing the form via shift + N
         form_is_showing = true;
         // Make rest of page untabbable
-        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input").attr("tabindex","-1");
+        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input, #advanced, #nav-menu, #user-greeting #username").attr("tabindex","-1");
         // Explained later
         replaceUnit();
     }
@@ -46,7 +46,7 @@ $(function() {
         $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
         $("#menu").attr("tabindex","2");
         $("#image-new-container, #user-greeting #username").attr("tabindex","1");
-        $(".assignment, .graph").attr("tabindex","0");
+        $(".assignment, .graph, #advanced, #nav-menu").attr("tabindex","0");
         // Used in utils.js for handling the user typing "N" when showing the form via shift + N
         form_is_showing = false;
     }
@@ -253,16 +253,21 @@ $(function() {
         });
     }
     // Form submission
-    $("#form-wrapper form").submit(function() {
-        // Enable disabled field on submit so it's sent with post
-        $("#id_ctime").removeAttr("disabled");
+    let submitted = false;
+    $("#form-wrapper form").submit(function(e) {
         // Prevent submit button spam clicking
-        $("#form-wrapper button").css("pointer-events", "none");
-        // JSON fields are picky with their number inputs, convert them to standard form
-        if (+$("#id_works").val()) {
-            $("#id_works").val(+$("#id_works").val());
+        if (submitted) {
+            e.preventDefault();
+        } else {
+            submitted = true;
+            // Enable disabled field on submit so it's sent with post
+            $("#id_ctime").removeAttr("disabled");
+            // JSON fields are picky with their number inputs, convert them to standard form
+            if (+$("#id_works").val()) {
+                $("#id_works").val(+$("#id_works").val());
+            }
+            gtag("event","modify_assignment");
         }
-        gtag("event","modify_assignment");
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
