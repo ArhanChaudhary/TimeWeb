@@ -36,19 +36,7 @@ $(function() {
         
         This is recommended to be enabled`
     );
-    let previous;
-    $(".info-button").click(function() {
-        if (previous && !previous.is(this)) {
-            previous.data("is_showing", false);
-        }
-        previous = $(this);
-        if (previous.data("is_showing")) {
-            previous.data("is_showing", false).blur();
-        } else {
-            previous.data("is_showing", true);
-        }
-        return false;
-    });
+    $(".info-button").on('click blur', info_button_handler);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val()||0);
     });

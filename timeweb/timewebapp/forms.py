@@ -29,7 +29,7 @@ class TimewebForm(forms.ModelForm):
         }
         error_messages = {
             'file_sel': {
-                'required': _("This assignment's name cannot be a space"),
+                'required': _("Please enter an assignment name"),
                 'max_length': _("This assignment's name is too long (>100 characters)"),
                 'invalid': _("This assignment's name is invalid"),
             },
@@ -41,19 +41,22 @@ class TimewebForm(forms.ModelForm):
                 'invalid': _('The due date is out of range or invalid'),
             },
             'unit': {
-                'required': _("This field's name cannot be a space"),
+                'required': _("Please enter a name"),
                 'max_length': _("This field's name is too long (>40 characters)"),
                 'invalid': _("This field's value is invalid"),
             },
             'y': {
+                'required': _("Please enter a value"),
                 'max_digits': _("This field's value is too long (>15 digits)"),
                 'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
                 'max_whole_digits': _("This field's value has too many digits before decimal point (>13 digits)"),
             },
             'works': {
+                'required': _("Please enter a value"),
                 'invalid': _("This field's value is invalid"),
             },
             'ctime': {
+                'required': _("Please enter a value"),
                 'max_digits': _("This field's value is too long (>15 digits)"),
                 'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
                 'max_whole_digits': _("This field's value has too many digits before decimal point (>13 digits)"),

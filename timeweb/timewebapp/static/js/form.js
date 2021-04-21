@@ -111,13 +111,8 @@ $(function() {
         // Show form
         showForm();
     });
-    // Hide form when overlay is clicked
-    $("#overlay").mousedown(function(e) {
-        if (e.target !== this) {
-            return
-        }
-        hideForm();
-    });
+    // Hide form when cancel is clicked
+    $("#form-wrapper #cancel-button").click(() => hideForm());
     // Replace fields with unit when unit is "Minute"
     function replaceUnit() {
         const val = $("#id_unit").val().trim();
@@ -129,7 +124,11 @@ $(function() {
         // Replace fields
         // onlyText is defined at the bottom
         if (val) {
-            $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
+            if (singular.toLowerCase() === 'minute') {
+                $("label[for='id_y']").text(`Estimated amount of Time to Complete this assignment in Minutes`);
+            } else {
+                $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
+            }
             $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
             $("label[for='id_ctime']").text(`Estimated amount of Time to complete each ${singular} in Minutes`);
             $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
@@ -180,6 +179,7 @@ $(function() {
     $('label[for="id_funct_round"]').info('right',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     );
+    $("#form-wrapper .info-button").on('click blur', info_button_handler);
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
     // Auto field scrolling

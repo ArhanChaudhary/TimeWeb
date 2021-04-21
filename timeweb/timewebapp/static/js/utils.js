@@ -84,8 +84,6 @@ document.addEventListener("DOMContentLoaded", function() {
             $("html").html(response.responseText);
         }
     }
-    // Fix bug where the nav can be visible despite overflow: hidden
-    window.scrollTo(0, 0);
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
     $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() {

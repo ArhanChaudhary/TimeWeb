@@ -1,13 +1,16 @@
 /*
 This file includes the code for:
 
-Prioritizing and coloring assignments,
+Prioritizing and coloring assignments
 Animating assignments that were just created or modified
 
 This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
+    function sort() {
+        
+    }
     // Returns color rgb from priority percentage
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;

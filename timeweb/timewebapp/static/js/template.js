@@ -25,6 +25,8 @@ if ('serviceWorker' in navigator) {
 }
 // Use "document.addEventListener("DOMContentLoaded", function() {" instead of "$(function() {" because "$(function() {" runs after first paint, messing up the initial transition
 document.addEventListener("DOMContentLoaded", function() {
+    // Fix bug where the nav can be visible despite overflow: hidden
+    window.scrollTo(0, 0);
     // Position content so that the scrollbar doesn't clip into the header
     if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
         $("main").css({
@@ -183,6 +185,17 @@ $(function() {
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
+
+    info_button_handler = function(_, run=true) {
+        if (run) {
+            if ($(this).data("is_showing")) {
+                $(this).data("is_showing", false).trigger('blur', false);
+            } else {
+                $(this).data("is_showing", true);
+            }
+        }
+        return false;
+    }
 });
 // Info tooltip
 (function($) {

@@ -150,24 +150,25 @@ header.animate::after {
     content: "Least Important";
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 3px);
+    margin-top: -12px;
 }
 .assignment-container:nth-child(2) .title::before {
     content: "Most Important";
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 3px);
+    margin-top: -12px;
 }
 .title[data-priority]::before {
     content: attr(data-priority) !important;
     position: absolute;
     font-size: 0.7em;
-    margin-top: calc(-1em - 3px);
+    margin-top: -12px;
 }
-.daysleft {
+.title[data-daysleft]::after {
+    content: attr(data-daysleft) !important;
     position: absolute;
     font-size: 0.7em;
-    margin-top: -1px;
+    display: block;
 }
 .arrow-container {
     float: left;
@@ -301,6 +302,9 @@ input[type=number]::-webkit-inner-spin-button {
     border-left: 1px solid #d8d8d8;
     height: 20px;
 }
+#form-wrapper input[type=number]::-webkit-inner-spin-button {
+    opacity: 0 !important;
+}
 input[type=number].translate-left::-webkit-inner-spin-button {
     transform: translateX(-23px);
 }
@@ -356,6 +360,17 @@ label[for='id_ad']::after {
     border-radius: 15px;
     padding: 5px 5px 25px 5px;
     position: relative;
+}
+#form-wrapper #cancel-button {
+    position: absolute;
+    cursor: pointer;
+    right: 7px;
+    top: 3px;
+    z-index: 1;
+    background-color: white;
+}
+#form-wrapper #cancel-button:focus:active {
+    outline: 0;
 }
 #form-wrapper #new-title-line {
     width: calc(100% - 20px);

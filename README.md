@@ -1,4 +1,4 @@
-TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. MSJHS warriors!
+TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today! MSJHS warriors!
 
 Installation (Linux):
 

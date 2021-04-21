@@ -32,7 +32,7 @@ CSP_BASE_URI = ("'none'", )
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
-PWA_APP_NAME = "TimeWeb PS" if DEBUG else  "TimeWeb"
+PWA_APP_NAME = "TimeWeb PS" if DEBUG else "TimeWeb"
 PWA_APP_DESCRIPTION = "TimeWeb PS APP" if DEBUG else "TimeWeb App"
 PWA_APP_THEME_COLOR = '#ffffff'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
@@ -50,11 +50,13 @@ except KeyError:
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost' if DEBUG else 'timeweb.io']
 # Application definition
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = 604800 # 7 days
 
 INSTALLED_APPS = [
     'django.contrib.auth',

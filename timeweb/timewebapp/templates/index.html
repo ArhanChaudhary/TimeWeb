@@ -16,6 +16,7 @@
   <div id="overlay">
     <div id="form-wrapper">
       <form method="POST" autocomplete="off">
+        <img id="cancel-button" width="45" height="45" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
         <div id="new-title-line"></div>
         <div id="new-title">New Assignment</div>
         <div id="top-note">* optional</div>
@@ -72,10 +73,7 @@
       <div class="assignment-container" {% if obj.file_sel == request.session.added_assignment %}id="animate-in"{% elif obj.file_sel == request.session.reentered_assignment %}id="animate-color"{% endif %}>
         <div class="assignment" tabindex="0">
           <div class="assignment-header">
-            <span class="title">
-              {{ obj.file_sel }}
-              <p class="daysleft">1d</p>
-            </span>
+            <span class="title" data-daysleft="1d">{{ obj.file_sel }}</span>
             <svg width="30px" height="20px" class="arrow-container">
               <polygon class="arrow" points="5,0 5,20 15,10">
                 <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
