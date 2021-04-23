@@ -99,9 +99,7 @@ $(function() {
             +selected_assignment[5][0],
             +selected_assignment[8],
             selected_assignment[9]-1 ? +selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
-            +selected_assignment[10]||'', // Minimum work time displays self if it isn't 0, else display nothing
-            // Note: the minimum work time is stored as the original value divided by the completion time per unit, as it is easier to do calculations
-            // This multiplies it back to the original value so the user sees the same thing they inputted
+            +selected_assignment[10]||'',
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
@@ -219,7 +217,11 @@ $(function() {
                 case "id_y":
                 case "id_works":
                 case "id_ctime":
+                case "id_funct_round":
                     message = 'Please enter a value';
+                    break;
+                case "id_min_work_time":
+                    message = 'Please enter a minimum work time';
                     break;
             }
         } else {

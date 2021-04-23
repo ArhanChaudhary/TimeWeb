@@ -9,7 +9,7 @@ Other minor utilities
 
 This only runs on index.html
 */
-
+gtag("event", "home");
 // Prevents submitting form on refresh
 // cite 
 // https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr

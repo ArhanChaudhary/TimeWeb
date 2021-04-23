@@ -26,7 +26,6 @@ $(function() {
     $("#id_password").attr("placeholder", "Password");
     $("form").submit(function() {
         sessionStorage.setItem("login-animation-ran", true);
-        gtag("event","login");
     });
     if ("login-animation-ran" in sessionStorage) {
         $(window).one("load", function() {

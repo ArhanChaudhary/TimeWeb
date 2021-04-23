@@ -65,6 +65,11 @@ $(function() {
         if (e.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
             $(document.activeElement).click();
         }
+        if (e.shiftKey) {
+            if (e.key === "A") {
+                window.location.href = '/admin';
+            }
+        }
     });
     // Header responiveness
     // Could be written better but unimportant for now

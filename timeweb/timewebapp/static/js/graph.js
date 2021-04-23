@@ -13,10 +13,7 @@ $(function() {
         const hour = Math.floor(total_minutes / 60),
             minute = Math.ceil(total_minutes % 60);
         if (hour === 0) {
-            if (total_minutes && total_minutes < 1) {
-                return "<1m";
-            }
-            return minute + "m";
+            return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
         } else if (minute === 0) {
             return hour + "h";
         } else {
@@ -312,9 +309,9 @@ $(function() {
                     }).info("right", 
                         `The skew ratio determines the work distribution of the graph
 
-                        Click this button and hover over the graph and click it to save
+                        Click this button and hover and click the graph
                         
-                        Note: this has no effect on assignments with only one working day`);
+                        Note: this has no effect on assignments with only one working day (since there is only one possible work distribution)`);
                     $(graph).click(function(e) {
                         if (set_skew_ratio) {
                             // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
@@ -468,6 +465,7 @@ $(function() {
                     });
                     const total_work_input_button = assignment.find(".total-work-input-button");
                     assignment.find(".submit-work-button").click(function() {
+                        if (!total_work_input_button.val()) return;
                         if (lw >= y) {
                             alert("You have already finished this assignment");
                         } else if (today_minus_dac > -1) {
@@ -557,7 +555,7 @@ $(function() {
                             // Reverses the logic of work inputs in and recursively decreases red_line_start_x
                             if (red_line_start_x > len_works + dif_assign) {
                                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign - 1; red_line_start_x--) {
+                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign; red_line_start_x--) {
                                     red_line_start_y = works[red_line_start_x - dif_assign];
                                     y_fremainder = (y - red_line_start_y) % funct_round;
                                     if (len_nwd) {
@@ -1132,8 +1130,7 @@ $(function() {
                         }
                         let displayed_day = new Date(date_assignment_created.valueOf());
                         displayed_day.setDate(displayed_day.getDate() + day);
-                        distance_today_from_displayed_day = today_minus_dac - day;
-
+                        const distance_today_from_displayed_day = today_minus_dac - day;
                         let str_day = displayed_day.toLocaleDateString("en-US", date_string_options);
                         switch (distance_today_from_displayed_day) {
                             case -1:
@@ -1164,7 +1161,11 @@ $(function() {
                             screen.fillText("You have not Entered in your Work from Previous Days!", 50+(width-50)/2, row_height*8);
                             screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*9);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || new Date(displayed_day.toDateString()) > new Date(new Date().toDateString())) {
-                            screen.fillText("You have Completed your Work for Today!", 50+(width-50)/2, row_height*9);
+                            if (displayed_day.toDateString() === new Date().toDateString()) {
+                                screen.fillText("You have Completed your Work for Today!", 50+(width-50)/2, row_height*9);
+                            } else {
+                                screen.fillText("You have Completed your Work for this Day!", 50+(width-50)/2, row_height*9);
+                            }
                         } else if (len_works && !assignmentIsInProgress() && (lw - works[len_works-1]) / warning_acceptance * 100 < funct(len_works + dif_assign) - works[len_works-1]) {
                             screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*8);
                             screen.fillText("You are BEHIND Schedule!", 50+(width-50)/2, row_height*9);
@@ -1329,7 +1330,7 @@ $(function() {
                         screen.fillText(bigger_index, number_x_pos, height - 39);
                     }
                     screen.fillText(0, 55.5, height - 38.5);
-                    if (today_minus_ad > -1) {
+                    if (today_minus_ad > -1 && today_minus_ad <= x) {
                         let today_x = today_minus_ad*wCon+47.5;
                         screen.fillStyle = "rgb(150,150,150)";
                         screen.fillRect(today_x, 0, 5, height-50);
@@ -1356,7 +1357,7 @@ $(function() {
                 //
                 // End draw graph
                 //
-                assignment.next().remove();
+                $(".assignment").next().remove();
                 setTimeout(function() {
                     if ("first_login" in sessionStorage) {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");

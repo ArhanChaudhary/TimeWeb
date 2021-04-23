@@ -25,7 +25,7 @@
         {% for field in form.visible_fields %}
           <p>
             {% if field.name == "nwd" %}
-              <label id="nwd-label-title">Select the Weekdays you won't work on this Assignment</label>
+              <label id="nwd-label-title">Select the Days you won't work on this Assignment</label>
               <div id="nwd-wrapper">
                 {% for value, text in field.field.choices %}
                   <input id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>

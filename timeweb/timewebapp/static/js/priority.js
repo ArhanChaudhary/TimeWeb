@@ -8,8 +8,13 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
-    function sort() {
+    function sort(autofill_override=false) {
+        if (!(dat.length - 1)) return;
         
+        let ordli = [],
+            total = 0,
+            tomorrow_total = 0,
+            incomplete_works = false;
     }
     // Returns color rgb from priority percentage
     function color(p) {

@@ -303,7 +303,7 @@ input[type=number]::-webkit-inner-spin-button {
     height: 20px;
 }
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
-    opacity: 0 !important;
+    display: none;
 }
 input[type=number].translate-left::-webkit-inner-spin-button {
     transform: translateX(-23px);
@@ -444,6 +444,7 @@ label[for='id_ad']::after {
     color: black;
 }
 #form-wrapper button {
+    width: calc(100% - 192px);
     margin: 0 auto;
     display: block;
     padding: 20px 60px;

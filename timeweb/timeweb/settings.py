@@ -49,8 +49,10 @@ except KeyError:
     SECRET_KEY = get_random_secret_key()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-ALLOWED_HOSTS = ['localhost' if DEBUG else 'timeweb.io']
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost']
+else:
+    ALLOWED_HOSTS = ['timeweb.io', 'www.timeweb.io']
 # Application definition
 
 CSRF_COOKIE_SECURE = True

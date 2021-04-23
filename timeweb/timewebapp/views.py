@@ -192,7 +192,7 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.min_work_time /= selected_model.ctime
 
                 if update_assignment:
-                    removed_works_start = (selected_model.ad - old_data.ad).days - selected_model.dif_assign
+                    removed_works_start = (selected_model.ad - old_data.ad).days - old_data.dif_assign # translates x position on graph to 0 so that it can be used in accessing works
                     if removed_works_start < 0:
                         removed_works_start = 0
                 if selected_model.x == None:
@@ -270,7 +270,6 @@ class TimewebListView(LoginRequiredMixin, View):
                         selected_model.dynamic_start += selected_model.dif_assign - old_data.dif_assign
                     if selected_model.dynamic_start < 0:
                         selected_model.dynamic_start = 0
-                    
                 if update_assignment and selected_model.dynamic_start > x_num - 1:
                     selected_model.dynamic_start = x_num - 1
                 selected_model.x = selected_model.ad + timedelta(x_num)
