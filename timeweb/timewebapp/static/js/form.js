@@ -26,7 +26,7 @@ $(function() {
         // Used in utils.js for handling the user typing "N" when showing the form via shift + N
         form_is_showing = true;
         // Make rest of page untabbable
-        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#form-wrapper button), .graph-container input, #advanced, #nav-menu, #user-greeting #username").attr("tabindex","-1");
+        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#submit-assignment-button), .graph-container input, #advanced, #nav-menu, #user-greeting #username").attr("tabindex","-1");
         // Explained later
         replaceUnit();
     }
@@ -43,7 +43,7 @@ $(function() {
             }).children().first().animate({top: "0"}, 300);
         }
         // Make rest of page retabbable
-        $("a, button:not(#form-wrapper button), .graph-container input").removeAttr("tabindex");
+        $("a, button:not(#submit-assignment-button), .graph-container input").removeAttr("tabindex");
         $("#menu").attr("tabindex","2");
         $("#image-new-container, #user-greeting #username").attr("tabindex","1");
         $(".assignment, .graph, #advanced, #nav-menu").attr("tabindex","0");
@@ -78,7 +78,7 @@ $(function() {
         }
         // Set form text
         $("#new-title").html("New Assignment");
-        $("#form-wrapper button").html("Create Assignment").val('');
+        $("#submit-assignment-button").html("Create Assignment").val('');
         // Show form
         showForm();
     });
@@ -86,7 +86,7 @@ $(function() {
     $('.update-button').click(function() {
         // Set form text
         $("#new-title").html("Re-enter Assignment");
-        $("#form-wrapper button").html("Modify Assignment");
+        $("#submit-assignment-button").html("Modify Assignment");
         // Find which assignment in dat was clicked
         const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
         // Reented form fields
@@ -95,17 +95,17 @@ $(function() {
             selected_assignment[1],
             selected_assignment[2],
             selected_assignment[3],
-            +selected_assignment[4],
-            +selected_assignment[5][0],
-            +selected_assignment[8],
+            selected_assignment[4],
+            selected_assignment[5][0],
+            selected_assignment[8],
             selected_assignment[9]-1 ? +selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
-            +selected_assignment[10]||'',
+            selected_assignment[10]*selected_assignment[8]||'',
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         selected_assignment[11].forEach(nwd => $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true));
         // Set button pk
-        $("#form-wrapper button").val($(this).val());
+        $("#submit-assignment-button").val($(this).val());
         // Show form
         showForm();
     });

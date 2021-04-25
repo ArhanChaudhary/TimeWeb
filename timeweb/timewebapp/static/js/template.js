@@ -206,7 +206,7 @@ $(function() {
 (function($) {
     $.fn.info = function(facing,text,position) {
         const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
-        if (window.show_info_buttons === false && !("first_login" in sessionStorage)) {
+        if (window.show_info_buttons === false && !("first_login" in sessionStorage) && !this.parents("#form-wrapper").length) {
             info_button.css("display", "none");
         }
         switch (position) {

@@ -19,7 +19,33 @@ if ( window.history.replaceState ) {
 // Load in assignment data
 dat = JSON.parse(document.getElementById("load-data").textContent);
 [warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login] = dat[0];
+
+// cite
+// https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
+// Date parser for safari
+function parseDate(date) {
+    const parsed = Date.parse(date);
+    if (!isNaN(parsed)) {
+        return parsed;
+    }
+    return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
+}
 def_nwd = def_nwd.map(Number);
+for (selected_assignment of dat.slice(1)) {
+    // Type conversions
+    selected_assignment[1] = parseDate(selected_assignment[1] + " 00:00");
+    selected_assignment[2] = Math.round((parseDate(selected_assignment[2] + " 00:00") - selected_assignment[1]) / 86400000); // Round to account for DST
+    selected_assignment[1] = new Date(selected_assignment[1]);
+    selected_assignment[4] = +selected_assignment[4];
+    selected_assignment[5] = selected_assignment[5].map(Number);
+    // dif assign is already an int
+    selected_assignment[7] = +selected_assignment[7];
+    selected_assignment[8] = +selected_assignment[8];
+    selected_assignment[9] = +selected_assignment[9];
+    selected_assignment[10] /= selected_assignment[8]; // Converts min_work_time to int if string or null
+    selected_assignment[11] = selected_assignment[11].map(Number);
+    // dynamic start is already an int
+}
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend

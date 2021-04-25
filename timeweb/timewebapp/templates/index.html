@@ -8,6 +8,7 @@
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
+<script src="{% static 'js/parabola.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
 <script src="{% static 'js/form.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
@@ -44,7 +45,7 @@
         {% for hidden in form.hidden_fields %}
           {{ hidden }}
         {% endfor %}
-        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %} type="submit" name="submit-button" title="(Enter)">{{submit}}</button>
+        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %} type="submit" name="submit-button" id="submit-assignment-button" title="(Enter)">{{submit}}</button>
       </form>
     </div>
   </div>

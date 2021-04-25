@@ -443,7 +443,7 @@ label[for='id_ad']::after {
     padding-left: 1px;
     color: black;
 }
-#form-wrapper button {
+#submit-assignment-button {
     width: calc(100% - 192px);
     margin: 0 auto;
     display: block;
@@ -453,10 +453,10 @@ label[for='id_ad']::after {
     border-radius: 3px;
     border: 1px solid rgb(79, 79, 79);
 }
-#form-wrapper button:hover {
+#submit-assignment-button:hover {
     background: rgb(229, 229, 229);
 }
-#form-wrapper button:active {
+#submit-assignment-button:active {
     background: rgb(245, 245, 245);
 }
 #form-wrapper .invalid {
