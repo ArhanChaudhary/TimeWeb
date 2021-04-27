@@ -106,17 +106,6 @@ class TimewebForm(forms.ModelForm):
                 )
         except:
             pass
-        try:
-            if x < timezone.localtime(timezone.now()).date():
-                self.add_error("x",
-                    forms.ValidationError(_("The due date cannot be before today"),code='invalid')
-                )
-            elif x == timezone.localtime(timezone.now()).date():
-                self.add_error("x",
-                    forms.ValidationError(_("The due date cannot be today"),code='invalid')
-                )
-        except:
-            pass
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):

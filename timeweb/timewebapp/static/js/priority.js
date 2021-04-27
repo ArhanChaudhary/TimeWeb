@@ -8,14 +8,249 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
-    function sort(autofill_override=false) {
-        if (!(dat.length - 1)) return;
+    sort = function(params /* autofill_override */) {
+        if (dat.length === 0) return;
         
         let ordli = [],
             total = 0,
             tomorrow_total = 0,
             incomplete_works = false;
+        dat.forEach(function(selected_assignment, index) {
+
+            // Direct copy of loading in data from graph.js
+            // Extremely inefficient and hard to maintain
+            // Changing this is definitely on my todo list
+            // also on todo: remove elses
+
+            // Load in data
+            let { ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode } = selected_assignment;
+            ad = parseDate(ad + " 00:00");
+            x = Math.round((parseDate(x + " 00:00") - ad) / 86400000);
+            ad = new Date(ad);
+            y = +y;
+            skew_ratio = +skew_ratio;
+            ctime = +ctime;
+            funct_round = +funct_round;
+            min_work_time /= ctime;
+            nwd = nwd.map(Number);
+            function c_pset(x2, y2) {
+                const context = {
+                    x: x,
+                    y: y,
+                    len_nwd: len_nwd,
+                    nwd: nwd,
+                    assign_day_of_week: assign_day_of_week,
+                    y_mod_funct_round: y_mod_funct_round,
+                    funct_round: funct_round,
+                    min_work_time: min_work_time,
+                    min_work_time_funct_round: min_work_time_funct_round,
+                    ignore_ends_mwt: ignore_ends_mwt,
+
+                    // wCon: wCon,
+                    // hCon: hCon,
+                    // skew_ratio_lim: skew_ratio_lim,
+                    // height: height,
+                    // set_skew_ratio: set_skew_ratio,
+                    red_line_start_x: red_line_start_x,
+                    red_line_start_y: red_line_start_y,
+                    skew_ratio: skew_ratio,
+                    mods: mods,
+                    remainder_mode: remainder_mode,
+                }
+                return pset(context, x2, y2);
+            }
+            function c_funct(n, translate) {
+                const context = {
+                    red_line_start_x: red_line_start_x,
+                    len_nwd: len_nwd,
+                    mods: mods,
+                    return_y_cutoff: return_y_cutoff,
+                    y: y,
+                    return_0_cutoff: return_0_cutoff,
+                    red_line_start_y: red_line_start_y,
+                    funct_round: funct_round,
+                    min_work_time: min_work_time,
+                    a: a,
+                    b: b,
+                    min_work_time_funct_round: min_work_time_funct_round,
+                    cutoff_to_use_round: cutoff_to_use_round,
+                    cutoff_transition_value: cutoff_transition_value,
+                    remainder_mode: remainder_mode,
+                    y_mod_funct_round: y_mod_funct_round,
+                }
+                return funct(n, context, translate);
+            }
+            function c_calc_mod_days() {
+                const context = {
+                    nwd: nwd,
+                    assign_day_of_week: assign_day_of_week, 
+                    red_line_start_x: red_line_start_x
+                }
+                return calc_mod_days(context);
+            }
+            let red_line_start_x = fixed_mode ? 0 : dynamic_start,
+                red_line_start_y = fixed_mode ? 0 : works[red_line_start_x - dif_assign];
+            if (funct_round > y - red_line_start_y) {
+                funct_round = y - red_line_start_y;
+            }
+            if (min_work_time > y - red_line_start_y) {
+                min_work_time = y - red_line_start_y;
+            }
+            if (min_work_time <= funct_round) {
+                min_work_time = 0;
+            } else if (funct_round < min_work_time && min_work_time < 2 * funct_round) {
+                min_work_time = funct_round * 2;
+            }
+            let len_works = works.length - 1,
+                y_mod_funct_round = (y - red_line_start_y) % funct_round,
+                ignore_ends_mwt = ignore_ends && min_work_time,
+                len_nwd = nwd.length,
+                unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute",
+                min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round;
+            let due_date = new Date(ad.valueOf());
+            due_date.setDate(due_date.getDate() + x);
+            let mods,
+                assign_day_of_week = ad.getDay();
+            if (len_nwd) {
+                mods = c_calc_mod_days();
+            }
+            let lw = works[len_works];
+            let a, b, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
+            ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+
+            // Will document soon
+            let daysleft = Math.round((new Date(new Date().toDateString()) - ad) / 86400000),
+                todo = c_funct(len_works+dif_assign+1) - lw;
+            const today_minus_dac = daysleft - dif_assign;
+            const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay());
+            let strdaysleft, status_value, status_message;
+            if (daysleft < 0) {
+                status_message = '#\u3000This Assignment has Not been Assigned Yet! Please wait until it is.';
+                if (daysleft === -1) {
+                   strdaysleft = 'Assigned Tomorrow';
+                } else if (daysleft > -7) {
+                   strdaysleft = `Assigned on ${ad.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                } else {
+                   strdaysleft = `Assigned in ${-daysleft}d`;
+                }
+                status_value = 5;
+            } else if (lw >= y || x - daysleft < 1) {
+                status_message = '*\u3000You have Finished this Assignment!';
+                status_value = 6;
+                if (-(x - daysleft)) {
+                    strdaysleft = `${-(x - daysleft)}d Ago`;
+                } else {
+                    strdaysleft = "Today";
+                }
+            } else {
+                if (today_minus_dac > len_works) {
+                    let has_autofilled = false;
+                    for (i = 0; i < today_minus_dac-len_works; i++) {
+                        if (has_autofilled) {
+                            todo = c_funct(len_works+dif_assign+1) - lw;
+                        }
+                        const autofill_this_loop = params.autofill_override || todo <= 0 || nwd.includes((assign_day_of_week + len_works + dif_assign) % 7);
+                        if (!autofill_this_loop || len_works + dif_assign === x - 1) {
+                            break;
+                        }
+                        has_autofilled = true;
+                        works.push(lw);
+                        len_works++;
+                        if (todo) {
+                            dynamic_start = len_works + dif_assign;
+                            if (!fixed_mode) {
+                                red_line_start_x = dynamic_start;
+                                red_line_start_y = works[red_line_start_x - dif_assign];
+                                y_mod_funct_round = (y - red_line_start_y) % funct_round;
+                                if (len_nwd) {
+                                    mods = c_calc_mod_days();
+                                }
+                                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                            }
+                        }
+                    }
+                    if (has_autofilled) {
+                        selected_assignment.dynamic_start = dynamic_start;
+                        todo = c_funct(len_works+dif_assign+1) - lw;
+                    }
+                }
+                daysleft = x - daysleft;
+                if (today_minus_dac > len_works && len_works + dif_assign < x) {
+                    status_message = '?\u3000Whoops! You have not Entered in your Work Completed from Previous Days!';
+                    status_value = 1;
+                } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(new Date().getDay()) && daysleft !== 1) {
+                    status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment for Today. Keep it up!';
+                    status_value = 4;
+                } else {
+                    status_value = 3;
+                    if (assignmentIsInProgress()) {
+                        status_message = "@\u3000This Assignment's Daily Work is in Progress!";
+                        todo = c_funct(len_works+dif_assign) - lw;
+                    } else if (len_works > 0 && (lw - works[-2]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - works[-2]) {
+                        status_message = '!\u3000Warning! You are behind your Work schedule!';
+                    } else {
+                        status_message = "\u2718\u3000This Assignment's Daily Work is Unfinished!";
+                    }
+                    if (unit_is_minute) {
+                        status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} of Work Today`;
+                    } else {
+                        status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} Today`;
+                    }
+                    total += Math.ceil(todo*ctime);                    
+                }
+                if (daysleft === 1) {
+                    strdaysleft = 'Tomorrow';
+                    tomorrow_total += Math.ceil(todo*ctime);
+                    if (status_value !== 1) {
+                        status_value = 2;
+                    }
+                } else if (daysleft < 7) {
+                    strdaysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                } else {
+                    strdaysleft = `${daysleft}d`;
+                }
+            }
+            let status_priority;
+            if ([1,5,6].includes(status_value)) {
+                status_priority = Math.abs(daysleft);
+            } else {
+                skew_ratio = 1;
+                red_line_start_x = dif_assign;
+                red_line_start_y = works[0];
+                if (len_nwd) {
+                    mods = c_calc_mod_days();
+                }
+                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+
+                len_works -= assignmentIsInProgress();
+                if (x-dif_assign-len_works === 0 || todo < 0 || len_works > today_minus_dac) {
+                    status_priority = 0;
+                } else {
+                    if (len_works && daysleft !== -1) {
+                        // more readable and faster than Array.prototype.reduce
+                        let sum_diff_red_blue = 0;
+                        for (i = 0; i <= len_works; i++) {
+                            if (!nwd.includes(assign_day_of_week + i - 1)) {
+                                sum_diff_red_blue += works[i] - c_funct(i);
+                            }
+                        }
+                        const how_well_followed_const = 1-sum_diff_red_blue/len_works/y;
+                        status_priority = how_well_followed_const*todo*ctime/(x-dif_assign-len_works);
+                    } else {
+                        status_priority = todo*ctime/(x-dif_assign-len_works);
+                    }
+                    if (status_priority < 0) {
+                        status_priority = 0;
+                    }
+                }
+            }
+            ordli.push([status_value, -status_priority, index]);
+            $(".status").eq(index).html(status_message);
+            $(".title").eq(index).attr("data-daysleft", strdaysleft);
+
+        });   
     }
+    sort({autofill_override: false});
     // Returns color rgb from priority percentage
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
@@ -70,8 +305,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Handles animating assignments that were just created or modified and coloring
     //
 
-    // A bit of context: the backend puts "#animate-in" to an assignment that was just created and "#animate-color" to an assignment that was just modified
-    // It's only one or the other
+    // A bit of context: the backend puts "#animate-in" to an assignment that was just created and "#animate-color" to an assignment that was just modified, and only one of these will exist at a time
 
     // If an assignment was just modified, I want it to be scrolled to and then change color from white to its priority color
 

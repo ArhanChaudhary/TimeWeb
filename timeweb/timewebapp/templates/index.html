@@ -4,7 +4,8 @@
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 {% endblock css %}
 {% block js %}
-{{ data|json_script:"load-data" }}
+{{ assignment_models|json_script:"assignment-models" }}
+{{ settings_model|json_script:"settings-model" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
@@ -82,17 +83,17 @@
               </polygon>
             </svg>
             <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
-            <button value="{{ obj.pk }}" class="button update-button">
+            <button class="button update-button">
               <img width="20" height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </button>
-            <button value="{{ obj.pk }}" class="button delete-button">
+            <button class="button delete-button">
               <img width="19" height="22" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
             </button>
           </div>
           <div class="relative-positioning-wrapper">
             <div class="graph-container">
               <canvas class="fixed-graph"></canvas>
-              <canvas value="{{ obj.pk }}" tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
+              <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
                 <button class="skew-ratio-button">Set skew ratio using graph</button>
                 <input class="total-work-input-button" placeholder="Enter total units done"/>

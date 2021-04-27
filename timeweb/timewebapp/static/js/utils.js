@@ -17,34 +17,21 @@ if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
 // Load in assignment data
-dat = JSON.parse(document.getElementById("load-data").textContent);
-[warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login] = dat[0];
-
+dat = JSON.parse(document.getElementById("assignment-models").textContent);
+({warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login} = JSON.parse(document.getElementById("settings-model").textContent));
+def_nwd = def_nwd.map(Number);
+for (selected_assignment of dat) {
+    selected_assignment.works = selected_assignment.works.map(Number);
+}
 // cite
 // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-// Date parser for safari
+// Date.parse but compatible with safari
 function parseDate(date) {
     const parsed = Date.parse(date);
     if (!isNaN(parsed)) {
         return parsed;
     }
     return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
-}
-def_nwd = def_nwd.map(Number);
-for (selected_assignment of dat.slice(1)) {
-    // Type conversions
-    selected_assignment[1] = parseDate(selected_assignment[1] + " 00:00");
-    selected_assignment[2] = Math.round((parseDate(selected_assignment[2] + " 00:00") - selected_assignment[1]) / 86400000); // Round to account for DST
-    selected_assignment[1] = new Date(selected_assignment[1]);
-    selected_assignment[4] = +selected_assignment[4];
-    selected_assignment[5] = selected_assignment[5].map(Number);
-    // dif assign is already an int
-    selected_assignment[7] = +selected_assignment[7];
-    selected_assignment[8] = +selected_assignment[8];
-    selected_assignment[9] = +selected_assignment[9];
-    selected_assignment[10] /= selected_assignment[8]; // Converts min_work_time to int if string or null
-    selected_assignment[11] = selected_assignment[11].map(Number);
-    // dynamic start is already an int
 }
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
@@ -117,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
                 $(".assignment.disable-hover").map(function() {
-                    return $("#assignments-container").children().index($(this).parent())
+                    return $(".assignment-container").index($(this).parent())
                 }).toArray()
             ));
         }
@@ -130,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if ("open_assignments" in sessionStorage) {
             JSON.parse(sessionStorage.getItem("open_assignments")).forEach(index => 
                 // Pretends created assignment isn't there to preserve index
-                $("#assignments-container").children().filter(function() { 
+                $(".assignment-container").filter(function() { 
                     return !$(this).is("#animate-in")
                 }).eq(index).children().first().click()
             );
@@ -152,12 +139,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this tool.<br><br>Create your first school or work assignment to get started");
         }
-    }
-    // Makes input bigger for info button
-    if (show_info_buttons || "first_login" in sessionStorage) {
-        $(".total-work-input-button").css("width", 163);
-        // Position up/down input scroller
-        $(".skew-ratio-textbox").addClass("translate-left");
     }
 });
 // Lock to landscape

@@ -168,7 +168,8 @@ header.animate::after {
     content: attr(data-daysleft) !important;
     position: absolute;
     font-size: 0.7em;
-    display: block;
+    transform: translateY(100%) translateY(5px);
+    left: 0;
 }
 .arrow-container {
     float: left;

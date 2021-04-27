@@ -10,11 +10,11 @@ from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
 import logging
 from django import forms
+from django.forms.models import model_to_dict
 from datetime import timedelta
 from decimal import Decimal as d
 from math import ceil, floor
 import json
-
 # Automatically creates settings model when user is created
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -84,7 +84,8 @@ class TimewebListView(LoginRequiredMixin, View):
     def make_list(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
         self.context['objlist'] = self.objlist
-        self.context['data'] = [list(vars(settings_model).values())[2:-1]] + [list(vars(obj).values())[2:-1] for obj in self.objlist]
+        self.context['assignment_models'] = list(self.objlist.values())
+        self.context['settings_model'] = model_to_dict(settings_model)
         if settings_model.first_login == True:
             settings_model.first_login = False
             settings_model.save()
@@ -216,6 +217,7 @@ class TimewebListView(LoginRequiredMixin, View):
                             x_num = (selected_model.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - adone)/selected_model.funct_round
                     x_num = floor(x_num)
                     if selected_model.nwd:
+                        len_nwd = len(selected_model.nwd)
                         if len_nwd == 7:
                             x_num = 1
                         else:
@@ -228,7 +230,7 @@ class TimewebListView(LoginRequiredMixin, View):
                             mods = [0]
                             mod_counter = 0
                             for mod_day in range(6):
-                                if (xday + mod_day) % 7 in nwd:
+                                if (xday + mod_day) % 7 in selected_model.nwd:
                                     mod_counter += 1
                                 mods.append(mod_counter)
                             mods = tuple(mods)

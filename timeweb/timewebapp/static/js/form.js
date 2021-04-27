@@ -50,27 +50,19 @@ $(function() {
         // Used in utils.js for handling the user typing "N" when showing the form via shift + N
         form_is_showing = false;
     }
+    function dateToInput(date) {
+        return [
+            date.getFullYear(),
+            ('0' + (date.getMonth() + 1)).slice(-2),
+            ('0' + date.getDate()).slice(-2),
+        ].join('-');
+    }
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         const today = new Date();
-        let tomorrow = new Date();
-        tomorrow.setDate(today.getDate()+1);
         // Set default values for a new form
-        ['',
-        
-        [
-            today.getFullYear(),
-            ('0' + (today.getMonth() + 1)).slice(-2),
-            ('0' + today.getDate()).slice(-2),
-        ].join('-'),
-
-        [
-            tomorrow.getFullYear(),
-            ('0' + (tomorrow.getMonth() + 1)).slice(-2),
-            ('0' + tomorrow.getDate()).slice(-2),
-        ].join('-'),
-
-        '','','0','','',+def_min_work_time||''].forEach(function(element, index) {
+        const initial_form_fields = ['', dateToInput(today), '', '', '', '0', '', '', +def_min_work_time||''];
+        initial_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let nwd of Array(7).keys()) {
@@ -88,24 +80,24 @@ $(function() {
         $("#new-title").html("Re-enter Assignment");
         $("#submit-assignment-button").html("Modify Assignment");
         // Find which assignment in dat was clicked
-        const selected_assignment = dat[$("#assignments-container").children().index($(this).parents(".assignment-container"))];
-        // Reented form fields
+        const selected_assignment = dat[$(".assignment-container").index($(this).parents(".assignment-container"))];
+        // Reentered form fields
         const form_data = [
-            selected_assignment[0],
-            selected_assignment[1],
-            selected_assignment[2],
-            selected_assignment[3],
-            selected_assignment[4],
-            selected_assignment[5][0],
-            selected_assignment[8],
-            selected_assignment[9]-1 ? +selected_assignment[9] : '', // Grouping value displays as self if it isn't 1, else display nothing
-            selected_assignment[10]*selected_assignment[8]||'',
+            selected_assignment.file_sel,
+            selected_assignment.ad,
+            selected_assignment.x,
+            selected_assignment.unit,
+            +selected_assignment.y,
+            +selected_assignment.works[0],
+            +selected_assignment.ctime,
+            selected_assignment.funct_round-1 ? +selected_assignment.funct_round : '', // Displays as self if it isn't 1, else display nothing
+            +selected_assignment.min_work_time||'',
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
-        selected_assignment[11].forEach(nwd => $("#id_nwd_"+((+nwd+6)%7)).prop("checked",true));
+        selected_assignment.nwd.forEach(nwd => $("#id_nwd_"+(nwd+6)%7).prop("checked",true));
         // Set button pk
-        $("#submit-assignment-button").val($(this).val());
+        $("#submit-assignment-button").val(selected_assignment.id);
         // Show form
         showForm();
     });
@@ -308,9 +300,10 @@ $(function() {
                 assignment_container.css("pointer-events", "none");
                 $(document).queue(function() {
                     // Once the assignment, is done, this sends the data to the backend and animates its deletion
+                    const selected_assignment_index = $(".assignment-container").index(assignment_container);
                     let data = {
                         'csrfmiddlewaretoken': csrf_token,
-                        'deleted': $this.val(), // Primary key value
+                        'deleted': dat[selected_assignment_index].id, // Primary key value
                     }
                     const success = function() {
                         const assignment = assignment_container.children().first();
@@ -328,7 +321,7 @@ $(function() {
                             // Animate height
                             assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                                 // Remove assignment data from dat
-                                dat.splice($("#assignments-container").children().index(assignment_container),1);
+                                dat.splice(selected_assignment_index, 1);
                                 // Remove from DOM
                                 assignment_container.remove();
                                 // Dequeue it
