@@ -83,7 +83,6 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
-    remainder_mode = models.BooleanField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

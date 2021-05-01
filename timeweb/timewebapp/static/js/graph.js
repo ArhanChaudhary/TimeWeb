@@ -95,7 +95,7 @@ $(function() {
                 // dat[0] is the settings and "$assignments-container :first child" is the assignments-container-header div, these cancel each other out when indexing
                 let selected_assignment = dat[$(".assignment-container").index(assignment.parents(".assignment-container"))];
                 // Load in data
-                let { ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode } = selected_assignment;
+                let { ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start } = selected_assignment;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
@@ -129,12 +129,11 @@ $(function() {
                     min_work_time = funct_round * 2;
                 }
                 let len_works = works.length - 1,
-                    y_mod_funct_round = (y - red_line_start_y) % funct_round, // funct_round remainder
+                    day = len_works,
+                    lw = works[len_works],
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only when min_work_time is also enabled
-                    len_nwd = nwd.length,
                     set_skew_ratio = false, // Bool to manually set skew ratio on graph
                     unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute",
-                    min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round, // LCM of min_work_time and funct_round
                     last_mouse_x,
                     last_mouse_y,
                     wCon,
@@ -147,7 +146,7 @@ $(function() {
                 // Handles not working days, explained later
                 let mods,
                     assign_day_of_week = ad.getDay(); // Used with mods
-                if (len_nwd) {
+                if (nwd.length) {
                     mods = c_calc_mod_days();
                 }
                 // Sets the upper and lower caps for skew_ratio
@@ -172,9 +171,7 @@ $(function() {
                 // Days between today and date_assignment_created
                 let today_minus_dac = Math.round((new Date(new Date().toDateString()) - date_assignment_created) / 86400000),
                     // Days between today and the assignment date
-                    today_minus_ad = Math.round((new Date(new Date().toDateString()) - ad) / 86400000),
-                    day = len_works,
-                    lw = works[len_works];
+                    today_minus_ad = Math.round((new Date(new Date().toDateString()) - ad) / 86400000);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                 const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay());
@@ -183,13 +180,10 @@ $(function() {
                     const context = {
                         x: x,
                         y: y,
-                        len_nwd: len_nwd,
                         nwd: nwd,
                         assign_day_of_week: assign_day_of_week,
-                        y_mod_funct_round: y_mod_funct_round,
                         funct_round: funct_round,
                         min_work_time: min_work_time,
-                        min_work_time_funct_round: min_work_time_funct_round,
                         ignore_ends_mwt: ignore_ends_mwt,
 
                         wCon: wCon,
@@ -201,28 +195,24 @@ $(function() {
                         red_line_start_y: red_line_start_y,
                         skew_ratio: skew_ratio,
                         mods: mods,
-                        remainder_mode: remainder_mode,
                     }
                     return pset(context, x2, y2);
                 }
                 function c_funct(n, translate) {
                     const context = {
                         red_line_start_x: red_line_start_x,
-                        len_nwd: len_nwd,
                         mods: mods,
                         return_y_cutoff: return_y_cutoff,
                         y: y,
+                        nwd: nwd,
                         return_0_cutoff: return_0_cutoff,
                         red_line_start_y: red_line_start_y,
                         funct_round: funct_round,
                         min_work_time: min_work_time,
                         a: a,
                         b: b,
-                        min_work_time_funct_round: min_work_time_funct_round,
                         cutoff_to_use_round: cutoff_to_use_round,
                         cutoff_transition_value: cutoff_transition_value,
-                        remainder_mode: remainder_mode,
-                        y_mod_funct_round: y_mod_funct_round,
                     }
                     return funct(n, context, translate);
                 }
@@ -241,14 +231,15 @@ $(function() {
                         skew_ratio_lim = 0;
                     } else {
                         let x1 = x - red_line_start_x;
-                        if (len_nwd) {
-                            x1 -= Math.floor(x1 / 7) * len_nwd + mods[x1 % 7];
+                        if (nwd.length) {
+                            x1 -= Math.floor(x1 / 7) * nwd.length + mods[x1 % 7];
                         }
                         /*
                         skew_ratio = (a + b) * x1 / y1;
                         skew_ratio = funct(1) * x1 / y1;
                         skew_ratio = (y1+min_work_time_funct_round) * x1 / y1;
                         */
+                        const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
                         skew_ratio_lim = Math.round((y1 + min_work_time_funct_round) * x1 / y1 * 10)/10;
                     }
                     assignment.find(".skew-ratio-textbox").attr({
@@ -432,12 +423,7 @@ $(function() {
                     screen.fillStyle = "black";
                     screen.textBaseline = "top";
                     screen.font = '13.75px Open Sans';
-                    if (((y - red_line_start_y) / funct_round) % 1) {
-                        screen.fillText(remainder_mode ? "Remainder: First" : "Remainder: Last", width-2, height-155+move_info_down);
-                        screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-172+move_info_down);
-                    } else {
-                        screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
-                    }
+                    screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
                     screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, width-2, height-138+move_info_down);
 
                     const daysleft = x - today_minus_ad;
@@ -513,7 +499,7 @@ $(function() {
                             }
                         } else if (len_works && !assignmentIsInProgress() && (lw - works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - works[len_works-1]) {
                             screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*8);
-                            screen.fillText("You are BEHIND Schedule!", 50+(width-50)/2, row_height*9);
+                            screen.fillText("You are Behind Schedule!", 50+(width-50)/2, row_height*9);
                         }
                     } else {
                         screen.fillText('Amazing Effort! You have Finished this Assignment!', 50+(width-50)/2, row_height*7);
@@ -710,43 +696,6 @@ $(function() {
                     $(window).resize(resize);
                     // END Setup
 
-                    // BEGIN Ajax handler
-                    let ajaxTimeout,
-                        data = {
-                            'csrfmiddlewaretoken': csrf_token,
-                            'pk': selected_assignment.id,
-                        };
-
-                    function SendButtonAjax(key, value) {
-                        // Add key and value the data going to be sent
-                        // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-                        data[key] = value;
-                        clearTimeout(ajaxTimeout);
-                        ajaxTimeout = setTimeout(function() {
-                            const success = function() {
-                                gtag("event","save_assignment");
-                            }
-                            // Send data along with the assignment's primary key
-
-                            // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
-                            // However, I decided to skip this check and still send the ajax
-                            // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
-                            // Plus, a pointless ajax of this sort won't happen frequently, and will have a minimal impact on the server's performance
-                            $.ajax({
-                                type: "POST",
-                                data: data,
-                                success: success,
-                                error: error,
-                            });
-                            // Reset data
-                            data = {
-                                'csrfmiddlewaretoken': csrf_token,
-                                'pk': selected_assignment.id,
-                            }
-                        }, 1000);
-                    }
-                    // END Ajax handler
-
                     // BEGIN Up and down arrow event handler
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
@@ -767,7 +716,7 @@ $(function() {
                         // Save skew ratio and draw
                         selected_assignment.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         old_skew_ratio = skew_ratio;
-                        SendButtonAjax('skew_ratio', skew_ratio);
+                        SendAttributeAjax('skew_ratio', skew_ratio, selected_assignment.id);
                         draw();
                     }
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
@@ -812,13 +761,13 @@ $(function() {
                     //
                     const skew_ratio_button = assignment.find(".skew-ratio-button"),
                         total_work_input_button = assignment.find(".total-work-input-button"),
-                        fixed_mode_button = assignment.find(".fixed-mode-button"),
+                        display_button = assignment.find(".display-button"),
                         skew_ratio_textbox = assignment.find(".skew-ratio-textbox"),
                         submit_work_button = assignment.find(".submit-work-button"),
-                        remainder_mode_button = assignment.find(".remainder-mode-button"),
-                        display_button = assignment.find(".display-button"),
+                        hide_assignment_button = assignment.find(".hide-assignment-button"),
+                        fixed_mode_button = assignment.find(".fixed-mode-button"),
                         delete_work_input_button = assignment.find(".delete-work-input-button"),
-                        hide_assignment_button = assignment.find(".hide-assignment-button");
+                        next_assignment_button = assignment.find(".next-assignment-button");
 
                     // BEGIN Set skew ratio button
                     skew_ratio_button.click(function() {
@@ -837,13 +786,13 @@ $(function() {
                             // Save skew ratio
                             selected_assignment.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            SendButtonAjax('skew_ratio', skew_ratio);
+                            SendAttributeAjax('skew_ratio', skew_ratio, selected_assignment.id);
                             // Disable mousemove
                             if (!draw_point) {
                                 $(this).off("mousemove");
                             }
+                            sort();
                             draw();
-                            sort({autofill_override: false});
                         } else if (draw_point) {
                             if (!isMobile) {
                                 // Runs if (!set_skew_ratio && draw_point) and not on mobile
@@ -918,23 +867,22 @@ $(function() {
                                     dynamic_start = len_works + dif_assign;
                                 }
                                 selected_assignment.dynamic_start = dynamic_start;
-                                SendButtonAjax("dynamic_start", dynamic_start);
+                                SendAttributeAjax("dynamic_start", dynamic_start, selected_assignment.id);
                                 if (!fixed_mode) {
                                     red_line_start_x = dynamic_start;
                                     red_line_start_y = works[dynamic_start - dif_assign];
-                                    y_mod_funct_round = (y - red_line_start_y) % funct_round;
-                                    if (len_nwd) {
+                                    if (nwd.length) {
                                         mods = c_calc_mod_days();
                                     }
                                     set_skew_ratio_lim();
                                     ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                                 }
                             }
-                            SendButtonAjax("works", works);
+                            SendAttributeAjax("works", works.map(String), selected_assignment.id);
                             day = len_works;
                             day -= assignmentIsInProgress();
+                            sort();
                             draw();
-                            sort({autofill_override: false});
                             if (lw >= y) {
                                 alert("Finish!\nYou have completed this assignment, good job!");
                             }
@@ -949,7 +897,7 @@ $(function() {
                         fixed_mode = !fixed_mode;
                         selected_assignment.fixed_mode = fixed_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         $(this).onlyText(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                        SendButtonAjax('fixed_mode', fixed_mode);
+                        SendAttributeAjax('fixed_mode', fixed_mode, selected_assignment.id);
                         if (fixed_mode) {
                             // Set start of red line and pset()
                             red_line_start_x = 0;
@@ -969,12 +917,11 @@ $(function() {
                                 day--;
                             }
                         }
-                        y_mod_funct_round = (y - red_line_start_y) % funct_round;
-                        if (len_nwd) {
+                        if (nwd.length) {
                             mods = c_calc_mod_days();
                         }
+                        sort();
                         draw();
-                        sort({autofill_override: false});
                     }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
                     // END Fixed/dynamic mode button
 
@@ -999,8 +946,8 @@ $(function() {
                             skew_ratio = old_skew_ratio;
                             old_skew_ratio = undefined;
                         }
+                        sort();
                         draw();
-                        sort({autofill_override: false});
                     }).keypress(function(e) {
                         var e = e || window.event;
                         // Saves skew ratio on enter
@@ -1014,24 +961,13 @@ $(function() {
                             // Save skew ratio
                             selected_assignment.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            SendButtonAjax('skew_ratio', skew_ratio);
+                            SendAttributeAjax('skew_ratio', skew_ratio, selected_assignment.id);
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
                     });
                     // END Skew ratio textbox
 
-                    // BEGIN Remainder mode button
-                    remainder_mode_button.click(function() {
-                        remainder_mode = !remainder_mode;
-                        selected_assignment.remainder_mode = remainder_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        $(this).onlyText(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First");
-                        SendButtonAjax('remainder_mode', remainder_mode);
-                        draw();
-                        sort({autofill_override: false});
-                    }).html(remainder_mode ? "Switch to Remainder: Last" : "Switch to Remainder: First");
-                    // END Remainder mode button
-                    
                     // BEGIN Display button
                     display_button.click(function() {
                         alert("This feature has not yet been implented");
@@ -1055,8 +991,7 @@ $(function() {
                                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
                                 outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign; red_line_start_x--) {
                                     red_line_start_y = works[red_line_start_x - dif_assign];
-                                    y_mod_funct_round = (y - red_line_start_y) % funct_round;
-                                    if (len_nwd) {
+                                    if (nwd.length) {
                                         mods = c_calc_mod_days();
                                     }
                                     set_skew_ratio_lim();
@@ -1080,18 +1015,17 @@ $(function() {
                                     red_line_start_x = 0;
                                 }
                                 red_line_start_y = works[red_line_start_x - dif_assign];
-                                y_mod_funct_round = (y - red_line_start_y) % funct_round;
-                                if (len_nwd) {
+                                if (nwd.length) {
                                     mods = c_calc_mod_days();
                                 }
                                 set_skew_ratio_lim();
                                 dynamic_start = red_line_start_x;
                                 selected_assignment.dynamic_start = dynamic_start;
-                                SendButtonAjax("dynamic_start", dynamic_start);
+                                SendAttributeAjax("dynamic_start", dynamic_start, selected_assignment.id)
                             }
-                            SendButtonAjax("works", works);
+                            SendAttributeAjax("works", works.map(String), selected_assignment.id);
+                            sort({do_not_autofill: true});
                             draw();
-                            sort({autofill_override: false});
                         }
                     });
                     // END Delete work input button
@@ -1101,6 +1035,20 @@ $(function() {
                         alert("This feature has not yet been implented");
                     }).css("text-decoration", "line-through");
                     // END Hide assignment button
+
+                    // BEGIN Next assignment button
+                    next_assignment_button.click(function() {
+                        const next_assignment = assignment.parent().next().children().first();
+                        // Only close if next assignment exists
+                        if (next_assignment.length) {
+                            assignment.click();
+                        }
+                        // Only open next assignment if closed
+                        if (!next_assignment.hasClass("disable-hover")) {     
+                            next_assignment.click();
+                        }
+                    });
+                    // END Next assignment button
 
                     // BEGIN Info buttons
                     skew_ratio_button.info("right", 
@@ -1132,35 +1080,25 @@ $(function() {
                         In this mode, if you fail to complete the specified amount of work for any day, the graph will change itself to start at your last work input, adapting to your work schedule
 
                         This mode is recommended if you can't keep up with an assignment's work schedule. It's easy to fall behind with this mode, so be careful`,"prepend"
-                    ).css({
-                        left: -3,
-                        marginRight: 3,
-                    }).children().first().css({
-                        "font-size": 11,
-                        "line-height": "11px",
+                    ).children().first().css({
+                        fontSize: 11,
+                        lineHeight: "11px",
                     });
 
                     skew_ratio_textbox.info("right", "Enter skew ratio as a number. Leave this blank to cancel or press enter to save",'after').css({
                         left: 134,
                         position: "absolute",
                         bottom: 36,
-                        zIndex: "2",
                     });
-
-                    remainder_mode_button.info('left',
-                        `Ignore this if you don't see a "Remainder: First" or "Remainder: Last" on your graph
-                        
-                        If the total number of units of work isn't divisible by the number of them you will complete at a time, this determines whether to complete the remainder of work on the first or last working day of this assignment`,'prepend'
-                    ).css({
-                        left: -3,
-                        marginRight: 3,
-                    });
-
-                    assignment.find(".info-button").on('click blur', info_button_handler);
                     // END Info buttons
                 }
                 function resize() {
                     if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
+                        // If autofilled by $(window).trigger("resize")
+                        len_works = works.length - 1;
+                        day = len_works;
+                        day -= assignmentIsInProgress();
+                        lw = works[len_works];
                         drawfixed();
                         draw();
                     }
@@ -1175,7 +1113,7 @@ $(function() {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
                         alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
                         alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
-                        alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress");
+                        alert("As you progress through your assignment, you will have to enter your own work inputs every day to measure your progress");
                         alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you have not entered any work inputs");
                         if (x <= 2) {
                             alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are more effective for this visualization`);

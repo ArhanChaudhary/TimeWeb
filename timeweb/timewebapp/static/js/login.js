@@ -7,7 +7,7 @@ Ensuring the animation only occurs once
 
 This only runs on login.html
 */
-
+gtag("event","logged_out");
 // Prevents submitting form on refresh
 // cite 
 // https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
@@ -47,5 +47,4 @@ $(function() {
         justifyContent: "center",
         alignItems: "center",
     });
-    gtag("event","logged_out");
 });

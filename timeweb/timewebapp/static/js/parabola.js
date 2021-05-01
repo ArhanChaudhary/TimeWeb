@@ -49,11 +49,12 @@ function pset(ctx, x2 = false, y2 = false) {
     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
     */
 
+    ctx.min_work_time_funct_round = ctx.min_work_time ? Math.ceil(ctx.min_work_time / ctx.funct_round) * ctx.funct_round : ctx.funct_round; // LCM of min_work_time and funct_round; minimum possible units of work a user can do any day
     // Define (x1, y1) and translate both variables to (0,0)
     let x1 = ctx.x - ctx.red_line_start_x,
         y1 = ctx.y - ctx.red_line_start_y;
-    if (ctx.len_nwd) {
-        x1 -= Math.floor(x1 / 7) * ctx.len_nwd + ctx.mods[x1 % 7]; // Handles not working day, explained later
+    if (ctx.nwd.length) {
+        x1 -= Math.floor(x1 / 7) * ctx.nwd.length + ctx.mods[x1 % 7]; // Handles not working day, explained later
     }
     // If set skew ratio is enabled, make the third point (x2,y2), which was passed as a parameter
     // x2 !== false is necessary because the user can resize the browser for example and call this function while set skew ratio is true but without passing any coordinates
@@ -64,12 +65,12 @@ function pset(ctx, x2 = false, y2 = false) {
         x2 = (x2 - 53.7) / ctx.wCon - ctx.red_line_start_x;
         y2 = (ctx.height - y2 - 44.5) / ctx.hCon - ctx.red_line_start_y;
         // Handles not working days, explained later
-        if (ctx.len_nwd) {
+        if (ctx.nwd.length) {
             const floorx2 = Math.floor(x2);
-            if (ctx.nwd.includes((ctx.assign_day_of_week + ctx.floorx2 + ctx.red_line_start_x) % 7)) {
+            if (ctx.nwd.includes((ctx.assign_day_of_week + floorx2 + ctx.red_line_start_x) % 7)) {
                 x2 = floorx2;
             }
-            x2 -= Math.floor(x2 / 7) * ctx.len_nwd + ctx.mods[floorx2 % 7];
+            x2 -= Math.floor(x2 / 7) * ctx.nwd.length + ctx.mods[floorx2 % 7];
         }
         // If the mouse is outside the graph to the left, make a line a the slope of y1
         // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph, caused by negative indexing by floorx2. This ensures that NaN passes this statement
@@ -79,9 +80,9 @@ function pset(ctx, x2 = false, y2 = false) {
                 b: y1,
                 skew_ratio: ctx.skew_ratio_lim,
                 cutoff_transition_value: 0,
-                // Don't include cutoff_to_use_round because it will never be used if a = 0 and b = y1 I think
-                return_y_cutoff: x1 ? 0 : -1,
-                return_0_cutoff: 1
+                // Don't include cutoff_to_use_round because it will never be used if a = 0 and b = y1
+                return_y_cutoff: x1 ? 1 : 0,
+                return_0_cutoff: 0,
             }
         } else if (x2 >= x1) {
             // If the mouse is outside the graph to the right, connect the points (0,0), (x1-1,0), (x1,y1)
@@ -91,10 +92,6 @@ function pset(ctx, x2 = false, y2 = false) {
 
             ctx.skew_ratio = 2 - ctx.skew_ratio_lim;
         } else {
-            // Adjusts for remainder mode
-            if (ctx.remainder_mode) {
-                y2 -= ctx.y_fremainder;
-            }
             // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
             // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
             ctx.a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
@@ -127,9 +124,9 @@ function pset(ctx, x2 = false, y2 = false) {
             b: y1,
             skew_ratio: ctx.skew_ratio,
             cutoff_transition_value: 0,
-            // Don't include cutoff_to_use_round because it will never be used if a = 0 and b = y1 I think
-            return_y_cutoff: x1 ? 0 : -1,
-            return_0_cutoff: 1,
+            // Don't include cutoff_to_use_round because it will never be used if a = 0 and b = y1
+            return_y_cutoff: x1 ? 1 : 0,
+            return_0_cutoff: 0,
         }
     }
     if (ctx.a <= 0 || ctx.b > 0) {
@@ -147,17 +144,15 @@ function pset(ctx, x2 = false, y2 = false) {
         if (ctx.a) {
             ctx.cutoff_to_use_round = ((ctx.min_work_time_funct_round - ctx.b) / ctx.a / 2).toFixed(10) - 1e-10;
             if (funct_zero < ctx.cutoff_to_use_round && ctx.cutoff_to_use_round < funct_y) {
-                let n = Math.floor(ctx.cutoff_to_use_round),
-                    prev_output;
-                for (n of [n, ++n]) {
-                    var output = funct(n, ctx, false);
-                    if (output > ctx.y) {
-                        output = ctx.y;
-                    } else if (output < 0) {
-                        output = 0;
-                    }
-                    prev_output = prev_output || output;
-                }
+                // Same thing as:
+                // const prev_output = clamp(0, c_funct(Math.floor(ctx.cutoff_to_use_round)), ctx.y)
+                // const output = clamp(0, c_funct(Math.ceil(ctx.cutoff_to_use_round)), ctx.y)
+                const prev_output = Math.min(Math.max(
+                    funct(Math.floor(ctx.cutoff_to_use_round), ctx, false)
+                , 0), ctx.y),
+                    output = Math.min(Math.max(
+                        funct(Math.ceil(ctx.cutoff_to_use_round), ctx, false)
+                    , 0), ctx.y);
                 if (output - prev_output) {
                     ctx.cutoff_transition_value = ctx.min_work_time_funct_round - output + prev_output;
                 }
@@ -166,13 +161,18 @@ function pset(ctx, x2 = false, y2 = false) {
     }
     if (ctx.ignore_ends_mwt) {
         var y_value_to_cutoff = y1;
-    } else if (ctx.funct_round < ctx.min_work_time && (!ctx.a && ctx.b < ctx.min_work_time_funct_round || ctx.a && (ctx.a > 0) === (funct_y < cutoff_to_use_round))) {
+    } else if (ctx.funct_round < ctx.min_work_time && (!ctx.a && ctx.b < ctx.min_work_time_funct_round || ctx.a && (ctx.a > 0) === (funct_y < ctx.cutoff_to_use_round))) {
         var y_value_to_cutoff = y1 - ctx.min_work_time_funct_round / 2;
     } else {
         var y_value_to_cutoff = y1 - ctx.min_work_time_funct_round + ctx.funct_round / 2;
     }
     if (y_value_to_cutoff > 0 && ctx.y > ctx.red_line_start_y && (ctx.a || ctx.b)) {
-        ctx.return_y_cutoff = (ctx.a ? (Math.sqrt(ctx.b * ctx.b + 4 * ctx.a * y_value_to_cutoff)-ctx.b)/ctx.a/2 : y_value_to_cutoff/ctx.b).toFixed(10) - 1e-10;
+        if (ctx.a) {
+            ctx.return_y_cutoff = (Math.sqrt(ctx.b * ctx.b + 4 * ctx.a * y_value_to_cutoff) - ctx.b) / ctx.a / 2;
+        } else {
+            ctx.return_y_cutoff = y_value_to_cutoff/ctx.b;
+        }
+        ctx.return_y_cutoff = +ctx.return_y_cutoff.toFixed(10);
     } else {
         ctx.return_y_cutoff = 0;
     }
@@ -216,11 +216,12 @@ function pset(ctx, x2 = false, y2 = false) {
     }
 
     if (y_value_to_cutoff < y1 && ctx.y > ctx.red_line_start_y && (ctx.a || ctx.b)) {
-        ctx.return_0_cutoff = (ctx.a ? (Math.sqrt(ctx.b * ctx.b + 4 * ctx.a * y_value_to_cutoff) - ctx.b) / ctx.a / 2 : y_value_to_cutoff / ctx.b).toFixed(10) - 1e-10;
-        // -1e-10 makes this negative
-        if (ctx.return_0_cutoff < 0) {
-            ctx.return_0_cutoff++;
+        if (ctx.a) {
+            ctx.return_0_cutoff = (Math.sqrt(ctx.b * ctx.b + 4 * ctx.a * y_value_to_cutoff) - ctx.b) / ctx.a / 2;
+        } else {
+            ctx.return_0_cutoff = y_value_to_cutoff / ctx.b;
         }
+        ctx.return_0_cutoff = +ctx.return_0_cutoff.toFixed(10);
     } else {
         ctx.return_0_cutoff = 1;
     }
@@ -257,19 +258,22 @@ function pset(ctx, x2 = false, y2 = false) {
     }
     return ctx;
 }
+
+
 function funct(n, ctx, translate=true) {
     if (translate) {
         // Translate x coordinate 
         n -= ctx.red_line_start_x;
-        if (ctx.len_nwd) {
-            n -= Math.floor(n / 7) * ctx.len_nwd + ctx.mods[n % 7];
+        if (ctx.nwd.length) {
+            n -= Math.floor(n / 7) * ctx.nwd.length + ctx.mods[n % 7];
         }
-        if (n > ctx.return_y_cutoff) {
+        if (n >= ctx.return_y_cutoff) {
             return ctx.y;
-        } else if (n < ctx.return_0_cutoff) {
+        } else if (n <= ctx.return_0_cutoff) {
             return ctx.red_line_start_y;
         }
     }
+    ctx.min_work_time_funct_round = ctx.min_work_time ? Math.ceil(ctx.min_work_time / ctx.funct_round) * ctx.funct_round : ctx.funct_round;
     if (ctx.funct_round < ctx.min_work_time && (!ctx.a && ctx.b < ctx.min_work_time_funct_round || ctx.a && (ctx.a > 0) === (n < ctx.cutoff_to_use_round))) {
         // Get translated y coordinate
         var output = ctx.min_work_time_funct_round * Math.round(n * (ctx.a * n + ctx.b) / ctx.min_work_time_funct_round);
@@ -281,13 +285,12 @@ function funct(n, ctx, translate=true) {
     } else {
         var output = ctx.funct_round * Math.round(n * (ctx.a * n + ctx.b) / ctx.funct_round);
     }
-    if (ctx.remainder_mode && output) {
-        output += ctx.y_fremainder;
-    }
     // Return untranslated y coordinate
     // No point in untranslating x coordinate
     return output + ctx.red_line_start_y;
 }
+
+
 function calc_mod_days(ctx) {
     let mods = [0],
         mod_counter = 0;

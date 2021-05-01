@@ -65,13 +65,16 @@ header.animate::after {
     right: 40px;
     position: absolute;
 }
-#advanced-options * {
+#advanced-options > * {
+    user-select: none;
     display: block;
     padding: 6px;
     font-size: 15px;
+    text-align: right;
 }
-#advanced-options *:hover, #advanced-options *:focus {
+#advanced-options > *:hover, #advanced-options > *:focus {
     background: gray;
+    outline: 0;
 }
 #hide-button {
     position: relative;
@@ -187,6 +190,7 @@ header.animate::after {
     -o-text-overflow: ellipsis;
        text-overflow: ellipsis;
     -webkit-line-clamp: 4;
+    white-space: pre;
 }
 .button {
     position: absolute;
@@ -289,13 +293,22 @@ canvas:focus {
     left: 50%;
     transform: translateX(-50%);
 }
-.skew-ratio-button, .skew-ratio-textbox, .display-button {
+.skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
     position: absolute;
     left: 0;
     z-index: 1;
 }
+.display-button, .hide-assignment-button, .next-assignment-button {
+    position: absolute;
+    right: 0;
+}
+.skew-ratio-textbox, .submit-work-button, .hide-assignment-button {
+    margin: 7px 0;
+}
 .skew-ratio-textbox {
     width: 146px;
+    /* Position it behind info button */
+    z-index: 0;
 }
 input[type=number]::-webkit-inner-spin-button {
     cursor: pointer;
@@ -309,13 +322,7 @@ input[type=number]::-webkit-inner-spin-button {
 input[type=number].translate-left::-webkit-inner-spin-button {
     transform: translateX(-23px);
 }
-.fixed-mode-button, .remainder-mode-button, .hide-assignment-button {
-    position: absolute;
-    right: 0;
-}
-.skew-ratio-textbox, .submit-work-button, .remainder-mode-button {
-    margin: 7px 0;
-}
+
 
 #form-wrapper input:focus, #form-wrapper label:focus {
     outline: 0;

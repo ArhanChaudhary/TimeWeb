@@ -8,7 +8,7 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
-    sort = function(params /* autofill_override */) {
+    sort = function(params={}) {
         if (dat.length === 0) return;
         
         let ordli = [],
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // also on todo: remove elses
 
             // Load in data
-            let { ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start, remainder_mode } = selected_assignment;
+            let { ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start } = selected_assignment;
             ad = parseDate(ad + " 00:00");
             x = Math.round((parseDate(x + " 00:00") - ad) / 86400000);
             ad = new Date(ad);
@@ -37,13 +37,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 const context = {
                     x: x,
                     y: y,
-                    len_nwd: len_nwd,
                     nwd: nwd,
                     assign_day_of_week: assign_day_of_week,
-                    y_mod_funct_round: y_mod_funct_round,
                     funct_round: funct_round,
                     min_work_time: min_work_time,
-                    min_work_time_funct_round: min_work_time_funct_round,
                     ignore_ends_mwt: ignore_ends_mwt,
 
                     // wCon: wCon,
@@ -55,28 +52,24 @@ document.addEventListener("DOMContentLoaded", function() {
                     red_line_start_y: red_line_start_y,
                     skew_ratio: skew_ratio,
                     mods: mods,
-                    remainder_mode: remainder_mode,
                 }
                 return pset(context, x2, y2);
             }
             function c_funct(n, translate) {
                 const context = {
                     red_line_start_x: red_line_start_x,
-                    len_nwd: len_nwd,
                     mods: mods,
                     return_y_cutoff: return_y_cutoff,
                     y: y,
+                    nwd: nwd,
                     return_0_cutoff: return_0_cutoff,
                     red_line_start_y: red_line_start_y,
                     funct_round: funct_round,
                     min_work_time: min_work_time,
                     a: a,
                     b: b,
-                    min_work_time_funct_round: min_work_time_funct_round,
                     cutoff_to_use_round: cutoff_to_use_round,
                     cutoff_transition_value: cutoff_transition_value,
-                    remainder_mode: remainder_mode,
-                    y_mod_funct_round: y_mod_funct_round,
                 }
                 return funct(n, context, translate);
             }
@@ -102,19 +95,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 min_work_time = funct_round * 2;
             }
             let len_works = works.length - 1,
-                y_mod_funct_round = (y - red_line_start_y) % funct_round,
+                lw = works[len_works],
                 ignore_ends_mwt = ignore_ends && min_work_time,
-                len_nwd = nwd.length,
-                unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute",
-                min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round;
-            let due_date = new Date(ad.valueOf());
-            due_date.setDate(due_date.getDate() + x);
+                unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute";
             let mods,
                 assign_day_of_week = ad.getDay();
-            if (len_nwd) {
+            if (nwd.length) {
                 mods = c_calc_mod_days();
             }
-            let lw = works[len_works];
             let a, b, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
 
@@ -135,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 status_value = 5;
             } else if (lw >= y || x - daysleft < 1) {
-                status_message = '*\u3000You have Finished this Assignment!';
+                status_message = '&#9733;\u3000You have Finished this Assignment!';
                 status_value = 6;
                 if (-(x - daysleft)) {
                     strdaysleft = `${-(x - daysleft)}d Ago`;
@@ -143,9 +131,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     strdaysleft = "Today";
                 }
             } else {
-                if (today_minus_dac > len_works) {
+                if (today_minus_dac > len_works && !params.do_not_autofill) {
                     let has_autofilled = false;
-                    for (i = 0; i < today_minus_dac-len_works; i++) {
+                    const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
+                    for (i = 0; i < number_of_forgotten_days; i++) {
                         if (has_autofilled) {
                             todo = c_funct(len_works+dif_assign+1) - lw;
                         }
@@ -161,8 +150,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             if (!fixed_mode) {
                                 red_line_start_x = dynamic_start;
                                 red_line_start_y = works[red_line_start_x - dif_assign];
-                                y_mod_funct_round = (y - red_line_start_y) % funct_round;
-                                if (len_nwd) {
+                                if (nwd.length) {
                                     mods = c_calc_mod_days();
                                 }
                                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
@@ -171,23 +159,25 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     if (has_autofilled) {
                         selected_assignment.dynamic_start = dynamic_start;
+                        SendAttributeAjax("works", works.map(String), selected_assignment.id);
+                        SendAttributeAjax("dynamic_start", dynamic_start, selected_assignment.id);
                         todo = c_funct(len_works+dif_assign+1) - lw;
                     }
                 }
                 daysleft = x - daysleft;
                 if (today_minus_dac > len_works && len_works + dif_assign < x) {
-                    status_message = '?\u3000Whoops! You have not Entered in your Work Completed from Previous Days!';
+                    status_message = '?\u3000  You have not Entered in your past Work Inputs!';
                     status_value = 1;
                 } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(new Date().getDay()) && daysleft !== 1) {
-                    status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment for Today. Keep it up!';
+                    status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment for Today';
                     status_value = 4;
                 } else {
                     status_value = 3;
                     if (assignmentIsInProgress()) {
                         status_message = "@\u3000This Assignment's Daily Work is in Progress!";
                         todo = c_funct(len_works+dif_assign) - lw;
-                    } else if (len_works > 0 && (lw - works[-2]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - works[-2]) {
-                        status_message = '!\u3000Warning! You are behind your Work schedule!';
+                    } else if (len_works && (lw - works[len_works - 1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - works[len_works - 1]) {
+                        status_message = '!\u3000 Warning! You are behind your Work schedule!';
                     } else {
                         status_message = "\u2718\u3000This Assignment's Daily Work is Unfinished!";
                     }
@@ -196,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     } else {
                         status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} Today`;
                     }
-                    total += Math.ceil(todo*ctime);                    
+                    total += Math.ceil(todo*ctime);
                 }
                 if (daysleft === 1) {
                     strdaysleft = 'Tomorrow';
@@ -205,10 +195,17 @@ document.addEventListener("DOMContentLoaded", function() {
                         status_value = 2;
                     }
                 } else if (daysleft < 7) {
+                    const due_date = new Date(ad.valueOf());
+                    due_date.setDate(due_date.getDate() + x);
                     strdaysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {
                     strdaysleft = `${daysleft}d`;
                 }
+            }
+            if (status_value === 6) {
+                $(".assignment-container").eq(index).addClass("finished");
+            } else {
+                $(".assignment-container").eq(index).removeClass("finished");
             }
             let status_priority;
             if ([1,5,6].includes(status_value)) {
@@ -217,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 skew_ratio = 1;
                 red_line_start_x = dif_assign;
                 red_line_start_y = works[0];
-                if (len_nwd) {
+                if (nwd.length) {
                     mods = c_calc_mod_days();
                 }
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
@@ -247,10 +244,9 @@ document.addEventListener("DOMContentLoaded", function() {
             ordli.push([status_value, -status_priority, index]);
             $(".status").eq(index).html(status_message);
             $(".title").eq(index).attr("data-daysleft", strdaysleft);
-
-        });   
+        });
     }
-    sort({autofill_override: false});
+    sort();
     // Returns color rgb from priority percentage
     function color(p) {
         return `rgb(${132+94*p},${200-109*p},${65+15*p})`;

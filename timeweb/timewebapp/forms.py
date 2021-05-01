@@ -18,7 +18,6 @@ class TimewebForm(forms.ModelForm):
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),
-            'remainder_mode': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Page, Paragraph, Question"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),

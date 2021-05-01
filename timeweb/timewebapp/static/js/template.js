@@ -178,24 +178,12 @@ $(function() {
         });
     }
     $("#nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
-    $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly"));
+    $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly")).css("text-decoration", "line-through");
     $("#nav-about").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
-    $("#nav-keybinds").click(() => alert("This feature has not yet been implemented")).css("text-decoration", "line-through");
     $("#account-settings").click(() => alert("Please contact me to change your account settings"));
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
-
-    info_button_handler = function(_, run=true) {
-        if (run) {
-            if ($(this).data("is_showing")) {
-                $(this).data("is_showing", false).trigger('blur', false);
-            } else {
-                $(this).data("is_showing", true);
-            }
-        }
-        return false;
-    }
 });
 // Info tooltip
 (function($) {
@@ -204,6 +192,7 @@ $(function() {
         if (window.show_info_buttons === false && !("first_login" in sessionStorage) && !this.parents("#form-wrapper").length) {
             info_button.css("display", "none");
         }
+        info_button.on('click blur', info_button_handler);
         switch (position) {
             case "prepend":
                 return info_button.prependTo(this);
@@ -212,5 +201,15 @@ $(function() {
             default:
                 return info_button.appendTo(this);
         }
+    }
+    function info_button_handler(_, run=true) {
+        if (run) {
+            if ($(this).data("is_showing")) {
+                $(this).data("is_showing", false).trigger('blur', false);
+            } else {
+                $(this).data("is_showing", true);
+            }
+        }
+        return false;
     }
 }(jQuery));

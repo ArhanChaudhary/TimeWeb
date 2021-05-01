@@ -36,7 +36,6 @@ $(function() {
         
         This is recommended to be enabled`
     );
-    $(".info-button").on('click blur', info_button_handler);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val()||0);
     });

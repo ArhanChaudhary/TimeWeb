@@ -8,11 +8,11 @@
 {{ settings_model|json_script:"settings-model" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
+<script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/parabola.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
 <script src="{% static 'js/form.js' %}"></script>
-<script src="{% static 'js/utils.js' %}"></script>
 {% endblock js %}
 {% block content %}
   <div id="overlay">
@@ -65,7 +65,7 @@
         <div id="advanced-options">
           <span id="open-assignments" tabindex="0">Open all assignments</span>
           <span id="close-assignments" tabindex="0">Close all assignments</span>
-          {% comment %} <span id="autofill-assignments" tabindex="0">Autofill no work done</span> {% endcomment %}
+          <span id="autofill-assignments" tabindex="0">Autofill no work done</span>
           <span id="delete-assignments" tabindex="0">Delete all completed<br>assignments</span>
           <span id="re-enable-tutorial" tabindex="0">Re-enable tutorial</span>
         </div>
@@ -82,7 +82,7 @@
                 <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
-            <p class="status">Nice Job! You are Finished with this Assignment for Today. Keep it up!</p>
+            <p class="status"></p>
             <button class="button update-button">
               <img width="20" height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </button>
@@ -95,17 +95,17 @@
               <canvas class="fixed-graph"></canvas>
               <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
-                <button class="skew-ratio-button">Set skew ratio using graph</button>
+                <button class="skew-ratio-button">Set skew ratio using Graph</button>
                 <input class="total-work-input-button" placeholder="Enter total units done"/>
-                <button class="fixed-mode-button"></button>
+                <button class="display-button">Display in Text</button>
                 <br>
                 <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
-                <button class="submit-work-button">Submit work input</button>
-                <button class="remainder-mode-button"></button>
+                <button class="submit-work-button">Submit work Input</button>
+                <button class="hide-assignment-button">Hide Assignment</button>
                 <br>
-                <button class="display-button">Display work schedule in text</button>
-                <button class="delete-work-input-button">Delete last work input</button>
-                <button class="hide-assignment-button">Hide assignment</button>
+                <button class="fixed-mode-button"></button>
+                <button class="delete-work-input-button">Delete last work Input</button>              
+                <button class="next-assignment-button">Next Assignment</button>
               </div>
             </div>
           </div>

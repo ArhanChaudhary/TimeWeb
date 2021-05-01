@@ -79,7 +79,7 @@
     z-index: -2;
     opacity: 0;
     top: 75px; /* Override flexbox */
-    animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
+    /* animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade; */
     animation-fill-mode: forwards;
 }
 #login span {
@@ -129,6 +129,16 @@ label {
 #beta-message a:visited {
     text-decoration: none;
     color: blue;
+}
+#discord_promo {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: flex;
+    font-size: 13px;
+    align-items: center;
+    text-decoration: none;
+    color: black;
 }
 #submit-button {
     width: 100%;

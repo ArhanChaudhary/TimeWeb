@@ -95,7 +95,7 @@ $(function() {
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
-        selected_assignment.nwd.forEach(nwd => $("#id_nwd_"+(nwd+6)%7).prop("checked",true));
+        selected_assignment.nwd.forEach(nwd => $("#id_nwd_"+(+nwd+6)%7).prop("checked", true));
         // Set button pk
         $("#submit-assignment-button").val(selected_assignment.id);
         // Show form
@@ -169,7 +169,6 @@ $(function() {
     $('label[for="id_funct_round"]').info('right',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     );
-    $("#form-wrapper .info-button").on('click blur', info_button_handler);
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
     // Auto field scrolling
@@ -303,7 +302,8 @@ $(function() {
                     const selected_assignment_index = $(".assignment-container").index(assignment_container);
                     let data = {
                         'csrfmiddlewaretoken': csrf_token,
-                        'deleted': dat[selected_assignment_index].id, // Primary key value
+                        'action': 'delete_assignment',
+                        'assignments': [dat[selected_assignment_index].id], // Primary key value
                     }
                     const success = function() {
                         const assignment = assignment_container.children().first();
@@ -331,6 +331,7 @@ $(function() {
                         gtag("event","delete_assignment");
                     }
                     // Send ajax to avoid a page reload
+                    data['assignments'] = JSON.stringify(data['assignments']);
                     $.ajax({
                         type: "POST",
                         data: data,

@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseServerError
 from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
@@ -153,7 +153,6 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model = self.form.save(commit=False)
                     selected_model.skew_ratio = SettingsModel.objects.get(user__username=request.user).def_skew_ratio
                     selected_model.fixed_mode = False
-                    selected_model.remainder_mode = False
                     adone = d(selected_model.works)
                     selected_model.user = get_user_model().objects.get(username=request.user)
                 else: # Handle "update"
@@ -175,16 +174,14 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.nwd = self.form.cleaned_data.get("nwd")
                 date_now = timezone.localtime(timezone.now()).date()
                 if create_assignment:
-                    if date_now >= selected_model.ad:
-                        selected_model.dif_assign = (date_now-selected_model.ad).days
-                    else:  
+                    selected_model.dif_assign = (date_now-selected_model.ad).days
+                    if selected_model.dif_assign < 0:
                         selected_model.dif_assign = 0
                     selected_model.dynamic_start = selected_model.dif_assign
                 else:
-                    if date_now < old_data.ad or old_data.dif_assign + (old_data.ad-selected_model.ad).days < 0:
+                    selected_model.dif_assign = old_data.dif_assign + (old_data.ad-selected_model.ad).days
+                    if date_now < old_data.ad or selected_model.dif_assign < 0:
                         selected_model.dif_assign = 0
-                    else:
-                        selected_model.dif_assign = old_data.dif_assign + (old_data.ad-selected_model.ad).days
                     
                 if not selected_model.funct_round:
                     selected_model.funct_round = 1
@@ -216,33 +213,35 @@ class TimewebListView(LoginRequiredMixin, View):
                         else:
                             x_num = (selected_model.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - adone)/selected_model.funct_round
                     x_num = floor(x_num)
-                    if selected_model.nwd:
-                        len_nwd = len(selected_model.nwd)
-                        if len_nwd == 7:
-                            x_num = 1
-                        else:
-                            guess_x = 7*floor(x_num/(7-len_nwd) - 1) - 1
-                            assign_day_of_week = selected_model.ad.weekday()
-                            red_line_start_x = selected_model.dif_assign
-
-                            # set_mod_days()
-                            xday = assign_day_of_week + red_line_start_x
-                            mods = [0]
-                            mod_counter = 0
-                            for mod_day in range(6):
-                                if (xday + mod_day) % 7 in selected_model.nwd:
-                                    mod_counter += 1
-                                mods.append(mod_counter)
-                            mods = tuple(mods)
-
-                            while 1:
-                                guess_x += 1
-                                if guess_x - guess_x // 7 * len_nwd - mods[guess_x % 7] == x_num:
-                                    x_num = guess_x
-                                    break
-                    elif not x_num:
-                        # x can sometimes be zero
+                    if not x_num or len(selected_model.nwd) == 7:
                         x_num = 1
+                    if selected_model.nwd:
+                        guess_x = 7*floor(x_num/(7-len(selected_model.nwd)) - 1) - 1
+                        assign_day_of_week = selected_model.ad.weekday()
+                        red_line_start_x = selected_model.dif_assign
+
+                        # set_mod_days()
+                        xday = assign_day_of_week + red_line_start_x
+                        mods = [0]
+                        mod_counter = 0
+                        for mod_day in range(6):
+                            if (xday + mod_day) % 7 in selected_model.nwd:
+                                mod_counter += 1
+                            mods.append(mod_counter)
+                        mods = tuple(mods)
+
+                        while 1:
+                            guess_x += 1
+                            if guess_x - guess_x // 7 * len(selected_model.nwd) - mods[guess_x % 7] == x_num:
+                                x_num = guess_x
+                                break
+                    # Make sure assignments arent finished by x_num
+                    # x_num = date_now+timedelta(x_num) - min(date_now, selected_model.ad)
+                    if selected_model.ad < date_now:
+                        # x_num = (date_now + timedelta(x_num) - selected_model.ad).days
+                        # x_num = (date_now - selected_model.ad).days + x_num
+                        # x_num += (date_now - selected_model.ad).days
+                        x_num += (date_now - selected_model.ad).days
                 else:
                     x_num = (selected_model.x - selected_model.ad).days
                 if selected_model.min_work_time != None:
@@ -251,7 +250,6 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.works = [str(selected_model.works)] # Same as str(adone)
                 else:
                     # If the reentered assign date cuts off some of the work inputs, adjust the work inputs accordingly
-
                     removed_works_end = len(old_data.works) - 1
 
                     # If the reentered due date cuts off some of the work inputs, remove the work input for the last day because that must complete assignment
@@ -293,61 +291,42 @@ class TimewebListView(LoginRequiredMixin, View):
                     self.context['invalid_form_pk'] = pk
                     self.context['submit'] = 'Modify Assignment'
             self.context['form'] = self.form
-        else:
-            for key, value in request.POST.items():
-                # Really badly optimized
-                
-                # User deleted assignment
-                if key == "deleted":
-                    selected_model = get_object_or_404(TimewebModel, pk=value)
+        elif request.POST['action'] == 'delete_assignment':
+            assignments = json.loads(request.POST['assignments'])
+            for pk in assignments:
+                selected_model = get_object_or_404(TimewebModel, pk=int(pk))
+                if request.user != selected_model.user:
+                    logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
+                    return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
+                selected_model.delete()
+                logger.info(f'User \"{request.user}\" deleted assignment "{selected_model.file_sel}"')
+        elif request.POST['action'] == 'save_assignment':
+            assignments = json.loads(request.POST['assignments'])
+            for assignment in assignments:
+                selected_model = get_object_or_404(TimewebModel, pk=assignment['pk'])
+                del assignment['pk']
+                for key, value in assignment.items():
+                    if key == "skew_ratio":
+                        forbidden_log_message = f"User \"{request.user}\" cannot update the skew ratio for an assignment that isn't their's"
+                        forbidden_client_message = "The assignment you are trying to update isn't yours"
+                        log_message = f'User \"{request.user}\" saved skew ratio for assignment "{selected_model.file_sel}"'             
+                    elif key == 'fixed_mode':
+                        forbidden_log_message = f"User \"{request.user}\" cannot update the fixed mode for an assignment that isn't their's"
+                        forbidden_client_message = "The assignment you are trying to update isn't yours"
+                        log_message = f'User \"{request.user}\" saved fixed mode for assignment "{selected_model.file_sel}"'
+                    elif key == 'works' or key == 'dynamic_start':
+                        forbidden_log_message = f"User \"{request.user}\" cannot modify works for an assignment that isn't their's"
+                        forbidden_client_message = "The assignment you are trying to modify work inputs isn't yours"
+                        log_message = f'User \"{request.user}\" modified works for assignment "{selected_model.file_sel}"'
                     if request.user != selected_model.user:
-                        logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
-                    selected_model.delete()
-                    logger.info(f'User \"{request.user}\" deleted assignment "{selected_model.file_sel}"')
-                # User updated skew ratio for assignment
-                elif key == "skew_ratio":
-                    selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
-                    if request.user != selected_model.user:
-                        logger.warning(f"User \"{request.user}\" cannot update the skew ratio for an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying to update isn't yours")
-                    selected_model.skew_ratio = value
+                        logger.warning(forbidden_log_message)
+                        return HttpResponseForbidden(forbidden_client_message)
+                    setattr(selected_model, key, value)
+                    logger.info(log_message)
+                try:
                     selected_model.save()
-                    logger.info(f'User \"{request.user}\" saved skew ratio for assignment "{selected_model.file_sel}"')
-                # User updated remainder mode for assignment
-                elif key == "remainder_mode":
-                    selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
-                    if request.user != selected_model.user:
-                        logger.warning(f"User \"{request.user}\" cannot update the remainder mode for an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying to update isn't yours")
-                    selected_model.remainder_mode = value == "true"
-                    selected_model.save()
-                    logger.info(f'User \"{request.user}\" saved remainder mode for assignment "{selected_model.file_sel}"')
-                # User updated fixed mode for an assignment               
-                elif key == 'fixed_mode':
-                    selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
-                    if request.user != selected_model.user:
-                        logger.warning(f"User \"{request.user}\" cannot update the fixed mode for an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying to update isn't yours")
-                    selected_model.fixed_mode = value == "true"
-                    selected_model.save()
-                    logger.info(f'User \"{request.user}\" saved fixed mode for assignment "{selected_model.file_sel}"')
-                elif key == 'works[]':
-                    selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
-                    if request.user != selected_model.user:
-                        logger.warning(f"User \"{request.user}\" cannot add work inputs for an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying to add work inputs isn't yours")
-                    selected_model.works = request.POST.getlist(key)
-                    selected_model.save()
-                    logger.info(f'User \"{request.user}\" added work input for assignment "{selected_model.file_sel}"')
-                elif key == 'dynamic_start':
-                    selected_model = get_object_or_404(TimewebModel, pk=request.POST['pk'])
-                    if request.user != selected_model.user:
-                        logger.warning(f"User \"{request.user}\" cannot change the dynamic start for an assignment that isn't their's")
-                        return HttpResponseForbidden("The assignment you are trying change the start of the red line isn't yours")
-                    selected_model.dynamic_start = value
-                    logger.info(f'User \"{request.user}\" changed the dynamic start for assignment "{selected_model.file_sel}"')
-                    selected_model.save()
+                except NameError:
+                    pass
         self.make_list(request)
         return render(request, "index.html", self.context)
 

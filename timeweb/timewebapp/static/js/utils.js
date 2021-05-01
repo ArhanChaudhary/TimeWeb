@@ -3,7 +3,6 @@ This file includes the code for:
 
 Loading in load data
 Advanced options
-Keybinds
 Ajax error function
 Other minor utilities
 
@@ -20,7 +19,7 @@ if ( window.history.replaceState ) {
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 ({warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login} = JSON.parse(document.getElementById("settings-model").textContent));
 def_nwd = def_nwd.map(Number);
-for (selected_assignment of dat) {
+for (let selected_assignment of dat) {
     selected_assignment.works = selected_assignment.works.map(Number);
 }
 // cite
@@ -58,10 +57,43 @@ document.addEventListener("DOMContentLoaded", function() {
         location.reload();
     });
     $("#delete-assignments").click(function() {
-        alert("This feature has not yet been implented");
-    }).css("text-decoration","line-through");
-    $("#autofill-assignments")//.info('left',`Autofills no work done for every assignment with incomplete past work inputs until today`);
-    // Keybinds
+        if (confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure you want to delete these?`)) {
+            const finished_assignments = $(".assignment-container").map(function(index) {
+                if ($(this).hasClass("finished")) {
+                    return dat[index].id
+                } else {
+                    return undefined
+                }
+            }).toArray();
+            let data = {
+                'csrfmiddlewaretoken': csrf_token,
+                'action': 'delete_assignment',
+                'assignments': finished_assignments,
+            }
+            const success = function() {
+                $(".finished").remove();
+                for (let i = 0; i < finished_assignments.length; i++) {
+                    gtag("event","delete_assignment");
+                }
+            }
+            // Send ajax to avoid a page reload
+            $.ajax({
+                type: "POST",
+                data: data,
+                success: success,
+                error: error,
+            });
+        }
+    });
+    $("#autofill-assignments").click(function() {
+        console.log("hi");
+        sort({autofill_override: true});
+        $(window).trigger("resize");
+    }).info("left",
+    `This only applies to every assignment you have not entered past work inputs for
+
+    Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend").css("left",-2);
+    // Keybind
     form_is_showing = false;
     $(document).keydown(function(e) {
         if (!form_is_showing && e.shiftKey /* shiftKey eeded if the user presses caps lock */ && e.key === 'N') {
@@ -96,6 +128,53 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             $("html").html(response.responseText);
         }
+    }
+    let ajaxTimeout,
+        data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'save_assignment',
+            'assignments': [],
+        };
+
+    SendAttributeAjax = function(key, value, pk) {
+        // Add key and value the data going to be sent
+        // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
+        let selected_assignment;
+        for (let assignment of data['assignments']) {
+            if (assignment.pk === pk) {
+                selected_assignment = assignment;
+            }
+        }
+        if (!selected_assignment) {
+            selected_assignment = {pk: pk};
+            data['assignments'].push(selected_assignment);
+        }
+        selected_assignment[key] = value;
+        clearTimeout(ajaxTimeout);
+        ajaxTimeout = setTimeout(function() {
+            const success = function() {
+                gtag("event","save_assignment");
+            }
+            // Send data along with the assignment's primary key
+
+            // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
+            // However, I decided to skip this check and still send the ajax
+            // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
+            // Plus, a pointless ajax of this sort won't happen frequently, and will have a minimal impact on the server's performance
+            data['assignments'] = JSON.stringify(data['assignments']);
+            $.ajax({
+                type: "POST",
+                data: data,
+                success: success,
+                error: error,
+            });
+            // Reset data
+            data = {
+                'csrfmiddlewaretoken': csrf_token,
+                'action': 'save_assignment',
+                'assignments': [],
+            }
+        }, 1000);
     }
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
@@ -141,6 +220,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 });
+
 // Lock to landscape
 if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape');
