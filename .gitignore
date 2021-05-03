@@ -74,6 +74,7 @@ gcldeployment.md
 original_favicon.png
 Original splash screens
 .gcloudignore
+TODO.md
 
 # Flask stuff:
 instance/
