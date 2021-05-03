@@ -1,9 +1,14 @@
 /* 
 This file includes the code for:
 
-Loading in load data
+Preventing submitting form on refresh
+Parsing date on safari
+Resolving a promise passed to a scroll function that determines when a scroll ends
+Hide button
 Advanced options
-Ajax error function
+Sending attribute AJAX
+Preserving page state before refresh
+Setting up the tutorial
 Other minor utilities
 
 This only runs on index.html
@@ -19,8 +24,8 @@ if ( window.history.replaceState ) {
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 ({warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login} = JSON.parse(document.getElementById("settings-model").textContent));
 def_nwd = def_nwd.map(Number);
-for (let selected_assignment of dat) {
-    selected_assignment.works = selected_assignment.works.map(Number);
+for (let sa of dat) {
+    sa.works = sa.works.map(Number);
 }
 // cite
 // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
@@ -32,6 +37,27 @@ function parseDate(date) {
     }
     return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
 }
+function load_assignment_data($assignment) {
+    return dat.find(assignment => assignment.file_sel === $assignment.attr("data-assignment-name"));
+}
+// Make these global because other files use scroll()
+let scrollTimeout;
+function scroll(resolver) {
+    clearTimeout(scrollTimeout);
+    // Runs when scroll ends
+    scrollTimeout = setTimeout(function() {
+        $("main").off('scroll');
+        // Resolves promise from the scope it is called in
+        resolver();
+    }, 200);
+}
+function displayClock() {
+    console
+    let estimated_completion_time = new Date();
+    estimated_completion_time.setMinutes(estimated_completion_time.getMinutes() + +$("#estimated-total-time").attr("data-minutes"));
+    $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
+}
+setInterval(displayClock, 1000);
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -39,30 +65,31 @@ document.addEventListener("DOMContentLoaded", function() {
     // Hide and show estimated completion time
     $("#hide-button").click(function() {
         if ($(this).html() === "Hide") {
-            $(this).html("Show").prev().toggle();
+            $(this).html("Show");
             localStorage.setItem("hide-button", true);
         } else {
-            $(this).html("Hide").prev().toggle();
+            $(this).html("Hide");
             localStorage.removeItem("hide-button");
         }
+        $("#estimated-total-time, #current-time, #tomorrow-time").toggle();
     });
     if ("hide-button" in localStorage) {
         $("#hide-button").html("Show").prev().toggle();
     }
-    $("#open-assignments").click(() => $(".assignment:not(.disable-hover)").click());
-    $("#close-assignments").click(() => $(".assignment.disable-hover").click());
+    $("#open-assignments").click(() => $(".assignment:not(.open-assignment)").click());
+    $("#close-assignments").click(() => $(".assignment.open-assignment").click());
     $("#re-enable-tutorial").click(function() {
         sessionStorage.setItem("first_login", true);
         sessionStorage.removeItem("open_assignments");
         location.reload();
     });
     $("#delete-assignments").click(function() {
-        if (confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure you want to delete these?`)) {
-            const finished_assignments = $(".assignment-container").map(function(index) {
+        if (isMobile ? confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure?`) : confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure? (Press enter)`)) {
+            const finished_assignments = $(".assignment-container").map(function() {
                 if ($(this).hasClass("finished")) {
-                    return dat[index].id
+                    return load_assignment_data($(this).children().first()).id;
                 } else {
-                    return undefined
+                    return undefined;
                 }
             }).toArray();
             let data = {
@@ -75,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 for (let i = 0; i < finished_assignments.length; i++) {
                     gtag("event","delete_assignment");
                 }
+                sort();
             }
             // Send ajax to avoid a page reload
             $.ajax({
@@ -86,11 +114,12 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     $("#autofill-assignments").click(function() {
-        console.log("hi");
-        sort({autofill_override: true});
-        $(window).trigger("resize");
+        if (confirm("This will autofill no work done until today for every assignment with missing work inputs. Are you sure?")) {
+            sort({autofill_override: true});
+            $(window).trigger("resize");
+        }
     }).info("left",
-    `This only applies to every assignment you have not entered past work inputs for
+    `This applies to every assignment you have not entered past work inputs for
 
     Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend").css("left",-2);
     // Keybind
@@ -139,17 +168,17 @@ document.addEventListener("DOMContentLoaded", function() {
     SendAttributeAjax = function(key, value, pk) {
         // Add key and value the data going to be sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-        let selected_assignment;
+        let sa;
         for (let assignment of data['assignments']) {
             if (assignment.pk === pk) {
-                selected_assignment = assignment;
+                sa = assignment;
             }
         }
-        if (!selected_assignment) {
-            selected_assignment = {pk: pk};
-            data['assignments'].push(selected_assignment);
+        if (!sa) {
+            sa = {pk: pk};
+            data['assignments'].push(sa);
         }
-        selected_assignment[key] = value;
+        sa[key] = value;
         clearTimeout(ajaxTimeout);
         ajaxTimeout = setTimeout(function() {
             const success = function() {
@@ -182,8 +211,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!("first_login" in sessionStorage)) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
-                $(".assignment.disable-hover").map(function() {
-                    return $(".assignment-container").index($(this).parent())
+                $(".assignment.open-assignment").map(function() {
+                    return $(this).find(".title").text()
                 }).toArray()
             ));
         }
@@ -194,12 +223,10 @@ document.addEventListener("DOMContentLoaded", function() {
     document.fonts.ready.then(function() {
         // Reopen closed assignments
         if ("open_assignments" in sessionStorage) {
-            JSON.parse(sessionStorage.getItem("open_assignments")).forEach(index => 
-                // Pretends created assignment isn't there to preserve index
-                $(".assignment-container").filter(function() { 
-                    return !$(this).is("#animate-in")
-                }).eq(index).children().first().click()
-            );
+            const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+            $(".title").filter(function() {
+                return open_assignments.includes($(this).text())
+            }).parents(".assignment").click();
         }
         // Scroll to original position
         // Needs to be here so it scrolls after assignments are opened
@@ -214,13 +241,23 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     if ("first_login" in sessionStorage) {
         if ($(".assignment-container").length) {
-            $(".assignment-container").first().append("<span>Click your assignment<br></span>")
+            $(".assignment-container").first().append("<span>Click your assignment<br></span>");
         } else {
-            $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this tool.<br><br>Create your first school or work assignment to get started");
+            $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
         }
     }
 });
-
+function format_minutes(total_minutes) {
+    const hour = Math.floor(total_minutes / 60),
+        minute = Math.ceil(total_minutes % 60);
+    if (hour === 0) {
+        return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
+    } else if (minute === 0) {
+        return hour + "h";
+    } else {
+        return hour + "h " + minute + "m";
+    }
+}
 // Lock to landscape
 if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('landscape');

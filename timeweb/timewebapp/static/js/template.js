@@ -136,10 +136,6 @@ $(function() {
     // cite
     // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
     isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    // Hides "Press enter" on mobile
-    if (isMobile) {
-        $("#form-wrapper #bottom-note").hide();
-    }
     // cite
     // https://web.dev/customize-install/
     let prompt;
@@ -180,7 +176,7 @@ $(function() {
     $("#nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly")).css("text-decoration", "line-through");
     $("#nav-about").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
-    $("#account-settings").click(() => alert("Please contact me to change your account settings"));
+    $("#account-settings").click(() => alert("Please contact me regarding your account settings"));
     // Deals with selecting the parent element when tabbing into the nav
     $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));

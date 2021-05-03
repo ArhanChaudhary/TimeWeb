@@ -13,17 +13,6 @@ This only runs on index.html
 //
 
 $(function() {
-    function format_minutes(total_minutes) {
-        const hour = Math.floor(total_minutes / 60),
-            minute = Math.ceil(total_minutes % 60);
-        if (hour === 0) {
-            return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
-        } else if (minute === 0) {
-            return hour + "h";
-        } else {
-            return hour + "h " + minute + "m";
-        }
-    }
     // scale and font_size is the same for every graph
     let scale, // resolution of the graph
         font_size, // font size of the central text in the graph
@@ -49,7 +38,7 @@ $(function() {
             let assignment = $(this);
             const graph_container = assignment.find(".graph-container"),
                 not_first_click = assignment.data('not_first_click');
-            if (graph_container.attr("style") && assignment.hasClass("disable-hover")) {
+            if (graph_container.attr("style") && assignment.hasClass("open-assignment")) {
                 // Runs when assignment is clicked while open
 
                 // Animate the graph's margin bottom to close the assignment
@@ -65,9 +54,9 @@ $(function() {
                 // Begin arrow animation
                 this.querySelector(".fallingarrowanimation").beginElement();
                 // Make assignment overflow hidden 
-                assignment.removeClass("disable-hover").css("overflow", "hidden");
+                assignment.removeClass("open-assignment").css("overflow", "hidden");
                 // If no graphs are open, allow arrow scroll
-                if ($(".disable-hover").length === 0) {
+                if ($(".open-assignment").length === 0) {
                     $(document).off("keydown", PreventArrowScroll);
                 }
             } else {
@@ -79,7 +68,7 @@ $(function() {
                     "margin-bottom": ""
                 });
                 // Prevents auto scroll if a graph is open
-                if ($(".disable-hover").length === 0) {
+                if ($(".open-assignment").length === 0) {
                     $(document).keydown(PreventArrowScroll);
                 }
                 // Make graph visible
@@ -87,15 +76,12 @@ $(function() {
                 let graph = this.querySelector('.graph'),
                     fixed_graph = this.querySelector('.fixed-graph');
                 // Disable hover
-                assignment.addClass("disable-hover");
+                assignment.addClass("open-assignment");
                 // Animate arrow
                 this.querySelector(".risingarrowanimation").beginElement();
-
-                // Select the assignment data in dat
-                // dat[0] is the settings and "$assignments-container :first child" is the assignments-container-header div, these cancel each other out when indexing
-                let selected_assignment = dat[$(".assignment-container").index(assignment.parents(".assignment-container"))];
-                // Load in data
-                let { ad, x, unit, y, works, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd, fixed_mode, dynamic_start } = selected_assignment;
+                let sa = load_assignment_data(assignment);
+                // Load in static data
+                let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
@@ -110,8 +96,8 @@ $(function() {
                 nwd = nwd.map(Number);
                 // dynamic start is already an int
                 
-                let red_line_start_x = fixed_mode ? 0 : dynamic_start, // X-coordinate of the start of the red line
-                    red_line_start_y = fixed_mode ? 0 : works[red_line_start_x - dif_assign]; // Y-coordinate of the start of the red line
+                let red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start, // X-coordinate of the start of the red line
+                    red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - dif_assign]; // Y-coordinate of the start of the red line
                 // Not sure if these if stataments are actually needed (except for the last one), but I included them in the original program, and there doesnt seem to be any harm
                 // Caps values
                 if (funct_round > y - red_line_start_y) {
@@ -128,9 +114,8 @@ $(function() {
                 } else if (funct_round < min_work_time && min_work_time < 2 * funct_round) {
                     min_work_time = funct_round * 2;
                 }
-                let len_works = works.length - 1,
-                    day = len_works,
-                    lw = works[len_works],
+                let len_works = sa.works.length - 1,
+                    lw = sa.works[len_works],
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only when min_work_time is also enabled
                     set_skew_ratio = false, // Bool to manually set skew ratio on graph
                     unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute",
@@ -175,7 +160,7 @@ $(function() {
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                 const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay());
-                day -= assignmentIsInProgress();
+                day = len_works - assignmentIsInProgress();
                 function c_pset(x2, y2) {
                     const context = {
                         x: x,
@@ -266,7 +251,7 @@ $(function() {
                             if (mouse_x < red_line_start_x) {
                                 mouse_y = true;
                             } else {
-                                mouse_y = Math.abs(mouse_y - c_funct(mouse_x)) > Math.abs(mouse_y - works[mouse_x - dif_assign]);
+                                mouse_y = Math.abs(mouse_y - c_funct(mouse_x)) > Math.abs(mouse_y - sa.works[mouse_x - dif_assign]);
                             }
                         } else {
                             mouse_y = false;
@@ -379,9 +364,9 @@ $(function() {
                     for (let point = 0; point < line_end; point += Math.ceil(1 / wCon)) {
                         circle_x = (point + dif_assign) * wCon + 50;
                         if (point > len_works) {
-                            circle_y = height - works[len_works] * hCon - 50;
+                            circle_y = height - sa.works[len_works] * hCon - 50;
                         } else {
-                            circle_y = height - works[point] * hCon - 50;
+                            circle_y = height - sa.works[point] * hCon - 50;
                         }
                         screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
                         screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
@@ -395,7 +380,7 @@ $(function() {
                     if (actually_draw_point) {
                         let funct_mouse_x;
                         if (mouse_y) {
-                            funct_mouse_x = works[mouse_x - dif_assign];
+                            funct_mouse_x = sa.works[mouse_x - dif_assign];
                         } else {
                             funct_mouse_x = c_funct(mouse_x).toFixed(6).replace(/\.?0*$/, '');
                         }
@@ -423,7 +408,7 @@ $(function() {
                     screen.fillStyle = "black";
                     screen.textBaseline = "top";
                     screen.font = '13.75px Open Sans';
-                    screen.fillText(fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
+                    screen.fillText(sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
                     screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, width-2, height-138+move_info_down);
 
                     const daysleft = x - today_minus_ad;
@@ -487,22 +472,22 @@ $(function() {
                         screen.fillText(todo_message, 50+(width-50)/2, row_height*4);
                         screen.fillText(`${pluralize(unit)} already Completed: ${lw}/${y}`, 50+(width-50)/2, row_height*5);
                         if (today_minus_ad < 0) {
-                            screen.fillText("This Assignment has Not Yet been Assigned!", 50+(width-50)/2, row_height*8);
+                            screen.fillText("This Assignment has Not Yet been Assigned", 50+(width-50)/2, row_height*8);
                         } else if (distance_today_from_displayed_day > 0) {
-                            screen.fillText("You have not Entered in your Work from Previous Days!", 50+(width-50)/2, row_height*8);
+                            screen.fillText("You have not Entered your Work from Previous Days", 50+(width-50)/2, row_height*8);
                             screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*9);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || new Date(displayed_day.toDateString()) > new Date(new Date().toDateString())) {
                             if (displayed_day.toDateString() === new Date().toDateString()) {
-                                screen.fillText("You have Completed your Work for Today!", 50+(width-50)/2, row_height*9);
+                                screen.fillText("You have Completed your Work for Today", 50+(width-50)/2, row_height*9);
                             } else {
-                                screen.fillText("You have Completed your Work for this Day!", 50+(width-50)/2, row_height*9);
+                                screen.fillText("You have Completed your Work for this Day", 50+(width-50)/2, row_height*9);
                             }
-                        } else if (len_works && !assignmentIsInProgress() && (lw - works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - works[len_works-1]) {
+                        } else if (len_works && !assignmentIsInProgress() && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
                             screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*8);
                             screen.fillText("You are Behind Schedule!", 50+(width-50)/2, row_height*9);
                         }
                     } else {
-                        screen.fillText('Amazing Effort! You have Finished this Assignment!', 50+(width-50)/2, row_height*7);
+                        screen.fillText('You have Finished this Assignment!', 50+(width-50)/2, row_height*7);
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }
@@ -685,9 +670,7 @@ $(function() {
                         const offset = $(fixed_graph).offset();
                         if (set_skew_ratio) {
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
-                            day = len_works;
-                            // Subtract day by one if assignment is in progress
-                            day -= assignmentIsInProgress();
+                            day = len_works - assignmentIsInProgress();
                         }
                         // Passes in mouse x and y to draw, explained later
                         draw(e.pageX - offset.left, e.pageY - offset.top);
@@ -711,12 +694,11 @@ $(function() {
                             }
                         }
                         ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                        day = len_works;
-                        day -= assignmentIsInProgress();
+                        day = len_works - assignmentIsInProgress();
                         // Save skew ratio and draw
-                        selected_assignment.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+                        sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         old_skew_ratio = skew_ratio;
-                        SendAttributeAjax('skew_ratio', skew_ratio, selected_assignment.id);
+                        SendAttributeAjax('skew_ratio', skew_ratio, sa.id);
                         draw();
                     }
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
@@ -784,9 +766,9 @@ $(function() {
                             // stop set skew ratio if canvas is clicked
                             $(this).next().find(".skew-ratio-button").onlyText("Set skew ratio using graph").off("click", cancel_sr);
                             // Save skew ratio
-                            selected_assignment.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+                            sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            SendAttributeAjax('skew_ratio', skew_ratio, selected_assignment.id);
+                            SendAttributeAjax('skew_ratio', skew_ratio, sa.id);
                             // Disable mousemove
                             if (!draw_point) {
                                 $(this).off("mousemove");
@@ -853,24 +835,23 @@ $(function() {
                                 input_done = 0;
                             }
                             if (rem_work) {
-                                works[len_works] = input_done;
+                                sa.works[len_works] = input_done;
                                 len_works -= 1;
                             } else {
-                                works.push(input_done);
+                                sa.works.push(input_done);
                             }
                             lw = input_done;
                             len_works++;
                             if (input_done !== todo) {
                                 if (len_works + dif_assign === x) {
-                                    dynamic_start = len_works + dif_assign - 1;
+                                    sa.dynamic_start = len_works + dif_assign - 1;
                                 } else {
-                                    dynamic_start = len_works + dif_assign;
+                                    sa.dynamic_start = len_works + dif_assign;
                                 }
-                                selected_assignment.dynamic_start = dynamic_start;
-                                SendAttributeAjax("dynamic_start", dynamic_start, selected_assignment.id);
-                                if (!fixed_mode) {
-                                    red_line_start_x = dynamic_start;
-                                    red_line_start_y = works[dynamic_start - dif_assign];
+                                SendAttributeAjax("dynamic_start", sa.dynamic_start, sa.id);
+                                if (!sa.fixed_mode) {
+                                    red_line_start_x = sa.dynamic_start;
+                                    red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
                                     if (nwd.length) {
                                         mods = c_calc_mod_days();
                                     }
@@ -878,14 +859,10 @@ $(function() {
                                     ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                                 }
                             }
-                            SendAttributeAjax("works", works.map(String), selected_assignment.id);
-                            day = len_works;
-                            day -= assignmentIsInProgress();
+                            SendAttributeAjax("works", sa.works.map(String), sa.id);
+                            day = len_works - assignmentIsInProgress();
                             sort();
                             draw();
-                            if (lw >= y) {
-                                alert("Finish!\nYou have completed this assignment, good job!");
-                            }
                         } else {
                             alert("Please wait until this is assigned");
                         }
@@ -894,22 +871,19 @@ $(function() {
 
                     // BEGIN Fixed/dynamic mode button
                     fixed_mode_button.click(function() {
-                        fixed_mode = !fixed_mode;
-                        selected_assignment.fixed_mode = fixed_mode; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        $(this).onlyText(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                        SendAttributeAjax('fixed_mode', fixed_mode, selected_assignment.id);
-                        if (fixed_mode) {
+                        sa.fixed_mode = !sa.fixed_mode;
+                        $(this).onlyText(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+                        SendAttributeAjax('fixed_mode', sa.fixed_mode, sa.id);
+                        if (sa.fixed_mode) {
                             // Set start of red line and pset()
                             red_line_start_x = 0;
                             red_line_start_y = 0;
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                             // Day needs to be set in case it was subtracted by one
-                            day = len_works;
-                            // Subtract day by one if assignment is in progress
-                            day -= assignmentIsInProgress();
+                            day = len_works - assignmentIsInProgress();
                         } else {
-                            red_line_start_x = dynamic_start;
-                            red_line_start_y = works[red_line_start_x - dif_assign];
+                            red_line_start_x = sa.dynamic_start;
+                            red_line_start_y = sa.works[red_line_start_x - dif_assign];
                             day = len_works;
                             // No need to pset()
                             // Caps dynamic start at x, wouldn't make sense for todo to be shown for the day on the due date
@@ -922,7 +896,7 @@ $(function() {
                         }
                         sort();
                         draw();
-                    }).html(fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+                    }).html(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
                     // END Fixed/dynamic mode button
 
                     // BEGIN Skew ratio textbox
@@ -959,9 +933,9 @@ $(function() {
                         $(this).val('');
                         if (old_skew_ratio !== undefined) {
                             // Save skew ratio
-                            selected_assignment.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+                            sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            SendAttributeAjax('skew_ratio', skew_ratio, selected_assignment.id);
+                            SendAttributeAjax('skew_ratio', skew_ratio, sa.id);
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
@@ -981,29 +955,29 @@ $(function() {
                             if (!assignmentIsInProgress()) {
                                 day--;
                             }
-                            works.pop();
+                            sa.works.pop();
                             len_works--;
-                            lw = works[len_works];
+                            lw = sa.works[len_works];
 
                             // If the deleted work input cut the dynamic start, run this
                             // Reverses the logic of work inputs in and recursively decreases red_line_start_x
                             if (red_line_start_x > len_works + dif_assign) {
                                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
                                 outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign; red_line_start_x--) {
-                                    red_line_start_y = works[red_line_start_x - dif_assign];
+                                    red_line_start_y = sa.works[red_line_start_x - dif_assign];
                                     if (nwd.length) {
                                         mods = c_calc_mod_days();
                                     }
                                     set_skew_ratio_lim();
                                     ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than that red_line_start_x
+                                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
                                     let next_funct = c_funct(red_line_start_x),
-                                        next_work = works[red_line_start_x - dif_assign];
+                                        next_work = sa.works[red_line_start_x - dif_assign];
                                     for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
                                         const this_funct = next_funct,
                                             this_work = next_work;
                                         next_funct = c_funct(i + 1),
-                                        next_work = works[i - dif_assign + 1];
+                                        next_work = sa.works[i - dif_assign + 1];
                                         // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
                                         if (next_funct - this_funct !== next_work - this_work) {
                                             red_line_start_x++;
@@ -1011,19 +985,18 @@ $(function() {
                                         }
                                     }
                                 }
-                                if (red_line_start_x < 0) {
-                                    red_line_start_x = 0;
+                                if (red_line_start_x < dif_assign) {
+                                    red_line_start_x = dif_assign;
                                 }
-                                red_line_start_y = works[red_line_start_x - dif_assign];
+                                red_line_start_y = sa.works[red_line_start_x - dif_assign];
                                 if (nwd.length) {
                                     mods = c_calc_mod_days();
                                 }
                                 set_skew_ratio_lim();
-                                dynamic_start = red_line_start_x;
-                                selected_assignment.dynamic_start = dynamic_start;
-                                SendAttributeAjax("dynamic_start", dynamic_start, selected_assignment.id)
+                                sa.dynamic_start = red_line_start_x;
+                                SendAttributeAjax("dynamic_start", sa.dynamic_start, sa.id)
                             }
-                            SendAttributeAjax("works", works.map(String), selected_assignment.id);
+                            SendAttributeAjax("works", sa.works.map(String), sa.id);
                             sort({do_not_autofill: true});
                             draw();
                         }
@@ -1044,7 +1017,7 @@ $(function() {
                             assignment.click();
                         }
                         // Only open next assignment if closed
-                        if (!next_assignment.hasClass("disable-hover")) {     
+                        if (!next_assignment.hasClass("open-assignment")) {     
                             next_assignment.click();
                         }
                     });
@@ -1079,7 +1052,7 @@ $(function() {
                         Dynamic mode (default):
                         In this mode, if you fail to complete the specified amount of work for any day, the graph will change itself to start at your last work input, adapting to your work schedule
 
-                        This mode is recommended if you can't keep up with an assignment's work schedule. It's easy to fall behind with this mode, so be careful`,"prepend"
+                        This mode is recommended if you can't keep up with an assignment's work schedule. It's easy to fall behind with this mode, so be careful`
                     ).children().first().css({
                         fontSize: 11,
                         lineHeight: "11px",
@@ -1093,12 +1066,21 @@ $(function() {
                     // END Info buttons
                 }
                 function resize() {
-                    if (assignment.hasClass("disable-hover") && assignment.is(":visible")) {
-                        // If autofilled by $(window).trigger("resize")
-                        len_works = works.length - 1;
-                        day = len_works;
-                        day -= assignmentIsInProgress();
-                        lw = works[len_works];
+                    // If autofilled by $(window).trigger("resize")
+                    len_works = sa.works.length - 1;
+                    if (!sa.fixed_mode) {
+                        red_line_start_x = sa.dynamic_start;
+                        red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
+                        if (nwd.length) {
+                            mods = c_calc_mod_days();
+                        }
+                        set_skew_ratio_lim();
+                        ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                    }
+                    day = len_works - assignmentIsInProgress();
+                    lw = sa.works[len_works];
+                    
+                    if (assignment.hasClass("open-assignment") && assignment.is(":visible")) {
                         drawfixed();
                         draw();
                     }

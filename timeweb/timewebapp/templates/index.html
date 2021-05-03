@@ -5,6 +5,8 @@
 {% endblock css %}
 {% block js %}
 {{ assignment_models|json_script:"assignment-models" }}
+{% comment %} 
+[{"id": 143, "file_sel": "Math \"homework\"", "ad": "2021-04-22", "x": "2021-05-07", "unit": "maths problem", "y": "71.00", "works": ["0", "0", "0", "0", "0", "0", "0", "0", "0"], "dif_assign": 0, "skew_ratio": "1.0000000000", "ctime": "5.00", "funct_round": "1.00", "min_work_time": null, "nwd": ["4", "0"], "fixed_mode": false, "dynamic_start": 7, "user_id": 7}] {% endcomment %}
 {{ settings_model|json_script:"settings-model" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
@@ -22,7 +24,6 @@
         <div id="new-title-line"></div>
         <div id="new-title">New Assignment</div>
         <div id="top-note">* optional</div>
-        <div id="bottom-note">Tip: keep pressing tab</div>
         {% csrf_token %}
         {% for field in form.visible_fields %}
           <p>
@@ -53,7 +54,7 @@
   <div id="assignments-container">
     <div id="assignments-header">
       <div id="info">
-        Estimated completion time: <span>1h 24m</span>
+        Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
       <div id="advanced" tabindex="0">
@@ -73,7 +74,7 @@
     </div>
     {% for obj in objlist %}
       <div class="assignment-container" {% if obj.file_sel == request.session.added_assignment %}id="animate-in"{% elif obj.file_sel == request.session.reentered_assignment %}id="animate-color"{% endif %}>
-        <div class="assignment" tabindex="0">
+        <div class="assignment" data-assignment-name="{{ obj.file_sel }}" tabindex="0">
           <div class="assignment-header">
             <span class="title" data-daysleft="1d">{{ obj.file_sel }}</span>
             <svg width="30px" height="20px" class="arrow-container">
@@ -82,7 +83,10 @@
                 <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
-            <p class="status"></p>
+            <p class="status">
+              <span class="status-message"></span>
+              <span class="completion-time"></span>
+            </p>
             <button class="button update-button">
               <img width="20" height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </button>

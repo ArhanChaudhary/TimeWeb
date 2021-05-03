@@ -212,10 +212,10 @@ class TimewebListView(LoginRequiredMixin, View):
                             x_num = (selected_model.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - adone)/ceil(ceil(selected_model.min_work_time/selected_model.funct_round)*selected_model.funct_round)
                         else:
                             x_num = (selected_model.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - adone)/selected_model.funct_round
-                    x_num = floor(x_num)
+                    x_num = ceil(x_num)
                     if not x_num or len(selected_model.nwd) == 7:
                         x_num = 1
-                    if selected_model.nwd:
+                    elif selected_model.nwd:
                         guess_x = 7*floor(x_num/(7-len(selected_model.nwd)) - 1) - 1
                         assign_day_of_week = selected_model.ad.weekday()
                         red_line_start_x = selected_model.dif_assign
@@ -233,7 +233,7 @@ class TimewebListView(LoginRequiredMixin, View):
                         while 1:
                             guess_x += 1
                             if guess_x - guess_x // 7 * len(selected_model.nwd) - mods[guess_x % 7] == x_num:
-                                x_num = guess_x
+                                x_num = max(1, guess_x)
                                 break
                     # Make sure assignments arent finished by x_num
                     # x_num = date_now+timedelta(x_num) - min(date_now, selected_model.ad)

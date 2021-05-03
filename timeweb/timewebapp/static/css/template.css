@@ -21,7 +21,8 @@ header {
     padding: 5px;
     position: absolute;
     z-index: 2;
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
 }
 header::after {
     content: '';
@@ -30,10 +31,13 @@ header::after {
     width: 100%;
     height: 20px;
     position: absolute;
-    box-shadow: 0 3px 7px rgb(13, 26, 38);
+    -webkit-box-shadow: 0 3px 7px rgb(13, 26, 38);
+            box-shadow: 0 3px 7px rgb(13, 26, 38);
     background: rgb(13, 26, 38);
     z-index: -1;
-    transform: translateY(-20px);
+    -webkit-transform: translateY(-20px);
+        -ms-transform: translateY(-20px);
+            transform: translateY(-20px);
 }
 #image-new-container {
     cursor: pointer;
@@ -60,8 +64,10 @@ header::after {
 main {
     height: 100vh;
     padding: 80px 30px 0 30px;
-    box-shadow: inset 20px 0 0 0 gray, inset -20px 0 0 0 gray;
-    box-sizing: border-box;
+    -webkit-box-shadow: inset 20px 0 0 0 gray, inset -20px 0 0 0 gray;
+            box-shadow: inset 20px 0 0 0 gray, inset -20px 0 0 0 gray;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
 }
 #logo-container {
     display: inline-block;
@@ -94,8 +100,8 @@ body {
     text-decoration: none;
     display: inline-block;
     padding: 2px 2px 0 6px;
-    background: -webkit-gradient(linear,left top, left bottom,color-stop(20%, rgb(72, 227, 235)),color-stop(80%, rgb(83,127,163)));
     background: -o-linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
+    background: -webkit-gradient(linear,left top, left bottom,color-stop(20%, rgb(72, 227, 235)),color-stop(80%, rgb(83,127,163)));
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -113,17 +119,26 @@ body {
     z-index: 500;
     border: 2px solid rgb(22, 177, 185);
     border-radius: 4px;
+    -webkit-transition: -webkit-transform .2s cubic-bezier(.5,-3,.5,4);
+    transition: -webkit-transform .2s cubic-bezier(.5,-3,.5,4);
+    -o-transition: transform .2s cubic-bezier(.5,-3,.5,4);
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
+    transition: transform .2s cubic-bezier(.5,-3,.5,4), -webkit-transform .2s cubic-bezier(.5,-3,.5,4);
 }
 #user-greeting #username:focus {
     outline: 0;
 }
 #user-greeting #username:focus::after {
-    filter: brightness(1.25);
-    transform: scale(1.04);
+    -webkit-filter: brightness(1.25);
+            filter: brightness(1.25);
+    -webkit-transform: scale(1.04);
+        -ms-transform: scale(1.04);
+            transform: scale(1.04);
 }
 #user-greeting #username:hover::after {
-    transform: scale(1.04);
+    -webkit-transform: scale(1.04);
+        -ms-transform: scale(1.04);
+            transform: scale(1.04);
 }
 
 
@@ -131,7 +146,9 @@ body {
     display: block;
 }
 #account-dropdown {
-    transform: translate(50%, 16px);
+    -webkit-transform: translate(50%, 16px);
+        -ms-transform: translate(50%, 16px);
+            transform: translate(50%, 16px);
     right: 50%;
     width: 150px;
     position: absolute;
@@ -148,7 +165,9 @@ body {
     border-color: transparent transparent rgb(43, 56, 68) transparent;
     bottom: 100%;
     left: 50%;
-    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+            transform: translateX(-50%);
     position: absolute;
 }
 #account-dropdown * {
@@ -192,14 +211,18 @@ nav {
     opacity: 0;
     width: 100%;
     height: 100%;
+    -webkit-transition: opacity .2s ease-in-out;
+    -o-transition: opacity .2s ease-in-out;
     transition: opacity .2s ease-in-out;
     z-index: -1;
 }
 #nav-items::after {
-    box-shadow: 0 0 4px 2px black;
+    -webkit-box-shadow: 0 0 4px 2px black;
+            box-shadow: 0 0 4px 2px black;
 }
 #nav-menu::after {
-    box-shadow: -5px 0 5px -5px gray;
+    -webkit-box-shadow: -5px 0 5px -5px gray;
+            box-shadow: -5px 0 5px -5px gray;
 }
 #nav-menu {
     background: rgb(13,26,38);
@@ -275,7 +298,17 @@ nav.open #nav-menu::after {
 }
 .info-button:focus .info-button-text {
     display: block;
-    animation: .2s ease-in-out 1 fadeIn;
+    -webkit-animation: .2s ease-in-out 1 fadeIn;
+            animation: .2s ease-in-out 1 fadeIn;
+}
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+        
+    }
 }
 @keyframes fadeIn {
     from {
@@ -295,7 +328,8 @@ nav.open #nav-menu::after {
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.75);
             box-shadow: 0 0 5px rgba(0,0,0,0.75);
     border-radius: 5px !important;
-    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+            box-shadow: none !important;
     border: 2px solid black;
     display: none;
     cursor: auto;
@@ -309,19 +343,27 @@ nav.open #nav-menu::after {
 }
 .info-button-text.info-right {
     left: calc(100% + 14px);
-    transform: translateY(-50%) translateY(-7px);
+    -webkit-transform: translateY(-50%) translateY(-7px);
+        -ms-transform: translateY(-50%) translateY(-7px);
+            transform: translateY(-50%) translateY(-7px);
 }
 .info-button-text.info-left {
     right: calc(100% + 14px);
-    transform: translateY(-50%) translateY(-7px);
+    -webkit-transform: translateY(-50%) translateY(-7px);
+        -ms-transform: translateY(-50%) translateY(-7px);
+            transform: translateY(-50%) translateY(-7px);
 }
 .info-button-text.info-top {
     bottom: calc(100% + 14px);
-    transform: translateX(-50%) translateX(11px);
+    -webkit-transform: translateX(-50%) translateX(11px);
+        -ms-transform: translateX(-50%) translateX(11px);
+            transform: translateX(-50%) translateX(11px);
 }
 .info-button-text.info-bottom {
     top: calc(100% + 14px);
-    transform: translateX(-50%) translateX(7px);
+    -webkit-transform: translateX(-50%) translateX(7px);
+        -ms-transform: translateX(-50%) translateX(7px);
+            transform: translateX(-50%) translateX(7px);
 }
 .info-button-text::after {
     position: absolute;
@@ -333,28 +375,36 @@ nav.open #nav-menu::after {
     content: "";
     right: calc(100% + 1px);
     top: 50%;
-    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
     border-color: transparent black transparent transparent;
 }
 .info-button-text.info-left::after {
     content: "";
     left: calc(100% + 1px);
     top: 50%;
-    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
     border-color: transparent transparent transparent black;
 }
 .info-button-text.info-top::after {
     content: "";
     top: calc(100% + 1px);
     right: 50%;
-    transform: translateX(50%);
+    -webkit-transform: translateX(50%);
+        -ms-transform: translateX(50%);
+            transform: translateX(50%);
     border-color: black transparent transparent transparent;
 }
 .info-button-text.info-bottom::after {
     content: "";
     bottom: calc(100% + 1px);
     right: 50%;
-    transform: translateX(50%);
+    -webkit-transform: translateX(50%);
+        -ms-transform: translateX(50%);
+            transform: translateX(50%);
     border-color: transparent transparent black transparent;
 }
 
@@ -374,7 +424,10 @@ nav.open #nav-menu::after {
     border: 1px solid green;
     border-radius: 5px;
     padding: 4px;
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
     -webkit-transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
     transition: -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
     -o-transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
@@ -387,7 +440,9 @@ nav.open #nav-menu::after {
             transform: scale(1.04);
 }
 #nwd-wrapper .nwd-label:active {
-    transform: translateY(1px);
+    -webkit-transform: translateY(1px);
+        -ms-transform: translateY(1px);
+            transform: translateY(1px);
 }
 /* open-sans 600 */
 @font-face {

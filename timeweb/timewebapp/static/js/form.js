@@ -80,24 +80,24 @@ $(function() {
         $("#new-title").html("Re-enter Assignment");
         $("#submit-assignment-button").html("Modify Assignment");
         // Find which assignment in dat was clicked
-        const selected_assignment = dat[$(".assignment-container").index($(this).parents(".assignment-container"))];
+        const sa = load_assignment_data($(this).parents(".assignment"));
         // Reentered form fields
         const form_data = [
-            selected_assignment.file_sel,
-            selected_assignment.ad,
-            selected_assignment.x,
-            selected_assignment.unit,
-            +selected_assignment.y,
-            +selected_assignment.works[0],
-            +selected_assignment.ctime,
-            selected_assignment.funct_round-1 ? +selected_assignment.funct_round : '', // Displays as self if it isn't 1, else display nothing
-            +selected_assignment.min_work_time||'',
+            sa.file_sel,
+            sa.ad,
+            sa.x,
+            sa.unit,
+            +sa.y,
+            +sa.works[0],
+            +sa.ctime,
+            sa.funct_round-1 ? +sa.funct_round : '', // Displays as self if it isn't 1, else display nothing
+            +sa.min_work_time||'',
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
-        selected_assignment.nwd.forEach(nwd => $("#id_nwd_"+(+nwd+6)%7).prop("checked", true));
+        sa.nwd.forEach(nwd => $("#id_nwd_"+(+nwd+6)%7).prop("checked", true));
         // Set button pk
-        $("#submit-assignment-button").val(selected_assignment.id);
+        $("#submit-assignment-button").val(sa.id);
         // Show form
         showForm();
     });
@@ -291,24 +291,23 @@ $(function() {
                     });
                 }, 0);
                 // The scroll function determines when the page has stopped scrolling and internally resolves the promise via "resolver"
-                resolver = resolve;
-                $("main").scroll(scroll);
-                scroll();
+                $("main").scroll(() => scroll(resolve));
+                scroll(resolve);
             }).then(function() {
                 // Deny updating or deleting again after queued
                 assignment_container.css("pointer-events", "none");
                 $(document).queue(function() {
                     // Once the assignment, is done, this sends the data to the backend and animates its deletion
-                    const selected_assignment_index = $(".assignment-container").index(assignment_container);
+                    const sa = load_assignment_data(assignment_container.children().first());
                     let data = {
                         'csrfmiddlewaretoken': csrf_token,
                         'action': 'delete_assignment',
-                        'assignments': [dat[selected_assignment_index].id], // Primary key value
+                        'assignments': [sa.id], // Primary key value
                     }
                     const success = function() {
                         const assignment = assignment_container.children().first();
                         new Promise(function(resolve) {
-                            if (assignment.hasClass("disable-hover")) {
+                            if (assignment.hasClass("open-assignment")) {
                                 ignore_queue = true;
                                 assignment.click().find(".graph-container").one("transitionend", resolve);
                                 ignore_queue = false;
@@ -321,11 +320,13 @@ $(function() {
                             // Animate height
                             assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                                 // Remove assignment data from dat
-                                dat.splice(selected_assignment_index, 1);
+                                dat = dat.filter(function(assignment) {
+                                    return sa.file_sel !== assignment.file_sel
+                                });
                                 // Remove from DOM
                                 assignment_container.remove();
-                                // Dequeue it
                                 $(document).dequeue();
+                                sort({ ignore_timeout: true });
                             });
                         });
                         gtag("event","delete_assignment");
@@ -352,7 +353,7 @@ $(function() {
     $.fn.onlyText = function(text) {
         $(this).contents().filter(function() {
             return this.nodeType === Node.TEXT_NODE;
-        }).first()[0].nodeValue = text
+        }).first()[0].nodeValue = text;
         return $(this);
     };
 }(jQuery));

@@ -4,16 +4,29 @@
 }
 /* Only perform box-shadow and transform transitions */
 main:not(.animate) {
+    -webkit-transition: -webkit-box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
+    transition: -webkit-box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
+    -o-transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
+    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15), -webkit-box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
 }
 header:not(.animate), header:not(.animate)::after {
+    -webkit-transition: -webkit-transform 1.7s cubic-bezier(.29,.81,.37,.99);
+    transition: -webkit-transform 1.7s cubic-bezier(.29,.81,.37,.99);
+    -o-transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
     transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
+    transition: transform 1.7s cubic-bezier(.29,.81,.37,.99), -webkit-transform 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #assignments-container:not(.animate) {
+    -webkit-transition: -webkit-transform 1.5s cubic-bezier(.29,.81,.37,.99);
+    transition: -webkit-transform 1.5s cubic-bezier(.29,.81,.37,.99);
+    -o-transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
+    transition: transform 1.5s cubic-bezier(.29,.81,.37,.99), -webkit-transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
 main.animate {
-    box-shadow: none;
+    -webkit-box-shadow: none;
+            box-shadow: none;
 }
 header.animate {
     -webkit-transform: translateY(-70px);
@@ -21,15 +34,22 @@ header.animate {
             transform: translateY(-70px);
 }
 header.animate::after {
-    transform: none;
+    -webkit-transform: none;
+        -ms-transform: none;
+            transform: none;
 }
 #assignments-container.animate {
-    transform: translateY(max(-400px, calc(-100% - 20px)));
+    -webkit-transform: translateY(max(-400px, calc(-100% - 20px)));
+        -ms-transform: translateY(max(-400px, calc(-100% - 20px)));
+            transform: translateY(max(-400px, calc(-100% - 20px)));
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
 #assignments-header {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
 }
 #info {
     display: inline;
@@ -47,7 +67,9 @@ header.animate::after {
     display: block;
 }
 #advanced-options {
-    transform: translateY(16px);
+    -webkit-transform: translateY(16px);
+        -ms-transform: translateY(16px);
+            transform: translateY(16px);
     right: -5px;
     z-index: 1;
     position: absolute;
@@ -66,7 +88,10 @@ header.animate::after {
     position: absolute;
 }
 #advanced-options > * {
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
     display: block;
     padding: 6px;
     font-size: 15px;
@@ -83,11 +108,18 @@ header.animate::after {
     background: none;
     border: 2px solid rgba(0,0,0,0.45);
     border-radius: 4px;
+    margin-right: 5px;
+}
+#tomorrow-time {
+    white-space: nowrap;
 }
 .assignment-container {
     position: relative;
     scroll-margin: 20px;
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 .assignment {
     -webkit-box-shadow: 0 0 4px rgb(115,115,115);
@@ -101,21 +133,33 @@ header.animate::after {
     border-radius: 5px;
     position: relative;
     width: 100%; /* Needed for when it becomes position: absolute during deletion */
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
+    -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
+    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
+}
+.assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
+    -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
+    -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
 }
 .assignment:focus, .button:focus {
     outline: 0;
     border: 2px solid rgb(0,95,204) !important;
 }
-.assignment:not(.disable-hover):hover {
-    transform: scale(var(--scale-percent),1.05);
+.assignment:not(.open-assignment):hover {
+    -webkit-transform: scale(var(--scale-percent),1.05);
+        -ms-transform: scale(var(--scale-percent),1.05);
+            transform: scale(var(--scale-percent),1.05);
     border-color: rgba(0,0,0,0.7);
     cursor: pointer;
-    box-shadow: 0 0 7px rgb(52,52,52);
+    -webkit-box-shadow: 0 0 7px rgb(52,52,52);
+            box-shadow: 0 0 7px rgb(52,52,52);
 }
 .assignment:focus {
-    box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
+    -webkit-box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
+            box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
 }
 .assignment::after {
     content: '';
@@ -127,10 +171,13 @@ header.animate::after {
     width: 100%;
     height: 100%;
     z-index: -1;
+    -webkit-transition: opacity .2s ease-in-out;
+    -o-transition: opacity .2s ease-in-out;
     transition: opacity .2s ease-in-out;
 }
-.assignment:not(:focus):not(.disable-hover):hover::after {
-    box-shadow: 0 0 7px rgb(52,52,52);
+.assignment:not(:focus):not(.open-assignment):hover::after {
+    -webkit-box-shadow: 0 0 7px rgb(52,52,52);
+            box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
 .assignment-header {
@@ -171,7 +218,9 @@ header.animate::after {
     content: attr(data-daysleft) !important;
     position: absolute;
     font-size: 0.7em;
-    transform: translateY(100%) translateY(5px);
+    -webkit-transform: translateY(100%) translateY(5px);
+        -ms-transform: translateY(100%) translateY(5px);
+            transform: translateY(100%) translateY(5px);
     left: 0;
 }
 .arrow-container {
@@ -180,30 +229,36 @@ header.animate::after {
     overflow: visible;
 }
 .status {
-    float: left;
     font-size: min(16.76px,calc(11px + 0.4vw));
     margin: 0;
-    margin-right: 80px;
-    overflow: hidden;
+    margin-right: 7px;
+    white-space: initial;
     display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -o-text-overflow: ellipsis;
-       text-overflow: ellipsis;
-    -webkit-line-clamp: 4;
-    white-space: pre;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+}
+.status-message {
+    margin-right: 6px;
+}
+.completion-time {
+    white-space: nowrap;
+    margin-left: auto;
 }
 .button {
-    position: absolute;
     background: -o-radial-gradient(circle, lightgray 40%, gray 100%);
     background: radial-gradient(circle, lightgray 40%, gray 100%);
     border: 2px solid rgb(80,80,80);
     border-radius: 50%;
-    top: 0;
-    bottom: 0;
-    margin: auto;
+    margin: -8px 0;
     cursor: pointer;
     height: 36px;
-    width: 36px;
+    min-width: 36px;
     padding: 0; /* Firefox */
 }
 .button:hover, .button:focus {
@@ -215,14 +270,15 @@ header.animate::after {
     background: radial-gradient(circle, white 55%, gray 100%);
 }
 .update-button {
-    right: 30px;
+    margin-left: auto;
+    margin-right: 4px;
+}
+.delete-button {
+    margin-right: -3px;
 }
 .update-button img {
     top: 2px;
     position: relative;
-}
-.delete-button {
-    right: -10px;
 }
 .delete-button img {
     top: 1.25px;
@@ -268,7 +324,8 @@ canvas:focus {
     cursor: pointer;
 }
 .graph-footer .info-button:focus {
-    box-shadow: none;
+    -webkit-box-shadow: none;
+            box-shadow: none;
 }
 .graph-footer {
     padding: 0 13px;
@@ -279,24 +336,27 @@ canvas:focus {
     border: none;
     padding: 3px 6px;
     background: rgba(219,219,219,0.9);
-    box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
+    -webkit-box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
+            box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
 .graph-footer *:focus {
     border-radius: 20px;
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
-    box-shadow: 0 0 0 3px rgb(0,95,204);
+    -webkit-box-shadow: 0 0 0 3px rgb(0,95,204);
+            box-shadow: 0 0 0 3px rgb(0,95,204);
 }
 .total-work-input-button, .submit-work-button, .delete-work-input-button  {
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+            transform: translateX(-50%);
 }
 .skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
     position: absolute;
     left: 0;
-    z-index: 1;
 }
 .display-button, .hide-assignment-button, .next-assignment-button {
     position: absolute;
@@ -320,7 +380,8 @@ input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
 input[type=number].translate-left::-webkit-inner-spin-button {
-    transform: translateX(-23px);
+    -webkit-transform: translateX(-23px);
+            transform: translateX(-23px);
 }
 
 
@@ -330,7 +391,8 @@ input[type=number].translate-left::-webkit-inner-spin-button {
             box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
 }
 #form-wrapper input:required {
-    box-shadow: none; /* Firefox */
+    -webkit-box-shadow: none;
+            box-shadow: none; /* Firefox */
 }
 #form-wrapper label::after {
     display: block;
@@ -352,11 +414,6 @@ label[for='id_ad']::after {
     position: absolute;
     left: 7px;
     top: 2px;
-}
-#form-wrapper #bottom-note {
-    text-align: center;
-    font-size: 10px;
-    font-style: italic;
 }
 #form-wrapper {
     width: min(100vw, 490px);
@@ -486,11 +543,6 @@ label[for='id_ad']::after {
     width: 100%;
     z-index: 4;
     display: none;
-}
-#animate-color .assignment, #animate-in .assignment {
-    -webkit-transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
-    -o-transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
-    transition: all .2s ease-in-out, opacity .1s ease-in-out, background 3s cubic-bezier(.29,.81,.37,.99);
 }
 
 
