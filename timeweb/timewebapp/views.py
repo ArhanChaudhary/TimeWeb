@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
@@ -71,9 +71,9 @@ class SettingsView(LoginRequiredMixin, View):
             settings_model.color_priority = self.form.cleaned_data.get("color_priority")
             settings_model.text_priority = self.form.cleaned_data.get("text_priority")
             settings_model.save()
+            logger.info(f'User \"{request.user}\" updated the settings page')
             return redirect("home")
         self.context['form'] = self.form
-        logger.info(f'User \"{request.user}\" updated the settings page')
         return render(request, "settings.html", self.context)
 class TimewebListView(LoginRequiredMixin, View):
     login_url = '/login/login/'
@@ -86,9 +86,6 @@ class TimewebListView(LoginRequiredMixin, View):
         self.context['objlist'] = self.objlist
         self.context['assignment_models'] = list(self.objlist.values())
         self.context['settings_model'] = model_to_dict(settings_model)
-        if settings_model.first_login == True:
-            settings_model.first_login = False
-            settings_model.save()
     def get(self,request):
         global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user \"{request.user}\"')
@@ -327,8 +324,12 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.save()
                 except NameError:
                     pass
-        self.make_list(request)
-        return render(request, "index.html", self.context)
+        elif request.POST['action'] == 'change_first_login':
+            settings_model = SettingsModel.objects.get(user__username=request.user)
+            settings_model.first_login = request.POST['first_login'] == "true"
+            settings_model.save()
+            logger.info(f"User \"{request.user}\" chaned their first login")
+        return HttpResponse(status=204)
 
 class ContactView(View):
     def get(self, request):

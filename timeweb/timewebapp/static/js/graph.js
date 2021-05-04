@@ -1088,7 +1088,7 @@ $(function() {
                 //
                 // End draw graph
                 //
-                if ("first_login" in sessionStorage) {
+                if (first_login) {
                     $(".assignment").next().remove(); // Remove "Click this assignment"
                     setTimeout(function() {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
@@ -1101,11 +1101,12 @@ $(function() {
                         }
                         alert("Once you add more assignments, they are prioritized based on their estimated completion times");
                         alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");
-                        sessionStorage.removeItem("first_login");
+                        first_login = false;
+                        send_tutorial_ajax();
                     }, 200);
                 }
                 // Makes input bigger for info button
-                if (show_info_buttons || "first_login" in sessionStorage) {
+                if (show_info_buttons || first_login) {
                     assignment.find(".total-work-input-button").css("width", 163);
                     // Position up/down input scroller
                     assignment.find(".skew-ratio-textbox").addClass("translate-left");

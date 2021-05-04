@@ -24,7 +24,6 @@ $(function() {
     }
     // Reset storages from index.js
     sessionStorage.removeItem("open_assignments");
-    sessionStorage.removeItem("first_login");
     localStorage.removeItem("scroll");
     $("#id_username").attr("placeholder", "Username");
     $("#id_password").attr("placeholder", "Password");

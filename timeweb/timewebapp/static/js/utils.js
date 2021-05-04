@@ -60,6 +60,19 @@ function displayClock() {
     $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
 }
 setInterval(displayClock, 1000);
+
+function send_tutorial_ajax() {
+    const data = {
+        'csrfmiddlewaretoken': csrf_token,
+        'action': 'change_first_login',
+        'first_login': first_login,
+    }
+    $.ajax({
+        type: "POST",
+        data: data,
+        error: error,
+    });
+}
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -81,9 +94,18 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#open-assignments").click(() => $(".assignment:not(.open-assignment)").click());
     $("#close-assignments").click(() => $(".assignment.open-assignment").click());
     $("#re-enable-tutorial").click(function() {
-        sessionStorage.setItem("first_login", true);
-        sessionStorage.removeItem("open_assignments");
-        location.reload();
+        if (!first_login) {
+            first_login = true;
+            sessionStorage.removeItem("open_assignments");
+            send_tutorial_ajax();
+
+            $("#close-assignments").click();
+            if ($(".assignment-container").length) {
+                $(".assignment-container").first().append("<span>Click your assignment<br></span>");
+            } else {
+                $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
+            }
+        }
     });
     $("#delete-assignments").click(function() {
         if (isMobile ? confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure?`) : confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure? (Press enter)`)) {
@@ -210,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
     $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() {
-        if (!("first_login" in sessionStorage)) {
+        if (!first_login) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
                 $(".assignment.open-assignment").map(function() {
@@ -237,11 +259,7 @@ document.addEventListener("DOMContentLoaded", function() {
             localStorage.removeItem("scroll");
         }
     });
-    // First login tutorial
     if (first_login) {
-        sessionStorage.setItem("first_login", true);
-    }
-    if ("first_login" in sessionStorage) {
         if ($(".assignment-container").length) {
             $(".assignment-container").first().append("<span>Click your assignment<br></span>");
         } else {
