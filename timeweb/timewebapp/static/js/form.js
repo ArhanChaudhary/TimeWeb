@@ -254,7 +254,7 @@ $(function() {
         } else {
             submitted = true;
             // Enable disabled field on submit so it's sent with post
-            $("#id_ctime").removeAttr("disabled");
+            $("#id_ctime, #id_funct_round").removeAttr("disabled");
             // JSON fields are picky with their number inputs, convert them to standard form
             if (+$("#id_works").val()) {
                 $("#id_works").val(+$("#id_works").val());

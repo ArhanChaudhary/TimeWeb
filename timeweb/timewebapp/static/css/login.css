@@ -95,7 +95,7 @@
 #image {
     margin: -10px;
     position: absolute;
-    height: 2944px;
+    height: 4316px;
     width: calc(100% - 40px);
     background-image: url(/static/images/scroller.png);
     background-size: 100%;

@@ -7,6 +7,9 @@ Ensuring the animation only occurs once
 
 This only runs on login.html
 */
+if (!window.gtag) {
+    function gtag() {};
+}
 gtag("event","logged_out");
 // Prevents submitting form on refresh
 // cite 

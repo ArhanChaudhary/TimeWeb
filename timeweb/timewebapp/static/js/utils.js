@@ -13,6 +13,9 @@ Other minor utilities
 
 This only runs on index.html
 */
+if (!window.gtag) {
+    function gtag() {};
+}
 gtag("event", "home");
 // Prevents submitting form on refresh
 // cite 
@@ -52,7 +55,6 @@ function scroll(resolver) {
     }, 200);
 }
 function displayClock() {
-    console
     let estimated_completion_time = new Date();
     estimated_completion_time.setMinutes(estimated_completion_time.getMinutes() + +$("#estimated-total-time").attr("data-minutes"));
     $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
@@ -95,14 +97,14 @@ document.addEventListener("DOMContentLoaded", function() {
             let data = {
                 'csrfmiddlewaretoken': csrf_token,
                 'action': 'delete_assignment',
-                'assignments': finished_assignments,
+                'assignments': JSON.stringify(finished_assignments),
             }
             const success = function() {
                 $(".finished").remove();
                 for (let i = 0; i < finished_assignments.length; i++) {
                     gtag("event","delete_assignment");
                 }
-                sort();
+                sort({ ignore_timeout: true });
             }
             // Send ajax to avoid a page reload
             $.ajax({
@@ -115,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     $("#autofill-assignments").click(function() {
         if (confirm("This will autofill no work done until today for every assignment with missing work inputs. Are you sure?")) {
-            sort({autofill_override: true});
+            sort({autofill_override: true, ignore_timeout: true});
             $(window).trigger("resize");
         }
     }).info("left",

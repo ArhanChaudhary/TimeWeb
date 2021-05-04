@@ -62,10 +62,15 @@ document.addEventListener("DOMContentLoaded", function() {
             $(document).dequeue();
         }
     }
-    let swapTimeout;
+    let sortTimeout;
     sort = function(params={}) {
-        clearTimeout(swapTimeout);
-        swapTimeout = setTimeout(function() {
+        clearTimeout(sortTimeout);
+        if (params.ignore_timeout) {
+            sort_without_timeout();
+        } else {
+            sortTimeout = setTimeout(sort_without_timeout, swap_duration);
+        }
+        function sort_without_timeout() {
             let ordered_assignments = [],
                 total = 0,
                 tomorrow_total = 0,
@@ -321,27 +326,22 @@ document.addEventListener("DOMContentLoaded", function() {
             }));
             for (let assignment of ordered_assignments) {
                 const sa = $(".assignment").eq(assignment[2]);
-                let priority = Math.max(1,Math.floor(assignment[1] / highest_priority * 100 + 1e-10));
-                if (assignment[0] === 4 || assignment[0] === 6) {
-                    priority = 0;
+                let priority;
+                if (assignment[0] === 1) {
+                    priority = NaN;
+                } else {
+                    priority = Math.max(1,Math.floor(assignment[1] / highest_priority * 100 + 1e-10));
                 }
                 if (assignment[0] === 2 || assignment[0] === 3) {
                     $(".title").eq(assignment[2]).attr("data-priority", `Priority: ${priority}%`);               
                 } else {
-                    $(".title").eq(assignment[2]).attr("data-priority", ""); 
+                    $(".title").eq(assignment[2]).attr("data-priority", "");
+                    if (assignment[0] === 4 || assignment[0] === 6 || assignment[0] === 5 /* Last part needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+                        priority = 0;
+                    }
                 }
                 const assignment_container = sa.parent();
                 if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
-                    // If the iterated assignment is the one that was created or modified, run this
-                    if ($("#animate-in").length) {
-                        // Set initial transition values for "#animate-in"
-                        assignment_container.css({
-                            // 20+ and -10 deals with top and bottom margins
-                            "top": 20+$("#assignments-container").offset().top + $("#assignments-container").height() - assignment_container.offset().top,
-                            "opacity": "0",
-                            "margin-bottom": -assignment_container.height()-10,
-                        });
-                    }
                     new Promise(function(resolve) {
                         $(window).one('load', function() {
                             // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     color_or_animate_assignment(sa, priority/100, false, params.first_sort);
                 }
             }
-            // Have this after above to preserve index on selected_assignment
+            // Have this after above to preserve index on sa
             for (let [index, assignment] of ordered_assignments.entries()) {
                 swap(index, assignment[2], params.first_sort);
                 ordered_assignments.find((sa) => sa[2] === index)[2] = assignment[2] // Adjust index of assignment that used to be there 
@@ -377,7 +377,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $("#estimated-total-time").html('Please enter your past inputs');
                 $("#current-time, #tomorrow-time").hide();
             } else if (!total) {
-                $("#estimated-total-time").html('You have Finished everything for Today!');
+                $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
                 $("#current-time, #tomorrow-time").hide();
                 $("#hide-button").css("visibility", "hidden"); // Preserve layout positioning
             } else {
@@ -387,12 +387,26 @@ document.addEventListener("DOMContentLoaded", function() {
                 $("#hide-button").css("visibility", "");
             }
             displayClock();
-        }, params.ignore_timeout ? 0 : swap_duration);
+        }
     }
     sort({ first_sort: true, ignore_timeout: true });
+    if ($("#animate-in").length) {
+        // Set initial transition values for "#animate-in"
+        // Needs to be after domswap or else "top" bugs about 
+        $("#animate-in").css({
+            // 20+ and -10 deals with top and bottom margins
+            "top": 20+$("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top,
+            "opacity": "0",
+            "margin-bottom": -$("#animate-in").height()-10,
+        });
+    }
     // Returns color rgb from priority percentagehd
     function color(p) {
-        return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
+        if (isNaN(p)) {
+            return "";
+        } else {
+            return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
+        } 
     }
     // 
     // Handles animating assignments that were just created or modified and coloring

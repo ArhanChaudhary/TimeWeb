@@ -1079,7 +1079,6 @@ $(function() {
                     }
                     day = len_works - assignmentIsInProgress();
                     lw = sa.works[len_works];
-                    
                     if (assignment.hasClass("open-assignment") && assignment.is(":visible")) {
                         drawfixed();
                         draw();
