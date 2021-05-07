@@ -23,7 +23,7 @@ class TimewebModel(models.Model):
     )
     ad = models.DateField(
         null=True,
-        verbose_name=_('Assignment Date'),
+        verbose_name=_('Date Assigned'),
     )
     x = models.DateField(
         null=True,
@@ -143,7 +143,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Display Priority with Color'),
     )
     text_priority = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_('Display Priority with Text'),
     )
     first_login = models.BooleanField(default=True)

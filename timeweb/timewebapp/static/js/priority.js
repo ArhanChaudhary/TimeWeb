@@ -8,7 +8,7 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
-    const swap_duration = 2000;
+    const swap_duration = 1000;
     swap = function(tar1_index, tar2_index, swap_instantly=false) {
         // Queues each swap
         if (tar1_index === tar2_index) return;
@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 tar1_height = tar1.height() + 10,
                 tar2_height = tar2.height() + 10; 
             // Deal with existing assingment margin
-            // Don't really know how this works but it makes the swap transition more smooth
             if (tar1_height > tar2_height) {
                 tar2.css("margin-top", 10);
             } else {
@@ -57,10 +56,78 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!swap_instantly) {
                 tar1.removeAttr("style");
                 tar2.removeAttr("style");
+                $(document).dequeue();
             }
             swap_temp.remove();
-            $(document).dequeue();
         }
+    }
+    insert = function(tar1_index, tar2_index, insert_instantly=false) {
+        if (tar1_index === tar2_index) return;
+        if (insert_instantly) {
+            const tar1 = $(".assignment-container").eq(tar1_index),
+                tar2 = $(".assignment-container").eq(tar2_index);
+            if (tar2_index > tar1_index) {
+                tar2.after(tar1);        
+            } else {
+                tar2.before(tar1);
+            }
+            return;
+        }
+        $(document).queue(function() {
+            const tar1 = $(".assignment-container").eq(tar1_index),
+                tar2 = $(".assignment-container").eq(tar2_index),
+                tar1_height = tar1.height() + 10,
+                tar2_height = tar2.height() + 10;
+            if (tar2_index > tar1_index) {
+                tar1.animate({
+                    top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height,
+                    marginBottom: "-=" + tar1_height,
+                }, {
+                    queue: false,
+                    duration: swap_duration,
+                    easing: "easeInOutQuad",
+                });
+                tar2.animate({
+                    marginBottom: "+=" + (tar1_height+10),
+                }, {
+                    queue: false,
+                    duration: swap_duration,
+                    easing: "easeInOutQuad",
+                    complete: function() {
+                        tar2.after(tar1);
+                        if (!insert_instantly) {
+                            tar1.removeAttr("style");
+                            tar2.removeAttr("style");
+                            $(document).dequeue();
+                        }
+                    },
+                });
+            } else {
+                tar1.animate({
+                    top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height*2 /*multiply this becaues the tar2 margin cancels this out*/,
+                    marginBottom: "-=" + tar1_height,
+                }, {
+                    queue: false,
+                    duration: swap_duration,
+                    easing: "easeInOutQuad",
+                });
+                tar2.animate({
+                    marginTop: "+=" + (tar1_height+10),
+                }, {
+                    queue: false,
+                    duration: swap_duration,
+                    easing: "easeInOutQuad",
+                    complete: function() {
+                        tar2.before(tar1);
+                        if (!insert_instantly) {
+                            tar1.removeAttr("style");
+                            tar2.removeAttr("style");
+                            $(document).dequeue();
+                        }
+                    },
+                });
+            }
+        });
     }
     let sortTimeout;
     sort = function(params={}) {
@@ -223,6 +290,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (today_minus_dac > len_works && len_works + dif_assign < x) {
                         status_message = '?\u3000  You have not Entered your past Work Inputs!';
                         status_value = 1;
+                        incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(new Date().getDay()) && daysleft !== 1) {
                         status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment for Today';
                         status_value = 4;
@@ -329,15 +397,16 @@ document.addEventListener("DOMContentLoaded", function() {
                 let priority;
                 if (assignment[0] === 1) {
                     priority = NaN;
+                } else if (assignment[0] === 4 || assignment[0] === 6 || assignment[0] === 5 /* Last part needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+                    priority = 0;
                 } else {
                     priority = Math.max(1,Math.floor(assignment[1] / highest_priority * 100 + 1e-10));
                 }
-                if (assignment[0] === 2 || assignment[0] === 3) {
-                    $(".title").eq(assignment[2]).attr("data-priority", `Priority: ${priority}%`);               
-                } else {
-                    $(".title").eq(assignment[2]).attr("data-priority", "");
-                    if (assignment[0] === 4 || assignment[0] === 6 || assignment[0] === 5 /* Last part needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
-                        priority = 0;
+                if (text_priority) {
+                    if (assignment[0] === 2 || assignment[0] === 3) {
+                        $(".title").eq(assignment[2]).attr("data-priority", `Priority: ${priority}%`);               
+                    } else {
+                        $(".title").eq(assignment[2]).attr("data-priority", "");       
                     }
                 }
                 const assignment_container = sa.parent();
@@ -369,9 +438,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             // Have this after above to preserve index on sa
             for (let [index, assignment] of ordered_assignments.entries()) {
-                swap(index, assignment[2], params.first_sort);
-                ordered_assignments.find((sa) => sa[2] === index)[2] = assignment[2] // Adjust index of assignment that used to be there 
-                assignment[2] = index;// Adjust index of current swapped assignment
+                if (index !== assignment[2]) {
+                    swap(index, assignment[2], params.first_sort);
+                    ordered_assignments.find(sa => sa[2] === index)[2] = assignment[2] // Adjust index of assignment that used to be there 
+                    assignment[2] = index;// Adjust index of current swapped assignment
+                }
             }
             if (incomplete_works) {
                 $("#estimated-total-time").html('Please enter your past inputs');
@@ -400,7 +471,7 @@ document.addEventListener("DOMContentLoaded", function() {
             "margin-bottom": -$("#animate-in").height()-10,
         });
     }
-    // Returns color rgb from priority percentagehd
+    // Returns color rgb from priority percentage
     function color(p) {
         if (isNaN(p)) {
             return "";

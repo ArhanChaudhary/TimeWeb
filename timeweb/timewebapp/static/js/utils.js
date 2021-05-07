@@ -50,7 +50,6 @@ function scroll(resolver) {
     // Runs when scroll ends
     scrollTimeout = setTimeout(function() {
         $("main").off('scroll');
-        // Resolves promise from the scope it is called in
         resolver();
     }, 200);
 }

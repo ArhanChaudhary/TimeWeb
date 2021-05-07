@@ -26,14 +26,13 @@ $(function() {
             e.preventDefault();
         }
     }
-    ignore_queue = false;
     $(".assignment").click(function(e) {
         var e = e || window.event;
         // Runs the click function if
-        // There is no other assignment being animated (ignored with ignore_queue=true)
+        // There is no other assignment being animated
         // The background of the assignment was clicked
         // The footer wasn't clicked (to prevent accidental closing)
-        if ((ignore_queue || $(document).queue().length === 0) && !["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
+        if (!["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
             // Runs if no assignments are swapping and the element clicked was the assignment background
             let assignment = $(this);
             const graph_container = assignment.find(".graph-container"),
@@ -840,9 +839,10 @@ $(function() {
                             } else {
                                 sa.works.push(input_done);
                             }
+                            const diff = input_done - lw;
                             lw = input_done;
                             len_works++;
-                            if (input_done !== todo) {
+                            if (diff !== todo) {
                                 if (len_works + dif_assign === x) {
                                     sa.dynamic_start = len_works + dif_assign - 1;
                                 } else {
@@ -1094,12 +1094,12 @@ $(function() {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
                         alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
                         alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
-                        alert("As you progress through your assignment, you will have to enter your own work inputs every day to measure your progress");
+                        alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
                         alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you have not entered any work inputs");
                         if (x <= 2) {
                             alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are more effective for this visualization`);
                         }
-                        alert("Once you add more assignments, they are prioritized based on their estimated completion times");
+                        alert("Once you add more assignments, they are prioritized based on their estimated completion times and due dates");
                         alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");
                         first_login = false;
                         send_tutorial_ajax();

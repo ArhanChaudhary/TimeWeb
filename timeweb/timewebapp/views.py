@@ -328,7 +328,7 @@ class TimewebListView(LoginRequiredMixin, View):
             settings_model = SettingsModel.objects.get(user__username=request.user)
             settings_model.first_login = request.POST['first_login'] == "true"
             settings_model.save()
-            logger.info(f"User \"{request.user}\" chaned their first login")
+            logger.info(f"User \"{request.user}\" changed their first login")
         return HttpResponse(status=204)
 
 class ContactView(View):

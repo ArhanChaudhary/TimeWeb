@@ -151,7 +151,7 @@ $(function() {
     }
     $("#id_unit").on('input', replaceUnit);
     // Add info buttons ($.info defined in template.js)
-    $('label[for="id_x"], label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
+    $('label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
@@ -308,9 +308,7 @@ $(function() {
                         const assignment = assignment_container.children().first();
                         new Promise(function(resolve) {
                             if (assignment.hasClass("open-assignment")) {
-                                ignore_queue = true;
                                 assignment.click().find(".graph-container").one("transitionend", resolve);
-                                ignore_queue = false;
                             } else {
                                 resolve();
                             }

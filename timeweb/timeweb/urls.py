@@ -16,8 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 
+import os
+try:
+    admin_url = os.environ["ADMINURL"]
+except:
+    admin_url = "admin/"
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(admin_url, admin.site.urls),
     path('login/', include('django.contrib.auth.urls')),
     path('', include('timewebapp.urls')),
     path('', include('pwa.urls')),
