@@ -93,6 +93,7 @@
     }
 }
 #image {
+    left: 30px;
     margin: -10px;
     position: absolute;
     height: 4316px;

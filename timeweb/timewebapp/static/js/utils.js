@@ -187,7 +187,6 @@ document.addEventListener("DOMContentLoaded", function() {
             'action': 'save_assignment',
             'assignments': [],
         };
-
     SendAttributeAjax = function(key, value, pk) {
         // Add key and value the data going to be sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
@@ -203,30 +202,31 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         sa[key] = value;
         clearTimeout(ajaxTimeout);
-        ajaxTimeout = setTimeout(function() {
-            const success = function() {
-                gtag("event","save_assignment");
-            }
-            // Send data along with the assignment's primary key
+        ajaxTimeout = setTimeout(sendAjaxNoTimeout, 1000);
+    }
+    function sendAjaxNoTimeout() {
+        const success = function() {
+            gtag("event","save_assignment");
+        }
+        // Send data along with the assignment's primary key
 
-            // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
-            // However, I decided to skip this check and still send the ajax
-            // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
-            // Plus, a pointless ajax of this sort won't happen frequently, and will have a minimal impact on the server's performance
-            data['assignments'] = JSON.stringify(data['assignments']);
-            $.ajax({
-                type: "POST",
-                data: data,
-                success: success,
-                error: error,
-            });
-            // Reset data
-            data = {
-                'csrfmiddlewaretoken': csrf_token,
-                'action': 'save_assignment',
-                'assignments': [],
-            }
-        }, 1000);
+        // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
+        // However, I decided to skip this check and still send the ajax
+        // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
+        // Plus, a pointless ajax of this sort won't happen frequently, and will have a minimal impact on the server's performance
+        data['assignments'] = JSON.stringify(data['assignments']);
+        $.ajax({
+            type: "POST",
+            data: data,
+            success: success,
+            error: error,
+        });
+        // Reset data
+        data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'save_assignment',
+            'assignments': [],
+        }
     }
     // Saves current open assignments to localstorage if refreshed or redirected
     // lighthouse says to use onpagehide instead of unload
@@ -241,6 +241,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         // Save scroll position
         localStorage.setItem("scroll", $("main").scrollTop());
+        if (data['assignments'].length) {
+            sendAjaxNoTimeout();
+        }
     });
     // Ensure fonts load for the graph
     document.fonts.ready.then(function() {

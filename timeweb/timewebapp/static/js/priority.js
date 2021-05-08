@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (params.ignore_timeout) {
             sort_without_timeout();
         } else {
-            sortTimeout = setTimeout(sort_without_timeout, swap_duration);
+            sortTimeout = setTimeout(sort_without_timeout, swap_duration + 500);
         }
         function sort_without_timeout() {
             let ordered_assignments = [],
@@ -352,7 +352,8 @@ document.addEventListener("DOMContentLoaded", function() {
                             let sum_diff_red_blue = 0;
                             for (i = 0; i <= len_works; i++) {
                                 if (!nwd.includes(assign_day_of_week + i - 1)) {
-                                    sum_diff_red_blue += sa.works[i] - c_funct(i);
+                                    // No need to worry about c_funct(i + dif_assign) being before dynamic_start because red_line_start_x is set to dif_assign
+                                    sum_diff_red_blue += sa.works[i] - c_funct(i + dif_assign);
                                 }
                             }
                             const how_well_followed_const = 1-sum_diff_red_blue/len_works/y;

@@ -963,7 +963,7 @@ $(function() {
                             // Reverses the logic of work inputs in and recursively decreases red_line_start_x
                             if (red_line_start_x > len_works + dif_assign) {
                                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x > dif_assign; red_line_start_x--) {
+                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x >= dif_assign; red_line_start_x--) {
                                     red_line_start_y = sa.works[red_line_start_x - dif_assign];
                                     if (nwd.length) {
                                         mods = c_calc_mod_days();
@@ -980,14 +980,15 @@ $(function() {
                                         next_work = sa.works[i - dif_assign + 1];
                                         // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
                                         if (next_funct - this_funct !== next_work - this_work) {
-                                            red_line_start_x++;
                                             break outer;
                                         }
                                     }
                                 }
-                                if (red_line_start_x < dif_assign) {
-                                    red_line_start_x = dif_assign;
-                                }
+                                // ++ for three cases:
+                                // if for loop doesnt run, do ++ to fix red_line_start_x
+                                // if for loop finds, do ++
+                                // if for loop doesnt find, change > dif_assign to >= dif_assign and do ++
+                                red_line_start_x++;
                                 red_line_start_y = sa.works[red_line_start_x - dif_assign];
                                 if (nwd.length) {
                                     mods = c_calc_mod_days();
