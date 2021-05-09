@@ -59,7 +59,6 @@ function displayClock() {
     estimated_completion_time.setMinutes(estimated_completion_time.getMinutes() + +$("#estimated-total-time").attr("data-minutes"));
     $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
 }
-setInterval(displayClock, 1000);
 
 const HOUR_TO_UPDATE = 4;
 function changeDateNow() {
@@ -68,7 +67,7 @@ function changeDateNow() {
         const data = {
             'csrfmiddlewaretoken': csrf_token,
             'action': 'update_date_now',
-            'date_now': JSON.stringify(date_now),
+            'date_now': stringifyDate(date_now),
         }
         $.ajax({
             type: "POST",
@@ -80,9 +79,26 @@ function changeDateNow() {
         }
     }
 }
-setInterval(changeDateNow, 1000*60);
-changeDateNow();
-
+// AJAX error function
+function error(response, exception) {
+    if (response.status == 0) {
+        alert('Failed to connect');
+    } else if (response.status == 403) {
+        $("html").html(response.responseText);
+    } else if (response.status == 404) {
+        alert('Not found, try again');
+    } else if (response.status == 500) {
+        alert('Internal server error. Please contact me if you see this');
+    } else if (exception === 'parsererror') {
+        alert('JSON parse failed');
+    } else if (exception === 'timeout') {
+        alert('Timed out, try again');
+    } else if (exception === 'abort') {
+        alert('Request aborted, try again');
+    } else {
+        $("html").html(response.responseText);
+    }
+}
 function send_tutorial_ajax() {
     const data = {
         'csrfmiddlewaretoken': csrf_token,
@@ -106,6 +122,8 @@ function stringifyDate(date) {
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
     csrf_token = $("form input:first-of-type").val();
+    changeDateNow();
+    setInterval(changeDateNow, 1000*60);
     // Hide and show estimated completion time
     $("#hide-button").click(function() {
         if ($(this).html() === "Hide") {
@@ -191,26 +209,6 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(document.querySelector(".assignment")).width()}`);
     });
     $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(document.querySelector(".assignment")).width()}`);
-    // Ajax error function
-    error = function(response, exception) {
-        if (response.status == 0) {
-            alert('Failed to connect');
-        } else if (response.status == 403) {
-            $("html").html(response.responseText);
-        } else if (response.status == 404) {
-            alert('Not found, try again');
-        } else if (response.status == 500) {
-            alert('Internal server error. Please contact me if you see this');
-        } else if (exception === 'parsererror') {
-            alert('JSON parse failed');
-        } else if (exception === 'timeout') {
-            alert('Timed out, try again');
-        } else if (exception === 'abort') {
-            alert('Request aborted, try again');
-        } else {
-            $("html").html(response.responseText);
-        }
-    }
     let ajaxTimeout,
         data = {
             'csrfmiddlewaretoken': csrf_token,

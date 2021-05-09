@@ -350,12 +350,12 @@ class TimewebListView(LoginRequiredMixin, View):
 
     def updated_date_now(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
-        date_now = json.loads(request.POST["date_now"])
+        date_now = request.POST["date_now"]
         date_now = datetime.datetime.strptime(date_now, "%Y-%m-%d").date()
         settings_model.date_now = date_now
         settings_model.save()
         # Unmark every assignment as completed
-        for assignment in TimewebModels.objects.filter(user__username=request.user):
+        for assignment in TimewebModel.objects.filter(user__username=request.user):
             if assignment.hidden:
                 assignment.hidden = False
                 assignment.save()

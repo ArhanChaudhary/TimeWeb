@@ -469,6 +469,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 $("#hide-button").css("visibility", "");
             }
             displayClock();
+            if (params.first_sort) {
+                setInterval(displayClock, 1000);
+            }
         }
     }
     sort({ first_sort: true, ignore_timeout: true });
