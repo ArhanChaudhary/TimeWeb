@@ -117,15 +117,18 @@ class TimewebListView(LoginRequiredMixin, View):
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
             self.created_assignment(request)
-        elif request.POST['action'] == 'delete_assignment':
-            self.deleted_assignment(request)
-        elif request.POST['action'] == 'save_assignment':
-            self.saved_assignment(request)
-        elif request.POST['action'] == 'change_first_login':
-            self.changed_first_login(request)
-        elif request.POST['action'] == 'update_date_now':
-            self.updated_date_now(request)
-        return HttpResponse(status=204)
+            self.make_list(request)
+            return render(request, "index.html", self.context)
+        else:
+            if request.POST['action'] == 'delete_assignment':
+                self.deleted_assignment(request)
+            elif request.POST['action'] == 'save_assignment':
+                self.saved_assignment(request)
+            elif request.POST['action'] == 'change_first_login':
+                self.changed_first_login(request)
+            elif request.POST['action'] == 'update_date_now':
+                self.updated_date_now(request)
+            return HttpResponse(status=204)
 
     def created_assignment(self, request):
         pk = request.POST['submit-button']
