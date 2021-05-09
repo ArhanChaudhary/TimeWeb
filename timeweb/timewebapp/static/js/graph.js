@@ -492,22 +492,6 @@ $(function() {
                 }
 
                 function drawfixed() {
-                    // These only really need to be executed once since this function is run for every assignment but doesnt matter
-                    width = $(fixed_graph).width();
-                    height = $(fixed_graph).height();
-                    if (width > 500) {
-                        font_size = 13.9;
-                    } else {
-                        font_size = Math.round((width + 450) / 47 * 0.6875);
-                    }
-                    scale = window.devicePixelRatio;
-                    wCon = (width - 55) / x;
-                    hCon = (height - 55) / y;
-
-                    graph.width = width * scale;
-                    graph.height = height * scale;
-                    fixed_graph.width = width * scale;
-                    fixed_graph.height = height * scale;
                     let screen = fixed_graph.getContext("2d");
                     screen.scale(scale, scale);
 
@@ -1090,6 +1074,21 @@ $(function() {
                     // If date_now is redefined
                     today_minus_dac = Math.round((date_now - date_assignment_created) / 86400000);
                     today_minus_ad = Math.round((date_now - ad) / 86400000);
+                    
+                    width = $(fixed_graph).width();
+                    height = $(fixed_graph).height();
+                    if (width > 500) {
+                        font_size = 13.9;
+                    } else {
+                        font_size = Math.round((width + 450) / 47 * 0.6875);
+                    }
+                    scale = window.devicePixelRatio;
+                    wCon = (width - 55) / x;
+                    hCon = (height - 55) / y;
+                    graph.width = width * scale;
+                    graph.height = height * scale;
+                    fixed_graph.width = width * scale;
+                    fixed_graph.height = height * scale;
                     if (assignment.hasClass("open-assignment") && assignment.is(":visible")) {
                         drawfixed();
                         draw();
