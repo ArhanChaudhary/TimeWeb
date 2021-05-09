@@ -276,6 +276,7 @@ nav.open #nav-menu::after {
 
 
 .info-button {
+    cursor: pointer;
     display: inline-block;
     position: relative;
     bottom: 1px;
@@ -291,6 +292,9 @@ nav.open #nav-menu::after {
     color: white;
     text-align: center;
     line-height: 15px;
+}
+.info-button.dont-hide-button {
+    display: inline-block !important;
 }
 .info-button:focus {
     background: rgb(16,135,148) !important;

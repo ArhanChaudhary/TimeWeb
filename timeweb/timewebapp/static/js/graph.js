@@ -127,7 +127,7 @@ $(function() {
                 due_date.setDate(due_date.getDate() + x);
                 // Enable draw_point by default, which determines whether to draw the point on the graph
                 let draw_point = true;
-                // Handles not working days, explained later
+                // Handles break days, explained later
                 let mods,
                     assign_day_of_week = ad.getDay(); // Used with mods
                 if (nwd.length) {
@@ -153,12 +153,12 @@ $(function() {
                 let date_assignment_created = new Date(ad.valueOf());
                 date_assignment_created.setDate(date_assignment_created.getDate() + dif_assign);
                 // Days between today and date_assignment_created
-                let today_minus_dac = Math.round((new Date(new Date().toDateString()) - date_assignment_created) / 86400000),
+                let today_minus_dac = Math.round((date_now - date_assignment_created) / 86400000),
                     // Days between today and the assignment date
-                    today_minus_ad = Math.round((new Date(new Date().toDateString()) - ad) / 86400000);
+                    today_minus_ad = Math.round((date_now - ad) / 86400000);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay());
+                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
                 day = len_works - assignmentIsInProgress();
                 function c_pset(x2, y2) {
                     const context = {
@@ -461,7 +461,7 @@ $(function() {
                         str_day += ':';
                         screen.fillText(str_day, 50+(width-50)/2, row_height*3);
                         let todo_message;
-                        if (displayed_day.toDateString() !== new Date().toDateString()) {
+                        if (displayed_day.valueOf() !== date_now.valueOf()) {
                             todo_message = `${pluralize(unit)} to Complete for this Day: ${todo}${reach_deadline}`;
                         } else if (assignmentIsInProgress()) {
                             todo_message = `Remaining ${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
@@ -475,8 +475,8 @@ $(function() {
                         } else if (distance_today_from_displayed_day > 0) {
                             screen.fillText("You have not Entered your Work from Previous Days", 50+(width-50)/2, row_height*8);
                             screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*9);
-                        } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || new Date(displayed_day.toDateString()) > new Date(new Date().toDateString())) {
-                            if (displayed_day.toDateString() === new Date().toDateString()) {
+                        } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
+                            if (displayed_day.valueOf() === date_now.valueOf()) {
                                 screen.fillText("You have Completed your Work for Today", 50+(width-50)/2, row_height*9);
                             } else {
                                 screen.fillText("You have Completed your Work for this Day", 50+(width-50)/2, row_height*9);
@@ -1006,8 +1006,11 @@ $(function() {
 
                     // BEGIN Hide assignment button
                     hide_assignment_button.click(function() {
-                        alert("This feature has not yet been implented");
-                    }).css("text-decoration", "line-through");
+                        sa.hidden = !sa.hidden;
+                        $(this).onlyText(sa.hidden ? "Unmark as Completed" : "Mark as Completed");
+                        SendAttributeAjax('hidden', sa.hidden, sa.id);
+                        sort({ ignore_timeout: true });
+                    }).html(sa.hidden ? "Unmark as Completed" : "Mark as Completed");
                     // END Hide assignment button
 
                     // BEGIN Next assignment button
@@ -1059,7 +1062,11 @@ $(function() {
                         lineHeight: "11px",
                     });
 
-                    skew_ratio_textbox.info("right", "Enter skew ratio as a number. Leave this blank to cancel or press enter to save",'after').css({
+                    skew_ratio_textbox.info("right", 
+                        `The skew ratio determines the work distribution of the graph
+
+                        Enter skew ratio as a number. Leave this blank to cancel or press enter to save`,'after'
+                    ).css({
                         left: 134,
                         position: "absolute",
                         bottom: 36,
@@ -1080,6 +1087,9 @@ $(function() {
                     }
                     day = len_works - assignmentIsInProgress();
                     lw = sa.works[len_works];
+                    // If date_now is redefined
+                    today_minus_dac = Math.round((date_now - date_assignment_created) / 86400000);
+                    today_minus_ad = Math.round((date_now - ad) / 86400000);
                     if (assignment.hasClass("open-assignment") && assignment.is(":visible")) {
                         drawfixed();
                         draw();

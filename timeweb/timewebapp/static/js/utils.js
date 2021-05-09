@@ -25,11 +25,12 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
-({warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login} = JSON.parse(document.getElementById("settings-model").textContent));
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now } = JSON.parse(document.getElementById("settings-model").textContent));
 def_nwd = def_nwd.map(Number);
 for (let sa of dat) {
     sa.works = sa.works.map(Number);
 }
+date_now = new Date(date_now + " 00:00");
 // cite
 // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
 // Date.parse but compatible with safari
@@ -41,7 +42,7 @@ function parseDate(date) {
     return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
 }
 function load_assignment_data($assignment) {
-    return dat.find(assignment => assignment.file_sel === $assignment.attr("data-assignment-name"));
+    return dat.find(assignment => assignment.assignment_name === $assignment.attr("data-assignment-name"));
 }
 // Make these global because other files use scroll()
 let scrollTimeout;
@@ -60,6 +61,28 @@ function displayClock() {
 }
 setInterval(displayClock, 1000);
 
+const HOUR_TO_UPDATE = 4;
+function changeDateNow() {
+    if (date_now.valueOf() + 86400000 + 1000*60*60*HOUR_TO_UPDATE < new Date().valueOf()) {
+        date_now.setDate(date_now.getDate() + 1);
+        const data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'update_date_now',
+            'date_now': JSON.stringify(date_now),
+        }
+        $.ajax({
+            type: "POST",
+            data: data,
+            error: error,
+        });
+        for (let sa of dat) {
+            sa.hidden = false;
+        }
+    }
+}
+setInterval(changeDateNow, 1000*60);
+changeDateNow();
+
 function send_tutorial_ajax() {
     const data = {
         'csrfmiddlewaretoken': csrf_token,
@@ -71,6 +94,13 @@ function send_tutorial_ajax() {
         data: data,
         error: error,
     });
+}
+function stringifyDate(date) {
+    return [
+        date.getFullYear(),
+        ('0' + (date.getMonth() + 1)).slice(-2),
+        ('0' + date.getDate()).slice(-2),
+    ].join('-');
 }
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
@@ -139,12 +169,12 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#autofill-assignments").click(function() {
         if (confirm("This will autofill no work done until today for every assignment with missing work inputs. Are you sure?")) {
             sort({autofill_override: true, ignore_timeout: true});
-            $(window).trigger("resize");
         }
     }).info("left",
-    `This applies to every assignment you have not entered past work inputs for
+        `This applies to every assignment you have not entered past work inputs for
 
-    Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend").css("left",-2);
+        Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend"
+    ).css("left", -2).addClass("dont-hide-button");
     // Keybind
     form_is_showing = false;
     $(document).keydown(function(e) {

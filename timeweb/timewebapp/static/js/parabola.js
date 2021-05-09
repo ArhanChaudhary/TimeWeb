@@ -2,7 +2,7 @@
 This file includes the code for:
 
 Calculating the curve of the parabola
-Implementing not working days, mininum work time, and amount of units to complete at a time
+Implementing break days, mininum work time, and amount of units to complete at a time
 Determining the ideal position to return the maximum or minimum graph value
 Returning an output from an x position on the parabola
 
@@ -17,7 +17,7 @@ This only runs on index.html
 The red line for all of the assignments follow a parabola
 The first part of the pset() function calculates the a and b values, and the second part handles the minimum work time and return cutoffs
 funct(n) returns the output of an^2 + bn (with no c variable because it is translated to go through the origin)
-set_mod_days() helps integrate not working days into the schedule 
+set_mod_days() helps integrate break days into the schedule 
 */
 // new file, easier for development
 // no side effect
@@ -53,7 +53,7 @@ function pset(ctx, x2 = false, y2 = false) {
     let x1 = ctx.x - ctx.red_line_start_x,
         y1 = ctx.y - ctx.red_line_start_y;
     if (ctx.nwd.length) {
-        x1 -= Math.floor(x1 / 7) * ctx.nwd.length + ctx.mods[x1 % 7]; // Handles not working day, explained later
+        x1 -= Math.floor(x1 / 7) * ctx.nwd.length + ctx.mods[x1 % 7]; // Handles break days, explained later
     }
     // If set skew ratio is enabled, make the third point (x2,y2), which was passed as a parameter
     // x2 !== false is necessary because the user can resize the browser for example and call this function while set skew ratio is true but without passing any coordinates
@@ -63,7 +63,7 @@ function pset(ctx, x2 = false, y2 = false) {
         // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions
         x2 = (x2 - 53.7) / ctx.wCon - ctx.red_line_start_x;
         y2 = (ctx.height - y2 - 44.5) / ctx.hCon - ctx.red_line_start_y;
-        // Handles not working days, explained later
+        // Handles break days, explained later
         if (ctx.nwd.length) {
             const floorx2 = Math.floor(x2);
             if (ctx.nwd.includes((ctx.assign_day_of_week + floorx2 + ctx.red_line_start_x) % 7)) {

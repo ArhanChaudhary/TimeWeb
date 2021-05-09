@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let ordered_assignments = [],
                 total = 0,
                 tomorrow_total = 0,
+                trigger_resize_from_autofill = false,
                 incomplete_works = false;
             $(".assignment").each(function(index) {
 
@@ -234,19 +235,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
 
                 // Will document soon
-                let daysleft = Math.round((new Date(new Date().toDateString()) - ad) / 86400000),
+                let daysleft = Math.round((date_now - ad) / 86400000),
                     todo = c_funct(len_works+dif_assign+1) - lw;
                 const today_minus_dac = daysleft - dif_assign;
-                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(new Date().getDay());
+                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
                 let strdaysleft, status_value, status_message;
                 if (daysleft < 0) {
                     status_message = '#\u3000 This Assignment has Not Yet been Assigned';
                     if (daysleft === -1) {
-                    strdaysleft = 'Assigned Tomorrow';
+                        strdaysleft = 'Assigned Tomorrow';
                     } else if (daysleft > -7) {
-                    strdaysleft = `Assigned on ${ad.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                        strdaysleft = `Assigned on ${ad.toLocaleDateString("en-US", {weekday: 'long'})}`;
                     } else {
-                    strdaysleft = `Assigned in ${-daysleft}d`;
+                        strdaysleft = `Assigned in ${-daysleft}d`;
                     }
                     status_value = 5;
                 } else if (lw >= y || x - daysleft < 1) {
@@ -284,6 +285,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             SendAttributeAjax("works", sa.works.map(String), sa.id);
                             SendAttributeAjax("dynamic_start", sa.dynamic_start, sa.id);
                             todo = c_funct(len_works+dif_assign+1) - lw;
+                            trigger_resize_from_autofill = true;
                         }
                     }
                     daysleft = x - daysleft;
@@ -291,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         status_message = '?\u3000  You have not Entered your past Work Inputs!';
                         status_value = 1;
                         incomplete_works = true;
-                    } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(new Date().getDay()) && daysleft !== 1) {
+                    } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
                         status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment for Today';
                         status_value = 4;
                     } else {
@@ -310,11 +312,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         } else {
                             status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} Today`;
                         }
-                        total += Math.ceil(todo*ctime);
+                        total += Math.ceil(sa.hidden ? 0 : todo*ctime);
                     }
                     if (daysleft === 1) {
                         strdaysleft = 'Tomorrow';
-                        tomorrow_total += Math.ceil(todo*ctime);
+                        tomorrow_total += Math.ceil(sa.hidden ? 0 : todo*ctime);
                         if (status_value !== 1) {
                             status_value = 2;
                         }
@@ -366,7 +368,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                     }
                 }
-                ordered_assignments.push([status_value, status_priority, index]);
+                let priority_data = [status_value, status_priority, index];
+                if (sa.hidden && status_value !== 1) {
+                    priority_data.push(true);
+                }
+                ordered_assignments.push(priority_data);
                 $(".status-message").eq(index).html(status_message);
                 $(".title").eq(index).attr("data-daysleft", strdaysleft);
                 if (display_format_minutes) {
@@ -375,6 +381,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     $(".completion-time").eq(index).html('');
                 }
             });
+            // fixes graph not updating after skew ratio causes autofill
+            if (trigger_resize_from_autofill) {
+                $(window).trigger("resize");
+            }
             ordered_assignments.sort(function(a, b) {
                 if (a[0] < b[0]) return -1;
                 if (a[0] > b[0]) return 1;
@@ -386,8 +396,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (a[2] < b[2]) return -1;
                 if (a[2] > b[2]) return 1;
             });
-            const highest_priority = Math.max(...Array.from(ordered_assignments, function(assignment) {
-                if (assignment[0] === 2 || assignment[0] === 3) {
+            const highest_priority = Math.max(...ordered_assignments.map(function(assignment) {
+                if ((assignment[0] === 2 || assignment[0] === 3) && !assignment[3]) {
                     return assignment[1];
                 } else {
                     return -Infinity;
@@ -398,13 +408,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 let priority;
                 if (assignment[0] === 1) {
                     priority = NaN;
-                } else if (assignment[0] === 4 || assignment[0] === 6 || assignment[0] === 5 /* Last part needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+                } else if (assignment[0] === 4 || assignment[3] || assignment[0] === 6 || assignment[0] === 5 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                     priority = 0;
                 } else {
                     priority = Math.max(1,Math.floor(assignment[1] / highest_priority * 100 + 1e-10));
                 }
                 if (text_priority) {
-                    if (assignment[0] === 2 || assignment[0] === 3) {
+                    if ((assignment[0] === 2 || assignment[0] === 3) && !assignment[3]) {
                         $(".title").eq(assignment[2]).attr("data-priority", `Priority: ${priority}%`);               
                     } else {
                         $(".title").eq(assignment[2]).attr("data-priority", "");       
@@ -432,9 +442,9 @@ document.addEventListener("DOMContentLoaded", function() {
                             $("main").scroll(() => scroll(resolve));
                             scroll(resolve);
                         });
-                    }).then(() => color_or_animate_assignment(sa, priority/100, true, params.first_sort));
+                    }).then(() => color_or_animate_assignment(sa, priority/100, true, params.first_sort, assignment[3]));
                 } else {
-                    color_or_animate_assignment(sa, priority/100, false, params.first_sort);
+                    color_or_animate_assignment(sa, priority/100, false, params.first_sort, assignment[3]);
                 }
             }
             // Have this after above to preserve index on sa
@@ -492,7 +502,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // This is done by setting its bottom margin to the negative value of its height, effectively making it seem like it's not there
     // Then, the assignment is moved to the bottom of the page and hidden by using the "top" and "opacity" styles
     // Finally, they are all set to their default values in a jQuery animation in the function directly below this
-    function color_or_animate_assignment($assignment, priority, is_element_submitted, color_instantly) {
+    function color_or_animate_assignment($assignment, priority, is_element_submitted, color_instantly, hidden) {
         if ($("#animate-in").length && is_element_submitted) {
             // If a new assignment was created and the assignment that color_or_animate_assignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
@@ -506,11 +516,17 @@ document.addEventListener("DOMContentLoaded", function() {
         if (color_priority) {
             if (color_instantly) {
                 $assignment.addClass("color-instantly");
-                $assignment.css("background", color(priority));
+                $assignment.css({
+                    background: color(priority),
+                    opacity: hidden ? "0.75" : "",
+                });
                 $assignment[0].offsetHeight;
                 $assignment.removeClass("color-instantly");
             } else {
-                $assignment.css("background", color(priority));
+                $assignment.css({
+                    background: color(priority),
+                    opacity: hidden ? "0.75" : "",
+                });
             }
         }
     }

@@ -140,9 +140,9 @@ header.animate::after {
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
 }
 .assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
-    -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
-    -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
-    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 0s;
+    -webkit-transition: none;
+    -o-transition: none;
+    transition: none
 }
 .assignment:focus, .button:focus {
     outline: 0;
@@ -408,15 +408,8 @@ label[for='id_min_work_time']::after, label[for='id_funct_round']::after {
 label[for='id_ad']::after {
     content: "(Enter today if you don't remember)";
 }
-#form-wrapper #top-note {
-    font-size: 11px;
-    font-style: italic;
-    position: absolute;
-    left: 7px;
-    top: 2px;
-}
 #form-wrapper {
-    width: min(100vw, 490px);
+    width: min(100vw, 460px);
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
@@ -483,6 +476,15 @@ label[for='id_ad']::after {
 #form-wrapper input[type="date"] {
     /* IOS */
     min-width: calc(100% - 30px);
+}
+#form-wrapper #advanced-inputs {
+    border-bottom: 1px solid;
+    cursor: pointer;
+    width: 149px;
+    margin: 0 auto 10px auto
+}
+#form-wrapper .advanced-input {
+    display: none !important;
 }
 #form-wrapper input.disabled-field, #form-wrapper label.disabled-field {
     opacity: 1;

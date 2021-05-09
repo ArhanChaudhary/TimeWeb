@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from decimal import Decimal
+import datetime
 WEEKDAYS = (
     ("1",_("Monday")),
     ("2",_("Tuesday")),
@@ -17,7 +18,7 @@ def default_works():
     return 0
 
 class TimewebModel(models.Model):
-    file_sel = models.CharField(
+    assignment_name = models.CharField(
         max_length=100,
         verbose_name=_('Name of this Assignment'),
     )
@@ -83,6 +84,9 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
+    hidden = models.BooleanField(
+        default=False,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -91,7 +95,7 @@ class TimewebModel(models.Model):
     )
     # Return assignment name when calling instance of model
     def __str__(self):
-        return self.file_sel
+        return self.assignment_name
 
 class SettingsModel(models.Model):
     warning_acceptance = models.IntegerField(
@@ -147,6 +151,9 @@ class SettingsModel(models.Model):
         verbose_name=_('Display Priority with Text'),
     )
     first_login = models.BooleanField(default=True)
+    date_now = models.DateField(
+        default=datetime.date.today
+    )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

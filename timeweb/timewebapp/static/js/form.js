@@ -18,7 +18,7 @@ $(function() {
             $("#overlay").fadeIn(300).children().first().animate({top: 15}, 300);
             if (!isMobile) {
                 // Focus on first field
-                $("#id_file_sel").focus();
+                $("#id_assignment_name").focus();
             }
             // Mobile
             $("#image-new-container").blur();
@@ -50,18 +50,16 @@ $(function() {
         // Used in utils.js for handling the user typing "N" when showing the form via shift + N
         form_is_showing = false;
     }
-    function dateToInput(date) {
-        return [
-            date.getFullYear(),
-            ('0' + (date.getMonth() + 1)).slice(-2),
-            ('0' + date.getDate()).slice(-2),
-        ].join('-');
-    }
+    $("#id_funct_round, #id_min_work_time").parent().addClass("advanced-input");
+    $("#nwd-label-title, #nwd-wrapper").addClass("advanced-input");
+    $("#form-wrapper #advanced-inputs").insertBefore($(".advanced-input").first()).click(function() {
+        $("#id_funct_round, #id_min_work_time").parent().toggleClass("advanced-input");
+        $("#nwd-label-title, #nwd-wrapper").toggleClass("advanced-input");
+    })
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
-        const today = new Date();
         // Set default values for a new form
-        const initial_form_fields = ['', dateToInput(today), '', '', '', '0', '', '', +def_min_work_time||''];
+        const initial_form_fields = ['', stringifyDate(date_now), '', '', '', '0', '', '', +def_min_work_time||''];
         initial_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
@@ -83,7 +81,7 @@ $(function() {
         const sa = load_assignment_data($(this).parents(".assignment"));
         // Reentered form fields
         const form_data = [
-            sa.file_sel,
+            sa.assignment_name,
             sa.ad,
             sa.x,
             sa.unit,
@@ -151,24 +149,23 @@ $(function() {
     }
     $("#id_unit").on('input', replaceUnit);
     // Add info buttons ($.info defined in template.js)
-    $('label[for="id_funct_round"], label[for="id_min_work_time"], label#nwd-label-title').append("*");
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
         e.g: If this assignment is reading a book, enter "Page"
 
         If you are unsure how to split up your assignment, please enter "Minute"`
-    );
+    ).addClass("dont-hide-button");
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field
 
         This value is also the y-coordinate of the first point on the blue line, or the initial work input
         
         Changing this initial value will vertically translate all of your other work inputs accordingly`
-    );
+    ).addClass("dont-hide-button");
     $('label[for="id_funct_round"]').info('right',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
-    );
+    ).addClass("dont-hide-button");
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
     // Auto field scrolling
@@ -189,7 +186,7 @@ $(function() {
         let message;
         if (e.type === "invalid") {
             switch ($(this).attr("id")) {
-                case "id_file_sel":
+                case "id_assignment_name":
                     message = 'Please enter an assignment name';
                     break;
                 case "id_ad":
@@ -319,7 +316,7 @@ $(function() {
                             assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                                 // Remove assignment data from dat
                                 dat = dat.filter(function(assignment) {
-                                    return sa.file_sel !== assignment.file_sel
+                                    return sa.assignment_name !== assignment.assignment_name
                                 });
                                 // Remove from DOM
                                 assignment_container.remove();

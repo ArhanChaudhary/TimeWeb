@@ -11,7 +11,7 @@ class TimewebForm(forms.ModelForm):
         model = TimewebModel
         fields = "__all__"
         widgets = {
-            'file_sel': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
+            'assignment_name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'ad': DateInput(),
             'x': DateInput(),
             'dif_assign': forms.HiddenInput(),
@@ -25,9 +25,10 @@ class TimewebForm(forms.ModelForm):
             'ctime': forms.NumberInput(attrs={"min":"0"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
+            'hidden': forms.HiddenInput(),
         }
         error_messages = {
-            'file_sel': {
+            'assignment_name': {
                 'required': _("Please enter an assignment name"),
                 'max_length': _("This assignment's name is too long (>100 characters)"),
                 'invalid': _("This assignment's name is invalid"),
@@ -84,7 +85,7 @@ class TimewebForm(forms.ModelForm):
         ad = cleaned_data.get("ad")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
-        file_sel = cleaned_data.get("file_sel")
+        assignment_name = cleaned_data.get("assignment_name")
         try:
             if works >= y >= 1:
                 self.add_error("works",
@@ -116,6 +117,7 @@ class SettingsForm(forms.ModelForm):
             "first_login": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'warning_acceptance': forms.NumberInput(attrs={"min":"1","max":"100"}),
+            'date_now': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {
