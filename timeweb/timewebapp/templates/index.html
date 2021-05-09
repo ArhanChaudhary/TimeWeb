@@ -95,7 +95,7 @@ scroller:
       <div class="assignment-container" {% if assignment.assignment_name == request.session.added_assignment %}id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %}id="animate-color"{% endif %}>
         <div class="assignment" data-assignment-name="{{ assignment.assignment_name }}" tabindex="0">
           <div class="assignment-header">
-            <span class="title" data-daysleft="1d">{{ assignment.assignment_name }}</span>
+            <span class="title">{{ assignment.assignment_name }}</span>
             <svg width="30px" height="20px" class="arrow-container">
               <polygon class="arrow" points="5,0 5,20 15,10">
                 <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>

@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Keybind
     form_is_showing = false;
     $(document).keydown(function(e) {
-        if (!form_is_showing && e.shiftKey /* shiftKey eeded if the user presses caps lock */ && e.key === 'N') {
+        if (!form_is_showing && e.shiftKey /* shiftKey needed if the user presses caps lock */ && e.key === 'N') {
             $("#image-new-container").click();
             return false;
         } else if (e.key === "Escape") {
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function() {
             'assignments': [],
         };
     SendAttributeAjax = function(key, value, pk) {
-        // Add key and value the data going to be sent
+        // Add key and values as the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
         let sa;
         for (let assignment of data['assignments']) {

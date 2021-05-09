@@ -159,7 +159,7 @@ $(function() {
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                 const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
-                day = len_works - assignmentIsInProgress();
+                let day = len_works - assignmentIsInProgress();
                 function c_pset(x2, y2) {
                     const context = {
                         x: x,
