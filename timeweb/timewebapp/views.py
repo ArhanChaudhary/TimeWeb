@@ -113,7 +113,6 @@ class TimewebListView(LoginRequiredMixin, View):
             return render(request, "index.html", self.context)
 
     def post(self,request):
-        breakpoint()
         logger.info(f'Recieved POST from user \"{request.user}\"')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
