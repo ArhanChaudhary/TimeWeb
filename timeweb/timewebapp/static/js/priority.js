@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
             if (incomplete_works) {
-                $("#estimated-total-time").html('Please enter your past inputs');
+                $("#estimated-total-time").html('Please enter your past work inputs');
                 $("#current-time, #tomorrow-time").hide();
             } else if (!total) {
                 $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
@@ -475,6 +475,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     sort({ first_sort: true, ignore_timeout: true });
+    // Have this here to make sure this is set after assignments are sorted and swapped
     if ($("#animate-in").length) {
         // Set initial transition values for "#animate-in"
         // Needs to be after domswap or else "top" bugs about 
@@ -521,14 +522,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 $assignment.addClass("color-instantly");
                 $assignment.css({
                     background: color(priority),
-                    opacity: hidden ? "0.75" : "",
+                    opacity: hidden ? "0.6" : "",
                 });
                 $assignment[0].offsetHeight;
                 $assignment.removeClass("color-instantly");
             } else {
                 $assignment.css({
                     background: color(priority),
-                    opacity: hidden ? "0.75" : "",
+                    opacity: hidden ? "0.6" : "",
                 });
             }
         }

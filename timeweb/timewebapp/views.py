@@ -89,7 +89,7 @@ class TimewebListView(LoginRequiredMixin, View):
     def get(self,request):
         global get_requests, administrator_get_requests
         logger.info(f'Recieved GET from user \"{request.user}\"')
-        # Get all of user's assignments
+        # Get all of the user's assignments
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         self.make_list(request)
         self.context['form'] = TimewebForm(None)
@@ -116,17 +116,21 @@ class TimewebListView(LoginRequiredMixin, View):
         logger.info(f'Recieved POST from user \"{request.user}\"')
         self.objlist = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
-            self.created_assignment(request)
-            self.make_list(request)
-            return render(request, "index.html", self.context)
+            status = self.created_assignment(request)
+            if status == 200:
+                self.make_list(request)
+                return render(request, "index.html", self.context)
+            elif status == 302:
+                return redirect(request.path_info)
         else:
-            if request.POST['action'] == 'delete_assignment':
+            action = request.POST['action']
+            if action == 'delete_assignment':
                 self.deleted_assignment(request)
-            elif request.POST['action'] == 'save_assignment':
+            elif action == 'save_assignment':
                 self.saved_assignment(request)
-            elif request.POST['action'] == 'change_first_login':
+            elif action == 'change_first_login':
                 self.changed_first_login(request)
-            elif request.POST['action'] == 'update_date_now':
+            elif action == 'update_date_now':
                 self.updated_date_now(request)
             return HttpResponse(status=204)
 
@@ -154,7 +158,6 @@ class TimewebListView(LoginRequiredMixin, View):
             form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
-
         if form_is_valid:
             if create_assignment: # Handle "new"
                 selected_model = self.form.save(commit=False)
@@ -289,8 +292,7 @@ class TimewebListView(LoginRequiredMixin, View):
             else:
                 request.session['reentered_assignment'] = selected_model.assignment_name    
                 logger.info(f'User \"{request.user}\" updated assignment "{selected_model.assignment_name}"')
-            self.make_list(request)
-            return redirect(request.path_info)
+            return 302
         else:
             logger.info(f"User \"{request.user}\" submitted an invalid form")
             if create_assignment:
@@ -299,6 +301,7 @@ class TimewebListView(LoginRequiredMixin, View):
                 self.context['invalid_form_pk'] = pk
                 self.context['submit'] = 'Modify Assignment'
         self.context['form'] = self.form
+        return 200
     
     def deleted_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])

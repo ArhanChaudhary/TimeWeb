@@ -10,46 +10,91 @@ Deleting assignments
 This only runs on index.html
 */
 // Note: modified assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
+function showForm(show_instantly=false) {
+    if (show_instantly) {
+        $('#overlay').show().children().first().css("top", 15);
+    } else {
+        $("#overlay").fadeIn(300).children().first().animate({top: 15}, 300);
+        if (!isMobile) {
+            // Focus on first field
+            $("#id_assignment_name").focus();
+        }
+        // Mobile
+        $("#image-new-container").blur();
+    }
+    // Used in utils.js for handling the user typing "N" when showing the form via shift + N
+    form_is_showing = true;
+    // Make rest of page untabbable
+    $(".assignment, .graph, #menu, #image-new-container, a, button:not(#submit-assignment-button), .graph-container input, #advanced, #nav-menu, #user-greeting #username").attr("tabindex","-1");
+    // Explained later
+    replaceUnit();
+}
+function hideForm(hide_instantly=false) {
+    if (hide_instantly) {
+        $("#overlay").hide().children().first();
+        $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
+    } else {
+        $("#overlay").fadeOut(300,function() {
+            // Remove all error notes when form is exited
+            $(".invalid").removeClass("invalid");
+            $(".error-note").remove();
+        }).children().first().animate({top: "0"}, 300);
+    }
+    // Make rest of page retabbable
+    $("a, button:not(#submit-assignment-button), .graph-container input").removeAttr("tabindex");
+    $("#menu").attr("tabindex","2");
+    $("#image-new-container, #user-greeting #username").attr("tabindex","1");
+    $(".assignment, .graph, #advanced, #nav-menu").attr("tabindex","0");
+    // Used in utils.js for handling the user typing "N" when showing the form via shift + N
+    form_is_showing = false;
+}
+// Replace fields with unit when unit is "Minute"
+function replaceUnit() {
+    const val = $("#id_unit").val().trim();
+    const plural = pluralize(val),
+        singular = pluralize(val,1);
+    if (['second','hour','day','week','month','year'].some(unit_of_time => singular.toLowerCase().includes(unit_of_time))) {
+        return alert(`You seem to be entering in "${val}," which is a unit of time. Please enter in "Minute" instead. Although this isn't invalid, it's simpler to use "Minute"`);
+    }
+    // Replace fields
+    // onlyText is defined at the bottom
+    if (val) {
+        if (singular.toLowerCase() === 'minute') {
+            $("label[for='id_y']").text(`Estimated amount of Time to Complete this assignment in Minutes`);
+        } else {
+            $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
+        }
+        $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
+        $("label[for='id_ctime']").text(`Estimated amount of Minutes to complete each ${singular}`);
+        $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
+        $("label[for='id_funct_round'] .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
+    } else {
+        $("label[for='id_y']").html("Total number of Units in this Assignment");
+        $("label[for='id_works']").onlyText("Total number of Units already Completed");
+        $("label[for='id_ctime']").html("Estimated amount of Minutes to complete each Unit");
+        $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
+        $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
+    }
+    if (singular.toLowerCase() === 'minute') {
+        // Disable fields
+        $("#id_ctime").val(1);
+        $("#id_ctime").prop("disabled",true).addClass("disabled-field");
+        $("label[for='id_ctime']").addClass("disabled-field");
+        if (def_funct_round_minute) {
+            $("#id_funct_round").val(5);
+            $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
+            $("label[for='id_funct_round']").addClass("disabled-field");
+        }
+    } else {
+        $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
+        $("label[for='id_ctime']").removeClass("disabled-field");
+        if (def_funct_round_minute) {
+            $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
+            $("label[for='id_funct_round']").removeClass("disabled-field");
+        }
+    }
+}
 $(function() {
-   function showForm(show_instantly=false) {
-        if (show_instantly) {
-            $('#overlay').show().children().first().css("top", 15);
-        } else {
-            $("#overlay").fadeIn(300).children().first().animate({top: 15}, 300);
-            if (!isMobile) {
-                // Focus on first field
-                $("#id_assignment_name").focus();
-            }
-            // Mobile
-            $("#image-new-container").blur();
-        }
-        // Used in utils.js for handling the user typing "N" when showing the form via shift + N
-        form_is_showing = true;
-        // Make rest of page untabbable
-        $(".assignment, .graph, #menu, #image-new-container, a, button:not(#submit-assignment-button), .graph-container input, #advanced, #nav-menu, #user-greeting #username").attr("tabindex","-1");
-        // Explained later
-        replaceUnit();
-    }
-    // Globally define hideForm so it can be used in utils.js
-    hideForm = function(hide_instantly=false) {
-        if (hide_instantly) {
-            $("#overlay").hide().children().first();
-            $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
-        } else {
-            $("#overlay").fadeOut(300,function() {
-                // Remove all error notes when form is exited
-                $(".invalid").removeClass("invalid");
-                $(".error-note").remove();
-            }).children().first().animate({top: "0"}, 300);
-        }
-        // Make rest of page retabbable
-        $("a, button:not(#submit-assignment-button), .graph-container input").removeAttr("tabindex");
-        $("#menu").attr("tabindex","2");
-        $("#image-new-container, #user-greeting #username").attr("tabindex","1");
-        $(".assignment, .graph, #advanced, #nav-menu").attr("tabindex","0");
-        // Used in utils.js for handling the user typing "N" when showing the form via shift + N
-        form_is_showing = false;
-    }
     $("#id_funct_round, #id_min_work_time").parent().addClass("advanced-input");
     $("#nwd-label-title, #nwd-wrapper").addClass("advanced-input");
     $("#form-wrapper #advanced-inputs").insertBefore($(".advanced-input").first()).click(function() {
@@ -101,52 +146,6 @@ $(function() {
     });
     // Hide form when cancel is clicked
     $("#form-wrapper #cancel-button").click(() => hideForm());
-    // Replace fields with unit when unit is "Minute"
-    function replaceUnit() {
-        const val = $("#id_unit").val().trim();
-        const plural = pluralize(val),
-            singular = pluralize(val,1);
-        if (['second','hour','day','week','month','year'].some(unit_of_time => singular.toLowerCase().includes(unit_of_time))) {
-            return alert(`You seem to be entering in "${val}," which is a unit of time. Please enter in "Minute" instead. Although this isn't invalid, it's simpler to use "Minute"`);
-        }
-        // Replace fields
-        // onlyText is defined at the bottom
-        if (val) {
-            if (singular.toLowerCase() === 'minute') {
-                $("label[for='id_y']").text(`Estimated amount of Time to Complete this assignment in Minutes`);
-            } else {
-                $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
-            }
-            $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
-            $("label[for='id_ctime']").text(`Estimated amount of Time to complete each ${singular} in Minutes`);
-            $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
-            $("label[for='id_funct_round'] .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
-        } else {
-            $("label[for='id_y']").html("Total number of Units in this Assignment");
-            $("label[for='id_works']").onlyText("Total number of Units already Completed");
-            $("label[for='id_ctime']").html("Estimated amount of Time to complete each Unit of Work in Minutes");
-            $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
-            $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
-        }
-        if (singular.toLowerCase() === 'minute') {
-            // Disable fields
-            $("#id_ctime").val(1);
-            $("#id_ctime").prop("disabled",true).addClass("disabled-field");
-            $("label[for='id_ctime']").addClass("disabled-field");
-            if (def_funct_round_minute) {
-                $("#id_funct_round").val(5);
-                $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
-                $("label[for='id_funct_round']").addClass("disabled-field");
-            }
-        } else {
-            $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
-            $("label[for='id_ctime']").removeClass("disabled-field");
-            if (def_funct_round_minute) {
-                $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
-                $("label[for='id_funct_round']").removeClass("disabled-field");
-            }
-        }
-    }
     $("#id_unit").on('input', replaceUnit);
     // Add info buttons ($.info defined in template.js)
     $('label[for="id_unit"]').info('right',
@@ -315,9 +314,7 @@ $(function() {
                             // Animate height
                             assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                                 // Remove assignment data from dat
-                                dat = dat.filter(function(assignment) {
-                                    return sa.assignment_name !== assignment.assignment_name
-                                });
+                                dat = dat.filter(assignment => sa.assignment_name !== assignment.assignment_name);
                                 // Remove from DOM
                                 assignment_container.remove();
                                 $(document).dequeue();

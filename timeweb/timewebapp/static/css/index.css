@@ -409,7 +409,7 @@ label[for='id_ad']::after {
     content: "(Enter today if you don't remember)";
 }
 #form-wrapper {
-    width: min(100vw, 460px);
+    width: min(100vw, 478px);
     background: white;
     -webkit-box-shadow: 0 0 8px black;
             box-shadow: 0 0 8px black;
@@ -460,7 +460,7 @@ label[for='id_ad']::after {
     position: relative;
 }
 #form-wrapper label:not(.nwd-label) {
-    margin: 0 49px;
+    margin: 0 25px;
 }
 #form-wrapper input {
     -webkit-box-sizing: border-box;
@@ -511,7 +511,7 @@ label[for='id_ad']::after {
     color: black;
 }
 #submit-assignment-button {
-    width: calc(100% - 192px);
+    width: calc(100% - 140px);
     margin: 0 auto;
     display: block;
     padding: 20px 45px;
