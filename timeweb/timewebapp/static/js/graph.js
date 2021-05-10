@@ -653,6 +653,7 @@ $(function() {
                         const offset = $(fixed_graph).offset();
                         if (set_skew_ratio) {
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
+                            // FLAG
                             day = len_works - assignmentIsInProgress();
                         }
                         // Passes in mouse x and y to draw, explained later
@@ -677,6 +678,7 @@ $(function() {
                             }
                         }
                         ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                        // FLAG
                         day = len_works - assignmentIsInProgress();
                         // Save skew ratio and draw
                         sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened

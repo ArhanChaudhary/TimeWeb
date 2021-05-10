@@ -288,9 +288,17 @@ document.addEventListener("DOMContentLoaded", function() {
                             trigger_resize_from_autofill = true;
                         }
                     }
+                    let x1 = x - red_line_start_x;
+                    if (nwd.length) {
+                        x1 -= Math.floor(x1 / 7) * nwd.length + mods[x1 % 7]; // Handles break days, explained later
+                    }
                     daysleft = x - daysleft;
-                    if (today_minus_dac > len_works && len_works + dif_assign < x) {
-                        status_message = '?\u3000  You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
+                    if ((today_minus_dac > len_works && len_works + dif_assign < x) || !x1) {
+                        if (!x1) {
+                            status_message = '?\u3000  This Assignment has no Working Days. Please Re-enter this assignment\'s Break Days';
+                        } else {
+                            status_message = '?\u3000  You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
+                        }
                         status_value = 1;
                         incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
