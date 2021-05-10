@@ -54,7 +54,7 @@ function replaceUnit() {
     const plural = pluralize(val),
         singular = pluralize(val,1);
     if (['second','hour','day','week','month','year'].some(unit_of_time => singular.toLowerCase().includes(unit_of_time))) {
-        return alert(`You seem to be entering in "${val}," which is a unit of time. Please enter in "Minute" instead. Although this isn't invalid, it's simpler to use "Minute"`);
+        return alert(`You seem to be entering in "${val}," which is a unit of time. Please enter "Minute" instead. Although this isn't invalid, it's simpler to use "Minute"`);
     }
     // Replace fields
     // onlyText is defined at the bottom

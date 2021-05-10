@@ -474,7 +474,7 @@ $(function() {
                             screen.fillText("This Assignment has Not Yet been Assigned", 50+(width-50)/2, row_height*8);
                         } else if (distance_today_from_displayed_day > 0) {
                             screen.fillText("You have not Entered your Work from Previous Days", 50+(width-50)/2, row_height*8);
-                            screen.fillText("Please Enter in your Progress to Continue", 50+(width-50)/2, row_height*9);
+                            screen.fillText("Please Enter your Progress to Continue", 50+(width-50)/2, row_height*9);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                             if (displayed_day.valueOf() === date_now.valueOf()) {
                                 screen.fillText("You have Completed your Work for Today", 50+(width-50)/2, row_height*9);

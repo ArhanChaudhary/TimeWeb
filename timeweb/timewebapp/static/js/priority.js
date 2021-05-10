@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     daysleft = x - daysleft;
                     if (today_minus_dac > len_works && len_works + dif_assign < x) {
-                        status_message = '?\u3000  You have not Entered your past Work Inputs!';
+                        status_message = '?\u3000  You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
                         status_value = 1;
                         incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
@@ -404,17 +404,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }));
             for (let assignment of ordered_assignments) {
+                // originally assignment[0] !== 1 && (assignment[3] || incomplete_works); if assignment[3] is true then assignment[0] !== 1;
+                const mark_as_completed = assignment[3] || incomplete_works && assignment[0] !== 1;
                 const sa = $(".assignment").eq(assignment[2]);
                 let priority;
                 if (assignment[0] === 1) {
                     priority = NaN;
-                } else if (assignment[0] === 4 || assignment[3] || assignment[0] === 6 || assignment[0] === 5 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+                } else if (mark_as_completed || assignment[0] === 4 || assignment[0] === 6 || assignment[0] === 5 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                     priority = 0;
                 } else {
                     priority = Math.max(1,Math.floor(assignment[1] / highest_priority * 100 + 1e-10));
                 }
                 if (text_priority) {
-                    if ((assignment[0] === 2 || assignment[0] === 3) && !assignment[3]) {
+                    if ((assignment[0] === 2 || assignment[0] === 3) && !mark_as_completed) {
                         $(".title").eq(assignment[2]).attr("data-priority", `Priority: ${priority}%`);               
                     } else {
                         $(".title").eq(assignment[2]).attr("data-priority", "");       
@@ -442,9 +444,9 @@ document.addEventListener("DOMContentLoaded", function() {
                             $("main").scroll(() => scroll(resolve));
                             scroll(resolve);
                         });
-                    }).then(() => color_or_animate_assignment(sa, priority/100, true, params.first_sort, assignment[3]));
+                    }).then(() => color_or_animate_assignment(sa, priority/100, true, params.first_sort, mark_as_completed));
                 } else {
-                    color_or_animate_assignment(sa, priority/100, false, params.first_sort, assignment[3]);
+                    color_or_animate_assignment(sa, priority/100, false, params.first_sort, mark_as_completed);
                 }
             }
             // Have this after above to preserve index on sa
