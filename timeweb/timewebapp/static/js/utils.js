@@ -62,7 +62,7 @@ function displayClock() {
 
 const HOUR_TO_UPDATE = 4;
 function changeDateNow() {
-    if (date_now.valueOf() + 86400000 + 1000*60*60*HOUR_TO_UPDATE < new Date().valueOf()) {
+    if (!disable_ajax && date_now.valueOf() + 86400000 + 1000*60*60*HOUR_TO_UPDATE < new Date().valueOf()) {
         date_now.setDate(date_now.getDate() + 1);
         const data = {
             'csrfmiddlewaretoken': csrf_token,
@@ -100,6 +100,7 @@ function error(response, exception) {
     }
 }
 function send_tutorial_ajax() {
+    if (disable_ajax) return;
     const data = {
         'csrfmiddlewaretoken': csrf_token,
         'action': 'change_first_login',
@@ -118,6 +119,7 @@ function stringifyDate(date) {
         ('0' + date.getDate()).slice(-2),
     ].join('-');
 }
+disable_ajax = false;
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -140,6 +142,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     $("#open-assignments").click(() => $(".assignment:not(.open-assignment)").click());
     $("#close-assignments").click(() => $(".assignment.open-assignment").click());
+    $("#next-day").click(function() {
+        disable_ajax = true;
+        date_now.setDate(date_now.getDate() + 1);
+        $(window).trigger("resize");
+        sort({ ignore_timeout: true });
+    }).info("left",
+        `Simulates the next day for every assignment
+        
+        All changes made in the simulation are NOT saved, and your assignments can be restored by refreshing this page`, 'prepend'
+    ).css("left", -3).addClass("dont-hide-button");
     $("#re-enable-tutorial").click(function() {
         if (!first_login) {
             first_login = true;
@@ -170,11 +182,14 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             const success = function() {
                 $(".finished").remove();
-                for (let i = 0; i < finished_assignments.length; i++) {
-                    gtag("event","delete_assignment");
+                if (!disable_ajax) {
+                    for (let i = 0; i < finished_assignments.length; i++) {
+                        gtag("event","delete_assignment");
+                    }
                 }
                 sort({ ignore_timeout: true });
             }
+            if (disable_ajax) return success();
             // Send ajax to avoid a page reload
             $.ajax({
                 type: "POST",
@@ -195,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ).css("left", -2).addClass("dont-hide-button");
     $("#advanced").click(function() {
         $("#advanced-options").toggleClass("hidden");
-    })
+    });
     // Keybind
     form_is_showing = false;
     $(document).keydown(function(e) {
@@ -220,6 +235,7 @@ document.addEventListener("DOMContentLoaded", function() {
             'assignments': [],
         };
     SendAttributeAjax = function(key, value, pk) {
+        if (disable_ajax) return;
         // Add key and values as the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
         let sa;

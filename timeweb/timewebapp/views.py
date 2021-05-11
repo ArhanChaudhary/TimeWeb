@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseForbidden
 from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
@@ -183,7 +183,11 @@ class TimewebListView(LoginRequiredMixin, View):
                 selected_model.min_work_time = self.form.cleaned_data.get("min_work_time")
                 selected_model.nwd = self.form.cleaned_data.get("nwd")
                 selected_model.hidden = self.form.cleaned_data.get("hidden")
-            date_now = timezone.localdate()
+            date_now = timezone.localtime(timezone.now())
+            if date_now.hour < 4:
+                date_now = date_now.date() - datetime.timedelta(1)
+            else:
+                date_now = date_now.date()
             if create_assignment:
                 selected_model.dif_assign = (date_now-selected_model.ad).days
                 if selected_model.dif_assign < 0:
@@ -300,8 +304,8 @@ class TimewebListView(LoginRequiredMixin, View):
             else:
                 self.context['invalid_form_pk'] = pk
                 self.context['submit'] = 'Modify Assignment'
-        self.context['form'] = self.form
-        return 200
+            self.context['form'] = self.form
+            return 200
     
     def deleted_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])

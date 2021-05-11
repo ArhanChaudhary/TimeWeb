@@ -297,11 +297,6 @@ $(function() {
                 $(document).queue(function() {
                     // Once the assignment, is done, this sends the data to the backend and animates its deletion
                     const sa = load_assignment_data(assignment_container.children().first());
-                    let data = {
-                        'csrfmiddlewaretoken': csrf_token,
-                        'action': 'delete_assignment',
-                        'assignments': [sa.id], // Primary key value
-                    }
                     const success = function() {
                         const assignment = assignment_container.children().first();
                         new Promise(function(resolve) {
@@ -323,7 +318,15 @@ $(function() {
                                 sort({ ignore_timeout: true });
                             });
                         });
-                        gtag("event","delete_assignment");
+                        if (!disable_ajax) {
+                            gtag("event","delete_assignment");
+                        }
+                    }
+                    if (disable_ajax) return success();
+                    let data = {
+                        'csrfmiddlewaretoken': csrf_token,
+                        'action': 'delete_assignment',
+                        'assignments': [sa.id], // Primary key value
                     }
                     // Send ajax to avoid a page reload
                     data['assignments'] = JSON.stringify(data['assignments']);
