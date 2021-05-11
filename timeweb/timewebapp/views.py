@@ -364,8 +364,8 @@ class TimewebListView(LoginRequiredMixin, View):
                 assignment.save()
 class ContactView(View):
     def get(self, request):
-        return render(request, "contact.html", {})
+        return render(request, "contact.html")
 
 class ChangelogView(View):
     def get(self, request):
-        return render(request, "changelog.html", {})
+        return render(request, "changelog.html")

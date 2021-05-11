@@ -141,10 +141,10 @@ body {
             transform: scale(1.04);
 }
 
-
-#username:focus #account-dropdown, #account-dropdown:hover {
-    display: block;
+.hidden *, .hidden {
+    display: none !important;
 }
+
 #account-dropdown {
     -webkit-transform: translate(50%, 16px);
         -ms-transform: translate(50%, 16px);
@@ -153,7 +153,7 @@ body {
     width: 150px;
     position: absolute;
     background: rgb(43, 56, 68);
-    display: none;
+    display: block;
     color: white;
     border: 2px solid transparent;
     -webkit-text-fill-color: currentcolor;
@@ -302,8 +302,8 @@ nav.open #nav-menu::after {
 }
 .info-button:focus .info-button-text {
     display: block;
-    -webkit-animation: .2s ease-in-out 1 fadeIn;
-            animation: .2s ease-in-out 1 fadeIn;
+    -webkit-animation: .1s ease-in-out 1 fadeIn;
+            animation: .1s ease-in-out 1 fadeIn;
 }
 @-webkit-keyframes fadeIn {
     from {

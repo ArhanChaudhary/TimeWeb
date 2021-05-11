@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     status_value = 5;
                 } else if (lw >= y || x - daysleft < 1) {
-                    status_message = '&#9733;\u3000You have Finished this Assignment';
+                    status_message = '&#9733;\u3000You have Completely Finished this Assignment';
                     status_value = 6;
                     strdaysleft = '';
                 } else {
@@ -295,14 +295,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     daysleft = x - daysleft;
                     if ((today_minus_dac > len_works && len_works + dif_assign < x) || !x1) {
                         if (!x1) {
-                            status_message = '?\u3000  This Assignment has no Working Days. Please Re-enter this assignment\'s Break Days';
+                            status_message = '?\u3000  This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
                         } else {
                             status_message = '?\u3000  You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
                         }
                         status_value = 1;
                         incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
-                        status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment for Today';
+                        status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment\'s Work for Today';
                         status_value = 4;
                     } else {
                         status_value = 3;
@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
                 let status_priority;
                 if ([1,5,6].includes(status_value)) {
-                    status_priority = Math.abs(daysleft);
+                    status_priority = -Math.abs(daysleft);
                 } else {
                     skew_ratio = 1;
                     red_line_start_x = dif_assign;
@@ -530,17 +530,21 @@ document.addEventListener("DOMContentLoaded", function() {
         if (color_priority) {
             if (color_instantly) {
                 $assignment.addClass("color-instantly");
-                $assignment.css({
-                    background: color(priority),
-                    opacity: hidden ? "0.6" : "",
-                });
+                $assignment.css("background", color(priority))
+                if (hidden) {
+                    $assignment.addClass("mark-as-completed");
+                } else {
+                    $assignment.removeClass("mark-as-completed");
+                }
                 $assignment[0].offsetHeight;
                 $assignment.removeClass("color-instantly");
             } else {
-                $assignment.css({
-                    background: color(priority),
-                    opacity: hidden ? "0.6" : "",
-                });
+                $assignment.css("background", color(priority))
+                if (hidden) {
+                    $assignment.addClass("mark-as-completed");
+                } else {
+                    $assignment.removeClass("mark-as-completed");
+                }
             }
         }
     }

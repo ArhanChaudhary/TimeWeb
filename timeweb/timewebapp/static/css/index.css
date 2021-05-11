@@ -63,9 +63,6 @@ header.animate::after {
 #advanced:focus {
     outline: 0;
 }
-#advanced:focus #advanced-options, #advanced-options:hover {
-    display: block;
-}
 #advanced-options {
     -webkit-transform: translateY(16px);
         -ms-transform: translateY(16px);
@@ -74,7 +71,7 @@ header.animate::after {
     z-index: 1;
     position: absolute;
     background: rgb(155,155,155);
-    display: none;
+    display: block;
     color: black;
     border: 2px solid rgb(140,140,140);
 }
@@ -138,6 +135,9 @@ header.animate::after {
     -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
     -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
+}
+.assignment.mark-as-completed {
+    opacity: 0.6;
 }
 .assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
     -webkit-transition: none;
@@ -482,9 +482,6 @@ label[for='id_ad']::after {
     cursor: pointer;
     width: 149px;
     margin: 0 auto 10px auto
-}
-#form-wrapper .advanced-input {
-    display: none !important;
 }
 #form-wrapper input.disabled-field, #form-wrapper label.disabled-field {
     opacity: 1;

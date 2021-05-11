@@ -60,7 +60,7 @@ function replaceUnit() {
     // onlyText is defined at the bottom
     if (val) {
         if (singular.toLowerCase() === 'minute') {
-            $("label[for='id_y']").text(`Estimated amount of Time to Complete this assignment in Minutes`);
+            $("label[for='id_y']").text(`Estimate how many Minutes this assignment will Take to Complete`);
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
         }
@@ -95,11 +95,11 @@ function replaceUnit() {
     }
 }
 $(function() {
-    $("#id_funct_round, #id_min_work_time").parent().addClass("advanced-input");
-    $("#nwd-label-title, #nwd-wrapper").addClass("advanced-input");
-    $("#form-wrapper #advanced-inputs").insertBefore($(".advanced-input").first()).click(function() {
-        $("#id_funct_round, #id_min_work_time").parent().toggleClass("advanced-input");
-        $("#nwd-label-title, #nwd-wrapper").toggleClass("advanced-input");
+    $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().addClass("hidden");
+    $("#nwd-wrapper").addClass("hidden");
+    $("#form-wrapper #advanced-inputs").insertBefore($("#form-wrapper .hidden").first()).click(function() {
+        $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().toggleClass("hidden");
+        $("#nwd-wrapper").toggleClass("hidden");
     })
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
@@ -138,7 +138,9 @@ $(function() {
         ];
         // Set reeneted form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
-        sa.nwd.forEach(nwd => $("#id_nwd_"+(+nwd+6)%7).prop("checked", true));
+        for (let nwd of Array(7).keys()) {
+            $("#id_nwd_"+((nwd+6)%7)).prop("checked",sa.nwd.includes(nwd));
+        }
         // Set button pk
         $("#submit-assignment-button").val(sa.id);
         // Show form

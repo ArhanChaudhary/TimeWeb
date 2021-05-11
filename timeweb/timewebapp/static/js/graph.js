@@ -29,12 +29,15 @@ $(function() {
     $(".assignment").click(function(e) {
         var e = e || window.event;
         // Runs the click function if
-        // There is no other assignment being animated
         // The background of the assignment was clicked
         // The footer wasn't clicked (to prevent accidental closing)
         if (!["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
-            // Runs if no assignments are swapping and the element clicked was the assignment background
             let assignment = $(this);
+            let sa = load_assignment_data(assignment);
+            // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days
+            if (assignment.hasClass("mark-as-completed") && !sa.hidden) {
+                return $(".assignment").first().focus();
+            }
             const graph_container = assignment.find(".graph-container"),
                 not_first_click = assignment.data('not_first_click');
             if (graph_container.attr("style") && assignment.hasClass("open-assignment")) {
@@ -47,8 +50,8 @@ $(function() {
                     // Hide graph when transition ends
                     assignment.css("overflow", "");
                     graph_container.removeAttr("style")
-                        // Used in form.js to resolve a promise to transition deleting the assignment
-                        .trigger("transitionend");
+                    // Used in form.js to resolve a promise to transition deleting the assignment
+                    .trigger("transitionend");
                 });
                 // Begin arrow animation
                 this.querySelector(".fallingarrowanimation").beginElement();
@@ -64,7 +67,7 @@ $(function() {
                 assignment.css("overflow", "");
                 graph_container.css({
                     "display": "",
-                    "margin-bottom": ""
+                    "margin-bottom": "",
                 });
                 // Prevents auto scroll if a graph is open
                 if ($(".open-assignment").length === 0) {
@@ -78,8 +81,7 @@ $(function() {
                 assignment.addClass("open-assignment");
                 // Animate arrow
                 this.querySelector(".risingarrowanimation").beginElement();
-                let sa = load_assignment_data(assignment);
-                // Load in static data
+                
                 let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 // Type conversions
                 ad = parseDate(ad + " 00:00");
@@ -486,7 +488,7 @@ $(function() {
                             screen.fillText("You are Behind Schedule!", 50+(width-50)/2, row_height*9);
                         }
                     } else {
-                        screen.fillText('You have Finished this Assignment!', 50+(width-50)/2, row_height*7);
+                        screen.fillText('You have Completely Finished this Assignment!', 50+(width-50)/2, row_height*7);
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }
@@ -653,7 +655,6 @@ $(function() {
                         const offset = $(fixed_graph).offset();
                         if (set_skew_ratio) {
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
-                            // FLAG
                             day = len_works - assignmentIsInProgress();
                         }
                         // Passes in mouse x and y to draw, explained later
@@ -678,7 +679,6 @@ $(function() {
                             }
                         }
                         ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                        // FLAG
                         day = len_works - assignmentIsInProgress();
                         // Save skew ratio and draw
                         sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
@@ -1034,13 +1034,13 @@ $(function() {
 
                     fixed_mode_button.info("top",
                         `Fixed mode:
-                        In this mode, the graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress," and you will have to make up the remainder of its work later that day. If you still don't finish its work, you will have to make it up on the next day
+                        The graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress", and you will have to make up the remainder of its work later that day. If you still don't finish its work, you will have to make it up on the next day
 
                         This mode is recommended for discipline or if the assignment is important
 
 
                         Dynamic mode (default):
-                        In this mode, if you fail to complete the specified amount of work for any day, the graph will change itself to start at your last work input, adapting to your work schedule
+                        In this mode, if you fail to complete the specified amount of work for any day, the graph will readjust itself to start at your last work input, adapting to your work schedule
 
                         This mode is recommended if you can't keep up with an assignment's work schedule. It's easy to fall behind with this mode, so be careful`
                     ).children().first().css({

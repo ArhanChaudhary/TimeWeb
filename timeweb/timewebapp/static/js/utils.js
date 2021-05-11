@@ -193,6 +193,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend"
     ).css("left", -2).addClass("dont-hide-button");
+    $("#advanced").click(function() {
+        $("#advanced-options").toggleClass("hidden");
+    })
     // Keybind
     form_is_showing = false;
     $(document).keydown(function(e) {
@@ -205,10 +208,11 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     // width * percent = width+10
     // percent = 1 + 10/width
-    $(window).resize(function() {
+    function resize() {
         $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(document.querySelector(".assignment")).width()}`);
-    });
-    $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(document.querySelector(".assignment")).width()}`);
+    }
+    $(window).resize(resize);
+    resize();
     let ajaxTimeout,
         data = {
             'csrfmiddlewaretoken': csrf_token,
