@@ -25,7 +25,7 @@ class TimewebForm(forms.ModelForm):
             'ctime': forms.NumberInput(attrs={"min":"0"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
-            'hidden': forms.HiddenInput(),
+            'mark_as_done': forms.HiddenInput(),
         }
         error_messages = {
             'assignment_name': {

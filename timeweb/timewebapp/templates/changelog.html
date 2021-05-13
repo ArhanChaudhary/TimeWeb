@@ -6,9 +6,22 @@
 {% endblock css %}
 
 {% block content %}
+5/12/2021 (v1.3.1):
+<ul>
+    <li>Enabling round to multiples of 5 minutes automatically modifies for every assignment</li>
+    <li>Increased sort timeout to avoid assignments resorting too fast</li>
+    <li>Automatically create an example assignment in the tutorial</li>
+    <li>Minor bug fixes</li>
+    <ul>
+        <li>Fixed an overflow error for longer due dates</li>
+        <li>Fixed the graph disappearing after re-entering the due date</li>
+        <li>Fixed work inputs not cutting off from a re-entered due date</li>
+    </ul>
+</ul>
 5/11/2021 (v1.3.0):
 <ul>
     <li>Added "Go to Next Day" in advanced</li>
+    <li>Added shift + click delete icon keybind to skip the prompt for deleting an assignment</li>
     <li>Minor bug fix</li>
     <ul>
         <li>Fixed assignments assigned after midnight causing unexpected behavior</li>
@@ -16,7 +29,7 @@
 </ul>
 5/11/2021 (v1.2.1):
 <ul>
-    <li>Made assignments unclickable if an assignment without past work inputs or no working days is present to force the user to resolve its issue</li>
+    <li>Made assignments unclickable if an assignment without past work inputs or no working days is present to force users to resolve its issue</li>
     <li>Minor bug fixes</li>
     <ul>
         <li>Fixed advanced options initially being visible</li>
@@ -26,8 +39,8 @@
 </ul>
 5/10/2021 (v1.2.0):
 <ul>
-    <li>Marked all other assignments as completed when an assignment without past work inputs is present to urge the user to enter their progress</li>
-    <li>Marked all other assignments as completed when an assignment with no working days is present to urge the user to re-enter its break days</li>
+    <li>Marked all other assignments as completed when an assignment without past work inputs is present to urge users to enter their progress</li>
+    <li>Marked all other assignments as completed when an assignment with no working days is present to urge users to re-enter its break days</li>
     <li>Lowered opacity for assignments marked as completed</li>
     <li>Improved Form UI</li>
     <li>Major bug fixes</li>

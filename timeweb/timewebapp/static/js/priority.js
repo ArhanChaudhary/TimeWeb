@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         $(document).queue(function() {
+            // Swap assignment containers because they don't have a transition
             const tar1 = $(".assignment-container").eq(tar1_index),
                 tar2 = $(".assignment-container").eq(tar2_index),
                 tar1_height = tar1.height() + 10,
@@ -135,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (params.ignore_timeout) {
             sort_without_timeout();
         } else {
-            sortTimeout = setTimeout(sort_without_timeout, swap_duration + 500);
+            sortTimeout = setTimeout(sort_without_timeout, swap_duration + 1000);
         }
         function sort_without_timeout() {
             let ordered_assignments = [],
@@ -320,11 +321,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         } else {
                             status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} Today`;
                         }
-                        total += Math.ceil(sa.hidden ? 0 : todo*ctime);
+                        total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
                     }
                     if (daysleft === 1) {
                         strdaysleft = 'Tomorrow';
-                        tomorrow_total += Math.ceil(sa.hidden ? 0 : todo*ctime);
+                        tomorrow_total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
                         if (status_value !== 1) {
                             status_value = 2;
                         }
@@ -336,6 +337,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         strdaysleft = `${daysleft}d`;
                     }
                 }
+                // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
                 if (status_value === 6) {
                     $(".assignment-container").eq(index).addClass("finished");
                 } else {
@@ -377,7 +379,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
                 let priority_data = [status_value, status_priority, index];
-                if (sa.hidden && status_value !== 1) {
+                if (sa.mark_as_done && status_value !== 1) {
                     priority_data.push(true);
                 }
                 ordered_assignments.push(priority_data);
@@ -404,33 +406,33 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (a[2] < b[2]) return -1;
                 if (a[2] > b[2]) return 1;
             });
-            const highest_priority = Math.max(...ordered_assignments.map(function(assignment) {
-                if ((assignment[0] === 2 || assignment[0] === 3) && !assignment[3]) {
-                    return assignment[1];
+            const highest_priority = Math.max(...ordered_assignments.map(function(sa) {
+                if ((sa[0] === 2 || sa[0] === 3) && !sa[3]) {
+                    return sa[1];
                 } else {
                     return -Infinity;
                 }
             }));
-            for (let assignment of ordered_assignments) {
+            for (let sa of ordered_assignments) {
                 // originally assignment[0] !== 1 && (assignment[3] || incomplete_works); if assignment[3] is true then assignment[0] !== 1;
-                const mark_as_completed = assignment[3] || incomplete_works && assignment[0] !== 1;
-                const sa = $(".assignment").eq(assignment[2]);
+                const mark_as_done = sa[3] || incomplete_works && sa[0] !== 1;
+                const dom_assignment = $(".assignment").eq(sa[2]);
                 let priority;
-                if (assignment[0] === 1) {
+                if (sa[0] === 1) {
                     priority = NaN;
-                } else if (mark_as_completed || assignment[0] === 4 || assignment[0] === 6 || assignment[0] === 5 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+                } else if (mark_as_done || sa[0] === 4 || sa[0] === 6 || sa[0] === 5 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                     priority = 0;
                 } else {
-                    priority = Math.max(1,Math.floor(assignment[1] / highest_priority * 100 + 1e-10));
+                    priority = Math.max(1,Math.floor(sa[1] / highest_priority * 100 + 1e-10));
                 }
                 if (text_priority) {
-                    if ((assignment[0] === 2 || assignment[0] === 3) && !mark_as_completed) {
-                        $(".title").eq(assignment[2]).attr("data-priority", `Priority: ${priority}%`);               
+                    if ((sa[0] === 2 || sa[0] === 3) && !mark_as_done) {
+                        $(".title").eq(sa[2]).attr("data-priority", `Priority: ${priority}%`);               
                     } else {
-                        $(".title").eq(assignment[2]).attr("data-priority", "");       
+                        $(".title").eq(sa[2]).attr("data-priority", "");       
                     }
                 }
-                const assignment_container = sa.parent();
+                const assignment_container = dom_assignment.parent();
                 if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                     new Promise(function(resolve) {
                         $(window).one('load', function() {
@@ -439,7 +441,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             let assignment_to_scroll_to = $("#animate-in").next();
                             if (!assignment_to_scroll_to.length) {
                                 // If "#animate-color" or "#animate-in" is the last assignment on the list, scroll to itself instead
-                                assignment_to_scroll_to = assignment_container;
+                                assignment_to_scroll_to = dom_assignment;
                             }
                             setTimeout(function() {
                                 // scrollIntoView sometimes doesn't work without setTimeout
@@ -452,9 +454,9 @@ document.addEventListener("DOMContentLoaded", function() {
                             $("main").scroll(() => scroll(resolve));
                             scroll(resolve);
                         });
-                    }).then(() => color_or_animate_assignment(sa, priority/100, true, params.first_sort, mark_as_completed));
+                    }).then(() => color_or_animate_assignment(dom_assignment, priority/100, true, params.first_sort, mark_as_done));
                 } else {
-                    color_or_animate_assignment(sa, priority/100, false, params.first_sort, mark_as_completed);
+                    color_or_animate_assignment(dom_assignment, priority/100, false, params.first_sort, mark_as_done);
                 }
             }
             // Have this after above to preserve index on sa
@@ -501,6 +503,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (isNaN(p)) {
             return "";
         } else {
+            // return `rgb(${35+220*p},${230-185*p},${9+28*p})`;
             return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
         } 
     }
@@ -516,7 +519,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // This is done by setting its bottom margin to the negative value of its height, effectively making it seem like it's not there
     // Then, the assignment is moved to the bottom of the page and hidden by using the "top" and "opacity" styles
     // Finally, they are all set to their default values in a jQuery animation in the function directly below this
-    function color_or_animate_assignment($assignment, priority, is_element_submitted, color_instantly, hidden) {
+    function color_or_animate_assignment($assignment, priority, is_element_submitted, color_instantly, mark_as_done) {
         if ($("#animate-in").length && is_element_submitted) {
             // If a new assignment was created and the assignment that color_or_animate_assignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
@@ -531,7 +534,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (color_instantly) {
                 $assignment.addClass("color-instantly");
                 $assignment.css("background", color(priority))
-                if (hidden) {
+                if (mark_as_done) {
                     $assignment.addClass("mark-as-completed");
                 } else {
                     $assignment.removeClass("mark-as-completed");
@@ -540,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $assignment.removeClass("color-instantly");
             } else {
                 $assignment.css("background", color(priority))
-                if (hidden) {
+                if (mark_as_done) {
                     $assignment.addClass("mark-as-completed");
                 } else {
                     $assignment.removeClass("mark-as-completed");

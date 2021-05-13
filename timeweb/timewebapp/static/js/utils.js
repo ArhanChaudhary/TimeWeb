@@ -59,7 +59,6 @@ function displayClock() {
     estimated_completion_time.setMinutes(estimated_completion_time.getMinutes() + +$("#estimated-total-time").attr("data-minutes"));
     $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
 }
-
 const HOUR_TO_UPDATE = 4;
 function changeDateNow() {
     if (!disable_ajax && date_now.valueOf() + 86400000 + 1000*60*60*HOUR_TO_UPDATE < new Date().valueOf()) {
@@ -75,7 +74,7 @@ function changeDateNow() {
             error: error,
         });
         for (let sa of dat) {
-            sa.hidden = false;
+            sa.mark_as_done = false;
         }
     }
 }
@@ -120,6 +119,10 @@ function stringifyDate(date) {
     ].join('-');
 }
 disable_ajax = false;
+
+// Uncomment if using scroller
+// disable_ajax = true;
+
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -289,6 +292,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         // Save scroll position
         localStorage.setItem("scroll", $("main").scrollTop());
+        if (!$("#form-wrapper .hidden").length) {
+            sessionStorage.setItem("advanced_inputs", true);
+        }
         if (data['assignments'].length) {
             sendAjaxNoTimeout();
         }
@@ -310,10 +316,14 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     if (first_login) {
-        if ($(".assignment-container").length) {
-            $(".assignment-container").first().append("<span>Click your assignment<br></span>");
+        const assignments_excluding_example = $(".assignment").filter(function() {
+            return $(this).attr("data-assignment-name") !== "Reading a Book (EXAMPLE ASSIGNMENT)"
+        })
+        if (assignments_excluding_example.length) {
+            assignments_excluding_example.parent().append("<span>Click your assignment<br></span>");
         } else {
             $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
+            $(".assignment-container").hide();
         }
     }
 });

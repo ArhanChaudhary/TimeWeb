@@ -21,26 +21,24 @@ $(function() {
 
     function PreventArrowScroll(e) {
         // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
-        var e = e || window.event;
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
             e.preventDefault();
         }
     }
     $(".assignment").click(function(e) {
-        var e = e || window.event;
         // Runs the click function if
         // The background of the assignment was clicked
         // The footer wasn't clicked (to prevent accidental closing)
         if (!["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
-            let assignment = $(this);
-            let sa = load_assignment_data(assignment);
-            // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days
-            if (assignment.hasClass("mark-as-completed") && !sa.hidden) {
+            let dom_assignment = $(this);
+            let sa = load_assignment_data(dom_assignment);
+            // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
+            if (dom_assignment.hasClass("mark-as-completed") && !sa.mark_as_done) {
                 return $(".assignment").first().focus();
             }
-            const graph_container = assignment.find(".graph-container"),
-                not_first_click = assignment.data('not_first_click');
-            if (graph_container.attr("style") && assignment.hasClass("open-assignment")) {
+            const graph_container = dom_assignment.find(".graph-container"),
+                not_first_click = dom_assignment.data('not_first_click');
+            if (graph_container.attr("style") && dom_assignment.hasClass("open-assignment")) {
                 // Runs when assignment is clicked while open
 
                 // Animate the graph's margin bottom to close the assignment
@@ -48,7 +46,7 @@ $(function() {
                     marginBottom: -graph_container.height()
                 }, 750, "easeOutCubic", function() {
                     // Hide graph when transition ends
-                    assignment.css("overflow", "");
+                    dom_assignment.css("overflow", "");
                     graph_container.removeAttr("style")
                     // Used in form.js to resolve a promise to transition deleting the assignment
                     .trigger("transitionend");
@@ -56,7 +54,7 @@ $(function() {
                 // Begin arrow animation
                 this.querySelector(".fallingarrowanimation").beginElement();
                 // Make assignment overflow hidden 
-                assignment.removeClass("open-assignment").css("overflow", "hidden");
+                dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
                 // If no graphs are open, allow arrow scroll
                 if ($(".open-assignment").length === 0) {
                     $(document).off("keydown", PreventArrowScroll);
@@ -64,7 +62,7 @@ $(function() {
             } else {
                 // If the assignment was clicked while it was closing, stop the closing animation and open it
                 graph_container.stop();
-                assignment.css("overflow", "");
+                dom_assignment.css("overflow", "");
                 graph_container.css({
                     "display": "",
                     "margin-bottom": "",
@@ -78,7 +76,7 @@ $(function() {
                 let graph = this.querySelector('.graph'),
                     fixed_graph = this.querySelector('.fixed-graph');
                 // Disable hover
-                assignment.addClass("open-assignment");
+                dom_assignment.addClass("open-assignment");
                 // Animate arrow
                 this.querySelector(".risingarrowanimation").beginElement();
                 
@@ -228,7 +226,7 @@ $(function() {
                         const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
                         skew_ratio_lim = Math.round((y1 + min_work_time_funct_round) * x1 / y1 * 10)/10;
                     }
-                    assignment.find(".skew-ratio-textbox").attr({
+                    dom_assignment.find(".skew-ratio-textbox").attr({
                         min: 1 - skew_ratio_lim,
                         max: skew_ratio_lim - 1,
                     });
@@ -651,7 +649,6 @@ $(function() {
                 if (!not_first_click) {
                     // BEGIN Setup
                     function mousemove(e) {
-                        var e = e || window.event;
                         const offset = $(fixed_graph).offset();
                         if (set_skew_ratio) {
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
@@ -691,7 +688,6 @@ $(function() {
                         graphinterval,
                         whichkey;
                     $(document).keydown(function(e) {
-                        var e = e || window.event;
                         // $(fixed_graph).is(":visible") to make sure it doesnt change when the assignment is closed
                         // !$(document.activeElement).hasClass("skew-ratio-textbox") prevents double dipping
                         if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("skew-ratio-textbox")) {
@@ -713,7 +709,6 @@ $(function() {
                         }
                     });
                     $(document).keyup(function(e) {
-                        var e = e || window.event;
                         if (e.key === whichkey) {
                             // If the keyup was the same key that was just pressed stop change skew ratio
                             fired = false;
@@ -726,15 +721,15 @@ $(function() {
                     //
                     // Nine buttons event listeners
                     //
-                    const skew_ratio_button = assignment.find(".skew-ratio-button"),
-                        total_work_input_button = assignment.find(".total-work-input-button"),
-                        display_button = assignment.find(".display-button"),
-                        skew_ratio_textbox = assignment.find(".skew-ratio-textbox"),
-                        submit_work_button = assignment.find(".submit-work-button"),
-                        hide_assignment_button = assignment.find(".hide-assignment-button"),
-                        fixed_mode_button = assignment.find(".fixed-mode-button"),
-                        delete_work_input_button = assignment.find(".delete-work-input-button"),
-                        next_assignment_button = assignment.find(".next-assignment-button");
+                    const skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
+                        total_work_input_button = dom_assignment.find(".total-work-input-button"),
+                        display_button = dom_assignment.find(".display-button"),
+                        skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
+                        submit_work_button = dom_assignment.find(".submit-work-button"),
+                        hide_assignment_button = dom_assignment.find(".hide-assignment-button"),
+                        fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
+                        delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
+                        next_assignment_button = dom_assignment.find(".next-assignment-button");
 
                     // BEGIN Set skew ratio button
                     skew_ratio_button.click(function() {
@@ -814,7 +809,7 @@ $(function() {
                                 }
                             }
                             if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done < y && !rem_work) {
-                                return alert("Your last work input must complete the assignment");
+                                return alert("Your last work input must complete this assignment");
                             }
                             if (input_done < 0) {
                                 input_done = 0;
@@ -887,7 +882,6 @@ $(function() {
 
                     // BEGIN Skew ratio textbox
                     skew_ratio_textbox.on("keydown paste click keyup", function() { // keydown for normal sr and keyup for delete
-                        var e = e || window.event;
                         if (old_skew_ratio === undefined) {
                             // Sets old_skew_ratio
                             old_skew_ratio = skew_ratio;
@@ -909,7 +903,6 @@ $(function() {
                         sort();
                         draw();
                     }).keypress(function(e) {
-                        var e = e || window.event;
                         // Saves skew ratio on enter
                         if (e.key === "Enter") {
                             // focusout event
@@ -992,19 +985,19 @@ $(function() {
 
                     // BEGIN Hide assignment button
                     hide_assignment_button.click(function() {
-                        sa.hidden = !sa.hidden;
-                        $(this).onlyText(sa.hidden ? "Unmark as Completed" : "Mark as Completed");
-                        SendAttributeAjax('hidden', sa.hidden, sa.id);
+                        sa.mark_as_done = !sa.mark_as_done;
+                        $(this).onlyText(sa.mark_as_done ? "Unmark as Completed" : "Mark as Completed");
+                        SendAttributeAjax('mark_as_done', sa.mark_as_done, sa.id);
                         sort({ ignore_timeout: true });
-                    }).html(sa.hidden ? "Unmark as Completed" : "Mark as Completed");
+                    }).html(sa.mark_as_done ? "Unmark as Completed" : "Mark as Completed");
                     // END Hide assignment button
 
                     // BEGIN Next assignment button
                     next_assignment_button.click(function() {
-                        const next_assignment = assignment.parent().next().children().first();
+                        const next_assignment = dom_assignment.parent().next().children().first();
                         // Only close if next assignment exists
                         if (next_assignment.length) {
-                            assignment.click();
+                            dom_assignment.click();
                         }
                         // Only open next assignment if closed
                         if (!next_assignment.hasClass("open-assignment")) {     
@@ -1034,15 +1027,12 @@ $(function() {
 
                     fixed_mode_button.info("top",
                         `Fixed mode:
-                        The graph is static and does not change. If you fail to complete the specified amount of work for any day, the assignment is marked as "in progress", and you will have to make up the remainder of its work later that day. If you still don't finish its work, you will have to make it up on the next day
-
-                        This mode is recommended for discipline or if the assignment is important
-
+                        The red line always starts at the assignment date. If you don't finish a day's work, you'll have to make it up on the next day
+                        This mode is recommended for discipline or if an assignment is important
 
                         Dynamic mode (default):
-                        In this mode, if you fail to complete the specified amount of work for any day, the graph will readjust itself to start at your last work input, adapting to your work schedule
-
-                        This mode is recommended if you can't keep up with an assignment's work schedule. It's easy to fall behind with this mode, so be careful`
+                        If you don't finish a day's work, the red line will readjust itself to start at your last work input, adapting to your work schedule
+                        This mode is recommended if you can't keep up with an assignment's work schedule`
                     ).children().first().css({
                         fontSize: 11,
                         lineHeight: "11px",
@@ -1091,7 +1081,7 @@ $(function() {
                     graph.height = height * scale;
                     fixed_graph.width = width * scale;
                     fixed_graph.height = height * scale;
-                    if (assignment.hasClass("open-assignment") && assignment.is(":visible")) {
+                    if (dom_assignment.hasClass("open-assignment") && dom_assignment.is(":visible")) {
                         drawfixed();
                         draw();
                     }
@@ -1111,7 +1101,7 @@ $(function() {
                         if (x <= 2) {
                             alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are more effective for this visualization`);
                         }
-                        alert("Once you add more assignments, they are prioritized based on their estimated completion times and due dates");
+                        alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
                         alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");
                         first_login = false;
                         send_tutorial_ajax();
@@ -1119,12 +1109,12 @@ $(function() {
                 }
                 // Makes input bigger for info button
                 if (show_info_buttons || first_login) {
-                    assignment.find(".total-work-input-button").css("width", 163);
+                    dom_assignment.find(".total-work-input-button").css("width", 163);
                     // Position up/down input scroller
-                    assignment.find(".skew-ratio-textbox").addClass("translate-left");
+                    dom_assignment.find(".skew-ratio-textbox").addClass("translate-left");
                 }
             }
-            assignment.data('not_first_click', true);
+            dom_assignment.data('not_first_click', true);
         }
     });
 });

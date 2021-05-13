@@ -84,7 +84,7 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
-    hidden = models.BooleanField(
+    mark_as_done = models.BooleanField(
         default=False,
     )
     user = models.ForeignKey(

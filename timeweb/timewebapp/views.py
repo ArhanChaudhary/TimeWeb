@@ -21,6 +21,29 @@ from django.dispatch import receiver
 @receiver(post_save, sender=get_user_model())
 def create_settings_model(sender, instance, created, **kwargs):
     if created:
+        date_now = timezone.localtime(timezone.now())
+        if date_now.hour < 4:
+            date_now = date_now.date() - datetime.timedelta(1)
+        else:
+            date_now = date_now.date()
+        TimewebModel.objects.create(**{
+            "assignment_name": "Reading a Book (EXAMPLE ASSIGNMENT)",
+            "ad": date_now.strftime("%Y-%m-%d"),
+            "x": (date_now + datetime.timedelta(30)).strftime("%Y-%m-%d"),
+            "unit": "Page",
+            "y": "400.00",
+            "works": ["0"],
+            "dif_assign": 0,
+            "skew_ratio": "1.0000000000",
+            "ctime": "3.00",
+            "funct_round": "1.00",
+            "min_work_time": "60.00",
+            "nwd": [],
+            "fixed_mode": False,
+            "dynamic_start": 0,
+            "mark_as_done": False,
+            "user": instance,
+        })
         SettingsModel.objects.create(user=instance)
         logger.info(f'Created settings model for user "{instance.username}"')
 
@@ -64,6 +87,11 @@ class SettingsView(LoginRequiredMixin, View):
             settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1
             settings_model.def_nwd = self.form.cleaned_data.get("def_nwd")
             settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
+            if settings_model.def_funct_round_minute:
+                for model in TimewebModel.objects.filter(user__username=request.user):
+                    if model.unit in ['minute', 'Minute', 'minutes', 'Minutes'] and model.funct_round != 5:
+                        model.funct_round = 5
+                        model.save()
             settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
             settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
             settings_model.show_info_buttons = self.form.cleaned_data.get("show_info_buttons")
@@ -182,7 +210,7 @@ class TimewebListView(LoginRequiredMixin, View):
                 selected_model.funct_round = self.form.cleaned_data.get("funct_round")
                 selected_model.min_work_time = self.form.cleaned_data.get("min_work_time")
                 selected_model.nwd = self.form.cleaned_data.get("nwd")
-                selected_model.hidden = self.form.cleaned_data.get("hidden")
+                selected_model.mark_as_done = self.form.cleaned_data.get("mark_as_done")
             date_now = timezone.localtime(timezone.now())
             if date_now.hour < 4:
                 date_now = date_now.date() - datetime.timedelta(1)
@@ -257,6 +285,10 @@ class TimewebListView(LoginRequiredMixin, View):
                     # x_num = (date_now - selected_model.ad).days + x_num
                     # x_num += (date_now - selected_model.ad).days
                     x_num += (date_now - selected_model.ad).days
+                try:
+                    selected_model.x = selected_model.ad + datetime.timedelta(x_num)
+                except OverflowError:
+                    selected_model.x = datetime.datetime.max.date()
             else:
                 x_num = (selected_model.x - selected_model.ad).days
             if selected_model.min_work_time != None:
@@ -267,9 +299,16 @@ class TimewebListView(LoginRequiredMixin, View):
                 # If the reentered assign date cuts off some of the work inputs, adjust the work inputs accordingly
                 removed_works_end = len(old_data.works) - 1
 
+                # Ensure x_num - selected_model.dif_assign isn't negative. This can't be checked earlier because selected_model.dif_assign depends on x_num, which itself depends in selected_model.dif_assign
+                # breakpoint()
+                # if x_num - selected_model.dif_assign < 0:
+                    # selected_model.dif_assign = x_num
+
+                end_of_works = (selected_model.x - old_data.ad).days
+
                 # If the reentered due date cuts off some of the work inputs, remove the work input for the last day because that must complete assignment
-                if removed_works_end >= x_num - selected_model.dif_assign:
-                    removed_works_end = x_num - selected_model.dif_assign
+                if removed_works_end >= end_of_works:
+                    removed_works_end = end_of_works
                     if old_data.works[removed_works_end] != selected_model.y:
                         removed_works_end -= 1
                 if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(adone)
@@ -285,9 +324,8 @@ class TimewebListView(LoginRequiredMixin, View):
                     selected_model.dynamic_start += selected_model.dif_assign - old_data.dif_assign
                 if selected_model.dynamic_start < 0:
                     selected_model.dynamic_start = 0
-            if update_assignment and selected_model.dynamic_start > x_num - 1:
-                selected_model.dynamic_start = x_num - 1
-            selected_model.x = selected_model.ad + datetime.timedelta(x_num)
+                elif selected_model.dynamic_start > x_num - 1:
+                    selected_model.dynamic_start = x_num - 1
             selected_model.save()
 
             if create_assignment:
@@ -335,7 +373,7 @@ class TimewebListView(LoginRequiredMixin, View):
                     forbidden_log_message = f"User \"{request.user}\" cannot modify works for an assignment that isn't their's"
                     forbidden_client_message = "The assignment you are trying to modify work inputs isn't yours"
                     log_message = f'User \"{request.user}\" modified works for assignment "{selected_model.assignment_name}"'
-                elif key == 'hidden':
+                elif key == 'mark_as_done':
                     forbidden_log_message = f"User \"{request.user}\" cannot mark or unmark an assignment completed that isn't their's"
                     forbidden_client_message = "The assignment you are trying to mark or unmark as completed isn't yours"
                     log_message = f'User \"{request.user}\" marked or unmarked assignment "{selected_model.assignment_name}" as completed'
@@ -363,8 +401,8 @@ class TimewebListView(LoginRequiredMixin, View):
         settings_model.save()
         # Unmark every assignment as completed
         for assignment in TimewebModel.objects.filter(user__username=request.user):
-            if assignment.hidden:
-                assignment.hidden = False
+            if assignment.mark_as_done:
+                assignment.mark_as_done = False
                 assignment.save()
 class ContactView(View):
     def get(self, request):

@@ -101,6 +101,10 @@ $(function() {
         $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().toggleClass("hidden");
         $("#nwd-wrapper").toggleClass("hidden");
     })
+    if ("advanced_inputs" in sessionStorage) {
+        $("#form-wrapper #advanced-inputs").click();
+        sessionStorage.removeItem("advanced_inputs");
+    }
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
@@ -273,17 +277,17 @@ $(function() {
     // Prevent label from stealing focus from info button
     $("#form-wrapper .info-button").click(() => false);
     // Delete assignment
-    $('.delete-button').click(function() {
+    $('.delete-button').click(function(e) {
         const $this = $(this),
-            assignment_container = $this.parents(".assignment-container");
-        if (confirm(isMobile ? 'Are you sure you want to delete this assignment?' : 'Are you sure you want to delete this assignment? (Press Enter)')) {
+            dom_assignment = $this.parents(".assignment");
+        if (e.shiftKey || confirm(isMobile ? 'Are you sure you want to delete this assignment?' : 'Are you sure you want to delete this assignment? (Press Enter)')) {
             // Unfocus to prevent pressing enter to click again
             $this.blur();
             new Promise(function(resolve) {
                 // Scroll to assignment before it is deleted if out of view
                 setTimeout(function() {
                     // Sometimes doesn't scroll without setTimeout
-                    assignment_container[0].scrollIntoView({
+                    dom_assignment[0].scrollIntoView({
                         behavior: 'smooth',
                         block: 'nearest',
                     });
@@ -293,25 +297,25 @@ $(function() {
                 scroll(resolve);
             }).then(function() {
                 // Deny updating or deleting again after queued
-                assignment_container.css("pointer-events", "none");
+                dom_assignment.css("pointer-events", "none");
                 $(document).queue(function() {
                     // Once the assignment, is done, this sends the data to the backend and animates its deletion
-                    const sa = load_assignment_data(assignment_container.children().first());
+                    const sa = load_assignment_data(dom_assignment);
                     const success = function() {
-                        const assignment = assignment_container.children().first();
                         new Promise(function(resolve) {
-                            if (assignment.hasClass("open-assignment")) {
-                                assignment.click().find(".graph-container").one("transitionend", resolve);
+                            if (dom_assignment.hasClass("open-assignment")) {
+                                dom_assignment.click().find(".graph-container").one("transitionend", resolve);
                             } else {
                                 resolve();
                             }
                         }).then(function() {
                             // Opacity CSS transition
-                            assignment.css("opacity", "0");
-                            // Animate height
+                            dom_assignment.css("opacity", "0");
+                            const assignment_container = dom_assignment.parent();
+                            // Animate height on assignment_container because it doesn't have a transition
                             assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                                 // Remove assignment data from dat
-                                dat = dat.filter(assignment => sa.assignment_name !== assignment.assignment_name);
+                                dat = dat.filter(dom_assignment => sa.assignment_name !== dom_assignment.assignment_name);
                                 // Remove from DOM
                                 assignment_container.remove();
                                 $(document).dequeue();
@@ -336,7 +340,7 @@ $(function() {
                         success: success,
                         error: function(response, exception) {
                             // If ajax failed, allow updating or deleting again
-                            assignment_container.css("pointer-events", "auto");
+                            dom_assignment.css("pointer-events", "auto");
                             error(response, exception);
                         }
                     });

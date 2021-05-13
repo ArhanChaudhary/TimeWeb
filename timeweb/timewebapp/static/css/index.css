@@ -112,7 +112,6 @@ header.animate::after {
 }
 .assignment-container {
     position: relative;
-    scroll-margin: 20px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
@@ -132,6 +131,7 @@ header.animate::after {
     width: 100%; /* Needed for when it becomes position: absolute during deletion */
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
+    scroll-margin: 20px;
     -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
     -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
@@ -471,7 +471,6 @@ label[for='id_ad']::after {
     width: calc(100% - 20px);
     border: 1px solid black;
     border-radius: 3px;
-    scroll-margin: 20px;
 }
 #form-wrapper input[type="date"] {
     /* IOS */
