@@ -49,7 +49,7 @@ $ python manage.py shell
   <div id="overlay">
     <div id="form-wrapper">
       <form method="POST" autocomplete="off">
-        <img id="cancel-button" width="45" height="45" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
+        <img id="cancel-button" class="button" width="45" height="45" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
         <div id="new-title-line"></div>
         <div id="new-title">New Assignment</div>
         {% csrf_token %}
@@ -123,12 +123,8 @@ $ python manage.py shell
               <span class="status-message"></span>
               <span class="completion-time"></span>
             </p>
-            <button class="button update-button">
-              <img width="20" height="20" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
-            </button>
-            <button class="button delete-button">
-              <img width="19" height="22" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
-            </button>
+            <img class="button update-button" width="45" height="45" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
+            <img class="button delete-button" width="45" height="45" src="{% static 'images/x.png' %}" alt="edit" draggable="false"/>
           </div>
           <div class="relative-positioning-wrapper">
             <div class="graph-container">

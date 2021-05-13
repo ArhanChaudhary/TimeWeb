@@ -144,10 +144,6 @@ header.animate::after {
     -o-transition: none;
     transition: none
 }
-.assignment:focus, .button:focus {
-    outline: 0;
-    border: 2px solid rgb(0,95,204) !important;
-}
 .assignment:not(.open-assignment):hover {
     -webkit-transform: scale(var(--scale-percent),1.05);
         -ms-transform: scale(var(--scale-percent),1.05);
@@ -158,6 +154,7 @@ header.animate::after {
             box-shadow: 0 0 7px rgb(52,52,52);
 }
 .assignment:focus {
+    outline: 0;
     -webkit-box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
             box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
 }
@@ -251,38 +248,24 @@ header.animate::after {
     margin-left: auto;
 }
 .button {
-    background: -o-radial-gradient(circle, lightgray 40%, gray 100%);
-    background: radial-gradient(circle, lightgray 40%, gray 100%);
-    border: 2px solid rgb(80,80,80);
-    border-radius: 50%;
-    margin: -8px 0;
+    margin: -13px 0;
     cursor: pointer;
-    height: 36px;
-    min-width: 36px;
-    padding: 0; /* Firefox */
+    transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
 .button:hover, .button:focus {
-    background: -o-radial-gradient(circle, white 35%, gray 100%);
-    background: radial-gradient(circle, white 35%, gray 100%);
+    filter: brightness(1.11);
+    transform: scale(1.02);
+    outline: 0;
 }
 .button:active {
-    background: -o-radial-gradient(circle, white 55%, gray 100%);
-    background: radial-gradient(circle, white 55%, gray 100%);
+    filter: none;
+    transform: scale(0.95);
 }
 .update-button {
     margin-left: auto;
-    margin-right: 4px;
 }
 .delete-button {
     margin-right: -3px;
-}
-.update-button img {
-    top: 2px;
-    position: relative;
-}
-.delete-button img {
-    top: 1.25px;
-    position: relative;
 }
 .graph-container {
     position: relative;
@@ -423,12 +406,9 @@ label[for='id_ad']::after {
     position: absolute;
     cursor: pointer;
     right: 7px;
-    top: 3px;
+    top: 16px;
     z-index: 1;
     background-color: white;
-}
-#form-wrapper #cancel-button:focus:active {
-    outline: 0;
 }
 #form-wrapper #new-title-line {
     width: calc(100% - 20px);

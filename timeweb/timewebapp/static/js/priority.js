@@ -145,7 +145,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 trigger_resize_from_autofill = false,
                 incomplete_works = false;
             $(".assignment").each(function(index) {
-
+                // Cancel current swaps and dequeue other swaps
+                $(document).clearQueue();
+                $(".assignment-container").removeAttr("style").stop();
                 // Direct copy of loading in data from graph.js
                 // Extremely inefficient and hard to maintain
                 // Changing this is definitely on my todo list
@@ -460,11 +462,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
             // Have this after above to preserve index on sa
-            for (let [index, assignment] of ordered_assignments.entries()) {
-                if (index !== assignment[2]) {
-                    swap(index, assignment[2], params.first_sort);
-                    ordered_assignments.find(sa => sa[2] === index)[2] = assignment[2] // Adjust index of assignment that used to be there 
-                    assignment[2] = index;// Adjust index of current swapped assignment
+            for (let [index, sa] of ordered_assignments.entries()) {
+                if (index !== sa[2]) {
+                    swap(index, sa[2], params.first_sort);
+                    ordered_assignments.find(sa => sa[2] === index)[2] = sa[2] // Adjust index of assignment that used to be there 
+                    sa[2] = index;// Adjust index of current swapped assignment
                 }
             }
             if (incomplete_works) {
