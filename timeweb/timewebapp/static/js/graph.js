@@ -264,6 +264,7 @@ $(function() {
 
                     const screen = graph.getContext("2d");
                     screen.scale(scale, scale);
+                    console.log(width, height);
                     screen.clearRect(0, 0, width, height);
                     let move_info_down,
                         todo = c_funct(day+dif_assign+1);
@@ -1051,6 +1052,7 @@ $(function() {
                 }
                 function resize() {
                     // If autofilled by $(window).trigger("resize")
+                    debugger;
                     len_works = sa.works.length - 1;
                     if (!sa.fixed_mode) {
                         red_line_start_x = sa.dynamic_start;
@@ -1077,11 +1079,11 @@ $(function() {
                     scale = window.devicePixelRatio;
                     wCon = (width - 55) / x;
                     hCon = (height - 55) / y;
-                    graph.width = width * scale;
-                    graph.height = height * scale;
-                    fixed_graph.width = width * scale;
-                    fixed_graph.height = height * scale;
                     if (dom_assignment.hasClass("open-assignment") && dom_assignment.is(":visible")) {
+                        graph.width = width * scale;
+                        graph.height = height * scale;
+                        fixed_graph.width = width * scale;
+                        fixed_graph.height = height * scale;
                         drawfixed();
                         draw();
                     }

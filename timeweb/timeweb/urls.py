@@ -27,3 +27,5 @@ urlpatterns = [
     path('', include('timewebapp.urls')),
     path('', include('pwa.urls')),
 ]
+
+handler403 = 'timewebapp.views.custom_permission_denied_view'

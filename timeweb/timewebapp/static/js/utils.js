@@ -121,7 +121,7 @@ function stringifyDate(date) {
 disable_ajax = false;
 
 // Uncomment if using scroller
-// disable_ajax = true;
+disable_ajax = true;
 
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }).info("left",
         `Simulates the next day for every assignment
         
-        All changes made in the simulation are NOT saved, and your assignments can be restored by refreshing this page`, 'prepend'
+        All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`, 'prepend'
     ).css("left", -3).addClass("dont-hide-button");
     $("#re-enable-tutorial").click(function() {
         if (!first_login) {
@@ -211,8 +211,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend"
     ).css("left", -2).addClass("dont-hide-button");
-    $("#advanced").click(function() {
-        $("#advanced-options").toggleClass("hidden");
+    $("#advanced").click(function(e) {
+        // Ignore propagation
+        if (e.target === this) {
+            $("#advanced-options").toggleClass("hidden");
+        }
     });
     // Keybind
     form_is_showing = false;

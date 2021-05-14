@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     dom_status_image.attr({
                         width: 16,
                         height: 16,
-                    }).css("margin-left", -2);
+                    }).css("margin-left", -3);
                     status_value = 6;
                     strdaysleft = '';
                 } else {
@@ -317,9 +317,9 @@ document.addEventListener("DOMContentLoaded", function() {
                             status_message = 'You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
                         }
                         dom_status_image.attr({
-                            width: 13,
-                            height: 20,
-                        }).css("margin-left", 1);
+                            width: 11,
+                            height: 18,
+                        }).css("margin-left", 2);
                         status_value = 1;
                         incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
@@ -328,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         dom_status_image.attr({
                             width: 15,
                             height: 15,
-                        }).css("margin-left", -1);
+                        }).css("margin-left", -2);
                         status_value = 4;
                     } else {
                         status_value = 3;
@@ -354,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             dom_status_image.attr({
                                 width: 15,
                                 height: 15,
-                            });
+                            }).css("margin-left", -2);
                         }
                         if (unit_is_minute) {
                             status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} of Work Today`;

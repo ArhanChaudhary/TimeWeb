@@ -412,3 +412,8 @@ class ContactView(View):
 class ChangelogView(View):
     def get(self, request):
         return render(request, "changelog.html")
+    
+def custom_permission_denied_view(request, exception=None):
+    response = render(request, "403_csrf.html", {})
+    response.status_code = 403
+    return response

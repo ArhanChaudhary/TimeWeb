@@ -32,7 +32,7 @@ $ python manage.py shell
   del settings_json['id']
   settings_json['user_id'] = user_id
   SettingsModel.objects.create(**settings_json)
->>> load_scroller({id of scroller user})
+>>> load_scroller({user_id})
 >>> quit()
 $ python manage.py runserver
 
@@ -104,8 +104,8 @@ $ python manage.py runserver
           <span id="open-assignments" tabindex="0">Open all Assignments</span>
           <span id="close-assignments" tabindex="0">Close all Assignments</span>
           <span id="autofill-assignments" tabindex="0">Autofill No Work Done</span>
-          <span id="delete-assignments" tabindex="0">Delete all Completed<br>Assignments</span>
           <span id="next-day" tabindex="0">Go to Next Day</span>
+          <span id="delete-assignments" tabindex="0">Delete all Completed<br>Assignments</span>
           <span id="re-enable-tutorial" tabindex="0">Re-enable Tutorial</span>
         </div>
       </div>
