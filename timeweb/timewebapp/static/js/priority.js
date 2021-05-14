@@ -8,21 +8,15 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 document.addEventListener("DOMContentLoaded", function() {
+    changeDateNow();
     const swap_duration = 1000;
-    swap = function(tar1_index, tar2_index, swap_instantly=false) {
+    swap = function(tar1, tar2, swap_instantly=false) {
         // Queues each swap
-        if (tar1_index === tar2_index) return;
-        if (swap_instantly) {
-            const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index);
-            DOMswap(tar1, tar2);
-            return;
-        }
+        if (tar1 === tar2) return;
+        if (swap_instantly) return DOMswap();
         $(document).queue(function() {
             // Swap assignment containers because they don't have a transition
-            const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index),
-                tar1_height = tar1.height() + 10,
+            const tar1_height = tar1.height() + 10,
                 tar2_height = tar2.height() + 10; 
             // Deal with existing assingment margin
             if (tar1_height > tar2_height) {
@@ -46,10 +40,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 queue: false,
                 duration: swap_duration,
                 easing: "easeInOutQuad",
-                complete: () => DOMswap(tar1, tar2),
+                complete: DOMswap,
             });
         });
-        function DOMswap(tar1, tar2) {
+        function DOMswap() {
             const swap_temp = $("<span></span>").insertAfter(tar2);
             tar1.after(tar2);
             swap_temp.after(tar1);
@@ -144,13 +138,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 tomorrow_total = 0,
                 trigger_resize_from_autofill = false,
                 incomplete_works = false;
-            $(".assignment").each(function(index) {
+            $(".assignment").each(function() {
                 // Cancel current swaps and dequeue other swaps
                 $(document).clearQueue();
                 $(".assignment-container").removeAttr("style").stop();
                 // Direct copy of loading in data from graph.js
                 // Changing this is definitely on my todo list
-                let sa = load_assignment_data($(this));
+                const dom_assignment = $(this);
+                let sa = load_assignment_data(dom_assignment);
                 let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 ad = parseDate(ad + " 00:00");
                 x = Math.round((parseDate(x + " 00:00") - ad) / 86400000);
@@ -240,11 +235,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     todo = c_funct(len_works+dif_assign+1) - lw;
                 const today_minus_dac = daysleft - dif_assign;
                 const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
-                const assignment_container = $(".assignment-container").eq(index),
-                    dom_status_image = $(".status-image").eq(index),
-                    dom_status_message = $(".status-message").eq(index),
-                    dom_title = $(".title").eq(index),
-                    dom_completion_time = $(".completion-time").eq(index);
+                const assignment_container = dom_assignment.parent(),
+                    dom_status_image = dom_assignment.find(".status-image"),
+                    dom_status_message = dom_assignment.find(".status-message"),
+                    dom_title = dom_assignment.find(".title"),
+                    dom_completion_time = dom_assignment.find(".completion-time");
                 let strdaysleft, status_value, status_message, status_image;
                 if (daysleft < 0) {
                     status_image = "not-assigned";
@@ -260,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     } else {
                         strdaysleft = `Assigned in ${-daysleft}d`;
                     }
-                    status_value = 5;
+                    status_value = 2;
                 } else if (lw >= y || x - daysleft < 1) {
                     status_image = "completely-finished";
                     status_message = 'You are Completely Finished with this Assignment';
@@ -268,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         width: 16,
                         height: 16,
                     }).css("margin-left", -3);
-                    status_value = 6;
+                    status_value = 1;
                     strdaysleft = '';
                 } else {
                     if (today_minus_dac > len_works && !params.do_not_autofill) {
@@ -320,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             width: 11,
                             height: 18,
                         }).css("margin-left", 2);
-                        status_value = 1;
+                        status_value = 6;
                         incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
                         status_image = 'finished';
@@ -329,9 +324,9 @@ document.addEventListener("DOMContentLoaded", function() {
                             width: 15,
                             height: 15,
                         }).css("margin-left", -2);
-                        status_value = 4;
-                    } else {
                         status_value = 3;
+                    } else {
+                        status_value = 4;
                         display_format_minutes = true;
                         if (assignmentIsInProgress()) {
                             status_image = 'in-progress';
@@ -366,8 +361,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     if (daysleft === 1) {
                         strdaysleft = 'Tomorrow';
                         tomorrow_total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
-                        if (status_value !== 1) {
-                            status_value = 2;
+                        if (status_value !== 6) {
+                            status_value = 5;
                         }
                     } else if (daysleft < 7) {
                         const due_date = new Date(ad.valueOf());
@@ -378,13 +373,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
                 // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-                if (status_value === 6) {
+                if (status_value === 1) {
                     assignment_container.addClass("finished");
                 } else {
                     assignment_container.removeClass("finished");
                 }
                 let status_priority;
-                if ([1,5,6].includes(status_value)) {
+                if ([6,2,1].includes(status_value)) {
                     status_priority = -Math.abs(daysleft);
                 } else {
                     skew_ratio = 1;
@@ -418,8 +413,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                     }
                 }
-                let priority_data = [status_value, status_priority, index];
-                if (sa.mark_as_done && status_value !== 1) {
+                let priority_data = [status_value, status_priority, dom_assignment];
+                if (sa.mark_as_done && status_value !== 6) {
                     priority_data.push(true);
                 }
                 ordered_assignments.push(priority_data);
@@ -438,40 +433,38 @@ document.addEventListener("DOMContentLoaded", function() {
                 $(window).trigger("resize");
             }
             ordered_assignments.sort(function(a, b) {
-                if (a[0] < b[0]) return -1;
-                if (a[0] > b[0]) return 1;
-
                 // Sort from max to min
+                if (a[0] < b[0]) return 1;
+                if (a[0] > b[0]) return -1;
                 if (a[1] < b[1]) return 1;
                 if (a[1] > b[1]) return -1;
-
-                if (a[2] < b[2]) return -1;
-                if (a[2] > b[2]) return 1;
+                // If priorities are the same, don't change anything
+                return 1;
             });
             const highest_priority = Math.max(...ordered_assignments.map(function(sa) {
-                if ((sa[0] === 2 || sa[0] === 3) && !sa[3]) {
+                if ((sa[0] === 5 || sa[0] === 4) && !sa[3]) {
                     return sa[1];
                 } else {
                     return -Infinity;
                 }
             }));
             for (let sa of ordered_assignments) {
-                // originally assignment[0] !== 1 && (assignment[3] || incomplete_works); if assignment[3] is true then assignment[0] !== 1;
-                const mark_as_done = sa[3] || incomplete_works && sa[0] !== 1;
-                const dom_assignment = $(".assignment").eq(sa[2]);
+                // originally assignment[0] !== 6 && (assignment[3] || incomplete_works); if assignment[3] is true then assignment[0] !== 6;
+                const mark_as_done = sa[3] || incomplete_works && sa[0] !== 6;
+                const dom_assignment = sa[2];
                 let priority;
-                if (sa[0] === 1) {
+                if (sa[0] === 6) {
                     priority = NaN;
-                } else if (mark_as_done || sa[0] === 4 || sa[0] === 6 || sa[0] === 5 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+                } else if (mark_as_done || sa[0] === 3 || sa[0] === 1 || sa[0] === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                     priority = 0;
                 } else {
-                    priority = Math.max(1,Math.floor(sa[1] / highest_priority * 100 + 1e-10));
+                    priority = Math.max(1, Math.floor(sa[1] / highest_priority * 100 + 1e-10));
                 }
                 if (text_priority) {
-                    if ((sa[0] === 2 || sa[0] === 3) && !mark_as_done) {
-                        $(".title").eq(sa[2]).attr("data-priority", `Priority: ${priority}%`);               
+                    if ((sa[0] === 5 || sa[0] === 4) && !mark_as_done) {
+                        dom_assignment.find(".title").attr("data-priority", `Priority: ${priority}%`);               
                     } else {
-                        $(".title").eq(sa[2]).attr("data-priority", "");       
+                        dom_assignment.find(".title").attr("data-priority", "");       
                     }
                 }
                 const assignment_container = dom_assignment.parent();
@@ -502,12 +495,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
             // Have this after above to preserve index on sa
+            debugger;
             for (let [index, sa] of ordered_assignments.entries()) {
-                if (index !== sa[2]) {
-                    swap(index, sa[2], params.first_sort);
-                    ordered_assignments.find(sa => sa[2] === index)[2] = sa[2] // Adjust index of assignment that used to be there 
-                    sa[2] = index;// Adjust index of current swapped assignment
-                }
+                // Index represents the final position
+                // sa[2] represnets its current position
+                const dom_assignment = $(".assignment").eq(index);
+                swap(dom_assignment.parent(), sa[2].parent(), params.first_sort);
             }
             if (incomplete_works) {
                 $("#estimated-total-time").html('Please enter your past work inputs');
