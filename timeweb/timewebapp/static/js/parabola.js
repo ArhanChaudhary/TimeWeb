@@ -131,7 +131,7 @@ function pset(ctx, x2 = false, y2 = false) {
     if (ctx.a <= 0 || ctx.b > 0) {
         var funct_zero = 0;
     } else {
-        var funct_zero = -ctx.b / ctx.a;
+        var funct_zero = (-ctx.b / ctx.a).toFixed(10);
     }
     if (ctx.a >= 0) {
         var funct_y = x1;

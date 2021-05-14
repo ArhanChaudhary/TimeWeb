@@ -159,10 +159,10 @@ label {
     text-decoration: none;
     color: blue;
 }
-#discord_promo {
+#discord-promo {
     position: absolute;
-    right: 8px;
-    bottom: 8px;
+    right: 12px;
+    bottom: 5px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -172,6 +172,9 @@ label {
             align-items: center;
     text-decoration: none;
     color: black;
+}
+#discord-image {
+    margin-left: 4px;
 }
 #submit-button {
     width: 100%;

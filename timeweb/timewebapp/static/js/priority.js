@@ -149,9 +149,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $(document).clearQueue();
                 $(".assignment-container").removeAttr("style").stop();
                 // Direct copy of loading in data from graph.js
-                // Extremely inefficient and hard to maintain
                 // Changing this is definitely on my todo list
-                // also on todo: remove elses
                 let sa = load_assignment_data($(this));
                 let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 ad = parseDate(ad + " 00:00");
@@ -242,9 +240,19 @@ document.addEventListener("DOMContentLoaded", function() {
                     todo = c_funct(len_works+dif_assign+1) - lw;
                 const today_minus_dac = daysleft - dif_assign;
                 const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
-                let strdaysleft, status_value, status_message;
+                const assignment_container = $(".assignment-container").eq(index),
+                    dom_status_image = $(".status-image").eq(index),
+                    dom_status_message = $(".status-message").eq(index),
+                    dom_title = $(".title").eq(index),
+                    dom_completion_time = $(".completion-time").eq(index);
+                let strdaysleft, status_value, status_message, status_image;
                 if (daysleft < 0) {
-                    status_message = '#\u3000 This Assignment has Not Yet been Assigned';
+                    status_image = "not-assigned";
+                    status_message = 'This Assignment has Not Yet been Assigned';
+                    dom_status_image.attr({
+                        width: 18,
+                        height: 20,
+                    }).css("margin-left", -2);
                     if (daysleft === -1) {
                         strdaysleft = 'Assigned Tomorrow';
                     } else if (daysleft > -7) {
@@ -254,7 +262,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     status_value = 5;
                 } else if (lw >= y || x - daysleft < 1) {
-                    status_message = '&#9733;\u3000You have Completely Finished this Assignment';
+                    status_image = "completely-finished";
+                    status_message = 'You are Completely Finished with this Assignment';
+                    dom_status_image.attr({
+                        width: 16,
+                        height: 16,
+                    }).css("margin-left", -2);
                     status_value = 6;
                     strdaysleft = '';
                 } else {
@@ -297,26 +310,51 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     daysleft = x - daysleft;
                     if ((today_minus_dac > len_works && len_works + dif_assign < x) || !x1) {
+                        status_image = 'question-mark';
                         if (!x1) {
-                            status_message = '?\u3000  This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
+                            status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
                         } else {
-                            status_message = '?\u3000  You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
+                            status_message = 'You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
                         }
+                        dom_status_image.attr({
+                            width: 13,
+                            height: 20,
+                        }).css("margin-left", 1);
                         status_value = 1;
                         incomplete_works = true;
                     } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works) || nwd.includes(date_now.getDay()) && daysleft !== 1) {
-                        status_message = '\u2714\u3000Nice Job! You are Finished with this Assignment\'s Work for Today';
+                        status_image = 'finished';
+                        status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
+                        dom_status_image.attr({
+                            width: 15,
+                            height: 15,
+                        }).css("margin-left", -1);
                         status_value = 4;
                     } else {
                         status_value = 3;
                         display_format_minutes = true;
                         if (assignmentIsInProgress()) {
-                            status_message = "@\u3000This Assignment's Daily Work is in Progress";
+                            status_image = 'in-progress';
+                            status_message = "This Assignment's Daily Work is in Progress";
+                            dom_status_image.attr({
+                                width: 17,
+                                height: 17,
+                            }).css("margin-left", -2);
                             todo = c_funct(len_works+dif_assign) - lw;
                         } else if (len_works && (lw - sa.works[len_works - 1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works - 1]) {
-                            status_message = '!\u3000 Warning! You are behind your Work schedule!';
+                            status_image = 'warning';
+                            dom_status_image.attr({
+                                width: 7,
+                                height: 22,
+                            }).css("margin-left", 5);
+                            status_message = 'Warning! You are behind your Work schedule!';
                         } else {
-                            status_message = "\u2718\u3000This Assignment's Daily Work is Unfinished";
+                            status_image = 'unfinished';
+                            status_message = "This Assignment's Daily Work is Unfinished";
+                            dom_status_image.attr({
+                                width: 15,
+                                height: 15,
+                            });
                         }
                         if (unit_is_minute) {
                             status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} of Work Today`;
@@ -336,14 +374,14 @@ document.addEventListener("DOMContentLoaded", function() {
                         due_date.setDate(due_date.getDate() + x);
                         strdaysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                     } else {
-                        strdaysleft = `${daysleft}d`;
+                        strdaysleft = daysleft + "d";
                     }
                 }
                 // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
                 if (status_value === 6) {
-                    $(".assignment-container").eq(index).addClass("finished");
+                    assignment_container.addClass("finished");
                 } else {
-                    $(".assignment-container").eq(index).removeClass("finished");
+                    assignment_container.removeClass("finished");
                 }
                 let status_priority;
                 if ([1,5,6].includes(status_value)) {
@@ -385,12 +423,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     priority_data.push(true);
                 }
                 ordered_assignments.push(priority_data);
-                $(".status-message").eq(index).html(status_message);
-                $(".title").eq(index).attr("data-daysleft", strdaysleft);
+
+                dom_status_image.attr("src", `${document.URL}static/images/status_icons/${status_image}.png`)
+                dom_status_message.html(status_message);
+                dom_title.attr("data-daysleft", strdaysleft);
                 if (display_format_minutes) {
-                    $(".completion-time").eq(index).html(format_minutes(todo * ctime));
+                    dom_completion_time.html(format_minutes(todo * ctime));
                 } else {
-                    $(".completion-time").eq(index).html('');
+                    dom_completion_time.html('');
                 }
             });
             // fixes graph not updating after skew ratio causes autofill
@@ -537,18 +577,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 $assignment.addClass("color-instantly");
                 $assignment.css("background", color(priority))
                 if (mark_as_done) {
-                    $assignment.addClass("mark-as-completed");
+                    $assignment.addClass("mark-as-done");
                 } else {
-                    $assignment.removeClass("mark-as-completed");
+                    $assignment.removeClass("mark-as-done");
                 }
                 $assignment[0].offsetHeight;
                 $assignment.removeClass("color-instantly");
             } else {
                 $assignment.css("background", color(priority))
                 if (mark_as_done) {
-                    $assignment.addClass("mark-as-completed");
+                    $assignment.addClass("mark-as-done");
                 } else {
-                    $assignment.removeClass("mark-as-completed");
+                    $assignment.removeClass("mark-as-done");
                 }
             }
         }

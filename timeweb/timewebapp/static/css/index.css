@@ -136,7 +136,7 @@ header.animate::after {
     -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
 }
-.assignment.mark-as-completed {
+.assignment.mark-as-done {
     opacity: 0.6;
 }
 .assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
@@ -155,6 +155,7 @@ header.animate::after {
 }
 .assignment:focus {
     outline: 0;
+    border: 2px solid rgb(0,95,204) !important;
     -webkit-box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
             box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
 }
@@ -240,8 +241,12 @@ header.animate::after {
         -ms-flex-align: center;
             align-items: center;
 }
+.status-image {
+    position: absolute;
+}
 .status-message {
     margin-right: 6px;
+    margin-left: 18px;
 }
 .completion-time {
     white-space: nowrap;

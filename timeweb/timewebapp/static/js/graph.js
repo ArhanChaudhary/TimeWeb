@@ -33,7 +33,7 @@ $(function() {
             let dom_assignment = $(this);
             let sa = load_assignment_data(dom_assignment);
             // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
-            if (dom_assignment.hasClass("mark-as-completed") && !sa.mark_as_done) {
+            if (dom_assignment.hasClass("mark-as-done") && !sa.mark_as_done) {
                 return $(".assignment").first().focus();
             }
             const graph_container = dom_assignment.find(".graph-container"),
@@ -486,7 +486,7 @@ $(function() {
                             screen.fillText("You are Behind Schedule!", 50+(width-50)/2, row_height*9);
                         }
                     } else {
-                        screen.fillText('You have Completely Finished this Assignment!', 50+(width-50)/2, row_height*7);
+                        screen.fillText('You are Completely Finished with this Assignment!', 50+(width-50)/2, row_height*7);
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }

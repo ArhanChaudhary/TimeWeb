@@ -103,7 +103,7 @@ class SettingsView(LoginRequiredMixin, View):
             return redirect("home")
         self.context['form'] = self.form
         return render(request, "settings.html", self.context)
-class TimewebListView(LoginRequiredMixin, View):
+class TimewebView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
 
@@ -404,6 +404,7 @@ class TimewebListView(LoginRequiredMixin, View):
             if assignment.mark_as_done:
                 assignment.mark_as_done = False
                 assignment.save()
+        logger.info(f"User \"{request.user}\" changed their date")
 class ContactView(View):
     def get(self, request):
         return render(request, "contact.html")
