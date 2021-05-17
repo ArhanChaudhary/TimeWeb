@@ -157,6 +157,16 @@ label {
     width: 100%;
     color: rgb(226,30,54);
 }
+#example-message {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
+    width: 100%;
+    position: absolute;
+    font-size: 10px;
+    margin-top: -60px;
+    text-align: center;
+}
 #beta-message {
     position: absolute;
     text-decoration: none;

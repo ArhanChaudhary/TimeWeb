@@ -4,12 +4,13 @@
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 {% endblock css %}
 {% block js %}
-{{ assignment_models|json_script:"assignment-models" }}
-{% comment %} 
+{{ assignment_models_as_json|json_script:"assignment-models" }}
+{% comment %}
 
 
 
 scroller load:
+
 uncomment line in utils.js
 $ python manage.py shell
 >>> def load_scroller(user_id):
@@ -38,15 +39,16 @@ $ python manage.py runserver
 
 
 [{"id": 143, "assignment_name": "Math \"homework\"", "ad": "2021-04-22", "x": "2021-05-07", "unit": "maths problem", "y": "71.00", "works": ["0", "0", "0", "0", "0", "0", "0", "0", "0"], "dif_assign": 0, "skew_ratio": "1.0000000000", "ctime": "5.00", "funct_round": "1.00", "min_work_time": null, "nwd": ["4", "0"], "fixed_mode": false, "dynamic_start": 7, "user_id": 7}] {% endcomment %}
-{{ settings_model|json_script:"settings-model" }}
+{{ settings_model_as_json|json_script:"settings-model" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/parabola.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
-<script src="{% static 'js/form.js' %}"></script>
+<script src="{% static 'js/crud.js' %}"></script>
 {% endblock js %}
+
 {% block content %}
   <div id="overlay">
     <div id="form-wrapper">
@@ -110,7 +112,7 @@ $ python manage.py runserver
         </div>
       </div>
     </div>
-    {% for assignment in assignmentlist %}
+    {% for assignment in assignment_models %}
       <div class="assignment-container" {% if assignment.assignment_name == request.session.added_assignment %}id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %}id="animate-color"{% endif %}>
         <div class="assignment" data-assignment-name="{{ assignment.assignment_name }}" tabindex="0">
           <div class="assignment-header">

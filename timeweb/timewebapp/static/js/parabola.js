@@ -260,7 +260,6 @@ function pset(ctx, x2 = false, y2 = false) {
     return ctx;
 }
 
-
 function funct(n, ctx, translate=true) {
     if (translate) {
         // Translate x coordinate 
@@ -290,7 +289,6 @@ function funct(n, ctx, translate=true) {
     // No point in untranslating x coordinate
     return output + ctx.red_line_start_y;
 }
-
 
 function calc_mod_days(ctx) {
     let mods = [0],

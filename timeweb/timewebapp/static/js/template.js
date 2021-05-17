@@ -187,30 +187,28 @@ $(function() {
     $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
 });
 // Info tooltip
-(function($) {
-    $.fn.info = function(facing,text,position) {
-        const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
-        if (window.show_info_buttons === false && !first_login) {
-            info_button.css("display", "none");
-        }
-        info_button.on('click blur', info_button_handler);
-        switch (position) {
-            case "prepend":
-                return info_button.prependTo(this);
-            case "after":
-                return info_button.insertAfter(this);
-            default:
-                return info_button.appendTo(this);
+$.fn.info = function(facing,text,position) {
+    const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
+    if (window.show_info_buttons === false && !first_login) {
+        info_button.css("display", "none");
+    }
+    info_button.on('click blur', info_button_handler);
+    switch (position) {
+        case "prepend":
+            return info_button.prependTo(this);
+        case "after":
+            return info_button.insertAfter(this);
+        default:
+            return info_button.appendTo(this);
+    }
+}
+function info_button_handler(_, run=true) {
+    if (run) {
+        if ($(this).data("is_showing")) {
+            $(this).data("is_showing", false).trigger('blur', false);
+        } else {
+            $(this).data("is_showing", true);
         }
     }
-    function info_button_handler(_, run=true) {
-        if (run) {
-            if ($(this).data("is_showing")) {
-                $(this).data("is_showing", false).trigger('blur', false);
-            } else {
-                $(this).data("is_showing", true);
-            }
-        }
-        return false;
-    }
-}(jQuery));
+    return false;
+}

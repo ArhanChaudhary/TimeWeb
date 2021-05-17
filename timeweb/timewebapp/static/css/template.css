@@ -40,6 +40,7 @@ header::after {
             transform: translateY(-20px);
 }
 #image-new-container {
+    user-select: none;
     cursor: pointer;
     display: inline-block;
     height: 60px;

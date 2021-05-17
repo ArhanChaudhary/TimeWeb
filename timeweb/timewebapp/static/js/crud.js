@@ -108,12 +108,14 @@ $(function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
-        const initial_form_fields = ['', stringifyDate(date_now), '', '', '', '0', '', '', +def_min_work_time||''];
+        const initial_form_fields = ['', utils.formatting.stringifyDate(date_now), '', '', '', '0', '', '', +def_min_work_time||''];
         initial_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let nwd of Array(7).keys()) {
-            $("#id_nwd_"+((nwd+6)%7)).prop("checked",def_nwd.includes(nwd));
+            // (nwd+6)%7) is for an ordering issue i think
+            // Treat this as: $("#id_nwd_"+nwd).prop("checked", def_nwd.includes(nwd));
+            $("#id_nwd_"+((nwd+6)%7)).prop("checked", def_nwd.includes(nwd));
         }
         // Set form text
         $("#new-title").html("New Assignment");
@@ -127,7 +129,7 @@ $(function() {
         $("#new-title").html("Re-enter Assignment");
         $("#submit-assignment-button").html("Modify Assignment");
         // Find which assignment in dat was clicked
-        const sa = load_assignment_data($(this).parents(".assignment"));
+        const sa = utils.loadAssignmentData($(this).parents(".assignment"));
         // Reentered form fields
         const form_data = [
             sa.assignment_name,
@@ -140,10 +142,12 @@ $(function() {
             sa.funct_round-1 ? +sa.funct_round : '', // Displays as self if it isn't 1, else display nothing
             +sa.min_work_time||'',
         ];
-        // Set reeneted form fields
+        // Set reentered form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         for (let nwd of Array(7).keys()) {
-            $("#id_nwd_"+((nwd+6)%7)).prop("checked",sa.nwd.includes(nwd));
+            // (nwd+6)%7) is for an ordering issue i think, ignore that
+            // Treat this as: $("#id_nwd_"+nwd).prop("checked", def_nwd.includes(nwd));
+            $("#id_nwd_"+((nwd+6)%7)).prop("checked", sa.nwd.includes(nwd));
         }
         // Set button pk
         $("#submit-assignment-button").val(sa.id);
@@ -293,14 +297,14 @@ $(function() {
                     });
                 }, 0);
                 // The scroll function determines when the page has stopped scrolling and internally resolves the promise via "resolver"
-                $("main").scroll(() => scroll(resolve));
-                scroll(resolve);
+                $("main").scroll(() => utils.scroll(resolve));
+                utils.scroll(resolve);
             }).then(function() {
                 // Deny updating or deleting again after queued
                 dom_assignment.css("pointer-events", "none");
                 $(document).queue(function() {
                     // Once the assignment, is done, this sends the data to the backend and animates its deletion
-                    const sa = load_assignment_data(dom_assignment);
+                    const sa = utils.loadAssignmentData(dom_assignment);
                     const success = function() {
                         new Promise(function(resolve) {
                             if (dom_assignment.hasClass("open-assignment")) {
@@ -315,18 +319,18 @@ $(function() {
                             // Animate height on assignment_container because it doesn't have a transition
                             assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                                 // Remove assignment data from dat
-                                dat = dat.filter(dom_assignment => sa.assignment_name !== dom_assignment.assignment_name);
+                                dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
                                 // Remove from DOM
                                 assignment_container.remove();
                                 $(document).dequeue();
-                                sort({ ignore_timeout: true });
+                                priority.sort({ ignore_timeout: true });
                             });
                         });
-                        if (!disable_ajax) {
+                        if (!ajaxUtils.disable_ajax) {
                             gtag("event","delete_assignment");
                         }
                     }
-                    if (disable_ajax) return success();
+                    if (ajaxUtils.disable_ajax) return success();
                     let data = {
                         'csrfmiddlewaretoken': csrf_token,
                         'action': 'delete_assignment',
@@ -341,7 +345,7 @@ $(function() {
                         error: function(response, exception) {
                             // If ajax failed, allow updating or deleting again
                             dom_assignment.css("pointer-events", "auto");
-                            error(response, exception);
+                            ajaxUtils.error(response, exception);
                         }
                     });
                 });

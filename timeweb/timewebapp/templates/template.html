@@ -11,6 +11,9 @@
             gtag('js', new Date());
 
             gtag('config', 'G-3K1HRD42V7');
+            {% if user.get_username %}
+            username = "{{ user.get_username }}"
+            {% endif %}
         </script>
         <title>TimeWeb</title>
         <meta charset="UTF-8">
@@ -29,7 +32,7 @@
         <meta property="twitter:description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
         <meta property="twitter:image" content="{% static 'images/icons/og.png' %}">
         <meta name="author" content="Arhan Chaudhary">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
         <!-- Don't use defer or async because it causes the first paint to be before DOMContentLoaded and mess up the transition -->
         <link rel="shortcut icon" href="{% static 'images/icons/favicon.ico' %}" type="image/x-icon">
         <link rel="stylesheet" href="{% static 'css/template.css' %}">

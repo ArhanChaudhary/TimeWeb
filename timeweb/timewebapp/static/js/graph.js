@@ -31,7 +31,7 @@ $(function() {
         // The footer wasn't clicked (to prevent accidental closing)
         if (!["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
             let dom_assignment = $(this);
-            let sa = load_assignment_data(dom_assignment);
+            let sa = utils.loadAssignmentData(dom_assignment);
             // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
             if (dom_assignment.hasClass("mark-as-done") && !sa.mark_as_done) {
                 return $(".assignment").first().focus();
@@ -48,7 +48,7 @@ $(function() {
                     // Hide graph when transition ends
                     dom_assignment.css("overflow", "");
                     graph_container.removeAttr("style")
-                    // Used in form.js to resolve a promise to transition deleting the assignment
+                    // Used in crud.js to resolve a promise to transition deleting the assignment
                     .trigger("transitionend");
                 });
                 // Begin arrow animation
@@ -82,8 +82,8 @@ $(function() {
                 
                 let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 // Type conversions
-                ad = parseDate(ad + " 00:00");
-                x = Math.round((parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
+                ad = utils.formatting.parseDate(ad + " 00:00");
+                x = Math.round((utils.formatting.parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
                 ad = new Date(ad);
                 y = +y;
                 // dif assign is already an int
@@ -92,7 +92,6 @@ $(function() {
                 funct_round = +funct_round;
                 // Converts min_work_time to int if string or null
                 min_work_time /= ctime;
-                nwd = nwd.map(Number);
                 // dynamic start is already an int
                 
                 let red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start, // X-coordinate of the start of the red line
@@ -264,7 +263,6 @@ $(function() {
 
                     const screen = graph.getContext("2d");
                     screen.scale(scale, scale);
-                    console.log(width, height);
                     screen.clearRect(0, 0, width, height);
                     let move_info_down,
                         todo = c_funct(day+dif_assign+1);
@@ -432,17 +430,12 @@ $(function() {
                     screen.textBaseline = "bottom";
                     screen.font = font_size + 'px Open Sans';
                     const row_height = screen.measureText(0).width * 2;
-                    screen.fillText(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 50+(width-50)/2, row_height);
+                    const center = (str, y_pos) => screen.fillText(str, 50+(width-50)/2, row_height*y_pos);
+                    center(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 1);
                     if (lw < y && daysleft > 0) {
                         todo -= lw;
-                        let reach_deadline = "";
-                        if (todo <= 0 || nwd.includes((assign_day_of_week+dif_assign+day) % 7)) {
+                        if (todo < 0 || nwd.includes((assign_day_of_week+dif_assign+day) % 7)) {
                             todo = 0;
-                            reach_deadline = " (Deadline Reached)";
-                        } else if (!unit_is_minute) {
-                            screen.fillText(`Estimated Completion Time: ${format_minutes(todo*ctime)}`, 50+(width-50)/2, row_height*6);
-                        } else if (todo*ctime >= 60) {
-                            reach_deadline = ` (${format_minutes(todo*ctime)})`;
                         }
                         let displayed_day = new Date(date_assignment_created.valueOf());
                         displayed_day.setDate(displayed_day.getDate() + day);
@@ -460,34 +453,21 @@ $(function() {
                                 break;
                         }
                         str_day += ':';
-                        screen.fillText(str_day, 50+(width-50)/2, row_height*3);
-                        let todo_message;
-                        if (displayed_day.valueOf() !== date_now.valueOf()) {
-                            todo_message = `${pluralize(unit)} to Complete for this Day: ${todo}${reach_deadline}`;
-                        } else if (assignmentIsInProgress()) {
-                            todo_message = `Remaining ${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
-                        } else {
-                            todo_message = `${pluralize(unit)} to Complete for Today: ${todo}${reach_deadline}`;
-                        }
-                        screen.fillText(todo_message, 50+(width-50)/2, row_height*4);
-                        screen.fillText(`${pluralize(unit)} already Completed: ${lw}/${y}`, 50+(width-50)/2, row_height*5);
+                        center(str_day, 3);
+                        center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "for Today" : "this Day"}: ${lw + todo}/${y} ${pluralize(unit,2)}`, 4);
                         if (today_minus_ad < 0) {
-                            screen.fillText("This Assignment has Not Yet been Assigned", 50+(width-50)/2, row_height*8);
+                            center("This Assignment has Not Yet been Assigned", 6);
                         } else if (distance_today_from_displayed_day > 0) {
-                            screen.fillText("You have not Entered your Work from Previous Days", 50+(width-50)/2, row_height*8);
-                            screen.fillText("Please Enter your Progress to Continue", 50+(width-50)/2, row_height*9);
+                            center("You have not Entered your Work from Previous Days", 6);
+                            center("Please Enter your Progress to Continue", 7);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
-                            if (displayed_day.valueOf() === date_now.valueOf()) {
-                                screen.fillText("You have Completed your Work for Today", 50+(width-50)/2, row_height*9);
-                            } else {
-                                screen.fillText("You have Completed your Work for this Day", 50+(width-50)/2, row_height*9);
-                            }
+                            center(`You have Completed your Work ${displayed_day.valueOf() === date_now.valueOf() ? "for Today" : "this Day"}`, 6);
                         } else if (len_works && !assignmentIsInProgress() && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
-                            screen.fillText("!!! ALERT !!!", 50+(width-50)/2, row_height*8);
-                            screen.fillText("You are Behind Schedule!", 50+(width-50)/2, row_height*9);
+                            center("!!! ALERT !!!", 6);
+                            center("You are Behind Schedule!", 7);
                         }
                     } else {
-                        screen.fillText('You are Completely Finished with this Assignment!', 50+(width-50)/2, row_height*7);
+                        center('You are Completely Finished with this Assignment!', 5);
                     }
                     screen.scale(1 / scale, 1 / scale);
                 }
@@ -520,7 +500,7 @@ $(function() {
                         var text = 'Minutes of Work',
                             label_x_pos = -2;
                     } else {
-                        var text = `${pluralize(unit)} (${format_minutes(ctime)} per ${pluralize(unit,1)})`,
+                        var text = `${pluralize(unit)} (${utils.formatting.formatMinutes(ctime)} per ${pluralize(unit,1)})`,
                             label_x_pos = -5;
                     }
                     if (screen.measureText(text).width > height - 50) {
@@ -681,7 +661,7 @@ $(function() {
                         // Save skew ratio and draw
                         sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         old_skew_ratio = skew_ratio;
-                        SendAttributeAjax('skew_ratio', skew_ratio, sa.id);
+                        ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
                         draw();
                     }
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
@@ -749,12 +729,12 @@ $(function() {
                             // Save skew ratio
                             sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            SendAttributeAjax('skew_ratio', skew_ratio, sa.id);
+                            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
                             // Disable mousemove
                             if (!draw_point) {
                                 $(this).off("mousemove");
                             }
-                            sort();
+                            priority.sort();
                             draw();
                         } else if (draw_point) {
                             if (!isMobile) {
@@ -830,7 +810,7 @@ $(function() {
                                 } else {
                                     sa.dynamic_start = len_works + dif_assign;
                                 }
-                                SendAttributeAjax("dynamic_start", sa.dynamic_start, sa.id);
+                                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
                                 if (!sa.fixed_mode) {
                                     red_line_start_x = sa.dynamic_start;
                                     red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
@@ -841,9 +821,9 @@ $(function() {
                                     ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                                 }
                             }
-                            SendAttributeAjax("works", sa.works.map(String), sa.id);
+                            ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
                             day = len_works - assignmentIsInProgress();
-                            sort();
+                            priority.sort();
                             draw();
                         } else {
                             alert("Please wait until this is assigned");
@@ -855,7 +835,7 @@ $(function() {
                     fixed_mode_button.click(function() {
                         sa.fixed_mode = !sa.fixed_mode;
                         $(this).onlyText(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                        SendAttributeAjax('fixed_mode', sa.fixed_mode, sa.id);
+                        ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', sa.fixed_mode, sa.id);
                         if (sa.fixed_mode) {
                             // Set start of red line and pset()
                             red_line_start_x = 0;
@@ -876,7 +856,7 @@ $(function() {
                         if (nwd.length) {
                             mods = c_calc_mod_days();
                         }
-                        sort();
+                        priority.sort();
                         draw();
                     }).html(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
                     // END Fixed/dynamic mode button
@@ -901,7 +881,7 @@ $(function() {
                             skew_ratio = old_skew_ratio;
                             old_skew_ratio = undefined;
                         }
-                        sort();
+                        priority.sort();
                         draw();
                     }).keypress(function(e) {
                         // Saves skew ratio on enter
@@ -915,7 +895,7 @@ $(function() {
                             // Save skew ratio
                             sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
-                            SendAttributeAjax('skew_ratio', skew_ratio, sa.id);
+                            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
@@ -975,10 +955,10 @@ $(function() {
                                 }
                                 set_skew_ratio_lim();
                                 sa.dynamic_start = red_line_start_x;
-                                SendAttributeAjax("dynamic_start", sa.dynamic_start, sa.id)
+                                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id)
                             }
-                            SendAttributeAjax("works", sa.works.map(String), sa.id);
-                            sort({do_not_autofill: true});
+                            ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
+                            priority.sort({do_not_autofill: true});
                             draw();
                         }
                     });
@@ -987,10 +967,10 @@ $(function() {
                     // BEGIN Hide assignment button
                     hide_assignment_button.click(function() {
                         sa.mark_as_done = !sa.mark_as_done;
-                        $(this).onlyText(sa.mark_as_done ? "Unmark as Completed" : "Mark as Completed");
-                        SendAttributeAjax('mark_as_done', sa.mark_as_done, sa.id);
-                        sort({ ignore_timeout: true });
-                    }).html(sa.mark_as_done ? "Unmark as Completed" : "Mark as Completed");
+                        $(this).onlyText(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
+                        ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
+                        priority.sort({ ignore_timeout: true });
+                    }).html(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
                     // END Hide assignment button
 
                     // BEGIN Next assignment button
@@ -1052,7 +1032,6 @@ $(function() {
                 }
                 function resize() {
                     // If autofilled by $(window).trigger("resize")
-                    debugger;
                     len_works = sa.works.length - 1;
                     if (!sa.fixed_mode) {
                         red_line_start_x = sa.dynamic_start;
@@ -1106,7 +1085,7 @@ $(function() {
                         alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
                         alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");
                         first_login = false;
-                        send_tutorial_ajax();
+                        ajaxUtils.sendTutorialAjax();
                     }, 200);
                 }
                 // Makes input bigger for info button
