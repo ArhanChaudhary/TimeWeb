@@ -102,7 +102,7 @@ utils = {
                     priority.sort({autofill_override: true, ignore_timeout: true});
                 }
             }).info("left",
-                `This applies to every assignment you have not entered past work inputs for
+                `This applies to every assignment you haven't entered past work inputs for
         
                 Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend"
             ).css("left", -2).addClass("dont-hide-button");
@@ -190,8 +190,8 @@ utils = {
         handleTutorialIntroduction: function() {
             if (first_login) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return $(this).attr("data-assignment-name") !== "Reading a Book (EXAMPLE ASSIGNMENT)";
-                })
+                    return $(this).attr("data-assignment-name") !== example_assignment_name;
+                });
                 if (assignments_excluding_example.length) {
                     assignments_excluding_example.parent().append("<span>Click your assignment<br></span>");
                 } else {
@@ -201,14 +201,13 @@ utils = {
             }
         },
         saveStatesOnClose: function() {
-            // Saves current open assignments to localstorage if refreshed or redirected
-            // lighthouse says to use onpagehide instead of unload
-            $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() {
+            // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
+            $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
                 if (!first_login) {
                     // Save current open assignments
                     sessionStorage.setItem("open_assignments", JSON.stringify(
                         $(".assignment.open-assignment").map(function() {
-                            return $(this).find(".title").text()
+                            return $(this).attr("data-assignment-name")
                         }).toArray()
                     ));
                 }
@@ -217,7 +216,8 @@ utils = {
                 if (!$("#form-wrapper .hidden").length) {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
-                if (data['assignments'].length) {
+                // Bypass ajax timeout
+                if (ajaxUtils.data['assignments'].length) {
                     ajaxUtils.SendAttributeAjax();
                 }
             });
@@ -226,9 +226,9 @@ utils = {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".title").filter(function() {
-                        return open_assignments.includes($(this).text())
-                    }).parents(".assignment").click();
+                    $(".assignment").filter(function() {
+                        return open_assignments.includes($(this).attr("data-assignment-name"))
+                    }).click();
                 }
                 // Scroll to original position
                 // Needs to be here so it scrolls after assignments are opened
@@ -238,6 +238,9 @@ utils = {
                 }
             });
         },
+    },
+    daysBetweenTwoDates: function(larger_date, smaller_date) {
+        return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
     loadAssignmentData: function($assignment) {
         return dat.find(assignment => assignment.assignment_name === $assignment.attr("data-assignment-name"));
@@ -253,10 +256,10 @@ utils = {
     },
 }
 
-isExampleAccount = username === "Example";
+isExampleAccount = username === example_account_name;
 ajaxUtils = {
     disable_ajax: isExampleAccount, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
-    hour_to_update: 4,
+    hour_to_update: hour_to_update,
     error: function(response, exception) {
         if (response.status == 0) {
             alert('Failed to connect');
@@ -276,18 +279,24 @@ ajaxUtils = {
             $("html").html(response.responseText);
         }
     },
-    changeDateNow: function() {
+    changeDateNowAndExampleAssignmentDates: function() {
         if (!ajaxUtils.disable_ajax && date_now.valueOf() + 1000*60*60*(24 + ajaxUtils.hour_to_update) < new Date().valueOf()) {
-            if (date_now.valueOf() < new Date(new Date().toDateString()).valueOf()) {
-                date_now = new Date();
-            } else {
-                date_now.setDate(date_now.getDate() + 1);
+            date_now = new Date(new Date().toDateString());
+            // If this runs after midnight, set date_now to yesterday
+            if (new Date().getHours() < ajaxUtils.hour_to_update) {
+                date_now = date_now.setDate(date_now.getDate() - 1);
             }
+
             const data = {
                 'csrfmiddlewaretoken': csrf_token,
                 'action': 'update_date_now',
                 'date_now': utils.formatting.stringifyDate(date_now),
             }
+            // const example_assignment = dat.filter(sa_iter => sa_iter.assignment_name === example_assignment_name);
+            // if (example_assignment.length) {
+            //     const days_since_example_ad = date_now - example_assignment.ad
+            //     data["days_since_example_ad"] = 
+            // }
             $.ajax({
                 type: "POST",
                 data: data,
@@ -317,9 +326,9 @@ ajaxUtils = {
         // Add key and values as the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
         let sa;
-        for (let assignment of ajaxUtils.data['assignments']) {
-            if (assignment.pk === pk) {
-                sa = assignment;
+        for (let iter_sa of ajaxUtils.data['assignments']) {
+            if (iter_sa.pk === pk) {
+                sa = iter_sa;
             }
         }
         if (!sa) {
@@ -353,7 +362,6 @@ ajaxUtils = {
             'assignments': [],
         }
     },
-
 }
 
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
@@ -366,8 +374,8 @@ document.addEventListener("DOMContentLoaded", function() {
         'action': 'save_assignment',
         'assignments': [],
     },
-    ajaxUtils.changeDateNow();
-    setInterval(ajaxUtils.changeDateNow, 1000*60);
+    ajaxUtils.changeDateNowAndExampleAssignmentDates();
+    setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
     utils.ui.setHideEstimatedCompletionTimeButton();
     utils.ui.setAdvancedClickHandlers();
     utils.ui.setKeybinds();

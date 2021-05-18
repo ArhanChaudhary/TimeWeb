@@ -23,12 +23,12 @@ from django.dispatch import receiver
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
         date_now = timezone.localtime(timezone.now())
-        if date_now.hour < 4:
+        if date_now.hour < hour_to_update:
             date_now = date_now.date() - datetime.timedelta(1)
         else:
             date_now = date_now.date()
         TimewebModel.objects.create(**{
-            "assignment_name": "Reading a Book (EXAMPLE ASSIGNMENT)",
+            "assignment_name": example_assignment_name,
             "ad": date_now.strftime("%Y-%m-%d"),
             "x": (date_now + datetime.timedelta(30)).strftime("%Y-%m-%d"),
             "unit": "Page",
@@ -54,8 +54,11 @@ def custom_permission_denied_view(request, exception=None):
     response.status_code = 403
     return response
 
+hour_to_update = 4
 example_account_name = "Example"
+example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 25
+
 logger = logging.getLogger('django')
 logger.propagate = False
 class SettingsView(LoginRequiredMixin, View):
@@ -123,7 +126,11 @@ class TimewebView(LoginRequiredMixin, View):
     redirect_field_name = 'redirect_to'
 
     def __init__(self):
-        self.context = {}
+        self.context = {
+            "example_account_name": example_account_name,
+            "hour_to_update": hour_to_update,
+            "example_assignment_name": example_assignment_name,
+        }
 
     def add_user_models_to_context(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
@@ -164,7 +171,7 @@ class TimewebView(LoginRequiredMixin, View):
                 return render(request, "index.html", self.context)
             elif status == "form_is_valid":
                 # post-get
-                # Don't make this return a 204 from the example account because there are too many assignments
+                # Don't make this return a 204 when submitting from the example account because there are too many assignments
                 return redirect(request.path_info)
             elif status == "not_user_assignment":
                 logger.warning(f"User \"{request.user}\" cannot modify an assignment that isn't their's")
@@ -222,7 +229,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.nwd = self.form.cleaned_data.get("nwd")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
         date_now = timezone.localtime(timezone.now())
-        if date_now.hour < 4:
+        if date_now.hour < hour_to_update:
             date_now = date_now.date() - datetime.timedelta(1)
         else:
             date_now = date_now.date()

@@ -163,7 +163,7 @@ $(function() {
         
         e.g: If this assignment is reading a book, enter "Page"
 
-        If you are unsure how to split up your assignment, please enter "Minute"`
+        If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute"`
     ).addClass("dont-hide-button");
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field

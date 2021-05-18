@@ -307,7 +307,7 @@ canvas:focus {
     width: 22px;
     height: 17px;
     font-size: 15px;
-    padding: 0;
+    padding: 0 !important;
     line-height: 17px;
     cursor: pointer;
 }
@@ -319,7 +319,7 @@ canvas:focus {
     padding: 0 13px;
     position: relative;
 }
-.graph-footer * {
+.graph-footer *:not(.advanced-buttons):not(svg) {
     border-radius: 20px;
     border: none;
     padding: 3px 6px;
@@ -335,22 +335,33 @@ canvas:focus {
     -webkit-box-shadow: 0 0 0 3px rgb(0,95,204);
             box-shadow: 0 0 0 3px rgb(0,95,204);
 }
-.total-work-input-button, .submit-work-button, .delete-work-input-button  {
+/* 1st column */
+.delete-work-input-button, .display-button, .skew-ratio-button {
+    position: absolute;
+    left: 0;
+}
+/* 2nd column */
+.work-input-button, .mark-as-finished-button, .skew-ratio-textbox, .advanced-buttons  {
     position: relative;
     left: 50%;
     -webkit-transform: translateX(-50%);
         -ms-transform: translateX(-50%);
             transform: translateX(-50%);
 }
-.skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
-    position: absolute;
-    left: 0;
+.advanced-buttons {
+    border-bottom: 1px solid;
+    cursor: pointer;
+    width: 124px;
+    font-size: 12px;
+    /* margin-bottom: -7px; */
 }
-.display-button, .hide-assignment-button, .next-assignment-button {
+/* 3rd column */
+.submit-work-button, .next-assignment-button, .fixed-mode-button {
     position: absolute;
     right: 0;
 }
-.skew-ratio-textbox, .submit-work-button, .hide-assignment-button {
+/* 2nd row */
+.display-button, .mark-as-finished-button, .next-assignment-button {
     margin: 7px 0;
 }
 .skew-ratio-textbox {
@@ -368,8 +379,8 @@ input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
 input[type=number].translate-left::-webkit-inner-spin-button {
-    -webkit-transform: translateX(-23px);
-            transform: translateX(-23px);
+    -webkit-transform: translateX(-22px);
+            transform: translateX(-22px);
 }
 
 

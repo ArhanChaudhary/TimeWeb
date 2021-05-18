@@ -64,7 +64,7 @@ priority = {
             let sa = utils.loadAssignmentData(dom_assignment);
             let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
             ad = utils.formatting.parseDate(ad + " 00:00");
-            x = Math.round((utils.formatting.parseDate(x + " 00:00") - ad) / 86400000);
+            x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x + " 00:00"), ad);
             ad = new Date(ad);
             y = +y;
             skew_ratio = +skew_ratio;
@@ -140,7 +140,7 @@ priority = {
             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
 
             // Will document soon
-            let daysleft = Math.round((date_now - ad) / 86400000),
+            let daysleft = utils.daysBetweenTwoDates(date_now, ad);
                 todo = c_funct(len_works+dif_assign+1) - lw;
             const today_minus_dac = daysleft - dif_assign;
             const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
@@ -165,7 +165,7 @@ priority = {
                 dom_status_image.attr({
                     width: 18,
                     height: 20,
-                }).css("margin-left", -2);
+                }).css("margin-left", -3);
                 if (daysleft === -1) {
                     strdaysleft = 'Assigned Tomorrow';
                 } else if (daysleft > -7) {
@@ -218,7 +218,7 @@ priority = {
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
                     } else {
-                        status_message = 'You have not Entered your past Work Inputs! Please Enter your Progress to Continue';
+                        status_message = "You haven't Entered your past Work Inputs! Please Enter your Progress to Continue";
                     }
                     dom_status_image.attr({
                         width: 11,

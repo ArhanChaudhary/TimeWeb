@@ -83,7 +83,7 @@ $(function() {
                 let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 // Type conversions
                 ad = utils.formatting.parseDate(ad + " 00:00");
-                x = Math.round((utils.formatting.parseDate(x + " 00:00") - ad) / 86400000); // Round to account for DST
+                x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x + " 00:00"), ad);
                 ad = new Date(ad);
                 y = +y;
                 // dif assign is already an int
@@ -152,9 +152,9 @@ $(function() {
                 let date_assignment_created = new Date(ad.valueOf());
                 date_assignment_created.setDate(date_assignment_created.getDate() + dif_assign);
                 // Days between today and date_assignment_created
-                let today_minus_dac = Math.round((date_now - date_assignment_created) / 86400000),
+                let today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created),
                     // Days between today and the assignment date
-                    today_minus_ad = Math.round((date_now - ad) / 86400000);
+                    today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                 const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
@@ -454,14 +454,14 @@ $(function() {
                         }
                         str_day += ':';
                         center(str_day, 3);
-                        center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "for Today" : "this Day"}: ${lw + todo}/${y} ${pluralize(unit,2)}`, 4);
+                        center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${lw + todo}/${y} ${pluralize(unit,2)}`, 4);
                         if (today_minus_ad < 0) {
                             center("This Assignment has Not Yet been Assigned", 6);
                         } else if (distance_today_from_displayed_day > 0) {
-                            center("You have not Entered your Work from Previous Days", 6);
+                            center("You haven't Entered your Work from Previous Days", 6);
                             center("Please Enter your Progress to Continue", 7);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
-                            center(`You have Completed your Work ${displayed_day.valueOf() === date_now.valueOf() ? "for Today" : "this Day"}`, 6);
+                            center(`You have Completed your Work for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}`, 6);
                         } else if (len_works && !assignmentIsInProgress() && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
                             center("!!! ALERT !!!", 6);
                             center("You are Behind Schedule!", 7);
@@ -703,11 +703,11 @@ $(function() {
                     // Nine buttons event listeners
                     //
                     const skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
-                        total_work_input_button = dom_assignment.find(".total-work-input-button"),
+                        work_input_button = dom_assignment.find(".work-input-button"),
                         display_button = dom_assignment.find(".display-button"),
                         skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
                         submit_work_button = dom_assignment.find(".submit-work-button"),
-                        hide_assignment_button = dom_assignment.find(".hide-assignment-button"),
+                        hide_assignment_button = dom_assignment.find(".mark-as-finished-button"),
                         fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
                         delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
                         next_assignment_button = dom_assignment.find(".next-assignment-button");
@@ -767,7 +767,7 @@ $(function() {
 
                     // BEGIN Submit work button
                     submit_work_button.click(function() {
-                        if (!total_work_input_button.val()) return;
+                        if (!work_input_button.val()) return;
                         if (lw >= y) {
                             alert("You have already finished this assignment");
                         } else if (today_minus_dac > -1) {
@@ -777,7 +777,7 @@ $(function() {
                                 var todo = c_funct(day + dif_assign + 1) - lw;
                             }
                             const rem_work = assignmentIsInProgress();
-                            let input_done = total_work_input_button.val().trim().toLowerCase();
+                            let input_done = work_input_button.val().trim().toLowerCase();
                             switch (input_done) {
                                 case "fin":
                                     input_done = c_funct(day + dif_assign + 1);
@@ -789,22 +789,21 @@ $(function() {
                                     }
                                 }
                             }
-                            if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done < y && !rem_work) {
+                            if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done + lw < y && !rem_work) {
                                 return alert("Your last work input must complete this assignment");
                             }
-                            if (input_done < 0) {
-                                input_done = 0;
+                            if (input_done + lw < 0) {
+                                input_done = -lw;
                             }
                             if (rem_work) {
-                                sa.works[len_works] = input_done;
+                                sa.works[len_works] = input_done + lw;
                                 len_works -= 1;
                             } else {
-                                sa.works.push(input_done);
+                                sa.works.push(input_done + lw);
                             }
-                            const diff = input_done - lw;
-                            lw = input_done;
+                            lw += input_done;
                             len_works++;
-                            if (diff !== todo) {
+                            if (input_done !== todo) {
                                 if (len_works + dif_assign === x) {
                                     sa.dynamic_start = len_works + dif_assign - 1;
                                 } else {
@@ -988,7 +987,7 @@ $(function() {
                     // END Next assignment button
 
                     // BEGIN Info buttons
-                    skew_ratio_button.info("right", 
+                    skew_ratio_button.info("top", 
                         `The skew ratio determines the work distribution of the graph
 
                         Click this button and hover and click the graph
@@ -996,12 +995,12 @@ $(function() {
                         Note: this has no effect on assignments with only one working day (since there is only one possible work distribution)`
                     );
 
-                    total_work_input_button.info("top",
-                        `Enter the total number of units done on the graph's displayed date and submit
+                    work_input_button.info("top",
+                        `Enter the number of units done on the graph's displayed date and submit
                         
                         Keyword: enter "fin" if you have completed an assignment's work for its displayed date`,"after"
                     ).css({
-                        left: "calc(50% + 63px)",
+                        left: "calc(50% + 46px)",
                         top: 3,
                         position: "absolute",
                     });
@@ -1013,20 +1012,20 @@ $(function() {
 
                         Dynamic mode (default):
                         If you don't finish a day's work, the red line will readjust itself to start at your last work input, adapting to your work schedule
-                        This mode is recommended if you can't keep up with an assignment's work schedule`
-                    ).children().first().css({
+                        This mode is recommended if you can't keep up with an assignment's work schedule`, "prepend"
+                    ).css("left", -3).children().first().css({
                         fontSize: 11,
                         lineHeight: "11px",
                     });
 
-                    skew_ratio_textbox.info("right", 
+                    skew_ratio_textbox.info("top", 
                         `The skew ratio determines the work distribution of the graph
 
-                        Enter skew ratio as a number. Leave this blank to cancel or press enter to save`,'after'
+                        Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
                     ).css({
-                        left: 134,
+                        left: "calc(50% + 54px)",
+                        bottom: 5,
                         position: "absolute",
-                        bottom: 36,
                     });
                     // END Info buttons
                 }
@@ -1045,8 +1044,8 @@ $(function() {
                     day = len_works - assignmentIsInProgress();
                     lw = sa.works[len_works];
                     // If date_now is redefined
-                    today_minus_dac = Math.round((date_now - date_assignment_created) / 86400000);
-                    today_minus_ad = Math.round((date_now - ad) / 86400000);
+                    today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
+                    today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                     
                     width = $(fixed_graph).width();
                     height = $(fixed_graph).height();
@@ -1078,7 +1077,7 @@ $(function() {
                         alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
                         alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
                         alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
-                        alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you have not entered any work inputs");
+                        alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs");
                         if (x <= 2) {
                             alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are more effective for this visualization`);
                         }
@@ -1090,9 +1089,12 @@ $(function() {
                 }
                 // Makes input bigger for info button
                 if (show_info_buttons || first_login) {
-                    dom_assignment.find(".total-work-input-button").css("width", 163);
+                    dom_assignment.find(".work-input-button").css("width", 129);
                     // Position up/down input scroller
                     dom_assignment.find(".skew-ratio-textbox").addClass("translate-left");
+                } else {
+                    dom_assignment.find(".work-input-button").css("width", 106);
+                    dom_assignment.find(".skew-ratio-textbox").css("width", 125);
                 }
             }
             dom_assignment.data('not_first_click', true);

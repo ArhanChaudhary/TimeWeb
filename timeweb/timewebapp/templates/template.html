@@ -3,6 +3,7 @@
 {% load pwa %}
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
         <script nonce="{{request.csp_nonce}}">
@@ -12,11 +13,13 @@
 
             gtag('config', 'G-3K1HRD42V7');
             {% if user.get_username %}
-            username = "{{ user.get_username }}"
+            username = "{{ user.get_username }}";
+            example_account_name = "{{ example_account_name }}";
+            example_assignment_name = "{{ example_assignment_name }}";
+            hour_to_update = {{ hour_to_update }};
             {% endif %}
         </script>
         <title>TimeWeb</title>
-        <meta charset="UTF-8">
         {% progressive_web_app_meta %}
         <meta name="title" content="TimeWeb">
         <meta name="description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">

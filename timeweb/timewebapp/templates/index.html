@@ -136,17 +136,32 @@ $ python manage.py runserver
               <canvas class="fixed-graph"></canvas>
               <canvas tabindex="0" class="graph">Your browser does not support the canvas tag.</canvas>
               <div class="graph-footer">
-                <button class="skew-ratio-button">Set skew ratio using Graph</button>
-                <input class="total-work-input-button" placeholder="Enter total units done"/>
-                <button class="display-button">Display in Text</button>
-                <br>
-                <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
                 <button class="submit-work-button">Submit work Input</button>
-                <button class="hide-assignment-button"></button>
+                <input class="work-input-button" placeholder="Enter units done"/>
+                <button class="delete-work-input-button">Delete last work Input</button>
                 <br>
-                <button class="fixed-mode-button"></button>
-                <button class="delete-work-input-button">Delete last work Input</button>              
+                <button class="display-button">Display in Text</button>
+                <button class="mark-as-finished-button"></button>
                 <button class="next-assignment-button">Next Assignment</button>
+                <br>
+                <div class="advanced-buttons first-advanced-button">
+                  Advanced Buttons
+                  <svg width="15px" height="10px">
+                    <polygon class="arrow" points="10,2.5 0,2.5 5,7.5">
+                    </polygon>
+                  </svg>
+                </div>
+                <br>
+                <button class="skew-ratio-button">Set skew ratio using Graph</button>
+                <input type="number" step="0.1" placeholder="Enter skew ratio" class="skew-ratio-textbox"/>
+                <button class="fixed-mode-button"></button>
+                <div class="advanced-buttons seecond-advanced-button">
+                  Advanced Buttons
+                  <svg width="15px" height="10px">
+                    <polygon class="arrow" points="10,10 0,10 5,5">
+                    </polygon>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
