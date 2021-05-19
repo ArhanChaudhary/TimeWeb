@@ -194,7 +194,7 @@ class TimewebView(LoginRequiredMixin, View):
             elif action == 'change_first_login':
                 self.changed_first_login(request)
             elif action == 'update_date_now':
-                self.updated_date_now(request)
+                self.updated_date_now_and_example_assignment(request)
             return HttpResponse(status=204)
     
     def valid_form(self, request):
@@ -427,7 +427,7 @@ class TimewebView(LoginRequiredMixin, View):
         settings_model.save()
         logger.info(f"User \"{request.user}\" changed their first login")
 
-    def updated_date_now(self, request):
+    def updated_date_now_and_example_assignment(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
         date_now = request.POST["date_now"]
         date_now = datetime.datetime.strptime(date_now, "%Y-%m-%d").date()
@@ -438,6 +438,12 @@ class TimewebView(LoginRequiredMixin, View):
             if assignment.mark_as_done:
                 assignment.mark_as_done = False
                 assignment.save()
+        days_since_example_ad = int(request.POST["days_since_example_ad"], 10)
+        if days_since_example_ad > 0:
+            example_assignment = get_object_or_404(TimewebModel, assignment_name=example_assignment_name)
+            example_assignment.ad += datetime.timedelta(days_since_example_ad)
+            example_assignment.x += datetime.timedelta(days_since_example_ad)
+            example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
 class ContactView(View):
     def get(self, request):

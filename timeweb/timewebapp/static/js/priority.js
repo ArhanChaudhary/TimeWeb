@@ -63,9 +63,8 @@ priority = {
             const dom_assignment = $(this);
             let sa = utils.loadAssignmentData(dom_assignment);
             let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
-            ad = utils.formatting.parseDate(ad + " 00:00");
-            x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x + " 00:00"), ad);
-            ad = new Date(ad);
+            ad = new Date(utils.formatting.parseDate(ad));
+            x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x), ad);
             y = +y;
             skew_ratio = +skew_ratio;
             ctime = +ctime;
@@ -409,7 +408,7 @@ priority = {
             }
         }
         // Make sure this is set after assignments are sorted and swapped
-        if ($("#animate-in").length) {
+        if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
             // Needs to be after domswap or else "top" bugs about 
             $("#animate-in").css({

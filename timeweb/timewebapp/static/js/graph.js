@@ -29,12 +29,17 @@ $(function() {
         // Runs the click function if
         // The background of the assignment was clicked
         // The footer wasn't clicked (to prevent accidental closing)
-        if (!["IMG", "BUTTON", "CANVAS", "INPUT"].includes(e.target.tagName) && !$(e.target).hasClass("graph-footer")) {
+        if (!["IMG", "CANVAS"].includes(e.target.tagName) && !$(e.target).parents(".graph-footer").length) {
             let dom_assignment = $(this);
             let sa = utils.loadAssignmentData(dom_assignment);
             // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
             if (dom_assignment.hasClass("mark-as-done") && !sa.mark_as_done) {
-                return $(".assignment").first().focus();
+                $(".assignment").first().focus().parent().animate({left: -5}, 75, "easeOutCubic", function() {
+                    $(this).animate({left: 5}, 75, "easeOutCubic", function() {
+                        $(this).animate({left: 0}, 75, "easeOutCubic");
+                    });
+                });
+                return
             }
             const graph_container = dom_assignment.find(".graph-container"),
                 not_first_click = dom_assignment.data('not_first_click');
@@ -82,9 +87,8 @@ $(function() {
                 
                 let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
                 // Type conversions
-                ad = utils.formatting.parseDate(ad + " 00:00");
-                x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x + " 00:00"), ad);
-                ad = new Date(ad);
+                ad = new Date(utils.formatting.parseDate(ad));
+                x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x), ad);
                 y = +y;
                 // dif assign is already an int
                 skew_ratio = +skew_ratio;
@@ -1024,9 +1028,9 @@ $(function() {
                         Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
                     ).css({
                         left: "calc(50% + 54px)",
-                        bottom: 5,
+                        bottom: 30,
                         position: "absolute",
-                    });
+                    }).toggle(); // Initially hide it for Advanced buttons
                     // END Info buttons
                 }
                 function resize() {

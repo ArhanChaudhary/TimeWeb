@@ -355,6 +355,9 @@ canvas:focus {
     font-size: 12px;
     /* margin-bottom: -7px; */
 }
+.second-advanced-button {
+    margin-top: 7px;
+}
 /* 3rd column */
 .submit-work-button, .next-assignment-button, .fixed-mode-button {
     position: absolute;

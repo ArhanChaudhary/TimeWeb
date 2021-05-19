@@ -17,27 +17,14 @@ if (!window.gtag) {
     function gtag() {};
 }
 gtag("event", "home");
-// Prevents submitting form on refresh
-// cite 
-// https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
-if ( window.history.replaceState ) {
-    window.history.replaceState( null, null, window.location.href );
-}
-// Load in assignment data
-dat = JSON.parse(document.getElementById("assignment-models").textContent);
-for (let sa of dat) {
-    sa.works = sa.works.map(Number);
-    sa.nwd = sa.nwd.map(Number);
-}
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now } = JSON.parse(document.getElementById("settings-model").textContent));
-def_nwd = def_nwd.map(Number);
-date_now = new Date(date_now + " 00:00");
 utils = {
     formatting: {
         // cite
         // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
         // Date.parse but compatible with safari
+        // This also adds "00:00" to the end of the inputted date string before parsing
         parseDate: function(date) {
+            date += " 00:00";
             const parsed = Date.parse(date);
             if (!isNaN(parsed)) {
                 return parsed;
@@ -86,6 +73,25 @@ utils = {
             }
         },
         setAdvancedClickHandlers: function() {
+            // Advanced inputs for the graph
+            $(".advanced-buttons").click(function() {
+                $(".skew-ratio-button, .skew-ratio-textbox, .skew-ratio-textbox + .info-button, .fixed-mode-button").toggle();
+                $(".advanced-buttons").toggle();
+            });
+            $(".second-advanced-button").toggle();
+            $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
+            // Advanced inputs for form
+            $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().addClass("hidden");
+            $("#nwd-wrapper").addClass("hidden");
+            $("#form-wrapper #advanced-inputs").insertBefore($("#form-wrapper .hidden").first()).click(function() {
+                $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().toggleClass("hidden");
+                $("#nwd-wrapper").toggleClass("hidden");
+            })
+            if ("advanced_inputs" in sessionStorage) {
+                $("#form-wrapper #advanced-inputs").click();
+                sessionStorage.removeItem("advanced_inputs");
+            }
+            // Advanced inputs in home
             $("#advanced").click(function(e) {
                 // Ignore propagation
                 if (e.target === this) {
@@ -196,7 +202,8 @@ utils = {
                     assignments_excluding_example.parent().append("<span>Click your assignment<br></span>");
                 } else {
                     $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
-                    $(".assignment-container").hide();
+                    // Hide .assignment because DOMswap has removeAttr("style")
+                    $(".assignment").hide();
                 }
             }
         },
@@ -292,11 +299,15 @@ ajaxUtils = {
                 'action': 'update_date_now',
                 'date_now': utils.formatting.stringifyDate(date_now),
             }
-            // const example_assignment = dat.filter(sa_iter => sa_iter.assignment_name === example_assignment_name);
-            // if (example_assignment.length) {
-            //     const days_since_example_ad = date_now - example_assignment.ad
-            //     data["days_since_example_ad"] = 
-            // }
+            const example_assignment = dat.find(sa_iter => sa_iter.assignment_name === example_assignment_name);
+            if (example_assignment === undefined) {
+                data["days_since_example_ad"] = 0;
+            } else {
+                const days_since_example_ad = utils.daysBetweenTwoDates(date_now, utils.formatting.parseDate(example_assignment.ad));
+                data["days_since_example_ad"] = days_since_example_ad;
+                example_assignment.ad.setDate(example_assignment.ad.getDate() + days_since_example_ad);
+                example_assignment.x.setDate(example_assignment.x.getDate() + days_since_example_ad);
+            }
             $.ajax({
                 type: "POST",
                 data: data,
@@ -363,6 +374,23 @@ ajaxUtils = {
         }
     },
 }
+
+
+// Prevents submitting form on refresh
+// cite 
+// https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
+if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+}
+// Load in assignment data
+dat = JSON.parse(document.getElementById("assignment-models").textContent);
+for (let sa of dat) {
+    sa.works = sa.works.map(Number);
+    sa.nwd = sa.nwd.map(Number);
+}
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now } = JSON.parse(document.getElementById("settings-model").textContent));
+def_nwd = def_nwd.map(Number);
+date_now = new Date(utils.formatting.parseDate(date_now));
 
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {

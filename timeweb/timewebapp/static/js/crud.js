@@ -95,16 +95,6 @@ function replaceUnit() {
     }
 }
 $(function() {
-    $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().addClass("hidden");
-    $("#nwd-wrapper").addClass("hidden");
-    $("#form-wrapper #advanced-inputs").insertBefore($("#form-wrapper .hidden").first()).click(function() {
-        $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().toggleClass("hidden");
-        $("#nwd-wrapper").toggleClass("hidden");
-    })
-    if ("advanced_inputs" in sessionStorage) {
-        $("#form-wrapper #advanced-inputs").click();
-        sessionStorage.removeItem("advanced_inputs");
-    }
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
