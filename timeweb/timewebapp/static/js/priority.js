@@ -301,7 +301,7 @@ priority = {
                 len_works -= assignmentIsInProgress();
                 if (x-dif_assign-len_works === 0 || todo < 0 || len_works > today_minus_dac) {
                     status_priority = 0;
-                } else if (len_works && daysleft !== -1) {
+                } else if (len_works && daysleft !== 1) {
                     let sum_diff_red_blue = 0;
                     for (i = 0; i <= len_works; i++) {
                         if (!nwd.includes(assign_day_of_week + i - 1)) {
@@ -340,8 +340,9 @@ priority = {
             if (a[0] > b[0]) return -1;
             if (a[1] < b[1]) return 1;
             if (a[1] > b[1]) return -1;
-            // If priorities are the same, don't change anything
-            return 1;
+
+            if (a[2] < b[2]) return -1;
+            if (a[2] > b[2]) return 1;
         });
         const highest_priority = Math.max(...ordered_assignments.map(function(sa) {
             if ((sa[0] === 5 || sa[0] === 4) && !sa[3]) {

@@ -319,7 +319,7 @@ canvas:focus {
     padding: 0 13px;
     position: relative;
 }
-.graph-footer *:not(.advanced-buttons):not(svg) {
+.graph-footer * {
     border-radius: 20px;
     border: none;
     padding: 3px 6px;
@@ -328,7 +328,6 @@ canvas:focus {
             box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
 .graph-footer *:focus {
-    border-radius: 20px;
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
@@ -381,7 +380,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
-input[type=number].translate-left::-webkit-inner-spin-button {
+.skew-ratio-textbox.translate-left::-webkit-inner-spin-button {
     -webkit-transform: translateX(-22px);
             transform: translateX(-22px);
 }

@@ -13,15 +13,12 @@ Other minor utilities
 
 This only runs on index.html
 */
-if (!window.gtag) {
-    function gtag() {};
-}
 gtag("event", "home");
 utils = {
     formatting: {
         // cite
         // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-        // Date.parse but compatible with safari
+        // Converts YYYY-MM-DD to Date objects reliably on safari
         // This also adds "00:00" to the end of the inputted date string before parsing
         parseDate: function(date) {
             date += " 00:00";
@@ -31,23 +28,20 @@ utils = {
             }
             return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
         },
-        formatMinutes: function(total_minutes) {
-            const hour = Math.floor(total_minutes / 60),
-                minute = Math.ceil(total_minutes % 60);
-            if (hour === 0) {
-                return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
-            } else if (minute === 0) {
-                return hour + "h";
-            } else {
-                return hour + "h " + minute + "m";
-            }
-        },
+        // Converts Date objects to YYYY-MM-DD
         stringifyDate: function(date) {
             return [
                 date.getFullYear(),
                 ('0' + (date.getMonth() + 1)).slice(-2),
                 ('0' + date.getDate()).slice(-2),
             ].join('-');
+        },
+        formatMinutes: function(total_minutes) {
+            const hour = Math.floor(total_minutes / 60),
+                minute = Math.ceil(total_minutes % 60);
+            if (hour === 0) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
+            if (minute === 0) return hour + "h";
+            return hour + "h " + minute + "m";
         },
     },
     ui: {
@@ -305,8 +299,12 @@ ajaxUtils = {
             } else {
                 const days_since_example_ad = utils.daysBetweenTwoDates(date_now, utils.formatting.parseDate(example_assignment.ad));
                 data["days_since_example_ad"] = days_since_example_ad;
-                example_assignment.ad.setDate(example_assignment.ad.getDate() + days_since_example_ad);
-                example_assignment.x.setDate(example_assignment.x.getDate() + days_since_example_ad);
+                const ad = new Date(utils.formatting.parseDate(example_assignment.ad));
+                ad.setDate(ad.getDate() + days_since_example_ad);
+                example_assignment.ad = utils.formatting.stringifyDate(ad);
+                const x = new Date(utils.formatting.parseDate(example_assignment.x));
+                x.setDate(x.getDate() + days_since_example_ad);
+                example_assignment.x = utils.formatting.stringifyDate(x);
             }
             $.ajax({
                 type: "POST",

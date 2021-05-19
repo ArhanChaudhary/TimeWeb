@@ -318,7 +318,7 @@ class TimewebView(LoginRequiredMixin, View):
             # If the reentered due date cuts off some of the work inputs, remove the work input for the last day because that must complete assignment
             if removed_works_end >= end_of_works:
                 removed_works_end = end_of_works
-                if old_data.works[removed_works_end] != self.sm.y:
+                if d(old_data.works[removed_works_end]) != self.sm.y:
                     removed_works_end -= 1
             if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
                 self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
@@ -440,7 +440,7 @@ class TimewebView(LoginRequiredMixin, View):
                 assignment.save()
         days_since_example_ad = int(request.POST["days_since_example_ad"], 10)
         if days_since_example_ad > 0:
-            example_assignment = get_object_or_404(TimewebModel, assignment_name=example_assignment_name)
+            example_assignment = get_object_or_404(TimewebModel, assignment_name=example_assignment_name, user__username=request.user)
             example_assignment.ad += datetime.timedelta(days_since_example_ad)
             example_assignment.x += datetime.timedelta(days_since_example_ad)
             example_assignment.save()

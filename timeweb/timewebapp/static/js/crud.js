@@ -293,7 +293,7 @@ $(function() {
                 // Deny updating or deleting again after queued
                 dom_assignment.css("pointer-events", "none");
                 $(document).queue(function() {
-                    // Once the assignment, is done, this sends the data to the backend and animates its deletion
+                    // Send data to backend and animates its deletion
                     const sa = utils.loadAssignmentData(dom_assignment);
                     const success = function() {
                         new Promise(function(resolve) {
@@ -313,7 +313,10 @@ $(function() {
                                 // Remove from DOM
                                 assignment_container.remove();
                                 $(document).dequeue();
-                                priority.sort({ ignore_timeout: true });
+                                // Don't want priority.sort to run while assignments are deleting because .stop() causes "ghost" assignments whose animate callbacks didn't run
+                                if ($(document).queue().length === 0) {
+                                    priority.sort({ ignore_timeout: true });
+                                }
                             });
                         });
                         if (!ajaxUtils.disable_ajax) {

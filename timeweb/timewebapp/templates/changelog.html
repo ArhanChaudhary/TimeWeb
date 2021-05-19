@@ -6,14 +6,32 @@
 {% endblock css %}
 
 {% block content %}
-{% comment %} 5/?/2021 (v1.2.5):
+5/19/2021 (v1.3.1):
 <ul>
-    <li></li>
+    <li>Rewrote tutorial alert text</li>
+    <li>Minor bug fixes</li>
     <ul>
-        <li>Fixed showing incorrect break days on modify assignment</li>
-        <li>Fixed deleting all finished assignments only visually deleting them locally</li>
+        <li>Fixed outline not showing on graph buttons</li>
+        <li>Fixed invisible ghost assignments when deleting them too quickly</li>
+        <li>Fixed info buttons sometimes being invisible</li>
+        <li>Fixed incorrect priority values if an assignment is due tomorrow</li>
+        <li>Fixed example assignment sometimes crashing the page</li>
+        <li>Fixed reentering assignments unintentionally removing work inputs</li>
     </ul>
-</ul> {% endcomment %}
+</ul>
+5/18/2021 (v1.3.0):
+<ul>
+    <li>Added a label for advanced buttons on the graph footer</li>
+    <li>Rearranged graph footer buttons</li>
+    <li>Changed "Enter total units done" to "Enter units done"</li>
+    <li>Minor bug fixes</li>
+    <ul>
+        <li>Fixed resorting after creating an assignment glitching out</li>
+        <li>Fixed example assignment initially visible on first login</li>
+        <li>Fixed displaying the wrong date after midnight</li>
+        <li>Fixed assignments not being saved after the page is quickly closed</li>
+    </ul>
+</ul>
 5/17/2021 (v1.2.4):
 <ul>
     <li>Added example account to login page</li>

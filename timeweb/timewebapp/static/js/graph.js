@@ -29,7 +29,7 @@ $(function() {
         // Runs the click function if
         // The background of the assignment was clicked
         // The footer wasn't clicked (to prevent accidental closing)
-        if (!["IMG", "CANVAS"].includes(e.target.tagName) && !$(e.target).parents(".graph-footer").length) {
+        if (!["IMG", "CANVAS"].includes(e.target.tagName) && !$(e.target).parents(".graph-footer").length && !$(e.target).hasClass("graph-footer")) {
             let dom_assignment = $(this);
             let sa = utils.loadAssignmentData(dom_assignment);
             // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
@@ -465,7 +465,7 @@ $(function() {
                             center("You haven't Entered your Work from Previous Days", 6);
                             center("Please Enter your Progress to Continue", 7);
                         } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
-                            center(`You have Completed your Work for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}`, 6);
+                            center("You have Completed your Work for Today", 6);
                         } else if (len_works && !assignmentIsInProgress() && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
                             center("!!! ALERT !!!", 6);
                             center("You are Behind Schedule!", 7);
@@ -716,58 +716,61 @@ $(function() {
                         delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
                         next_assignment_button = dom_assignment.find(".next-assignment-button");
 
-                    // BEGIN Set skew ratio button
-                    skew_ratio_button.click(function() {
-                        $(this).onlyText("(Click again to cancel)").one("click", cancel_sr);
-                        // Turn off mousemove to ensure there is only one mousemove handler at a time
-                        $(graph).off("mousemove").mousemove(mousemove);
-                        set_skew_ratio = true;
-                    });
-                    let old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
-                    $(graph).click(function(e) {
-                        if (set_skew_ratio) {
-                            // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
-                            set_skew_ratio = false;
-                            // stop set skew ratio if canvas is clicked
-                            $(this).next().find(".skew-ratio-button").onlyText("Set skew ratio using graph").off("click", cancel_sr);
-                            // Save skew ratio
-                            sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                            old_skew_ratio = skew_ratio;
-                            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
-                            // Disable mousemove
-                            if (!draw_point) {
-                                $(this).off("mousemove");
+                    // BEGIN Delete work input button
+                    delete_work_input_button.click(function() {
+                        if (len_works > 0) {
+                            // Change day if assignment isn't in progress
+                            if (!assignmentIsInProgress()) {
+                                day--;
                             }
-                            priority.sort();
+                            sa.works.pop();
+                            len_works--;
+                            lw = sa.works[len_works];
+
+                            // If the deleted work input cut the dynamic start, run this
+                            // Reverses the logic of work inputs in and recursively decreases red_line_start_x
+                            if (red_line_start_x > len_works + dif_assign) {
+                                // The outer for loop decrements red_line_start_x if the inner for loop didn't break
+                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x >= dif_assign; red_line_start_x--) {
+                                    red_line_start_y = sa.works[red_line_start_x - dif_assign];
+                                    if (nwd.length) {
+                                        mods = c_calc_mod_days();
+                                    }
+                                    set_skew_ratio_lim();
+                                    ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+                                    let next_funct = c_funct(red_line_start_x),
+                                        next_work = sa.works[red_line_start_x - dif_assign];
+                                    for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
+                                        const this_funct = next_funct,
+                                            this_work = next_work;
+                                        next_funct = c_funct(i + 1),
+                                        next_work = sa.works[i - dif_assign + 1];
+                                        // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
+                                        if (next_funct - this_funct !== next_work - this_work) {
+                                            break outer;
+                                        }
+                                    }
+                                }
+                                // ++ for three cases:
+                                // if for loop doesnt run, do ++ to fix red_line_start_x
+                                // if for loop finds, do ++
+                                // if for loop doesnt find, change > dif_assign to >= dif_assign and do ++
+                                red_line_start_x++;
+                                red_line_start_y = sa.works[red_line_start_x - dif_assign];
+                                if (nwd.length) {
+                                    mods = c_calc_mod_days();
+                                }
+                                set_skew_ratio_lim();
+                                sa.dynamic_start = red_line_start_x;
+                                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id)
+                            }
+                            ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
+                            priority.sort({do_not_autofill: true});
                             draw();
-                        } else if (draw_point) {
-                            if (!isMobile) {
-                                // Runs if (!set_skew_ratio && draw_point) and not on mobile
-                                // Disable draw point
-                                $(this).off("mousemove");
-                                draw_point = false;
-                                last_mouse_x = -1;
-                                draw();
-                            }
-                        } else {
-                            // Runs if (!set_skew_ratio && !draw_point)
-                            // Enable draw point
-                            draw_point = true;
-                            // Turn off mousemove to ensure there is only one mousemove handler at a time
-                            $(this).off("mousemove").mousemove(mousemove);
-                            // Pass in e because $.trigger makes e.pageX undefined
-                            mousemove(e);
                         }
                     });
-                    // Cancel set skew ratio
-                    function cancel_sr() {
-                        $(this).onlyText("Set skew ratio using graph");
-                        set_skew_ratio = false;
-                        skew_ratio = old_skew_ratio;
-                        draw();
-                        // No need to ajax since skew ratio is the same
-                    }
-                    // END Set skew ratio button
+                    // END Delete work input button
 
                     // BEGIN Submit work button
                     submit_work_button.click(function() {
@@ -834,35 +837,87 @@ $(function() {
                     });
                     // END Submit work button
 
-                    // BEGIN Fixed/dynamic mode button
-                    fixed_mode_button.click(function() {
-                        sa.fixed_mode = !sa.fixed_mode;
-                        $(this).onlyText(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                        ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', sa.fixed_mode, sa.id);
-                        if (sa.fixed_mode) {
-                            // Set start of red line and pset()
-                            red_line_start_x = 0;
-                            red_line_start_y = 0;
-                            ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                            // Day needs to be set in case it was subtracted by one
-                            day = len_works - assignmentIsInProgress();
-                        } else {
-                            red_line_start_x = sa.dynamic_start;
-                            red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                            day = len_works;
-                            // No need to pset()
-                            // Caps dynamic start at x, wouldn't make sense for todo to be shown for the day on the due date
-                            if (len_works + dif_assign === x) {
-                                day--;
+                    // BEGIN Display button
+                    display_button.click(function() {
+                        alert("This feature has not yet been implented");
+                    }).css("text-decoration", "line-through");
+                    // END Display button
+
+                    // BEGIN Mark as finished button
+                    hide_assignment_button.click(function() {
+                        sa.mark_as_done = !sa.mark_as_done;
+                        $(this).onlyText(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
+                        ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
+                        priority.sort({ ignore_timeout: true });
+                    }).html(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
+                    // END Mark as finished button
+
+                    // BEGIN Next assignment button
+                    next_assignment_button.click(function() {
+                        const next_assignment = dom_assignment.parent().next().children().first();
+                        // Only close if next assignment exists
+                        if (next_assignment.length) {
+                            dom_assignment.click();
+                        }
+                        // Only open next assignment if closed
+                        if (!next_assignment.hasClass("open-assignment")) {     
+                            next_assignment.click();
+                        }
+                    });
+                    // END Next assignment button
+
+                    // BEGIN Set skew ratio using graph button
+                    skew_ratio_button.click(function() {
+                        $(this).onlyText("(Click again to cancel)").one("click", cancel_sr);
+                        // Turn off mousemove to ensure there is only one mousemove handler at a time
+                        $(graph).off("mousemove").mousemove(mousemove);
+                        set_skew_ratio = true;
+                    });
+                    let old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
+                    $(graph).click(function(e) {
+                        if (set_skew_ratio) {
+                            // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
+                            set_skew_ratio = false;
+                            // stop set skew ratio if canvas is clicked
+                            $(this).next().find(".skew-ratio-button").onlyText("Set skew ratio using graph").off("click", cancel_sr);
+                            // Save skew ratio
+                            sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+                            old_skew_ratio = skew_ratio;
+                            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
+                            // Disable mousemove
+                            if (!draw_point) {
+                                $(this).off("mousemove");
                             }
+                            priority.sort();
+                            draw();
+                        } else if (draw_point) {
+                            if (!isMobile) {
+                                // Runs if (!set_skew_ratio && draw_point) and not on mobile
+                                // Disable draw point
+                                $(this).off("mousemove");
+                                draw_point = false;
+                                last_mouse_x = -1;
+                                draw();
+                            }
+                        } else {
+                            // Runs if (!set_skew_ratio && !draw_point)
+                            // Enable draw point
+                            draw_point = true;
+                            // Turn off mousemove to ensure there is only one mousemove handler at a time
+                            $(this).off("mousemove").mousemove(mousemove);
+                            // Pass in e because $.trigger makes e.pageX undefined
+                            mousemove(e);
                         }
-                        if (nwd.length) {
-                            mods = c_calc_mod_days();
-                        }
-                        priority.sort();
+                    });
+                    // Cancel set skew ratio
+                    function cancel_sr() {
+                        $(this).onlyText("Set skew ratio using graph");
+                        set_skew_ratio = false;
+                        skew_ratio = old_skew_ratio;
                         draw();
-                    }).html(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                    // END Fixed/dynamic mode button
+                        // No need to ajax since skew ratio is the same
+                    }
+                    // END Set skew ratio button using graph button
 
                     // BEGIN Skew ratio textbox
                     skew_ratio_textbox.on("keydown paste click keyup", function() { // keydown for normal sr and keyup for delete
@@ -905,90 +960,35 @@ $(function() {
                     });
                     // END Skew ratio textbox
 
-                    // BEGIN Display button
-                    display_button.click(function() {
-                        alert("This feature has not yet been implented");
-                    }).css("text-decoration", "line-through");
-                    // END Display button
-
-                    // BEGIN Delete work input button
-                    delete_work_input_button.click(function() {
-                        if (len_works > 0) {
-                            // Change day if assignment isn't in progress
-                            if (!assignmentIsInProgress()) {
+                    // BEGIN Fixed/dynamic mode button
+                    fixed_mode_button.click(function() {
+                        sa.fixed_mode = !sa.fixed_mode;
+                        $(this).onlyText(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+                        ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', sa.fixed_mode, sa.id);
+                        if (sa.fixed_mode) {
+                            // Set start of red line and pset()
+                            red_line_start_x = 0;
+                            red_line_start_y = 0;
+                            ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                            // Day needs to be set in case it was subtracted by one
+                            day = len_works - assignmentIsInProgress();
+                        } else {
+                            red_line_start_x = sa.dynamic_start;
+                            red_line_start_y = sa.works[red_line_start_x - dif_assign];
+                            day = len_works;
+                            // No need to pset()
+                            // Caps dynamic start at x, wouldn't make sense for todo to be shown for the day on the due date
+                            if (len_works + dif_assign === x) {
                                 day--;
                             }
-                            sa.works.pop();
-                            len_works--;
-                            lw = sa.works[len_works];
-
-                            // If the deleted work input cut the dynamic start, run this
-                            // Reverses the logic of work inputs in and recursively decreases red_line_start_x
-                            if (red_line_start_x > len_works + dif_assign) {
-                                // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x >= dif_assign; red_line_start_x--) {
-                                    red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                    if (nwd.length) {
-                                        mods = c_calc_mod_days();
-                                    }
-                                    set_skew_ratio_lim();
-                                    ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
-                                    let next_funct = c_funct(red_line_start_x),
-                                        next_work = sa.works[red_line_start_x - dif_assign];
-                                    for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
-                                        const this_funct = next_funct,
-                                            this_work = next_work;
-                                        next_funct = c_funct(i + 1),
-                                        next_work = sa.works[i - dif_assign + 1];
-                                        // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
-                                        if (next_funct - this_funct !== next_work - this_work) {
-                                            break outer;
-                                        }
-                                    }
-                                }
-                                // ++ for three cases:
-                                // if for loop doesnt run, do ++ to fix red_line_start_x
-                                // if for loop finds, do ++
-                                // if for loop doesnt find, change > dif_assign to >= dif_assign and do ++
-                                red_line_start_x++;
-                                red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                if (nwd.length) {
-                                    mods = c_calc_mod_days();
-                                }
-                                set_skew_ratio_lim();
-                                sa.dynamic_start = red_line_start_x;
-                                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id)
-                            }
-                            ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                            priority.sort({do_not_autofill: true});
-                            draw();
                         }
-                    });
-                    // END Delete work input button
-
-                    // BEGIN Hide assignment button
-                    hide_assignment_button.click(function() {
-                        sa.mark_as_done = !sa.mark_as_done;
-                        $(this).onlyText(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
-                        ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
-                        priority.sort({ ignore_timeout: true });
-                    }).html(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
-                    // END Hide assignment button
-
-                    // BEGIN Next assignment button
-                    next_assignment_button.click(function() {
-                        const next_assignment = dom_assignment.parent().next().children().first();
-                        // Only close if next assignment exists
-                        if (next_assignment.length) {
-                            dom_assignment.click();
+                        if (nwd.length) {
+                            mods = c_calc_mod_days();
                         }
-                        // Only open next assignment if closed
-                        if (!next_assignment.hasClass("open-assignment")) {     
-                            next_assignment.click();
-                        }
-                    });
-                    // END Next assignment button
+                        priority.sort();
+                        draw();
+                    }).html(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+                    // END Fixed/dynamic mode button
 
                     // BEGIN Info buttons
                     skew_ratio_button.info("top", 
@@ -997,14 +997,14 @@ $(function() {
                         Click this button and hover and click the graph
                         
                         Note: this has no effect on assignments with only one working day (since there is only one possible work distribution)`
-                    );
+                    ).css("margin-right", 1);
 
                     work_input_button.info("top",
                         `Enter the number of units done on the graph's displayed date and submit
                         
                         Keyword: enter "fin" if you have completed an assignment's work for its displayed date`,"after"
                     ).css({
-                        left: "calc(50% + 46px)",
+                        left: "calc(50% + 47px)",
                         top: 3,
                         position: "absolute",
                     });
@@ -1027,10 +1027,10 @@ $(function() {
 
                         Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
                     ).css({
-                        left: "calc(50% + 54px)",
+                        left: "calc(50% + 56px)",
                         bottom: 30,
                         position: "absolute",
-                    }).toggle(); // Initially hide it for Advanced buttons
+                    }).toggle($(".second-advanced-button").is(":visible")); // Initially hide this for "Advanced Buttons"
                     // END Info buttons
                 }
                 function resize() {
@@ -1078,24 +1078,23 @@ $(function() {
                     $(".assignment").next().remove(); // Remove "Click this assignment"
                     setTimeout(function() {
                         alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
-                        alert(`The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date`);
-                        alert("The red line is the generated work schedule of this assignment, and it can be adjusted by changing its skew ratio");
+                        alert("The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment");
                         alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
                         alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs");
                         if (x <= 2) {
-                            alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Longer-term assignments are more effective for this visualization`);
+                            alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates`);
                         }
                         alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
-                        alert("Now that you have finished reading this, click the info icons next to each of the buttons and check out the settings to set your preferences");
+                        alert("Now that you have finished reading this, check out the settings to set your preferences");
                         first_login = false;
                         ajaxUtils.sendTutorialAjax();
                     }, 200);
                 }
                 // Makes input bigger for info button
                 if (show_info_buttons || first_login) {
-                    dom_assignment.find(".work-input-button").css("width", 129);
+                    dom_assignment.find(".work-input-button").css("width", 131);
                     // Position up/down input scroller
-                    dom_assignment.find(".skew-ratio-textbox").addClass("translate-left");
+                    dom_assignment.find(".skew-ratio-textbox").css("width", 150).addClass("translate-left");
                 } else {
                     dom_assignment.find(".work-input-button").css("width", 106);
                     dom_assignment.find(".skew-ratio-textbox").css("width", 125);

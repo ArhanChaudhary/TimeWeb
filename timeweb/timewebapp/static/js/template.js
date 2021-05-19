@@ -10,7 +10,9 @@ Other minor utilities
 
 This runs on every template
 */
-
+if (!window.gtag) {
+    function gtag() {};
+}
 // Initialize the service worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/serviceworker.js', {
