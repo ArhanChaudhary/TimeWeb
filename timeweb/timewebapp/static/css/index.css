@@ -323,6 +323,7 @@ canvas:focus {
     border-radius: 20px;
     border: none;
     padding: 3px 6px;
+    cursor: pointer;
     background: rgba(219,219,219,0.9);
     -webkit-box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
             box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
@@ -333,6 +334,12 @@ canvas:focus {
     background: white;
     -webkit-box-shadow: 0 0 0 3px rgb(0,95,204);
             box-shadow: 0 0 0 3px rgb(0,95,204);
+}
+.advanced-buttons, .advanced-buttons svg {
+    background: none;
+    border-radius: unset;
+    padding: 0;
+    box-shadow: none;
 }
 /* 1st column */
 .delete-work-input-button, .display-button, .skew-ratio-button {
@@ -349,7 +356,6 @@ canvas:focus {
 }
 .advanced-buttons {
     border-bottom: 1px solid;
-    cursor: pointer;
     width: 124px;
     font-size: 12px;
     /* margin-bottom: -7px; */
