@@ -115,12 +115,11 @@ $(function() {
                         left: 5,
                         transform: "none",
                     });
-                    // If it does, checks if the username protrudes into the logo (after floated left)
                     if (username.offset().left-20 < 211+5) {
-                        // If it does, hide the logo
-                        logo.hide();
+                        // If it does, shorten the logo
+                        logo.css("width", username.offset().left-20-5);
                     } else {
-                        logo.show();
+                        logo.css("width", 211);
                     }
                 } else {
                     // If it does not, reset css

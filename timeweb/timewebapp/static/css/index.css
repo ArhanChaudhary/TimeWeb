@@ -318,6 +318,8 @@ canvas:focus {
 .graph-footer {
     padding: 0 13px;
     position: relative;
+    padding-bottom: 7px;
+    margin-bottom: -7px;
 }
 .graph-footer * {
     border-radius: 20px;

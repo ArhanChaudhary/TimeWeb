@@ -79,6 +79,7 @@ priority = {
                     assign_day_of_week: assign_day_of_week,
                     funct_round: funct_round,
                     min_work_time: min_work_time,
+                    min_work_time_funct_round: min_work_time_funct_round,
                     ignore_ends_mwt: ignore_ends_mwt,
                     red_line_start_x: red_line_start_x,
                     red_line_start_y: red_line_start_y,
@@ -98,6 +99,7 @@ priority = {
                     red_line_start_y: red_line_start_y,
                     funct_round: funct_round,
                     min_work_time: min_work_time,
+                    min_work_time_funct_round: min_work_time_funct_round,
                     a: a,
                     b: b,
                     cutoff_to_use_round: cutoff_to_use_round,
@@ -126,6 +128,7 @@ priority = {
             } else if (funct_round < min_work_time && min_work_time < 2 * funct_round) {
                 min_work_time = funct_round * 2;
             }
+            const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
             let len_works = sa.works.length - 1,
                 lw = sa.works[len_works],
                 ignore_ends_mwt = ignore_ends && min_work_time,
@@ -149,7 +152,7 @@ priority = {
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index);
             let strdaysleft, status_value, status_message, status_image;
-            if (lw >= y || x <= daysleft) {
+            if (lw >= y) {
                 status_image = "completely-finished";
                 status_message = 'You are Completely Finished with this Assignment';
                 dom_status_image.attr({
@@ -266,7 +269,13 @@ priority = {
                     }
                     total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
                 }
-                if (daysleft === 1) {
+                if (daysleft < -1) {
+                    strdaysleft = -daysleft + "d Ago";
+                } else if (daysleft === -1) {
+                    strdaysleft = 'Yesterday';
+                } else if (daysleft === 0) {
+                    strdaysleft = 'Today';
+                } else if (daysleft === 1) {
                     strdaysleft = 'Tomorrow';
                     tomorrow_total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
                     if (status_value !== 6) {

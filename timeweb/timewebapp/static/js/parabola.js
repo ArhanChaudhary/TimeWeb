@@ -48,7 +48,6 @@ function pset(ctx, x2 = false, y2 = false) {
     If set skew ratio isn't enabled, the third point is now (1,x1/y1 * skew_ratio)
     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
     */
-    ctx.min_work_time_funct_round = ctx.min_work_time ? Math.ceil(ctx.min_work_time / ctx.funct_round) * ctx.funct_round : ctx.funct_round; // LCM of min_work_time and funct_round; minimum possible units of work a user can do any day
     // Define (x1, y1) and translate both variables to (0,0)
     let x1 = ctx.x - ctx.red_line_start_x,
         y1 = ctx.y - ctx.red_line_start_y;
@@ -179,8 +178,7 @@ function pset(ctx, x2 = false, y2 = false) {
         if (ctx.return_y_cutoff < 1) {
             var output = 0;
         } else {
-            // change n > 0 to n > 1 because return_y_cutoff is >= instead of >
-            for (let n = Math.floor(ctx.return_y_cutoff); n > 1; n--) {
+            for (let n = Math.floor(ctx.return_y_cutoff); n > 0; n--) {
                 var output = funct(n, ctx, false);
                 if (output <= ctx.y - ctx.min_work_time_funct_round) {
                     break;
@@ -229,8 +227,7 @@ function pset(ctx, x2 = false, y2 = false) {
         if (x1 - ctx.return_0_cutoff < 1) {
             var output = 0;
         } else {
-            // x1-1 for same reason
-            for (let n = Math.ceil(ctx.return_0_cutoff); n < x1 - 1; n++) {
+            for (let n = Math.ceil(ctx.return_0_cutoff); n < x1; n++) {
                 var output = funct(n, ctx, false);
                 if (output >= ctx.min_work_time_funct_round + ctx.red_line_start_y) {
                     break;
@@ -273,7 +270,6 @@ function funct(n, ctx, translate=true) {
             return ctx.red_line_start_y;
         }
     }
-    ctx.min_work_time_funct_round = ctx.min_work_time ? Math.ceil(ctx.min_work_time / ctx.funct_round) * ctx.funct_round : ctx.funct_round;
     if (ctx.funct_round < ctx.min_work_time && (!ctx.a && ctx.b < ctx.min_work_time_funct_round || ctx.a && (ctx.a > 0) === (n < ctx.cutoff_to_use_round))) {
         // Get translated y coordinate
         var output = ctx.min_work_time_funct_round * Math.round(n * (ctx.a * n + ctx.b) / ctx.min_work_time_funct_round);

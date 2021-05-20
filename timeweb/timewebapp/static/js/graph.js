@@ -116,6 +116,7 @@ $(function() {
                 } else if (funct_round < min_work_time && min_work_time < 2 * funct_round) {
                     min_work_time = funct_round * 2;
                 }
+                const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
                 let len_works = sa.works.length - 1,
                     lw = sa.works[len_works],
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only when min_work_time is also enabled
@@ -171,6 +172,7 @@ $(function() {
                         assign_day_of_week: assign_day_of_week,
                         funct_round: funct_round,
                         min_work_time: min_work_time,
+                        min_work_time_funct_round: min_work_time_funct_round,
                         ignore_ends_mwt: ignore_ends_mwt,
 
                         wCon: wCon,
@@ -196,6 +198,7 @@ $(function() {
                         red_line_start_y: red_line_start_y,
                         funct_round: funct_round,
                         min_work_time: min_work_time,
+                        min_work_time_funct_round: min_work_time_funct_round,
                         a: a,
                         b: b,
                         cutoff_to_use_round: cutoff_to_use_round,
@@ -226,7 +229,6 @@ $(function() {
                         skew_ratio = funct(1) * x1 / y1;
                         skew_ratio = (y1+min_work_time_funct_round) * x1 / y1;
                         */
-                        const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
                         skew_ratio_lim = Math.round((y1 + min_work_time_funct_round) * x1 / y1 * 10)/10;
                     }
                     dom_assignment.find(".skew-ratio-textbox").attr({
@@ -436,7 +438,7 @@ $(function() {
                     const row_height = screen.measureText(0).width * 2;
                     const center = (str, y_pos) => screen.fillText(str, 50+(width-50)/2, row_height*y_pos);
                     center(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 1);
-                    if (lw < y && daysleft > 0) {
+                    if (lw < y) {
                         todo -= lw;
                         if (todo < 0 || break_days.includes((assign_day_of_week+dif_assign+day) % 7)) {
                             todo = 0;
@@ -641,6 +643,10 @@ $(function() {
                         }
                         // Passes in mouse x and y to draw, explained later
                         draw(e.pageX - offset.left, e.pageY - offset.top);
+                    }
+                    let x1 = x - red_line_start_x; // Amount of working days in the assignment
+                    if (break_days.length) {
+                        x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7]; // Handles break days, explained later
                     }
                     $(graph).off("mousemove").mousemove(mousemove); // Turn off mousemove to ensure there is only one mousemove handler at a time
                     $(window).resize(resize);
@@ -867,7 +873,17 @@ $(function() {
                     // END Next assignment button
 
                     // BEGIN Set skew ratio using graph button
+                    let not_applicable_timeout2;
                     skew_ratio_button.click(function() {
+                        if (x1 <= 1) {
+                            const $this = $(this);
+                            $this.onlyText("Not Applicable");
+                            clearTimeout(not_applicable_timeout2);
+                            not_applicable_timeout2 = setTimeout(function() {
+                                $this.onlyText("Set Skew Ratio using Graph"); // $(this) changes to window
+                            }, 1000);
+                            return;
+                        }
                         $(this).onlyText("(Click again to cancel)").one("click", cancel_sr);
                         // Turn off mousemove to ensure there is only one mousemove handler at a time
                         $(graph).off("mousemove").mousemove(mousemove);
@@ -888,7 +904,7 @@ $(function() {
                             if (!draw_point) {
                                 $(this).off("mousemove");
                             }
-                            priority.sort();
+                            priority.sort({ ignore_timeout: true });
                             draw();
                         } else if (draw_point) {
                             if (!isMobile) {
@@ -920,10 +936,19 @@ $(function() {
                     // END Set skew ratio button using graph button
 
                     // BEGIN Skew ratio textbox
+                    let not_applicable_timeout;
                     skew_ratio_textbox.on("keydown paste click keyup", function() { // keydown for normal sr and keyup for delete
                         if (old_skew_ratio === undefined) {
                             // Sets old_skew_ratio
                             old_skew_ratio = skew_ratio;
+                        }
+                        if (x1 <= 1) {
+                            const $this = $(this);
+                            $this.val('').attr("placeholder", "Not Applicable");
+                            clearTimeout(not_applicable_timeout);
+                            not_applicable_timeout = setTimeout(function() {
+                                $this.attr("placeholder", "Enter Skew Ratio"); // $(this) changes to window
+                            }, 1000);
                         }
                         if ($(this).val()) {
                             // Sets and caps skew ratio
@@ -939,7 +964,6 @@ $(function() {
                             skew_ratio = old_skew_ratio;
                             old_skew_ratio = undefined;
                         }
-                        priority.sort();
                         draw();
                     }).keypress(function(e) {
                         // Saves skew ratio on enter
@@ -957,6 +981,7 @@ $(function() {
                         }
                         // Update old skew ratio
                         old_skew_ratio = skew_ratio;
+                        priority.sort({ ignore_timeout: true });
                     });
                     // END Skew ratio textbox
 
@@ -994,9 +1019,7 @@ $(function() {
                     skew_ratio_button.info("top", 
                         `The skew ratio determines the work distribution of the graph
 
-                        Click this button and hover and click the graph
-                        
-                        Note: this has no effect on assignments with only one working day (since there is only one possible work distribution)`
+                        Click this button and hover and click the graph`
                     ).css("margin-right", 1);
 
                     work_input_button.info("top",
@@ -1028,7 +1051,7 @@ $(function() {
                         Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
                     ).css({
                         left: "calc(50% + 56px)",
-                        bottom: 30,
+                        bottom: 37,
                         position: "absolute",
                     }).toggle($(".second-advanced-button").is(":visible")); // Initially hide this for "Advanced Buttons"
                     // END Info buttons

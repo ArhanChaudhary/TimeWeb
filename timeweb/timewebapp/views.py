@@ -61,12 +61,18 @@ MAX_NUMBER_ASSIGNMENTS = 25
 
 logger = logging.getLogger('django')
 logger.propagate = False
+def get_default_context():
+    return {
+        "example_account_name": example_account_name,
+        "hour_to_update": hour_to_update,
+        "example_assignment_name": example_assignment_name,
+    }
 class SettingsView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
 
     def __init__(self):
-        self.context = {}
+        self.context = get_default_context()
     def get(self,request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
         initial = {
@@ -126,11 +132,7 @@ class TimewebView(LoginRequiredMixin, View):
     redirect_field_name = 'redirect_to'
 
     def __init__(self):
-        self.context = {
-            "example_account_name": example_account_name,
-            "hour_to_update": hour_to_update,
-            "example_assignment_name": example_assignment_name,
-        }
+        self.context = get_default_context()
 
     def add_user_models_to_context(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
@@ -165,7 +167,6 @@ class TimewebView(LoginRequiredMixin, View):
     def post(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
-            print(request.POST)
             status = self.assignment_form_submitted(request)
             if status == "form_is_invalid":
                 self.add_user_models_to_context(request)
@@ -272,6 +273,10 @@ class TimewebView(LoginRequiredMixin, View):
                 else:
                     x_num = (self.sm.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - first_work)/self.sm.funct_round
             x_num = ceil(x_num)
+            if self.sm.dif_assign >= x_num:
+                self.sm.dif_assign = 0
+                if self.created_assignment:
+                    self.sm.dynamic_start = self.sm.dif_assign
             if not x_num or len(self.sm.break_days) == 7:
                 x_num = 1
             elif self.sm.break_days:
@@ -307,6 +312,10 @@ class TimewebView(LoginRequiredMixin, View):
                 self.sm.x = datetime.datetime.max.date()
         else:
             x_num = (self.sm.x - self.sm.ad).days
+            if self.sm.dif_assign >= x_num:
+                self.sm.dif_assign = 0
+                if self.created_assignment:
+                    self.sm.dynamic_start = self.sm.dif_assign
         if self.sm.min_work_time != None:
             self.sm.min_work_time *= self.sm.ctime
         if self.created_assignment:
