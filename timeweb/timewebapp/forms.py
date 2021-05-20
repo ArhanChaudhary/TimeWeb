@@ -19,7 +19,7 @@ class TimewebForm(forms.ModelForm):
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),
             'user': forms.HiddenInput(),
-            'unit': forms.TextInput(attrs={"placeholder": "Ex: Page, Paragraph, Question"}),
+            'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
             'y': forms.NumberInput(attrs={"min":"1"}),
             'ctime': forms.NumberInput(attrs={"min":"0"}),

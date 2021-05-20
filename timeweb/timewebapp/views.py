@@ -31,7 +31,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "assignment_name": example_assignment_name,
             "ad": date_now.strftime("%Y-%m-%d"),
             "x": (date_now + datetime.timedelta(30)).strftime("%Y-%m-%d"),
-            "unit": "Page",
+            "unit": "Chapter",
             "y": "400.00",
             "works": ["0"],
             "dif_assign": 0,
@@ -39,7 +39,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "ctime": "3.00",
             "funct_round": "1.00",
             "min_work_time": "60.00",
-            "nwd": [],
+            "break_days": [],
             "fixed_mode": False,
             "dynamic_start": 0,
             "mark_as_done": False,
@@ -73,7 +73,7 @@ class SettingsView(LoginRequiredMixin, View):
             'warning_acceptance': settings_model.warning_acceptance,
             'def_min_work_time': settings_model.def_min_work_time,
             'def_skew_ratio': settings_model.def_skew_ratio,
-            'def_nwd': settings_model.def_nwd,
+            'def_break_days': settings_model.def_break_days,
             'def_funct_round_minute': settings_model.def_funct_round_minute,
             'ignore_ends': settings_model.ignore_ends,
             'show_progress_bar': settings_model.show_progress_bar,
@@ -101,7 +101,7 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
         settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
         settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1 # A skew ratio entered as "0" is added to 1 and is then stored as "1". The reasoning is in parabola.js
-        settings_model.def_nwd = self.form.cleaned_data.get("def_nwd")
+        settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
         settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
         if settings_model.def_funct_round_minute:
@@ -165,6 +165,7 @@ class TimewebView(LoginRequiredMixin, View):
     def post(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
+            print(request.POST)
             status = self.assignment_form_submitted(request)
             if status == "form_is_invalid":
                 self.add_user_models_to_context(request)
@@ -226,7 +227,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.ctime = self.form.cleaned_data.get("ctime")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
-            self.sm.nwd = self.form.cleaned_data.get("nwd")
+            self.sm.break_days = self.form.cleaned_data.get("break_days")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
         date_now = timezone.localtime(timezone.now())
         if date_now.hour < hour_to_update:
@@ -271,10 +272,10 @@ class TimewebView(LoginRequiredMixin, View):
                 else:
                     x_num = (self.sm.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - first_work)/self.sm.funct_round
             x_num = ceil(x_num)
-            if not x_num or len(self.sm.nwd) == 7:
+            if not x_num or len(self.sm.break_days) == 7:
                 x_num = 1
-            elif self.sm.nwd:
-                guess_x = 7*floor(x_num/(7-len(self.sm.nwd)) - 1) - 1
+            elif self.sm.break_days:
+                guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
                 assign_day_of_week = self.sm.ad.weekday()
                 red_line_start_x = self.sm.dif_assign
 
@@ -283,14 +284,14 @@ class TimewebView(LoginRequiredMixin, View):
                 mods = [0]
                 mod_counter = 0
                 for mod_day in range(6):
-                    if (xday + mod_day) % 7 in self.sm.nwd:
+                    if (xday + mod_day) % 7 in self.sm.break_days:
                         mod_counter += 1
                     mods.append(mod_counter)
                 mods = tuple(mods)
 
                 while 1:
                     guess_x += 1
-                    if guess_x - guess_x // 7 * len(self.sm.nwd) - mods[guess_x % 7] == x_num:
+                    if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
                         x_num = max(1, guess_x)
                         break
             # Make sure assignments arent finished by x_num

@@ -25,12 +25,12 @@
         {% csrf_token %}
         {% for field in form.visible_fields %}
           <p>
-            {% if field.name == "nwd" %}
-              <label id="nwd-label-title">Break Days</label>
-              <div id="nwd-wrapper">
+            {% if field.name == "break_days" %}
+              <label id="break-days-label-title">Break Days</label>
+              <div id="break-days-wrapper">
                 {% for value, text in field.field.choices %}
-                  <input id="id_nwd_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_nwd %}checked="checked"{% endif %}>
-                  <label tabindex="0" class="nwd-label" for="id_nwd_{{ forloop.counter0 }}">{{ text }}</label>
+                  <input id="id_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_break_days %}checked="checked"{% endif %}>
+                  <label tabindex="0" class="break-days-label" for="id_break_days_{{ forloop.counter0 }}">{{ text }}</label>
                 {% endfor %}
               </div>
             {% else %}

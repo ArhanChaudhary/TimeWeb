@@ -414,14 +414,14 @@ nav.open #nav-menu::after {
 }
 
 
-#nwd-wrapper input {
+#break-days-wrapper input {
     display: none !important;
 }
-#nwd-wrapper input:checked + .nwd-label {
+#break-days-wrapper input:checked + .break-days-label {
     border-color: rgb(128,0,0);
     background: rgb(255,127,127);
 }
-#nwd-wrapper .nwd-label {
+#break-days-wrapper .break-days-label {
     background: rgb(127,255,127);
     display: inline-block;
     margin-right: 4px;
@@ -439,12 +439,12 @@ nav.open #nav-menu::after {
     transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
     transition: transform .3s cubic-bezier(.23,.77,.11,1.94), -webkit-transform .3s cubic-bezier(.23,.77,.11,1.94);
 }
-#nwd-wrapper .nwd-label:hover, #nwd-wrapper .nwd-label:focus {
+#break-days-wrapper .break-days-label:hover, #break-days-wrapper .break-days-label:focus {
     -webkit-transform: scale(1.04);
         -ms-transform: scale(1.04);
             transform: scale(1.04);
 }
-#nwd-wrapper .nwd-label:active {
+#break-days-wrapper .break-days-label:active {
     -webkit-transform: translateY(1px);
         -ms-transform: translateY(1px);
             transform: translateY(1px);

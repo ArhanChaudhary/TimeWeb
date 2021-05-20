@@ -52,8 +52,8 @@ function pset(ctx, x2 = false, y2 = false) {
     // Define (x1, y1) and translate both variables to (0,0)
     let x1 = ctx.x - ctx.red_line_start_x,
         y1 = ctx.y - ctx.red_line_start_y;
-    if (ctx.nwd.length) {
-        x1 -= Math.floor(x1 / 7) * ctx.nwd.length + ctx.mods[x1 % 7]; // Handles break days, explained later
+    if (ctx.break_days.length) {
+        x1 -= Math.floor(x1 / 7) * ctx.break_days.length + ctx.mods[x1 % 7]; // Handles break days, explained later
     }
     // If set skew ratio is enabled, make the third point (x2,y2), which was passed as a parameter
     // x2 !== false is necessary because the user can resize the browser for example and call this function while set skew ratio is true but without passing any coordinates
@@ -64,12 +64,12 @@ function pset(ctx, x2 = false, y2 = false) {
         x2 = (x2 - 53.7) / ctx.wCon - ctx.red_line_start_x;
         y2 = (ctx.height - y2 - 44.5) / ctx.hCon - ctx.red_line_start_y;
         // Handles break days, explained later
-        if (ctx.nwd.length) {
+        if (ctx.break_days.length) {
             const floorx2 = Math.floor(x2);
-            if (ctx.nwd.includes((ctx.assign_day_of_week + floorx2 + ctx.red_line_start_x) % 7)) {
+            if (ctx.break_days.includes((ctx.assign_day_of_week + floorx2 + ctx.red_line_start_x) % 7)) {
                 x2 = floorx2;
             }
-            x2 -= Math.floor(x2 / 7) * ctx.nwd.length + ctx.mods[floorx2 % 7];
+            x2 -= Math.floor(x2 / 7) * ctx.break_days.length + ctx.mods[floorx2 % 7];
         }
         // If the mouse is outside the graph to the left, make a line a the slope of y1
         // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph, caused by negative indexing by floorx2. This ensures that NaN passes this statement
@@ -264,8 +264,8 @@ function funct(n, ctx, translate=true) {
     if (translate) {
         // Translate x coordinate 
         n -= ctx.red_line_start_x;
-        if (ctx.nwd.length) {
-            n -= Math.floor(n / 7) * ctx.nwd.length + ctx.mods[n % 7];
+        if (ctx.break_days.length) {
+            n -= Math.floor(n / 7) * ctx.break_days.length + ctx.mods[n % 7];
         }
         if (n >= ctx.return_y_cutoff) {
             return ctx.y;
@@ -294,7 +294,7 @@ function calc_mod_days(ctx) {
     let mods = [0],
         mod_counter = 0;
     for (let mod_day = 0; mod_day < 6; mod_day++) {
-        if (ctx.nwd.includes((ctx.assign_day_of_week + ctx.red_line_start_x + mod_day) % 7)) {
+        if (ctx.break_days.includes((ctx.assign_day_of_week + ctx.red_line_start_x + mod_day) % 7)) {
             mod_counter++;
         }
         mods.push(mod_counter);

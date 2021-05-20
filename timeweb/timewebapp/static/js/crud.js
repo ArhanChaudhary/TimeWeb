@@ -102,10 +102,10 @@ $(function() {
         initial_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
-        for (let nwd of Array(7).keys()) {
-            // (nwd+6)%7) is for an ordering issue i think
-            // Treat this as: $("#id_nwd_"+nwd).prop("checked", def_nwd.includes(nwd));
-            $("#id_nwd_"+((nwd+6)%7)).prop("checked", def_nwd.includes(nwd));
+        for (let break_day of Array(7).keys()) {
+            // (break_days+6)%7) is for an ordering issue i think
+            // Treat this as: $("#id_break_days_"+break_days).prop("checked", def_break_days.includes(break_days));
+            $("#id_break_days_"+((break_day+6)%7)).prop("checked", def_break_days.includes(break_day));
         }
         // Set form text
         $("#new-title").html("New Assignment");
@@ -134,10 +134,10 @@ $(function() {
         ];
         // Set reentered form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
-        for (let nwd of Array(7).keys()) {
-            // (nwd+6)%7) is for an ordering issue i think, ignore that
-            // Treat this as: $("#id_nwd_"+nwd).prop("checked", def_nwd.includes(nwd));
-            $("#id_nwd_"+((nwd+6)%7)).prop("checked", sa.nwd.includes(nwd));
+        for (let break_day of Array(7).keys()) {
+            // (break_day+6)%7) is for an ordering issue, ignore that
+            // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_break_days.includes(break_day));
+            $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
         // Set button pk
         $("#submit-assignment-button").val(sa.id);
@@ -151,7 +151,7 @@ $(function() {
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
-        e.g: If this assignment is reading a book, enter "Page"
+        e.g: If this assignment is reading a book, enter "Chapter"
 
         If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute"`
     ).addClass("dont-hide-button");
@@ -166,7 +166,7 @@ $(function() {
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     ).addClass("dont-hide-button");
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
-    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='nwd'])");
+    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days'])");
     // Auto field scrolling
     form_inputs.focus(function() {
         this.scrollIntoView({
@@ -224,7 +224,7 @@ $(function() {
             localStorage.setItem("form_fields",
                 JSON.stringify([
                     ...form_inputs.toArray().map(field => field.value),
-                    $("#form-wrapper #nwd-wrapper input").toArray().map(nwd_field => nwd_field.checked),
+                    $("#form-wrapper #break-days-wrapper input").toArray().map(break_day_field => break_day_field.checked),
                 ])
             );
         }
@@ -237,7 +237,7 @@ $(function() {
         form_inputs.each(function(index) {
             $(this).val(pr_data[index]);
         });
-        $("#form-wrapper #nwd-wrapper input").each(function(index) {
+        $("#form-wrapper #break-days-wrapper input").each(function(index) {
             $(this).prop('checked',pr_data[9][index]);
         });
     }

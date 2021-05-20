@@ -358,7 +358,6 @@ canvas:focus {
     border-bottom: 1px solid;
     width: 124px;
     font-size: 12px;
-    /* margin-bottom: -7px; */
 }
 .second-advanced-button {
     margin-top: 7px;
@@ -458,12 +457,12 @@ label[for='id_ad']::after {
     width: calc(100% - 50px);
     margin: 5px;
 }
-#form-wrapper label, #form-wrapper #nwd-label-title {
+#form-wrapper label, #form-wrapper #break-days-label-title {
     text-align: center;
     display: block;
     position: relative;
 }
-#form-wrapper label:not(.nwd-label) {
+#form-wrapper label:not(.break-days-label) {
     margin: 0 25px;
 }
 #form-wrapper input {
@@ -548,7 +547,7 @@ label[for='id_ad']::after {
 }
 
 
-#nwd-wrapper {
+#break-days-wrapper {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;

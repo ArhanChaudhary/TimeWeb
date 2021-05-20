@@ -85,7 +85,7 @@ $(function() {
                 // Animate arrow
                 this.querySelector(".risingarrowanimation").beginElement();
                 
-                let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
+                let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, break_days } = sa;
                 // Type conversions
                 ad = new Date(utils.formatting.parseDate(ad));
                 x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x), ad);
@@ -133,7 +133,7 @@ $(function() {
                 // Handles break days, explained later
                 let mods,
                     assign_day_of_week = ad.getDay(); // Used with mods
-                if (nwd.length) {
+                if (break_days.length) {
                     mods = c_calc_mod_days();
                 }
                 // Sets the upper and lower caps for skew_ratio
@@ -161,13 +161,13 @@ $(function() {
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
+                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
                 let day = len_works - assignmentIsInProgress();
                 function c_pset(x2, y2) {
                     const context = {
                         x: x,
                         y: y,
-                        nwd: nwd,
+                        break_days: break_days,
                         assign_day_of_week: assign_day_of_week,
                         funct_round: funct_round,
                         min_work_time: min_work_time,
@@ -191,7 +191,7 @@ $(function() {
                         mods: mods,
                         return_y_cutoff: return_y_cutoff,
                         y: y,
-                        nwd: nwd,
+                        break_days: break_days,
                         return_0_cutoff: return_0_cutoff,
                         red_line_start_y: red_line_start_y,
                         funct_round: funct_round,
@@ -205,7 +205,7 @@ $(function() {
                 }
                 function c_calc_mod_days() {
                     const context = {
-                        nwd: nwd,
+                        break_days: break_days,
                         assign_day_of_week: assign_day_of_week, 
                         red_line_start_x: red_line_start_x
                     }
@@ -218,8 +218,8 @@ $(function() {
                         skew_ratio_lim = 0;
                     } else {
                         let x1 = x - red_line_start_x;
-                        if (nwd.length) {
-                            x1 -= Math.floor(x1 / 7) * nwd.length + mods[x1 % 7];
+                        if (break_days.length) {
+                            x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7];
                         }
                         /*
                         skew_ratio = (a + b) * x1 / y1;
@@ -438,7 +438,7 @@ $(function() {
                     center(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 1);
                     if (lw < y && daysleft > 0) {
                         todo -= lw;
-                        if (todo < 0 || nwd.includes((assign_day_of_week+dif_assign+day) % 7)) {
+                        if (todo < 0 || break_days.includes((assign_day_of_week+dif_assign+day) % 7)) {
                             todo = 0;
                         }
                         let displayed_day = new Date(date_assignment_created.valueOf());
@@ -464,7 +464,7 @@ $(function() {
                         } else if (distance_today_from_displayed_day > 0) {
                             center("You haven't Entered your Work from Previous Days", 6);
                             center("Please Enter your Progress to Continue", 7);
-                        } else if (nwd.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
+                        } else if (break_days.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                             center("You have Completed your Work for Today", 6);
                         } else if (len_works && !assignmentIsInProgress() && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
                             center("!!! ALERT !!!", 6);
@@ -733,7 +733,7 @@ $(function() {
                                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
                                 outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x >= dif_assign; red_line_start_x--) {
                                     red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                    if (nwd.length) {
+                                    if (break_days.length) {
                                         mods = c_calc_mod_days();
                                     }
                                     set_skew_ratio_lim();
@@ -758,7 +758,7 @@ $(function() {
                                 // if for loop doesnt find, change > dif_assign to >= dif_assign and do ++
                                 red_line_start_x++;
                                 red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                if (nwd.length) {
+                                if (break_days.length) {
                                     mods = c_calc_mod_days();
                                 }
                                 set_skew_ratio_lim();
@@ -778,7 +778,7 @@ $(function() {
                         if (lw >= y) {
                             alert("You have already finished this assignment");
                         } else if (today_minus_dac > -1) {
-                            if (nwd.includes((assign_day_of_week + dif_assign + day) % 7)) {
+                            if (break_days.includes((assign_day_of_week + dif_assign + day) % 7)) {
                                 var todo = 0;
                             } else {
                                 var todo = c_funct(day + dif_assign + 1) - lw;
@@ -820,7 +820,7 @@ $(function() {
                                 if (!sa.fixed_mode) {
                                     red_line_start_x = sa.dynamic_start;
                                     red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
-                                    if (nwd.length) {
+                                    if (break_days.length) {
                                         mods = c_calc_mod_days();
                                     }
                                     set_skew_ratio_lim();
@@ -982,7 +982,7 @@ $(function() {
                                 day--;
                             }
                         }
-                        if (nwd.length) {
+                        if (break_days.length) {
                             mods = c_calc_mod_days();
                         }
                         priority.sort();
@@ -1039,7 +1039,7 @@ $(function() {
                     if (!sa.fixed_mode) {
                         red_line_start_x = sa.dynamic_start;
                         red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
-                        if (nwd.length) {
+                        if (break_days.length) {
                             mods = c_calc_mod_days();
                         }
                         set_skew_ratio_lim();

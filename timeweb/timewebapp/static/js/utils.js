@@ -75,11 +75,11 @@ utils = {
             $(".second-advanced-button").toggle();
             $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
             // Advanced inputs for form
-            $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().addClass("hidden");
-            $("#nwd-wrapper").addClass("hidden");
+            $("#id_funct_round, #id_min_work_time, #break-days-label-title").parent().addClass("hidden");
+            $("#break-days-wrapper").addClass("hidden");
             $("#form-wrapper #advanced-inputs").insertBefore($("#form-wrapper .hidden").first()).click(function() {
-                $("#id_funct_round, #id_min_work_time, #nwd-label-title").parent().toggleClass("hidden");
-                $("#nwd-wrapper").toggleClass("hidden");
+                $("#id_funct_round, #id_min_work_time, #break-days-label-title").parent().toggleClass("hidden");
+                $("#break-days-wrapper").toggleClass("hidden");
             })
             if ("advanced_inputs" in sessionStorage) {
                 $("#form-wrapper #advanced-inputs").click();
@@ -384,10 +384,10 @@ if ( window.history.replaceState ) {
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
     sa.works = sa.works.map(Number);
-    sa.nwd = sa.nwd.map(Number);
+    sa.break_days = sa.break_days.map(Number);
 }
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_nwd, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now } = JSON.parse(document.getElementById("settings-model").textContent));
-def_nwd = def_nwd.map(Number);
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now } = JSON.parse(document.getElementById("settings-model").textContent));
+def_break_days = def_break_days.map(Number);
 date_now = new Date(utils.formatting.parseDate(date_now));
 
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason

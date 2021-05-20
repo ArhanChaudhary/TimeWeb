@@ -74,7 +74,7 @@ class TimewebModel(models.Model):
         null=True,
         verbose_name=_('Minimum Daily Work Time in Minutes'),
     )
-    nwd = MultiSelectField(
+    break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True,
@@ -117,7 +117,7 @@ class SettingsModel(models.Model):
         default=1,
         verbose_name=_('Default Skew Ratio'),
     )
-    def_nwd = MultiSelectField(
+    def_break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True

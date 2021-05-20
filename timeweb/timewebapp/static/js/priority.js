@@ -62,7 +62,7 @@ priority = {
             // Changing this is definitely on my todo list
             const dom_assignment = $(this);
             let sa = utils.loadAssignmentData(dom_assignment);
-            let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, nwd } = sa;
+            let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, break_days } = sa;
             ad = new Date(utils.formatting.parseDate(ad));
             x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x), ad);
             y = +y;
@@ -75,7 +75,7 @@ priority = {
                 const context = {
                     x: x,
                     y: y,
-                    nwd: nwd,
+                    break_days: break_days,
                     assign_day_of_week: assign_day_of_week,
                     funct_round: funct_round,
                     min_work_time: min_work_time,
@@ -93,7 +93,7 @@ priority = {
                     mods: mods,
                     return_y_cutoff: return_y_cutoff,
                     y: y,
-                    nwd: nwd,
+                    break_days: break_days,
                     return_0_cutoff: return_0_cutoff,
                     red_line_start_y: red_line_start_y,
                     funct_round: funct_round,
@@ -107,7 +107,7 @@ priority = {
             }
             function c_calc_mod_days() {
                 const context = {
-                    nwd: nwd,
+                    break_days: break_days,
                     assign_day_of_week: assign_day_of_week, 
                     red_line_start_x: red_line_start_x
                 }
@@ -132,7 +132,7 @@ priority = {
                 unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute";
             let mods,
                 assign_day_of_week = ad.getDay();
-            if (nwd.length) {
+            if (break_days.length) {
                 mods = c_calc_mod_days();
             }
             let a, b, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
@@ -142,7 +142,7 @@ priority = {
             let daysleft = utils.daysBetweenTwoDates(date_now, ad);
                 todo = c_funct(len_works+dif_assign+1) - lw;
             const today_minus_dac = daysleft - dif_assign;
-            const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !nwd.includes(date_now.getDay());
+            const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
@@ -181,7 +181,7 @@ priority = {
                         if (has_autofilled) {
                             todo = c_funct(len_works+dif_assign+1) - lw;
                         }
-                        const autofill_this_loop = params.autofill_override || todo <= 0 || nwd.includes((assign_day_of_week + len_works + dif_assign) % 7);
+                        const autofill_this_loop = params.autofill_override || todo <= 0 || break_days.includes((assign_day_of_week + len_works + dif_assign) % 7);
                         if (!autofill_this_loop || len_works + dif_assign === x - 1) {
                             break;
                         }
@@ -193,7 +193,7 @@ priority = {
                             if (!sa.fixed_mode) {
                                 red_line_start_x = sa.dynamic_start;
                                 red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                if (nwd.length) {
+                                if (break_days.length) {
                                     mods = c_calc_mod_days();
                                 }
                                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
@@ -208,8 +208,8 @@ priority = {
                     }
                 }
                 let x1 = x - red_line_start_x;
-                if (nwd.length) {
-                    x1 -= Math.floor(x1 / 7) * nwd.length + mods[x1 % 7]; // Handles break days, explained later
+                if (break_days.length) {
+                    x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7]; // Handles break days, explained later
                 }
                 daysleft = x - daysleft;
                 if ((today_minus_dac > len_works && len_works + dif_assign < x) || !x1) {
@@ -293,7 +293,7 @@ priority = {
                 skew_ratio = 1;
                 red_line_start_x = dif_assign;
                 red_line_start_y = sa.works[0];
-                if (nwd.length) {
+                if (break_days.length) {
                     mods = c_calc_mod_days();
                 }
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
@@ -304,7 +304,7 @@ priority = {
                 } else if (len_works && daysleft !== 1) {
                     let sum_diff_red_blue = 0;
                     for (i = 0; i <= len_works; i++) {
-                        if (!nwd.includes(assign_day_of_week + i - 1)) {
+                        if (!break_days.includes(assign_day_of_week + i - 1)) {
                             // No need to worry about c_funct(i + dif_assign) being before dynamic_start because red_line_start_x is set to dif_assign
                             sum_diff_red_blue += sa.works[i] - c_funct(i + dif_assign);
                         }
