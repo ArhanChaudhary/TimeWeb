@@ -322,8 +322,8 @@ priority = {
                     status_priority = 0;
                 } else if (len_works && daysleft !== 1) {
                     let sum_diff_red_blue = 0;
-                    for (i = 0; i <= len_works; i++) {
-                        if (!break_days.includes(assign_day_of_week + i - 1)) {
+                    for (i = 1; i < len_works + 1; i++) { // Start at one because funct(0) - works[0] is always 0
+                        if (!break_days.includes(assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - c_funct(i + dif_assign); is a break day
                             // No need to worry about c_funct(i + dif_assign) being before dynamic_start because red_line_start_x is set to dif_assign
                             sum_diff_red_blue += sa.works[i] - c_funct(i + dif_assign);
                         }

@@ -16,6 +16,11 @@ from decimal import Decimal as d
 from math import ceil, floor
 import json
 
+hour_to_update = 4
+example_account_name = "Example"
+example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
+MAX_NUMBER_ASSIGNMENTS = 25
+
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -53,11 +58,6 @@ def custom_permission_denied_view(request, exception=None):
     response = render(request, "403_csrf.html", {})
     response.status_code = 403
     return response
-
-hour_to_update = 4
-example_account_name = "Example"
-example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
-MAX_NUMBER_ASSIGNMENTS = 25
 
 logger = logging.getLogger('django')
 logger.propagate = False
@@ -172,38 +172,48 @@ class TimewebView(LoginRequiredMixin, View):
     def post(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         if 'submit-button' in request.POST:
-            status = self.assignment_form_submitted(request)
-            if status == "form_is_invalid":
-                self.add_user_models_to_context(request)
-                return render(request, "index.html", self.context)
-            elif status == "form_is_valid":
-                # post-get
-                # Don't make this return a 204 when submitting from the example account because there are too many assignments
-                return redirect(request.path_info)
-            elif status == "not_user_assignment":
-                logger.warning(f"User \"{request.user}\" cannot modify an assignment that isn't their's")
-                return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
+            return self.assignment_form_submitted(request)
         else:
             if request.user.username == example_account_name: return HttpResponse(status=204)
             action = request.POST['action']
             if action == 'delete_assignment':
-                self.is_user_assignment = True
-                self.deleted_assignment(request)
-                if not self.is_user_assignment:
-                    logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
-                    return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
+                return self.deleted_assignment(request)
             elif action == 'save_assignment':
-                self.is_user_assignment = True
-                self.saved_assignment(request)
-                if not self.is_user_assignment:
-                    logger.warning(f"User \"{request.user}\" cannot save an assignment that isn't theirs")
-                    return HttpResponseForbidden("This assignment isn't yours")
+                return self.saved_assignment(request)
             elif action == 'change_first_login':
-                self.changed_first_login(request)
+                return self.changed_first_login(request)
             elif action == 'update_date_now':
-                self.updated_date_now_and_example_assignment(request)
-            return HttpResponse(status=204)
+                return self.updated_date_now_and_example_assignment(request)
     
+    def assignment_form_submitted(self, request):
+        # The frontend adds the assignment's pk as a "value" attribute to the submit button
+        self.pk = request.POST['submit-button']
+        if self.pk == '':
+            # If no pk was added, then the assignment was created
+            self.pk = None
+            self.created_assignment = True
+        else:
+            self.created_assignment = False
+        self.form = TimewebForm(request.POST)
+
+        # Parts of the form that can only validate in views
+        form_is_valid = True
+        # Ensure that the user's assignment name doesn't match with any other assignment
+        # If the form was reentered, exclude itself so it doesn't match its name with itself
+        # Can't use unique=True because it doesn't exclude itself
+        if self.assignment_models.exclude(pk=self.pk).filter(assignment_name=request.POST['assignment_name'].strip()).exists():
+            self.form.add_error("assignment_name", forms.ValidationError(_('An assignment with this name already exists')))
+            form_is_valid = False
+        if self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
+            self.form.add_error("assignment_name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+            form_is_valid = False
+        if not self.form.is_valid():
+            form_is_valid = False
+
+        if form_is_valid:
+            return self.valid_form(request)
+        else:
+            return self.invalid_form(request)
     def valid_form(self, request):
         if self.created_assignment:
             self.sm = self.form.save(commit=False)
@@ -218,9 +228,12 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
-                self.is_user_assignment = False
-                return
-            if request.user.username == example_account_name: return
+                logger.warning(f"User \"{request.user}\" cannot modify an assignment that isn't their's")
+                return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
+            if request.user.username == example_account_name: 
+                # post-get
+                # Don't make this return a 204 when submitting from the example account because there are too many assignments
+                return redirect(request.path_info)
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
             # Update model values
@@ -235,6 +248,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
+        # Set date_now to 
         date_now = timezone.localtime(timezone.now())
         if date_now.hour < hour_to_update:
             date_now = date_now.date() - datetime.timedelta(1)
@@ -351,6 +365,15 @@ class TimewebView(LoginRequiredMixin, View):
             elif self.sm.dynamic_start > x_num - 1:
                 self.sm.dynamic_start = x_num - 1
         self.sm.save()
+        if self.created_assignment:
+            request.session['added_assignment'] = self.sm.assignment_name
+            logger.info(f'User \"{request.user}\" added assignment "{self.sm.assignment_name}"')
+        else:
+            request.session['reentered_assignment'] = self.sm.assignment_name    
+            logger.info(f'User \"{request.user}\" updated assignment "{self.sm.assignment_name}"')
+        # post-get
+        # Don't make this return a 204 when submitting from the example account because there are too many assignments
+        return redirect(request.path_info)
 
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
@@ -360,57 +383,19 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Modify Assignment'
         self.context['form'] = self.form
-
-    def assignment_form_submitted(self, request):
-        # The frontend adds the assignment's pk as a "value" attribute to the submit button
-        self.pk = request.POST['submit-button']
-        if self.pk == '':
-            # If no pk was added, then the assignment was created
-            self.pk = None
-            self.created_assignment = True
-        else:
-            self.created_assignment = False
-        self.form = TimewebForm(request.POST)
-
-        # Parts of the form that can only validate in views
-        form_is_valid = True
-        # Ensure that the user's assignment name doesn't match with any other assignment
-        # If the form was reentered, exclude itself so it doesn't match its name with itself
-        # Can't use unique=True because it doesn't exclude itself
-        if self.assignment_models.exclude(pk=self.pk).filter(assignment_name=request.POST['assignment_name'].strip()).exists():
-            self.form.add_error("assignment_name", forms.ValidationError(_('An assignment with this name already exists')))
-            form_is_valid = False
-        if self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-            self.form.add_error("assignment_name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
-            form_is_valid = False
-        if not self.form.is_valid():
-            form_is_valid = False
-
-        if form_is_valid:
-            self.is_user_assignment = True
-            self.valid_form(request)
-            if not self.is_user_assignment:
-                return "not_user_assignment"
-            if self.created_assignment:
-                request.session['added_assignment'] = self.sm.assignment_name
-                logger.info(f'User \"{request.user}\" added assignment "{self.sm.assignment_name}"')
-            else:
-                request.session['reentered_assignment'] = self.sm.assignment_name    
-                logger.info(f'User \"{request.user}\" updated assignment "{self.sm.assignment_name}"')
-            return "form_is_valid"
-        else:
-            self.invalid_form(request)
-            return "form_is_invalid"
+        self.add_user_models_to_context(request)
+        return render(request, "index.html", self.context)
     
     def deleted_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])
         for pk in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=int(pk))
             if request.user != self.sm.user:
-                self.is_user_assignment = False
-                return
+                logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
+                return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
             self.sm.delete()
             logger.info(f'User \"{request.user}\" deleted assignment "{self.sm.assignment_name}"')
+        return HttpResponse(status=204)
         
     def saved_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])
@@ -427,20 +412,22 @@ class TimewebView(LoginRequiredMixin, View):
                 elif key == 'mark_as_done':
                     log_message = f'User \"{request.user}\" marked or unmarked assignment "{self.sm.assignment_name}" as completed'
                 if request.user != self.sm.user:
-                    self.is_user_assignment = False
-                    return
+                    logger.warning(f"User \"{request.user}\" cannot save an assignment that isn't theirs")
+                    return HttpResponseForbidden("This assignment isn't yours")
                 setattr(self.sm, key, value)
                 logger.info(log_message)
             try:
                 self.sm.save()
             except NameError:
                 pass
+        return HttpResponse(status=204)
         
     def changed_first_login(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
         settings_model.first_login = request.POST['first_login'] == "true"
         settings_model.save()
         logger.info(f"User \"{request.user}\" changed their first login")
+        return HttpResponse(status=204)
 
     def updated_date_now_and_example_assignment(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
@@ -460,6 +447,7 @@ class TimewebView(LoginRequiredMixin, View):
             example_assignment.x += datetime.timedelta(days_since_example_ad)
             example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
+        return HttpResponse(status=204)
 class ContactView(View):
     def __init__(self):
         self.context = get_default_context()
