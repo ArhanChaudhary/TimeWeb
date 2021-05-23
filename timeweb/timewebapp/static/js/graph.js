@@ -162,7 +162,7 @@ $(function() {
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
+                const assignmentIsInProgress = () => (today_minus_dac === len_works - 1 || len_works + dif_assign === x && today_minus_dac === len_works) && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
                 let day = len_works - assignmentIsInProgress();
                 function c_pset(x2, y2) {
                     const context = {
@@ -772,7 +772,7 @@ $(function() {
                                 ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id)
                             }
                             ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                            priority.sort({do_not_autofill: true});
+                            priority.sort({do_not_autofill: true}); // Don't autofill on delete work input because it'll just undo the delete in some cases
                             draw();
                         }
                     });
@@ -793,7 +793,7 @@ $(function() {
                             let input_done = work_input_button.val().trim().toLowerCase();
                             switch (input_done) {
                                 case "fin":
-                                    input_done = c_funct(day + dif_assign + 1);
+                                    input_done = c_funct(day + dif_assign + 1) - lw; // This can't be todo because of break_days
                                     break;
                                 default: {
                                     input_done = +input_done;
@@ -1059,6 +1059,9 @@ $(function() {
                 function resize() {
                     // If autofilled by $(window).trigger("resize")
                     len_works = sa.works.length - 1;
+                    // If date_now is redefined
+                    today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
+                    today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                     if (!sa.fixed_mode) {
                         red_line_start_x = sa.dynamic_start;
                         red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
@@ -1070,9 +1073,6 @@ $(function() {
                     }
                     day = len_works - assignmentIsInProgress();
                     lw = sa.works[len_works];
-                    // If date_now is redefined
-                    today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
-                    today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                     
                     width = $(fixed_graph).width();
                     height = $(fixed_graph).height();

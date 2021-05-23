@@ -55,6 +55,9 @@ header.animate::after {
     display: inline;
     font-size: 17px;
 }
+#simulated-date {
+    font-size: 17px;
+}
 #advanced {
     margin-left: auto;
     border-bottom: 1px solid;
@@ -178,6 +181,28 @@ header.animate::after {
             box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
+#delete-assignments {
+    font-size: 14px;
+    position: relative;
+    cursor: pointer;
+}
+#delete-assignments-text {
+    left: 0;
+    right: 0;
+    top: -10px;
+    text-align: center;
+    position: absolute;
+}
+#delete-assignments-line-right {
+    width: calc(50% - 107px);
+    margin-top: 10px;
+    border-top: 1px solid black;
+}
+#delete-assignments-line-left {
+    width: calc(50% - 107px);
+    float: right;
+    border-top: 1px solid black;
+}
 .assignment-header {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -200,7 +225,7 @@ header.animate::after {
     font-size: 0.7em;
     margin-top: -12px;
 }
-.assignment-container:nth-child(2) .title::before {
+#assignments-container > :not(.assignment-container) + .assignment-container .title::before {
     content: "Most Important";
     position: absolute;
     font-size: 0.7em;

@@ -29,6 +29,7 @@ if not DEBUG:
     CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
+CSP_IMG_SRC = ("'self'", 'data:')
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
@@ -75,6 +76,7 @@ INSTALLED_APPS = [
     # Admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'django.contrib.admin',
     'pwa',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
@@ -127,7 +129,7 @@ if os.getenv('GAE_APPLICATION', None):
         }
     }
 else:
-    proxy = False
+    proxy = 0
     if proxy:
         # If running locally and connecting to server database, connect via the proxy.
         #

@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
+from colorfield.fields import ColorField
 from decimal import Decimal
 import datetime
 WEEKDAYS = (
@@ -150,6 +151,8 @@ class SettingsModel(models.Model):
         default=True,
         verbose_name=_('Display Priority with Text'),
     )
+    highest_priority_color = ColorField(default="#e25b50")
+    lowest_priority_color = ColorField(default="#84c841")
     first_login = models.BooleanField(default=True)
     date_now = models.DateField(
         default=datetime.date.today

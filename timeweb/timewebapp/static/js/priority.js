@@ -8,12 +8,12 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 priority = {
-    sort_timeout_duration: 3000,
+    sort_timeout_duration: 2000,
     get_color: function(p) {
         if (isNaN(p)) {
             return "";
         } else {
-            return `rgb(${132+94*p},${200-109*p},${65+15*p})`;
+            return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
         } 
     },
     // Handles coloring and animating assignments that were just created or modified
@@ -52,7 +52,7 @@ priority = {
         let ordered_assignments = [],
             total = 0,
             tomorrow_total = 0,
-            trigger_resize_from_autofill = false,
+            has_autofilled = false,
             incomplete_works = false;
         $(".assignment").each(function(index) {
             // Cancel current swaps and dequeue other swaps
@@ -145,12 +145,28 @@ priority = {
             let daysleft = utils.daysBetweenTwoDates(date_now, ad);
                 todo = c_funct(len_works+dif_assign+1) - lw;
             const today_minus_dac = daysleft - dif_assign;
-            const assignmentIsInProgress = () => today_minus_dac === len_works - 1 && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
+            const assignmentIsInProgress = () => (today_minus_dac === len_works - 1 || len_works + dif_assign === x && today_minus_dac === len_works) && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index);
+            if (params.autofill_all_work_done && today_minus_dac > len_works && !params.do_not_autofill) {
+                const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
+                for (i = 0; i < number_of_forgotten_days; i++) {
+                    todo = c_funct(len_works+dif_assign+1) - lw;
+                    has_autofilled = true;
+                    if (len_works + dif_assign === x) break; // Don't autofill past completion
+                    lw += Math.max(0, todo);
+                    sa.works.push(lw);
+                    len_works++;
+                }
+                if (has_autofilled) {
+                    ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
+                    ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
+                    todo = c_funct(len_works+dif_assign+1) - lw; // Update this if loop ends
+                }
+            }
             let strdaysleft, status_value, status_message, status_image;
             if (lw >= y) {
                 status_image = "completely-finished";
@@ -178,16 +194,11 @@ priority = {
                 status_value = 2;
             } else {
                 if (today_minus_dac > len_works && !params.do_not_autofill) {
-                    let has_autofilled = false;
                     const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                     for (i = 0; i < number_of_forgotten_days; i++) {
-                        if (has_autofilled) {
-                            todo = c_funct(len_works+dif_assign+1) - lw;
-                        }
-                        const autofill_this_loop = params.autofill_override || todo <= 0 || break_days.includes((assign_day_of_week + len_works + dif_assign) % 7);
-                        if (!autofill_this_loop || len_works + dif_assign === x - 1) {
-                            break;
-                        }
+                        todo = c_funct(len_works+dif_assign+1) - lw;
+                        const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || break_days.includes((assign_day_of_week + len_works + dif_assign) % 7);
+                        if (!autofill_this_loop || len_works + dif_assign === x - 1) break;
                         has_autofilled = true;
                         sa.works.push(lw);
                         len_works++;
@@ -206,8 +217,7 @@ priority = {
                     if (has_autofilled) {
                         ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
                         ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
-                        todo = c_funct(len_works+dif_assign+1) - lw;
-                        trigger_resize_from_autofill = true;
+                        todo = c_funct(len_works+dif_assign+1) - lw; // Update this if loop ends
                     }
                 }
                 let x1 = x - red_line_start_x;
@@ -215,7 +225,7 @@ priority = {
                     x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7]; // Handles break days, explained later
                 }
                 daysleft = x - daysleft;
-                if ((today_minus_dac > len_works && len_works + dif_assign < x) || !x1) {
+                if (today_minus_dac > len_works - assignmentIsInProgress() || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
@@ -339,8 +349,8 @@ priority = {
                 dom_completion_time.html('');
             }
         });
-        // fixes graph not updating after skew ratio causes autofill
-        if (trigger_resize_from_autofill) {
+        // fixes graph not updating from skew ratio causing autofill
+        if (has_autofilled) {
             $(window).trigger("resize");
         }
         ordered_assignments.sort(function(a, b) {
@@ -361,7 +371,7 @@ priority = {
             }
         }));
         for (let sa of ordered_assignments) {
-            // originally assignment[0] !== 6 && (assignment[3] || incomplete_works); if assignment[3] is true then assignment[0] !== 6;
+            // originally sa[0] !== 6 && (sa[3] || incomplete_works); if sa[3] is true then sa[0] !== 6;
             const mark_as_done = sa[3] || incomplete_works && sa[0] !== 6;
             const dom_assignment = $(".assignment").eq(sa[2]);
             let priority_percentage;
@@ -371,6 +381,9 @@ priority = {
                 priority_percentage = 0;
             } else {
                 priority_percentage = Math.max(1, Math.floor(sa[1] / highest_priority * 100 + 1e-10));
+                if (isNaN(priority_percentage)) {
+                    priority_percentage = 100;
+                }
             }
             if (text_priority) {
                 const dom_title = $(".title").eq(sa[2]);
@@ -407,6 +420,7 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
         }
+        $("#delete-assignments").hide() // "Delete all starred assignments" div, moved in priority.swap()
         // Have this after above to preserve index on sa
         for (let [index, sa] of ordered_assignments.entries()) {
             // Index represents the final position
@@ -429,16 +443,19 @@ priority = {
             });
         }
         if (incomplete_works) {
-            $("#estimated-total-time").html('Please enter your past work inputs');
-            $("#current-time, #tomorrow-time").hide();
+            $("#current-time, #tomorrow-time, #info").hide();
+            $("#simulated-date").css("margin-top", -21);
         } else if (!total) {
+            $("#info").show();
+            $("#simulated-date").css("margin-top", "");
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time").hide();
             $("#hide-button").css("visibility", "hidden"); // Preserve layout positioning
         } else {
+            $("#current-time, #tomorrow-time, #info").show();
+            $("#simulated-date").css("margin-top", "");
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
-            $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`)
-            $("#current-time, #tomorrow-time").show();
+            $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
             $("#hide-button").css("visibility", "");
         }
         utils.ui.displayClock();
@@ -495,6 +512,9 @@ ordering = {
                 tar1.removeAttr("style");
                 tar2.removeAttr("style");
                 $(document).dequeue();
+            }
+            if ($(document).queue().length === 0 && $(".finished").length >= 2) {
+                $("#delete-assignments").show().insertBefore($(".finished").first());
             }
             swap_temp.remove();
         }
@@ -566,7 +586,46 @@ ordering = {
                 });
             }
         });
-    }
+    },
+    deleteStarredAssignmentsListener: function() {
+        $("#delete-assignments-text").click(function() {
+            if (isMobile ? confirm(`This will delete ${$(".finished").length} starred assignments. Are you sure?`) : confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure? (Press enter)`)) {
+                const finished_assignments = $(".assignment-container").map(function() {
+                    if ($(this).hasClass("finished")) {
+                        return utils.loadAssignmentData($(this).children().first()).id;
+                    } else {
+                        return undefined;
+                    }
+                }).toArray();
+                let data = {
+                    'csrfmiddlewaretoken': csrf_token,
+                    'action': 'delete_assignment',
+                    'assignments': JSON.stringify(finished_assignments),
+                }
+                const success = function() {
+                    const assignment_names_to_delete = $(".finished").map(function() {
+                        return $(this).children().first().attr("data-assignment-name")
+                    }).toArray();
+                    dat = dat.filter(iter_sa => !assignment_names_to_delete.includes(iter_sa.assignment_name));
+                    $(".finished").remove();
+                    if (!ajaxUtils.disable_ajax) {
+                        for (let i = 0; i < finished_assignments.length; i++) {
+                            gtag("event","delete_assignment");
+                        }
+                    }
+                    priority.sort({ ignore_timeout: true });
+                }
+                if (ajaxUtils.disable_ajax) return success();
+                // Send ajax to avoid a page reload
+                $.ajax({
+                    type: "POST",
+                    data: data,
+                    success: success,
+                    error: ajaxUtils.error,
+                });
+            }
+        });
+    },
 }
 document.addEventListener("DOMContentLoaded", function() {
     priority.sort({ first_sort: true, ignore_timeout: true });

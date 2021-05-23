@@ -86,7 +86,7 @@ function pset(ctx, x2 = false, y2 = false) {
             // If the mouse is outside the graph to the right, connect the points (0,0), (x1-1,0), (x1,y1)
             // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
             ctx.a = y1 / x1;
-            ctx.b = a * (1 - x1);
+            ctx.b = ctx.a * (1 - x1);
 
             ctx.skew_ratio = 2 - ctx.skew_ratio_lim;
         } else {
@@ -185,6 +185,9 @@ function pset(ctx, x2 = false, y2 = false) {
                 }
                 ctx.return_y_cutoff--;
             }
+            if (ctx.return_y_cutoff <= 0) {
+                ctx.return_y_cutoff++;
+            }
         }
         if (ctx.ignore_ends_mwt) {
             const lower = [ctx.return_y_cutoff, ctx.y - output];
@@ -232,6 +235,9 @@ function pset(ctx, x2 = false, y2 = false) {
                 if (output >= ctx.min_work_time_funct_round + ctx.red_line_start_y) {
                     break;
                 }
+                ctx.return_0_cutoff++;
+            }
+            if (ctx.return_0_cutoff >= x1) {
                 ctx.return_0_cutoff++;
             }
         }

@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Position content so that the scrollbar doesn't clip into the header
     if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
         $("main").css({
-            overflowY: "auto",
+            overflowY: "overlay",
             height: "calc(100vh - 70px)",
             padding: "10px 30px",
             marginTop: 70,
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             $("header").one("transitionend", function() {
                 // Position content so that the scrollbar doesn't clip into the header
                 $("main").css({
-                    overflowY: "auto",
+                    overflowY: "overlay",
                     height: "calc(100vh - 70px)",
                     padding: "10px 30px",
                     marginTop: 70,

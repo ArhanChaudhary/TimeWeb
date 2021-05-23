@@ -36,6 +36,21 @@ $(function() {
         
         This is recommended to be enabled`
     );
+    $("#reset-button").click(function() {
+        $("#id_warning_acceptance").val(50);
+        $("#id_def_min_work_time").val("");
+        $("#id_def_skew_ratio").val(0);
+        $("#break-days-wrapper input").prop("checked", false);
+        $("#id_def_funct_round_minute").prop("checked", false);
+        $("#id_ignore_ends").prop("checked", false);
+        $("#id_show_progress_bar").prop("checked", false);
+        $("#id_show_info_buttons").prop("checked", true);
+        $("#id_show_past").prop("checked", true);
+        $("#id_color_priority").prop("checked", true);
+        $("#id_text_priority").prop("checked", true);
+        $("#id_highest_priority_color").val("#E25B50").trigger("input");
+        $("#id_lowest_priority_color").val("#84C841").trigger("keydown");
+    });
     $("form").submit(function() {
         $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val()||0);
     });

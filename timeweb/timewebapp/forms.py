@@ -1,8 +1,7 @@
 from django import forms
 from .models import TimewebModel, SettingsModel
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
-from datetime import timedelta
+from colorfield.widgets import ColorWidget
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -118,6 +117,8 @@ class SettingsForm(forms.ModelForm):
             'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'warning_acceptance': forms.NumberInput(attrs={"min":"1","max":"100"}),
             'date_now': forms.HiddenInput(),
+            'highest_priority_color': ColorWidget,
+            'lowest_priority_color': ColorWidget,
         }
         error_messages = {
             'def_min_work_time': {

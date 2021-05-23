@@ -43,6 +43,17 @@ utils = {
             if (minute === 0) return hour + "h";
             return hour + "h " + minute + "m";
         },
+        // cite
+        // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+        hexToRgb: function(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+            } : null;
+        }
+          
     },
     ui: {
         displayClock: function() {
@@ -97,19 +108,29 @@ utils = {
     
             $("#close-assignments").click(() => $(".assignment.open-assignment").click());
     
-            $("#autofill-assignments").click(function() {
+            $("#autofill-no-work-done").click(function() {
                 if (confirm("This will autofill no work done until today for every assignment with missing work inputs. Are you sure?")) {
-                    priority.sort({autofill_override: true, ignore_timeout: true});
+                    priority.sort({autofill_no_work_done: true, ignore_timeout: true});
                 }
             }).info("left",
                 `This applies to every assignment you haven't entered past work inputs for
         
-                Assumes you completed nothing for every missing work input and autofills in no work done until today`,"prepend"
-            ).css("left", -2).addClass("dont-hide-button");
-    
+                Assumes you have completed nothing since your last work input and autofills in no work done until today`,"prepend"
+            ).css("left", -3).addClass("dont-hide-button");
+            $("#autofill-all-work-done").click(function() {
+                if (confirm("This will autofill all work done until today for every assignment with missing work inputs. Are you sure?")) {
+                    priority.sort({autofill_all_work_done: true, ignore_timeout: true});
+                }
+            }).info("left",
+                `This applies to every assignment you haven't entered past work inputs for
+        
+                Assumes you followed your work schedule since your last work input and autofills in all work done until today`,"prepend"
+            ).css("left", -3).addClass("dont-hide-button");
+            $("#simulated-date").hide();
             $("#next-day").click(function() {
                 ajaxUtils.disable_ajax = true;
                 date_now.setDate(date_now.getDate() + 1);
+                $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}))
                 $(window).trigger("resize");
                 priority.sort({ ignore_timeout: true });
             }).info("left",
@@ -117,44 +138,7 @@ utils = {
                 
                 All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`, 'prepend'
             ).css("left", -3).addClass("dont-hide-button");
-    
-            $("#delete-assignments").click(function() {
-                if (isMobile ? confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure?`) : confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure? (Press enter)`)) {
-                    const finished_assignments = $(".assignment-container").map(function() {
-                        if ($(this).hasClass("finished")) {
-                            return utils.loadAssignmentData($(this).children().first()).id;
-                        } else {
-                            return undefined;
-                        }
-                    }).toArray();
-                    let data = {
-                        'csrfmiddlewaretoken': csrf_token,
-                        'action': 'delete_assignment',
-                        'assignments': JSON.stringify(finished_assignments),
-                    }
-                    const success = function() {
-                        const assignment_names_to_delete = $(".finished").map(function() {
-                            return $(this).children().first().attr("data-assignment-name")
-                        }).toArray();
-                        dat = dat.filter(iter_sa => !assignment_names_to_delete.includes(iter_sa.assignment_name));
-                        $(".finished").remove();
-                        if (!ajaxUtils.disable_ajax) {
-                            for (let i = 0; i < finished_assignments.length; i++) {
-                                gtag("event","delete_assignment");
-                            }
-                        }
-                        priority.sort({ ignore_timeout: true });
-                    }
-                    if (ajaxUtils.disable_ajax) return success();
-                    // Send ajax to avoid a page reload
-                    $.ajax({
-                        type: "POST",
-                        data: data,
-                        success: success,
-                        error: ajaxUtils.error,
-                    });
-                }
-            });
+
             $("#re-enable-tutorial").click(function() {
                 if (!first_login) {
                     first_login = true;
@@ -386,10 +370,11 @@ for (let sa of dat) {
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
 }
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now } = JSON.parse(document.getElementById("settings-model").textContent));
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(utils.formatting.parseDate(date_now));
-
+highest_priority_color = utils.formatting.hexToRgb(highest_priority_color)
+lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color)
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -404,6 +389,7 @@ document.addEventListener("DOMContentLoaded", function() {
     setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
     utils.ui.setHideEstimatedCompletionTimeButton();
     utils.ui.setAdvancedClickHandlers();
+    ordering.deleteStarredAssignmentsListener();;
     utils.ui.setKeybinds();
     $(window).resize(utils.ui.setAssignmentHoverScale);
     utils.ui.setAssignmentHoverScale();

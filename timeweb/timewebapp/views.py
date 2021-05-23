@@ -31,7 +31,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "assignment_name": example_assignment_name,
             "ad": date_now.strftime("%Y-%m-%d"),
             "x": (date_now + datetime.timedelta(30)).strftime("%Y-%m-%d"),
-            "unit": "Chapter",
+            "unit": "Page",
             "y": "400.00",
             "works": ["0"],
             "dif_assign": 0,
@@ -87,6 +87,8 @@ class SettingsView(LoginRequiredMixin, View):
             'show_past': settings_model.show_past,
             'color_priority': settings_model.color_priority,
             'text_priority': settings_model.text_priority,
+            'highest_priority_color': settings_model.highest_priority_color,
+            'lowest_priority_color': settings_model.lowest_priority_color,
         }
         self.context['form'] = SettingsForm(None, initial=initial)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
@@ -95,14 +97,13 @@ class SettingsView(LoginRequiredMixin, View):
     def post(self, request):
         self.form = SettingsForm(request.POST)
         if self.form.is_valid():
-            self.valid_form(request)
-            return redirect("home")
+            return self.valid_form(request)
         else:
-            self.invalid_form(request)
-            return render(request, "settings.html", self.context)
+            return self.invalid_form(request)
+            
     
     def valid_form(self, request):
-        if request.user.username == example_account_name: return
+        if request.user.username == example_account_name: return redirect("home")
         settings_model = SettingsModel.objects.get(user__username=request.user)
         settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
         settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
@@ -121,11 +122,15 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model.show_past = self.form.cleaned_data.get("show_past")
         settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         settings_model.text_priority = self.form.cleaned_data.get("text_priority")
+        settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
+        settings_model.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
         settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
+        return redirect("home")
     
     def invalid_form(self, request):
         self.context['form'] = self.form
+        return render(request, "settings.html", self.context)
 
 class TimewebView(LoginRequiredMixin, View):
     login_url = '/login/login/'
@@ -456,9 +461,13 @@ class TimewebView(LoginRequiredMixin, View):
             example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
 class ContactView(View):
+    def __init__(self):
+        self.context = get_default_context()
     def get(self, request):
-        return render(request, "contact.html")
+        return render(request, "contact.html", self.context)
 
 class ChangelogView(View):
+    def __init__(self):
+        self.context = get_default_context()
     def get(self, request):
-        return render(request, "changelog.html")
+        return render(request, "changelog.html", self.context)
