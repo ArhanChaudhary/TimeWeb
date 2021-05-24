@@ -1119,7 +1119,7 @@ $(function() {
                     // Position up/down input scroller
                     dom_assignment.find(".skew-ratio-textbox").css("width", 150).addClass("translate-left");
                 } else {
-                    dom_assignment.find(".work-input-button").css("width", 106);
+                    dom_assignment.find(".work-input-button").css("width", 110);
                     dom_assignment.find(".skew-ratio-textbox").css("width", 125);
                 }
             }

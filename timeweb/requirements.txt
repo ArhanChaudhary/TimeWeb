@@ -3,7 +3,7 @@ Django==3.1.8
 django-colorfield==0.4.1
 django-csp==3.7
 django-multiselectfield==0.1.12
-django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@50f355b143511b32405c53e5d7276bcc37977366
+django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@8e011ff13e4ffb3b7539b1f39c7cc2529035546c
 gunicorn==20.0.4
 psycopg2-binary==2.8.6
 pytz==2021.1
