@@ -12,9 +12,6 @@ $(function() {
     $("#id_def_skew_ratio").val(+($("#id_def_skew_ratio").val()-1).toFixed(10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
 
-    $("label[for='id_show_past']").css("text-decoration", "line-through");
-    $("#id_show_past").click(() => alert("This feature has not yet been implented"));
-
     $("#id_warning_acceptance").parent().info('bottom',
         `Determines when to display a warning on an assignment if you fall behind on an assignment's work schedule
 
@@ -44,7 +41,6 @@ $(function() {
         $("#id_def_funct_round_minute").prop("checked", false);
         $("#id_ignore_ends").prop("checked", false);
         $("#id_show_progress_bar").prop("checked", false);
-        $("#id_show_past").prop("checked", true);
         $("#id_color_priority").prop("checked", true);
         $("#id_text_priority").prop("checked", true);
         $("#id_highest_priority_color").val("#E25B50").trigger("input");

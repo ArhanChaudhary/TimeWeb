@@ -57,9 +57,13 @@ utils = {
     },
     ui: {
         displayClock: function() {
-            let estimated_completion_time = new Date();
-            estimated_completion_time.setMinutes(estimated_completion_time.getMinutes() + +$("#estimated-total-time").attr("data-minutes"));
-            $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
+            const estimated_completion_time = new Date();
+            const minute_value = estimated_completion_time.getMinutes();
+            if (minute_value !== utils.ui.old_minute_value) {
+                estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
+                $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
+                utils.ui.old_minute_value = minute_value;
+            }
         },
         setHideEstimatedCompletionTimeButton: function() {
             // Hide and show estimated completion time
@@ -370,7 +374,7 @@ for (let sa of dat) {
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
 }
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, show_past, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(utils.formatting.parseDate(date_now));
 highest_priority_color = utils.formatting.hexToRgb(highest_priority_color)

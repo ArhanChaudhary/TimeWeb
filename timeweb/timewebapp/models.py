@@ -134,10 +134,6 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Show Graph Progress Bar'),
     )
-    show_past = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Past Work Inputs in Text Schedule'),
-    )
     color_priority = models.BooleanField(
         default=True,
         verbose_name=_('Display Priority with Color'),
