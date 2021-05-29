@@ -781,65 +781,60 @@ $(function() {
                     // BEGIN Submit work button
                     submit_work_button.click(function() {
                         if (!work_input_button.val()) return;
-                        if (lw >= y) {
-                            alert("You have already finished this assignment");
-                        } else if (today_minus_dac > -1) {
-                            if (break_days.includes((assign_day_of_week + dif_assign + day) % 7)) {
-                                var todo = 0;
-                            } else {
-                                var todo = c_funct(day + dif_assign + 1) - lw;
-                            }
-                            const rem_work = assignmentIsInProgress();
-                            let input_done = work_input_button.val().trim().toLowerCase();
-                            switch (input_done) {
-                                case "fin":
-                                    input_done = c_funct(day + dif_assign + 1) - lw; // This can't be todo because of break_days
-                                    break;
-                                default: {
-                                    input_done = +input_done;
-                                    if (isNaN(input_done)) {
-                                        return alert("Value isn't a number or keyword");
-                                    }
+                        if (lw >= y) return alert("You have already finished this assignment");
+                        if (today_minus_dac < 0) return alert("Please wait until this is assigned");
+                        let todo = c_funct(day + dif_assign + 1) - lw;
+                        const rem_work = assignmentIsInProgress();
+                        let input_done = work_input_button.val().trim().toLowerCase();
+                        switch (input_done) {
+                            case "fin":
+                                input_done = todo;
+                                break;
+                            default: {
+                                input_done = +input_done;
+                                if (isNaN(input_done)) {
+                                    return alert("Value isn't a number or keyword");
                                 }
                             }
-                            if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done + lw < y && !rem_work) {
-                                return alert("Your last work input must complete this assignment");
-                            }
-                            if (input_done + lw < 0) {
-                                input_done = -lw;
-                            }
-                            if (rem_work) {
-                                sa.works[len_works] = input_done + lw;
-                                len_works -= 1;
-                            } else {
-                                sa.works.push(input_done + lw);
-                            }
-                            lw += input_done;
-                            len_works++;
-                            if (input_done !== todo) {
-                                if (len_works + dif_assign === x) {
-                                    sa.dynamic_start = len_works + dif_assign - 1;
-                                } else {
-                                    sa.dynamic_start = len_works + dif_assign;
-                                }
-                                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
-                                if (!sa.fixed_mode) {
-                                    red_line_start_x = sa.dynamic_start;
-                                    red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
-                                    if (break_days.length) {
-                                        mods = c_calc_mod_days();
-                                    }
-                                    set_skew_ratio_lim();
-                                    ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                                }
-                            }
-                            ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                            day = len_works - assignmentIsInProgress();
-                            priority.sort();
-                            draw();
-                        } else {
-                            alert("Please wait until this is assigned");
                         }
+                        if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done + lw < y && !rem_work) {
+                            return alert("Your last work input must complete this assignment");
+                        }
+                        if (input_done + lw < 0) {
+                            input_done = -lw;
+                        }
+                        if (rem_work) {
+                            sa.works[len_works] = input_done + lw;
+                            len_works -= 1;
+                        } else {
+                            sa.works.push(input_done + lw);
+                        }
+                        lw += input_done;
+                        len_works++;
+                        if (break_days.includes((assign_day_of_week + dif_assign + day) % 7)) {
+                            todo = 0;
+                        }
+                        if (input_done !== todo) {
+                            if (len_works + dif_assign === x) {
+                                sa.dynamic_start = len_works + dif_assign - 1;
+                            } else {
+                                sa.dynamic_start = len_works + dif_assign;
+                            }
+                            ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
+                            if (!sa.fixed_mode) {
+                                red_line_start_x = sa.dynamic_start;
+                                red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
+                                if (break_days.length) {
+                                    mods = c_calc_mod_days();
+                                }
+                                set_skew_ratio_lim();
+                                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                            }
+                        }
+                        ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
+                        day = len_works - assignmentIsInProgress();
+                        priority.sort();
+                        draw();
                     });
                     // END Submit work button
 
@@ -849,14 +844,14 @@ $(function() {
                     }).css("text-decoration", "line-through");
                     // END Display button
 
-                    // BEGIN Mark as finished button
+                    // BEGIN ignore button
                     hide_assignment_button.click(function() {
                         sa.mark_as_done = !sa.mark_as_done;
-                        $(this).onlyText(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
+                        $(this).onlyText(sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
                         ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
                         priority.sort({ ignore_timeout: true });
-                    }).html(sa.mark_as_done ? "Unmark as Finished for Today" : "Mark as Finished for Today");
-                    // END Mark as finished button
+                    }).html(sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
+                    // END ignore button
 
                     // BEGIN Next assignment button
                     next_assignment_button.click(function() {
@@ -1112,15 +1107,6 @@ $(function() {
                         first_login = false;
                         ajaxUtils.sendTutorialAjax();
                     }, 200);
-                }
-                // Makes input bigger for info button
-                if (show_info_buttons || first_login) {
-                    dom_assignment.find(".work-input-button").css("width", 131);
-                    // Position up/down input scroller
-                    dom_assignment.find(".skew-ratio-textbox").css("width", 150).addClass("translate-left");
-                } else {
-                    dom_assignment.find(".work-input-button").css("width", 110);
-                    dom_assignment.find(".skew-ratio-textbox").css("width", 125);
                 }
             }
             dom_assignment.data('not_first_click', true);

@@ -190,9 +190,6 @@ $(function() {
 // Info tooltip
 $.fn.info = function(facing,text,position) {
     const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
-    if (window.show_info_buttons === false && !first_login) {
-        info_button.css("display", "none");
-    }
     info_button.on('click blur', info_button_handler);
     switch (position) {
         case "prepend":

@@ -398,8 +398,11 @@ canvas:focus {
 .display-button, .mark-as-finished-button, .next-assignment-button {
     margin: 7px 0;
 }
+.work-input-button {
+    width: 131px;
+}
 .skew-ratio-textbox {
-    width: 146px;
+    width: 150px;
     /* Position it behind info button */
     z-index: 0;
 }
@@ -412,7 +415,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
-.skew-ratio-textbox.translate-left::-webkit-inner-spin-button {
+.skew-ratio-textbox::-webkit-inner-spin-button {
     -webkit-transform: translateX(-22px);
             transform: translateX(-22px);
 }

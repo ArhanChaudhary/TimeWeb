@@ -32,7 +32,7 @@ $(function() {
         
         Ignores the minimum work time for the first and last working days of all assignments in exchange for making their work distributions smoother
         
-        Fixes an issue that causes you to work significantly more on the first and last working days of an assignment
+        It does so by fixing an issue that causes you to work significantly more on the first and last working days of an assignment
         
         This is recommended to be enabled`
     );
@@ -44,7 +44,6 @@ $(function() {
         $("#id_def_funct_round_minute").prop("checked", false);
         $("#id_ignore_ends").prop("checked", false);
         $("#id_show_progress_bar").prop("checked", false);
-        $("#id_show_info_buttons").prop("checked", true);
         $("#id_show_past").prop("checked", true);
         $("#id_color_priority").prop("checked", true);
         $("#id_text_priority").prop("checked", true);

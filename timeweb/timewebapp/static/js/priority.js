@@ -230,7 +230,7 @@ priority = {
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
                     } else {
-                        status_message = "You haven't Entered your past Work Inputs! Please Enter your Progress to Continue";
+                        status_message = "You haven't Entered your past Work inputs! Please Enter your Progress to Continue";
                     }
                     dom_status_image.attr({
                         width: 11,
@@ -458,8 +458,8 @@ priority = {
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
             $("#hide-button").css("visibility", "");
         }
-        utils.ui.displayClock();
         if (params.first_sort) {
+            utils.ui.displayClock();
             setInterval(utils.ui.displayClock, 1000);
         }
     },
@@ -513,7 +513,7 @@ ordering = {
                 tar2.removeAttr("style");
                 $(document).dequeue();
             }
-            if ($(document).queue().length === 0 && $(".finished").length >= 2) {
+            if ($(document).queue().length === 0) { // test if this works before deploy
                 $("#delete-assignments").show().insertBefore($(".finished").first());
             }
             swap_temp.remove();
@@ -593,8 +593,6 @@ ordering = {
                 const finished_assignments = $(".assignment-container").map(function() {
                     if ($(this).hasClass("finished")) {
                         return utils.loadAssignmentData($(this).children().first()).id;
-                    } else {
-                        return undefined;
                     }
                 }).toArray();
                 let data = {

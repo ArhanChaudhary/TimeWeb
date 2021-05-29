@@ -94,7 +94,6 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
-    # Return assignment name when calling instance of model
     def __str__(self):
         return self.assignment_name
 
@@ -134,10 +133,6 @@ class SettingsModel(models.Model):
     show_progress_bar = models.BooleanField(
         default=False,
         verbose_name=_('Show Graph Progress Bar'),
-    )
-    show_info_buttons = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Info Buttons'),
     )
     show_past = models.BooleanField(
         default=True,

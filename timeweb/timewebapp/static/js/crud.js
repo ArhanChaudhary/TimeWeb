@@ -279,55 +279,52 @@ $(function() {
             $this.blur();
             // Deny updating or deleting again after queued
             dom_assignment.css("pointer-events", "none");
-            $(document).queue(function() {
-                // Send data to backend and animates its deletion
-                const sa = utils.loadAssignmentData(dom_assignment);
-                const success = function() {
-                    new Promise(function(resolve) {
-                        if (dom_assignment.hasClass("open-assignment")) {
-                            dom_assignment.click().find(".graph-container").one("transitionend", resolve);
-                        } else {
-                            resolve();
+            // Send data to backend and animates its deletion
+            const sa = utils.loadAssignmentData(dom_assignment);
+            const success = function() {
+                new Promise(function(resolve) {
+                    if (dom_assignment.hasClass("open-assignment")) {
+                        dom_assignment.click().find(".graph-container").one("transitionend", resolve);
+                    } else {
+                        resolve();
+                    }
+                }).then(function() {
+                    // Opacity CSS transition
+                    dom_assignment.css("opacity", "0");
+                    const assignment_container = dom_assignment.parent();
+                    // Animate height on assignment_container because it doesn't have a transition
+                    assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
+                        // Remove assignment data from dat
+                        dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
+                        // Remove from DOM
+                        assignment_container.remove();
+                        // Don't want priority.sort to run while assignments are deleting because .stop() causes "ghost" assignments whose animate callbacks didn't run
+                        if ($(document).queue().length === 0) {
+                            priority.sort({ ignore_timeout: true });
                         }
-                    }).then(function() {
-                        // Opacity CSS transition
-                        dom_assignment.css("opacity", "0");
-                        const assignment_container = dom_assignment.parent();
-                        // Animate height on assignment_container because it doesn't have a transition
-                        assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
-                            // Remove assignment data from dat
-                            dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
-                            // Remove from DOM
-                            assignment_container.remove();
-                            $(document).dequeue();
-                            // Don't want priority.sort to run while assignments are deleting because .stop() causes "ghost" assignments whose animate callbacks didn't run
-                            if ($(document).queue().length === 0) {
-                                priority.sort({ ignore_timeout: true });
-                            }
-                        });
                     });
-                    if (!ajaxUtils.disable_ajax) {
-                        gtag("event","delete_assignment");
-                    }
-                }
-                if (ajaxUtils.disable_ajax) return success();
-                let data = {
-                    'csrfmiddlewaretoken': csrf_token,
-                    'action': 'delete_assignment',
-                    'assignments': [sa.id], // Primary key value
-                }
-                // Send ajax to avoid a page reload
-                data['assignments'] = JSON.stringify(data['assignments']);
-                $.ajax({
-                    type: "POST",
-                    data: data,
-                    success: success,
-                    error: function(response, exception) {
-                        // If ajax failed, allow updating or deleting again
-                        dom_assignment.css("pointer-events", "auto");
-                        ajaxUtils.error(response, exception);
-                    }
                 });
+                if (!ajaxUtils.disable_ajax) {
+                    gtag("event","delete_assignment");
+                }
+            }
+            if (ajaxUtils.disable_ajax) return success();
+            let data = {
+                'csrfmiddlewaretoken': csrf_token,
+                'action': 'delete_assignment',
+                'assignments': [sa.id], // Primary key value
+            }
+            // Send ajax to avoid a page reload
+            data['assignments'] = JSON.stringify(data['assignments']);
+            $.ajax({
+                type: "POST",
+                data: data,
+                success: success,
+                error: function(response, exception) {
+                    // If ajax failed, allow updating or deleting again
+                    dom_assignment.css("pointer-events", "auto");
+                    ajaxUtils.error(response, exception);
+                }
             });
         }
     });

@@ -83,7 +83,6 @@ class SettingsView(LoginRequiredMixin, View):
             'def_funct_round_minute': settings_model.def_funct_round_minute,
             'ignore_ends': settings_model.ignore_ends,
             'show_progress_bar': settings_model.show_progress_bar,
-            'show_info_buttons': settings_model.show_info_buttons,
             'show_past': settings_model.show_past,
             'color_priority': settings_model.color_priority,
             'text_priority': settings_model.text_priority,
@@ -118,7 +117,6 @@ class SettingsView(LoginRequiredMixin, View):
                     model.save()
         settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
-        settings_model.show_info_buttons = self.form.cleaned_data.get("show_info_buttons")
         settings_model.show_past = self.form.cleaned_data.get("show_past")
         settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         settings_model.text_priority = self.form.cleaned_data.get("text_priority")
@@ -459,3 +457,15 @@ class ChangelogView(View):
         self.context = get_default_context()
     def get(self, request):
         return render(request, "changelog.html", self.context)
+
+class hotdogsView(View):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request):
+        return render(request, "hotdogs.html", self.context)
+
+class doovView(View):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request):
+        return redirect("http://doov.com")

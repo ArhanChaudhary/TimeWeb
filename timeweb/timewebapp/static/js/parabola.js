@@ -178,7 +178,8 @@ function pset(ctx, x2 = false, y2 = false) {
         if (ctx.return_y_cutoff < 1) {
             var output = 0;
         } else {
-            for (let n = Math.floor(ctx.return_y_cutoff); n > 0; n--) {
+            // do ceil -1 instead of floor because ceil -1 is inclusive of ints; without this integer return cutoffs are glitchy
+            for (let n = Math.ceil(ctx.return_y_cutoff - 1); n > 0; n--) {
                 var output = funct(n, ctx, false);
                 if (output <= ctx.y - ctx.min_work_time_funct_round) {
                     break;
@@ -193,7 +194,7 @@ function pset(ctx, x2 = false, y2 = false) {
             const lower = [ctx.return_y_cutoff, ctx.y - output];
 
             let did_loop = false;
-            for (let n = Math.ceil(ctx.return_y_cutoff); n < x1; n++) {
+            for (let n = Math.floor(ctx.return_y_cutoff + 1); n < x1; n++) {
                 const pre_output = funct(n, ctx, false);
                 if (pre_output >= ctx.y) {
                     break;
@@ -238,7 +239,7 @@ function pset(ctx, x2 = false, y2 = false) {
                 ctx.return_0_cutoff++;
             }
             if (ctx.return_0_cutoff >= x1) {
-                ctx.return_0_cutoff++;
+                ctx.return_0_cutoff--;
             }
         }
         if (ctx.ignore_ends_mwt) {

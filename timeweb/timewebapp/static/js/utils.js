@@ -109,20 +109,20 @@ utils = {
             $("#close-assignments").click(() => $(".assignment.open-assignment").click());
     
             $("#autofill-no-work-done").click(function() {
-                if (confirm("This will autofill no work done until today for every assignment with missing work inputs. Are you sure?")) {
+                if (confirm("This will autofill no work done until today for ALL assignments with missing work inputs. Are you sure?")) {
                     priority.sort({autofill_no_work_done: true, ignore_timeout: true});
                 }
             }).info("left",
-                `This applies to every assignment you haven't entered past work inputs for
+                `This applies to ALL assignments you haven't entered past work inputs for
         
                 Assumes you have completed nothing since your last work input and autofills in no work done until today`,"prepend"
             ).css("left", -3).addClass("dont-hide-button");
             $("#autofill-all-work-done").click(function() {
-                if (confirm("This will autofill all work done until today for every assignment with missing work inputs. Are you sure?")) {
+                if (confirm("This will autofill all work done until today for ALL assignments with missing work inputs. Are you sure?")) {
                     priority.sort({autofill_all_work_done: true, ignore_timeout: true});
                 }
             }).info("left",
-                `This applies to every assignment you haven't entered past work inputs for
+                `This applies to ALL assignments you haven't entered past work inputs for
         
                 Assumes you followed your work schedule since your last work input and autofills in all work done until today`,"prepend"
             ).css("left", -3).addClass("dont-hide-button");
@@ -134,7 +134,7 @@ utils = {
                 $(window).trigger("resize");
                 priority.sort({ ignore_timeout: true });
             }).info("left",
-                `Simulates the next day for every assignment
+                `Simulates the next day for ALL assignments
                 
                 All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`, 'prepend'
             ).css("left", -3).addClass("dont-hide-button");
@@ -251,7 +251,7 @@ ajaxUtils = {
         } else if (response.status == 403) {
             $("html").html(response.responseText);
         } else if (response.status == 404) {
-            alert('Not found, try again');
+            alert('Not found, try refreshing');
         } else if (response.status == 500) {
             alert('Internal server error. Please contact me if you see this');
         } else if (exception === 'parsererror') {
@@ -370,7 +370,7 @@ for (let sa of dat) {
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
 }
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, show_info_buttons, show_past, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_funct_round_minute, ignore_ends, show_progress_bar, show_past, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(utils.formatting.parseDate(date_now));
 highest_priority_color = utils.formatting.hexToRgb(highest_priority_color)
