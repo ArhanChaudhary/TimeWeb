@@ -80,6 +80,7 @@ class SettingsView(LoginRequiredMixin, View):
             'def_min_work_time': settings_model.def_min_work_time,
             'def_skew_ratio': settings_model.def_skew_ratio,
             'def_break_days': settings_model.def_break_days,
+            'def_unit_to_minute': settings_model.def_unit_to_minute,
             'def_funct_round_minute': settings_model.def_funct_round_minute,
             'ignore_ends': settings_model.ignore_ends,
             'show_progress_bar': settings_model.show_progress_bar,
@@ -107,6 +108,7 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
         settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1 # A skew ratio entered as "0" is added to 1 and is then stored as "1". The reasoning is in parabola.js
         settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
+        settings_model.def_unit_to_minute = self.form.cleaned_data.get("def_unit_to_minute")
         settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
         if settings_model.def_funct_round_minute:

@@ -98,7 +98,7 @@ $(function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
-        const initial_form_fields = ['', utils.formatting.stringifyDate(date_now), '', '', '', '0', '', '', +def_min_work_time||''];
+        const initial_form_fields = ['', utils.formatting.stringifyDate(date_now), '', def_unit_to_minute ? "Minute" : '', '', '0', '', '', +def_min_work_time||''];
         initial_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });

@@ -122,6 +122,10 @@ class SettingsModel(models.Model):
         blank=True,
         null=True
     )
+    def_unit_to_minute = models.BooleanField(
+        default=False,
+        verbose_name=_('Set the Default Unit of Work to "Minute"'),
+    )
     def_funct_round_minute = models.BooleanField(
         default=False,
         verbose_name=_('Round to Multiples of 5 Minutes'),
