@@ -24,8 +24,6 @@ function showForm(show_instantly=false) {
     }
     // Used in utils.js for handling the user typing "N" when showing the form via shift + N
     form_is_showing = true;
-    // Make rest of page untabbable
-    $(".assignment, .graph, #menu, #image-new-container, a, button:not(#submit-assignment-button), .graph-container input, #advanced, #nav-menu, #user-greeting #username").attr("tabindex","-1");
     // Explained later
     replaceUnit();
 }
@@ -40,11 +38,6 @@ function hideForm(hide_instantly=false) {
             $(".error-note").remove();
         }).children().first().animate({top: "0"}, 300);
     }
-    // Make rest of page retabbable
-    $("a, button:not(#submit-assignment-button), .graph-container input").removeAttr("tabindex");
-    $("#menu").attr("tabindex","2");
-    $("#image-new-container, #user-greeting #username").attr("tabindex","1");
-    $(".assignment, .graph, #advanced, #nav-menu").attr("tabindex","0");
     // Used in utils.js for handling the user typing "N" when showing the form via shift + N
     form_is_showing = false;
 }
@@ -154,17 +147,17 @@ $(function() {
         e.g: If this assignment is reading a book, enter "Chapter"
 
         If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute"`
-    ).addClass("dont-hide-button");
+    );
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field
 
         This value is also the y-coordinate of the first point on the blue line, or the initial work input
         
         Changing this initial value will vertically translate all of your other work inputs accordingly`
-    ).addClass("dont-hide-button");
+    );
     $('label[for="id_funct_round"]').info('right',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
-    ).addClass("dont-hide-button");
+    );
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days'])");
     // Auto field scrolling

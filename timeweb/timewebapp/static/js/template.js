@@ -189,7 +189,7 @@ $(function() {
 });
 // Info tooltip
 $.fn.info = function(facing,text,position) {
-    const info_button = $('<div class="info-button" tabindex="0">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
+    const info_button = $('<div class="info-button" tabindex="-1">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
     info_button.on('click blur', info_button_handler);
     switch (position) {
         case "prepend":

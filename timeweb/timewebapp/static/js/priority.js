@@ -52,8 +52,7 @@ priority = {
         let ordered_assignments = [],
             total = 0,
             tomorrow_total = 0,
-            has_autofilled = false,
-            incomplete_works = false;
+            has_autofilled = false;
         $(".assignment").each(function(index) {
             // Cancel current swaps and dequeue other swaps
             $(document).clearQueue();
@@ -237,7 +236,6 @@ priority = {
                         height: 18,
                     }).css("margin-left", 2);
                     status_value = 6;
-                    incomplete_works = true;
                 } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works)) {
                     status_image = 'finished';
                     status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
@@ -300,11 +298,8 @@ priority = {
                 }
             }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            if (status_value === 1) {
-                assignment_container.addClass("finished");
-            } else {
-                assignment_container.removeClass("finished");
-            }
+            assignment_container.toggleClass("finished", status_value === 1);
+            assignment_container.toggleClass("question-mark", status_value === 6);
             let status_priority;
             if ([6,2,1].includes(status_value)) {
                 status_priority = -Math.abs(daysleft);
@@ -371,8 +366,8 @@ priority = {
             }
         }));
         for (let sa of ordered_assignments) {
-            // originally sa[0] !== 6 && (sa[3] || incomplete_works); if sa[3] is true then sa[0] !== 6;
-            const mark_as_done = sa[3] || incomplete_works && sa[0] !== 6;
+            // originally sa[0] !== 6 && (sa[3] || $(".question-mark").length); if sa[3] is true then sa[0] !== 6;
+            const mark_as_done = !!(sa[3] || $(".question-mark").length && sa[0] !== 6);
             const dom_assignment = $(".assignment").eq(sa[2]);
             let priority_percentage;
             if (sa[0] === 6) {
@@ -420,15 +415,26 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
         }
-        $("#delete-assignments").hide() // "Delete all starred assignments" div, moved in priority.swap()
+        $("#delete-assignments, #autofill-work-done").hide() // Hide shortcuts and put them back in DOMswap()
+        let did_swap = false;
         // Have this after above to preserve index on sa
         for (let [index, sa] of ordered_assignments.entries()) {
             // Index represents the final position
             // sa[2] represnets its current position
             if (index !== sa[2]) {
+                did_swap = true;
                 ordering.swap(index, sa[2], params.first_sort);
-                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2] // Adjust index of assignment that used to be there 
+                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
                 sa[2] = index; // Adjust index of current swapped assignment
+            }
+        }
+        // Add shortcuts if DOMswap never happened
+        if (!did_swap) {
+            if ($(".finished").length) {
+                $("#delete-assignments").show().insertBefore($(".finished").first());
+            }
+            if ($(".question-mark").length) {
+                $("#autofill-work-done").show();
             }
         }
         // Make sure this is set after assignments are sorted and swapped
@@ -442,7 +448,7 @@ priority = {
                 "margin-bottom": -$("#animate-in").height()-10,
             });
         }
-        if (incomplete_works) {
+        if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css("margin-top", -21);
         } else if (!total) {
@@ -483,7 +489,7 @@ ordering = {
                 tar1.css("margin-bottom", 10);
             }
             tar1.animate({
-                top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height,
+                top: tar2.offset().top + tar2_height - (tar1.offset().top + tar1_height),
                 marginBottom: "-=" + (tar1_height - tar2_height),
             }, {
                 queue: false,
@@ -513,8 +519,13 @@ ordering = {
                 tar2.removeAttr("style");
                 $(document).dequeue();
             }
-            if ($(document).queue().length === 0) { // test if this works before deploy
-                $("#delete-assignments").show().insertBefore($(".finished").first());
+            if ($(document).queue().length === 0) {
+                if ($(".finished").length) {
+                    $("#delete-assignments").show().insertBefore($(".finished").first());
+                }
+                if ($(".question-mark").length) {
+                    $("#autofill-work-done").show();
+                }
             }
             swap_temp.remove();
         }
@@ -624,6 +635,42 @@ ordering = {
             }
         });
     },
+    autofillAssignmentsListener: function() {
+        $("#autofill-work-done").click(function(e) {
+            if ($(e.target).is("#autofill-selection")) return;
+            switch ($("#autofill-selection").val()) {
+                case "No":
+                    if (confirm("This will autofill no work done until today for ALL assignments with missing work inputs. Are you sure?")) {
+                        priority.sort({autofill_no_work_done: true, ignore_timeout: true});
+                    }
+                    break;
+                case "All":
+                    if (confirm("This will autofill all work done until today for ALL assignments with missing work inputs. Are you sure?")) {
+                        priority.sort({autofill_all_work_done: true, ignore_timeout: true});
+                    }
+                    break;
+            }
+        });
+        function replaceAutofillInfo() {
+            $("#autofill-work-done-text").find(".info-button").remove();
+            let message;
+            switch ($("#autofill-selection").val()) {
+                case "No":
+                    message = `This applies to ALL assignments you haven't entered past work inputs for
+                    
+                    Assumes you have completed nothing since your last work input and autofills in no work done until today`;
+                    break;
+                case "All":
+                    message = `This applies to ALL assignments you haven't entered past work inputs for
+                
+                    Assumes you followed your work schedule since your last work input and autofills in all work done until today`;
+                    break;
+            }
+            $("#autofill-work-done-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});
+        }
+        $("#autofill-selection").on("change", replaceAutofillInfo);
+        replaceAutofillInfo();
+    }
 }
 document.addEventListener("DOMContentLoaded", function() {
     priority.sort({ first_sort: true, ignore_timeout: true });

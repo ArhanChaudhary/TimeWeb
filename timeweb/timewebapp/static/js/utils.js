@@ -112,24 +112,6 @@ utils = {
     
             $("#close-assignments").click(() => $(".assignment.open-assignment").click());
     
-            $("#autofill-no-work-done").click(function() {
-                if (confirm("This will autofill no work done until today for ALL assignments with missing work inputs. Are you sure?")) {
-                    priority.sort({autofill_no_work_done: true, ignore_timeout: true});
-                }
-            }).info("left",
-                `This applies to ALL assignments you haven't entered past work inputs for
-        
-                Assumes you have completed nothing since your last work input and autofills in no work done until today`,"prepend"
-            ).css("left", -3).addClass("dont-hide-button");
-            $("#autofill-all-work-done").click(function() {
-                if (confirm("This will autofill all work done until today for ALL assignments with missing work inputs. Are you sure?")) {
-                    priority.sort({autofill_all_work_done: true, ignore_timeout: true});
-                }
-            }).info("left",
-                `This applies to ALL assignments you haven't entered past work inputs for
-        
-                Assumes you followed your work schedule since your last work input and autofills in all work done until today`,"prepend"
-            ).css("left", -3).addClass("dont-hide-button");
             $("#simulated-date").hide();
             $("#next-day").click(function() {
                 ajaxUtils.disable_ajax = true;
@@ -141,7 +123,7 @@ utils = {
                 `Simulates the next day for ALL assignments
                 
                 All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`, 'prepend'
-            ).css("left", -3).addClass("dont-hide-button");
+            ).css("left", -3);
 
             $("#re-enable-tutorial").click(function() {
                 if (!first_login) {
@@ -393,7 +375,8 @@ document.addEventListener("DOMContentLoaded", function() {
     setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
     utils.ui.setHideEstimatedCompletionTimeButton();
     utils.ui.setAdvancedClickHandlers();
-    ordering.deleteStarredAssignmentsListener();;
+    ordering.deleteStarredAssignmentsListener();
+    ordering.autofillAssignmentsListener();
     utils.ui.setKeybinds();
     $(window).resize(utils.ui.setAssignmentHoverScale);
     utils.ui.setAssignmentHoverScale();
