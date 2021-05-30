@@ -84,7 +84,6 @@ class TimewebForm(forms.ModelForm):
         ad = cleaned_data.get("ad")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
-        assignment_name = cleaned_data.get("assignment_name")
         try:
             if works >= y >= 1:
                 self.add_error("works",
@@ -119,6 +118,7 @@ class SettingsForm(forms.ModelForm):
             'date_now': forms.HiddenInput(),
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
+            'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
         }
         error_messages = {
             'def_min_work_time': {
