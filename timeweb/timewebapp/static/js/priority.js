@@ -464,8 +464,9 @@ priority = {
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
             $("#hide-button").css("visibility", "");
         }
+        utils.ui.old_minute_value = undefined; // Force displayClock to update. Without this, it may not update and display (Invalid Date)
+        utils.ui.displayClock();
         if (params.first_sort) {
-            utils.ui.displayClock();
             setInterval(utils.ui.displayClock, 1000);
         }
     },
@@ -658,12 +659,16 @@ ordering = {
                 case "No":
                     message = `This applies to ALL assignments you haven't entered past work inputs for
                     
-                    Assumes you have completed nothing since your last work input and autofills in no work done until today`;
+                    Assumes you have completed nothing since your last work input and autofills in no work done until today
+                    
+                    Click the horizontal line to perform this action`;
                     break;
                 case "All":
                     message = `This applies to ALL assignments you haven't entered past work inputs for
                 
-                    Assumes you followed your work schedule since your last work input and autofills in all work done until today`;
+                    Assumes you followed your work schedule since your last work input and autofills in all work done until today
+                    
+                    Click the horizontal line to perform this action`;
                     break;
             }
             $("#autofill-work-done-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});
