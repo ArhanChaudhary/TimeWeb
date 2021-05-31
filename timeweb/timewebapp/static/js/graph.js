@@ -162,8 +162,7 @@ $(function() {
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                const assignmentIsInProgress = () => (today_minus_dac === len_works - 1 || len_works + dif_assign === x && today_minus_dac === len_works) && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
-                let day = len_works - assignmentIsInProgress();
+                let day = len_works;
                 function c_pset(x2, y2) {
                     const context = {
                         x: x,
@@ -468,7 +467,7 @@ $(function() {
                             center("Please Enter your Progress to Continue", 7);
                         } else if (break_days.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                             center("You have Completed your Work for Today", 6);
-                        } else if (len_works && !assignmentIsInProgress() && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
+                        } else if (len_works && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
                             center("!!! ALERT !!!", 6);
                             center("You are Behind Schedule!", 7);
                         }
@@ -636,12 +635,11 @@ $(function() {
                 if (!not_first_click) {
                     // BEGIN Setup
                     function mousemove(e) {
-                        const offset = $(fixed_graph).offset();
                         if (set_skew_ratio) {
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
-                            day = len_works - assignmentIsInProgress();
                         }
-                        // Passes in mouse x and y to draw, explained later
+                        // Passes mouse x and y coords 
+                        const offset = $(fixed_graph).offset();
                         draw(e.pageX - offset.left, e.pageY - offset.top);
                     }
                     let x1 = x - red_line_start_x; // Amount of working days in the assignment
@@ -667,7 +665,6 @@ $(function() {
                             }
                         }
                         ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                        day = len_works - assignmentIsInProgress();
                         // Save skew ratio and draw
                         sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         old_skew_ratio = skew_ratio;
@@ -725,12 +722,9 @@ $(function() {
                     // BEGIN Delete work input button
                     delete_work_input_button.click(function() {
                         if (len_works > 0) {
-                            // Change day if assignment isn't in progress
-                            if (!assignmentIsInProgress()) {
-                                day--;
-                            }
                             sa.works.pop();
                             len_works--;
+                            day = len_works;
                             lw = sa.works[len_works];
 
                             // If the deleted work input cut the dynamic start, run this
@@ -784,7 +778,6 @@ $(function() {
                         if (lw >= y) return alert("You have already finished this assignment");
                         if (today_minus_dac < 0) return alert("Please wait until this is assigned");
                         let todo = c_funct(day + dif_assign + 1) - lw;
-                        const rem_work = assignmentIsInProgress();
                         let input_done = work_input_button.val().trim().toLowerCase();
                         switch (input_done) {
                             case "fin":
@@ -797,26 +790,22 @@ $(function() {
                                 }
                             }
                         }
-                        if (len_works + dif_assign === x - 1 && x - 1 !== today_minus_ad && input_done + lw < y && !rem_work) {
+                        if (len_works + dif_assign === x - 1 && input_done + lw < y) {
                             return alert("Your last work input must complete this assignment");
                         }
                         if (input_done + lw < 0) {
                             input_done = -lw;
                         }
-                        if (rem_work) {
-                            sa.works[len_works] = input_done + lw;
-                            len_works -= 1;
-                        } else {
-                            sa.works.push(input_done + lw);
-                        }
+                        sa.works.push(input_done + lw);
                         lw += input_done;
                         len_works++;
+                        day = len_works;
                         if (break_days.includes((assign_day_of_week + dif_assign + day) % 7)) {
                             todo = 0;
                         }
                         if (input_done !== todo) {
                             if (len_works + dif_assign === x) {
-                                sa.dynamic_start = len_works + dif_assign - 1;
+                                sa.dynamic_start = len_works + dif_assign - 1; // If users enter a value >y on the last day dont change dynamic start
                             } else {
                                 sa.dynamic_start = len_works + dif_assign;
                             }
@@ -832,7 +821,6 @@ $(function() {
                             }
                         }
                         ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                        day = len_works - assignmentIsInProgress();
                         priority.sort();
                         draw();
                     });
@@ -895,7 +883,7 @@ $(function() {
                             sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
                             ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
-                            // Disable mousemove
+                            // Disable mousemove if only skew ratio is running
                             if (!draw_point) {
                                 $(this).off("mousemove");
                             }
@@ -990,22 +978,15 @@ $(function() {
                             red_line_start_x = 0;
                             red_line_start_y = 0;
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                            // Day needs to be set in case it was subtracted by one
-                            day = len_works - assignmentIsInProgress();
                         } else {
                             red_line_start_x = sa.dynamic_start;
                             red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                            day = len_works;
                             // No need to pset()
-                            // Caps dynamic start at x, wouldn't make sense for todo to be shown for the day on the due date
-                            if (len_works + dif_assign === x) {
-                                day--;
-                            }
                         }
                         if (break_days.length) {
                             mods = c_calc_mod_days();
                         }
-                        priority.sort();
+                        priority.sort({ ignore_timeout: true });
                         draw();
                     }).html(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
                     // END Fixed/dynamic mode button
@@ -1029,11 +1010,11 @@ $(function() {
 
                     fixed_mode_button.info("top",
                         `Fixed mode:
-                        The red line always starts at the assignment date. If you don't finish a day's work, you'll have to make it up on the next day
+                        The red line always starts at the assignment date, meaning if you don't finish a day's work, you'll have to make it up on the next day
                         This mode is recommended for discipline or if an assignment is important
 
                         Dynamic mode (default):
-                        If you don't finish a day's work, the red line will readjust itself to start at your last work input, adapting to your work schedule
+                        If you don't finish a day's work, the red line will readjust itself and adapt to your work schedule
                         This mode is recommended if you can't keep up with an assignment's work schedule`, "prepend"
                     ).css("left", -3).children().first().css({
                         fontSize: 11,
@@ -1054,6 +1035,8 @@ $(function() {
                 function resize() {
                     // If autofilled by $(window).trigger("resize")
                     len_works = sa.works.length - 1;
+                    day = len_works;
+                    lw = sa.works[len_works];
                     // If date_now is redefined
                     today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
@@ -1066,8 +1049,6 @@ $(function() {
                         set_skew_ratio_lim();
                         ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                     }
-                    day = len_works - assignmentIsInProgress();
-                    lw = sa.works[len_works];
                     
                     width = $(fixed_graph).width();
                     height = $(fixed_graph).height();

@@ -144,7 +144,6 @@ priority = {
             let daysleft = utils.daysBetweenTwoDates(date_now, ad);
                 todo = c_funct(len_works+dif_assign+1) - lw;
             const today_minus_dac = daysleft - dif_assign;
-            const assignmentIsInProgress = () => (today_minus_dac === len_works - 1 || len_works + dif_assign === x && today_minus_dac === len_works) && c_funct(len_works + dif_assign) > lw && !break_days.includes(date_now.getDay());
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
@@ -224,7 +223,7 @@ priority = {
                     x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7]; // Handles break days, explained later
                 }
                 daysleft = x - daysleft;
-                if (today_minus_dac > len_works - assignmentIsInProgress() || !x1) {
+                if (today_minus_dac > len_works || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
@@ -236,7 +235,7 @@ priority = {
                         height: 18,
                     }).css("margin-left", 2);
                     status_value = 6;
-                } else if (!assignmentIsInProgress() && (todo <= 0 || today_minus_dac < len_works)) {
+                } else if (todo <= 0 || today_minus_dac < len_works) {
                     status_image = 'finished';
                     status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
                     dom_status_image.attr({
@@ -247,15 +246,7 @@ priority = {
                 } else {
                     status_value = 4;
                     display_format_minutes = true;
-                    if (assignmentIsInProgress()) {
-                        status_image = 'in-progress';
-                        status_message = "This Assignment's Daily Work is in Progress";
-                        dom_status_image.attr({
-                            width: 17,
-                            height: 17,
-                        }).css("margin-left", -2);
-                        todo = c_funct(len_works+dif_assign) - lw;
-                    } else if (len_works && (lw - sa.works[len_works - 1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works - 1]) {
+                    if (len_works && (lw - sa.works[len_works - 1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works - 1]) {
                         status_image = 'warning';
                         dom_status_image.attr({
                             width: 7,
@@ -311,9 +302,7 @@ priority = {
                     mods = c_calc_mod_days();
                 }
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-
-                len_works -= assignmentIsInProgress();
-                if (x-dif_assign-len_works === 0 || todo < 0 || len_works > today_minus_dac) {
+                if (len_works + dif_assign === x || todo < 0 || len_works > today_minus_dac) {
                     status_priority = 0;
                 } else if (len_works && daysleft !== 1) {
                     let sum_diff_red_blue = 0;
