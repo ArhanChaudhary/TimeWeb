@@ -1020,7 +1020,7 @@ $(function() {
                     work_input_button.info("top",
                         `Enter the number of units done on the graph's displayed date and submit
                         
-                        Keyword: enter "fin" if you have completed an assignment's work for its displayed date`,"after"
+                        Keyword: enter "fin" if you've completed an assignment's work for its displayed date`,"after"
                     ).css({
                         left: "calc(50% + 47px)",
                         top: 3,

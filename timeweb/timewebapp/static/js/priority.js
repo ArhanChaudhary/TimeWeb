@@ -659,7 +659,7 @@ ordering = {
                 case "No":
                     message = `This applies to ALL assignments you haven't entered past work inputs for
                     
-                    Assumes you have completed nothing since your last work input and autofills in no work done until today
+                    Assumes you haven't done anything since your last work input and autofills in no work done until today
                     
                     Click the horizontal line to perform this action`;
                     break;

@@ -23,6 +23,5 @@ urlpatterns = [
 
     path('hotdogs', views.hotdogsView.as_view(),name='hotdogs'),
     path("doov", views.doovView.as_view(), name='doov'),
-    re_path(r"^wp", RedirectView.as_view(url='/static/misc/rick.html')),
-    re_path(r"^wordpress", RedirectView.as_view(url='/static/misc/rick.html')),
+    re_path(r"^(wp|wordpress)", views.rickView.as_view()),
 ]

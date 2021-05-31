@@ -458,6 +458,12 @@ class ChangelogView(View):
     def get(self, request):
         return render(request, "changelog.html", self.context)
 
+class rickView(View):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request, _):
+        return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
+
 class hotdogsView(View):
     def __init__(self):
         self.context = get_default_context()
