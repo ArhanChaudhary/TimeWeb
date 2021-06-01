@@ -162,7 +162,6 @@ $(function() {
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                let day = len_works;
                 function c_pset(x2, y2) {
                     const context = {
                         x: x,
@@ -270,7 +269,7 @@ $(function() {
                     screen.scale(scale, scale);
                     screen.clearRect(0, 0, width, height);
                     let move_info_down,
-                        todo = c_funct(day+dif_assign+1);
+                        todo = c_funct(len_works+dif_assign+1);
                     if (show_progress_bar) {
                         move_info_down = 0;
                         let should_be_done_x = width - 155 + todo / y * 146,
@@ -439,12 +438,12 @@ $(function() {
                     center(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 1);
                     if (lw < y) {
                         todo -= lw;
-                        if (todo < 0 || break_days.includes((assign_day_of_week+dif_assign+day) % 7)) {
+                        if (todo < 0 || break_days.includes((assign_day_of_week+dif_assign+len_works) % 7)) {
                             todo = 0;
                         }
                         let displayed_day = new Date(date_assignment_created.valueOf());
-                        displayed_day.setDate(displayed_day.getDate() + day);
-                        const distance_today_from_displayed_day = today_minus_dac - day;
+                        displayed_day.setDate(displayed_day.getDate() + len_works);
+                        const distance_today_from_displayed_day = today_minus_dac - len_works;
                         let str_day = displayed_day.toLocaleDateString("en-US", date_string_options);
                         switch (distance_today_from_displayed_day) {
                             case -1:
@@ -465,7 +464,7 @@ $(function() {
                         } else if (distance_today_from_displayed_day > 0) {
                             center("You haven't Entered your Work from Previous Days", 6);
                             center("Please Enter your Progress to Continue", 7);
-                        } else if (break_days.includes((assign_day_of_week+dif_assign+day) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
+                        } else if (break_days.includes((assign_day_of_week+dif_assign+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                             center("You have Completed your Work for Today", 6);
                         } else if (len_works && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
                             center("!!! ALERT !!!", 6);
@@ -725,7 +724,7 @@ $(function() {
                         if (len_works > 0) {
                             sa.works.pop();
                             len_works--;
-                            day = len_works;
+                            ;
                             lw = sa.works[len_works];
 
                             // If the deleted work input cut the dynamic start, run this
@@ -778,7 +777,7 @@ $(function() {
                         if (!work_input_button.val()) return;
                         if (lw >= y) return alert("You have already finished this assignment");
                         if (today_minus_dac < 0) return alert("Please wait until this is assigned");
-                        let todo = c_funct(day + dif_assign + 1) - lw;
+                        let todo = c_funct(len_works + dif_assign + 1) - lw;
                         let input_done = work_input_button.val().trim().toLowerCase();
                         switch (input_done) {
                             case "fin":
@@ -800,8 +799,8 @@ $(function() {
                         sa.works.push(input_done + lw);
                         lw += input_done;
                         len_works++;
-                        day = len_works;
-                        if (break_days.includes((assign_day_of_week + dif_assign + day) % 7)) {
+                        ;
+                        if (break_days.includes((assign_day_of_week + dif_assign + len_works) % 7)) {
                             todo = 0;
                         }
                         if (input_done !== todo) {
@@ -1036,7 +1035,7 @@ $(function() {
                 function resize() {
                     // If autofilled by $(window).trigger("resize")
                     len_works = sa.works.length - 1;
-                    day = len_works;
+                    ;
                     lw = sa.works[len_works];
                     // If date_now is redefined
                     today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
