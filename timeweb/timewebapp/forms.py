@@ -48,7 +48,7 @@ class TimewebForm(forms.ModelForm):
                 'required': _("Please enter a value"),
                 'max_digits': _("This field's value is too long (>15 digits)"),
                 'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("This field's value has too many digits before decimal point (>13 digits)"),
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
             },
             'works': {
                 'required': _("Please enter a value"),
@@ -58,19 +58,19 @@ class TimewebForm(forms.ModelForm):
                 'required': _("Please enter a value"),
                 'max_digits': _("This field's value is too long (>15 digits)"),
                 'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("This field's value has too many digits before decimal point (>13 digits)"),
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
                 'invalid': _("This field's value is invalid"),
             },
             'funct_round': {
                 'max_digits': _("This field's value is too long (>15 digits)"),
                 'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("This field's value has too many digits before decimal point (>13 digits)"),
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
                 'invalid': _("This field's value is invalid"),
             },
             'min_work_time': {
                 'max_digits': _('The minimum work time is too long (>15 digits)'),
                 'max_decimal_places': _("The minimum work time has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("The minimum work time has too many digits before decimal point (>13 digits)"),
+                'max_whole_digits': _("The minimum work time has too many digits before its decimal point (>13 digits)"),
                 'invalid': _("The minimum work time is invalid"),
             },
         }
@@ -124,13 +124,13 @@ class SettingsForm(forms.ModelForm):
             'def_min_work_time': {
                 'max_digits': _('The default minimum work time is too long (>15 digits)'),
                 'max_decimal_places': _("The default minimum work time has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("The default minimum work time has too many digits before decimal point (>13 digits)"),
+                'max_whole_digits': _("The default minimum work time has too many digits before its decimal point (>13 digits)"),
                 'invalid': _("The default minimum work time is invalid"),
             },
             'def_skew_ratio': {
                 'max_digits': _('The default skew ratio is too long (>17 digits)'),
                 'max_decimal_places': _("The default skew ratio has too many decimal places (>10 decimal places)"),
-                'max_whole_digits': _("The default skew ratio has too many digits before decimal point (>7 digits)"),
+                'max_whole_digits': _("The default skew ratio has too many digits before its decimal point (>7 digits)"),
                 'invalid': _("The default skew ratio is invalid"),
             }
         }

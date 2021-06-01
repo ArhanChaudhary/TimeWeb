@@ -131,7 +131,7 @@ priority = {
             let len_works = sa.works.length - 1,
                 lw = sa.works[len_works],
                 ignore_ends_mwt = ignore_ends && min_work_time,
-                unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute";
+                unit_is_of_time = ["minute", "hour"].includes(pluralize(unit, 1).toLowerCase());
             let mods,
                 assign_day_of_week = ad.getDay();
             if (break_days.length) {
@@ -261,7 +261,7 @@ priority = {
                             height: 15,
                         }).css("margin-left", -2);
                     }
-                    if (unit_is_minute) {
+                    if (unit_is_of_time) {
                         status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} of Work Today`;
                     } else {
                         status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} Today`;

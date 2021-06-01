@@ -19,9 +19,9 @@ utils = {
         // cite
         // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
         // Converts YYYY-MM-DD to Date objects reliably on safari
-        // This also adds "00:00" to the end of the inputted date string before parsing
+        // This also adds "T00:00" to the end of the inputted date string before parsing
         parseDate: function(date) {
-            date += " 00:00";
+            date += "T00:00";
             const parsed = Date.parse(date);
             if (!isNaN(parsed)) {
                 return parsed;
@@ -39,8 +39,8 @@ utils = {
         formatMinutes: function(total_minutes) {
             const hour = Math.floor(total_minutes / 60),
                 minute = Math.ceil(total_minutes % 60);
-            if (hour === 0) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
-            if (minute === 0) return hour + "h";
+            if (!hour) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
+            if (!minute) return hour + "h";
             return hour + "h " + minute + "m";
         },
         // cite
@@ -61,6 +61,9 @@ utils = {
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
+                if (isNaN(estimated_completion_time.getMinutes())) {
+                    estimated_completion_time.setTime(8640000000000000);
+                }
                 $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
                 utils.ui.old_minute_value = minute_value;
             }

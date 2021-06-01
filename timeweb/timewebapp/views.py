@@ -350,14 +350,7 @@ class TimewebView(LoginRequiredMixin, View):
             if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
                 self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
 
-            # Adjust dynamic_start and fixed_start in the same manner as above
-            # Add dynamic_start as a condition because if its x coordinate is 0, keep it a 0
-            # If the above is false, add not old_data.dif_assign as a condition to change dynamic_start if dif_assign is 0
-            # If both of them are False, then that variable doesn't change
-
-            # If dynamic_start is x coordinate 0, then keep it at x coordinate 0
-            if self.sm.dynamic_start or not old_data.dif_assign:
-                self.sm.dynamic_start += self.sm.dif_assign - old_data.dif_assign
+            self.sm.dynamic_start += self.sm.dif_assign - old_data.dif_assign
             if self.sm.dynamic_start < 0:
                 self.sm.dynamic_start = 0
             elif self.sm.dynamic_start > x_num - 1:

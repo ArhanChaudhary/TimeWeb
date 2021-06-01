@@ -46,31 +46,30 @@ function replaceUnit() {
     const val = $("#id_unit").val().trim();
     const plural = pluralize(val),
         singular = pluralize(val,1);
-    if (['second','hour','day','week','month','year'].some(unit_of_time => singular.toLowerCase().includes(unit_of_time))) {
-        return alert(`You seem to be entering in "${val}," which is a unit of time. Please enter "Minute" instead. Although this isn't invalid, it's simpler to use "Minute"`);
-    }
+    const units_of_time = {"minute": 1, "hour": 60};
+    const chose_units_of_time = units_of_time[singular.toLowerCase()];
     // Replace fields
     // onlyText is defined at the bottom
     if (val) {
-        if (singular.toLowerCase() === 'minute') {
-            $("label[for='id_y']").text(`Estimate how many Minutes this assignment will Take to Complete`);
+        if (chose_units_of_time) {
+            $("label[for='id_y']").text(`Estimate how many ${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} this assignment will Take to Complete`);
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
         }
         $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
-        $("label[for='id_ctime']").text(`Estimated amount of Minutes to complete each ${singular}`);
+        $("label[for='id_ctime']").text(`Estimated number of Minutes to complete each ${singular}`);
         $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
         $("label[for='id_funct_round'] .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
     } else {
         $("label[for='id_y']").html("Total number of Units in this Assignment");
         $("label[for='id_works']").onlyText("Total number of Units already Completed");
-        $("label[for='id_ctime']").html("Estimated amount of Minutes to complete each Unit");
+        $("label[for='id_ctime']").html("Estimated number of Minutes to complete each Unit");
         $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
         $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
     }
-    if (singular.toLowerCase() === 'minute') {
+    if (chose_units_of_time) {
         // Disable fields
-        $("#id_ctime").val(1);
+        $("#id_ctime").val(chose_units_of_time);
         $("#id_ctime").prop("disabled",true).addClass("disabled-field");
         $("label[for='id_ctime']").addClass("disabled-field");
         if (def_funct_round_minute) {
@@ -146,7 +145,7 @@ $(function() {
         
         e.g: If this assignment is reading a book, enter "Chapter"
 
-        If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute"`
+        If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute" or "Hour"`
     );
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field

@@ -34,7 +34,6 @@ class TimewebModel(models.Model):
     )
     unit = models.CharField(
         max_length=40,
-        default=_("Minute"),
         verbose_name=_('Name of each Unit of Work'),
     )
     y = models.DecimalField(

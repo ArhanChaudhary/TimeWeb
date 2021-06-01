@@ -121,7 +121,7 @@ $(function() {
                     lw = sa.works[len_works],
                     ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only when min_work_time is also enabled
                     set_skew_ratio = false, // Bool to manually set skew ratio on graph
-                    unit_is_minute = pluralize(unit, 1).toLowerCase() === "minute",
+                    unit_is_of_time = ["minute", "hour"].includes(pluralize(unit, 1).toLowerCase()),
                     last_mouse_x,
                     last_mouse_y,
                     wCon,
@@ -501,8 +501,9 @@ $(function() {
 
                     // y axis label
                     screen.rotate(Math.PI / 2);
-                    if (unit_is_minute) {
-                        var text = 'Minutes of Work',
+                    if (unit_is_of_time) {
+                        const plural = pluralize(unit);
+                        var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`,
                             label_x_pos = -2;
                     } else {
                         var text = `${pluralize(unit)} (${utils.formatting.formatMinutes(ctime)} per ${pluralize(unit,1)})`,
@@ -635,11 +636,11 @@ $(function() {
                 if (!not_first_click) {
                     // BEGIN Setup
                     function mousemove(e) {
+                        const offset = $(fixed_graph).offset();
                         if (set_skew_ratio) {
                             ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
                         }
-                        // Passes mouse x and y coords 
-                        const offset = $(fixed_graph).offset();
+                        // Passes mouse x and y coords
                         draw(e.pageX - offset.left, e.pageY - offset.top);
                     }
                     let x1 = x - red_line_start_x; // Amount of working days in the assignment
