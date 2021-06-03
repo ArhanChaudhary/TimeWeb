@@ -216,6 +216,11 @@ utils = {
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
+    // from math.round mdn docs
+    precisionRound: function(number, precision) {
+        var factor = Math.pow(10, precision);
+        return Math.round(number * factor) / factor;
+    },
     loadAssignmentData: function($assignment) {
         return dat.find(assignment => assignment.assignment_name === $assignment.attr("data-assignment-name"));
     },
@@ -237,8 +242,6 @@ ajaxUtils = {
     error: function(response, exception) {
         if (response.status == 0) {
             alert('Failed to connect');
-        } else if (response.status == 403) {
-            $("html").html(response.responseText);
         } else if (response.status == 404) {
             alert('Not found, try refreshing');
         } else if (response.status == 500) {

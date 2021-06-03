@@ -130,17 +130,17 @@ function pset(ctx, x2 = false, y2 = false) {
     if (ctx.a <= 0 || ctx.b > 0) {
         var funct_zero = 0;
     } else {
-        var funct_zero = (-ctx.b / ctx.a).toFixed(10);
+        var funct_zero = utils.precisionRound(-ctx.b / ctx.a, 10)
     }
     if (ctx.a >= 0) {
         var funct_y = x1;
     } else {
-        var funct_y = ((Math.sqrt(ctx.b * ctx.b + 4 * ctx.a * y1) - ctx.b) / ctx.a / 2).toFixed(10);
+        var funct_y = utils.precisionRound((Math.sqrt(ctx.b * ctx.b + 4 * ctx.a * y1) - ctx.b) / ctx.a / 2, 10);
     }
     if (ctx.funct_round < ctx.min_work_time) {
         ctx.cutoff_transition_value = 0;
         if (ctx.a) {
-            ctx.cutoff_to_use_round = ((ctx.min_work_time_funct_round - ctx.b) / ctx.a / 2).toFixed(10) - 1e-10;
+            ctx.cutoff_to_use_round = utils.precisionRound((ctx.min_work_time_funct_round - ctx.b) / ctx.a / 2, 10) - 1e-10;
             if (funct_zero < ctx.cutoff_to_use_round && ctx.cutoff_to_use_round < funct_y) {
                 // Same thing as:
                 // const prev_output = clamp(0, c_funct(Math.floor(ctx.cutoff_to_use_round)), ctx.y)
@@ -170,7 +170,7 @@ function pset(ctx, x2 = false, y2 = false) {
         } else {
             ctx.return_y_cutoff = y_value_to_cutoff/ctx.b;
         }
-        ctx.return_y_cutoff = +ctx.return_y_cutoff.toFixed(10);
+        ctx.return_y_cutoff = utils.precisionRound(ctx.return_y_cutoff, 10);
     } else {
         ctx.return_y_cutoff = 0;
     }
@@ -223,7 +223,7 @@ function pset(ctx, x2 = false, y2 = false) {
         } else {
             ctx.return_0_cutoff = y_value_to_cutoff / ctx.b;
         }
-        ctx.return_0_cutoff = +ctx.return_0_cutoff.toFixed(10);
+        ctx.return_0_cutoff = utils.precisionRound(ctx.return_0_cutoff, 10);
     } else {
         ctx.return_0_cutoff = 1;
     }

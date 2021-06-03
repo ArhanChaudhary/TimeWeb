@@ -160,6 +160,15 @@ $(function() {
                 let today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created),
                     // Days between today and the assignment date
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
+                const skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
+                    work_input_button = dom_assignment.find(".work-input-button"),
+                    display_button = dom_assignment.find(".display-button"),
+                    skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
+                    submit_work_button = dom_assignment.find(".submit-work-button"),
+                    hide_assignment_button = dom_assignment.find(".mark-as-finished-button"),
+                    fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
+                    delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
+                    next_assignment_button = dom_assignment.find(".next-assignment-button");
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                 function c_pset(x2, y2) {
@@ -229,7 +238,7 @@ $(function() {
                         */
                         skew_ratio_lim = Math.round((y1 + min_work_time_funct_round) * x1 / y1 * 10)/10;
                     }
-                    dom_assignment.find(".skew-ratio-textbox").attr({
+                    skew_ratio_textbox.attr({
                         min: 1 - skew_ratio_lim,
                         max: skew_ratio_lim - 1,
                     });
@@ -384,7 +393,7 @@ $(function() {
                         if (mouse_y) {
                             funct_mouse_x = sa.works[mouse_x - dif_assign];
                         } else {
-                            funct_mouse_x = c_funct(mouse_x).toFixed(6).replace(/\.?0*$/, '');
+                            funct_mouse_x = utils.precisionRound(c_funct(mouse_x), 6);
                         }
                         let str_mouse_x = new Date(ad);
                         str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
@@ -654,12 +663,12 @@ $(function() {
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
-                            skew_ratio = +(skew_ratio - 0.1).toFixed(1);
+                            skew_ratio = utils.precisionRound(skew_ratio - 0.1, 1);
                             if (skew_ratio < 2 - skew_ratio_lim) {
                                 skew_ratio = skew_ratio_lim;
                             }
                         } else {
-                            skew_ratio = +(skew_ratio + 0.1).toFixed(1);
+                            skew_ratio = utils.precisionRound(skew_ratio + 0.1, 1);
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             }
@@ -669,6 +678,7 @@ $(function() {
                         sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                         old_skew_ratio = skew_ratio;
                         ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
+                        priority.sort();
                         draw();
                     }
                     let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
@@ -705,19 +715,6 @@ $(function() {
                         }
                     });
                     // END Up and down arrow event handler
-
-                    //
-                    // Nine buttons event listeners
-                    //
-                    const skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
-                        work_input_button = dom_assignment.find(".work-input-button"),
-                        display_button = dom_assignment.find(".display-button"),
-                        skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
-                        submit_work_button = dom_assignment.find(".submit-work-button"),
-                        hide_assignment_button = dom_assignment.find(".mark-as-finished-button"),
-                        fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
-                        delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
-                        next_assignment_button = dom_assignment.find(".next-assignment-button");
 
                     // BEGIN Delete work input button
                     delete_work_input_button.click(function() {
@@ -878,7 +875,7 @@ $(function() {
                             // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
                             set_skew_ratio = false;
                             // stop set skew ratio if canvas is clicked
-                            $(this).next().find(".skew-ratio-button").onlyText("Set skew ratio using graph").off("click", cancel_sr);
+                            skew_ratio_button.onlyText("Set skew ratio using graph").off("click", cancel_sr);
                             // Save skew ratio
                             sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
                             old_skew_ratio = skew_ratio;
