@@ -264,29 +264,26 @@ function pset(ctx, x2 = false, y2 = false) {
     return ctx;
 }
 
-function funct(n, ctx, translate=true) {
-    if (translate) {
+function funct(x, ctx, translateX) {
+    if (translateX) {
         // Translate x coordinate 
-        n -= ctx.red_line_start_x;
+        x -= ctx.red_line_start_x;
         if (ctx.break_days.length) {
-            n -= Math.floor(n / 7) * ctx.break_days.length + ctx.mods[n % 7];
+            x -= Math.floor(x / 7) * ctx.break_days.length + ctx.mods[x % 7];
         }
-        if (n >= ctx.return_y_cutoff) {
-            return ctx.y;
-        } else if (n <= ctx.return_0_cutoff) {
-            return ctx.red_line_start_y;
-        }
+        if (x >= ctx.return_y_cutoff) return ctx.y;
+        if (x <= ctx.return_0_cutoff) return ctx.red_line_start_y;
     }
-    if (ctx.funct_round < ctx.min_work_time && (!ctx.a && ctx.b < ctx.min_work_time_funct_round || ctx.a && (ctx.a > 0) === (n < ctx.cutoff_to_use_round))) {
+    if (ctx.funct_round < ctx.min_work_time && (!ctx.a && ctx.b < ctx.min_work_time_funct_round || ctx.a && (ctx.a > 0) === (x < ctx.cutoff_to_use_round))) {
         // Get translated y coordinate
-        var output = ctx.min_work_time_funct_round * Math.round(n * (ctx.a * n + ctx.b) / ctx.min_work_time_funct_round);
+        var output = ctx.min_work_time_funct_round * Math.round(x * (ctx.a * x + ctx.b) / ctx.min_work_time_funct_round);
         if (ctx.a < 0) {
             output += ctx.cutoff_transition_value;
         } else {
             output -= ctx.cutoff_transition_value;
         }
     } else {
-        var output = ctx.funct_round * Math.round(n * (ctx.a * n + ctx.b) / ctx.funct_round);
+        var output = ctx.funct_round * Math.round(x * (ctx.a * x + ctx.b) / ctx.funct_round);
     }
     // Return untranslated y coordinate
     // No point in untranslating x coordinate

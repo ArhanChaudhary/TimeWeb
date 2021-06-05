@@ -39,10 +39,19 @@ $(function() {
                         $(this).animate({left: 0}, 75, "easeOutCubic");
                     });
                 });
-                return
+                return;
             }
             const graph_container = dom_assignment.find(".graph-container"),
-                not_first_click = dom_assignment.data('not_first_click');
+                    skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
+                    work_input_button = dom_assignment.find(".work-input-button"),
+                    display_button = dom_assignment.find(".display-button"),
+                    skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
+                    submit_work_button = dom_assignment.find(".submit-work-button"),
+                    hide_assignment_button = dom_assignment.find(".mark-as-finished-button"),
+                    fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
+                    delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
+                    next_assignment_button = dom_assignment.find(".next-assignment-button"),
+                    not_first_click = dom_assignment.data('not_first_click');
             if (graph_container.attr("style") && dom_assignment.hasClass("open-assignment")) {
                 // Runs when assignment is clicked while open
 
@@ -160,15 +169,6 @@ $(function() {
                 let today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created),
                     // Days between today and the assignment date
                     today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
-                const skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
-                    work_input_button = dom_assignment.find(".work-input-button"),
-                    display_button = dom_assignment.find(".display-button"),
-                    skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
-                    submit_work_button = dom_assignment.find(".submit-work-button"),
-                    hide_assignment_button = dom_assignment.find(".mark-as-finished-button"),
-                    fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
-                    delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
-                    next_assignment_button = dom_assignment.find(".next-assignment-button");
                 let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
                 ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                 function c_pset(x2, y2) {

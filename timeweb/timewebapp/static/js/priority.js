@@ -10,11 +10,8 @@ This only runs on index.html
 priority = {
     sort_timeout_duration: 2000,
     get_color: function(p) {
-        if (isNaN(p)) {
-            return "";
-        } else {
-            return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
-        } 
+        if (isNaN(p)) return "";
+        return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
     },
     // Handles coloring and animating assignments that were just created or modified
     color_or_animate_assignment: function($assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
@@ -54,9 +51,6 @@ priority = {
             tomorrow_total = 0,
             has_autofilled = false;
         $(".assignment").each(function(index) {
-            // Cancel current swaps and dequeue other swaps
-            $(document).clearQueue();
-            $(".assignment-container").removeAttr("style").stop();
             // Direct copy of loading in data from graph.js
             // Changing this is definitely on my todo list
             const dom_assignment = $(this);
@@ -404,28 +398,27 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
         }
-        $("#delete-assignments, #autofill-work-done").hide() // Hide shortcuts and put them back in DOMswap()
-        let did_swap = false;
+        if ($(".finished").length) {
+            $("#delete-starred-assignments").show().insertBefore($(".finished").first());
+        } else {
+            $("#delete-starred-assignments").hide();
+        }
+        if ($(".question-mark").length) {
+            $("#autofill-work-done").show();
+        } else {
+            $("#autofill-work-done").hide();
+        }
         // Have this after above to preserve index on sa
         for (let [index, sa] of ordered_assignments.entries()) {
             // Index represents the final position
             // sa[2] represnets its current position
             if (index !== sa[2]) {
-                did_swap = true;
                 ordering.swap(index, sa[2], params.first_sort);
                 ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
                 sa[2] = index; // Adjust index of current swapped assignment
             }
         }
-        // Add shortcuts if DOMswap never happened
-        if (!did_swap) {
-            if ($(".finished").length) {
-                $("#delete-assignments").show().insertBefore($(".finished").first());
-            }
-            if ($(".question-mark").length) {
-                $("#autofill-work-done").show();
-            }
-        }
+        ordering.transition_swaps();
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
@@ -462,130 +455,36 @@ priority = {
 }
 ordering = {
     swap_duration: 1000,
-    swap: function(tar1_index, tar2_index, swap_instantly=false) {
+    swap: function(tar1_index, tar2_index, dont_transition) {
         // Queues each swap
         if (tar1_index === tar2_index) return;
-        if (swap_instantly) return DOMswap();
-        $(document).queue(function() {
-            // Swap assignment containers because they don't have a transition
-            const tar1 = $(".assignment-container").eq(tar1_index),
+        const tar1 = $(".assignment-container").eq(tar1_index),
                 tar2 = $(".assignment-container").eq(tar2_index);
-            const tar1_height = tar1.height() + 10,
-                tar2_height = tar2.height() + 10; 
-            // Deal with existing assingment margin
-            if (tar1_height > tar2_height) {
-                tar2.css("margin-top", 10);
-            } else {
-                tar1.css("margin-bottom", 10);
-            }
-            tar1.animate({
-                top: tar2.offset().top + tar2_height - (tar1.offset().top + tar1_height),
-                marginBottom: "-=" + (tar1_height - tar2_height),
-            }, {
-                queue: false,
-                duration: ordering.swap_duration,
-                easing: "easeInOutQuad",
-            });
-
-            tar2.animate({
-                bottom: tar2.offset().top - tar1.offset().top,
-                marginTop: "+=" + (tar1_height - tar2_height),
-            }, {
-                queue: false,
-                duration: ordering.swap_duration,
-                easing: "easeInOutQuad",
-                complete: DOMswap,
-            });
-        });
-        function DOMswap() {
-            const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index);
-            const swap_temp = $("<span></span>").insertAfter(tar2);
-            tar1.after(tar2);
-            swap_temp.after(tar1);
-            // swapping on first sort removes pre #animate-in styles
-            if (!swap_instantly) {
-                tar1.removeAttr("style");
-                tar2.removeAttr("style");
-                $(document).dequeue();
-            }
-            if ($(document).queue().length === 0) {
-                if ($(".finished").length) {
-                    $("#delete-assignments").show().insertBefore($(".finished").first());
-                }
-                if ($(".question-mark").length) {
-                    $("#autofill-work-done").show();
-                }
-            }
-            swap_temp.remove();
+        const swap_temp = $("<span></span>").insertAfter(tar2);
+        tar1.after(tar2);
+        swap_temp.after(tar1);
+        swap_temp.remove();
+        if ($(".finished").length) {
+            $("#delete-starred-assignments").show().insertBefore($(".finished").first());
         }
+        if ($(".question-mark").length) {
+            $("#autofill-work-done").show();
+        }
+        if (dont_transition) return;
+        console.log(tar1_index, tar2_index);
+        const top = tar2.offset().top - tar1.offset().top;
+        // debugger;
+        tar1.attr("data-transform-value", top + (+tar1.attr("data-transform-value")||0));
+        tar2.attr("data-transform-value", -top + (+tar2.attr("data-transform-value")||0));
     },
-    insert: function(tar1_index, tar2_index, insert_instantly=false) {
-        if (tar1_index === tar2_index) return;
-        if (insert_instantly) {
-            const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index);
-            if (tar2_index > tar1_index) {
-                tar2.after(tar1);        
-            } else {
-                tar2.before(tar1);
-            }
-            return;
-        }
-        $(document).queue(function() {
-            const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index),
-                tar1_height = tar1.height() + 10,
-                tar2_height = tar2.height() + 10;
-            if (tar2_index > tar1_index) {
-                tar1.animate({
-                    top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height,
-                    marginBottom: "-=" + tar1_height,
-                }, {
-                    queue: false,
-                    duration: ordering.swap_duration,
-                    easing: "easeInOutQuad",
-                });
-                tar2.animate({
-                    marginBottom: "+=" + (tar1_height+10),
-                }, {
-                    queue: false,
-                    duration: ordering.swap_duration,
-                    easing: "easeInOutQuad",
-                    complete: function() {
-                        tar2.after(tar1);
-                        if (!insert_instantly) {
-                            tar1.removeAttr("style");
-                            tar2.removeAttr("style");
-                            $(document).dequeue();
-                        }
-                    },
-                });
-            } else {
-                tar1.animate({
-                    top: tar2.offset().top + tar2_height - tar1.offset().top - tar1_height*2 /* multiply this becaues of tar2 margin */,
-                    marginBottom: "-=" + tar1_height,
-                }, {
-                    queue: false,
-                    duration: ordering.swap_duration,
-                    easing: "easeInOutQuad",
-                });
-                tar2.animate({
-                    marginTop: "+=" + (tar1_height+10),
-                }, {
-                    queue: false,
-                    duration: ordering.swap_duration,
-                    easing: "easeInOutQuad",
-                    complete: function() {
-                        tar2.before(tar1);
-                        if (!insert_instantly) {
-                            tar1.removeAttr("style");
-                            tar2.removeAttr("style");
-                            $(document).dequeue();
-                        }
-                    },
-                });
-            }
+    transition_swaps: function() {
+        $(".assignment-container[data-transform-value]").each(function() {
+            $(this).addClass("transform-instantly")
+                    .css("transform", `translateY(${$(this).attr("data-transform-value")}px)`)
+                    [0].offsetHeight;
+            $(this).removeAttr("data-transform-value")
+                    .removeClass("transform-instantly")
+                    .css("transform", "");
         });
     },
     deleteStarredAssignmentsListener: function() {

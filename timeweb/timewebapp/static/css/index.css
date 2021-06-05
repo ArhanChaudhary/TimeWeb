@@ -114,11 +114,15 @@ header.animate::after {
     white-space: nowrap;
 }
 .assignment-container {
+    transition: transform 2s ease-in-out;
     position: relative;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
+}
+.assignment-container.transform-instantly {
+    transition: none;
 }
 .assignment {
     -webkit-box-shadow: 0 0 4px rgb(115,115,115);
@@ -181,7 +185,7 @@ header.animate::after {
             box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
-#delete-assignments {
+#delete-starred-assignments {
     font-size: 14px;
     position: relative;
 }
