@@ -418,7 +418,7 @@ priority = {
                 sa[2] = index; // Adjust index of current swapped assignment
             }
         }
-        ordering.transition_swaps();
+        ordering.transition_swaps(); // Note: nothing happens on first_sort because data-transform-value isnt added to anything
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
