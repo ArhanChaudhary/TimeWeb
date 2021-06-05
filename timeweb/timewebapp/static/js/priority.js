@@ -456,7 +456,6 @@ priority = {
 ordering = {
     swap_duration: 1000,
     swap: function(tar1_index, tar2_index, dont_transition) {
-        // Queues each swap
         if (tar1_index === tar2_index) return;
         const tar1 = $(".assignment-container").eq(tar1_index),
                 tar2 = $(".assignment-container").eq(tar2_index);
@@ -471,20 +470,40 @@ ordering = {
             $("#autofill-work-done").show();
         }
         if (dont_transition) return;
-        console.log(tar1_index, tar2_index);
-        const top = tar2.offset().top - tar1.offset().top;
-        // debugger;
-        tar1.attr("data-transform-value", top + (+tar1.attr("data-transform-value")||0));
-        tar2.attr("data-transform-value", -top + (+tar2.attr("data-transform-value")||0));
+        // Originally like this:
+
+        // // Set transform to differences of bottom y values
+        // tar2.attr("data-transform-value", tar1.offset().top + tar1.height() - (tar2.offset().top + tar2.height()) + (+tar2.attr("data-transform-value")||0))
+        //     .attr("data-margin-value", tar1.height() - tar2.height() + (+tar2.attr("data-margin-value")||0));
+        // // Set transform to differences of top y values
+        // tar1.attr("data-transform-value", tar2.offset().top - tar1.offset().top + (+tar1.attr("data-transform-value")||0))
+        //     .attr("data-margin-value", tar2.height() - tar1.height() + (+tar1.attr("data-margin-value")||0));
+
+        // However this needs to change because tar1 needs to use margin-top and tar2 needs to use margin-bottom, but there's no way of telling transition_swaps which one to use
+        // So, replicate margin-top using margin-bottom and translateY: margin-top Npx = margin-bottom Npx and translateY Npx
+
+        // Set transform to differences of bottom y values
+        tar2.attr("data-transform-value", tar1.offset().top + tar1.height() - (tar2.offset().top + tar2.height()) + (+tar2.attr("data-transform-value")||0))
+            .attr("data-margin-value", tar1.height() - tar2.height() + (+tar2.attr("data-margin-value")||0));
+        // Set transform to differences of top y values
+        tar1.attr("data-transform-value", tar2.offset().top - tar1.offset().top + (+tar1.attr("data-transform-value")||0) + tar2.height() - tar1.height())
+            .attr("data-margin-value", tar2.height() - tar1.height() + (+tar1.attr("data-margin-value")||0));
     },
     transition_swaps: function() {
         $(".assignment-container[data-transform-value]").each(function() {
             $(this).addClass("transform-instantly")
-                    .css("transform", `translateY(${$(this).attr("data-transform-value")}px)`)
+                    .css({
+                        transform: `translateY(${$(this).attr("data-transform-value")}px)`,
+                        marginBottom: `${$(this).attr("data-margin-value")}px`,
+                    })
                     [0].offsetHeight;
             $(this).removeAttr("data-transform-value")
+                    .removeAttr("data-margin-value")
                     .removeClass("transform-instantly")
-                    .css("transform", "");
+                    .css({
+                        transform: "",
+                        marginBottom: "",
+                    });
         });
     },
     deleteStarredAssignmentsListener: function() {
@@ -495,7 +514,7 @@ ordering = {
                         return utils.loadAssignmentData($(this).children().first()).id;
                     }
                 }).toArray();
-                let data = {
+                const data = {
                     'csrfmiddlewaretoken': csrf_token,
                     'action': 'delete_assignment',
                     'assignments': JSON.stringify(finished_assignments),

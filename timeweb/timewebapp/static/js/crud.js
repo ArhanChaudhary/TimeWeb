@@ -303,13 +303,13 @@ $(function() {
                     }
                 }
                 if (ajaxUtils.disable_ajax) return success();
-                let data = {
+                const data = {
                     'csrfmiddlewaretoken': csrf_token,
                     'action': 'delete_assignment',
                     'assignments': [sa.id], // Primary key value
                 }
                 // Send ajax to avoid a page reload
-                data['assignments'] = JSON.stringify(data['assignments']);
+                data.assignments = JSON.stringify(data['assignments']);
                 $.ajax({
                     type: "POST",
                     data: data,

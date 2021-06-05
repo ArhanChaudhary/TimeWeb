@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("main").css({
             overflowY: "overlay",
             height: "calc(100vh - 70px)",
-            padding: "10px 30px",
+            padding: "10px 20px",
             marginTop: 70,
         });
     // Do starting animation
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 $("main").css({
                     overflowY: "overlay",
                     height: "calc(100vh - 70px)",
-                    padding: "10px 30px",
+                    padding: "10px 20px",
                     marginTop: 70,
                 });
             });

@@ -45,6 +45,7 @@ header.animate::after {
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
 #assignments-header {
+    padding: 0 10px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -56,6 +57,7 @@ header.animate::after {
     font-size: 17px;
 }
 #simulated-date {
+    padding: 0 10px;
     font-size: 17px;
 }
 #advanced {
@@ -114,12 +116,16 @@ header.animate::after {
     white-space: nowrap;
 }
 .assignment-container {
-    transition: transform 2s ease-in-out;
+    transition: transform 2s ease-in-out, margin-bottom 2s ease-in-out;
     position: relative;
+    padding: 5px 10px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
+}
+#assignments-container > :not(.assignment-container) + .assignment-container {
+    margin-top: 10px;
 }
 .assignment-container.transform-instantly {
     transition: none;
@@ -130,7 +136,6 @@ header.animate::after {
     background: white;
     /*  background: rgb(226,91,80);
     background: rgb(132,200,65); */
-    margin: 10px 0;
     padding: 15px;
     border: 2px solid rgb(80,80,80);
     border-radius: 5px;
@@ -188,6 +193,7 @@ header.animate::after {
 #delete-starred-assignments {
     font-size: 14px;
     position: relative;
+    padding: 0 10px;
 }
 .shortcut-text {
     left: 0;
@@ -197,6 +203,9 @@ header.animate::after {
     position: absolute;
     cursor: pointer;
 }
+#autofill-work-done {
+    padding: 0 10px;
+}
 #autofill-work-done-text {
     margin-top: -12px;
 }
@@ -205,12 +214,14 @@ header.animate::after {
     font-size: 12px;
 }
 .shortcut-line-right {
-    width: calc(50% - 107px);
+    padding: 0 10px;
+    width: calc(50% - 128px);
     margin-top: 10px;
     border-top: 1px solid black;
 }
 .shortcut-line-left {
-    width: calc(50% - 107px);
+    padding: 0 10px;
+    width: calc(50% - 128px);
     float: right;
     border-top: 1px solid black;
 }
