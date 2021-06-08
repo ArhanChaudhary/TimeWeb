@@ -286,8 +286,12 @@ priority = {
             assignment_container.toggleClass("finished", status_value === 1);
             assignment_container.toggleClass("question-mark", status_value === 6);
             let status_priority;
-            if ([6,2,1].includes(status_value)) {
-                status_priority = -Math.abs(daysleft);
+            if (status_value === 1) {
+                status_priority = -index;
+            } else if (status_value === 2) {
+                status_priority = daysleft;
+            } else if (status_value === 6) {
+                status_priority = -daysleft;
             } else {
                 skew_ratio = 1;
                 red_line_start_x = dif_assign;

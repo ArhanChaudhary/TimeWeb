@@ -1025,7 +1025,7 @@ $(function() {
                         left: "calc(50% + 56px)",
                         bottom: 37,
                         position: "absolute",
-                    }).toggle($(".second-advanced-button").is(":visible")); // Initially hide this for "Advanced Buttons"
+                    }).toggle($(".second-advanced-button").is(":visible")); // Initially hide this for "Advanced Options"
                     // END Info buttons
                 }
                 function resize() {
