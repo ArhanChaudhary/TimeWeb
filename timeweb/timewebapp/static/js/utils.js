@@ -16,6 +16,7 @@ This only runs on index.html
 gtag("event", "home");
 utils = {
     formatting: {
+        // Reverses stringifyDate
         // cite
         // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
         // Converts YYYY-MM-DD to Date objects reliably on safari
@@ -28,6 +29,7 @@ utils = {
             }
             return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
         },
+        // Reverses parseDate
         // Converts Date objects to YYYY-MM-DD
         stringifyDate: function(date) {
             return [
@@ -47,11 +49,11 @@ utils = {
         // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
         hexToRgb: function(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
+            return {
               r: parseInt(result[1], 16),
               g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16)
-            } : null;
+              b: parseInt(result[3], 16),
+            }
         }
           
     },
@@ -133,13 +135,8 @@ utils = {
                     first_login = true;
                     sessionStorage.removeItem("open_assignments");
                     ajaxUtils.sendTutorialAjax();
-    
-                    $("#close-assignments").click();
-                    if ($(".assignment-container").length) {
-                        $(".assignment-container").first().append("<span>Click your assignment<br></span>");
-                    } else {
-                        $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
-                    }
+                    $(".assignment.open-assignment").click();
+                    utils.ui.handleTutorialIntroduction();
                 }
             });
         },
@@ -166,11 +163,10 @@ utils = {
                     return $(this).attr("data-assignment-name") !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
-                    assignments_excluding_example.parent().append("<span>Click your assignment<br></span>");
+                    assignments_excluding_example.first().after("<span>Click your assignment<br></span>");
                 } else {
                     $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
-                    // Hide .assignment because DOMswap has removeAttr("style")
-                    $(".assignment").hide();
+                    $(".assignment-container").hide();
                 }
             }
         },
@@ -218,13 +214,14 @@ utils = {
     },
     // from math.round mdn docs
     precisionRound: function(number, precision) {
-        var factor = Math.pow(10, precision);
+        const factor = Math.pow(10, precision);
         return Math.round(number * factor) / factor;
     },
     loadAssignmentData: function($assignment) {
         return dat.find(assignment => assignment.assignment_name === $assignment.attr("data-assignment-name"));
     },
     // Resolves a resolver promise function when automatic scrolling ends
+    // Scrolling detected with $("main").scroll(scroll);
     scroll: function(resolver) {
         clearTimeout(utils.scrollTimeout);
         // Runs when scroll ends

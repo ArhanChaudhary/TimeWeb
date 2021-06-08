@@ -102,7 +102,7 @@ class SettingsView(LoginRequiredMixin, View):
             
     
     def valid_form(self, request):
-        if request.user.username == example_account_name: return redirect("home")
+        if self.isExampleAccount: return redirect("home")
         settings_model = SettingsModel.objects.get(user__username=request.user)
         settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
         settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
@@ -169,10 +169,11 @@ class TimewebView(LoginRequiredMixin, View):
 
     def post(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
+        self.isExampleAccount = request.user.username == example_account_name
         if 'submit-button' in request.POST:
             return self.assignment_form_submitted(request)
         else:
-            if request.user.username == example_account_name: return HttpResponse(status=204)
+            if self.isExampleAccount: return HttpResponse(status=204)
             action = request.POST['action']
             if action == 'delete_assignment':
                 return self.deleted_assignment(request)
@@ -196,15 +197,19 @@ class TimewebView(LoginRequiredMixin, View):
 
         # Parts of the form that can only validate in views
         form_is_valid = True
-        # Ensure that the user's assignment name doesn't match with any other assignment
-        # If the form was reentered, exclude itself so it doesn't match its name with itself
-        # Can't use unique=True because it doesn't exclude itself
-        if self.assignment_models.exclude(pk=self.pk).filter(assignment_name=request.POST['assignment_name'].strip()).exists():
-            self.form.add_error("assignment_name", forms.ValidationError(_('An assignment with this name already exists')))
+        if self.isExampleAccount:
+            self.form.add_error("assignment_name", forms.ValidationError(_('You cannot create or modify assignments in the example account') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
             form_is_valid = False
-        if self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-            self.form.add_error("assignment_name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
-            form_is_valid = False
+        else:
+            # Ensure that the user's assignment name doesn't match with any other assignment
+            # If the form was reentered, exclude itself so it doesn't match its name with itself
+            # Can't use unique=True because it doesn't exclude itself
+            if self.assignment_models.exclude(pk=self.pk).filter(assignment_name=request.POST['assignment_name'].strip()).exists():
+                self.form.add_error("assignment_name", forms.ValidationError(_('An assignment with this name already exists')))
+                form_is_valid = False
+            if self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
+                self.form.add_error("assignment_name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+                form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
 
@@ -228,7 +233,7 @@ class TimewebView(LoginRequiredMixin, View):
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" cannot modify an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
-            if request.user.username == example_account_name: 
+            if self.isExampleAccount:
                 # post-get
                 # Don't make this return a 204 when submitting from the example account because there are too many assignments
                 return redirect(request.path_info)

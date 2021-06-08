@@ -14,11 +14,11 @@ priority = {
         return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
     },
     // Handles coloring and animating assignments that were just created or modified
-    color_or_animate_assignment: function($assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
+    color_or_animate_assignment: function(dom_assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
         if ($("#animate-in").length && is_element_submitted) {
             // If a new assignment was created and the assignment that color_or_animate_assignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
-            $assignment.parent().animate({
+            dom_assignment.parents(".assignment-container").animate({
                 top: "0", 
                 opacity: "1", 
                 marginBottom: "0",
@@ -27,13 +27,13 @@ priority = {
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
         if (color_priority) {
             if (color_instantly) {
-                $assignment.addClass("color-instantly");
+                dom_assignment.addClass("color-instantly");
             }
-            $assignment.css("background", priority.get_color(priority_percentage));
-            $assignment.toggleClass("mark-as-done", mark_as_done);
+            dom_assignment.css("background", priority.get_color(priority_percentage));
+            dom_assignment.toggleClass("mark-as-done", mark_as_done);
             if (color_instantly) {
-                $assignment[0].offsetHeight;
-                $assignment.removeClass("color-instantly");
+                dom_assignment[0].offsetHeight;
+                dom_assignment.removeClass("color-instantly");
             }
         }
     },
@@ -371,7 +371,7 @@ priority = {
                     dom_title.attr("data-priority", "");       
                 }
             }
-            const assignment_container = dom_assignment.parent();
+            const assignment_container = dom_assignment.parents(".assignment-container");
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {
@@ -399,7 +399,7 @@ priority = {
             }
         }
         if ($(".finished").length) {
-            $("#delete-starred-assignments").show().insertBefore($(".finished").first());
+            $("#delete-starred-assignments").show().insertBefore($(".finished").first().children(".assignment"));
         } else {
             $("#delete-starred-assignments").hide();
         }
@@ -408,17 +408,9 @@ priority = {
         } else {
             $("#autofill-work-done").hide();
         }
-        // Have this after above to preserve index on sa
-        for (let [index, sa] of ordered_assignments.entries()) {
-            // Index represents the final position
-            // sa[2] represnets its current position
-            if (index !== sa[2]) {
-                ordering.swap(index, sa[2], params.first_sort);
-                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
-                sa[2] = index; // Adjust index of current swapped assignment
-            }
-        }
-        ordering.transition_swaps(); // Note: nothing happens on first_sort because data-transform-value isnt added to anything
+        if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
+        ordering.sortAssignments(ordered_assignments);
+        if (!params.first_sort) ordering.transitionSwaps();
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
@@ -454,64 +446,57 @@ priority = {
     },
 }
 ordering = {
-    swap_duration: 1000,
-    swap: function(tar1_index, tar2_index, dont_transition) {
-        if (tar1_index === tar2_index) return;
+    setInitialTopAssignmentOffsets: function() {
+        $(".assignment-container").each(function() {
+            $(this).attr("data-initial-top-offset", $(this).offset().top);
+        });
+    },
+    sortAssignments: function(ordered_assignments) {
+        // Selection sort
+        for (let [index, sa] of ordered_assignments.entries()) {
+            // index represents the selected assignment's final position
+            // sa[2] represents the selected assignment's current position
+            if (index !== sa[2]) {
+                // Swap them in the dom
+                ordering.domSwapAssignments(index, sa[2]);
+                // Swap them in ordered_assignments
+                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
+                sa[2] = index; // Adjust index of current swapped assignment
+            }
+        }
+    },
+    domSwapAssignments: function(tar1_index, tar2_index) {  
         const tar1 = $(".assignment-container").eq(tar1_index),
                 tar2 = $(".assignment-container").eq(tar2_index);
         const swap_temp = $("<span></span>").insertAfter(tar2);
         tar1.after(tar2);
         swap_temp.after(tar1);
         swap_temp.remove();
-        if ($(".finished").length) {
-            $("#delete-starred-assignments").show().insertBefore($(".finished").first());
-        }
-        if ($(".question-mark").length) {
-            $("#autofill-work-done").show();
-        }
-        if (dont_transition) return;
-        // Originally like this:
-
-        // // Set transform to differences of bottom y values
-        // tar2.attr("data-transform-value", tar1.offset().top + tar1.height() - (tar2.offset().top + tar2.height()) + (+tar2.attr("data-transform-value")||0))
-        //     .attr("data-margin-value", tar1.height() - tar2.height() + (+tar2.attr("data-margin-value")||0));
-        // // Set transform to differences of top y values
-        // tar1.attr("data-transform-value", tar2.offset().top - tar1.offset().top + (+tar1.attr("data-transform-value")||0))
-        //     .attr("data-margin-value", tar2.height() - tar1.height() + (+tar1.attr("data-margin-value")||0));
-
-        // However this needs to change because tar1 needs to use margin-top and tar2 needs to use margin-bottom, but there's no way of telling transition_swaps which one to use
-        // So, replicate margin-top using margin-bottom and translateY: margin-top Npx = margin-bottom Npx and translateY Npx
-
-        // Set transform to differences of bottom y values
-        tar2.attr("data-transform-value", tar1.offset().top + tar1.height() - (tar2.offset().top + tar2.height()) + (+tar2.attr("data-transform-value")||0))
-            .attr("data-margin-value", tar1.height() - tar2.height() + (+tar2.attr("data-margin-value")||0));
-        // Set transform to differences of top y values
-        tar1.attr("data-transform-value", tar2.offset().top - tar1.offset().top + (+tar1.attr("data-transform-value")||0) + tar2.height() - tar1.height())
-            .attr("data-margin-value", tar2.height() - tar1.height() + (+tar1.attr("data-margin-value")||0));
     },
-    transition_swaps: function() {
-        $(".assignment-container[data-transform-value]").each(function() {
+    transitionSwaps: function() {
+        $(".assignment-container").each(function() {
+            const initial_height = $(this).attr("data-initial-top-offset");
+            const current_translate_value = ($(this).css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
+            // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
+            const final_height = $(this).offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
+            const transform_value = initial_height - final_height;
+            $(this).removeAttr("data-initial-top-offset");
             $(this).addClass("transform-instantly")
-                    .css({
-                        transform: `translateY(${$(this).attr("data-transform-value")}px)`,
-                        marginBottom: `${$(this).attr("data-margin-value")}px`,
-                    })
+                    .css("transform", `translateY(${transform_value}px)`)
                     [0].offsetHeight;
-            $(this).removeAttr("data-transform-value")
-                    .removeAttr("data-margin-value")
-                    .removeClass("transform-instantly")
+            $(this).removeClass("transform-instantly")
                     .css({
                         transform: "",
-                        marginBottom: "",
+                        transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
                     });
         });
     },
     deleteStarredAssignmentsListener: function() {
-        $("#delete-assignments-text").click(function() {
+        $("#delete-starred-assignments-text").click(function() {
             if (isMobile ? confirm(`This will delete ${$(".finished").length} starred assignments. Are you sure?`) : confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure? (Press enter)`)) {
                 const finished_assignments = $(".assignment-container").map(function() {
                     if ($(this).hasClass("finished")) {
-                        return utils.loadAssignmentData($(this).children().first()).id;
+                        return utils.loadAssignmentData($(this).children(".assignment")).id;
                     }
                 }).toArray();
                 const data = {
@@ -521,7 +506,7 @@ ordering = {
                 }
                 const success = function() {
                     const assignment_names_to_delete = $(".finished").map(function() {
-                        return $(this).children().first().attr("data-assignment-name")
+                        return $(this).children(".assignment").attr("data-assignment-name")
                     }).toArray();
                     dat = dat.filter(iter_sa => !assignment_names_to_delete.includes(iter_sa.assignment_name));
                     $(".finished").remove();

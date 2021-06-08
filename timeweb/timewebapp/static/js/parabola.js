@@ -265,7 +265,7 @@ function pset(ctx, x2 = false, y2 = false) {
 }
 
 function funct(x, ctx, translateX) {
-    if (translateX) {
+    if (translateX !== false) {
         // Translate x coordinate 
         x -= ctx.red_line_start_x;
         if (ctx.break_days.length) {

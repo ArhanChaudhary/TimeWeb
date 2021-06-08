@@ -116,7 +116,7 @@ header.animate::after {
     white-space: nowrap;
 }
 .assignment-container {
-    transition: transform 2s ease-in-out, margin-bottom 2s ease-in-out;
+    transition: transform 2s ease-in-out;
     position: relative;
     padding: 5px 10px;
     -webkit-user-select: none;
@@ -154,7 +154,7 @@ header.animate::after {
 .assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
     -webkit-transition: none;
     -o-transition: none;
-    transition: none
+    transition: none;
 }
 .assignment:not(.open-assignment):hover {
     -webkit-transform: scale(var(--scale-percent),1.05);
@@ -193,7 +193,8 @@ header.animate::after {
 #delete-starred-assignments {
     font-size: 14px;
     position: relative;
-    padding: 0 10px;
+    margin-bottom: 15px;
+    margin-top: -7px;
 }
 .shortcut-text {
     left: 0;
@@ -214,14 +215,14 @@ header.animate::after {
     font-size: 12px;
 }
 .shortcut-line-right {
-    padding: 0 10px;
-    width: calc(50% - 128px);
+    width: calc(50% - 107px);
     margin-top: 10px;
     border-top: 1px solid black;
+    top: 1px;
+    position: relative;
 }
 .shortcut-line-left {
-    padding: 0 10px;
-    width: calc(50% - 128px);
+    width: calc(50% - 107px);
     float: right;
     border-top: 1px solid black;
 }

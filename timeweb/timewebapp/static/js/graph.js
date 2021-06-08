@@ -14,7 +14,7 @@ This only runs on index.html
 
 $(function() {
     // scale and font_size is the same for every graph
-    let scale, // resolution of the graph
+    let scale = window.devicePixelRatio, // resolution of the graph
         font_size, // font size of the central text in the graph
         width, // Dimensions of each assignment
         height; // Dimensions of each assignment
@@ -34,7 +34,7 @@ $(function() {
             let sa = utils.loadAssignmentData(dom_assignment);
             // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
             if (dom_assignment.hasClass("mark-as-done") && !sa.mark_as_done) {
-                $(".assignment").first().focus().parent().animate({left: -5}, 75, "easeOutCubic", function() {
+                $(".assignment").first().focus().parents(".assignment-container").animate({left: -5}, 75, "easeOutCubic", function() {
                     $(this).animate({left: 5}, 75, "easeOutCubic", function() {
                         $(this).animate({left: 0}, 75, "easeOutCubic");
                     });
@@ -721,7 +721,6 @@ $(function() {
                         if (len_works > 0) {
                             sa.works.pop();
                             len_works--;
-                            ;
                             lw = sa.works[len_works];
 
                             // If the deleted work input cut the dynamic start, run this
@@ -840,7 +839,7 @@ $(function() {
 
                     // BEGIN Next assignment button
                     next_assignment_button.click(function() {
-                        const next_assignment = dom_assignment.parent().next().children().first();
+                        const next_assignment = dom_assignment.parents(".assignment-container").next().children(".assignment");
                         // Only close if next assignment exists
                         if (next_assignment.length) {
                             dom_assignment.click();
@@ -1013,7 +1012,7 @@ $(function() {
                         Dynamic mode (default):
                         If you don't finish a day's work, the red line will readjust itself and adapt to your work schedule
                         This mode is recommended if you can't keep up with an assignment's work schedule`, "prepend"
-                    ).css("left", -3).children().first().css({
+                    ).css("left", -3).children(".info-button-text").css({
                         fontSize: 11,
                         lineHeight: "11px",
                     });
@@ -1032,7 +1031,6 @@ $(function() {
                 function resize() {
                     // If autofilled by $(window).trigger("resize")
                     len_works = sa.works.length - 1;
-                    ;
                     lw = sa.works[len_works];
                     // If date_now is redefined
                     today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
@@ -1047,17 +1045,16 @@ $(function() {
                         ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
                     }
                     
-                    width = $(fixed_graph).width();
-                    height = $(fixed_graph).height();
-                    if (width > 500) {
-                        font_size = 13.9;
-                    } else {
-                        font_size = Math.round((width + 450) / 47 * 0.6875);
-                    }
-                    scale = window.devicePixelRatio;
-                    wCon = (width - 55) / x;
-                    hCon = (height - 55) / y;
                     if (dom_assignment.hasClass("open-assignment") && dom_assignment.is(":visible")) {
+                        width = $(fixed_graph).width();
+                        height = $(fixed_graph).height();
+                        if (width > 500) {
+                            font_size = 13.9;
+                        } else {
+                            font_size = Math.round((width + 450) / 47 * 0.6875);
+                        }
+                        wCon = (width - 55) / x;
+                        hCon = (height - 55) / y;
                         graph.width = width * scale;
                         graph.height = height * scale;
                         fixed_graph.width = width * scale;

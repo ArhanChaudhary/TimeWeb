@@ -12,9 +12,9 @@ This only runs on index.html
 // Note: modified assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
 function showForm(show_instantly=false) {
     if (show_instantly) {
-        $('#overlay').show().children().first().css("top", 15);
+        $('#overlay').show().children("#form-wrapper").css("top", 15);
     } else {
-        $("#overlay").fadeIn(300).children().first().animate({top: 15}, 300);
+        $("#overlay").fadeIn(300).children("#form-wrapper").animate({top: 15}, 300);
         if (!isMobile) {
             // Focus on first field
             $("#id_assignment_name").focus();
@@ -29,14 +29,14 @@ function showForm(show_instantly=false) {
 }
 function hideForm(hide_instantly=false) {
     if (hide_instantly) {
-        $("#overlay").hide().children().first();
+        $("#overlay").hide().children("#form-wrapper");
         $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
     } else {
         $("#overlay").fadeOut(300,function() {
             // Remove all error notes when form is exited
             $(".invalid").removeClass("invalid");
             $(".error-note").remove();
-        }).children().first().animate({top: "0"}, 300);
+        }).children("#form-wrapper").animate({top: "0"}, 300);
     }
     // Used in utils.js for handling the user typing "N" when showing the form via shift + N
     form_is_showing = false;
@@ -252,14 +252,14 @@ $(function() {
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
-        $(this).prev().children().eq(1).addClass("invalid");
+        $(this).prev().children("input").first().addClass("invalid");
         // Give the previous field an error if appropriate
         if (this.id === "error_id_x" && $(this).text().includes("assignment") || this.id === "error_id_works" && $(this).text().includes("of")) {
-            $(this).prev().prev().children().eq(1).addClass("invalid");
+            $(this).prev().prev().children("input").first().addClass("invalid");
         }
     });
     // Focus on first invalid field
-    $("#form-wrapper .error-note").first().prev().children().eq(1).focus();
+    $("#form-wrapper .error-note").first().prev().children("input").first().focus();
     // Prevent label from stealing focus from info button
     $("#form-wrapper .info-button").click(() => false);
     // Delete assignment
@@ -284,7 +284,7 @@ $(function() {
                     }).then(function() {
                         // Opacity CSS transition
                         dom_assignment.css("opacity", "0");
-                        const assignment_container = dom_assignment.parent();
+                        const assignment_container = dom_assignment.parents(".assignment-container");
                         // Animate height on assignment_container because it doesn't have a transition
                         assignment_container.animate({marginBottom: -assignment_container.height()-10}, 750, "easeOutCubic", function() {
                             // Remove assignment data from dat
