@@ -53,7 +53,7 @@ except KeyError:
 if DEBUG:
     ALLOWED_HOSTS = ['localhost']
 else:
-    ALLOWED_HOSTS = ['timeweb.io', 'www.timeweb.io', '20210325t214932-dot-timeweb-308201.wl.r.appspot.com']
+    ALLOWED_HOSTS = ['timeweb.io', 'www.timeweb.io', 'timeweb-308201.wl.r.appspot.com']
 # Application definition
 
 CSRF_COOKIE_SECURE = True

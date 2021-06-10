@@ -473,3 +473,9 @@ class doovView(View):
         self.context = get_default_context()
     def get(self, request):
         return redirect("http://doov.com")
+
+class stackpileView(View):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request):
+        return redirect("https://stackpile.me")

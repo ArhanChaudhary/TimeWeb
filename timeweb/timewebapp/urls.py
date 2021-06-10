@@ -28,6 +28,7 @@ urlpatterns = [
     path('safari-pinned-tab.svg', RedirectView.as_view(url='/static/images/icons/safari-pinned-tab.svg')),
 
     path('hotdogs', views.hotdogsView.as_view(),name='hotdogs'),
+    path('stackpile', views.stackpileView.as_view(),name='stackpile'),
     path("doov", views.doovView.as_view(), name='doov'),
     re_path(r"^(wp|wordpress)", views.rickView.as_view()),
 ]

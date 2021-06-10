@@ -20,7 +20,7 @@ $(function() {
         NOTE: Warnings do not affect anything and are there just for you to see`
     );
     $("#id_def_funct_round_minute").parent().info('right',
-        `If your unit of work for any assignment is "Minute," meaning it is divided up into minutes, round each day's work to the nearest multiple of 5 Minutes
+        `If your unit of work for any assignment is "Minute," meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes
         
         This is because raw minute work values look ugly (e.g: 17 Minutes, 49 Minutes)`
     );
