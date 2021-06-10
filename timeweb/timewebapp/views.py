@@ -88,13 +88,15 @@ class SettingsView(LoginRequiredMixin, View):
             'text_priority': settings_model.text_priority,
             'highest_priority_color': settings_model.highest_priority_color,
             'lowest_priority_color': settings_model.lowest_priority_color,
+            'background_image': settings_model.background_image,
         }
-        self.context['form'] = SettingsForm(None, initial=initial)
+        self.context['form'] = SettingsForm(initial=initial)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return render(request, "settings.html", self.context)
         
     def post(self, request):
-        self.form = SettingsForm(request.POST)
+        self.isExampleAccount = request.user.username == example_account_name
+        self.form = SettingsForm(data=request.POST, files=request.FILES)
         if self.form.is_valid():
             return self.valid_form(request)
         else:
@@ -122,6 +124,8 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model.text_priority = self.form.cleaned_data.get("text_priority")
         settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
         settings_model.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
+
+        settings_model.background_image = self.form.cleaned_data.get("background_image") or None
         settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
@@ -142,7 +146,8 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['assignment_models'] = self.assignment_models
         self.context['assignment_models_as_json'] = list(self.assignment_models.values())
         self.context['settings_model_as_json'] = model_to_dict(settings_model)
-
+        del self.context['settings_model_as_json']['background_image']
+        self.context['background_image_url'] = settings_model.background_image.url if settings_model.background_image else ""
     def get(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.add_user_models_to_context(request)
@@ -152,8 +157,8 @@ class TimewebView(LoginRequiredMixin, View):
         try:
             # self.assignment_form_submitted() adds the assignment's name to request.session['added_assignment'] if it was created or request.session['reentered_assignment'] if it was modified
             # I used sessions as a way to preserve a value during a post-get request
-            # The session value is passed to index.html, where it adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-            # Once the response has been rendered, delete the key value to ensure that "#animate-in" and "#animate-color" isn't there when refreshed
+            # The session value is passed to index.html, which adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
+            # Once the response has been rendered, delete the key value to ensure that "#animate-in" and "#animate-color" is only applied once
             try:
                 request.session['added_assignment']
                 response = render(request, "index.html", self.context)
@@ -193,7 +198,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.created_assignment = True
         else:
             self.created_assignment = False
-        self.form = TimewebForm(request.POST)
+        self.form = TimewebForm(data=request.POST, files=request.FILES)
 
         # Parts of the form that can only validate in views
         form_is_valid = True

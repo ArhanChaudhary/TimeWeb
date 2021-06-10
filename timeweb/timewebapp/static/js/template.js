@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }
+    if (window.background_image_url) {
+        $("main").css("background-image",background_image_url);
+    }
 });
 $(function() {
     // Click element when enter is pressed
@@ -209,4 +212,9 @@ function info_button_handler(_, run=true) {
         }
     }
     return false;
+}
+// from math.round mdn docs
+function precisionRound(number, precision) {
+    const factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
 }

@@ -29,7 +29,7 @@ if not DEBUG:
     CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
-CSP_IMG_SRC = ("'self'", 'data:')
+CSP_IMG_SRC = ("'self'")
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'pwa',
     'colorfield',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -189,13 +190,14 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'
-# Django Logging config
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+# Django Logging config
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

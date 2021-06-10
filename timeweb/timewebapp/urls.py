@@ -1,9 +1,23 @@
 from django.urls import path, re_path
 from . import views
 from django.views.generic import RedirectView
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
+from django.conf import settings
+from django.conf.urls.static import static
 
+from django.contrib.auth.decorators import login_required
+from django.views.static import serve
+from .models import SettingsModel
+
+@login_required
+def protected_serve(request, path):
+    obj = SettingsModel.objects.get(user=request.user)
+    if obj.background_image and obj.background_image.url[len(settings.MEDIA_URL):] == path:
+        return serve(request, path, settings.MEDIA_ROOT)
+    else:
+        return HttpResponseForbidden("You do not have access to this image")
 urlpatterns = [
+    re_path(r'^{}(?P<path>.*)$'.format(settings.MEDIA_URL[1:]), protected_serve),
     path('', views.TimewebView.as_view(),name='home'),
     path('settings', views.SettingsView.as_view(),name='settings'),
     path('contact', views.ContactView.as_view(),name='contact'),
@@ -32,3 +46,5 @@ urlpatterns = [
     path("doov", views.doovView.as_view(), name='doov'),
     re_path(r"^(wp|wordpress)", views.rickView.as_view()),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

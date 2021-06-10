@@ -147,6 +147,11 @@ class SettingsModel(models.Model):
     )
     highest_priority_color = ColorField(default="#e25b50")
     lowest_priority_color = ColorField(default="#84c841")
+    background_image = models.ImageField(
+        upload_to='images/',
+        null=True,
+        blank=True
+    )
     first_login = models.BooleanField(default=True)
     date_now = models.DateField(
         default=datetime.date.today

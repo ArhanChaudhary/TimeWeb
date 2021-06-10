@@ -67,6 +67,7 @@ db.sqlite3-journal
 cloud_sql_proxy
 .vscode
 timeweb/static/**
+timeweb/media/**
 app.yaml
 main.py
 env_variables.yaml

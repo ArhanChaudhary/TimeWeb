@@ -11,7 +11,7 @@
 
 {% block content %}
 {{ form.media }}
-<form method="POST" autocomplete="off">
+<form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
     <h3>These are applied to all assignments</h3>
     <table>

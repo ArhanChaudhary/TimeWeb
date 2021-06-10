@@ -393,7 +393,7 @@ $(function() {
                         if (mouse_y) {
                             funct_mouse_x = sa.works[mouse_x - dif_assign];
                         } else {
-                            funct_mouse_x = utils.precisionRound(c_funct(mouse_x), 6);
+                            funct_mouse_x = precisionRound(c_funct(mouse_x), 6);
                         }
                         let str_mouse_x = new Date(ad);
                         str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
@@ -663,12 +663,12 @@ $(function() {
                     function ChangeSkewRatio() {
                         // Change skew ratio by +- 0.1 and cap it
                         if (whichkey === "ArrowDown") {
-                            skew_ratio = utils.precisionRound(skew_ratio - 0.1, 1);
+                            skew_ratio = precisionRound(skew_ratio - 0.1, 1);
                             if (skew_ratio < 2 - skew_ratio_lim) {
                                 skew_ratio = skew_ratio_lim;
                             }
                         } else {
-                            skew_ratio = utils.precisionRound(skew_ratio + 0.1, 1);
+                            skew_ratio = precisionRound(skew_ratio + 0.1, 1);
                             if (skew_ratio > skew_ratio_lim) {
                                 skew_ratio = 2 - skew_ratio_lim;
                             }
