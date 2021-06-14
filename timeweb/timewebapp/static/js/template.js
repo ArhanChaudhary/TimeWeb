@@ -182,7 +182,6 @@ $(function() {
             }
         });
     }
-    $("#nav-how").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#nav-usage").click(() => alert("This has not yet been written, please contact me directly")).css("text-decoration", "line-through");
     $("#nav-about").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#account-settings").click(() => alert("Please contact me regarding your account settings"));

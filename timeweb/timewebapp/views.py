@@ -115,7 +115,7 @@ class SettingsView(LoginRequiredMixin, View):
         # Automatically reflect rounding to multiples of 5 minutes
         if settings_model.def_funct_round_minute:
             for model in TimewebModel.objects.filter(user__username=request.user):
-                if model.unit in ['minute', 'Minute', 'minutes', 'Minutes'] and model.funct_round != 5:
+                if model.unit in ('minute', 'Minute', 'minutes', 'Minutes') and model.funct_round != 5:
                     model.funct_round = 5
                     model.save()
         settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
@@ -124,7 +124,6 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model.text_priority = self.form.cleaned_data.get("text_priority")
         settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
         settings_model.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
-
         settings_model.background_image = self.form.cleaned_data.get("background_image") or None
         settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
@@ -146,8 +145,8 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['assignment_models'] = self.assignment_models
         self.context['assignment_models_as_json'] = list(self.assignment_models.values())
         self.context['settings_model_as_json'] = model_to_dict(settings_model)
-        del self.context['settings_model_as_json']['background_image']
-        self.context['background_image_url'] = settings_model.background_image.url if settings_model.background_image else ""
+        del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable nor is it needed
+        self.context['background_image'] = settings_model.background_image
     def get(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.add_user_models_to_context(request)

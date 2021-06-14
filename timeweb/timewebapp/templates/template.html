@@ -17,7 +17,6 @@
             example_account_name = "{{ example_account_name }}";
             example_assignment_name = "{{ example_assignment_name }}";
             hour_to_update = {{ hour_to_update }};
-            background_image_url = "{{background_image_url}}";
             {% endif %}
         </script>
         <title>TimeWeb</title>
@@ -89,7 +88,6 @@
                         <a href="#" id="nav-usage">User Guide</a>   
                         <span>Install on Home Screen</span>
                         <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                        <a href="#" id="nav-how">How Does This Work</a>
                         <a href="{% static 'policies/policies.html' %}">Policies</a>
                         <a href="/changelog">Changelog</a>
                         <a href="/contact">Contact Me</a>
@@ -102,6 +100,10 @@
                 </a>
             </header>
             <main>
+                {% if background_image %}
+                <div id="background-image"></div>
+                <style nonce="{{request.csp_nonce}}">#background-image { background-image: url({{ background_image.url }});}</style>
+                {% endif %}
                 {% block content %}{% endblock content %}
             </main>
         </div>

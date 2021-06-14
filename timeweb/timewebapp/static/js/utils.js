@@ -165,7 +165,7 @@ utils = {
                 if (assignments_excluding_example.length) {
                     assignments_excluding_example.first().after("<span>Click your assignment<br></span>");
                 } else {
-                    $("#assignments-header").replaceWith("<span>Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
+                    $("#assignments-header").replaceWith("<span style=\"padding: 0 10px;\">Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
                     $(".assignment-container").hide();
                 }
             }

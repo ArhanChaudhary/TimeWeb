@@ -315,8 +315,9 @@ $(function() {
                     data: data,
                     success: success,
                     error: function(response, exception) {
-                        // If ajax failed, allow updating or deleting again
+                        // If ajax failed, allow updating or deleting again and dequeue
                         dom_assignment.css("pointer-events", "auto");
+                        $(document).dequeue();
                         ajaxUtils.error(response, exception);
                     }
                 });
