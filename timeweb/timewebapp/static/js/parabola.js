@@ -70,45 +70,27 @@ function pset(ctx, x2 = false, y2 = false) {
             }
             x2 -= Math.floor(x2 / 7) * ctx.break_days.length + ctx.mods[floorx2 % 7];
         }
-        // If the mouse is outside the graph to the left, make a line a the slope of y1
+        // If the mouse is outside the graph to the left or right, ignore it
         // Use !(x2 > 0) instead of (x2 <= 0) because x2 can be NaN from being outside of the graph, caused by negative indexing by floorx2. This ensures that NaN passes this statement
-        if (!(x2 > 0)) {
-            return {
-                a: 0,
-                b: y1,
-                skew_ratio: ctx.skew_ratio_lim,
-                cutoff_transition_value: 0,
-                // Don't include cutoff_to_use_round because it will never be used if a = 0 and b = y1
-                return_y_cutoff: x1 ? 1 : 0,
-                return_0_cutoff: 0,
-            }
-        } else if (x2 >= x1) {
-            // If the mouse is outside the graph to the right, connect the points (0,0), (x1-1,0), (x1,y1)
-            // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-            ctx.a = y1 / x1;
-            ctx.b = ctx.a * (1 - x1);
+        if (!(x2 > 0) || x2 >= x1) return ctx;
+        // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
+        // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+        ctx.a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
+        ctx.b = (y1 - x1 * x1 * ctx.a) / x1;
 
+        // Redefine skew ratio
+        ctx.skew_ratio = (ctx.a + ctx.b) * x1 / y1;
+        // Cap skew ratio
+        if (ctx.skew_ratio > ctx.skew_ratio_lim) {
+            ctx.skew_ratio = ctx.skew_ratio_lim;
+        } else if (ctx.skew_ratio < 2 - ctx.skew_ratio_lim) {
             ctx.skew_ratio = 2 - ctx.skew_ratio_lim;
-        } else {
-            // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
+        } else if (Math.abs(ctx.skew_ratio) % 1 < 0.05) {
+            // Snap skew ratio to whole numbers
+            ctx.skew_ratio = Math.round(ctx.skew_ratio);
             // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-            ctx.a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
+            ctx.a = y1 * (1 - ctx.skew_ratio) / ((x1 - 1) * x1);
             ctx.b = (y1 - x1 * x1 * ctx.a) / x1;
-
-            // Redefine skew ratio
-            ctx.skew_ratio = (ctx.a + ctx.b) * x1 / y1;
-            // Cap skew ratio
-            if (ctx.skew_ratio > ctx.skew_ratio_lim) {
-                ctx.skew_ratio = ctx.skew_ratio_lim;
-            } else if (ctx.skew_ratio < 2 - ctx.skew_ratio_lim) {
-                ctx.skew_ratio = 2 - ctx.skew_ratio_lim;
-            } else if (Math.abs(ctx.skew_ratio) % 1 < 0.05) {
-                // Snap skew ratio to whole numbers
-                ctx.skew_ratio = Math.round(ctx.skew_ratio);
-                // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-                ctx.a = y1 * (1 - ctx.skew_ratio) / ((x1 - 1) * x1);
-                ctx.b = (y1 - x1 * x1 * ctx.a) / x1;
-            }
         }
     } else {
         // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points

@@ -322,7 +322,7 @@ priority = {
             }
             ordered_assignments.push(priority_data);
 
-            dom_status_image.attr("src", `${document.URL}static/images/status_icons/${status_image}.png`)
+            dom_status_image.attr("src", `/static/images/status_icons/${status_image}.png`)
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", strdaysleft);
             if (display_format_minutes) {
@@ -420,10 +420,9 @@ priority = {
             // Set initial transition values for "#animate-in"
             // Needs to be after domswap or else "top" bugs about 
             $("#animate-in").css({
-                // 20+ and -10 deals with top and bottom margins
-                "top": 20+$("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top,
+                "top": $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + 20, // Move to below the last assignment and add a 20px margin
                 "opacity": "0",
-                "margin-bottom": -$("#animate-in").height()-10,
+                "margin-bottom": -($("#animate-in").height()+10), // +10 deals with margins
             });
         }
         if ($(".question-mark").length) {

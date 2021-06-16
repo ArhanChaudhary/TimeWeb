@@ -15,7 +15,7 @@ import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
 try:
-    DEBUG = os.environ['DEBUG'] == "True"  
+    DEBUG = os.environ['DEBUG'] == "True"
 except KeyError:
     DEBUG = True
 
@@ -23,13 +23,13 @@ except KeyError:
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Dont sent to google analytics in debug
 if not DEBUG:
-    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com')
+    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', )
     CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com') # Needs to be set so nonce can be added
     CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com')
     CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
-CSP_IMG_SRC = ("'self'")
+CSP_IMG_SRC = ("'self'", )
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
@@ -190,13 +190,22 @@ USE_L10N = True
 
 USE_TZ = True
 
-MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+if not DEBUG:
+    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    GS_BUCKET_NAME = 'timeweb-308201.appspot.com'
+
+    GS_PROJECT_ID = 'timeweb-308201'
+    from google.oauth2 import service_account
+    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+        BASE_DIR / "sa-private-key.json"
+    )
 # Django Logging config
 LOGGING = {
     'version': 1,

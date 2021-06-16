@@ -70,6 +70,7 @@ timeweb/static/**
 timeweb/media/**
 app.yaml
 main.py
+sa-private-key.json
 env_variables.yaml
 gcldeployment.md
 original_favicon.png

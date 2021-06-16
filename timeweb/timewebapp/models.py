@@ -6,6 +6,10 @@ from django.conf import settings
 from colorfield.fields import ColorField
 from decimal import Decimal
 import datetime
+
+
+def create_path(instance, filename):
+    return f"images/{instance.user.username}/{filename}"
 WEEKDAYS = (
     ("1",_("Monday")),
     ("2",_("Tuesday")),
@@ -148,7 +152,7 @@ class SettingsModel(models.Model):
     highest_priority_color = ColorField(default="#e25b50")
     lowest_priority_color = ColorField(default="#84c841")
     background_image = models.ImageField(
-        upload_to='images/',
+        upload_to=create_path,
         null=True,
         blank=True
     )

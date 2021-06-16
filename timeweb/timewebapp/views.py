@@ -15,11 +15,14 @@ import datetime
 from decimal import Decimal as d
 from math import ceil, floor
 import json
+from google.cloud import storage
 
+from os.path import basename
 hour_to_update = 4
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 25
+MAX_UPLOAD_SIZE = 5242880
 
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
@@ -97,7 +100,13 @@ class SettingsView(LoginRequiredMixin, View):
     def post(self, request):
         self.isExampleAccount = request.user.username == example_account_name
         self.form = SettingsForm(data=request.POST, files=request.FILES)
-        if self.form.is_valid():
+        form_is_valid = True
+        if not self.form.is_valid():
+            form_is_valid = False
+        elif self.form.cleaned_data.get("background_image") and self.form.cleaned_data.get("background_image").size > MAX_UPLOAD_SIZE:
+            self.form.add_error("background_image", forms.ValidationError(_('This file is too big (>%(amount)d bytes)') % {'amount': MAX_UPLOAD_SIZE}))
+            form_is_valid = False
+        if form_is_valid:
             return self.valid_form(request)
         else:
             return self.invalid_form(request)
@@ -145,8 +154,9 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['assignment_models'] = self.assignment_models
         self.context['assignment_models_as_json'] = list(self.assignment_models.values())
         self.context['settings_model_as_json'] = model_to_dict(settings_model)
-        del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable nor is it needed
+        del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['background_image'] = settings_model.background_image
+        self.context['background_image_name'] = basename(settings_model.background_image.name)
     def get(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.add_user_models_to_context(request)
@@ -448,6 +458,23 @@ class TimewebView(LoginRequiredMixin, View):
             example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
         return HttpResponse(status=204)
+class ImagesView(LoginRequiredMixin, View):
+    login_url = '/login/login/'
+    redirect_field_name = 'redirect_to'
+
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request, imageUser, imageName):
+        if request.user.username != imageUser:
+            return HttpResponseForbidden("You do not have access to this image")
+        client = storage.Client()
+        bucket = client.bucket("timeweb-308201.appspot.com")
+        blob = bucket.get_blob(f"images/{imageUser}/{imageName}")
+        if blob:
+            response = blob.download_as_bytes()
+            return HttpResponse(response)
+        else:
+            return HttpResponse(status=204)
 class ContactView(View):
     def __init__(self):
         self.context = get_default_context()
@@ -465,18 +492,6 @@ class rickView(View):
         self.context = get_default_context()
     def get(self, request, _):
         return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
-
-class hotdogsView(View):
-    def __init__(self):
-        self.context = get_default_context()
-    def get(self, request):
-        return render(request, "hotdogs.html", self.context)
-
-class doovView(View):
-    def __init__(self):
-        self.context = get_default_context()
-    def get(self, request):
-        return redirect("http://doov.com")
 
 class stackpileView(View):
     def __init__(self):

@@ -101,8 +101,7 @@
             </header>
             <main>
                 {% if background_image %}
-                <div id="background-image"></div>
-                <style nonce="{{request.csp_nonce}}">#background-image { background-image: url({{ background_image.url }});}</style>
+                <img id="background-image" src="/media/images/{{ user.get_username }}/{{ background_image_name }}" width="{{background_image.width}}" height="{{background_image.height}}">
                 {% endif %}
                 {% block content %}{% endblock content %}
             </main>

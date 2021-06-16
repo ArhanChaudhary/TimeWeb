@@ -1,24 +1,11 @@
 from django.urls import path, re_path
 from . import views
 from django.views.generic import RedirectView
-from django.http import HttpResponse, HttpResponseForbidden
-from django.conf import settings
-from django.conf.urls.static import static
+from django.http import HttpResponse
 
-from django.contrib.auth.decorators import login_required
-from django.views.static import serve
-from .models import SettingsModel
-
-@login_required
-def protected_serve(request, path):
-    obj = SettingsModel.objects.get(user=request.user)
-    if obj.background_image and obj.background_image.url[len(settings.MEDIA_URL):] == path:
-        return serve(request, path, settings.MEDIA_ROOT)
-    else:
-        return HttpResponseForbidden("You do not have access to this image")
 urlpatterns = [
-    re_path(r'^{}(?P<path>.*)$'.format(settings.MEDIA_URL[1:]), protected_serve),
     path('', views.TimewebView.as_view(),name='home'),
+    path('media/images/<str:imageUser>/<str:imageName>', views.ImagesView.as_view(), name='images'),
     path('settings', views.SettingsView.as_view(),name='settings'),
     path('contact', views.ContactView.as_view(),name='contact'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
@@ -28,7 +15,7 @@ urlpatterns = [
     path('licenses-and-credits', RedirectView.as_view(url='/static/policies/licenses-and-credits.html')),
     path('privacy', RedirectView.as_view(url='/static/policies/privacy.html')),
     path('terms', RedirectView.as_view(url='/static/policies/terms.html')),
-
+    
     path('robots.txt', lambda x: HttpResponse("# If you came from the discord gg you get a super duper secret role\n# pm me this message at Arch#5808\n# also, pls don't tell anyone as it'll ruin the fun of this small game\nUser-Agent: *\nDisallow:", content_type="text/plain"), name="robots_file"),
     path('android-chrome-192x192.png', RedirectView.as_view(url='/static/images/icons/android-chrome-192x192.png')),
     path('android-chrome-512x512.png', RedirectView.as_view(url='/static/images/icons/android-chrome-512x512.png')),
@@ -41,10 +28,10 @@ urlpatterns = [
     path('mstile-150x150.png', RedirectView.as_view(url='/static/images/icons/mstile-150x150.png')),
     path('safari-pinned-tab.svg', RedirectView.as_view(url='/static/images/icons/safari-pinned-tab.svg')),
 
-    path('hotdogs', views.hotdogsView.as_view(),name='hotdogs'),
     path('stackpile', views.stackpileView.as_view(),name='stackpile'),
-    path("doov", views.doovView.as_view(), name='doov'),
     re_path(r"^(wp|wordpress)", views.rickView.as_view()),
 ]
+from django.conf import settings
 if settings.DEBUG:
+    from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

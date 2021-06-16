@@ -73,12 +73,11 @@ main {
 }
 #background-image {
     top: 0;
-    width: calc(100% - 40px);
+    left: 0;
+    width: 100%;
     height: 100%;
-    position: absolute;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    position: fixed;
+    object-fit: cover;
 }
 #logo-container {
     display: inline-block;
@@ -299,7 +298,8 @@ nav.open #nav-menu::after {
     font-size: 14px;
     font-style: italic;
     font-family: "Serif";
-
+    text-shadow: none; /* Disable parent text shadow */
+    
     color: white;
     text-align: center;
     line-height: 15px;

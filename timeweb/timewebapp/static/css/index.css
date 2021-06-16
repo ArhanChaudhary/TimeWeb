@@ -203,6 +203,7 @@ header.animate::after {
     text-align: center;
     position: absolute;
     cursor: pointer;
+    text-shadow: 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
 }
 #autofill-work-done {
     padding: 0 10px;
@@ -220,11 +221,13 @@ header.animate::after {
     border-top: 1px solid black;
     top: 1px;
     position: relative;
+    box-shadow: 0 0 1px 1px #fff;
 }
 .shortcut-line-left {
     width: calc(50% - 107px);
     float: right;
     border-top: 1px solid black;
+    box-shadow: 0 0 1px 1px #fff;
 }
 .assignment-header {
     display: -webkit-box;
