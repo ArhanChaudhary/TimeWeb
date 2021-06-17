@@ -427,7 +427,7 @@ priority = {
         }
         if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
-            $("#simulated-date").css("margin-top", -21);
+            $("#simulated-date").css("margin-top", -23);
         } else if (!total) {
             $("#info").show();
             $("#simulated-date").css("margin-top", "");

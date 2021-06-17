@@ -61,6 +61,7 @@ header.animate::after {
     font-size: 17px;
 }
 #advanced {
+    position: relative;
     margin-left: auto;
     border-bottom: 1px solid;
     cursor: pointer;
@@ -68,7 +69,12 @@ header.animate::after {
 #advanced:focus {
     outline: 0;
 }
+#move-advanced-arrow {
+    margin-left: -2px;
+}
 #advanced-options {
+    text-shadow: none; /* Override parent text shadow if user has a background image */
+    width: 169px;
     -webkit-transform: translateY(16px);
         -ms-transform: translateY(16px);
             transform: translateY(16px);
@@ -104,10 +110,11 @@ header.animate::after {
     outline: 0;
 }
 #hide-button {
+    cursor: pointer;
     position: relative;
     left: 1px;
     bottom: 1px;
-    background: none;
+    background-color: white;
     border: 2px solid rgba(0,0,0,0.45);
     border-radius: 4px;
     margin-right: 5px;
@@ -203,7 +210,6 @@ header.animate::after {
     text-align: center;
     position: absolute;
     cursor: pointer;
-    text-shadow: 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
 }
 #autofill-work-done {
     padding: 0 10px;
@@ -221,13 +227,11 @@ header.animate::after {
     border-top: 1px solid black;
     top: 1px;
     position: relative;
-    box-shadow: 0 0 1px 1px #fff;
 }
 .shortcut-line-left {
     width: calc(50% - 107px);
     float: right;
     border-top: 1px solid black;
-    box-shadow: 0 0 1px 1px #fff;
 }
 .assignment-header {
     display: -webkit-box;
@@ -631,4 +635,22 @@ label[for='id_ad']::after {
 }
 .info-button:focus .info-button-text.info-right {
     left: calc(100% + 12px);
+}
+
+.add-white-shadow {
+    text-shadow: 1px 1px white, -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white;
+}
+#advanced.add-white-shadow::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: -1px;
+    height: 3px;
+    width: calc(100% + 2px);
+    background-color: black;
+    box-shadow: inset 0 0 0 1px white;
+}
+.shortcut-line-left.add-white-shadow, .shortcut-line-right.add-white-shadow {
+    text-shadow: none;
+    box-shadow: 0 0 0 1px white;
 }

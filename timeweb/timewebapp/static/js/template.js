@@ -29,7 +29,7 @@ if ('serviceWorker' in navigator) {
 document.addEventListener("DOMContentLoaded", function() {
     // Fix bug where the nav can be visible despite overflow: hidden
     window.scrollTo(0, 0);
-    // Position content so that the scrollbar doesn't clip into the header
+    // Position content such that the scrollbar doesn't clip into the header
     if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
         $("main").css({
             overflowY: "overlay",
@@ -37,20 +37,23 @@ document.addEventListener("DOMContentLoaded", function() {
             padding: "10px 20px",
             marginTop: 70,
         });
+        $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
     // Do starting animation
     } else {
         // If the animation has not already been run, add the class "animate" to the elements that will be animated
         // The animation will happen instantly, because the transitions are only applied to :not(.animate)
         // Then, when the window loads, remove ".animate". This will cause the actual transition
-        // Note: I have tried using keyframes instead of this, but that still required this same process, so I found this way to be the fastest
+        // Note: Using keyframes still required this same process
         $("main, header, #assignments-container").addClass("animate");
         sessionStorage.setItem("animation-ran", true);
         // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
         $(window).one('load', function() {
+            // Only start loading background image after window.one("load")
+            $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
             $("main, header, #assignments-container").removeClass("animate");
             // Run when the header animation completely ends since the header animation takes the longest
             $("header").one("transitionend", function() {
-                // Position content so that the scrollbar doesn't clip into the header
+                // Position content such that the scrollbar doesn't clip into the header
                 $("main").css({
                     overflowY: "overlay",
                     height: "calc(100vh - 70px)",
@@ -59,9 +62,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             });
         });
-    }
-    if (window.background_image_url) {
-        $("main").css("background-image",background_image_url);
     }
 });
 $(function() {

@@ -48,7 +48,7 @@
         <div id="advanced-inputs" tabindex="0">
           Advanced Inputs
           <svg width="15px" height="10px">
-            <polygon class="arrow" points="10,2.5 0,2.5 5,7.5">
+            <polygon points="10,2.5 0,2.5 5,7.5">
             </polygon>
           </svg>
         </div>
@@ -58,14 +58,18 @@
   </div>
   <div id="assignments-container">
     <div id="assignments-header">
-      <div id="info">
+      <div id="info"{% if background_image %} class="add-white-shadow"{% endif %}>
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
-      <div id="advanced" tabindex="0">
+      <div id="advanced" tabindex="0"{% if background_image %} class="add-white-shadow"{% endif %}>
         Advanced
-        <svg width="15px" height="10px">
-          <polygon class="arrow" points="10,2.5 0,2.5 5,7.5">
+        <svg width="17px" height="10px"{% if not background_image %} id="move-advanced-arrow"{% endif %}>
+          {% if background_image %}
+          <polygon points="14,1.5 0,1.5 7,9" fill="white">
+          </polygon>
+          {% endif %}
+          <polygon points="12,2.5 2,2.5 7,7.5">
           </polygon>
         </svg>
         <div id="advanced-options" class="hidden">
@@ -76,11 +80,11 @@
         </div>
       </div>
     </div>
-    <div id="simulated-date"></div>
+    <div id="simulated-date"{% if background_image %} class="add-white-shadow"{% endif %}></div>
     <div id="autofill-work-done">
-      <div class="shortcut-line-right"></div>
-      <div class="shortcut-line-left"></div>
-      <span id="autofill-work-done-text" class="shortcut-text">
+      <div class="shortcut-line-right{% if background_image %} add-white-shadow{% endif %}"></div>
+      <div class="shortcut-line-left{% if background_image %} add-white-shadow{% endif %}"></div>
+      <span id="autofill-work-done-text" class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">
         Autofill
         <select id="autofill-selection">
           <option>No</option>
@@ -90,9 +94,9 @@
       </span>
     </div>
     <div id="delete-starred-assignments">
-      <div class="shortcut-line-right"></div>
-      <div class="shortcut-line-left"></div>
-      <span id="delete-starred-assignments-text" class="shortcut-text">Delete all Starred Assignments</span>
+      <div class="shortcut-line-right{% if background_image %} add-white-shadow{% endif %}"></div>
+      <div class="shortcut-line-left{% if background_image %} add-white-shadow{% endif %}"></div>
+      <span id="delete-starred-assignments-text" class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
       <div class="assignment-container" {% if assignment.assignment_name == request.session.added_assignment %}id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %}id="animate-color"{% endif %}>
@@ -100,7 +104,7 @@
           <div class="assignment-header">
             <span class="title">{{ assignment.assignment_name }}</span>
             <svg width="30px" height="20px" class="arrow-container">
-              <polygon class="arrow" points="5,0 5,20 15,10">
+              <polygon points="5,0 5,20 15,10">
                 <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
                 <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
@@ -129,7 +133,7 @@
                 <div class="advanced-buttons">
                   Advanced Options
                   <svg width="15px" height="10px">
-                    <polygon class="arrow" points="10,2.5 0,2.5 5,7.5"></polygon>
+                    <polygon points="10,2.5 0,2.5 5,7.5"></polygon>
                   </svg>
                 </div>
                 <button class="skew-ratio-button">Set Skew Ratio using Graph</button>
@@ -138,7 +142,7 @@
                 <div class="advanced-buttons second-advanced-button">
                   Advanced Options
                   <svg width="15px" height="10px">
-                    <polygon class="arrow" points="10,10 0,10 5,5"></polygon>
+                    <polygon points="10,10 0,10 5,5"></polygon>
                   </svg>
                 </div>
               </div>

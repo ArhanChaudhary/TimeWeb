@@ -16,7 +16,7 @@ from decimal import Decimal as d
 from math import ceil, floor
 import json
 from google.cloud import storage
-
+from django.views.decorators.cache import cache_control
 from os.path import basename
 hour_to_update = 4
 example_account_name = "Example"
@@ -156,7 +156,8 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['settings_model_as_json'] = model_to_dict(settings_model)
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['background_image'] = settings_model.background_image
-        self.context['background_image_name'] = basename(settings_model.background_image.name)
+        if settings_model.background_image.name:
+            self.context['background_image_name'] = basename(settings_model.background_image.name)
     def get(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.add_user_models_to_context(request)
@@ -464,6 +465,9 @@ class ImagesView(LoginRequiredMixin, View):
 
     def __init__(self):
         self.context = get_default_context()
+
+    # GS_CACHE_CONTROL in settings.py is supposed to set a cache but it doesnt for some reason
+    @cache_control(public=True, max_age=604800)
     def get(self, request, imageUser, imageName):
         if request.user.username != imageUser:
             return HttpResponseForbidden("You do not have access to this image")
@@ -471,8 +475,7 @@ class ImagesView(LoginRequiredMixin, View):
         bucket = client.bucket("timeweb-308201.appspot.com")
         blob = bucket.get_blob(f"images/{imageUser}/{imageName}")
         if blob:
-            response = blob.download_as_bytes()
-            return HttpResponse(response)
+            return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
         else:
             return HttpResponse(status=204)
 class ContactView(View):

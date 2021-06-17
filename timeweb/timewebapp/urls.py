@@ -5,7 +5,6 @@ from django.http import HttpResponse
 
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
-    path('media/images/<str:imageUser>/<str:imageName>', views.ImagesView.as_view(), name='images'),
     path('settings', views.SettingsView.as_view(),name='settings'),
     path('contact', views.ContactView.as_view(),name='contact'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
@@ -35,3 +34,5 @@ from django.conf import settings
 if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns.append(path('media/images/<str:imageUser>/<str:imageName>', views.ImagesView.as_view(), name='images'))
