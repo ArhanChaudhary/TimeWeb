@@ -17,6 +17,8 @@ class TimewebForm(forms.ModelForm):
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),
+            'mark_as_done': forms.HiddenInput(),
+            'tags': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
@@ -24,7 +26,6 @@ class TimewebForm(forms.ModelForm):
             'ctime': forms.NumberInput(attrs={"min":"0"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
-            'mark_as_done': forms.HiddenInput(),
         }
         error_messages = {
             'assignment_name': {

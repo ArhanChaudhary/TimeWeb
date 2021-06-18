@@ -91,6 +91,10 @@ class TimewebModel(models.Model):
     mark_as_done = models.BooleanField(
         default=False,
     )
+    tags = models.JSONField(
+        null=True,
+        blank=True,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -123,7 +127,7 @@ class SettingsModel(models.Model):
     def_break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
-        null=True
+        null=True,
     )
     def_unit_to_minute = models.BooleanField(
         default=False,
@@ -154,7 +158,7 @@ class SettingsModel(models.Model):
     background_image = models.ImageField(
         upload_to=create_path,
         null=True,
-        blank=True
+        blank=True,
     )
     first_login = models.BooleanField(default=True)
     date_now = models.DateField(

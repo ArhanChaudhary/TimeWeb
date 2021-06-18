@@ -99,7 +99,7 @@
       <span id="delete-starred-assignments-text" class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container" {% if assignment.assignment_name == request.session.added_assignment %}id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %}id="animate-color"{% endif %}>
+      <div class="assignment-container"{% if assignment.assignment_name == request.session.added_assignment %} id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %} id="animate-color"{% endif %}>
         <div class="assignment" data-assignment-name="{{ assignment.assignment_name }}" tabindex="0">
           <div class="assignment-header">
             <span class="title">{{ assignment.assignment_name }}</span>
@@ -109,11 +109,24 @@
                 <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
-            <p class="status">
+            <div class="right-side-of-header">
               <img class="status-image">
-              <span class="status-message"></span>
+              <div class="align-to-status-message-container">
+                <div class="tags">
+                  {% for tag in assignment.tags %}
+                    <div class="tag">
+                      <div class="tag-name">{{ tag }}</div>
+                      <div class="tag-delete">
+                        <span class="x-icon-slash x-icon-first-slash"></span>
+                        <span class="x-icon-slash x-icon-second-slash"></span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+                <span class="status-message"></span>
+              </div>
               <span class="completion-time"></span>
-            </p>
+            </div>
             <img class="button update-button" width="45" height="45" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             <img class="button delete-button" width="45" height="45" src="{% static 'images/x.png' %}" alt="edit" draggable="false"/>
           </div>

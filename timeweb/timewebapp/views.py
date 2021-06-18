@@ -1,4 +1,5 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
+import enum
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
@@ -22,6 +23,7 @@ hour_to_update = 4
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 25
+MAX_NUMBER_TAGS = 5
 MAX_UPLOAD_SIZE = 5242880
 
 # Automatically creates settings model and example assignment when user is created
@@ -185,20 +187,19 @@ class TimewebView(LoginRequiredMixin, View):
     def post(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
-        if 'submit-button' in request.POST:
-            return self.assignment_form_submitted(request)
-        else:
-            if self.isExampleAccount: return HttpResponse(status=204)
-            action = request.POST['action']
-            if action == 'delete_assignment':
-                return self.deleted_assignment(request)
-            elif action == 'save_assignment':
-                return self.saved_assignment(request)
-            elif action == 'change_first_login':
-                return self.changed_first_login(request)
-            elif action == 'update_date_now':
-                return self.updated_date_now_and_example_assignment(request)
-    
+        if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
+        if self.isExampleAccount: return HttpResponse(status=204)
+        action = request.POST['action']
+        if action == 'delete_assignment':
+            return self.deleted_assignment(request)
+        elif action == 'save_assignment':
+            return self.saved_assignment(request)
+        elif action == 'change_first_login':
+            return self.changed_first_login(request)
+        elif action == 'update_date_now':
+            return self.updated_date_now_and_example_assignment(request)
+        elif action.startswith("tag"):
+            return self.posted_tag(request)
     def assignment_form_submitted(self, request):
         # The frontend adds the assignment's pk as a "value" attribute to the submit button
         self.pk = request.POST['submit-button']
@@ -217,8 +218,7 @@ class TimewebView(LoginRequiredMixin, View):
             form_is_valid = False
         else:
             # Ensure that the user's assignment name doesn't match with any other assignment
-            # If the form was reentered, exclude itself so it doesn't match its name with itself
-            # Can't use unique=True because it doesn't exclude itself
+            # Can't use unique=True because it doesn't exclude itself if its name doesnt change when reentered
             if self.assignment_models.exclude(pk=self.pk).filter(assignment_name=request.POST['assignment_name'].strip()).exists():
                 self.form.add_error("assignment_name", forms.ValidationError(_('An assignment with this name already exists')))
                 form_is_valid = False
@@ -459,6 +459,59 @@ class TimewebView(LoginRequiredMixin, View):
             example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
         return HttpResponse(status=204)
+    
+    def posted_tag(self, request):
+        action = request.POST['action']
+        if action == "tag_add":
+            return self.tag_add(request)
+        elif action == "tag_update":
+            return self.tag_update(request)
+        elif action == "tag_delete":
+            return self.tag_delete(request)
+    
+    def tag_add(self, request):
+        self.pk = request.POST['pk']
+        self.sm = get_object_or_404(TimewebModel, pk=self.pk)
+        if request.user != self.sm.user:
+            logger.warning(f"User \"{request.user}\" cannot save add a tag to an assignment that isn't theirs")
+            return HttpResponseForbidden("This assignment isn't yours")
+        tag_name = request.POST['tag_name'].strip()
+        if len(self.sm.tags or []) == MAX_NUMBER_TAGS: return HttpResponse("tooManyTags")
+        if tag_name in (self.sm.tags or []): return HttpResponse("alreadyExists")
+        if self.sm.tags:
+            self.sm.tags.append(tag_name)
+        else:
+            self.sm.tags = [tag_name]
+        self.sm.save()
+        logger.info(f"User \"{request.user}\" add tag \"{tag_name}\" to \"{self.sm.assignment_name}\"")
+        return HttpResponse(status=204)
+
+    def tag_update(self, request):
+        old_tag_name = request.POST['old_tag_name'].strip()
+        new_tag_name = request.POST['new_tag_name'].strip()
+        assignment_models = TimewebModel.objects.filter(user__username=request.user)
+        for assignment in assignment_models:
+            if new_tag_name in (assignment.tags or []):
+                return HttpResponse("alreadyExists")
+        for assignment in assignment_models:
+            for i, tag in enumerate(assignment.tags or []):
+                if tag == old_tag_name:
+                    assignment.tags[i] = new_tag_name
+                    assignment.save()
+                    break
+        logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
+        return HttpResponse(status=204)
+        
+    def tag_delete(self, request):
+        tag_name = request.POST['tag_name'].strip()
+        assignment_models = TimewebModel.objects.filter(user__username=request.user)
+        for assignment in assignment_models:
+            if tag_name in (assignment.tags or []):
+                assignment.tags.remove(tag_name)
+                assignment.save()
+        logger.info(f"User \"{request.user}\" deleted tag \"{tag_name}\"")
+        return HttpResponse(status=204)
+
 class ImagesView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'

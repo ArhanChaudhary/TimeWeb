@@ -552,14 +552,14 @@ ordering = {
             let message;
             switch ($("#autofill-selection").val()) {
                 case "No":
-                    message = `This applies to ALL assignments you haven't entered past work inputs for
+                    message = `This applies to ALL assignments you haven't entered past work inputs for (white assignments)
                     
                     Assumes you haven't done anything since your last work input and autofills in no work done until today
                     
                     Click the horizontal line to perform this action`;
                     break;
                 case "All":
-                    message = `This applies to ALL assignments you haven't entered past work inputs for
+                    message = `This applies to ALL assignments you haven't entered past work inputs for (white assignments)
                 
                     Assumes you followed your work schedule since your last work input and autofills in all work done until today
                     
