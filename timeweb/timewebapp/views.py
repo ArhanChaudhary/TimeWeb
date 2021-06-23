@@ -1,5 +1,4 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-import enum
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
@@ -71,6 +70,7 @@ def get_default_context():
         "example_account_name": example_account_name,
         "hour_to_update": hour_to_update,
         "example_assignment_name": example_assignment_name,
+        "max_number_tags": MAX_NUMBER_TAGS,
     }
 class SettingsView(LoginRequiredMixin, View):
     login_url = '/login/login/'
@@ -189,6 +189,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.isExampleAccount = request.user.username == example_account_name
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         if self.isExampleAccount: return HttpResponse(status=204)
+        # AJAX requests
         action = request.POST['action']
         if action == 'delete_assignment':
             return self.deleted_assignment(request)
@@ -198,8 +199,8 @@ class TimewebView(LoginRequiredMixin, View):
             return self.changed_first_login(request)
         elif action == 'update_date_now':
             return self.updated_date_now_and_example_assignment(request)
-        elif action.startswith("tag"):
-            return self.posted_tag(request)
+        elif action == "tag_add" or action == "tag_delete":
+            return self.tag_add_or_delete(request, action)
     def assignment_form_submitted(self, request):
         # The frontend adds the assignment's pk as a "value" attribute to the submit button
         self.pk = request.POST['submit-button']
@@ -460,57 +461,46 @@ class TimewebView(LoginRequiredMixin, View):
         logger.info(f"User \"{request.user}\" changed their date")
         return HttpResponse(status=204)
     
-    def posted_tag(self, request):
-        action = request.POST['action']
-        if action == "tag_add":
-            return self.tag_add(request)
-        elif action == "tag_update":
-            return self.tag_update(request)
-        elif action == "tag_delete":
-            return self.tag_delete(request)
-    
-    def tag_add(self, request):
+    def tag_add_or_delete(self, request, action):
         self.pk = request.POST['pk']
         self.sm = get_object_or_404(TimewebModel, pk=self.pk)
         if request.user != self.sm.user:
             logger.warning(f"User \"{request.user}\" cannot save add a tag to an assignment that isn't theirs")
             return HttpResponseForbidden("This assignment isn't yours")
-        tag_name = request.POST['tag_name'].strip()
-        if len(self.sm.tags or []) == MAX_NUMBER_TAGS: return HttpResponse("tooManyTags")
-        if tag_name in (self.sm.tags or []): return HttpResponse("alreadyExists")
-        if self.sm.tags:
-            self.sm.tags.append(tag_name)
-        else:
-            self.sm.tags = [tag_name]
+        tag_names = request.POST.getlist('tag_names[]')
+        if action == "tag_add":
+            tag_names = [tag_name for tag_name in tag_names if tag_name not in (self.sm.tags or [])]
+            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponse("tooManyTags")
+            if not self.sm.tags:
+                self.sm.tags = []
+            self.sm.tags.extend(tag_names)
+        elif action == "tag_delete":
+            # Remove tag_names from self.sm.tags
+            self.sm.tags = [tag_name for tag_name in self.sm.tags if tag_name not in tag_names]
         self.sm.save()
-        logger.info(f"User \"{request.user}\" add tag \"{tag_name}\" to \"{self.sm.assignment_name}\"")
+        if action == "tag_add":
+            logger.info(f"User \"{request.user}\" added tags \"{tag_names}\" to \"{self.sm.assignment_name}\"")
+        elif action == "tag_delete":
+            logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{self.sm.assignment_name}\"")
         return HttpResponse(status=204)
 
-    def tag_update(self, request):
-        old_tag_name = request.POST['old_tag_name'].strip()
-        new_tag_name = request.POST['new_tag_name'].strip()
-        assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        for assignment in assignment_models:
-            if new_tag_name in (assignment.tags or []):
-                return HttpResponse("alreadyExists")
-        for assignment in assignment_models:
-            for i, tag in enumerate(assignment.tags or []):
-                if tag == old_tag_name:
-                    assignment.tags[i] = new_tag_name
-                    assignment.save()
-                    break
-        logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
-        return HttpResponse(status=204)
-        
-    def tag_delete(self, request):
-        tag_name = request.POST['tag_name'].strip()
-        assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        for assignment in assignment_models:
-            if tag_name in (assignment.tags or []):
-                assignment.tags.remove(tag_name)
-                assignment.save()
-        logger.info(f"User \"{request.user}\" deleted tag \"{tag_name}\"")
-        return HttpResponse(status=204)
+    # Unused but I'll keep it here just in case
+
+    # def tag_update(self, request):
+    #     old_tag_name = request.POST['old_tag_name'].strip()
+    #     new_tag_name = request.POST['new_tag_name'].strip()
+    #     assignment_models = TimewebModel.objects.filter(user__username=request.user)
+    #     for assignment in assignment_models:
+    #         if new_tag_name in (assignment.tags or []):
+    #             return HttpResponse("alreadyExists")
+    #     for assignment in assignment_models:
+    #         for i, tag in enumerate(assignment.tags or []):
+    #             if tag == old_tag_name:
+    #                 assignment.tags[i] = new_tag_name
+    #                 assignment.save()
+    #                 break
+    #     logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
+    #     return HttpResponse(status=204)
 
 class ImagesView(LoginRequiredMixin, View):
     login_url = '/login/login/'

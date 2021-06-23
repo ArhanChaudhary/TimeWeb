@@ -26,10 +26,7 @@ $(function() {
         }
     }
     $(".assignment").click(function(e) {
-        // Runs the click function if
-        // The background of the assignment was clicked
-        // The footer wasn't clicked (to prevent accidental closing)
-        if (!["IMG", "CANVAS"].includes(e.target.tagName) && !$(e.target).parents(".graph-footer").length && !$(e.target).hasClass("graph-footer")) {
+        if ($(e.target).is(".status-message, .right-side-of-header, .relative-positioning-wrapper, .assignment, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) {
             let dom_assignment = $(this);
             let sa = utils.loadAssignmentData(dom_assignment);
             // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule

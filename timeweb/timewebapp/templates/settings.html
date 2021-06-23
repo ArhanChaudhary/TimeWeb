@@ -10,6 +10,7 @@
 {% endblock js %}
 
 {% block content %}
+{% comment %} Injects libraries for the color picker {% endcomment %}
 {{ form.media }}
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
@@ -37,9 +38,6 @@
             </tr>
         {% endfor %}
     </table>
-    {% for hidden in form.hidden_fields %}
-        {{ hidden }}
-    {% endfor %}
     <input type="button" value="Reset" id="reset-button">
     <input type="submit" value="Save">
 </form>

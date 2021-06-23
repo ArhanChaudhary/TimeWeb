@@ -285,7 +285,7 @@ $(function() {
                     dom_assignment.css("opacity", "0");
                     const assignment_container = dom_assignment.parents(".assignment-container");
                     // Animate height on assignment_container because it doesn't have a transition
-                    // Add +10 because of "padding: 5px 10px;"
+                    // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
                     assignment_container.animate({marginBottom: -(assignment_container.height()+10)}, 750, "easeOutCubic", function() {
                         // Remove assignment data from dat
                         dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
@@ -316,11 +316,11 @@ $(function() {
                 type: "POST",
                 data: data,
                 success: success,
-                error: function(response, exception) {
+                error: function() {
                     // If ajax failed, allow updating or deleting again and dequeue
                     dom_assignment.css("pointer-events", "auto");
                     $(document).dequeue();
-                    ajaxUtils.error(response, exception);
+                    ajaxUtils.error(...arguments);
                 }
             });
         }

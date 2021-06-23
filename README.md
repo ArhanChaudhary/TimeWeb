@@ -50,4 +50,8 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-9. go to http://localhost:8000/ and log in with your created user
+9. Go to http://localhost:8000/ and log in with your created user
+
+Tips for development:
+- Ensure your cache is updated if you modify a static file
+- Run "python manage.py makemigrations;python manage.py migrate" if you change the fields in models.py

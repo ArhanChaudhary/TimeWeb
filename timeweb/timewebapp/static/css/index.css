@@ -79,7 +79,7 @@ header.animate::after {
         -ms-transform: translateY(16px);
             transform: translateY(16px);
     right: -5px;
-    z-index: 1;
+    z-index: 100;
     position: absolute;
     background: rgb(155,155,155);
     display: block;
@@ -303,42 +303,208 @@ header.animate::after {
     margin-left: 18px;
 }
 .tags {
-    width: 100%;
     position: absolute;
     top: 2px;
+    white-space: nowrap;
+    font-size: min(10px, 0.7em);
 }
-.tag {
+.tag-wrapper {
     position: relative;
     display: inline-block;
     vertical-align: top;
-    padding: 0 8px;
+    padding: 0 5px;
     border: 1px solid black;
     border-radius: 10px;
-    font-size: min(10px, 0.7em);
-    background-color: white;
-}
-.tag-name {
-    transition: transform 0.15s ease-in-out;
+    opacity: 1;
+    margin-right: 3px;
+    background: linear-gradient(135deg, rgb(255,255,255) 0%, rgb(222,222,222) 100%);
+    transform-origin: right;
+    transition: margin-left 0.75s ease-in-out, opacity 0.7s linear, transform 0.5s linear 0.2s;
 }
 .tag-delete {
+    position: absolute;
     width: 8px;
     height: 8px;
+    top: 3px;
+    right: 3px;
     border-radius: 50%;
     background-color: black;
-    top: 3px;
-    right: 8px;
-    position: absolute;
+    cursor: pointer;
     opacity: 0;
-    transition: opacity 0.1s linear, transform 0.15s ease-in-out;
+    transition: opacity 0.1s linear;
 }
-.tag:hover .tag-name {
-    transform: translateX(-5px);
+.tag-add {
+    position: relative;
+    vertical-align: top;
+    display: inline-block;
+    top: 0;
+    width: 13px;
+    height: 13px;
+    border-radius: 10px;
+    background-color: rgb(231, 231, 231);
+    border: 1px dashed rgb(24, 24, 24);
+    cursor: pointer;
+    transition: width 0.25s ease-out;
 }
-.tag:hover .tag-delete {
-    transform: translateX(5px);
+.tag-add-text {
+    opacity: 0;
+    transition: opacity 0.2s linear;
+    text-align: right;
+    direction: rtl;
+    margin-right: 4px;
+    margin-left: 5px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.tag-name {
+    transition: margin-right 0.15s ease-in-out;
+}
+.tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
+    margin-right: 9px;
+}
+.tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
 }
-.x-icon-slash {
+.tag-add:hover, .tag-add.open-tag-add-box {
+    width: 57px;
+}
+.tag-add:hover .tag-add-text, .tag-add.open-tag-add-box .tag-add-text {
+    opacity: 1;
+}
+.tag-add-box {
+    display: block;
+    padding: 0 !important;
+    border: none;
+    white-space: normal;
+    width: 152px;
+    height: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 5px 1px rgba(170,170,170,0.65) !important;
+    transform-origin: top;
+    transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-10px) !important;
+    opacity: 0;
+    transition: transform 0.15s cubic-bezier(0.31, 1.15, 0.5, 1.2), opacity 0.1s linear;
+}
+.tag-add-box::after {
+    border-color: transparent transparent rgb(220,220,220) transparent !important;
+    bottom: 100% !important;
+}
+.tag-add.open-tag-add-box .tag-add-box {
+    transform: translateX(-50%) translateX(6px) !important;
+    opacity: 1;
+    height: unset;
+    overflow: visible;
+    border: 1px solid gray;
+}
+.tag-add-overflow-hidden-container {
+    overflow: hidden;
+    border-radius: 5px;
+}
+.tag-add-button {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    right: 0;
+    border-radius: 50%;
+    margin-top: 4px;
+    margin-right: 3px;
+    background-color: rgb(195,195,195);
+}
+.tag-add-button::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 4px 1px rgb(60, 60, 60);
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+}
+.tag-add-button:hover::after, .tag-add-button:focus::after {
+    opacity: 0.75;
+}
+.tag-add-button:focus {
+    outline: 0;
+}
+.tag-add-button.tag-add-red-box-shadow::after {
+    box-shadow: 0 0 4px 1px rgb(170, 0, 0);
+}
+
+
+
+
+.tag-add-plus {
+    background-color: rgb(65,65,65) !important;
+    height: 15px !important;
+}
+.tag-add-plus-second-slash {
+    transform: rotate(90deg);
+}
+.tag-add-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+    background-color: rgb(220,220,220);
+    padding: 10px 12px;
+    padding-right: 41px;
+}
+.tag-add-input:focus {
+    outline: 0;
+}
+
+.tag-add-selection-item {
+    position: relative;
+    padding: 6px 4px;
+}
+.tag-add-selection-item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: rgb(240, 240, 240);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(.29,.81,.37,.99);
+}
+.tag-add-selection-item:hover::after, .tag-add-selection-item:focus::after {
+    transform: none;
+}
+.tag-add-selection-item:focus {
+    outline: 0;
+}
+.tag-add-selection-item.checked::after {
+    background-color: lightblue;
+    transform: none;
+}
+.tag-add-selection-item:nth-child(n+4)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: calc(100% - 10px);
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+.tag-add-selection-item-name {
+    word-break: break-word;
+}
+.tag-add-checkbox {
+    -webkit-appearance: auto;
+}
+.tag-add-transition-disabler {
+    transition: none !important;
+}
+.icon-slash {
     top: 0;
     bottom: 0;
     right: 0;
@@ -354,6 +520,19 @@ header.animate::after {
 }
 .x-icon-second-slash {
     transform: rotate(-45deg);
+}
+.plus-first-slash {
+    right: unset;
+    left: 6px;
+    height: 9px;
+    background-color: black;
+}
+.plus-second-slash {
+    right: unset;
+    left: 6px;
+    height: 9px;
+    background-color: black;
+    transform: rotate(90deg);
 }
 .completion-time {
     white-space: nowrap;
@@ -654,11 +833,9 @@ label[for='id_ad']::after {
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 4;
+    z-index: 102;
     display: none;
 }
-
-
 #break-days-wrapper {
     display: -webkit-box;
     display: -ms-flexbox;

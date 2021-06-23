@@ -20,7 +20,7 @@ header {
     height: 70px;
     padding: 5px;
     position: absolute;
-    z-index: 2;
+    z-index: 101;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
 }
@@ -345,7 +345,7 @@ nav.open #nav-menu::after {
             box-shadow: none !important;
     border: 2px solid black;
     display: none;
-    cursor: auto;
+    cursor: pointer;
     text-align: left;
     padding: 5px 5px !important;
     color: black;
@@ -382,7 +382,6 @@ nav.open #nav-menu::after {
     position: absolute;
     border-width: 10px;
     border-style: solid;
-    cursor: pointer;
 }
 .info-button-text.info-right::after {
     content: "";
@@ -468,5 +467,5 @@ nav.open #nav-menu::after {
 }
 
 #changelog-container {
-    padding: 0 10px;
+    padding: 0 20px;
 }

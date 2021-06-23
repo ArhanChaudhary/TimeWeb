@@ -140,6 +140,143 @@ utils = {
                 }
             });
         },
+        addTagHandlers: function() {
+            const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
+            const tag_template = $("#tag-template").html();
+            $(".tag-add").click(tagAddClick);
+            function tagAddClick(e) {
+                const $this = $(this);
+                // Close add tag box if "Add Tag" is clicked again
+                if ($(e.target).parent().hasClass("tag-add") && $this.hasClass("open-tag-add-box")) {
+                    $this.removeClass("open-tag-add-box");
+                    return;
+                }
+                // Plus button was clicked
+                if ($(e.target).is(".tag-add-button, .tag-add-plus")) {
+                    const sa = utils.loadAssignmentData($this);
+                    let tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
+                        return $(this).text();
+                    }).toArray();
+                    const inputted_tag_name = $this.find(".tag-add-input").val().trim();
+                    if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!") {
+                        tag_names.push(inputted_tag_name);
+                    }
+                    if (!tag_names.length) return;
+                    tag_names = tag_names.filter(tag_name => !sa.tags.includes(tag_name));
+                    if (sa.tags.length + tag_names.length > max_number_tags) {
+                        $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
+                        $(this).find(".tag-add-input").val("Too Many Tags!");
+                        return;
+                    }
+                    const success = function() {
+                        // Add tags to dat locally
+                        sa.tags.push(...tag_names);
+                        // Close box and add tags visually
+                        $this.removeClass("open-tag-add-box");
+                        for (let tag_name of tag_names) {
+                            const tag = $(tag_template);
+                            tag.find(".tag-name").text(tag_name);
+                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-name", sa.assignment_name);
+                            tag.insertBefore($this);
+
+                            tag.addClass("tag-add-transition-disabler");
+                            // Need to use jquery to set css for marginLeft
+                            tag.css({
+                                marginLeft: -tag.outerWidth(true),
+                                opacity: "0",
+                                transform: "scale(0.6)",
+                            });
+                            tag[0].offsetHeight;
+                            tag.removeClass("tag-add-transition-disabler");
+                            tag.css({
+                                marginLeft: "",
+                                opacity: "",
+                                transform: "",
+                            });
+
+                            tag.prev().css("z-index", "1");
+                            tag.one("transitionend", function() {
+                                tag.prev().css("z-index", "");
+                            });
+                        }
+                    }
+                    
+                    // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
+                    if (ajaxUtils.disable_ajax || !tag_names.length) return success();
+                    const data = {
+                        csrfmiddlewaretoken: csrf_token,
+                        pk: sa.id,
+                        tag_names: tag_names,
+                        action: "tag_add",
+                    }
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        success: success,
+                        error: ajaxUtils.error,
+                    });
+                    return;
+                }
+                // Tag add textbox was selected or tags were selected
+                if ($this.hasClass("open-tag-add-box")) return;
+                $this.addClass("open-tag-add-box");
+                $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow");
+                $this.find(".tag-add-input").focus().val("");
+                $this.find(".tag-add-selection-item").remove();
+                const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
+                let allTags = [];
+                dat.forEach(sa => allTags.push(...sa.tags));
+                for (let tag of Array.from(new Set(allTags))) {
+                    const tag_add_selection_item = $(tag_add_selection_item_template);
+                    tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
+                    container_for_tags.append(tag_add_selection_item);
+                    tag_add_selection_item.click(function() {
+                        $(this).find(".tag-add-checkbox").prop("checked", !$(this).hasClass("checked"));
+                        $(this).toggleClass("checked");
+                    });
+                }
+            }
+            $(".tag-delete").click(tagDelete);
+            function tagDelete() {
+                const $this = $(this);
+                const tag_wrapper = $this.parents(".tag-wrapper");
+                tag_wrapper.addClass("keep-delete-open");
+                const sa = utils.loadAssignmentData($this);
+                const data = {
+                    csrfmiddlewaretoken: csrf_token,
+                    pk: sa.id,
+                    tag_names: [$this.attr("data-tag-deletion-name")],
+                    action: "tag_delete",
+                }
+                const success = function() {
+                    // Remove data locally from dat
+                    sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+                    // Transition the deletion
+                    // Need to use jquery to set css for marginLeft
+                    tag_wrapper.css({
+                        marginLeft: -tag_wrapper.outerWidth(true),
+                        opacity: "0",
+                        transform: "scale(0.6)",
+                    });
+                    tag_wrapper.prev().css("z-index", "1");
+                    tag_wrapper.one("transitionend", function() {
+                        tag_wrapper.prev().css("z-index", "");
+                        tag_wrapper.remove();
+                    });
+                    $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
+                }
+                if (ajaxUtils.disable_ajax) return success();
+                $.ajax({
+                    type: "POST",
+                    data: data,
+                    success: success,
+                    error: function() {
+                        tag_wrapper.removeClass("keep-delete-open");
+                        ajaxUtils.error(...arguments);
+                    }
+                });
+            }
+        },
         setKeybinds: function() {
             // Keybind
             utils.form_is_showing = false;
@@ -152,10 +289,17 @@ utils = {
                 }
             });
         },
-        setAssignmentHoverScale: function() {
+        setAssignmentScaleUtils: function() {
             // width * percent = width+10
             // percent = 1 + 10/width
+            $(window).resize(() => $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`));
             $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
+
+            // Fixes the tag add box going behind the below assignment on scale
+            const number_of_assignments = $(".assignment").length;
+            $(".assignment").each(function(index) {
+                $(this).css("z-index", number_of_assignments - index);
+            });
         },
         handleTutorialIntroduction: function() {
             if (first_login) {
@@ -212,8 +356,8 @@ utils = {
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
-    loadAssignmentData: function($assignment) {
-        return dat.find(assignment => assignment.assignment_name === $assignment.attr("data-assignment-name"));
+    loadAssignmentData: function($element_with_assignment_name_attribute) {
+        return dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
     },
     // Resolves a resolver promise function when automatic scrolling ends
     // Scrolling detected with $("main").scroll(scroll);
@@ -373,11 +517,11 @@ document.addEventListener("DOMContentLoaded", function() {
     setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
     utils.ui.setHideEstimatedCompletionTimeButton();
     utils.ui.setAdvancedClickHandlers();
+    utils.ui.addTagHandlers();
     ordering.deleteStarredAssignmentsListener();
     ordering.autofillAssignmentsListener();
     utils.ui.setKeybinds();
-    $(window).resize(utils.ui.setAssignmentHoverScale);
-    utils.ui.setAssignmentHoverScale();
+    utils.ui.setAssignmentScaleUtils();
     utils.ui.saveStatesOnClose();
     utils.ui.handleTutorialIntroduction();
 });

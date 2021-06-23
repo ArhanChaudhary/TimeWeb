@@ -72,6 +72,7 @@ app.yaml
 main.py
 sa-private-key.json
 env_variables.yaml
+updateinstructions.md
 gcldeployment.md
 original_favicon.png
 original_maskable_favicon.png
