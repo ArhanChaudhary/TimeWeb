@@ -21,7 +21,8 @@ WEEKDAYS = (
 )
 def default_works():
     return 0
-
+def default_tags():
+    return []
 class TimewebModel(models.Model):
     assignment_name = models.CharField(
         max_length=100,
@@ -92,6 +93,7 @@ class TimewebModel(models.Model):
         default=False,
     )
     tags = models.JSONField(
+        default=default_tags,
         null=True,
         blank=True,
     )

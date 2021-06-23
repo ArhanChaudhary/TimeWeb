@@ -469,8 +469,6 @@ class TimewebView(LoginRequiredMixin, View):
             return HttpResponseForbidden("This assignment isn't yours")
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
-            if not self.sm.tags:
-                self.sm.tags = []
             tag_names = [tag_name for tag_name in tag_names if tag_name not in self.sm.tags]
             if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponse("tooManyTags")
             self.sm.tags.extend(tag_names)
