@@ -497,6 +497,7 @@ dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
+    sa.tags = sa.tags || [];
 }
 ({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
