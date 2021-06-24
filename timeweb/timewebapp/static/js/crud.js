@@ -286,7 +286,9 @@ $(function() {
                     const assignment_container = dom_assignment.parents(".assignment-container");
                     // Animate height on assignment_container because it doesn't have a transition
                     // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
-                    assignment_container.animate({marginBottom: -(assignment_container.height()+10)}, 750, "easeOutCubic", function() {
+
+                    // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
+                    assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
                         // Remove assignment data from dat
                         dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
                         // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted

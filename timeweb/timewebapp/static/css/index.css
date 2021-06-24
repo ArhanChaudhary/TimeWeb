@@ -225,16 +225,15 @@ header.animate::after {
     font-size: 12px;
 }
 .shortcut-line-left {
-    width: calc(50% - 102px);
-    left: -5px;
+    width: calc(50% - 100px);
+    left: -7px;
     margin-top: 9px;
     border-top: 2px solid black;
     top: 2px;
     position: relative;
 }
 .shortcut-line-right {
-    width: calc(50% - 102px);
-    margin-right: -5px;
+    width: calc(50% - 107px);
     float: right;
     border-top: 2px solid black;
 }
@@ -250,18 +249,18 @@ header.animate::after {
     content: '';
     position: absolute;
     height: 100%;
-    left: 4px;
+    left: 2px;
     bottom: 0;
     border-left: 2px solid black;
 }
-.assignment-container.finished::before {
+.assignment-container.first-finished::before {
     height: calc(100% - 20px);
 }
 .assignment-container.last-incomplete-works::after, .assignment-container.last-finished::after {
     content: '';
     position: absolute;
-    width: 200px;
-    left: 4px;
+    width: 25px;
+    left: 2px;
     bottom: -1px;
     border-bottom: 2px solid black;
 }
