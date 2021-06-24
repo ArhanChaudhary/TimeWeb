@@ -287,7 +287,7 @@ priority = {
             }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === 1);
-            assignment_container.toggleClass("question-mark", status_value === 6);
+            assignment_container.toggleClass("incomplete-works", status_value === 6);
             let status_priority;
             if (status_value === 1) {
                 status_priority = -index;
@@ -356,8 +356,8 @@ priority = {
             }
         }));
         for (let sa of ordered_assignments) {
-            // originally sa[0] !== 6 && (sa[3] || $(".question-mark").length); if sa[3] is true then sa[0] !== 6;
-            const mark_as_done = !!(sa[3] || $(".question-mark").length && sa[0] !== 6);
+            // originally sa[0] !== 6 && (sa[3] || $(".incomplete-works").length); if sa[3] is true then sa[0] !== 6;
+            const mark_as_done = !!(sa[3] || $(".incomplete-works").length && sa[0] !== 6);
             const dom_assignment = $(".assignment").eq(sa[2]);
             let priority_percentage;
             if (sa[0] === 6) {
@@ -410,7 +410,7 @@ priority = {
         } else {
             $("#delete-starred-assignments").hide();
         }
-        if ($(".question-mark").length) {
+        if ($(".incomplete-works").length) {
             $("#autofill-work-done").show();
         } else {
             $("#autofill-work-done").hide();
@@ -428,7 +428,9 @@ priority = {
                 "margin-bottom": -($("#animate-in").height()+10), // +10 deals with margins
             });
         }
-        if ($(".question-mark").length) {
+        $(".finished").last().addClass("last-finished");
+        $(".incomplete-works").last().addClass("last-incomplete-works");
+        if ($(".incomplete-works").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css("margin-top", -23);
         } else if (!total) {

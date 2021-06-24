@@ -224,17 +224,46 @@ header.animate::after {
     vertical-align: top;
     font-size: 12px;
 }
-.shortcut-line-right {
-    width: calc(50% - 107px);
-    margin-top: 10px;
-    border-top: 1px solid black;
-    top: 1px;
+.shortcut-line-left {
+    width: calc(50% - 102px);
+    left: -5px;
+    margin-top: 9px;
+    border-top: 2px solid black;
+    top: 2px;
     position: relative;
 }
-.shortcut-line-left {
-    width: calc(50% - 107px);
+.shortcut-line-right {
+    width: calc(50% - 102px);
+    margin-right: -5px;
     float: right;
-    border-top: 1px solid black;
+    border-top: 2px solid black;
+}
+.shortcut-line-left::after {
+    content: '';
+    position: absolute;
+    border-left: 2px solid black;
+    top: -2px;
+    left: -1px;
+    height: 11px;
+}
+.assignment-container.incomplete-works::before, .assignment-container.finished::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    left: 4px;
+    bottom: 0;
+    border-left: 2px solid black;
+}
+.assignment-container.finished::before {
+    height: calc(100% - 20px);
+}
+.assignment-container.last-incomplete-works::after, .assignment-container.last-finished::after {
+    content: '';
+    position: absolute;
+    width: 200px;
+    left: 4px;
+    bottom: -1px;
+    border-bottom: 2px solid black;
 }
 .assignment-header {
     display: -webkit-box;
@@ -882,7 +911,7 @@ label[for='id_ad']::after {
     background-color: black;
     box-shadow: inset 0 0 0 1px white;
 }
-.shortcut-line-left.add-white-shadow, .shortcut-line-right.add-white-shadow {
+.shortcut-line-right.add-white-shadow, .shortcut-line-left.add-white-shadow {
     text-shadow: none;
     box-shadow: 0 0 0 1px white;
 }

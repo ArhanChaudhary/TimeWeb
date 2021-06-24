@@ -223,7 +223,6 @@ $(function() {
         }
     });
     if ("form_fields" in localStorage) {
-        
         // Restore form on refresh or invalid
         const pr_data = JSON.parse(localStorage.getItem("form_fields"));
         localStorage.removeItem('form_fields');
