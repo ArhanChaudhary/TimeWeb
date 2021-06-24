@@ -1077,7 +1077,7 @@ $(function() {
                         alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
                         alert("Now that you have finished reading this, check out the settings to set your preferences");
                         first_login = false;
-                        ajaxUtils.sendTutorialAjax();
+                        ajaxUtils.ajaxFinishedTutorial();
                     }, 200);
                 }
             }

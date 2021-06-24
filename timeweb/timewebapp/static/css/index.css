@@ -44,6 +44,9 @@ header.animate::after {
             transform: translateY(max(-400px, calc(-100% - 20px)));
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
+#introduction-message {
+    padding: 0 10px;
+}
 #assignments-header {
     padding: 0 10px;
     display: -webkit-box;
@@ -383,9 +386,9 @@ header.animate::after {
     overflow: hidden;
     box-shadow: 0 2px 5px 1px rgba(170,170,170,0.65) !important;
     transform-origin: top;
-    transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-10px) !important;
+    transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
     opacity: 0;
-    transition: transform 0.15s cubic-bezier(0.31, 1.15, 0.5, 1.2), opacity 0.1s linear;
+    transition: transform 0.15s cubic-bezier(0.31, 1.15, 0.5, 1.2), opacity 0.1s ease-out;
 }
 .tag-add-box::after {
     border-color: transparent transparent rgb(220,220,220) transparent !important;

@@ -38,6 +38,10 @@
             </tr>
         {% endfor %}
     </table>
+    {% comment %} Needs to be here to form.is_valid() isnt false {% endcomment %}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
     <input type="button" value="Reset" id="reset-button">
     <input type="submit" value="Save">
 </form>

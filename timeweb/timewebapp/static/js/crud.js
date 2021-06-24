@@ -24,7 +24,7 @@ function showForm(show_instantly=false) {
     }
     // Used in utils.js for handling the user typing "N" when showing the form via shift + N
     form_is_showing = true;
-    // Explained later
+    $("main").css("overflow", "hidden");
     replaceUnit();
 }
 function hideForm(hide_instantly=false) {
@@ -40,6 +40,7 @@ function hideForm(hide_instantly=false) {
     }
     // Used in utils.js for handling the user typing "N" when showing the form via shift + N
     form_is_showing = false;
+    $("main").css("overflow", "overlay");
 }
 // Replace fields with unit when unit is "Minute"
 function replaceUnit() {

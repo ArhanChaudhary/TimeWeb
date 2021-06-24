@@ -113,7 +113,6 @@ class SettingsForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "user": forms.HiddenInput(),
-            "first_login": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'warning_acceptance': forms.NumberInput(attrs={"min":"1","max":"100"}),
             'date_now': forms.HiddenInput(),

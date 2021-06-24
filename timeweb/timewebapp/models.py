@@ -162,7 +162,10 @@ class SettingsModel(models.Model):
         null=True,
         blank=True,
     )
-    first_login = models.BooleanField(default=True)
+    first_login = models.BooleanField(
+        default=True,
+        verbose_name=_('Enable Tutorial'),
+    )
     date_now = models.DateField(
         default=datetime.date.today
     )

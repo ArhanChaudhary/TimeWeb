@@ -129,16 +129,6 @@ utils = {
                 
                 All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`, 'prepend'
             ).css("left", -3);
-
-            $("#re-enable-tutorial").click(function() {
-                if (!first_login) {
-                    first_login = true;
-                    sessionStorage.removeItem("open_assignments");
-                    ajaxUtils.sendTutorialAjax();
-                    $(".assignment.open-assignment").click();
-                    utils.ui.handleTutorialIntroduction();
-                }
-            });
         },
         addTagHandlers: function() {
             const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
@@ -149,6 +139,17 @@ utils = {
                 // Close add tag box if "Add Tag" is clicked again
                 if ($(e.target).parent().hasClass("tag-add") && $this.hasClass("open-tag-add-box")) {
                     $this.removeClass("open-tag-add-box");
+                    const tag_add_box = $this.find(".tag-add-box");
+                    tag_add_box.css({
+                        height: "unset",
+                        overflow: "visible",
+                    });
+                    tag_add_box.one("transitionend", function() {
+                        tag_add_box.css({
+                            height: "",
+                            overflow: "",
+                        });
+                    });
                     return;
                 }
                 // Plus button was clicked
@@ -276,6 +277,11 @@ utils = {
                     }
                 });
             }
+            $(".tag-add").focusout(function() {
+                $(this).parents(".tag-add").removeClass("open-tag-add-box");
+            }).focusin(function() {
+                $(this).parents(".tag-add").addClass("open-tag-add-box");
+            });
         },
         setKeybinds: function() {
             // Keybind
@@ -294,12 +300,6 @@ utils = {
             // percent = 1 + 10/width
             $(window).resize(() => $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`));
             $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
-
-            // Fixes the tag add box going behind the below assignment on scale
-            const number_of_assignments = $(".assignment").length;
-            $(".assignment").each(function(index) {
-                $(this).css("z-index", number_of_assignments - index);
-            });
         },
         handleTutorialIntroduction: function() {
             if (first_login) {
@@ -309,7 +309,7 @@ utils = {
                 if (assignments_excluding_example.length) {
                     assignments_excluding_example.first().after("<span>Click your assignment<br></span>");
                 } else {
-                    $("#assignments-header").replaceWith("<span style=\"padding: 0 10px;\">Welcome to TimeWeb Beta! Thank you for your interest in using this app.<br><br>Create your first school or work assignment to get started</span>");
+                    $("#assignments-header").replaceWith('<div id="introduction-message"><div>Welcome to TimeWeb Beta! Thank you for your interest in using this app.</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container").hide();
                 }
             }
@@ -330,7 +330,7 @@ utils = {
                 if (!$("#form-wrapper .hidden").length) {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
-                // Bypass ajax timeout
+                // Send ajax before close if it's on timeout
                 if (ajaxUtils.data['assignments'].length) {
                     ajaxUtils.SendAttributeAjax();
                 }
@@ -429,12 +429,11 @@ ajaxUtils = {
             }
         }
     },
-    sendTutorialAjax: function() {
+    ajaxFinishedTutorial: function() {
         if (ajaxUtils.disable_ajax) return;
         const data = {
             'csrfmiddlewaretoken': csrf_token,
-            'action': 'change_first_login',
-            'first_login': first_login,
+            'action': 'finished_tutorial',
         }
         $.ajax({
             type: "POST",
@@ -444,7 +443,7 @@ ajaxUtils = {
     },
     SendAttributeAjaxWithTimeout: function(key, value, pk) {
         if (ajaxUtils.disable_ajax) return;
-        // Add key and values as the data being sent
+        // Add key and values to the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
         let sa;
         for (let iter_sa of ajaxUtils.data['assignments']) {

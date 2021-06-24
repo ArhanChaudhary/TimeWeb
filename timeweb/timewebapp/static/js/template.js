@@ -186,8 +186,11 @@ $(function() {
     $("#nav-about").click(() => alert("This has not yet been written")).css("text-decoration", "line-through");
     $("#account-settings").click(() => alert("Please contact me regarding your account settings"));
     // Deals with selecting the parent element when tabbing into the nav
-    $("#nav-items a, #nav-menu").focusout(() => $("nav").removeClass("open"));
-    $("#nav-items a, #nav-menu").focus(() => $("nav").addClass("open"));
+    $("nav").focusout(function() {
+        $(this).removeClass("open");
+    }).focusin(function() {
+        $(this).addClass("open");
+    });
 });
 // Info tooltip
 $.fn.info = function(facing,text,position) {

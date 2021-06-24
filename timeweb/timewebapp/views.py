@@ -195,8 +195,8 @@ class TimewebView(LoginRequiredMixin, View):
             return self.deleted_assignment(request)
         elif action == 'save_assignment':
             return self.saved_assignment(request)
-        elif action == 'change_first_login':
-            return self.changed_first_login(request)
+        elif action == 'finished_tutorial':
+            return self.finished_tutorial(request)
         elif action == 'update_date_now':
             return self.updated_date_now_and_example_assignment(request)
         elif action == "tag_add" or action == "tag_delete":
@@ -434,11 +434,11 @@ class TimewebView(LoginRequiredMixin, View):
                 pass
         return HttpResponse(status=204)
         
-    def changed_first_login(self, request):
+    def finished_tutorial(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
-        settings_model.first_login = request.POST['first_login'] == "true"
+        settings_model.first_login = False
         settings_model.save()
-        logger.info(f"User \"{request.user}\" changed their first login")
+        logger.info(f"User \"{request.user}\" finished their tutorial")
         return HttpResponse(status=204)
 
     def updated_date_now_and_example_assignment(self, request):

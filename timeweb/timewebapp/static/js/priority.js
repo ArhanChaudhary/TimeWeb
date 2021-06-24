@@ -50,10 +50,13 @@ priority = {
             total = 0,
             tomorrow_total = 0,
             has_autofilled = false;
+        const number_of_assignments = $(".assignment").length;
         $(".assignment").each(function(index) {
             // Direct copy of loading in data from graph.js
             // Changing this is definitely on my todo list
             const dom_assignment = $(this);
+            // Fixes the tag add box going behind the below assignment on scale
+            dom_assignment.css("z-index", number_of_assignments - index);
             let sa = utils.loadAssignmentData(dom_assignment);
             let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, break_days } = sa;
             ad = new Date(utils.formatting.parseDate(ad));
@@ -418,7 +421,7 @@ priority = {
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
-            // Needs to be after domswap or else "top" bugs about 
+            // Needs to be after domswap or else "top" bugs out 
             $("#animate-in").css({
                 "top": $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + 20, // Move to below the last assignment and add a 20px margin
                 "opacity": "0",
