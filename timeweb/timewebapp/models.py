@@ -28,7 +28,7 @@ class TimewebModel(models.Model):
         max_length=100,
         verbose_name=_('Name of this Assignment'),
     )
-    ad = models.DateField(
+    assignment_date = models.DateField(
         null=True,
         verbose_name=_('Date Assigned'),
     )

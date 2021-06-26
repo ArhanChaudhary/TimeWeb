@@ -38,7 +38,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             date_now = date_now.date()
         TimewebModel.objects.create(**{
             "assignment_name": example_assignment_name,
-            "ad": date_now.strftime("%Y-%m-%d"),
+            "assignment_date": date_now.strftime("%Y-%m-%d"),
             "x": (date_now + datetime.timedelta(30)).strftime("%Y-%m-%d"),
             "unit": "Page",
             "y": "400.00",
@@ -257,7 +257,7 @@ class TimewebView(LoginRequiredMixin, View):
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
             # Update model values
             self.sm.assignment_name = self.form.cleaned_data.get("assignment_name")
-            self.sm.ad = self.form.cleaned_data.get("ad")
+            self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
             self.sm.x = self.form.cleaned_data.get("x")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
@@ -274,20 +274,20 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             date_now = date_now.date()
         if self.created_assignment:
-            self.sm.blue_line_start = (date_now-self.sm.ad).days
+            self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
             if self.sm.blue_line_start < 0:
                 self.sm.blue_line_start = 0
             self.sm.dynamic_start = self.sm.blue_line_start
         else:
-            self.sm.blue_line_start = old_data.blue_line_start + (old_data.ad-self.sm.ad).days
-            if date_now < old_data.ad or self.sm.blue_line_start < 0:
+            self.sm.blue_line_start = old_data.blue_line_start + (old_data.assignment_date-self.sm.assignment_date).days
+            if date_now < old_data.assignment_date or self.sm.blue_line_start < 0:
                 self.sm.blue_line_start = 0 
         if not self.sm.funct_round:
             self.sm.funct_round = 1
         if self.sm.min_work_time != None:
             self.sm.min_work_time /= self.sm.ctime
         if not self.created_assignment:
-            removed_works_start = (self.sm.ad - old_data.ad).days - old_data.blue_line_start # translates x position on graph to 0 so that it can be used in accessing works
+            removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position on graph to 0 so that it can be used in accessing works
             if removed_works_start < 0:
                 removed_works_start = 0
 
@@ -319,7 +319,7 @@ class TimewebView(LoginRequiredMixin, View):
                 x_num = 1
             elif self.sm.break_days:
                 guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
-                assign_day_of_week = self.sm.ad.weekday()
+                assign_day_of_week = self.sm.assignment_date.weekday()
                 red_line_start_x = self.sm.blue_line_start
 
                 # set_mod_days()
@@ -338,18 +338,18 @@ class TimewebView(LoginRequiredMixin, View):
                         x_num = max(1, guess_x)
                         break
             # Make sure assignments arent finished by x_num
-            # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.ad)
-            if self.sm.ad < date_now:
-                # x_num = (date_now + timedelta(x_num) - self.sm.ad).days
-                # x_num = (date_now - self.sm.ad).days + x_num
-                # x_num += (date_now - self.sm.ad).days
-                x_num += (date_now - self.sm.ad).days
+            # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
+            if self.sm.assignment_date < date_now:
+                # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
+                # x_num = (date_now - self.sm.assignment_date).days + x_num
+                # x_num += (date_now - self.sm.assignment_date).days
+                x_num += (date_now - self.sm.assignment_date).days
             try:
-                self.sm.x = self.sm.ad + datetime.timedelta(x_num)
+                self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
             except OverflowError:
                 self.sm.x = datetime.datetime.max.date()
         else:
-            x_num = (self.sm.x - self.sm.ad).days
+            x_num = (self.sm.x - self.sm.assignment_date).days
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
                 if self.created_assignment:
@@ -361,7 +361,7 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             # If the reentered assign date cuts off some of the work inputs, adjust the work inputs accordingly
             removed_works_end = len(old_data.works) - 1
-            end_of_works = (self.sm.x - old_data.ad).days
+            end_of_works = (self.sm.x - old_data.assignment_date).days
 
             # If the reentered due date cuts off some of the work inputs, remove the work input for the last day because that must complete assignment
             if removed_works_end >= end_of_works:
@@ -455,7 +455,7 @@ class TimewebView(LoginRequiredMixin, View):
         days_since_example_ad = int(request.POST["days_since_example_ad"], 10)
         if days_since_example_ad > 0:
             example_assignment = get_object_or_404(TimewebModel, assignment_name=example_assignment_name, user__username=request.user)
-            example_assignment.ad += datetime.timedelta(days_since_example_ad)
+            example_assignment.assignment_date += datetime.timedelta(days_since_example_ad)
             example_assignment.x += datetime.timedelta(days_since_example_ad)
             example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")

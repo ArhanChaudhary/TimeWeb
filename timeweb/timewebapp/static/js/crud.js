@@ -116,7 +116,7 @@ $(function() {
         // Reentered form fields
         const form_data = [
             sa.assignment_name,
-            sa.ad,
+            sa.assignment_date,
             sa.x,
             sa.unit,
             +sa.y,

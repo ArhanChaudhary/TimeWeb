@@ -413,11 +413,11 @@ ajaxUtils = {
             if (example_assignment === undefined) {
                 data["days_since_example_ad"] = 0;
             } else {
-                const days_since_example_ad = utils.daysBetweenTwoDates(date_now, utils.formatting.parseDate(example_assignment.ad));
+                const days_since_example_ad = utils.daysBetweenTwoDates(date_now, utils.formatting.parseDate(example_assignment.assignment_date));
                 data["days_since_example_ad"] = days_since_example_ad;
-                const ad = new Date(utils.formatting.parseDate(example_assignment.ad));
-                ad.setDate(ad.getDate() + days_since_example_ad);
-                example_assignment.ad = utils.formatting.stringifyDate(ad);
+                const assignment_date = new Date(utils.formatting.parseDate(example_assignment.assignment_date));
+                assignment_date.setDate(assignment_date.getDate() + days_since_example_ad);
+                example_assignment.assignment_date = utils.formatting.stringifyDate(assignment_date);
                 const x = new Date(utils.formatting.parseDate(example_assignment.x));
                 x.setDate(x.getDate() + days_since_example_ad);
                 example_assignment.x = utils.formatting.stringifyDate(x);
@@ -499,8 +499,8 @@ if ( window.history.replaceState ) {
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 org_dat = dat.slice(0);
 for (let sa of dat) {
-    sa.ad = new Date(utils.formatting.parseDate(sa.ad));
-    sa.x = utils.daysBetweenTwoDates(utils.formatting.parseDate(sa.x), sa.ad);
+    sa.assignment_date = new Date(utils.formatting.parseDate(sa.assignment_date));
+    sa.x = utils.daysBetweenTwoDates(utils.formatting.parseDate(sa.x), sa.assignment_date);
     sa.y = +sa.y;
     sa.ctime = +sa.ctime;
     sa.funct_round = +sa.funct_round;

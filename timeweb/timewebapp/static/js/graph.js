@@ -37,7 +37,7 @@ class Assignment {
             this.sa.min_work_time = this.sa.funct_round * 2;
         }
         this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
-        this.assign_day_of_week = this.sa.ad.getDay();
+        this.assign_day_of_week = this.sa.assignment_date.getDay();
         if (this.sa.break_days.length) {
             this.mods = this.calcModDays();
         }
@@ -293,16 +293,16 @@ class VisualAssignment extends Assignment {
         this.fixed_graph = dom_assignment.find(".fixed-graph");
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
-        this.due_date = new Date(this.sa.ad.valueOf());
+        this.due_date = new Date(this.sa.assignment_date.valueOf());
         this.due_date.setDate(this.due_date.getDate() + this.sa.x);
-        if (this.sa.ad.getFullYear() === this.due_date.getFullYear()) {
+        if (this.sa.assignment_date.getFullYear() === this.due_date.getFullYear()) {
             this.date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {month: 'long', day: 'numeric'};
         } else {
             this.date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
         }
-        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.ad);
+        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         this.dom_assignment.find(".skew-ratio-textbox").attr({
             min: 1 - this.skew_ratio_lim,
             max: this.skew_ratio_lim - 1,
@@ -319,7 +319,7 @@ class VisualAssignment extends Assignment {
     resize() {
         // If date_now changes, redefine variables dependent on them
         // This also means works may change because of autofill in priority.js
-        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.ad);
+        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js
             this.red_line_start_x = this.sa.dynamic_start;
@@ -401,7 +401,7 @@ class VisualAssignment extends Assignment {
     static scale = window.devicePixelRatio || 2; // Resolution of every graph
     draw(x2, y2) {
         const len_works = this.sa.works.length - 1;
-        const lw = this.sa.works[len_works];
+        const last_work_input = this.sa.works[len_works];
         // && x2 is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && x2) {
             // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
@@ -435,7 +435,7 @@ class VisualAssignment extends Assignment {
             move_info_down = 0;
             let should_be_done_x = VisualAssignment.width - 155 + todo / this.sa.y * 146,
                 bar_move_left = should_be_done_x - VisualAssignment.width + 17;
-            if (bar_move_left < 0 || this.sa.x <= today_minus_ad || lw >= this.sa.y) {
+            if (bar_move_left < 0 || this.sa.x <= today_minus_ad || last_work_input >= this.sa.y) {
                 bar_move_left = 0
             } else if (should_be_done_x > VisualAssignment.width - 8) {
                 bar_move_left = VisualAssignment.width - 8;
@@ -471,9 +471,9 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
-            if (this.sa.x > today_minus_ad && lw < this.sa.y) {
-                screen.fillText(`Your Progress: ${Math.floor(lw/this.sa.y*100)}%`, VisualAssignment.width-81, VisualAssignment.height-68);
-                const done_x = VisualAssignment.width-153+lw/this.sa.y*144-bar_move_left;
+            if (this.sa.x > today_minus_ad && last_work_input < this.sa.y) {
+                screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, VisualAssignment.width-81, VisualAssignment.height-68);
+                const done_x = VisualAssignment.width-153+last_work_input/this.sa.y*144-bar_move_left;
                 screen.fillStyle = "white";
                 screen.fillRect(done_x, VisualAssignment.height-119, VisualAssignment.width-9-bar_move_left-done_x, 46);
                 if (should_be_done_x >= VisualAssignment.width - 153) {
@@ -547,7 +547,7 @@ class VisualAssignment extends Assignment {
             } else {
                 funct_mouse_x = precisionRound(this.funct(mouse_x), 6);
             }
-            let str_mouse_x = new Date(this.sa.ad);
+            let str_mouse_x = new Date(this.sa.assignment_date);
             str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
             str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
             if (this.wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`).width > VisualAssignment.width - 5) {
@@ -597,12 +597,12 @@ class VisualAssignment extends Assignment {
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(VisualAssignment.width-50)/2, row_height*y_pos);
         center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
-        if (lw < this.sa.y) {
-            todo -= lw;
+        if (last_work_input < this.sa.y) {
+            todo -= last_work_input;
             if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week+this.sa.blue_line_start+len_works) % 7)) {
                 todo = 0;
             }
-            let displayed_day = new Date(this.sa.ad.valueOf());
+            let displayed_day = new Date(this.sa.assignment_date.valueOf());
             displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
             const distance_today_from_displayed_day = this.today_minus_ad - this.sa.blue_line_start - len_works;
             let str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
@@ -619,7 +619,7 @@ class VisualAssignment extends Assignment {
             }
             str_day += ':';
             center(str_day, 3);
-            center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${lw + todo}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
+            center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${last_work_input + todo}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
             if (this.today_minus_ad < 0) {
                 center("This Assignment has Not Yet been Assigned", 6);
             } else if (distance_today_from_displayed_day > 0) {
@@ -627,7 +627,7 @@ class VisualAssignment extends Assignment {
                 center("Please Enter your Progress to Continue", 7);
             } else if (this.sa.break_days.includes((this.assign_day_of_week+this.sa.blue_line_start+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                 center("You have Completed your Work for Today", 6);
-            } else if (len_works && (lw - this.sa.works[len_works-1]) / warning_acceptance * 100 < this.funct(len_works + this.sa.blue_line_start) - this.sa.works[len_works-1]) {
+            } else if (len_works && (last_work_input - this.sa.works[len_works-1]) / warning_acceptance * 100 < this.funct(len_works + this.sa.blue_line_start) - this.sa.works[len_works-1]) {
                 center("!!! ALERT !!!", 6);
                 center("You are Behind Schedule!", 7);
             }
@@ -914,11 +914,11 @@ class VisualAssignment extends Assignment {
         // BEGIN Submit work button
         submit_work_button.click(() => {
             let len_works = this.sa.works.length - 1;
-            let lw = this.sa.works[len_works];
+            let last_work_input = this.sa.works[len_works];
             if (!work_input_button.val()) return;
-            if (lw >= this.sa.y) return alert("You have already finished this assignment");
+            if (last_work_input >= this.sa.y) return alert("You have already finished this assignment");
             if (this.today_minus_ad < this.sa.blue_line_start) return alert("Please wait until this is assigned");
-            let todo = this.funct(len_works + this.sa.blue_line_start + 1) - lw;
+            let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_button.val().trim().toLowerCase();
             switch (input_done) {
                 case "fin":
@@ -929,12 +929,12 @@ class VisualAssignment extends Assignment {
                     if (isNaN(input_done)) return alert("Value isn't a number or keyword");
                 }
             }
-            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + lw < this.sa.y) return alert("Your last work input must complete this assignment");
-            if (input_done + lw < 0) {
-                input_done = -lw;
+            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y) return alert("Your last work input must complete this assignment");
+            if (input_done + last_work_input < 0) {
+                input_done = -last_work_input;
             }
-            this.sa.works.push(input_done + lw);
-            // lw += input_done; No point in redefining lw since it's not used from here
+            this.sa.works.push(input_done + last_work_input);
+            // last_work_input += input_done; No point in redefining last_work_input since it's not used from here
             len_works++;
             if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 todo = 0;

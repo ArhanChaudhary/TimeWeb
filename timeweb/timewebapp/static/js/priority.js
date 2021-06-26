@@ -60,11 +60,11 @@ priority = {
             const sa = new VisualAssignment(dom_assignment);
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
-            let lw = sa.sa.works[len_works];
+            let last_work_input = sa.sa.works[len_works];
             sa.setParabolaValues();
             // Will document soon
-            let daysleft = utils.daysBetweenTwoDates(date_now, sa.sa.ad);
-                todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw;
+            let daysleft = utils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
+                todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
             const today_minus_dac = daysleft - sa.sa.blue_line_start;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
@@ -74,21 +74,21 @@ priority = {
             if (params.autofill_all_work_done && today_minus_dac > len_works && !params.do_not_autofill) {
                 const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                 for (i = 0; i < number_of_forgotten_days; i++) {
-                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw;
+                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                     has_autofilled = true;
                     if (len_works + sa.sa.blue_line_start === sa.sa.x) break; // Don't autofill past completion
-                    lw += Math.max(0, todo);
-                    sa.sa.works.push(lw);
+                    last_work_input += Math.max(0, todo);
+                    sa.sa.works.push(last_work_input);
                     len_works++;
                 }
                 if (has_autofilled) {
                     ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw; // Update this if loop ends
+                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                 }
             }
             let strdaysleft, status_value, status_message, status_image;
-            if (lw >= sa.sa.y) {
+            if (last_work_input >= sa.sa.y) {
                 status_image = "completely-finished";
                 status_message = 'You are Completely Finished with this Assignment';
                 dom_status_image.attr({
@@ -107,7 +107,7 @@ priority = {
                 if (daysleft === -1) {
                     strdaysleft = 'Assigned Tomorrow';
                 } else if (daysleft > -7) {
-                    strdaysleft = `Assigned on ${sa.sa.ad.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                    strdaysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
                 } else {
                     strdaysleft = `Assigned in ${-daysleft}d`;
                 }
@@ -116,11 +116,11 @@ priority = {
                 if (today_minus_dac > len_works && !params.do_not_autofill) {
                     const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                     for (i = 0; i < number_of_forgotten_days; i++) {
-                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw;
+                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                         const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.blue_line_start) % 7);
                         if (!autofill_this_loop || len_works + sa.sa.blue_line_start === sa.sa.x - 1) break;
                         has_autofilled = true;
-                        sa.sa.works.push(lw);
+                        sa.sa.works.push(last_work_input);
                         len_works++;
                         if (todo) {
                             sa.sa.dynamic_start = len_works + sa.sa.blue_line_start;
@@ -137,7 +137,7 @@ priority = {
                     if (has_autofilled) {
                         ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw; // Update this if loop ends
+                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                     }
                 }
                 let x1 = sa.sa.x - sa.red_line_start_x;
@@ -168,7 +168,7 @@ priority = {
                 } else {
                     status_value = 4;
                     display_format_minutes = true;
-                    if (len_works && (lw - sa.sa.works[len_works - 1]) / warning_acceptance * 100 < sa.funct(len_works + sa.sa.blue_line_start) - sa.sa.works[len_works - 1]) {
+                    if (len_works && (last_work_input - sa.sa.works[len_works - 1]) / warning_acceptance * 100 < sa.funct(len_works + sa.sa.blue_line_start) - sa.sa.works[len_works - 1]) {
                         status_image = 'warning';
                         dom_status_image.attr({
                             width: 7,
@@ -203,7 +203,7 @@ priority = {
                         status_value = 5;
                     }
                 } else if (daysleft < 7) {
-                    const due_date = new Date(sa.sa.ad.valueOf());
+                    const due_date = new Date(sa.sa.assignment_date.valueOf());
                     due_date.setDate(due_date.getDate() + sa.sa.x);
                     strdaysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {

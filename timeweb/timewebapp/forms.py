@@ -11,7 +11,7 @@ class TimewebForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             'assignment_name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
-            'ad': DateInput(),
+            'assignment_date': DateInput(),
             'x': DateInput(),
             'blue_line_start': forms.HiddenInput(),
             'skew_ratio': forms.HiddenInput(),
@@ -33,7 +33,7 @@ class TimewebForm(forms.ModelForm):
                 'max_length': _("This assignment's name is too long (>100 characters)"),
                 'invalid': _("This assignment's name is invalid"),
             },
-            'ad': {
+            'assignment_date': {
                 'required': _('You must enter an assignment date'),
                 'invalid': _('The assignment date is out of range or invalid'),
             },
@@ -82,7 +82,7 @@ class TimewebForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         x = cleaned_data.get("x")
-        ad = cleaned_data.get("ad")
+        assignment_date = cleaned_data.get("assignment_date")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
         try:
@@ -97,10 +97,10 @@ class TimewebForm(forms.ModelForm):
         except:
             pass
         try:
-            if x <= ad:
+            if x <= assignment_date:
                 self.add_error("x",
                     forms.ValidationError(_("The due date cannot be %(on_or_before)s the assignment date"),code='invalid',params={
-                        'on_or_before': "on" if x == ad else "before",
+                        'on_or_before': "on" if x == assignment_date else "before",
                     })
                 )
         except:
