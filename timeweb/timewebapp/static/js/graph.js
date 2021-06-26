@@ -12,1076 +12,1237 @@ This only runs on index.html
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 //
 
-$(function() {
-    // scale and font_size is the same for every graph
-    let scale = window.devicePixelRatio, // resolution of the graph
-        font_size, // font size of the central text in the graph
-        width, // Dimensions of each assignment
-        height; // Dimensions of each assignment
+class Assignment {
+    constructor(dom_assignment) {
+        this.sa = utils.loadAssignmentData(dom_assignment);
+        this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
+        this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.dif_assign]; // Y-coordinate of the start of the red line
+        // Not sure if these if stataments are actually needed but I included them in the original program, and there doesnt seem to be any harm
+        // Caps values
+        const y1 = this.sa.y - this.red_line_start_y;
+        if (this.sa.funct_round > y1) {
+            this.sa.funct_round = y1;
+        }
+        if (this.sa.min_work_time > y1) {
+            this.sa.min_work_time = y1;
+        }
+        // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
+        // Set it to 0 to pretend it isn't enabled for calculations in setParabolaValues()
+        if (this.sa.min_work_time <= this.sa.funct_round) {
+            this.sa.min_work_time = 0;
+        // Suppose funct_round is 4, min_work_time is 5, f(4) = 18, and f(5) = 23
+        // f(4) gets rounded to 20 and f(5) gets rounded to 24, violating the min_work_time of 5
+        // This fixes the problem
+        } else if (this.sa.funct_round < this.sa.min_work_time && this.sa.min_work_time < 2 * this.sa.funct_round) {
+            this.sa.min_work_time = this.sa.funct_round * 2;
+        }
+        this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
+        this.assign_day_of_week = this.sa.ad.getDay();
+        if (this.sa.break_days.length) {
+            this.mods = this.calcModDays();
+        }
+        this.skew_ratio_lim = this.calcSkewRatioLim();
+        if (this.sa.skew_ratio > this.skew_ratio_lim) {
+            this.sa.skew_ratio = this.skew_ratio_lim;
+        } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
+            this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+        }
+        this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
+    }
+    calcModDays() {
+        let mods = [0],
+            mod_counter = 0;
+        for (let mod_day = 0; mod_day < 6; mod_day++) {
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.red_line_start_x + mod_day) % 7)) {
+                mod_counter++;
+            }
+            mods.push(mod_counter);
+        }
+        return mods;
+    }
+    calcSkewRatioLim() {
+        const y1 = this.sa.y - this.red_line_start_y;
+        if (!y1) return 0;
+        let x1 = this.sa.x - this.red_line_start_x;
+        if (this.sa.break_days.length) {
+            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
+        }
+        /*
+        skew_ratio = (a + b) * x1 / y1;
+        skew_ratio = this.funct(1) * x1 / y1;
+        skew_ratio = (y1+min_work_time_funct_round) * x1 / y1;
+        */
+        return Math.round((y1 + this.min_work_time_funct_round) * x1 / y1 * 10)/10;
+    }
+    /* 
+    The red line for all of the assignments follow a parabola
+    The first part of the setParabolaValues() function calculates the a and b values, and the second part handles the minimum work time and return cutoffs
+    this.funct(n) returns the output of an^2 + bn (with no c variable because it is translated to go through the origin)
+    set_mod_days() helps integrate break days into the schedule 
+    */
+    setParabolaValues() {
+        /*
+        The purpose of this function is to calculate these seven variables:
+        a
+        b
+        cutoff_transition_value
+        cutoff_to_use_round
+        return_y_cutoff
+        return_0_cutoff
 
-    function PreventArrowScroll(e) {
+
+        This part calculates a, b, and skew_ratio
+
+        Three points are defined, one of which is (0,0), to generate a and b variables such that the parabola passes through all three of them
+        This works because there is a parabola that exists that passes through any three chosen points (with different x coordinates)
+        Notice how the parabola passes through the origin, meaning it does not use a c variable
+        If the start of the line is moved and doesn't pass through (0,0) anymore, translate the parabola back to the origin instead of using a c variable
+        Once the a and b variables are calculated, the assignment is retranslated accordingly
+
+        The second point is (x1,y1), where x1 is the amount of days and y1 is the amount of units
+
+        If set skew ratio is enabled, the third point is (x2,y2). skew_ratio will also be redefined
+        If set skew ratio isn't enabled, the third point is now (1,x1/y1 * skew_ratio)
+        Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
+        */
+        // Define (x1, y1) and translate both variables to (0,0)
+        let x1 = this.sa.x - this.red_line_start_x,
+            y1 = this.sa.y - this.red_line_start_y;
+        if (this.sa.break_days.length) {
+            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
+        }
+        // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+        this.a = y1 * (1 - this.sa.skew_ratio) / ((x1 - 1) * x1);
+        this.b = (y1 - x1 * x1 * this.a) / x1;
+        if (!Number.isFinite(this.a)) {
+            // If there was a zero division somewhere, where x2 === 1 or something else happened, make a line with the slope of y1
+            this.a = 0;
+            this.b = y1;
+            this.cutoff_transition_value = 0;
+            // Don't define cutoff_to_use_round because it will never be used if a = 0 and b = y1
+            this.return_y_cutoff = x1 ? 1 : 0;
+            this.return_0_cutoff = 0;
+            return;
+        }
+        if (this.a <= 0 || this.b > 0) {
+            var funct_zero = 0;
+        } else {
+            var funct_zero = precisionRound(-this.b / this.a, 10)
+        }
+        if (this.a >= 0) {
+            var funct_y = x1;
+        } else {
+            var funct_y = precisionRound((Math.sqrt(this.b * this.b + 4 * this.a * y1) - this.b) / this.a / 2, 10);
+        }
+        if (this.sa.funct_round < this.sa.min_work_time) {
+            this.cutoff_transition_value = 0;
+            if (this.a) {
+                this.cutoff_to_use_round = precisionRound((this.min_work_time_funct_round - this.b) / this.a / 2, 10) - 1e-10;
+                if (funct_zero < this.cutoff_to_use_round && this.cutoff_to_use_round < funct_y) {
+                    // Same thing as:
+                    // const prev_output = clamp(0, this.funct(Math.floor(this.cutoff_to_use_round)), this.sa.y)
+                    // const output = clamp(0, this.funct(Math.ceil(this.cutoff_to_use_round)), this.sa.y)
+                    const prev_output = Math.min(Math.max(
+                        this.funct(Math.floor(this.cutoff_to_use_round), false)
+                    , 0), this.sa.y),
+                        output = Math.min(Math.max(
+                            this.funct(Math.ceil(this.cutoff_to_use_round), false)
+                        , 0), this.sa.y);
+                    if (output - prev_output) {
+                        this.cutoff_transition_value = this.min_work_time_funct_round - output + prev_output;
+                    }
+                }
+            }
+        }
+        if (ignore_ends && this.sa.min_work_time) {
+            var y_value_to_cutoff = y1;
+        } else if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (funct_y < this.cutoff_to_use_round))) {
+            var y_value_to_cutoff = y1 - this.min_work_time_funct_round / 2;
+        } else {
+            var y_value_to_cutoff = y1 - this.min_work_time_funct_round + this.sa.funct_round / 2;
+        }
+        if (y_value_to_cutoff > 0 && this.sa.y > this.red_line_start_y && (this.a || this.b)) {
+            if (this.a) {
+                this.return_y_cutoff = (Math.sqrt(this.b * this.b + 4 * this.a * y_value_to_cutoff) - this.b) / this.a / 2;
+            } else {
+                this.return_y_cutoff = y_value_to_cutoff/this.b;
+            }
+            this.return_y_cutoff = precisionRound(this.return_y_cutoff, 10);
+        } else {
+            this.return_y_cutoff = 0;
+        }
+        if (this.return_y_cutoff < 2500) {
+            if (this.return_y_cutoff < 1) {
+                var output = 0;
+            } else {
+                // do ceil -1 instead of floor because ceil -1 is inclusive of ints; without this integer return cutoffs are glitchy
+                for (let n = Math.ceil(this.return_y_cutoff - 1); n > 0; n--) {
+                    var output = this.funct(n, false);
+                    if (output <= this.sa.y - this.min_work_time_funct_round) {
+                        break;
+                    }
+                    this.return_y_cutoff--;
+                }
+                if (this.return_y_cutoff <= 0) {
+                    this.return_y_cutoff++;
+                }
+            }
+            if (this.ignore_ends_mwt) {
+                const lower = [this.return_y_cutoff, this.sa.y - output];
+
+                let did_loop = false;
+                for (let n = Math.floor(this.return_y_cutoff + 1); n < x1; n++) {
+                    const pre_output = this.funct(n, false);
+                    if (pre_output >= this.sa.y) {
+                        break;
+                    }
+                    did_loop = true;
+                    output = pre_output;
+                    this.return_y_cutoff++;
+                }
+                if (did_loop) {
+                    const upper = [this.return_y_cutoff, this.sa.y - output];
+                    this.return_y_cutoff = [upper, lower][+(this.min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
+                }
+            }
+        }
+        if (ignore_ends && this.sa.min_work_time) {
+            var y_value_to_cutoff = 0;
+        } else if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (funct_zero < this.cutoff_to_use_round))) {
+            var y_value_to_cutoff = this.min_work_time_funct_round / 2;
+        } else {
+            var y_value_to_cutoff = this.min_work_time_funct_round - this.sa.funct_round / 2;
+        }
+
+        if (y_value_to_cutoff < y1 && this.sa.y > this.red_line_start_y && (this.a || this.b)) {
+            if (this.a) {
+                this.return_0_cutoff = (Math.sqrt(this.b * this.b + 4 * this.a * y_value_to_cutoff) - this.b) / this.a / 2;
+            } else {
+                this.return_0_cutoff = y_value_to_cutoff / this.b;
+            }
+            this.return_0_cutoff = precisionRound(this.return_0_cutoff, 10);
+        } else {
+            this.return_0_cutoff = 1;
+        }
+        if (x1 - this.return_0_cutoff < 2500) {
+            if (x1 - this.return_0_cutoff < 1) {
+                var output = 0;
+            } else {
+                for (let n = Math.ceil(this.return_0_cutoff); n < x1; n++) {
+                    var output = this.funct(n, false);
+                    if (output >= this.min_work_time_funct_round + this.red_line_start_y) {
+                        break;
+                    }
+                    this.return_0_cutoff++;
+                }
+                if (this.return_0_cutoff >= x1) {
+                    this.return_0_cutoff--;
+                }
+            }
+            if (this.ignore_ends_mwt) {
+                const upper = [this.return_0_cutoff, output];
+
+                let did_loop = false;
+                for (let n = Math.floor(this.return_0_cutoff); n > 0; n--) {
+                    const pre_output = this.funct(n, false);
+                    if (pre_output <= this.red_line_start_y) {
+                        break;
+                    }
+                    did_loop = true;
+                    var output = pre_output;
+                    this.return_0_cutoff--;
+                }
+                if (did_loop) {
+                    const lower = [this.return_0_cutoff, output];
+                    this.return_0_cutoff = [lower, upper][+(this.min_work_time_funct_round * 2 - upper[1] > lower[1])][0];
+                }
+            }
+        }
+    }
+    funct(x, translateX) {
+        if (translateX !== false) {
+            // Translate x coordinate 
+            x -= this.red_line_start_x;
+            if (this.sa.break_days.length) {
+                x -= Math.floor(x / 7) * this.sa.break_days.length + this.mods[x % 7];
+            }
+            if (x >= this.return_y_cutoff) return this.sa.y;
+            if (x <= this.return_0_cutoff) return this.red_line_start_y;
+        }
+        if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (x < this.cutoff_to_use_round))) {
+            // Get translated y coordinate
+            var output = this.min_work_time_funct_round * Math.round(x * (this.a * x + this.b) / this.min_work_time_funct_round);
+            if (this.a < 0) {
+                output += this.cutoff_transition_value;
+            } else {
+                output -= this.cutoff_transition_value;
+            }
+        } else {
+            var output = this.sa.funct_round * Math.round(x * (this.a * x + this.b) / this.sa.funct_round);
+        }
+        // Return untranslated y coordinate
+        // No point in untranslating x coordinate
+        return output + this.red_line_start_y;
+    }
+}
+class VisualAssignment extends Assignment {
+    constructor(dom_assignment) {
+        super(dom_assignment);
+        this.dom_assignment = dom_assignment;
+        this.graph = dom_assignment.find(".graph");
+        this.fixed_graph = dom_assignment.find(".fixed-graph");
+        this.set_skew_ratio_using_graph = false;
+        this.draw_mouse_point = true;
+        this.due_date = new Date(this.sa.ad.valueOf());
+        this.due_date.setDate(this.due_date.getDate() + this.sa.x);
+        if (this.sa.ad.getFullYear() === this.due_date.getFullYear()) {
+            this.date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
+            this.date_string_options_no_weekday = {month: 'long', day: 'numeric'};
+        } else {
+            this.date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
+            this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
+        }
+        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.ad);
+        this.dom_assignment.find(".skew-ratio-textbox").attr({
+            min: 1 - this.skew_ratio_lim,
+            max: this.skew_ratio_lim - 1,
+        });
+    }
+    calcSkewRatioLimVisually() {
+        const skew_ratio_lim = super.calcSkewRatioLim();
+        this.dom_assignment.find(".skew-ratio-textbox").attr({
+            min: 1 - skew_ratio_lim,
+            max: skew_ratio_lim - 1,
+        });
+        return skew_ratio_lim;
+    }
+    resize() {
+        // If date_now changes, redefine variables dependent on them
+        // This also means works may change because of autofill in priority.js
+        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.ad);
+        if (!this.sa.fixed_mode) {
+            // Use sa because dynamic_start is changed in priority.js
+            this.red_line_start_x = this.sa.dynamic_start;
+            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+            if (this.sa.break_days.length) {
+                mods = this.calcModDays();
+            }
+            this.skew_ratio_lim = this.calcSkewRatioLim();
+            this.setParabolaValues();
+        }
+        if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
+            // Static properties
+            VisualAssignment.width = this.fixed_graph.width();
+            VisualAssignment.height = this.fixed_graph.height();
+            if (VisualAssignment.width > 500) {
+                VisualAssignment.font_size = 13.9;
+            } else {
+                VisualAssignment.font_size = Math.round((VisualAssignment.width + 450) / 47 * 0.6875);
+            }
+            this.wCon = (VisualAssignment.width - 55) / this.sa.x;
+            this.hCon = (VisualAssignment.height - 55) / this.sa.y;
+            this.graph[0].width = VisualAssignment.width * VisualAssignment.scale;
+            this.graph[0].height = VisualAssignment.height * VisualAssignment.scale;
+            this.fixed_graph[0].width = VisualAssignment.width * VisualAssignment.scale;
+            this.fixed_graph[0].height = VisualAssignment.height * VisualAssignment.scale;
+            this.drawfixed();
+            this.draw();
+        }
+    }
+    mousemove(e) {
+        const x2 = e.pageX - this.fixed_graph.offset().left;
+        const y2 = e.pageY - this.fixed_graph.offset().top;
+        // If set skew ratio is enabled, make the third point (x2,y2)
+        if (this.set_skew_ratio_using_graph) {
+            let x1 = this.sa.x - this.red_line_start_x;
+            const y1 = this.sa.y - this.red_line_start_y;
+            if (this.sa.break_days.length) {
+                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
+            }
+            // (x2,y2) are the raw coordinates of the graoh
+            // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
+            let x2 = (x2 - 53.7) / this.wCon - this.red_line_start_x;
+            const y2 = (VisualAssignment.height - y2 - 44.5) / this.hCon - this.red_line_start_y;
+            // Handles break days
+            if (this.sa.break_days.length) {
+                const floorx2 = Math.floor(x2);
+                if (this.sa.break_days.includes((this.assign_day_of_week + floorx2 + this.red_line_start_x) % 7)) {
+                    x2 = floorx2;
+                }
+                x2 -= Math.floor(x2 / 7) * this.sa.break_days.length + this.mods[floorx2 % 7];
+            }
+            // If the mouse is outside the graph to the left or right, ignore it
+            // NOTE: x2 can be NaN from being outside of the graph caused by negative indexing by floorx2. Doesn't matter if this happens
+            if (0 < x2 & x2 < x1) {
+                // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
+                // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                this.a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
+                this.b = (y1 - x1 * x1 * this.a) / x1;
+
+                // Redefine skew ratio
+                this.sa.skew_ratio = (this.a + this.b) * x1 / y1;
+                // Cap skew ratio
+                if (this.sa.skew_ratio > this.skew_ratio_lim) {
+                    this.sa.skew_ratio = this.skew_ratio_lim;
+                } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
+                    this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+                } else if (Math.abs(this.sa.skew_ratio) % 1 < 0.05) {
+                    // Snap skew ratio to whole numbers
+                    this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
+                    // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                    this.a = y1 * (1 - this.sa.skew_ratio) / ((x1 - 1) * x1);
+                    this.b = (y1 - x1 * x1 * this.a) / x1;
+                }
+            }
+        }
+        // Passes mouse x and y coords so mouse point can be drawn
+        this.draw(x2, y2);
+    }
+    static scale = window.devicePixelRatio || 2; // Resolution of every graph
+    draw(x2, y2) {
+        const len_works = this.sa.works.length - 1;
+        const lw = this.sa.works[len_works];
+        // && x2 is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
+        if (this.draw_mouse_point && x2) {
+            // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
+            var mouse_x = Math.round((x2 - 53.7) / this.wCon),
+                mouse_y = (VisualAssignment.height - y2 - 44.5) / this.hCon;
+            if (mouse_x < Math.min(this.red_line_start_x, this.sa.dif_assign)) {
+                mouse_x = Math.min(this.red_line_start_x, this.sa.dif_assign);
+            } else if (mouse_x > this.sa.x) {
+                mouse_x = this.sa.x;
+            }
+            if (this.sa.dif_assign <= mouse_x && mouse_x <= len_works + this.sa.dif_assign) {
+                if (mouse_x < this.red_line_start_x) {
+                    mouse_y = true;
+                } else {
+                    mouse_y = Math.abs(mouse_y - this.funct(mouse_x)) > Math.abs(mouse_y - this.sa.works[mouse_x - this.sa.dif_assign]);
+                }
+            } else {
+                mouse_y = false;
+            }
+            if (!this.set_skew_ratio_using_graph && this.last_mouse_x === mouse_x && this.last_mouse_y === mouse_y) return;
+            this.last_mouse_x = mouse_x;
+            this.last_mouse_y = mouse_y;
+        }
+        this.setParabolaValues();
+        const screen = this.graph[0].getContext("2d");
+        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
+        screen.clearRect(0, 0, VisualAssignment.width, VisualAssignment.height);
+        let move_info_down,
+            todo = this.funct(len_works+this.sa.dif_assign+1);
+        if (show_progress_bar) {
+            move_info_down = 0;
+            let should_be_done_x = VisualAssignment.width - 155 + todo / this.sa.y * 146,
+                bar_move_left = should_be_done_x - VisualAssignment.width + 17;
+            if (bar_move_left < 0 || this.sa.x <= today_minus_ad || lw >= this.sa.y) {
+                bar_move_left = 0
+            } else if (should_be_done_x > VisualAssignment.width - 8) {
+                bar_move_left = VisualAssignment.width - 8;
+            }
+            // bar move left
+            screen.fillStyle = "rgb(55,55,55)";
+            screen.fillRect(VisualAssignment.width-155-bar_move_left, VisualAssignment.height-121,148,50);
+            screen.fillStyle = "lime";
+            screen.fillRect(VisualAssignment.width-153-bar_move_left, VisualAssignment.height-119,144,46);
+
+            screen.fillStyle = "rgb(0,128,0)";
+            const slash_x = VisualAssignment.width - 142 - bar_move_left;
+            screen.beginPath();
+            screen.moveTo(slash_x,VisualAssignment.height-119);
+            screen.lineTo(slash_x+15,VisualAssignment.height-119);
+            screen.lineTo(slash_x+52.5,VisualAssignment.height-73);
+            screen.lineTo(slash_x+37.5,VisualAssignment.height-73);
+            screen.fill();
+            screen.beginPath();
+            screen.moveTo(slash_x+35,VisualAssignment.height-119);
+            screen.lineTo(slash_x+50,VisualAssignment.height-119);
+            screen.lineTo(slash_x+87.5,VisualAssignment.height-73);
+            screen.lineTo(slash_x+72.5,VisualAssignment.height-73);
+            screen.fill();
+            screen.beginPath();
+            screen.moveTo(slash_x+70,VisualAssignment.height-119);
+            screen.lineTo(slash_x+85,VisualAssignment.height-119);
+            screen.lineTo(slash_x+122.5,VisualAssignment.height-73);
+            screen.lineTo(slash_x+107.5,VisualAssignment.height-73);
+            screen.fill();
+
+            screen.textAlign = "center";
+            screen.fillStyle = "black";
+            screen.font = '13.75px Open Sans';
+            screen.textBaseline = "top";
+            if (this.sa.x > today_minus_ad && lw < this.sa.y) {
+                screen.fillText(`Your Progress: ${Math.floor(lw/this.sa.y*100)}%`, VisualAssignment.width-81, VisualAssignment.height-68);
+                const done_x = VisualAssignment.width-153+lw/this.sa.y*144-bar_move_left;
+                screen.fillStyle = "white";
+                screen.fillRect(done_x, VisualAssignment.height-119, VisualAssignment.width-9-bar_move_left-done_x, 46);
+                if (should_be_done_x >= VisualAssignment.width - 153) {
+                    screen.fillStyle = "black";
+                    if (should_be_done_x > VisualAssignment.width - 17) {
+                        should_be_done_x = VisualAssignment.width - 17;
+                    }
+                    screen.rotate(Math.PI / 2);
+                    // Since rotate, swap x and y, make x negative
+                    screen.fillText("Goal", VisualAssignment.height-95, -should_be_done_x-14);
+                    screen.rotate(-Math.PI / 2);
+                    screen.fillStyle = "rgb(55,55,55)";
+                    screen.fillRect(should_be_done_x, VisualAssignment.height-119, 2, 46);
+                }
+            } else {
+                screen.fillText("Completed!", VisualAssignment.width-81-bar_move_left, VisualAssignment.height-68);
+            }
+        } else {
+            move_info_down = 72;
+        }
+        let radius = this.wCon / 3;
+        if (radius > 3) {
+            radius = 3;
+        } else if (radius < 2) {
+            radius = 2;
+        }
+        let circle_x,
+            circle_y,
+            line_end = this.sa.x + Math.ceil(1 / this.wCon);
+        screen.strokeStyle = "rgb(233,68,46)"; // red
+        screen.lineWidth = radius;
+        screen.beginPath();
+        for (let point = this.red_line_start_x; point < line_end; point += Math.ceil(1 / this.wCon)) {
+            circle_x = point * this.wCon + 50;
+            if (circle_x > VisualAssignment.width - 5) {
+                circle_x = VisualAssignment.width - 5;
+            }
+            circle_y = VisualAssignment.height - this.funct(point) * this.hCon - 50;
+            screen.lineTo(circle_x - (point === this.red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
+            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+            screen.moveTo(circle_x, circle_y);
+        }
+        screen.stroke();
+        screen.beginPath();
+        radius *= 0.75;
+        if (len_works + Math.ceil(1 / this.wCon) < line_end) {
+            line_end = len_works + Math.ceil(1 / this.wCon);
+        }
+        screen.strokeStyle = "rgb(1,147,255)"; // blue
+        screen.lineWidth = radius;
+        for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
+            circle_x = (point + this.sa.dif_assign) * this.wCon + 50;
+            if (point > len_works) {
+                circle_y = VisualAssignment.height - this.sa.works[len_works] * this.hCon - 50;
+            } else {
+                circle_y = VisualAssignment.height - this.sa.works[point] * this.hCon - 50;
+            }
+            screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
+            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+            screen.moveTo(circle_x, circle_y);
+        }
+        radius /= 0.75;
+        screen.stroke();
+        screen.textBaseline = "top";
+        screen.textAlign = "start";
+        screen.font = VisualAssignment.font_size + 'px Open Sans';
+        if (this.draw_mouse_point && x2) {
+            let funct_mouse_x;
+            if (mouse_y) {
+                funct_mouse_x = this.sa.works[mouse_x - this.sa.dif_assign];
+            } else {
+                funct_mouse_x = precisionRound(this.funct(mouse_x), 6);
+            }
+            let str_mouse_x = new Date(this.sa.ad);
+            str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
+            str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
+            if (this.wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`).width > VisualAssignment.width - 5) {
+                screen.textAlign = "end";
+            }
+            if (VisualAssignment.height - funct_mouse_x * this.hCon - 50 + screen.measureText(0).width * 2 > VisualAssignment.height - 50) {
+                screen.textBaseline = "bottom";
+            }
+            screen.fillStyle = "black";
+            screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x}) `, this.wCon * mouse_x + 50, VisualAssignment.height - funct_mouse_x * this.hCon - 50);
+            screen.fillStyle = "lime";
+            screen.strokeStyle = "lime";
+            screen.beginPath();
+            screen.arc(this.wCon * mouse_x + 50, VisualAssignment.height - funct_mouse_x * this.hCon - 50, radius, 0, 2 * Math.PI);
+            screen.stroke();
+            screen.fill();
+            screen.fillStyle = "black";
+        }
+        const rounded_skew_ratio = Math.round((this.sa.skew_ratio-1)*1000)/1000;
+        screen.textAlign = "end";
+        screen.fillStyle = "black";
+        screen.textBaseline = "top";
+        screen.font = '13.75px Open Sans';
+        screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", VisualAssignment.width-2, VisualAssignment.height-155+move_info_down);
+        screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, VisualAssignment.width-2, VisualAssignment.height-138+move_info_down);
+
+        const daysleft = this.sa.x - this.today_minus_ad;
+        let strdaysleft = '';
+        if (daysleft < -1) {
+            strdaysleft = ` (${-daysleft} Days Ago)`;
+        } else {
+            switch (daysleft) {
+                case -1:
+                    strdaysleft = " (Yesterday)";
+                    break
+                case 0:
+                    strdaysleft = " (Today)";
+                    break;
+                case 1:
+                    strdaysleft = " (Tomorrow)";
+                    break;
+            }
+        }
+        screen.textAlign = "center";
+        screen.textBaseline = "bottom";
+        screen.font = VisualAssignment.font_size + 'px Open Sans';
+        const row_height = screen.measureText(0).width * 2;
+        const center = (str, y_pos) => screen.fillText(str, 50+(VisualAssignment.width-50)/2, row_height*y_pos);
+        center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
+        if (lw < this.sa.y) {
+            todo -= lw;
+            if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week+this.sa.dif_assign+len_works) % 7)) {
+                todo = 0;
+            }
+            let displayed_day = new Date(this.sa.ad.valueOf());
+            displayed_day.setDate(displayed_day.getDate() + this.sa.dif_assign + len_works);
+            const distance_today_from_displayed_day = this.today_minus_ad - this.sa.dif_assign - len_works;
+            let str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
+            switch (distance_today_from_displayed_day) {
+                case -1:
+                    str_day += ' (Tomorrow)';
+                    break;
+                case 0:
+                    str_day += ' (Today)';
+                    break;
+                case 1:
+                    str_day += ' (Yesterday)';
+                    break;
+            }
+            str_day += ':';
+            center(str_day, 3);
+            center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${lw + todo}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
+            if (this.today_minus_ad < 0) {
+                center("This Assignment has Not Yet been Assigned", 6);
+            } else if (distance_today_from_displayed_day > 0) {
+                center("You haven't Entered your Work from Previous Days", 6);
+                center("Please Enter your Progress to Continue", 7);
+            } else if (this.sa.break_days.includes((this.assign_day_of_week+this.sa.dif_assign+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
+                center("You have Completed your Work for Today", 6);
+            } else if (len_works && (lw - this.sa.works[len_works-1]) / warning_acceptance * 100 < this.funct(len_works + this.sa.dif_assign) - this.sa.works[len_works-1]) {
+                center("!!! ALERT !!!", 6);
+                center("You are Behind Schedule!", 7);
+            }
+        } else {
+            center('You are Completely Finished with this Assignment!', 5);
+        }
+        screen.scale(1 / VisualAssignment.scale, 1 / VisualAssignment.scale);
+    }
+    drawfixed() {
+        const screen = this.fixed_graph[0].getContext("2d");
+        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
+        let gradient = screen.createLinearGradient(0, 0, 0, VisualAssignment.height * 4 / 3);
+        gradient.addColorStop(0, "white");
+        gradient.addColorStop(1, "lightgray");
+        screen.fillStyle = gradient;
+        screen.fillRect(0, 0, VisualAssignment.width, VisualAssignment.height * 4 / 3);
+
+        // x and y axis rectangles
+        screen.fillStyle = "rgb(185,185,185)";
+        screen.fillRect(40, 0, 10, VisualAssignment.height);
+        screen.fillRect(0, VisualAssignment.height - 50, VisualAssignment.width, 10);
+
+        // x axis label
+        screen.fillStyle = "black";
+        screen.textAlign = "center";
+        screen.font = '17.1875px Open Sans';
+        screen.fillText("Days", (VisualAssignment.width - 50) / 2 + 50, VisualAssignment.height - 5);
+
+        // y axis label
+        screen.rotate(Math.PI / 2);
+        if (this.unit_is_of_time) {
+            const plural = pluralize(this.sa.unit);
+            var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`,
+                label_x_pos = -2;
+        } else {
+            var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.ctime)} per ${pluralize(this.sa.unit,1)})`,
+                label_x_pos = -5;
+        }
+        if (screen.measureText(text).width > VisualAssignment.height - 50) {
+            text = pluralize(this,unit);
+        }
+        screen.fillText(text, (VisualAssignment.height - 50) / 2, label_x_pos);
+        screen.rotate(-Math.PI / 2);
+
+        screen.font = '13.75px Open Sans';
+        screen.textBaseline = "top";
+        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.x))) * Math.ceil(this.sa.x.toString()[0] / Math.ceil((VisualAssignment.width - 100) / 100));
+        if (this.sa.x >= 10) {
+            gradient = screen.createLinearGradient(0, 0, 0, VisualAssignment.height * 4 / 3);
+            gradient.addColorStop(0, "gainsboro");
+            gradient.addColorStop(1, "silver");
+            const small_x_axis_scale = x_axis_scale / 5,
+                label_index = screen.measureText(Math.floor(this.sa.x)).width * 1.25 < small_x_axis_scale * this.wCon;
+            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.x / small_x_axis_scale); smaller_index++) {
+                if (smaller_index % 5) {
+                    const displayed_number = smaller_index * small_x_axis_scale;
+                    screen.fillStyle = gradient; // Line color
+                    screen.fillRect(displayed_number * this.wCon + 48.5, 0, 2, VisualAssignment.height - 50); // Draws line index
+                    screen.fillStyle = "rgb(80,80,80)"; // Number color
+                    if (label_index) {
+                        const numberwidth = screen.measureText(displayed_number).width;
+                        let number_x_pos = displayed_number * this.wCon + 50;
+                        if (number_x_pos + numberwidth / 2 > VisualAssignment.width - 1) {
+                            number_x_pos = VisualAssignment.width - numberwidth / 2 - 1;
+                        }
+                        screen.fillText(displayed_number, number_x_pos, VisualAssignment.height - 39);
+                    }
+                }
+            }
+        }
+
+        screen.textBaseline = "alphabetic";
+        screen.textAlign = "right";
+        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((VisualAssignment.height - 100) / 100));
+        let font_size2 = 16.90625 - Math.ceil(this.sa.y - this.sa.y % y_axis_scale).toString().length * 1.71875;
+        if (this.sa.y >= 10) {
+            const small_y_axis_scale = y_axis_scale / 5;
+            if (font_size2 < 8.5) {
+                font_size2 = 8.5;
+            }
+            screen.font = font_size2 + 'px Open Sans';
+            const text_height = screen.measureText(0).width * 2,
+                label_index = text_height < small_y_axis_scale * this.hCon;
+            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
+                const displayed_number = smaller_index * small_y_axis_scale;
+                if (smaller_index % 5) {
+                    const gradient_percent = 1 - (displayed_number * this.hCon) / (VisualAssignment.height - 50);
+                    screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
+                    screen.fillRect(50, VisualAssignment.height - 51.5 - displayed_number * this.hCon, VisualAssignment.width - 50, 2);
+                    screen.fillStyle = "rgb(80,80,80)";
+                    if (label_index) {
+                        let number_y_pos = VisualAssignment.height - displayed_number * this.hCon - 54 + text_height / 2;
+                        if (number_y_pos < 4 + text_height / 2) {
+                            number_y_pos = 4 + text_height / 2;
+                        }
+                        if (38.5 - screen.measureText(displayed_number).width < 13 - label_x_pos) {
+                            screen.textAlign = "left";
+                            screen.fillText(displayed_number, 13 - label_x_pos, number_y_pos);
+                            screen.textAlign = "right";
+                        } else {
+                            screen.fillText(displayed_number, 38.5, number_y_pos);
+                        }
+                    }
+                }
+            }
+        }
+        font_size2 *= 1.2;
+        screen.font = font_size2 + 'px Open Sans';
+        const text_height = screen.measureText(0).width * 2;
+        for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
+            if (bigger_index * 2 < y_axis_scale) {
+                break;
+            }
+            screen.fillStyle = "rgb(205,205,205)";
+            screen.fillRect(50, VisualAssignment.height - bigger_index * this.hCon - 52.5, VisualAssignment.width - 50, 5);
+            screen.fillStyle = "black";
+            let number_y_pos = VisualAssignment.height - bigger_index * this.hCon - 54 + text_height / 2;
+            if (number_y_pos < 4 + text_height / 2) {
+                number_y_pos = 4 + text_height / 2;
+            }
+            if (38.5 - screen.measureText(bigger_index).width < 13 - label_x_pos) {
+                screen.textAlign = "left";
+                screen.fillText(bigger_index, 13 - label_x_pos, number_y_pos);
+                screen.textAlign = "right";
+            } else {
+                screen.fillText(bigger_index, 38.5, number_y_pos);
+            }
+        }
+        screen.fillText(0, 39, VisualAssignment.height - 52);
+
+        screen.textBaseline = "top";
+        screen.textAlign = "center";
+        screen.font = '16.5px Open Sans';
+        for (let bigger_index = Math.ceil(this.sa.x - this.sa.x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
+            screen.fillStyle = "rgb(205,205,205)";
+            screen.fillRect(bigger_index * this.wCon + 47.5, 0, 5, VisualAssignment.height - 50);
+            screen.fillStyle = "black";
+            const numberwidth = screen.measureText(bigger_index).width;
+            let number_x_pos = bigger_index * this.wCon + 50;
+            if (number_x_pos + numberwidth / 2 > VisualAssignment.width - 1) {
+                number_x_pos = VisualAssignment.width - numberwidth / 2 - 1;
+            }
+            screen.fillText(bigger_index, number_x_pos, VisualAssignment.height - 39);
+        }
+        screen.fillText(0, 55.5, VisualAssignment.height - 38.5);
+        if (this.today_minus_ad > -1 && this.today_minus_ad <= this.sa.x) {
+            let today_x = this.today_minus_ad*this.wCon+47.5;
+            screen.fillStyle = "rgb(150,150,150)";
+            screen.fillRect(today_x, 0, 5, VisualAssignment.height-50);
+            screen.fillStyle = "black";
+            screen.rotate(Math.PI / 2);
+            screen.textAlign = "center";
+            screen.textBaseline = "middle";
+            screen.font = '17.1875px Open Sans';
+            if (today_x > VisualAssignment.width - 12.5) {
+                today_x = VisualAssignment.width - 12.5;
+            }
+            screen.fillText("Today Line", (VisualAssignment.height-50)/2, -today_x-2.5);
+            screen.rotate(-Math.PI / 2);
+        }
+    }
+    static preventArrowScroll(e) {
         // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
             e.preventDefault();
         }
     }
-    $(".assignment").click(function(e) {
-        if ($(e.target).is(".status-message, .right-side-of-header, .relative-positioning-wrapper, .assignment, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) {
-            let dom_assignment = $(this);
-            let sa = utils.loadAssignmentData(dom_assignment);
-            // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
-            if (dom_assignment.hasClass("mark-as-done") && !sa.mark_as_done) {
-                $(".assignment").first().focus().parents(".assignment-container").animate({left: -5}, 75, "easeOutCubic", function() {
-                    $(this).animate({left: 5}, 75, "easeOutCubic", function() {
-                        $(this).animate({left: 0}, 75, "easeOutCubic");
-                    });
-                });
+    static changeSkewRatio() {
+        // Change skew ratio by +- 0.1 and cap it
+        if (this.pressed_arrow_key === "ArrowDown") {
+            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio - 0.1, 1);
+            if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
+                this.sa.skew_ratio = this.skew_ratio_lim;
+            }
+        } else {
+            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio + 0.1, 1);
+            if (this.sa.skew_ratio > this.skew_ratio_lim) {
+                this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+            }
+        }
+        this.setParabolaValues();
+        // Save skew ratio and draw
+        this.sa.skew_ratio = this.sa.skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
+        this.old_skew_ratio = this.sa.skew_ratio;
+        ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+        priority.sort();
+        this.draw();
+    }
+    setAssignmentEventListeners() {
+        const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
+                work_input_button = this.dom_assignment.find(".work-input-button"),
+                display_button = this.dom_assignment.find(".display-button"),
+                skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
+                submit_work_button = this.dom_assignment.find(".submit-work-button"),
+                hide_assignment_button = this.dom_assignment.find(".mark-as-finished-button"),
+                fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
+                delete_work_input_button = this.dom_assignment.find(".delete-work-input-button"),
+                next_assignment_button = this.dom_assignment.find(".next-assignment-button");
+        this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
+        $(window).resize(this.resize.bind(this));
+
+        // BEGIN Up and down arrow event handler
+        let graphtimeout,
+            fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
+            graphinterval;
+        $(document).keydown((e) => {
+            // fixed_graph.is(":visible") to make sure it doesnt change when the assignment is closed
+            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && this.fixed_graph.is(":visible")) {
+                const rect = this.fixed_graph[0].getBoundingClientRect();
+                // Makes sure graph is on screen
+                if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
+                    // "fired" makes .keydown fire only when a key is pressed, not repeatedly
+                    fired = true;
+                    this.pressed_arrow_key = e.key;
+                    VisualAssignment.changeSkewRatio();
+                    graphtimeout = setTimeout(function() {
+                        clearInterval(graphinterval);
+                        graphinterval = setInterval(VisualAssignment.changeSkewRatio.bind(this), 13);
+                    }, 500);
+                }
+            }
+        }).keyup((e) => {
+            // Ensures the same key pressed fires the keyup to stop change skew ratio
+            // Without this, you could press another key while the down arrow is being pressed for example and stop graphinterval
+            if (e.key === this.pressed_arrow_key) {
+                fired = false;
+                clearTimeout(graphtimeout);
+                clearInterval(graphinterval);
+            }
+        });
+        // END Up and down arrow event handler
+
+        // BEGIN Delete work input button
+        delete_work_input_button.click(() => {
+            let len_works = this.sa.works.length - 1;
+            if (!len_works) return;
+            this.sa.works.pop();
+            len_works--;
+
+            // If the deleted work input cut the dynamic start, run this
+            // Reverses the logic of work inputs in and recursively decreases red_line_start_x
+            if (this.red_line_start_x > len_works + this.sa.dif_assign) {
+                // The outer for loop decrements red_line_start_x if the inner for loop didn't break
+                outer: for (this.red_line_start_x = this.red_line_start_x - 2; this.red_line_start_x >= this.sa.dif_assign; this.red_line_start_x--) {
+                    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+                    if (this.sa.break_days.length) {
+                        this.mods = this.calcModDays();
+                    }
+                    this.skew_ratio_lim = this.calcSkewRatioLimVisually();
+                    this.setParabolaValues();
+                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+                    let next_funct = this.funct(this.red_line_start_x),
+                        next_work = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+                    for (let i = this.red_line_start_x; i < len_works + this.sa.dif_assign; i++) {
+                        const this_funct = next_funct,
+                            this_work = next_work;
+                        next_funct = this.funct(i + 1),
+                        next_work = this.sa.works[i - this.sa.dif_assign + 1];
+                        // When a day is found where the work input isn't the same as the red line for that red_line_start_x, break and then increase it by 1 to where it doesnt happen
+                        if (next_funct - this_funct !== next_work - this_work) {
+                            break outer;
+                        }
+                    }
+                }
+                // ++ for three cases:
+                // if for loop doesnt run, do ++ to fix red_line_start_x
+                // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
+                // if for loop doesnt find, do ++; cond was originally > dif_assign instead of >= dif_assign
+                this.red_line_start_x++;
+                this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+                if (this.sa.break_days.length) {
+                    this.mods = this.calcModDays();
+                }
+                this.skew_ratio_lim = this.calcSkewRatioLimVisually();
+                this.sa.dynamic_start = this.red_line_start_x;
+                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id)
+            }
+            ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
+            priority.sort({do_not_autofill: true}); // Don't autofill on delete work input because it'll just undo the delete in some cases
+            this.draw();
+        });
+        // END Delete work input button
+
+        // BEGIN Submit work button
+        submit_work_button.click(() => {
+            let len_works = this.sa.works.length - 1;
+            let lw = this.sa.works[len_works];
+            if (!work_input_button.val()) return;
+            if (lw >= this.sa.y) return alert("You have already finished this assignment");
+            if (this.today_minus_ad < this.sa.dif_assign) return alert("Please wait until this is assigned");
+            let todo = this.funct(len_works + this.sa.dif_assign + 1) - lw;
+            let input_done = work_input_button.val().trim().toLowerCase();
+            switch (input_done) {
+                case "fin":
+                    input_done = todo;
+                    break;
+                default: {
+                    input_done = +input_done;
+                    if (isNaN(input_done)) return alert("Value isn't a number or keyword");
+                }
+            }
+            if (len_works + this.sa.dif_assign === this.sa.x - 1 && input_done + lw < this.sa.y) return alert("Your last work input must complete this assignment");
+            if (input_done + lw < 0) {
+                input_done = -lw;
+            }
+            this.sa.works.push(input_done + lw);
+            // lw += input_done; No point in redefining lw since it's not used from here
+            len_works++;
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.dif_assign + len_works) % 7)) {
+                todo = 0;
+            }
+            if (input_done !== todo) {
+                if (len_works + this.sa.dif_assign === this.sa.x) {
+                    this.sa.dynamic_start = len_works + this.sa.dif_assign - 1; // If users enter a value >y on the last day dont change dynamic start
+                } else {
+                    this.sa.dynamic_start = len_works + this.sa.dif_assign;
+                }
+                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+                if (!this.sa.fixed_mode) {
+                    this.red_line_start_x = this.sa.dynamic_start;
+                    this.red_line_start_y = this.sa.works[this.sa.dynamic_start - this.sa.dif_assign];
+                    if (this.sa.break_days.length) {
+                        this.mods = this.calcModDays();
+                    }
+                    this.skew_ratio_lim = this.calcSkewRatioLimVisually();
+                    this.setParabolaValues();
+                }
+            }
+            ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
+            priority.sort();
+            this.draw();
+        });
+        // END Submit work button
+
+        // BEGIN Display button
+        display_button.click(() => {
+            alert("This feature has not yet been implented");
+        }).css("text-decoration", "line-through");
+        // END Display button
+
+        // BEGIN ignore button
+        hide_assignment_button.click(() => {
+            this.sa.mark_as_done = !this.sa.mark_as_done;
+            hide_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
+            ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
+            priority.sort({ ignore_timeout: true });
+        }).html(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
+        // END ignore button
+
+        // BEGIN Next assignment button
+        next_assignment_button.click(() => {
+            const next_assignment = this.dom_assignment.parents(".assignment-container").next().children(".assignment");
+            if (next_assignment.length && !next_assignment.hasClass("open-assignment")) {  
+                this.dom_assignment.click();
+                next_assignment.click();
+            }
+        });
+        // END Next assignment button
+
+        // BEGIN Set skew ratio using graph button
+        function cancel_set_skew_ratio_using_graph() {
+            skew_ratio_button.onlyText("Set skew ratio using graph");
+            this.set_skew_ratio_using_graph = false;
+            this.sa.skew_ratio = old_skew_ratio;
+            draw();
+            // No need to ajax since skew ratio is the same
+        }
+        let not_applicable_timeout_skew_ratio_button;
+        skew_ratio_button.click(() => {
+            let x1 = this.sa.x - this.red_line_start_x;
+            if (this.sa.break_days.length) {
+                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
+            }
+            if (x1 <= 1) {
+                skew_ratio_button.onlyText("Not Applicable");
+                clearTimeout(not_applicable_timeout_skew_ratio_button);
+                not_applicable_timeout_skew_ratio_button = setTimeout(function() {
+                    skew_ratio_button.onlyText("Set Skew Ratio using Graph");
+                }, 1000);
                 return;
             }
-            const graph_container = dom_assignment.find(".graph-container"),
-                    skew_ratio_button = dom_assignment.find(".skew-ratio-button"),
-                    work_input_button = dom_assignment.find(".work-input-button"),
-                    display_button = dom_assignment.find(".display-button"),
-                    skew_ratio_textbox = dom_assignment.find(".skew-ratio-textbox"),
-                    submit_work_button = dom_assignment.find(".submit-work-button"),
-                    hide_assignment_button = dom_assignment.find(".mark-as-finished-button"),
-                    fixed_mode_button = dom_assignment.find(".fixed-mode-button"),
-                    delete_work_input_button = dom_assignment.find(".delete-work-input-button"),
-                    next_assignment_button = dom_assignment.find(".next-assignment-button"),
-                    not_first_click = dom_assignment.data('not_first_click');
-            if (graph_container.attr("style") && dom_assignment.hasClass("open-assignment")) {
-                // Runs when assignment is clicked while open
-
-                // Animate the graph's margin bottom to close the assignment
-                graph_container.animate({
-                    marginBottom: -graph_container.height()
-                }, 750, "easeOutCubic", function() {
-                    // Hide graph when transition ends
-                    dom_assignment.css("overflow", "");
-                    graph_container.removeAttr("style")
-                    // Used in crud.js to resolve a promise to transition deleting the assignment
-                    .trigger("transitionend");
-                });
-                // Begin arrow animation
-                this.querySelector(".fallingarrowanimation").beginElement();
-                // Make assignment overflow hidden 
-                dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
-                // If no graphs are open, allow arrow scroll
-                if ($(".open-assignment").length === 0) {
-                    $(document).off("keydown", PreventArrowScroll);
+            skew_ratio_button.onlyText("(Click again to cancel)").one("click", cancel_set_skew_ratio_using_graph.bind(this));
+            // Turn off mousemove to ensure there is only one mousemove handler at a time
+            this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
+            this.set_skew_ratio_using_graph = true;
+        });
+        let old_skew_ratio = this.sa.skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
+        this.graph.click((e) => {
+            if (this.set_skew_ratio_using_graph) {
+                // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
+                this.set_skew_ratio_using_graph = false;
+                // stop set skew ratio if canvas is clicked
+                skew_ratio_button.onlyText("Set skew ratio using graph").off("click", cancel_set_skew_ratio_using_graph.bind(this));
+                old_skew_ratio = this.sa.skew_ratio;
+                ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+                // Disable mousemove if only skew ratio is running
+                if (!this.draw_mouse_point) {
+                    this.graph.off("mousemove");
+                }
+                priority.sort({ ignore_timeout: true });
+                this.draw();
+            } else if (this.draw_mouse_point) {
+                if (!isMobile) {
+                    // Runs if (!set_skew_ratio_using_graph && draw_mouse_point) and not on mobile
+                    // Disable draw point
+                    this.graph.off("mousemove");
+                    this.draw_mouse_point = false;
+                    delete this.last_mouse_x;
+                    this.draw();
                 }
             } else {
-                // If the assignment was clicked while it was closing, stop the closing animation and open it
-                graph_container.stop();
-                dom_assignment.css("overflow", "");
-                graph_container.css({
-                    "display": "",
-                    "margin-bottom": "",
-                });
-                // Prevents auto scroll if a graph is open
-                if ($(".open-assignment").length === 0) {
-                    $(document).keydown(PreventArrowScroll);
-                }
-                // Make graph visible
-                graph_container.css("display", "block");
-                let graph = this.querySelector('.graph'),
-                    fixed_graph = this.querySelector('.fixed-graph');
-                // Disable hover
-                dom_assignment.addClass("open-assignment");
-                // Animate arrow
-                this.querySelector(".risingarrowanimation").beginElement();
-                
-                let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, break_days } = sa;
-                // Type conversions
-                ad = new Date(utils.formatting.parseDate(ad));
-                x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x), ad);
-                y = +y;
-                // dif assign is already an int
-                skew_ratio = +skew_ratio;
-                ctime = +ctime;
-                funct_round = +funct_round;
-                // Converts min_work_time to int if string or null
-                min_work_time /= ctime;
-                // dynamic start is already an int
-                
-                let red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start, // X-coordinate of the start of the red line
-                    red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - dif_assign]; // Y-coordinate of the start of the red line
-                // Not sure if these if stataments are actually needed (except for the last one), but I included them in the original program, and there doesnt seem to be any harm
-                // Caps values
-                if (funct_round > y - red_line_start_y) {
-                    funct_round = y - red_line_start_y;
-                }
-                if (min_work_time > y - red_line_start_y) {
-                    min_work_time = y - red_line_start_y;
-                }
-                if (min_work_time <= funct_round) {
-                    min_work_time = 0;
-                // Suppose funct_round is 4, min_work_time is 5, f(4) = 18, and f(5) = 23
-                // f(4) gets rounded to 20 and f(5) gets rounded to 24, violating the min_work_time of 5
-                // This fixes the problem
-                } else if (funct_round < min_work_time && min_work_time < 2 * funct_round) {
-                    min_work_time = funct_round * 2;
-                }
-                const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
-                let len_works = sa.works.length - 1,
-                    lw = sa.works[len_works],
-                    ignore_ends_mwt = ignore_ends && min_work_time, // ignore_ends only when min_work_time is also enabled
-                    set_skew_ratio = false, // Bool to manually set skew ratio on graph
-                    unit_is_of_time = ["minute", "hour"].includes(pluralize(unit, 1).toLowerCase()),
-                    last_mouse_x,
-                    last_mouse_y,
-                    wCon,
-                    hCon;
-                // Due date
-                let due_date = new Date(ad.valueOf());
-                due_date.setDate(due_date.getDate() + x);
-                // Enable draw_point by default, which determines whether to draw the point on the graph
-                let draw_point = true;
-                // Handles break days, explained later
-                let mods,
-                    assign_day_of_week = ad.getDay(); // Used with mods
-                if (break_days.length) {
-                    mods = c_calc_mod_days();
-                }
-                // Sets the upper and lower caps for skew_ratio
-                let skew_ratio_lim;
-                set_skew_ratio_lim();
-                if (skew_ratio > skew_ratio_lim) {
-                    skew_ratio = skew_ratio_lim;
-                } else if (skew_ratio < 2 - skew_ratio_lim) {
-                    skew_ratio = 2 - skew_ratio_lim;
-                }
-                // Whether or not to display the year
-                let date_string_options, date_string_options_no_weekday;
-                if (ad.getFullYear() === due_date.getFullYear()) {
-                    date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
-                    date_string_options_no_weekday = {month: 'long', day: 'numeric'};
-                } else {
-                    date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
-                    date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
-                }
-                let date_assignment_created = new Date(ad.valueOf());
-                date_assignment_created.setDate(date_assignment_created.getDate() + dif_assign);
-                // Days between today and date_assignment_created
-                let today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created),
-                    // Days between today and the assignment date
-                    today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
-                let a, b, /* skew_ratio has already been declared */ cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
-                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                function c_pset(x2, y2) {
-                    const context = {
-                        x: x,
-                        y: y,
-                        break_days: break_days,
-                        assign_day_of_week: assign_day_of_week,
-                        funct_round: funct_round,
-                        min_work_time: min_work_time,
-                        min_work_time_funct_round: min_work_time_funct_round,
-                        ignore_ends_mwt: ignore_ends_mwt,
-
-                        wCon: wCon,
-                        hCon: hCon,
-                        skew_ratio_lim: skew_ratio_lim,
-                        height: height,
-                        set_skew_ratio: set_skew_ratio,
-                        red_line_start_x: red_line_start_x,
-                        red_line_start_y: red_line_start_y,
-                        skew_ratio: skew_ratio,
-                        mods: mods,
-                    }
-                    return pset(context, x2, y2);
-                }
-                function c_funct(n, translate) {
-                    const context = {
-                        red_line_start_x: red_line_start_x,
-                        mods: mods,
-                        return_y_cutoff: return_y_cutoff,
-                        y: y,
-                        break_days: break_days,
-                        return_0_cutoff: return_0_cutoff,
-                        red_line_start_y: red_line_start_y,
-                        funct_round: funct_round,
-                        min_work_time: min_work_time,
-                        min_work_time_funct_round: min_work_time_funct_round,
-                        a: a,
-                        b: b,
-                        cutoff_to_use_round: cutoff_to_use_round,
-                        cutoff_transition_value: cutoff_transition_value,
-                    }
-                    return funct(n, context, translate);
-                }
-                function c_calc_mod_days() {
-                    const context = {
-                        break_days: break_days,
-                        assign_day_of_week: assign_day_of_week, 
-                        red_line_start_x: red_line_start_x
-                    }
-                    return calc_mod_days(context);
-                }
-                
-                function set_skew_ratio_lim() {
-                    const y1 = y - red_line_start_y;
-                    if (!y1) {
-                        skew_ratio_lim = 0;
-                    } else {
-                        let x1 = x - red_line_start_x;
-                        if (break_days.length) {
-                            x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7];
-                        }
-                        /*
-                        skew_ratio = (a + b) * x1 / y1;
-                        skew_ratio = funct(1) * x1 / y1;
-                        skew_ratio = (y1+min_work_time_funct_round) * x1 / y1;
-                        */
-                        skew_ratio_lim = Math.round((y1 + min_work_time_funct_round) * x1 / y1 * 10)/10;
-                    }
-                    skew_ratio_textbox.attr({
-                        min: 1 - skew_ratio_lim,
-                        max: skew_ratio_lim - 1,
-                    });
-                }
-                //
-                // Draw graph
-                //
-                function draw(x2 = false, y2 = false) {
-                    const actually_draw_point = draw_point && x2 !== false;
-                    if (actually_draw_point) {
-                        // Cant pass in mouse_x and mouse_y as x2 and y2 because mouse_y becomes a bool
-                        // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-                        var mouse_x = Math.round((x2 - 53.7) / wCon),
-                            mouse_y = (height - y2 - 44.5) / hCon;
-                        if (mouse_x < Math.min(red_line_start_x, dif_assign)) {
-                            mouse_x = Math.min(red_line_start_x, dif_assign);
-                        } else if (mouse_x > x) {
-                            mouse_x = x;
-                        }
-                        if (dif_assign <= mouse_x && mouse_x <= len_works + dif_assign) {
-                            if (mouse_x < red_line_start_x) {
-                                mouse_y = true;
-                            } else {
-                                mouse_y = Math.abs(mouse_y - c_funct(mouse_x)) > Math.abs(mouse_y - sa.works[mouse_x - dif_assign]);
-                            }
-                        } else {
-                            mouse_y = false;
-                        }
-                        if (!set_skew_ratio && last_mouse_x === mouse_x && last_mouse_y === mouse_y) {
-                            return;
-                        }
-                        last_mouse_x = mouse_x; last_mouse_y = mouse_y;
-                    }
-                    ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(x2, y2));
-
-                    const screen = graph.getContext("2d");
-                    screen.scale(scale, scale);
-                    screen.clearRect(0, 0, width, height);
-                    let move_info_down,
-                        todo = c_funct(len_works+dif_assign+1);
-                    if (show_progress_bar) {
-                        move_info_down = 0;
-                        let should_be_done_x = width - 155 + todo / y * 146,
-                            bar_move_left = should_be_done_x - width + 17;
-                        if (bar_move_left < 0 || x <= today_minus_ad || lw >= y) {
-                            bar_move_left = 0
-                        } else if (should_be_done_x > width - 8) {
-                            bar_move_left = width - 8;
-                        }
-                        // bar move left
-                        screen.fillStyle = "rgb(55,55,55)";
-                        screen.fillRect(width-155-bar_move_left,height-121,148,50);
-                        screen.fillStyle = "lime";
-                        screen.fillRect(width-153-bar_move_left,height-119,144,46);
-
-                        screen.fillStyle = "rgb(0,128,0)";
-                        const slash_x = width - 142 - bar_move_left;
-                        screen.beginPath();
-                        screen.moveTo(slash_x,height-119);
-                        screen.lineTo(slash_x+15,height-119);
-                        screen.lineTo(slash_x+52.5,height-73);
-                        screen.lineTo(slash_x+37.5,height-73);
-                        screen.fill();
-                        screen.beginPath();
-                        screen.moveTo(slash_x+35,height-119);
-                        screen.lineTo(slash_x+50,height-119);
-                        screen.lineTo(slash_x+87.5,height-73);
-                        screen.lineTo(slash_x+72.5,height-73);
-                        screen.fill();
-                        screen.beginPath();
-                        screen.moveTo(slash_x+70,height-119);
-                        screen.lineTo(slash_x+85,height-119);
-                        screen.lineTo(slash_x+122.5,height-73);
-                        screen.lineTo(slash_x+107.5,height-73);
-                        screen.fill();
-
-                        screen.textAlign = "center";
-                        screen.fillStyle = "black";
-                        screen.font = '13.75px Open Sans';
-                        screen.textBaseline = "top";
-                        if (x > today_minus_ad && lw < y) {
-                            screen.fillText(`Your Progress: ${Math.floor(lw/y*100)}%`, width-81, height-68);
-                            const done_x = width-153+lw/y*144-bar_move_left;
-                            screen.fillStyle = "white";
-                            screen.fillRect(done_x, height-119, width-9-bar_move_left-done_x, 46);
-                            if (should_be_done_x >= width - 153) {
-                                screen.fillStyle = "black";
-                                if (should_be_done_x > width - 17) {
-                                    should_be_done_x = width - 17;
-                                }
-                                screen.rotate(Math.PI / 2);
-                                // Since rotate, swap x and y, make x negative
-                                screen.fillText("Goal", height-95, -should_be_done_x-14);
-                                screen.rotate(-Math.PI / 2);
-                                screen.fillStyle = "rgb(55,55,55)";
-                                screen.fillRect(should_be_done_x, height-119, 2, 46);
-                            }
-                        } else {
-                            screen.fillText("Completed!", width-81-bar_move_left, height-68);
-                        }
-                    } else {
-                        move_info_down = 72;
-                    }
-                    let radius = wCon / 3;
-                    if (radius > 3) {
-                        radius = 3;
-                    } else if (radius < 2) {
-                        radius = 2;
-                    }
-                    let circle_x,
-                        circle_y,
-                        line_end = x + Math.ceil(1 / wCon);
-                    screen.strokeStyle = "rgb(233,68,46)"; // red
-                    screen.lineWidth = radius;
-                    screen.beginPath();
-                    for (let point = red_line_start_x; point < line_end; point += Math.ceil(1 / wCon)) {
-                        circle_x = point * wCon + 50;
-                        if (circle_x > width - 5) {
-                            circle_x = width - 5;
-                        }
-                        circle_y = height - c_funct(point) * hCon - 50;
-                        screen.lineTo(circle_x - (point === red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
-                        screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
-                        screen.moveTo(circle_x, circle_y);
-                    }
-                    screen.stroke();
-                    screen.beginPath();
-                    radius *= 0.75;
-                    if (len_works + Math.ceil(1 / wCon) < line_end) {
-                        line_end = len_works + Math.ceil(1 / wCon);
-                    }
-                    screen.strokeStyle = "rgb(1,147,255)"; // blue
-                    screen.lineWidth = radius;
-                    for (let point = 0; point < line_end; point += Math.ceil(1 / wCon)) {
-                        circle_x = (point + dif_assign) * wCon + 50;
-                        if (point > len_works) {
-                            circle_y = height - sa.works[len_works] * hCon - 50;
-                        } else {
-                            circle_y = height - sa.works[point] * hCon - 50;
-                        }
-                        screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
-                        screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
-                        screen.moveTo(circle_x, circle_y);
-                    }
-                    radius /= 0.75;
-                    screen.stroke();
-                    screen.textBaseline = "top";
-                    screen.textAlign = "start";
-                    screen.font = font_size + 'px Open Sans';
-                    if (actually_draw_point) {
-                        let funct_mouse_x;
-                        if (mouse_y) {
-                            funct_mouse_x = sa.works[mouse_x - dif_assign];
-                        } else {
-                            funct_mouse_x = precisionRound(c_funct(mouse_x), 6);
-                        }
-                        let str_mouse_x = new Date(ad);
-                        str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
-                        str_mouse_x = str_mouse_x.toLocaleDateString("en-US", date_string_options_no_weekday);
-                        if (wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(unit,1)}: ${funct_mouse_x})`).width > width - 5) {
-                            screen.textAlign = "end";
-                        }
-                        if (height - funct_mouse_x * hCon - 50 + screen.measureText(0).width * 2 > height - 50) {
-                            screen.textBaseline = "bottom";
-                        }
-                        screen.fillStyle = "black";
-                        screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(unit,1)}: ${funct_mouse_x}) `, wCon * mouse_x + 50, height - funct_mouse_x * hCon - 50);
-                        screen.fillStyle = "lime";
-                        screen.strokeStyle = "lime";
-                        screen.beginPath();
-                        screen.arc(wCon * mouse_x + 50, height - funct_mouse_x * hCon - 50, radius, 0, 2 * Math.PI);
-                        screen.stroke();
-                        screen.fill();
-                        screen.fillStyle = "black";
-                    }
-                    const rounded_skew_ratio = Math.round(1000*(skew_ratio-1))/1000;
-                    screen.textAlign = "end";
-                    screen.fillStyle = "black";
-                    screen.textBaseline = "top";
-                    screen.font = '13.75px Open Sans';
-                    screen.fillText(sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", width-2, height-155+move_info_down);
-                    screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, width-2, height-138+move_info_down);
-
-                    const daysleft = x - today_minus_ad;
-                    let strdaysleft = '';
-                    if (daysleft < -1) {
-                        strdaysleft = ` (${-daysleft} Days Ago)`;
-                    } else {
-                        switch (daysleft) {
-                            case -1:
-                                strdaysleft = " (Yesterday)";
-                                break
-                            case 0:
-                                strdaysleft = " (Today)";
-                                break;
-                            case 1:
-                                strdaysleft = " (Tomorrow)";
-                                break;
-                        }
-                    }
-                    screen.textAlign = "center";
-                    screen.textBaseline = "bottom";
-                    screen.font = font_size + 'px Open Sans';
-                    const row_height = screen.measureText(0).width * 2;
-                    const center = (str, y_pos) => screen.fillText(str, 50+(width-50)/2, row_height*y_pos);
-                    center(`Due Date: ${due_date.toLocaleDateString("en-US", date_string_options)}${strdaysleft}`, 1);
-                    if (lw < y) {
-                        todo -= lw;
-                        if (todo < 0 || break_days.includes((assign_day_of_week+dif_assign+len_works) % 7)) {
-                            todo = 0;
-                        }
-                        let displayed_day = new Date(date_assignment_created.valueOf());
-                        displayed_day.setDate(displayed_day.getDate() + len_works);
-                        const distance_today_from_displayed_day = today_minus_dac - len_works;
-                        let str_day = displayed_day.toLocaleDateString("en-US", date_string_options);
-                        switch (distance_today_from_displayed_day) {
-                            case -1:
-                                str_day += ' (Tomorrow)';
-                                break;
-                            case 0:
-                                str_day += ' (Today)';
-                                break;
-                            case 1:
-                                str_day += ' (Yesterday)';
-                                break;
-                        }
-                        str_day += ':';
-                        center(str_day, 3);
-                        center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${lw + todo}/${y} ${pluralize(unit,2)}`, 4);
-                        if (today_minus_ad < 0) {
-                            center("This Assignment has Not Yet been Assigned", 6);
-                        } else if (distance_today_from_displayed_day > 0) {
-                            center("You haven't Entered your Work from Previous Days", 6);
-                            center("Please Enter your Progress to Continue", 7);
-                        } else if (break_days.includes((assign_day_of_week+dif_assign+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
-                            center("You have Completed your Work for Today", 6);
-                        } else if (len_works && (lw - sa.works[len_works-1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works-1]) {
-                            center("!!! ALERT !!!", 6);
-                            center("You are Behind Schedule!", 7);
-                        }
-                    } else {
-                        center('You are Completely Finished with this Assignment!', 5);
-                    }
-                    screen.scale(1 / scale, 1 / scale);
-                }
-
-                function drawfixed() {
-                    let screen = fixed_graph.getContext("2d");
-                    screen.scale(scale, scale);
-
-                    // bg gradient
-                    let gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
-                    gradient.addColorStop(0, "white");
-                    gradient.addColorStop(1, "lightgray");
-                    screen.fillStyle = gradient;
-                    screen.fillRect(0, 0, width, height * 4 / 3);
-
-                    // x and y axis rectangles
-                    screen.fillStyle = "rgb(185,185,185)";
-                    screen.fillRect(40, 0, 10, height);
-                    screen.fillRect(0, height - 50, width, 10);
-
-                    // x axis label
-                    screen.fillStyle = "black";
-                    screen.textAlign = "center";
-                    screen.font = '17.1875px Open Sans';
-                    screen.fillText("Days", (width - 50) / 2 + 50, height - 5);
-
-                    // y axis label
-                    screen.rotate(Math.PI / 2);
-                    if (unit_is_of_time) {
-                        const plural = pluralize(unit);
-                        var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`,
-                            label_x_pos = -2;
-                    } else {
-                        var text = `${pluralize(unit)} (${utils.formatting.formatMinutes(ctime)} per ${pluralize(unit,1)})`,
-                            label_x_pos = -5;
-                    }
-                    if (screen.measureText(text).width > height - 50) {
-                        text = pluralize(unit);
-                    }
-                    screen.fillText(text, (height - 50) / 2, label_x_pos);
-                    screen.rotate(-Math.PI / 2);
-
-                    screen.font = '13.75px Open Sans';
-                    screen.textBaseline = "top";
-                    const x_axis_scale = Math.pow(10, Math.floor(Math.log10(x))) * Math.ceil(x.toString()[0] / Math.ceil((width - 100) / 100));
-                    if (x >= 10) {
-                        gradient = screen.createLinearGradient(0, 0, 0, height * 4 / 3);
-                        gradient.addColorStop(0, "gainsboro");
-                        gradient.addColorStop(1, "silver");
-                        const small_x_axis_scale = x_axis_scale / 5,
-                            label_index = screen.measureText(Math.floor(x)).width * 1.25 < small_x_axis_scale * wCon;
-                        for (let smaller_index = 1; smaller_index <= Math.floor(x / small_x_axis_scale); smaller_index++) {
-                            if (smaller_index % 5) {
-                                const displayed_number = smaller_index * small_x_axis_scale;
-                                screen.fillStyle = gradient; // Line color
-                                screen.fillRect(displayed_number * wCon + 48.5, 0, 2, height - 50); // Draws line index
-                                screen.fillStyle = "rgb(80,80,80)"; // Number color
-                                if (label_index) {
-                                    const numberwidth = screen.measureText(displayed_number).width;
-                                    let number_x_pos = displayed_number * wCon + 50;
-                                    if (number_x_pos + numberwidth / 2 > width - 1) {
-                                        number_x_pos = width - numberwidth / 2 - 1;
-                                    }
-                                    screen.fillText(displayed_number, number_x_pos, height - 39);
-                                }
-                            }
-                        }
-                    }
-
-                    screen.textBaseline = "alphabetic";
-                    screen.textAlign = "right";
-                    const y_axis_scale = Math.pow(10, Math.floor(Math.log10(y))) * Math.ceil(y.toString()[0] / Math.ceil((height - 100) / 100));
-                    let font_size5 = 16.90625 - Math.ceil(y - y % y_axis_scale).toString().length * 1.71875;
-                    if (y >= 10) {
-                        const small_y_axis_scale = y_axis_scale / 5;
-                        if (font_size5 < 8.5) {
-                            font_size5 = 8.5;
-                        }
-                        screen.font = font_size5 + 'px Open Sans';
-                        const text_height = screen.measureText(0).width * 2,
-                            label_index = text_height < small_y_axis_scale * hCon;
-                        for (let smaller_index = 1; smaller_index <= Math.floor(y / small_y_axis_scale); smaller_index++) {
-                            const displayed_number = smaller_index * small_y_axis_scale;
-                            if (smaller_index % 5) {
-                                const gradient_percent = 1 - (displayed_number * hCon) / (height - 50);
-                                screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
-                                screen.fillRect(50, height - 51.5 - displayed_number * hCon, width - 50, 2);
-                                screen.fillStyle = "rgb(80,80,80)";
-                                if (label_index) {
-                                    let number_y_pos = height - displayed_number * hCon - 54 + text_height / 2;
-                                    if (number_y_pos < 4 + text_height / 2) {
-                                        number_y_pos = 4 + text_height / 2;
-                                    }
-                                    if (38.5 - screen.measureText(displayed_number).width < 13 - label_x_pos) {
-                                        screen.textAlign = "left";
-                                        screen.fillText(displayed_number, 13 - label_x_pos, number_y_pos);
-                                        screen.textAlign = "right";
-                                    } else {
-                                        screen.fillText(displayed_number, 38.5, number_y_pos);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    font_size5 *= 1.2;
-                    screen.font = font_size5 + 'px Open Sans';
-                    const text_height = screen.measureText(0).width * 2;
-                    for (let bigger_index = Math.ceil(y - y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
-                        if (bigger_index * 2 < y_axis_scale) {
-                            break;
-                        }
-                        screen.fillStyle = "rgb(205,205,205)";
-                        screen.fillRect(50, height - bigger_index * hCon - 52.5, width - 50, 5);
-                        screen.fillStyle = "black";
-                        let number_y_pos = height - bigger_index * hCon - 54 + text_height / 2;
-                        if (number_y_pos < 4 + text_height / 2) {
-                            number_y_pos = 4 + text_height / 2;
-                        }
-                        if (38.5 - screen.measureText(bigger_index).width < 13 - label_x_pos) {
-                            screen.textAlign = "left";
-                            screen.fillText(bigger_index, 13 - label_x_pos, number_y_pos);
-                            screen.textAlign = "right";
-                        } else {
-                            screen.fillText(bigger_index, 38.5, number_y_pos);
-                        }
-                    }
-                    screen.fillText(0, 39, height - 52);
-
-                    screen.textBaseline = "top";
-                    screen.textAlign = "center";
-                    screen.font = '16.5px Open Sans';
-                    for (let bigger_index = Math.ceil(x - x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
-                        screen.fillStyle = "rgb(205,205,205)";
-                        screen.fillRect(bigger_index * wCon + 47.5, 0, 5, height - 50);
-                        screen.fillStyle = "black";
-                        const numberwidth = screen.measureText(bigger_index).width;
-                        let number_x_pos = bigger_index * wCon + 50;
-                        if (number_x_pos + numberwidth / 2 > width - 1) {
-                            number_x_pos = width - numberwidth / 2 - 1;
-                        }
-                        screen.fillText(bigger_index, number_x_pos, height - 39);
-                    }
-                    screen.fillText(0, 55.5, height - 38.5);
-                    if (today_minus_ad > -1 && today_minus_ad <= x) {
-                        let today_x = today_minus_ad*wCon+47.5;
-                        screen.fillStyle = "rgb(150,150,150)";
-                        screen.fillRect(today_x, 0, 5, height-50);
-                        screen.fillStyle = "black";
-                        screen.rotate(Math.PI / 2);
-                        screen.textAlign = "center";
-                        screen.textBaseline = "middle";
-                        screen.font = '17.1875px Open Sans';
-                        if (today_x > width - 12.5) {
-                            today_x = width - 12.5;
-                        }
-                        screen.fillText("Today Line", (height-50)/2, -today_x-2.5);
-                        screen.rotate(-Math.PI / 2);
-                    }
-                }
-                // Sets event handlers only on the assignment's first click
-                if (!not_first_click) {
-                    // BEGIN Setup
-                    function mousemove(e) {
-                        const offset = $(fixed_graph).offset();
-                        if (set_skew_ratio) {
-                            ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset(e.pageX - offset.left, e.pageY - offset.top));
-                        }
-                        // Passes mouse x and y coords
-                        draw(e.pageX - offset.left, e.pageY - offset.top);
-                    }
-                    let x1 = x - red_line_start_x; // Amount of working days in the assignment
-                    if (break_days.length) {
-                        x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7]; // Handles break days, explained later
-                    }
-                    $(graph).off("mousemove").mousemove(mousemove); // Turn off mousemove to ensure there is only one mousemove handler at a time
-                    $(window).resize(resize);
-                    // END Setup
-
-                    // BEGIN Up and down arrow event handler
-                    function ChangeSkewRatio() {
-                        // Change skew ratio by +- 0.1 and cap it
-                        if (whichkey === "ArrowDown") {
-                            skew_ratio = precisionRound(skew_ratio - 0.1, 1);
-                            if (skew_ratio < 2 - skew_ratio_lim) {
-                                skew_ratio = skew_ratio_lim;
-                            }
-                        } else {
-                            skew_ratio = precisionRound(skew_ratio + 0.1, 1);
-                            if (skew_ratio > skew_ratio_lim) {
-                                skew_ratio = 2 - skew_ratio_lim;
-                            }
-                        }
-                        ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                        // Save skew ratio and draw
-                        sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                        old_skew_ratio = skew_ratio;
-                        ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
-                        priority.sort();
-                        draw();
-                    }
-                    let graphtimeout, // set the hold delay to a variable so it can be cleared key if the user lets go of it within 500ms
-                        fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
-                        graphinterval,
-                        whichkey;
-                    $(document).keydown(function(e) {
-                        // $(fixed_graph).is(":visible") to make sure it doesnt change when the assignment is closed
-                        // !$(document.activeElement).hasClass("skew-ratio-textbox") prevents double dipping
-                        if ((e.key === "ArrowUp" || e.key === "ArrowDown") && $(fixed_graph).is(":visible") && !$(document.activeElement).hasClass("skew-ratio-textbox")) {
-                            const rect = fixed_graph.getBoundingClientRect();
-                            // Makes sure graph is on screen
-                            if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
-                                // "fired" makes .keydown fire only when a key is pressed, not repeatedly
-                                fired = true;
-                                // Which key was pressed
-                                whichkey = e.key;
-                                // Change skew ratio
-                                ChangeSkewRatio();
-                                // Add delay to change skew ratio internal
-                                graphtimeout = setTimeout(function() {
-                                    clearInterval(graphinterval);
-                                    graphinterval = setInterval(ChangeSkewRatio, 13); // Changes skew ratio
-                                }, 500);
-                            }
-                        }
-                    });
-                    $(document).keyup(function(e) {
-                        if (e.key === whichkey) {
-                            // If the keyup was the same key that was just pressed stop change skew ratio
-                            fired = false;
-                            clearTimeout(graphtimeout);
-                            clearInterval(graphinterval);
-                        }
-                    });
-                    // END Up and down arrow event handler
-
-                    // BEGIN Delete work input button
-                    delete_work_input_button.click(function() {
-                        if (len_works > 0) {
-                            sa.works.pop();
-                            len_works--;
-                            lw = sa.works[len_works];
-
-                            // If the deleted work input cut the dynamic start, run this
-                            // Reverses the logic of work inputs in and recursively decreases red_line_start_x
-                            if (red_line_start_x > len_works + dif_assign) {
-                                // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                                outer: for (red_line_start_x = red_line_start_x - 2; red_line_start_x >= dif_assign; red_line_start_x--) {
-                                    red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                    if (break_days.length) {
-                                        mods = c_calc_mod_days();
-                                    }
-                                    set_skew_ratio_lim();
-                                    ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
-                                    let next_funct = c_funct(red_line_start_x),
-                                        next_work = sa.works[red_line_start_x - dif_assign];
-                                    for (let i = red_line_start_x; i < len_works + dif_assign; i++) {
-                                        const this_funct = next_funct,
-                                            this_work = next_work;
-                                        next_funct = c_funct(i + 1),
-                                        next_work = sa.works[i - dif_assign + 1];
-                                        // When a day is found where the work input isn't the same as the red line for that red_line_start_x, increase red_line_start_x back to where this doesnt happen and break
-                                        if (next_funct - this_funct !== next_work - this_work) {
-                                            break outer;
-                                        }
-                                    }
-                                }
-                                // ++ for three cases:
-                                // if for loop doesnt run, do ++ to fix red_line_start_x
-                                // if for loop finds, do ++
-                                // if for loop doesnt find, change > dif_assign to >= dif_assign and do ++
-                                red_line_start_x++;
-                                red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                if (break_days.length) {
-                                    mods = c_calc_mod_days();
-                                }
-                                set_skew_ratio_lim();
-                                sa.dynamic_start = red_line_start_x;
-                                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id)
-                            }
-                            ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                            priority.sort({do_not_autofill: true}); // Don't autofill on delete work input because it'll just undo the delete in some cases
-                            draw();
-                        }
-                    });
-                    // END Delete work input button
-
-                    // BEGIN Submit work button
-                    submit_work_button.click(function() {
-                        if (!work_input_button.val()) return;
-                        if (lw >= y) return alert("You have already finished this assignment");
-                        if (today_minus_dac < 0) return alert("Please wait until this is assigned");
-                        let todo = c_funct(len_works + dif_assign + 1) - lw;
-                        let input_done = work_input_button.val().trim().toLowerCase();
-                        switch (input_done) {
-                            case "fin":
-                                input_done = todo;
-                                break;
-                            default: {
-                                input_done = +input_done;
-                                if (isNaN(input_done)) {
-                                    return alert("Value isn't a number or keyword");
-                                }
-                            }
-                        }
-                        if (len_works + dif_assign === x - 1 && input_done + lw < y) {
-                            return alert("Your last work input must complete this assignment");
-                        }
-                        if (input_done + lw < 0) {
-                            input_done = -lw;
-                        }
-                        sa.works.push(input_done + lw);
-                        lw += input_done;
-                        len_works++;
-                        ;
-                        if (break_days.includes((assign_day_of_week + dif_assign + len_works) % 7)) {
-                            todo = 0;
-                        }
-                        if (input_done !== todo) {
-                            if (len_works + dif_assign === x) {
-                                sa.dynamic_start = len_works + dif_assign - 1; // If users enter a value >y on the last day dont change dynamic start
-                            } else {
-                                sa.dynamic_start = len_works + dif_assign;
-                            }
-                            ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
-                            if (!sa.fixed_mode) {
-                                red_line_start_x = sa.dynamic_start;
-                                red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
-                                if (break_days.length) {
-                                    mods = c_calc_mod_days();
-                                }
-                                set_skew_ratio_lim();
-                                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                            }
-                        }
-                        ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                        priority.sort();
-                        draw();
-                    });
-                    // END Submit work button
-
-                    // BEGIN Display button
-                    display_button.click(function() {
-                        alert("This feature has not yet been implented");
-                    }).css("text-decoration", "line-through");
-                    // END Display button
-
-                    // BEGIN ignore button
-                    hide_assignment_button.click(function() {
-                        sa.mark_as_done = !sa.mark_as_done;
-                        $(this).onlyText(sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
-                        ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
-                        priority.sort({ ignore_timeout: true });
-                    }).html(sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
-                    // END ignore button
-
-                    // BEGIN Next assignment button
-                    next_assignment_button.click(function() {
-                        const next_assignment = dom_assignment.parents(".assignment-container").next().children(".assignment");
-                        // Only close if next assignment exists
-                        if (next_assignment.length) {
-                            dom_assignment.click();
-                        }
-                        // Only open next assignment if closed
-                        if (!next_assignment.hasClass("open-assignment")) {     
-                            next_assignment.click();
-                        }
-                    });
-                    // END Next assignment button
-
-                    // BEGIN Set skew ratio using graph button
-                    let not_applicable_timeout2;
-                    skew_ratio_button.click(function() {
-                        if (x1 <= 1) {
-                            const $this = $(this);
-                            $this.onlyText("Not Applicable");
-                            clearTimeout(not_applicable_timeout2);
-                            not_applicable_timeout2 = setTimeout(function() {
-                                $this.onlyText("Set Skew Ratio using Graph"); // $(this) changes to window
-                            }, 1000);
-                            return;
-                        }
-                        $(this).onlyText("(Click again to cancel)").one("click", cancel_sr);
-                        // Turn off mousemove to ensure there is only one mousemove handler at a time
-                        $(graph).off("mousemove").mousemove(mousemove);
-                        set_skew_ratio = true;
-                    });
-                    let old_skew_ratio = skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
-                    $(graph).click(function(e) {
-                        if (set_skew_ratio) {
-                            // Runs if (set_skew_ratio && draw_point || set_skew_ratio && !draw_point)
-                            set_skew_ratio = false;
-                            // stop set skew ratio if canvas is clicked
-                            skew_ratio_button.onlyText("Set skew ratio using graph").off("click", cancel_sr);
-                            // Save skew ratio
-                            sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                            old_skew_ratio = skew_ratio;
-                            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
-                            // Disable mousemove if only skew ratio is running
-                            if (!draw_point) {
-                                $(this).off("mousemove");
-                            }
-                            priority.sort({ ignore_timeout: true });
-                            draw();
-                        } else if (draw_point) {
-                            if (!isMobile) {
-                                // Runs if (!set_skew_ratio && draw_point) and not on mobile
-                                // Disable draw point
-                                $(this).off("mousemove");
-                                draw_point = false;
-                                last_mouse_x = -1;
-                                draw();
-                            }
-                        } else {
-                            // Runs if (!set_skew_ratio && !draw_point)
-                            // Enable draw point
-                            draw_point = true;
-                            // Turn off mousemove to ensure there is only one mousemove handler at a time
-                            $(this).off("mousemove").mousemove(mousemove);
-                            // Pass in e because $.trigger makes e.pageX undefined
-                            mousemove(e);
-                        }
-                    });
-                    // Cancel set skew ratio
-                    function cancel_sr() {
-                        $(this).onlyText("Set skew ratio using graph");
-                        set_skew_ratio = false;
-                        skew_ratio = old_skew_ratio;
-                        draw();
-                        // No need to ajax since skew ratio is the same
-                    }
-                    // END Set skew ratio button using graph button
-
-                    // BEGIN Skew ratio textbox
-                    let not_applicable_timeout;
-                    skew_ratio_textbox.on("keydown paste click keyup", function() { // keydown for normal sr and keyup for delete
-                        if (old_skew_ratio === undefined) {
-                            // Sets old_skew_ratio
-                            old_skew_ratio = skew_ratio;
-                        }
-                        if (x1 <= 1) {
-                            const $this = $(this);
-                            $this.val('').attr("placeholder", "Not Applicable");
-                            clearTimeout(not_applicable_timeout);
-                            not_applicable_timeout = setTimeout(function() {
-                                $this.attr("placeholder", "Enter Skew Ratio"); // $(this) changes to window
-                            }, 1000);
-                        }
-                        if ($(this).val()) {
-                            // Sets and caps skew ratio
-                            // The skew ratio in the code is 1 more than the displayed skew ratio
-                            skew_ratio = +$(this).val() + 1;
-                            if (skew_ratio > skew_ratio_lim) {
-                                skew_ratio = 2 - skew_ratio_lim;
-                            } else if (skew_ratio < 2 - skew_ratio_lim) {
-                                skew_ratio = skew_ratio_lim;
-                            }
-                        } else {
-                            // Reset skew ratio to old value if blank
-                            skew_ratio = old_skew_ratio;
-                            old_skew_ratio = undefined;
-                        }
-                        draw();
-                    }).keypress(function(e) {
-                        // Saves skew ratio on enter
-                        if (e.key === "Enter") {
-                            // focusout event
-                            this.blur();
-                        }
-                    }).focusout(function() {
-                        $(this).val('');
-                        if (old_skew_ratio !== undefined) {
-                            // Save skew ratio
-                            sa.skew_ratio = skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
-                            old_skew_ratio = skew_ratio;
-                            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', skew_ratio, sa.id);
-                        }
-                        // Update old skew ratio
-                        old_skew_ratio = skew_ratio;
-                        priority.sort({ ignore_timeout: true });
-                    });
-                    // END Skew ratio textbox
-
-                    // BEGIN Fixed/dynamic mode button
-                    fixed_mode_button.click(function() {
-                        sa.fixed_mode = !sa.fixed_mode;
-                        $(this).onlyText(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                        ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', sa.fixed_mode, sa.id);
-                        if (sa.fixed_mode) {
-                            // Set start of red line and pset()
-                            red_line_start_x = 0;
-                            red_line_start_y = 0;
-                            ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                        } else {
-                            red_line_start_x = sa.dynamic_start;
-                            red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                            // No need to pset()
-                        }
-                        if (break_days.length) {
-                            mods = c_calc_mod_days();
-                        }
-                        priority.sort({ ignore_timeout: true });
-                        draw();
-                    }).html(sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-                    // END Fixed/dynamic mode button
-
-                    // BEGIN Info buttons
-                    skew_ratio_button.info("top", 
-                        `The skew ratio determines the work distribution of the graph
-
-                        Click this button and hover and click the graph`
-                    ).css("margin-right", 1);
-
-                    work_input_button.info("top",
-                        `Enter the number of units done on the graph's displayed date and submit
-                        
-                        Keyword: enter "fin" if you've completed an assignment's work for its displayed date`,"after"
-                    ).css({
-                        left: "calc(50% + 47px)",
-                        top: 3,
-                        position: "absolute",
-                    });
-
-                    fixed_mode_button.info("top",
-                        `Fixed mode:
-                        The red line always starts at the assignment date, meaning if you don't finish a day's work, you'll have to make it up on the next day
-                        This mode is recommended for discipline or if an assignment is important
-
-                        Dynamic mode (default):
-                        If you don't finish a day's work, the red line will readjust itself and adapt to your work schedule
-                        This mode is recommended if you can't keep up with an assignment's work schedule`, "prepend"
-                    ).css("left", -3).children(".info-button-text").css({
-                        fontSize: 11,
-                        lineHeight: "11px",
-                    });
-
-                    skew_ratio_textbox.info("top", 
-                        `The skew ratio determines the work distribution of the graph
-
-                        Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
-                    ).css({
-                        left: "calc(50% + 56px)",
-                        bottom: 37,
-                        position: "absolute",
-                    }).toggle($(".second-advanced-button").is(":visible")); // Initially hide this for "Advanced Options"
-                    // END Info buttons
-                }
-                function resize() {
-                    // If autofilled by $(window).trigger("resize")
-                    len_works = sa.works.length - 1;
-                    lw = sa.works[len_works];
-                    // If date_now is redefined
-                    today_minus_dac = utils.daysBetweenTwoDates(date_now, date_assignment_created);
-                    today_minus_ad = utils.daysBetweenTwoDates(date_now, ad);
-                    if (!sa.fixed_mode) {
-                        red_line_start_x = sa.dynamic_start;
-                        red_line_start_y = sa.works[sa.dynamic_start - dif_assign];
-                        if (break_days.length) {
-                            mods = c_calc_mod_days();
-                        }
-                        set_skew_ratio_lim();
-                        ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                    }
-                    
-                    if (dom_assignment.hasClass("open-assignment") && dom_assignment.is(":visible")) {
-                        width = $(fixed_graph).width();
-                        height = $(fixed_graph).height();
-                        if (width > 500) {
-                            font_size = 13.9;
-                        } else {
-                            font_size = Math.round((width + 450) / 47 * 0.6875);
-                        }
-                        wCon = (width - 55) / x;
-                        hCon = (height - 55) / y;
-                        graph.width = width * scale;
-                        graph.height = height * scale;
-                        fixed_graph.width = width * scale;
-                        fixed_graph.height = height * scale;
-                        drawfixed();
-                        draw();
-                    }
-                }
-                resize();
-                //
-                // End draw graph
-                //
-                if (first_login) {
-                    $(".assignment").next().remove(); // Remove "Click this assignment"
-                    setTimeout(function() {
-                        alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
-                        alert("The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment");
-                        alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
-                        alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs");
-                        if (x <= 2) {
-                            alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates`);
-                        }
-                        alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
-                        alert("Now that you have finished reading this, check out the settings to set your preferences");
-                        first_login = false;
-                        ajaxUtils.ajaxFinishedTutorial();
-                    }, 200);
-                }
+                // Runs if (!set_skew_ratio_using_graph && !draw_mouse_point)
+                // Enable draw point
+                this.draw_mouse_point = true;
+                // Turn off mousemove to ensure there is only one mousemove handler at a time
+                this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
+                // Pass in e because $.trigger makes e.pageX undefined
+                this.mousemove(e);
             }
-            dom_assignment.data('not_first_click', true);
+        });
+        // END Set skew ratio button using graph button
+
+        // BEGIN Skew ratio textbox
+        let not_applicable_timeout;
+        skew_ratio_textbox.on("keydown paste click keyup", () => { // keydown for normal sr and keyup for delete
+            if (old_skew_ratio === undefined) {
+                // Sets old_skew_ratio
+                old_skew_ratio = this.sa.skew_ratio;
+            }
+            let x1 = this.sa.x - this.red_line_start_x;
+            if (this.sa.break_days.length) {
+                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
+            }
+            if (x1 <= 1) {
+                skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
+                clearTimeout(not_applicable_timeout);
+                not_applicable_timeout = setTimeout(function() {
+                    skew_ratio_textbox.attr("placeholder", "Enter Skew Ratio");
+                }, 1000);
+            }
+            if (skew_ratio_textbox.val()) {
+                // Sets and caps skew ratio
+                // The skew ratio in the code is 1 more than the displayed skew ratio
+                this.sa.skew_ratio = +skew_ratio_textbox.val() + 1;
+                if (this.sa.skew_ratio > this.skew_ratio_lim) {
+                    this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+                } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
+                    this.sa.skew_ratio = this.skew_ratio_lim;
+                }
+            } else {
+                // Reset skew ratio to old value if blank
+                this.sa.skew_ratio = old_skew_ratio;
+                old_skew_ratio = undefined;
+            }
+            this.draw();
+        }).keypress((e) => {
+            // Saves skew ratio on enter
+            if (e.key === "Enter") {
+                // Also triggers below
+                skew_ratio_textbox.blur();
+            }
+        }).focusout(() => {
+            skew_ratio_textbox.val('');
+            if (old_skew_ratio !== undefined) {
+                // Save skew ratio
+                old_skew_ratio = this.sa.skew_ratio;
+                ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+            }
+            // Update old skew ratio
+            old_skew_ratio = this.sa.skew_ratio;
+            priority.sort({ ignore_timeout: true });
+        });
+        // END Skew ratio textbox
+
+        // BEGIN Fixed/dynamic mode button
+        fixed_mode_button.click(() => {
+            this.sa.fixed_mode = !this.sa.fixed_mode;
+            fixed_mode_button.onlyText(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+            ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
+            if (this.sa.fixed_mode) {
+                // Set start of red line and setParabolaValues()
+                this.red_line_start_x = 0;
+                this.red_line_start_y = 0;
+                this.setParabolaValues();
+            } else {
+                this.red_line_start_x = this.sa.dynamic_start;
+                this.red_line_start_y = this.sa.works[this.ed_line_start_x - this.sa.dif_assign];
+                // No need to setParabolaValues()
+            }
+            if (this.sa.break_days.length) {
+                this.mods = this.calcModDays();
+            }
+            priority.sort({ ignore_timeout: true });
+            this.draw();
+        }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+        // END Fixed/dynamic mode button        
+    }
+    addAssignmentInfoButtons() {
+        const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
+                work_input_button = this.dom_assignment.find(".work-input-button"),
+                skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
+                fixed_mode_button = this.dom_assignment.find(".fixed-mode-button");
+        skew_ratio_button.info("top", 
+            `The skew ratio determines the work distribution of the graph
+
+            Click this button and hover and click the graph`
+        ).css("margin-right", 1);
+
+        work_input_button.info("top",
+            `Enter the number of units done on the graph's displayed date and submit
+            
+            Keyword: enter "fin" if you've completed an assignment's work for its displayed date`,"after"
+        ).css({
+            left: "calc(50% + 47px)",
+            top: 3,
+            position: "absolute",
+        });
+
+        fixed_mode_button.info("top",
+            `Fixed mode:
+            The red line always starts at the assignment date, meaning if you don't finish a day's work, you'll have to make it up on the next day
+            This mode is recommended for discipline or if an assignment is important
+
+            Dynamic mode (default):
+            If you don't finish a day's work, the red line will readjust itself and adapt to your work schedule
+            This mode is recommended if you can't keep up with an assignment's work schedule`, "prepend"
+        ).css("left", -3).children(".info-button-text").css({
+            fontSize: 11,
+            lineHeight: "11px",
+        });
+
+        skew_ratio_textbox.info("top", 
+            `The skew ratio determines the work distribution of the graph
+
+            Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
+        ).css({
+            left: "calc(50% + 56px)",
+            bottom: 37,
+            position: "absolute",
+        // Initially hide or show this if "Advanced Options" is visible or not
+        // Only need to do this here because this info button is absolutely positioned
+        }).toggle($(".second-advanced-button").is(":visible"));
+    }
+}
+$(function() {
+$(".assignment").click(function(e) {
+    if (!$(e.target).is(".status-message, .right-side-of-header, .relative-positioning-wrapper, .assignment, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
+    const dom_assignment = $(this);
+    // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
+    if (dom_assignment.hasClass("mark-as-done") && !utils.loadAssignmentData(dom_assignment).mark_as_done) {
+        $(".assignment").first().focus().parents(".assignment-container").animate({left: -5}, 75, "easeOutCubic", function() {
+            $(this).animate({left: 5}, 75, "easeOutCubic", function() {
+                $(this).animate({left: 0}, 75, "easeOutCubic");
+            });
+        });
+        return;
+    }
+    const first_click = !dom_assignment.hasClass('has-been-clicked');
+    dom_assignment.addClass("has-been-clicked");
+    const graph_container = dom_assignment.find(".graph-container");
+    // Close assignment
+    if (dom_assignment.hasClass("open-assignment")) {
+        // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
+        graph_container.animate({
+            marginBottom: -graph_container.height()
+        }, 750, "easeOutCubic", function() {
+            // Hide graph when transition ends
+            dom_assignment.css("overflow", "");
+            graph_container.removeAttr("style")
+            // Used in crud.js to begin transitioning an assignment's deletion
+            .trigger("transitionend");
+        });
+        dom_assignment.find(".falling-arrow-animation")[0].beginElement();
+        dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
+        // If no graphs are open, allow arrow scroll
+        if ($(".open-assignment").length === 0) {
+            $(document).off("keydown", VisualAssignment.preventArrowScroll);
         }
+        return;
+    }
+    const sa = new VisualAssignment(dom_assignment);
+    // If the assignment was clicked while it was closing, stop the closing animation and open it
+    graph_container.stop().css({
+        display: "",
+        marginBottom: "",
     });
+    dom_assignment.css("overflow", "");
+    // Prevents auto scroll if a graph is open
+    if ($(".open-assignment").length === 0) {
+        $(document).keydown(VisualAssignment.preventArrowScroll);
+    }
+    graph_container.css("display", "block");
+    dom_assignment.addClass("open-assignment");
+    dom_assignment.find(".rising-arrow-animation")[0].beginElement();
+    // Sets event handlers only on the assignment's first click
+    if (first_click) {
+        sa.setAssignmentEventListeners();
+        sa.addAssignmentInfoButtons();
+    }
+    sa.resize();
+    if (first_login) {
+        $(".assignment").next().remove(); // Remove "Click this assignment"
+        setTimeout(function() {
+            alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
+            alert("The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment");
+            alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
+            alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs");
+            if (x <= 2) {
+                alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates`);
+            }
+            alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
+            alert("Now that you have finished reading this, check out the settings to set your preferences");
+            first_login = false;
+            ajaxUtils.ajaxFinishedTutorial();
+        }, 200);
+    }
+});
 });

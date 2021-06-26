@@ -10,7 +10,6 @@
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
-<script src="{% static 'js/parabola.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
 <script src="{% static 'js/crud.js' %}"></script>
 {% endblock js %}
@@ -99,8 +98,8 @@
             <span class="title">{{ assignment.assignment_name }}</span>
             <svg width="30px" height="20px" class="arrow-container">
               <polygon points="5,0 5,20 15,10">
-                <animate class="risingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
-                <animate class="fallingarrowanimation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
+                <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
+                <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
             <div class="right-side-of-header">
@@ -138,7 +137,7 @@
               </div>
               <span class="completion-time"></span>
             </div>
-            <img class="button update-button" width="45" height="45" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
+            <img class="button update-button" data-assignment-name="{{ assignment.assignment_name }}" width="45" height="45" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             <img class="button delete-button" width="45" height="45" src="{% static 'images/x.png' %}" alt="edit" draggable="false"/>
           </div>
           <div class="relative-positioning-wrapper">

@@ -57,90 +57,15 @@ priority = {
             const dom_assignment = $(this);
             // Fixes the tag add box going behind the below assignment on scale
             dom_assignment.css("z-index", number_of_assignments - index);
-            let sa = utils.loadAssignmentData(dom_assignment);
-            let { ad, x, unit, y, dif_assign, skew_ratio, ctime, funct_round, min_work_time, break_days } = sa;
-            ad = new Date(utils.formatting.parseDate(ad));
-            x = utils.daysBetweenTwoDates(utils.formatting.parseDate(x), ad);
-            y = +y;
-            skew_ratio = +skew_ratio;
-            ctime = +ctime;
-            funct_round = +funct_round;
-            min_work_time /= ctime;
+            const sa = new VisualAssignment(dom_assignment);
             let display_format_minutes = false;
-            function c_pset(x2, y2) {
-                const context = {
-                    x: x,
-                    y: y,
-                    break_days: break_days,
-                    assign_day_of_week: assign_day_of_week,
-                    funct_round: funct_round,
-                    min_work_time: min_work_time,
-                    min_work_time_funct_round: min_work_time_funct_round,
-                    ignore_ends_mwt: ignore_ends_mwt,
-                    red_line_start_x: red_line_start_x,
-                    red_line_start_y: red_line_start_y,
-                    skew_ratio: skew_ratio,
-                    mods: mods,
-                }
-                return pset(context, x2, y2);
-            }
-            function c_funct(n, translate) {
-                const context = {
-                    red_line_start_x: red_line_start_x,
-                    mods: mods,
-                    return_y_cutoff: return_y_cutoff,
-                    y: y,
-                    break_days: break_days,
-                    return_0_cutoff: return_0_cutoff,
-                    red_line_start_y: red_line_start_y,
-                    funct_round: funct_round,
-                    min_work_time: min_work_time,
-                    min_work_time_funct_round: min_work_time_funct_round,
-                    a: a,
-                    b: b,
-                    cutoff_to_use_round: cutoff_to_use_round,
-                    cutoff_transition_value: cutoff_transition_value,
-                }
-                return funct(n, context, translate);
-            }
-            function c_calc_mod_days() {
-                const context = {
-                    break_days: break_days,
-                    assign_day_of_week: assign_day_of_week, 
-                    red_line_start_x: red_line_start_x
-                }
-                return calc_mod_days(context);
-            }
-            let red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start,
-                red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - dif_assign];
-            if (funct_round > y - red_line_start_y) {
-                funct_round = y - red_line_start_y;
-            }
-            if (min_work_time > y - red_line_start_y) {
-                min_work_time = y - red_line_start_y;
-            }
-            if (min_work_time <= funct_round) {
-                min_work_time = 0;
-            } else if (funct_round < min_work_time && min_work_time < 2 * funct_round) {
-                min_work_time = funct_round * 2;
-            }
-            const min_work_time_funct_round = min_work_time ? Math.ceil(min_work_time / funct_round) * funct_round : funct_round; // LCM of min_work_time and funct_round
-            let len_works = sa.works.length - 1,
-                lw = sa.works[len_works],
-                ignore_ends_mwt = ignore_ends && min_work_time,
-                unit_is_of_time = ["minute", "hour"].includes(pluralize(unit, 1).toLowerCase());
-            let mods,
-                assign_day_of_week = ad.getDay();
-            if (break_days.length) {
-                mods = c_calc_mod_days();
-            }
-            let a, b, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff;
-            ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-
+            let len_works = sa.sa.works.length - 1;
+            let lw = sa.sa.works[len_works];
+            sa.setParabolaValues();
             // Will document soon
-            let daysleft = utils.daysBetweenTwoDates(date_now, ad);
-                todo = c_funct(len_works+dif_assign+1) - lw;
-            const today_minus_dac = daysleft - dif_assign;
+            let daysleft = utils.daysBetweenTwoDates(date_now, sa.sa.ad);
+                todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw;
+            const today_minus_dac = daysleft - sa.sa.dif_assign;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
@@ -149,21 +74,21 @@ priority = {
             if (params.autofill_all_work_done && today_minus_dac > len_works && !params.do_not_autofill) {
                 const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                 for (i = 0; i < number_of_forgotten_days; i++) {
-                    todo = c_funct(len_works+dif_assign+1) - lw;
+                    todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw;
                     has_autofilled = true;
-                    if (len_works + dif_assign === x) break; // Don't autofill past completion
+                    if (len_works + sa.sa.dif_assign === sa.sa.x) break; // Don't autofill past completion
                     lw += Math.max(0, todo);
-                    sa.works.push(lw);
+                    sa.sa.works.push(lw);
                     len_works++;
                 }
                 if (has_autofilled) {
-                    ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                    ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
-                    todo = c_funct(len_works+dif_assign+1) - lw; // Update this if loop ends
+                    ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
+                    ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                    todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw; // Update this if loop ends
                 }
             }
             let strdaysleft, status_value, status_message, status_image;
-            if (lw >= y) {
+            if (lw >= sa.sa.y) {
                 status_image = "completely-finished";
                 status_message = 'You are Completely Finished with this Assignment';
                 dom_status_image.attr({
@@ -182,7 +107,7 @@ priority = {
                 if (daysleft === -1) {
                     strdaysleft = 'Assigned Tomorrow';
                 } else if (daysleft > -7) {
-                    strdaysleft = `Assigned on ${ad.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                    strdaysleft = `Assigned on ${sa.sa.ad.toLocaleDateString("en-US", {weekday: 'long'})}`;
                 } else {
                     strdaysleft = `Assigned in ${-daysleft}d`;
                 }
@@ -191,35 +116,35 @@ priority = {
                 if (today_minus_dac > len_works && !params.do_not_autofill) {
                     const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                     for (i = 0; i < number_of_forgotten_days; i++) {
-                        todo = c_funct(len_works+dif_assign+1) - lw;
-                        const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || break_days.includes((assign_day_of_week + len_works + dif_assign) % 7);
-                        if (!autofill_this_loop || len_works + dif_assign === x - 1) break;
+                        todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw;
+                        const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.dif_assign) % 7);
+                        if (!autofill_this_loop || len_works + sa.sa.dif_assign === sa.sa.x - 1) break;
                         has_autofilled = true;
-                        sa.works.push(lw);
+                        sa.sa.works.push(lw);
                         len_works++;
                         if (todo) {
-                            sa.dynamic_start = len_works + dif_assign;
-                            if (!sa.fixed_mode) {
-                                red_line_start_x = sa.dynamic_start;
-                                red_line_start_y = sa.works[red_line_start_x - dif_assign];
-                                if (break_days.length) {
-                                    mods = c_calc_mod_days();
+                            sa.sa.dynamic_start = len_works + sa.sa.dif_assign;
+                            if (!sa.sa.fixed_mode) {
+                                sa.red_line_start_x = sa.sa.dynamic_start;
+                                sa.red_line_start_y = sa.sa.works[sa.red_line_start_x - sa.sa.dif_assign];
+                                if (sa.sa.break_days.length) {
+                                    sa.mods = sa.calcModDays();
                                 }
-                                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
+                                sa.setParabolaValues();
                             }
                         }
                     }
                     if (has_autofilled) {
-                        ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.works.map(String), sa.id);
-                        ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.dynamic_start, sa.id);
-                        todo = c_funct(len_works+dif_assign+1) - lw; // Update this if loop ends
+                        ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
+                        ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                        todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw; // Update this if loop ends
                     }
                 }
-                let x1 = x - red_line_start_x;
-                if (break_days.length) {
-                    x1 -= Math.floor(x1 / 7) * break_days.length + mods[x1 % 7]; // Handles break days, explained later
+                let x1 = sa.sa.x - sa.red_line_start_x;
+                if (sa.sa.break_days.length) {
+                    x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + sa.mods[x1 % 7]; // Handles break days, explained later
                 }
-                daysleft = x - daysleft;
+                daysleft = sa.sa.x - daysleft;
                 if (today_minus_dac > len_works || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
@@ -243,7 +168,7 @@ priority = {
                 } else {
                     status_value = 4;
                     display_format_minutes = true;
-                    if (len_works && (lw - sa.works[len_works - 1]) / warning_acceptance * 100 < c_funct(len_works + dif_assign) - sa.works[len_works - 1]) {
+                    if (len_works && (lw - sa.sa.works[len_works - 1]) / warning_acceptance * 100 < sa.funct(len_works + sa.sa.dif_assign) - sa.sa.works[len_works - 1]) {
                         status_image = 'warning';
                         dom_status_image.attr({
                             width: 7,
@@ -258,12 +183,12 @@ priority = {
                             height: 15,
                         }).css("margin-left", -2);
                     }
-                    if (unit_is_of_time) {
-                        status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} of Work Today`;
+                    if (sa.unit_is_of_time) {
+                        status_message += `<br>Complete ${todo} ${pluralize(sa.sa.unit,todo)} of Work Today`;
                     } else {
-                        status_message += `<br>Complete ${todo} ${pluralize(unit,todo)} Today`;
+                        status_message += `<br>Complete ${todo} ${pluralize(sa.sa.unit,todo)} Today`;
                     }
-                    total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
+                    total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
                 }
                 if (daysleft < -1) {
                     strdaysleft = -daysleft + "d Ago";
@@ -273,13 +198,13 @@ priority = {
                     strdaysleft = 'Today';
                 } else if (daysleft === 1) {
                     strdaysleft = 'Tomorrow';
-                    tomorrow_total += Math.ceil(sa.mark_as_done ? 0 : todo*ctime);
+                    tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
                     if (status_value !== 6) {
                         status_value = 5;
                     }
                 } else if (daysleft < 7) {
-                    const due_date = new Date(ad.valueOf());
-                    due_date.setDate(due_date.getDate() + x);
+                    const due_date = new Date(sa.sa.ad.valueOf());
+                    due_date.setDate(due_date.getDate() + sa.sa.x);
                     strdaysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {
                     strdaysleft = daysleft + "d";
@@ -296,31 +221,33 @@ priority = {
             } else if (status_value === 6) {
                 status_priority = -daysleft;
             } else {
-                skew_ratio = 1;
-                red_line_start_x = dif_assign;
-                red_line_start_y = sa.works[0];
-                if (break_days.length) {
-                    mods = c_calc_mod_days();
+                const original_skew_ratio = sa.sa.skew_ratio;
+                sa.sa.skew_ratio = 1;
+                sa.red_line_start_x = sa.sa.dif_assign;
+                sa.red_line_start_y = sa.sa.works[0];
+                if (sa.sa.break_days.length) {
+                    sa.mods = sa.calcModDays();
                 }
-                ({ a, b, skew_ratio, cutoff_transition_value, cutoff_to_use_round, return_y_cutoff, return_0_cutoff } = c_pset());
-                if (len_works + dif_assign === x || todo < 0 || len_works > today_minus_dac) {
+                sa.setParabolaValues();
+                sa.sa.skew_ratio = original_skew_ratio;
+                if (len_works + sa.sa.dif_assign === sa.sa.x || todo < 0 || len_works > today_minus_dac) {
                     status_priority = 0;
                 } else if (len_works && daysleft !== 1) {
                     let sum_diff_red_blue = 0;
                     for (i = 1; i < len_works + 1; i++) { // Start at one because funct(0) - works[0] is always 0
-                        if (!break_days.includes(assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - c_funct(i + dif_assign); is a break day
-                            // No need to worry about c_funct(i + dif_assign) being before dynamic_start because red_line_start_x is set to dif_assign
-                            sum_diff_red_blue += sa.works[i] - c_funct(i + dif_assign);
+                        if (!sa.sa.break_days.includes(sa.assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - sa.funct(i + dif_assign); is a break day
+                            // No need to worry about sa.funct(i + dif_assign) being before dynamic_start because red_line_start_x is set to dif_assign
+                            sum_diff_red_blue += sa.sa.works[i] - sa.funct(i + sa.sa.dif_assign);
                         }
                     }
-                    const how_well_followed_const = 1-sum_diff_red_blue/len_works/y;
-                    status_priority = Math.max(0, how_well_followed_const*todo*ctime/(x-dif_assign-len_works));
+                    const how_well_followed_const = 1-sum_diff_red_blue/len_works/sa.sa.y;
+                    status_priority = Math.max(0, how_well_followed_const*todo*sa.sa.ctime/(sa.sa.x-sa.sa.dif_assign-len_works));
                 } else {
-                    status_priority = todo*ctime/(x-dif_assign-len_works);
+                    status_priority = todo*sa.sa.ctime/(sa.sa.x-sa.sa.dif_assign-len_works);
                 }
             }
             let priority_data = [status_value, status_priority, index];
-            if (sa.mark_as_done && status_value !== 6) {
+            if (sa.sa.mark_as_done && status_value !== 6) {
                 priority_data.push(true);
             }
             ordered_assignments.push(priority_data);
@@ -329,7 +256,7 @@ priority = {
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", strdaysleft);
             if (display_format_minutes) {
-                dom_completion_time.html(utils.formatting.formatMinutes(todo * ctime));
+                dom_completion_time.html(utils.formatting.formatMinutes(todo * sa.sa.ctime));
             } else {
                 dom_completion_time.html('');
             }
@@ -420,7 +347,7 @@ priority = {
         $(".finished").first().addClass("first-finished");
         $(".last-finished").removeClass("last-finished");
         $(".finished").last().addClass("last-finished");
-        $(".last-incomplete-works").remove();
+        $(".last-incomplete-works").removeClass("last-incomplete-works");
         $(".incomplete-works").last().addClass("last-incomplete-works");
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
@@ -557,6 +484,8 @@ ordering = {
                     break;
             }
         });
+        replaceAutofillInfo();
+        $("#autofill-selection").on("change", replaceAutofillInfo);
         function replaceAutofillInfo() {
             $("#autofill-work-done-text").find(".info-button").remove();
             let message;
@@ -578,8 +507,6 @@ ordering = {
             }
             $("#autofill-work-done-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});
         }
-        $("#autofill-selection").on("change", replaceAutofillInfo);
-        replaceAutofillInfo();
     }
 }
 document.addEventListener("DOMContentLoaded", function() {

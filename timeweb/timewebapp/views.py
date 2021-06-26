@@ -119,7 +119,7 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model = SettingsModel.objects.get(user__username=request.user)
         settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
         settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
-        settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1 # A skew ratio entered as "0" is added to 1 and is then stored as "1". The reasoning is in parabola.js
+        settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1 # A skew ratio entered as 0 is stored as 1
         settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
         settings_model.def_unit_to_minute = self.form.cleaned_data.get("def_unit_to_minute")
         settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")

@@ -91,8 +91,8 @@ $(function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
-        const initial_form_fields = ['', utils.formatting.stringifyDate(date_now), '', def_unit_to_minute ? "Minute" : '', '', '0', '', '', +def_min_work_time||''];
-        initial_form_fields.forEach(function(element, index) {
+        const default_form_fields = ['', utils.formatting.stringifyDate(date_now), '', def_unit_to_minute ? "Minute" : '', '', '0', '', '', +def_min_work_time||''];
+        default_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
         for (let break_day of Array(7).keys()) {
@@ -112,7 +112,7 @@ $(function() {
         $("#new-title").html("Re-enter Assignment");
         $("#submit-assignment-button").html("Modify Assignment");
         // Find which assignment in dat was clicked
-        const sa = utils.loadAssignmentData($(this).parents(".assignment"));
+        const sa = utils.loadAssignmentData($(this), {load_original_data: true});
         // Reentered form fields
         const form_data = [
             sa.assignment_name,
@@ -122,7 +122,7 @@ $(function() {
             +sa.y,
             +sa.works[0],
             +sa.ctime,
-            sa.funct_round-1 ? +sa.funct_round : '', // Displays as self if it isn't 1, else display nothing
+            sa.funct_round-1 ? +sa.funct_round : '', // Displays nothing if it is 1
             +sa.min_work_time||'',
         ];
         // Set reentered form fields

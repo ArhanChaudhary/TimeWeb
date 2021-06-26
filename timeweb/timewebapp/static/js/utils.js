@@ -356,8 +356,12 @@ utils = {
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
-    loadAssignmentData: function($element_with_assignment_name_attribute) {
-        return dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
+    loadAssignmentData: function($element_with_assignment_name_attribute, params={}) {
+        if (params.load_original_data) {
+            return org_dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
+        } else {
+            return dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
+        }
     },
     // Resolves a resolver promise function when automatic scrolling ends
     // Scrolling detected with $("main").scroll(scroll);
@@ -493,7 +497,15 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
+org_dat = dat.slice(0);
 for (let sa of dat) {
+    sa.ad = new Date(utils.formatting.parseDate(sa.ad));
+    sa.x = utils.daysBetweenTwoDates(utils.formatting.parseDate(sa.x), sa.ad);
+    sa.y = +sa.y;
+    sa.ctime = +sa.ctime;
+    sa.funct_round = +sa.funct_round;
+    sa.min_work_time /= sa.ctime; // Converts min_work_time to int if string or null
+    sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
 }
