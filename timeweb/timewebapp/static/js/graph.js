@@ -325,7 +325,7 @@ class VisualAssignment extends Assignment {
             this.red_line_start_x = this.sa.dynamic_start;
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             if (this.sa.break_days.length) {
-                mods = this.calcModDays();
+                this.mods = this.calcModDays();
             }
             this.skew_ratio_lim = this.calcSkewRatioLim();
             this.setParabolaValues();

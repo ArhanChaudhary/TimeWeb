@@ -342,13 +342,6 @@ priority = {
         } else {
             $("#autofill-work-done").hide();
         }
-        // Replicates first-of-class and last-of-class; this is further used in index.css
-        $(".first-finished").removeClass("first-finished");
-        $(".finished").first().addClass("first-finished");
-        $(".last-finished").removeClass("last-finished");
-        $(".finished").last().addClass("last-finished");
-        $(".last-incomplete-works").removeClass("last-incomplete-works");
-        $(".incomplete-works").last().addClass("last-incomplete-works");
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
         if (!params.first_sort) ordering.transitionSwaps();
@@ -362,6 +355,13 @@ priority = {
                 "margin-bottom": -($("#animate-in").height()+10), // +10 deals with margins
             });
         }
+        // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
+        $(".first-finished").removeClass("first-finished");
+        $(".finished").first().addClass("first-finished");
+        $(".last-finished").removeClass("last-finished");
+        $(".finished").last().addClass("last-finished");
+        $(".last-incomplete-works").removeClass("last-incomplete-works");
+        $(".incomplete-works").last().addClass("last-incomplete-works");
         if ($(".incomplete-works").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css("margin-top", -23);
