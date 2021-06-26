@@ -43,7 +43,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "unit": "Page",
             "y": "400.00",
             "works": ["0"],
-            "dif_assign": 0,
+            "blue_line_start": 0,
             "skew_ratio": "1.0000000000",
             "ctime": "3.00",
             "funct_round": "1.00",
@@ -274,20 +274,20 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             date_now = date_now.date()
         if self.created_assignment:
-            self.sm.dif_assign = (date_now-self.sm.ad).days
-            if self.sm.dif_assign < 0:
-                self.sm.dif_assign = 0
-            self.sm.dynamic_start = self.sm.dif_assign
+            self.sm.blue_line_start = (date_now-self.sm.ad).days
+            if self.sm.blue_line_start < 0:
+                self.sm.blue_line_start = 0
+            self.sm.dynamic_start = self.sm.blue_line_start
         else:
-            self.sm.dif_assign = old_data.dif_assign + (old_data.ad-self.sm.ad).days
-            if date_now < old_data.ad or self.sm.dif_assign < 0:
-                self.sm.dif_assign = 0 
+            self.sm.blue_line_start = old_data.blue_line_start + (old_data.ad-self.sm.ad).days
+            if date_now < old_data.ad or self.sm.blue_line_start < 0:
+                self.sm.blue_line_start = 0 
         if not self.sm.funct_round:
             self.sm.funct_round = 1
         if self.sm.min_work_time != None:
             self.sm.min_work_time /= self.sm.ctime
         if not self.created_assignment:
-            removed_works_start = (self.sm.ad - old_data.ad).days - old_data.dif_assign # translates x position on graph to 0 so that it can be used in accessing works
+            removed_works_start = (self.sm.ad - old_data.ad).days - old_data.blue_line_start # translates x position on graph to 0 so that it can be used in accessing works
             if removed_works_start < 0:
                 removed_works_start = 0
 
@@ -311,16 +311,16 @@ class TimewebView(LoginRequiredMixin, View):
                 else:
                     x_num = (self.sm.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - first_work)/self.sm.funct_round
             x_num = ceil(x_num)
-            if self.sm.dif_assign >= x_num:
-                self.sm.dif_assign = 0
+            if self.sm.blue_line_start >= x_num:
+                self.sm.blue_line_start = 0
                 if self.created_assignment:
-                    self.sm.dynamic_start = self.sm.dif_assign
+                    self.sm.dynamic_start = self.sm.blue_line_start
             if not x_num or len(self.sm.break_days) == 7:
                 x_num = 1
             elif self.sm.break_days:
                 guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
                 assign_day_of_week = self.sm.ad.weekday()
-                red_line_start_x = self.sm.dif_assign
+                red_line_start_x = self.sm.blue_line_start
 
                 # set_mod_days()
                 xday = assign_day_of_week + red_line_start_x
@@ -350,10 +350,10 @@ class TimewebView(LoginRequiredMixin, View):
                 self.sm.x = datetime.datetime.max.date()
         else:
             x_num = (self.sm.x - self.sm.ad).days
-            if self.sm.dif_assign >= x_num:
-                self.sm.dif_assign = 0
+            if self.sm.blue_line_start >= x_num:
+                self.sm.blue_line_start = 0
                 if self.created_assignment:
-                    self.sm.dynamic_start = self.sm.dif_assign
+                    self.sm.dynamic_start = self.sm.blue_line_start
         if self.sm.min_work_time != None:
             self.sm.min_work_time *= self.sm.ctime
         if self.created_assignment:
@@ -371,7 +371,7 @@ class TimewebView(LoginRequiredMixin, View):
             if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
                 self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
 
-            self.sm.dynamic_start += self.sm.dif_assign - old_data.dif_assign
+            self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
             if self.sm.dynamic_start < 0:
                 self.sm.dynamic_start = 0
             elif self.sm.dynamic_start > x_num - 1:

@@ -49,7 +49,7 @@ class TimewebModel(models.Model):
     works = models.JSONField(
         default=default_works,
     )
-    dif_assign = models.IntegerField(
+    blue_line_start = models.IntegerField(
         blank=True,
         null=True,
     )

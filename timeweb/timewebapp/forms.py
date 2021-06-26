@@ -13,7 +13,7 @@ class TimewebForm(forms.ModelForm):
             'assignment_name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'ad': DateInput(),
             'x': DateInput(),
-            'dif_assign': forms.HiddenInput(),
+            'blue_line_start': forms.HiddenInput(),
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),

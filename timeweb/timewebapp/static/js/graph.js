@@ -16,7 +16,7 @@ class Assignment {
     constructor(dom_assignment) {
         this.sa = utils.loadAssignmentData(dom_assignment);
         this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
-        this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.dif_assign]; // Y-coordinate of the start of the red line
+        this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
         // Not sure if these if stataments are actually needed but I included them in the original program, and there doesnt seem to be any harm
         // Caps values
         const y1 = this.sa.y - this.red_line_start_y;
@@ -323,7 +323,7 @@ class VisualAssignment extends Assignment {
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js
             this.red_line_start_x = this.sa.dynamic_start;
-            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             if (this.sa.break_days.length) {
                 mods = this.calcModDays();
             }
@@ -407,16 +407,16 @@ class VisualAssignment extends Assignment {
             // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
             var mouse_x = Math.round((x2 - 53.7) / this.wCon),
                 mouse_y = (VisualAssignment.height - y2 - 44.5) / this.hCon;
-            if (mouse_x < Math.min(this.red_line_start_x, this.sa.dif_assign)) {
-                mouse_x = Math.min(this.red_line_start_x, this.sa.dif_assign);
+            if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start)) {
+                mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
             } else if (mouse_x > this.sa.x) {
                 mouse_x = this.sa.x;
             }
-            if (this.sa.dif_assign <= mouse_x && mouse_x <= len_works + this.sa.dif_assign) {
+            if (this.sa.blue_line_start <= mouse_x && mouse_x <= len_works + this.sa.blue_line_start) {
                 if (mouse_x < this.red_line_start_x) {
                     mouse_y = true;
                 } else {
-                    mouse_y = Math.abs(mouse_y - this.funct(mouse_x)) > Math.abs(mouse_y - this.sa.works[mouse_x - this.sa.dif_assign]);
+                    mouse_y = Math.abs(mouse_y - this.funct(mouse_x)) > Math.abs(mouse_y - this.sa.works[mouse_x - this.sa.blue_line_start]);
                 }
             } else {
                 mouse_y = false;
@@ -430,7 +430,7 @@ class VisualAssignment extends Assignment {
         screen.scale(VisualAssignment.scale, VisualAssignment.scale);
         screen.clearRect(0, 0, VisualAssignment.width, VisualAssignment.height);
         let move_info_down,
-            todo = this.funct(len_works+this.sa.dif_assign+1);
+            todo = this.funct(len_works+this.sa.blue_line_start+1);
         if (show_progress_bar) {
             move_info_down = 0;
             let should_be_done_x = VisualAssignment.width - 155 + todo / this.sa.y * 146,
@@ -525,7 +525,7 @@ class VisualAssignment extends Assignment {
         screen.strokeStyle = "rgb(1,147,255)"; // blue
         screen.lineWidth = radius;
         for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
-            circle_x = (point + this.sa.dif_assign) * this.wCon + 50;
+            circle_x = (point + this.sa.blue_line_start) * this.wCon + 50;
             if (point > len_works) {
                 circle_y = VisualAssignment.height - this.sa.works[len_works] * this.hCon - 50;
             } else {
@@ -543,7 +543,7 @@ class VisualAssignment extends Assignment {
         if (this.draw_mouse_point && x2) {
             let funct_mouse_x;
             if (mouse_y) {
-                funct_mouse_x = this.sa.works[mouse_x - this.sa.dif_assign];
+                funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];
             } else {
                 funct_mouse_x = precisionRound(this.funct(mouse_x), 6);
             }
@@ -599,12 +599,12 @@ class VisualAssignment extends Assignment {
         center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
         if (lw < this.sa.y) {
             todo -= lw;
-            if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week+this.sa.dif_assign+len_works) % 7)) {
+            if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week+this.sa.blue_line_start+len_works) % 7)) {
                 todo = 0;
             }
             let displayed_day = new Date(this.sa.ad.valueOf());
-            displayed_day.setDate(displayed_day.getDate() + this.sa.dif_assign + len_works);
-            const distance_today_from_displayed_day = this.today_minus_ad - this.sa.dif_assign - len_works;
+            displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
+            const distance_today_from_displayed_day = this.today_minus_ad - this.sa.blue_line_start - len_works;
             let str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
             switch (distance_today_from_displayed_day) {
                 case -1:
@@ -625,9 +625,9 @@ class VisualAssignment extends Assignment {
             } else if (distance_today_from_displayed_day > 0) {
                 center("You haven't Entered your Work from Previous Days", 6);
                 center("Please Enter your Progress to Continue", 7);
-            } else if (this.sa.break_days.includes((this.assign_day_of_week+this.sa.dif_assign+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
+            } else if (this.sa.break_days.includes((this.assign_day_of_week+this.sa.blue_line_start+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                 center("You have Completed your Work for Today", 6);
-            } else if (len_works && (lw - this.sa.works[len_works-1]) / warning_acceptance * 100 < this.funct(len_works + this.sa.dif_assign) - this.sa.works[len_works-1]) {
+            } else if (len_works && (lw - this.sa.works[len_works-1]) / warning_acceptance * 100 < this.funct(len_works + this.sa.blue_line_start) - this.sa.works[len_works-1]) {
                 center("!!! ALERT !!!", 6);
                 center("You are Behind Schedule!", 7);
             }
@@ -869,10 +869,10 @@ class VisualAssignment extends Assignment {
 
             // If the deleted work input cut the dynamic start, run this
             // Reverses the logic of work inputs in and recursively decreases red_line_start_x
-            if (this.red_line_start_x > len_works + this.sa.dif_assign) {
+            if (this.red_line_start_x > len_works + this.sa.blue_line_start) {
                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                outer: for (this.red_line_start_x = this.red_line_start_x - 2; this.red_line_start_x >= this.sa.dif_assign; this.red_line_start_x--) {
-                    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+                outer: for (this.red_line_start_x = this.red_line_start_x - 2; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
+                    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
                     if (this.sa.break_days.length) {
                         this.mods = this.calcModDays();
                     }
@@ -880,12 +880,12 @@ class VisualAssignment extends Assignment {
                     this.setParabolaValues();
                     // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
                     let next_funct = this.funct(this.red_line_start_x),
-                        next_work = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
-                    for (let i = this.red_line_start_x; i < len_works + this.sa.dif_assign; i++) {
+                        next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                    for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
                         const this_funct = next_funct,
                             this_work = next_work;
                         next_funct = this.funct(i + 1),
-                        next_work = this.sa.works[i - this.sa.dif_assign + 1];
+                        next_work = this.sa.works[i - this.sa.blue_line_start + 1];
                         // When a day is found where the work input isn't the same as the red line for that red_line_start_x, break and then increase it by 1 to where it doesnt happen
                         if (next_funct - this_funct !== next_work - this_work) {
                             break outer;
@@ -895,9 +895,9 @@ class VisualAssignment extends Assignment {
                 // ++ for three cases:
                 // if for loop doesnt run, do ++ to fix red_line_start_x
                 // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
-                // if for loop doesnt find, do ++; cond was originally > dif_assign instead of >= dif_assign
+                // if for loop doesnt find, do ++; cond was originally > blue_line_start instead of >= blue_line_start
                 this.red_line_start_x++;
-                this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.dif_assign];
+                this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
                 if (this.sa.break_days.length) {
                     this.mods = this.calcModDays();
                 }
@@ -917,8 +917,8 @@ class VisualAssignment extends Assignment {
             let lw = this.sa.works[len_works];
             if (!work_input_button.val()) return;
             if (lw >= this.sa.y) return alert("You have already finished this assignment");
-            if (this.today_minus_ad < this.sa.dif_assign) return alert("Please wait until this is assigned");
-            let todo = this.funct(len_works + this.sa.dif_assign + 1) - lw;
+            if (this.today_minus_ad < this.sa.blue_line_start) return alert("Please wait until this is assigned");
+            let todo = this.funct(len_works + this.sa.blue_line_start + 1) - lw;
             let input_done = work_input_button.val().trim().toLowerCase();
             switch (input_done) {
                 case "fin":
@@ -929,26 +929,26 @@ class VisualAssignment extends Assignment {
                     if (isNaN(input_done)) return alert("Value isn't a number or keyword");
                 }
             }
-            if (len_works + this.sa.dif_assign === this.sa.x - 1 && input_done + lw < this.sa.y) return alert("Your last work input must complete this assignment");
+            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + lw < this.sa.y) return alert("Your last work input must complete this assignment");
             if (input_done + lw < 0) {
                 input_done = -lw;
             }
             this.sa.works.push(input_done + lw);
             // lw += input_done; No point in redefining lw since it's not used from here
             len_works++;
-            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.dif_assign + len_works) % 7)) {
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 todo = 0;
             }
             if (input_done !== todo) {
-                if (len_works + this.sa.dif_assign === this.sa.x) {
-                    this.sa.dynamic_start = len_works + this.sa.dif_assign - 1; // If users enter a value >y on the last day dont change dynamic start
+                if (len_works + this.sa.blue_line_start === this.sa.x) {
+                    this.sa.dynamic_start = len_works + this.sa.blue_line_start - 1; // If users enter a value >y on the last day dont change dynamic start
                 } else {
-                    this.sa.dynamic_start = len_works + this.sa.dif_assign;
+                    this.sa.dynamic_start = len_works + this.sa.blue_line_start;
                 }
                 ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
                 if (!this.sa.fixed_mode) {
                     this.red_line_start_x = this.sa.dynamic_start;
-                    this.red_line_start_y = this.sa.works[this.sa.dynamic_start - this.sa.dif_assign];
+                    this.red_line_start_y = this.sa.works[this.sa.dynamic_start - this.sa.blue_line_start];
                     if (this.sa.break_days.length) {
                         this.mods = this.calcModDays();
                     }
@@ -1114,7 +1114,7 @@ class VisualAssignment extends Assignment {
                 this.setParabolaValues();
             } else {
                 this.red_line_start_x = this.sa.dynamic_start;
-                this.red_line_start_y = this.sa.works[this.ed_line_start_x - this.sa.dif_assign];
+                this.red_line_start_y = this.sa.works[this.ed_line_start_x - this.sa.blue_line_start];
                 // No need to setParabolaValues()
             }
             if (this.sa.break_days.length) {
@@ -1235,8 +1235,8 @@ $(".assignment").click(function(e) {
             alert("The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment");
             alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
             alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs");
-            if (x <= 2) {
-                alert(`Note: since this assignment is due in only ${x} day${x-dif_assign === 1 ? '' : 's'}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates`);
+            if (sa.sa.x <= 2) {
+                alert(`Note: since this assignment is due in only ${sa.sa.x} day${sa.sa.x-sa.blue_line_start === 1 ? '' : 's'}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates`);
             }
             alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
             alert("Now that you have finished reading this, check out the settings to set your preferences");

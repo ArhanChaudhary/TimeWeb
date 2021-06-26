@@ -64,8 +64,8 @@ priority = {
             sa.setParabolaValues();
             // Will document soon
             let daysleft = utils.daysBetweenTwoDates(date_now, sa.sa.ad);
-                todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw;
-            const today_minus_dac = daysleft - sa.sa.dif_assign;
+                todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw;
+            const today_minus_dac = daysleft - sa.sa.blue_line_start;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
@@ -74,9 +74,9 @@ priority = {
             if (params.autofill_all_work_done && today_minus_dac > len_works && !params.do_not_autofill) {
                 const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                 for (i = 0; i < number_of_forgotten_days; i++) {
-                    todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw;
+                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw;
                     has_autofilled = true;
-                    if (len_works + sa.sa.dif_assign === sa.sa.x) break; // Don't autofill past completion
+                    if (len_works + sa.sa.blue_line_start === sa.sa.x) break; // Don't autofill past completion
                     lw += Math.max(0, todo);
                     sa.sa.works.push(lw);
                     len_works++;
@@ -84,7 +84,7 @@ priority = {
                 if (has_autofilled) {
                     ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                    todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw; // Update this if loop ends
+                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw; // Update this if loop ends
                 }
             }
             let strdaysleft, status_value, status_message, status_image;
@@ -116,17 +116,17 @@ priority = {
                 if (today_minus_dac > len_works && !params.do_not_autofill) {
                     const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
                     for (i = 0; i < number_of_forgotten_days; i++) {
-                        todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw;
-                        const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.dif_assign) % 7);
-                        if (!autofill_this_loop || len_works + sa.sa.dif_assign === sa.sa.x - 1) break;
+                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw;
+                        const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.blue_line_start) % 7);
+                        if (!autofill_this_loop || len_works + sa.sa.blue_line_start === sa.sa.x - 1) break;
                         has_autofilled = true;
                         sa.sa.works.push(lw);
                         len_works++;
                         if (todo) {
-                            sa.sa.dynamic_start = len_works + sa.sa.dif_assign;
+                            sa.sa.dynamic_start = len_works + sa.sa.blue_line_start;
                             if (!sa.sa.fixed_mode) {
                                 sa.red_line_start_x = sa.sa.dynamic_start;
-                                sa.red_line_start_y = sa.sa.works[sa.red_line_start_x - sa.sa.dif_assign];
+                                sa.red_line_start_y = sa.sa.works[sa.red_line_start_x - sa.sa.blue_line_start];
                                 if (sa.sa.break_days.length) {
                                     sa.mods = sa.calcModDays();
                                 }
@@ -137,7 +137,7 @@ priority = {
                     if (has_autofilled) {
                         ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                        todo = sa.funct(len_works+sa.sa.dif_assign+1) - lw; // Update this if loop ends
+                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - lw; // Update this if loop ends
                     }
                 }
                 let x1 = sa.sa.x - sa.red_line_start_x;
@@ -168,7 +168,7 @@ priority = {
                 } else {
                     status_value = 4;
                     display_format_minutes = true;
-                    if (len_works && (lw - sa.sa.works[len_works - 1]) / warning_acceptance * 100 < sa.funct(len_works + sa.sa.dif_assign) - sa.sa.works[len_works - 1]) {
+                    if (len_works && (lw - sa.sa.works[len_works - 1]) / warning_acceptance * 100 < sa.funct(len_works + sa.sa.blue_line_start) - sa.sa.works[len_works - 1]) {
                         status_image = 'warning';
                         dom_status_image.attr({
                             width: 7,
@@ -223,27 +223,27 @@ priority = {
             } else {
                 const original_skew_ratio = sa.sa.skew_ratio;
                 sa.sa.skew_ratio = 1;
-                sa.red_line_start_x = sa.sa.dif_assign;
+                sa.red_line_start_x = sa.sa.blue_line_start;
                 sa.red_line_start_y = sa.sa.works[0];
                 if (sa.sa.break_days.length) {
                     sa.mods = sa.calcModDays();
                 }
                 sa.setParabolaValues();
                 sa.sa.skew_ratio = original_skew_ratio;
-                if (len_works + sa.sa.dif_assign === sa.sa.x || todo < 0 || len_works > today_minus_dac) {
+                if (len_works + sa.sa.blue_line_start === sa.sa.x || todo < 0 || len_works > today_minus_dac) {
                     status_priority = 0;
                 } else if (len_works && daysleft !== 1) {
                     let sum_diff_red_blue = 0;
                     for (i = 1; i < len_works + 1; i++) { // Start at one because funct(0) - works[0] is always 0
-                        if (!sa.sa.break_days.includes(sa.assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - sa.funct(i + dif_assign); is a break day
-                            // No need to worry about sa.funct(i + dif_assign) being before dynamic_start because red_line_start_x is set to dif_assign
-                            sum_diff_red_blue += sa.sa.works[i] - sa.funct(i + sa.sa.dif_assign);
+                        if (!sa.sa.break_days.includes(sa.assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - sa.funct(i + blue_line_start); is a break day
+                            // No need to worry about sa.funct(i + blue_line_start) being before dynamic_start because red_line_start_x is set to blue_line_start
+                            sum_diff_red_blue += sa.sa.works[i] - sa.funct(i + sa.sa.blue_line_start);
                         }
                     }
                     const how_well_followed_const = 1-sum_diff_red_blue/len_works/sa.sa.y;
-                    status_priority = Math.max(0, how_well_followed_const*todo*sa.sa.ctime/(sa.sa.x-sa.sa.dif_assign-len_works));
+                    status_priority = Math.max(0, how_well_followed_const*todo*sa.sa.ctime/(sa.sa.x-sa.sa.blue_line_start-len_works));
                 } else {
-                    status_priority = todo*sa.sa.ctime/(sa.sa.x-sa.sa.dif_assign-len_works);
+                    status_priority = todo*sa.sa.ctime/(sa.sa.x-sa.sa.blue_line_start-len_works);
                 }
             }
             let priority_data = [status_value, status_priority, index];
