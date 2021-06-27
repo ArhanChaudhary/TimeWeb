@@ -4,44 +4,25 @@
 }
 /* Only perform box-shadow and transform transitions */
 main:not(.animate) {
-    -webkit-transition: -webkit-box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
-    transition: -webkit-box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
-    -o-transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
-    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15), -webkit-box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
 }
 header:not(.animate), header:not(.animate)::after {
-    -webkit-transition: -webkit-transform 1.7s cubic-bezier(.29,.81,.37,.99);
-    transition: -webkit-transform 1.7s cubic-bezier(.29,.81,.37,.99);
-    -o-transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
     transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
-    transition: transform 1.7s cubic-bezier(.29,.81,.37,.99), -webkit-transform 1.7s cubic-bezier(.29,.81,.37,.99);
 }
 #assignments-container:not(.animate) {
-    -webkit-transition: -webkit-transform 1.5s cubic-bezier(.29,.81,.37,.99);
-    transition: -webkit-transform 1.5s cubic-bezier(.29,.81,.37,.99);
-    -o-transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
-    transition: transform 1.5s cubic-bezier(.29,.81,.37,.99), -webkit-transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
 main.animate {
-    -webkit-box-shadow: none;
-            box-shadow: none;
+    box-shadow: none;
 }
 header.animate {
-    -webkit-transform: translateY(-70px);
-        -ms-transform: translateY(-70px);
-            transform: translateY(-70px);
+    transform: translateY(-70px);
 }
 header.animate::after {
-    -webkit-transform: none;
-        -ms-transform: none;
-            transform: none;
+    transform: none;
 }
 #assignments-container.animate {
-    -webkit-transform: translateY(max(-400px, calc(-100% - 20px)));
-        -ms-transform: translateY(max(-400px, calc(-100% - 20px)));
-            transform: translateY(max(-400px, calc(-100% - 20px)));
+    transform: translateY(max(-400px, calc(-100% - 20px)));
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
 #introduction-message {
@@ -49,11 +30,8 @@ header.animate::after {
 }
 #assignments-header {
     padding: 0 10px;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 #info {
     display: inline;
@@ -78,9 +56,7 @@ header.animate::after {
 #advanced-options {
     text-shadow: none; /* Override parent text shadow if user has a background image */
     width: 169px;
-    -webkit-transform: translateY(16px);
-        -ms-transform: translateY(16px);
-            transform: translateY(16px);
+    transform: translateY(16px);
     right: -5px;
     z-index: 100;
     position: absolute;
@@ -141,8 +117,7 @@ header.animate::after {
     transition: none;
 }
 .assignment {
-    -webkit-box-shadow: 0 0 4px rgb(115,115,115);
-            box-shadow: 0 0 4px rgb(115,115,115);
+    box-shadow: 0 0 4px rgb(115,115,115);
     background: white;
     /*  background: rgb(226,91,80);
     background: rgb(132,200,65); */
@@ -151,8 +126,7 @@ header.animate::after {
     border-radius: 5px;
     position: relative;
     width: 100%; /* Needed for when it becomes position: absolute during deletion */
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
+    box-sizing: border-box;
     scroll-margin: 20px;
     transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s, left 0s;
 }
@@ -160,24 +134,18 @@ header.animate::after {
     opacity: 0.6;
 }
 .assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
-    -webkit-transition: none;
-    -o-transition: none;
     transition: none;
 }
 .assignment:not(.open-assignment):hover {
-    -webkit-transform: scale(var(--scale-percent),1.05);
-        -ms-transform: scale(var(--scale-percent),1.05);
-            transform: scale(var(--scale-percent),1.05);
+    transform: scale(var(--scale-percent),1.05);
     border-color: rgba(0,0,0,0.7);
     cursor: pointer;
-    -webkit-box-shadow: 0 0 7px rgb(52,52,52);
-            box-shadow: 0 0 7px rgb(52,52,52);
+    box-shadow: 0 0 7px rgb(52,52,52);
 }
 .assignment:focus {
     outline: 0;
     border: 2px solid rgb(0,95,204) !important;
-    -webkit-box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
-            box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
+    box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
 }
 .assignment::after {
     content: '';
@@ -189,13 +157,10 @@ header.animate::after {
     width: 100%;
     height: 100%;
     z-index: -1;
-    -webkit-transition: opacity .2s ease-in-out;
-    -o-transition: opacity .2s ease-in-out;
     transition: opacity .2s ease-in-out;
 }
 .assignment:not(:focus):not(.open-assignment):hover::after {
-    -webkit-box-shadow: 0 0 7px rgb(52,52,52);
-            box-shadow: 0 0 7px rgb(52,52,52);
+    box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
 #delete-starred-assignments {
@@ -263,12 +228,8 @@ header.animate::after {
     border-bottom: 2px solid black;
 }
 .assignment-header {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
+    align-items: center;
 }
 .title {
     min-width: calc(20px + 13vw);
@@ -299,9 +260,7 @@ header.animate::after {
     content: attr(data-daysleft) !important;
     position: absolute;
     font-size: 0.7em;
-    -webkit-transform: translateY(100%) translateY(5px);
-        -ms-transform: translateY(100%) translateY(5px);
-            transform: translateY(100%) translateY(5px);
+    transform: translateY(100%) translateY(5px);
     left: 15px;
 }
 .arrow-container {
@@ -314,15 +273,9 @@ header.animate::after {
     margin: 0;
     margin-right: 7px;
     white-space: initial;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-            flex-grow: 1;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
+    flex-grow: 1;
+    align-items: center;
 }
 .status-image {
     position: absolute;
@@ -599,8 +552,7 @@ canvas {
     margin-left: 13px;
 }
 canvas:focus {
-    -webkit-box-shadow: 0 0 0 3px rgb(0,95,204);
-            box-shadow: 0 0 0 3px rgb(0,95,204);
+    box-shadow: 0 0 0 3px rgb(0,95,204);
     outline: 0;
 }
 .fixed-graph {
@@ -622,8 +574,7 @@ canvas:focus {
     cursor: pointer;
 }
 .graph-footer .info-button:hover {
-    -webkit-box-shadow: none;
-            box-shadow: none;
+    box-shadow: none;
 }
 .graph-footer {
     padding: 0 13px;
@@ -637,15 +588,13 @@ canvas:focus {
     padding: 3px 6px;
     cursor: pointer;
     background: rgba(219,219,219,0.9);
-    -webkit-box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
-            box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
+    box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
 .graph-footer *:not(.info-button):focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
-    -webkit-box-shadow: 0 0 0 3px rgb(0,95,204);
-            box-shadow: 0 0 0 3px rgb(0,95,204);
+    box-shadow: 0 0 0 3px rgb(0,95,204);
 }
 .advanced-buttons, .advanced-buttons svg {
     background: none;
@@ -662,9 +611,7 @@ canvas:focus {
 .work-input-button, .mark-as-finished-button, .skew-ratio-textbox, .advanced-buttons  {
     position: relative;
     left: 50%;
-    -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-            transform: translateX(-50%);
+    transform: translateX(-50%);
 }
 .advanced-buttons {
     border-bottom: 1px solid;
@@ -701,19 +648,16 @@ input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
 .skew-ratio-textbox::-webkit-inner-spin-button {
-    -webkit-transform: translateX(-22px);
-            transform: translateX(-22px);
+    transform: translateX(-22px);
 }
 
 
 #form-wrapper input:focus, #form-wrapper label:focus {
     outline: 0;
-    -webkit-box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important;
-            box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
+    box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
 }
 #form-wrapper input:required {
-    -webkit-box-shadow: none;
-            box-shadow: none; /* Firefox */
+    box-shadow: none; /* Firefox */
 }
 #form-wrapper label::after {
     display: block;
@@ -732,8 +676,7 @@ label[for='id_ad']::after {
 #form-wrapper {
     width: min(100vw, 478px);
     background: white;
-    -webkit-box-shadow: 0 0 8px black;
-            box-shadow: 0 0 8px black;
+    box-shadow: 0 0 8px black;
     margin: 5px auto 35px;
     border: 1px solid black;
     border-radius: 15px;
@@ -764,9 +707,7 @@ label[for='id_ad']::after {
     background: white;
     padding: 0 4px;
     left: 50%;
-    -webkit-transform: translateX(-50%);
-        -ms-transform: translateX(-50%);
-            transform: translateX(-50%);
+    transform: translateX(-50%);
 }
 #form-wrapper .field {
     width: calc(100% - 50px);
@@ -781,8 +722,7 @@ label[for='id_ad']::after {
     margin: 0 25px;
 }
 #form-wrapper input {
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box; 
+    box-sizing: border-box; 
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -805,8 +745,6 @@ label[for='id_ad']::after {
 }
 #form-wrapper label.disabled-field {
     opacity: 0.6 !important;
-    -webkit-transition: opacity .25s ease-out;
-    -o-transition: opacity .25s ease-out;
     transition: opacity .25s ease-out;
 }
 #form-wrapper input:not(.disabled-field) {
@@ -814,8 +752,6 @@ label[for='id_ad']::after {
 }
 #form-wrapper input.disabled-field {
     opacity: 0.75 !important;
-    -webkit-transition: all .25s ease-out, border-width 0s, padding 0s;
-    -o-transition: all .25s ease-out, border-width 0s, padding 0s;
     transition: all .25s ease-out, border-width 0s, padding 0s;
     background-color: rgb(228,228,228);
     border-color: rgb(103,103,103);
@@ -861,14 +797,9 @@ label[for='id_ad']::after {
     display: none;
 }
 #break-days-wrapper {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
-    -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
+    justify-content: center;
+    flex-wrap: wrap;
     margin: -1em 50px 0;
 }
 
