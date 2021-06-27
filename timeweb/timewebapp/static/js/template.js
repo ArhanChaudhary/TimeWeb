@@ -194,8 +194,7 @@ $(function() {
 });
 // Info tooltip
 $.fn.info = function(facing,text,position) {
-    const info_button = $('<div class="info-button" tabindex="-1">i<span class="info-button-text info-' + facing + '">' + text + '</span></div>');
-    info_button.on('click blur', info_button_handler);
+    const info_button = $(`<div class="info-button" tabindex="-1">i<span class="info-button-text info-${facing}">${text}</span></div>`);
     switch (position) {
         case "prepend":
             return info_button.prependTo(this);
@@ -204,16 +203,6 @@ $.fn.info = function(facing,text,position) {
         default:
             return info_button.appendTo(this);
     }
-}
-function info_button_handler(_, run=true) {
-    if (run) {
-        if ($(this).data("is_showing")) {
-            $(this).data("is_showing", false).trigger('blur', false);
-        } else {
-            $(this).data("is_showing", true);
-        }
-    }
-    return false;
 }
 // from math.round mdn docs
 function precisionRound(number, precision) {

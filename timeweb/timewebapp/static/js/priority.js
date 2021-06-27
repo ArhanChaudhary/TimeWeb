@@ -50,13 +50,8 @@ priority = {
             total = 0,
             tomorrow_total = 0,
             has_autofilled = false;
-        const number_of_assignments = $(".assignment").length;
         $(".assignment").each(function(index) {
-            // Direct copy of loading in data from graph.js
-            // Changing this is definitely on my todo list
             const dom_assignment = $(this);
-            // Fixes the tag add box going behind the below assignment on scale
-            dom_assignment.css("z-index", number_of_assignments - index);
             const sa = new VisualAssignment(dom_assignment);
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
@@ -344,7 +339,15 @@ priority = {
         }
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
-        if (!params.first_sort) ordering.transitionSwaps();
+        if (params.first_sort) {
+            const number_of_assignments = $(".assignment").length;
+            $(".assignment").each(function(index) {
+                // Fixes the tag add box going behind the below assignment on scale
+                $(this).css("z-index", number_of_assignments - index);
+            });
+        } else {
+            ordering.transitionSwapsAndSetZIndex();
+        }
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
@@ -386,11 +389,13 @@ priority = {
     },
 }
 ordering = {
+
     setInitialTopAssignmentOffsets: function() {
         $(".assignment-container").each(function() {
             $(this).attr("data-initial-top-offset", $(this).offset().top);
         });
     },
+
     sortAssignments: function(ordered_assignments) {
         // Selection sort
         for (let [index, sa] of ordered_assignments.entries()) {
@@ -405,6 +410,7 @@ ordering = {
             }
         }
     },
+
     domSwapAssignments: function(tar1_index, tar2_index) {  
         const tar1 = $(".assignment-container").eq(tar1_index),
                 tar2 = $(".assignment-container").eq(tar2_index);
@@ -413,8 +419,10 @@ ordering = {
         swap_temp.after(tar1);
         swap_temp.remove();
     },
-    transitionSwaps: function() {
-        $(".assignment-container").each(function() {
+
+    transitionSwapsAndSetZIndex: function() {
+        const number_of_assignments = $(".assignment").length;
+        $(".assignment-container").each(function(index) {
             const initial_height = $(this).attr("data-initial-top-offset");
             const current_translate_value = ($(this).css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
             // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
@@ -429,6 +437,8 @@ ordering = {
                         transform: "",
                         transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
                     });
+            // Fixes the tag add box going behind the below assignment on scale
+            $(this).children(".assignment").css("z-index", number_of_assignments - index);
         });
     },
     deleteStarredAssignmentsListener: function() {
@@ -491,16 +501,12 @@ ordering = {
             let message;
             switch ($("#autofill-selection").val()) {
                 case "No":
-                    message = `This applies to ALL assignments you haven't entered past work inputs for (white assignments)
-                    
-                    Assumes you haven't done anything since your last work input and autofills in no work done until today
+                    message = `Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for
                     
                     Click the horizontal line to perform this action`;
                     break;
                 case "All":
-                    message = `This applies to ALL assignments you haven't entered past work inputs for (white assignments)
-                
-                    Assumes you followed your work schedule since your last work input and autofills in all work done until today
+                    message = `Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for
                     
                     Click the horizontal line to perform this action`;
                     break;

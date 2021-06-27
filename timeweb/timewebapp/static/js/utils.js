@@ -294,6 +294,12 @@ utils = {
                     hideForm();
                 }
             });
+            $(".tag-add-input").keydown(function(e) {
+                if (e.key === "Enter") {
+                    // blur so it hides the tag add box
+                    $(this).blur().siblings(".tag-add-button").click();
+                }
+            });
         },
         setAssignmentScaleUtils: function() {
             // width * percent = width+10

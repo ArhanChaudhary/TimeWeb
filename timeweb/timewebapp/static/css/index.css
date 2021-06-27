@@ -154,9 +154,7 @@ header.animate::after {
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
     scroll-margin: 20px;
-    -webkit-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
-    -o-transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
-    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s;
+    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s, left 0s;
 }
 .assignment.mark-as-done {
     opacity: 0.6;
@@ -405,22 +403,17 @@ header.animate::after {
     opacity: 1;
 }
 .tag-add-box {
-    display: block;
-    padding: 0 !important;
-    border: none;
     white-space: normal;
     width: 152px;
-    height: 0;
-    overflow: hidden;
     box-shadow: 0 2px 5px 1px rgba(170,170,170,0.65) !important;
+    background: white !important;
     transform-origin: top;
     transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
-    opacity: 0;
     transition: transform 0.15s cubic-bezier(0.31, 1.15, 0.5, 1.2), opacity 0.1s ease-out;
 }
 .tag-add-box::after {
     border-color: transparent transparent rgb(220,220,220) transparent !important;
-    bottom: 100% !important;
+    bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
 }
 .tag-add.open-tag-add-box .tag-add-box {
     transform: translateX(-50%) translateX(6px) !important;
@@ -628,7 +621,7 @@ canvas:focus {
     line-height: 17px;
     cursor: pointer;
 }
-.graph-footer .info-button:focus {
+.graph-footer .info-button:hover {
     -webkit-box-shadow: none;
             box-shadow: none;
 }
@@ -647,7 +640,7 @@ canvas:focus {
     -webkit-box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
             box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
-.graph-footer *:focus {
+.graph-footer *:not(.info-button):focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
@@ -879,23 +872,6 @@ label[for='id_ad']::after {
     margin: -1em 50px 0;
 }
 
-
-.info-button:focus {
-    background: rgb(16,135,148) !important;
-    outline: 0;
-}
-.info-button:focus .info-button-text {
-    opacity: 1;
-    height: auto;
-    padding: 5px 5px !important;
-    border: 2px solid black !important;
-    -webkit-transition: all .2s ease-in-out;
-    -o-transition: all .2s ease-in-out;
-    transition: all .2s ease-in-out;
-}
-.info-button:focus .info-button-text.info-right {
-    left: calc(100% + 12px);
-}
 
 .add-white-shadow {
     text-shadow: 1px 1px white, -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white;

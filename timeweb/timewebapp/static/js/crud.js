@@ -151,9 +151,7 @@ $(function() {
     $('label[for="id_works"]').info('right',
         `The following is only relevant if you are re-entering this field
 
-        This value is also the y-coordinate of the first point on the blue line, or the initial work input
-        
-        Changing this initial value will vertically translate all of your other work inputs accordingly`
+        This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`
     );
     $('label[for="id_funct_round"]').info('right',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
@@ -260,8 +258,6 @@ $(function() {
     });
     // Focus on first invalid field
     $("#form-wrapper .error-note").first().prev().children("input").first().focus();
-    // Prevent label from stealing focus from info button
-    $("#form-wrapper .info-button").click(() => false);
     // Delete assignment
     $('.delete-button').click(function(e) {
         const $this = $(this),

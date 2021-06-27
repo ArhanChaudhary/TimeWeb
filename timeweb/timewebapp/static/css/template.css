@@ -286,8 +286,8 @@ nav.open #nav-menu::after {
 
 
 .info-button {
-    cursor: pointer;
     display: inline-block;
+    cursor: default !important;
     position: relative;
     bottom: 1px;
     left: 4px;
@@ -304,55 +304,42 @@ nav.open #nav-menu::after {
     text-align: center;
     line-height: 15px;
 }
-.info-button:focus {
-    background: rgb(16,135,148) !important;
+.info-button:hover {
+    background: rgb(16,135,148);
     outline: 0;
 }
-.info-button:focus .info-button-text {
-    display: block;
-    -webkit-animation: .1s ease-in-out 1 fadeIn;
-            animation: .1s ease-in-out 1 fadeIn;
-}
-@-webkit-keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-        
-    }
-}
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-        
-    }
+.info-button:hover .info-button-text {
+    height: unset;
+    border: 2px solid black;
+    overflow: visible;
+    padding: 5px 5px !important;
+    transition: padding .1s ease-in-out, opacity .15s linear;
+    opacity: 1;
 }
 .info-button-text {
     position: absolute;
     width: 265px;
-    z-index: 3;
+    z-index: 100;
 
     user-select: none;
-    background: white !important;
+    background: rgb(245,245,245) !important;
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.75);
             box-shadow: 0 0 5px rgba(0,0,0,0.75);
     border-radius: 5px !important;
     -webkit-box-shadow: none !important;
             box-shadow: none !important;
-    border: 2px solid black;
-    display: none;
-    cursor: pointer;
+    border: none;
+    height: 0;
+    overflow: hidden;
+    display: block;
     text-align: left;
-    padding: 5px 5px !important;
+    padding: 0 !important;
     color: black;
     font-size: 13px;
     line-height: 13px;
     font-style: normal;
     white-space: pre-line;
+    opacity: 0;
 }
 .info-button-text.info-right {
     left: calc(100% + 14px);
@@ -418,6 +405,10 @@ nav.open #nav-menu::after {
         -ms-transform: translateX(50%);
             transform: translateX(50%);
     border-color: transparent transparent black transparent;
+}
+/* Don't know why this is here but it is here */
+.info-button:hover .info-button-text.info-right {
+    left: calc(100% + 12px);
 }
 
 
