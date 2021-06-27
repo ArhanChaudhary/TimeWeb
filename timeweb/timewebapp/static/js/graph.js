@@ -589,7 +589,6 @@ class VisualAssignment extends Assignment {
         }
         this.setParabolaValues();
         // Save skew ratio and draw
-        this.sa.skew_ratio = this.sa.skew_ratio; // Change this so it is locally saved when the assignment is closed so it is loaded in correctly when reopened
         this.old_skew_ratio = this.sa.skew_ratio;
         ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
         priority.sort();
@@ -650,7 +649,8 @@ class VisualAssignment extends Assignment {
             // Reverses the logic of work inputs in and recursively decreases red_line_start_x
             if (this.red_line_start_x > len_works + this.sa.blue_line_start) {
                 // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                outer: for (this.red_line_start_x = this.red_line_start_x - 2; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
+                outer: 
+                for (this.red_line_start_x = this.red_line_start_x - 2; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
                     this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
                     if (this.sa.break_days.length) {
                         this.mods = this.calcModDays();

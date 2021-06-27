@@ -278,9 +278,9 @@ utils = {
                 });
             }
             $(".tag-add").focusout(function() {
-                $(this).parents(".tag-add").removeClass("open-tag-add-box");
+                $(this).removeClass("open-tag-add-box");
             }).focusin(function() {
-                $(this).parents(".tag-add").addClass("open-tag-add-box");
+                $(this).addClass("open-tag-add-box");
             });
         },
         setKeybinds: function() {
