@@ -188,7 +188,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
-        if self.isExampleAccount: return HttpResponse(status=204)
+        # if self.isExampleAccount: return HttpResponse(status=204)
         # AJAX requests
         action = request.POST['action']
         if action == 'delete_assignment':

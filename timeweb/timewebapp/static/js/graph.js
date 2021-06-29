@@ -214,7 +214,7 @@ class VisualAssignment extends Assignment {
             move_info_down = 0;
             let should_be_done_x = VisualAssignment.width - 155 + todo / this.sa.y * 146,
                 bar_move_left = should_be_done_x - VisualAssignment.width + 17;
-            if (bar_move_left < 0 || this.sa.x <= today_minus_ad || last_work_input >= this.sa.y) {
+            if (bar_move_left < 0 || this.sa.x <= this.today_minus_ad || last_work_input >= this.sa.y) {
                 bar_move_left = 0
             } else if (should_be_done_x > VisualAssignment.width - 8) {
                 bar_move_left = VisualAssignment.width - 8;
@@ -250,7 +250,7 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
-            if (this.sa.x > today_minus_ad && last_work_input < this.sa.y) {
+            if (this.sa.x > this.today_minus_ad && last_work_input < this.sa.y) {
                 screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, VisualAssignment.width-81, VisualAssignment.height-68);
                 const done_x = VisualAssignment.width-153+last_work_input/this.sa.y*144-bar_move_left;
                 screen.fillStyle = "white";

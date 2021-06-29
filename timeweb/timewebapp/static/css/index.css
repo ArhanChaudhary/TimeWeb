@@ -520,7 +520,7 @@ header.animate::after {
     align-items: center;
     justify-content: center;
     margin: -13px 0;
-    margin-right: -2px;
+    margin-right: -4px;
     min-width: 40px;
     min-height: 40px;
     cursor: pointer;
