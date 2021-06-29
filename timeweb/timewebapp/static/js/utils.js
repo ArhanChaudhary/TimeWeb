@@ -551,7 +551,7 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
-org_dat = dat.slice(0);
+org_dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
     sa.assignment_date = new Date(utils.formatting.parseDate(sa.assignment_date));
     sa.x = utils.daysBetweenTwoDates(utils.formatting.parseDate(sa.x), sa.assignment_date);
