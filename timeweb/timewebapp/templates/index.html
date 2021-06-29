@@ -19,7 +19,7 @@
   <div id="overlay">
     <div id="form-wrapper">
       <form method="POST" autocomplete="off">
-        <img id="cancel-button" class="button" width="30" height="30" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
+        <img id="cancel-button" class="button" width="20" height="20" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
         <div id="new-title-line"></div>
         <div id="new-title">New Assignment</div>
         {% csrf_token %}
@@ -135,8 +135,8 @@
               </div>
               <span class="completion-time"></span>
             </div>
-            <div class="button">
-              <img class="update-button" data-assignment-name="{{ assignment.assignment_name }}" width="22" height="22" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
+            <div class="button" data-assignment-name="{{ assignment.assignment_name }}">
+              <img class="update-button" width="22" height="22" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </div>
             <div class="button">
               <img class="delete-button" height="25" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
