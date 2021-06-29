@@ -53,13 +53,12 @@ priority = {
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
+            sa.setParabolaValues();
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
-            sa.setParabolaValues();
-            // Will document soon
             let today_minus_ad = utils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
-                todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
+            let todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),

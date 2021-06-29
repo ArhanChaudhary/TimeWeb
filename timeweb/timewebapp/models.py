@@ -149,14 +149,20 @@ class SettingsModel(models.Model):
     )
     color_priority = models.BooleanField(
         default=True,
-        verbose_name=_('Display Priority with Color'),
+        verbose_name=_('Show Priority Colors'),
     )
     text_priority = models.BooleanField(
         default=True,
-        verbose_name=_('Display Priority with Text'),
+        verbose_name=_('Show Priority Text'),
     )
-    highest_priority_color = ColorField(default="#e25b50")
-    lowest_priority_color = ColorField(default="#84c841")
+    highest_priority_color = ColorField(
+        default="#e25b50",
+        verbose_name=_('Highest Priority Color'),
+    )
+    lowest_priority_color = ColorField(
+        default="#84c841",
+        verbose_name=_('Lowest Priority Color'),
+    )
     background_image = models.ImageField(
         upload_to=create_path,
         null=True,

@@ -178,6 +178,32 @@ class VisualAssignment extends Assignment {
         this.draw(x2, y2);
     }
     static scale = window.devicePixelRatio || 2; // Resolution of every graph
+    static preventArrowScroll(e) {
+        // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            e.preventDefault();
+        }
+    }
+    changeSkewRatio() {
+        // Change skew ratio by +- 0.1 and cap it
+        if (this.pressed_arrow_key === "ArrowDown") {
+            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio - 0.1, 1);
+            if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
+                this.sa.skew_ratio = this.skew_ratio_lim;
+            }
+        } else {
+            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio + 0.1, 1);
+            if (this.sa.skew_ratio > this.skew_ratio_lim) {
+                this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+            }
+        }
+        this.setParabolaValues();
+        // Save skew ratio and draw
+        this.old_skew_ratio = this.sa.skew_ratio;
+        ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+        priority.sort();
+        this.draw();
+    }
     draw(x2, y2) {
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
@@ -567,32 +593,6 @@ class VisualAssignment extends Assignment {
             screen.fillText("Today Line", (VisualAssignment.height-50)/2, -today_x-2.5);
             screen.rotate(-Math.PI / 2);
         }
-    }
-    static preventArrowScroll(e) {
-        // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
-        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-            e.preventDefault();
-        }
-    }
-    changeSkewRatio() {
-        // Change skew ratio by +- 0.1 and cap it
-        if (this.pressed_arrow_key === "ArrowDown") {
-            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio - 0.1, 1);
-            if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
-                this.sa.skew_ratio = this.skew_ratio_lim;
-            }
-        } else {
-            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio + 0.1, 1);
-            if (this.sa.skew_ratio > this.skew_ratio_lim) {
-                this.sa.skew_ratio = 2 - this.skew_ratio_lim;
-            }
-        }
-        this.setParabolaValues();
-        // Save skew ratio and draw
-        this.old_skew_ratio = this.sa.skew_ratio;
-        ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-        priority.sort();
-        this.draw();
     }
     setAssignmentEventListeners() {
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
