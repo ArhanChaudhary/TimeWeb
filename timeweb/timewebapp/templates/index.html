@@ -19,7 +19,7 @@
   <div id="overlay">
     <div id="form-wrapper">
       <form method="POST" autocomplete="off">
-        <img id="cancel-button" class="button" width="45" height="45" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
+        <img id="cancel-button" class="button" width="30" height="30" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
         <div id="new-title-line"></div>
         <div id="new-title">New Assignment</div>
         {% csrf_token %}
@@ -59,12 +59,9 @@
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
-      <div id="advanced" tabindex="0"{% if background_image %} class="add-white-shadow"{% endif %}>
+      <div id="advanced" tabindex="0">
         Advanced
         <svg width="17px" height="10px"{% if not background_image %} id="move-advanced-arrow"{% endif %}>
-          {% if background_image %}
-          <polygon points="14,1.5 0,1.5 7,9" fill="white"></polygon>
-          {% endif %}
           <polygon points="12,2.5 2,2.5 7,7.5"></polygon>
         </svg>
         <div id="advanced-options" class="hidden">
@@ -93,7 +90,7 @@
       <span id="delete-starred-assignments-text" class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container"{% if assignment.assignment_name == request.session.added_assignment %} id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %} id="animate-color"{% endif %}>
+      <div class="assignment-container{% if background_image %} add-white-shadow{% endif %}"{% if assignment.assignment_name == request.session.added_assignment %} id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %} id="animate-color"{% endif %}>
         <div class="assignment" data-assignment-name="{{ assignment.assignment_name }}" tabindex="0">
           <div class="assignment-header">
             <span class="title">{{ assignment.assignment_name }}</span>
@@ -118,7 +115,7 @@
                       </div>
                     </div>
                   {% endfor %}
-                  <div class="tag-add" data-assignment-name="{{ assignment.assignment_name }}" tabindex="-1">
+                  <div class="tag-add" data-assignment-name="{{ assignment.assignment_name }}" >
                   {% endspaceless %}
                     <span class="icon-slash plus-first-slash"></span>
                     <span class="icon-slash plus-second-slash"></span>
@@ -138,8 +135,12 @@
               </div>
               <span class="completion-time"></span>
             </div>
-            <img class="button update-button" data-assignment-name="{{ assignment.assignment_name }}" width="45" height="45" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
-            <img class="button delete-button" width="45" height="45" src="{% static 'images/x.png' %}" alt="edit" draggable="false"/>
+            <div class="button">
+              <img class="update-button" data-assignment-name="{{ assignment.assignment_name }}" width="22" height="22" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
+            </div>
+            <div class="button">
+              <img class="delete-button" height="25" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
+            </div>
           </div>
           <div class="relative-positioning-wrapper">
             <div class="graph-container">

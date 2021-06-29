@@ -107,7 +107,7 @@ $(function() {
         showForm();
     });
     // Populate reentered form on modify
-    $('.update-button').click(function() {
+    $('.update-button').parent().click(function() {
         // Set form text
         $("#new-title").html("Re-enter Assignment");
         $("#submit-assignment-button").html("Modify Assignment");
@@ -259,7 +259,7 @@ $(function() {
     // Focus on first invalid field
     $("#form-wrapper .error-note").first().prev().children("input").first().focus();
     // Delete assignment
-    $('.delete-button').click(function(e) {
+    $('.delete-button').parent().click(function(e) {
         const $this = $(this),
             dom_assignment = $this.parents(".assignment");
         if (e.shiftKey || confirm(isMobile ? 'Are you sure you want to delete this assignment?' : 'Are you sure you want to delete this assignment? (Press Enter)')) {
@@ -270,21 +270,18 @@ $(function() {
             // Send data to backend and animates its deletion
             const sa = utils.loadAssignmentData(dom_assignment);
             const success = function() {
-                new Promise(function(resolve) {
-                    if (dom_assignment.hasClass("open-assignment")) {
-                        dom_assignment.click().find(".graph-container").one("transitionend", resolve);
-                    } else {
-                        resolve();
-                    }
-                }).then(function() {
-                    // Opacity CSS transition
-                    dom_assignment.css("opacity", "0");
-                    const assignment_container = dom_assignment.parents(".assignment-container");
-                    // Animate height on assignment_container because it doesn't have a transition
-                    // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
+                // Make overflow hidden because trying transitioning margin bottom off the screen as done below still allows it to be scrolled to
+                $("#assignments-container").css("overflow", "hidden");
+                // Opacity CSS transition
+                dom_assignment.css("opacity", "0");
+                const assignment_container = dom_assignment.parents(".assignment-container");
+                // Animate height on assignment_container because it doesn't have a transition
+                // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
 
-                    // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
-                    assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
+                // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
+                // let c = 0;
+                assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
+                        $("#assignments-container").css("overflow", "");
                         // Remove assignment data from dat
                         dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
                         // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
@@ -294,9 +291,8 @@ $(function() {
                         // Remove assignment from DOM
                         assignment_container.remove();
                         // Although nothing needs to be swapped, priority.sort() still needs to be run
-                        // This is to recolor assignments and place "delete all starred assignments" accordingly
+                        // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
                         priority.sort({ ignore_timeout: true });
-                    });
                 });
                 if (!ajaxUtils.disable_ajax) {
                     gtag("event","delete_assignment");
@@ -317,7 +313,6 @@ $(function() {
                 error: function() {
                     // If ajax failed, allow updating or deleting again and dequeue
                     dom_assignment.css("pointer-events", "auto");
-                    $(document).dequeue();
                     ajaxUtils.error(...arguments);
                 }
             });

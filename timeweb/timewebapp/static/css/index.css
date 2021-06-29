@@ -2,7 +2,6 @@
 #assignments-container {
     position: relative;
 }
-/* Only perform box-shadow and transform transitions */
 main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
 }
@@ -206,14 +205,14 @@ header.animate::after {
     border-left: 2px solid black;
     top: -2px;
     left: -1px;
-    height: 11px;
+    height: 12px;
 }
 .assignment-container.incomplete-works::before, .assignment-container.finished::before {
     content: '';
     position: absolute;
     height: 100%;
     left: 2px;
-    bottom: 0;
+    bottom: -1px;
     border-left: 2px solid black;
 }
 .assignment-container.first-finished::before {
@@ -222,8 +221,8 @@ header.animate::after {
 .assignment-container.last-incomplete-works::after, .assignment-container.last-finished::after {
     content: '';
     position: absolute;
-    width: 25px;
-    left: 2px;
+    width: 23px;
+    left: 4px;
     bottom: -1px;
     border-bottom: 2px solid black;
 }
@@ -516,24 +515,39 @@ header.animate::after {
     margin-left: auto;
 }
 .button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: -13px 0;
+    margin-right: -2px;
+    min-width: 40px;
+    min-height: 40px;
     cursor: pointer;
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
-.button:hover, .button:focus {
-    filter: brightness(1.11);
-    transform: scale(1.02);
+.button + .button {
+    margin-right: -7px;
+}
+.button::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255,255,255,0.6);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+.button:hover::after {
+    opacity: 0.75;
+}
+.button:focus {
     outline: 0;
 }
 .button:active {
-    filter: none;
     transform: scale(0.95);
-}
-.update-button {
-    margin-left: auto;
-}
-.delete-button {
-    margin-right: -3px;
 }
 .graph-container {
     position: relative;
@@ -687,8 +701,11 @@ label[for='id_ad']::after {
     position: absolute;
     cursor: pointer;
     right: 7px;
-    top: 16px;
+    top: 18px;
+    border: 7px solid white;
     z-index: 1;
+    min-height: unset;
+    min-width: unset;
     background-color: white;
 }
 #form-wrapper #new-title-line {
@@ -804,20 +821,16 @@ label[for='id_ad']::after {
 }
 
 
-.add-white-shadow {
-    text-shadow: 1px 1px white, -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white;
+:not(.assignment-container).add-white-shadow {
+    mix-blend-mode: difference;
+    color: white;
 }
-#advanced.add-white-shadow::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: -1px;
-    height: 3px;
-    width: calc(100% + 2px);
-    background-color: black;
-    box-shadow: inset 0 0 0 1px white;
+.shortcut-line-right.add-white-shadow, .shortcut-line-left.add-white-shadow,
+.shortcut-line-left.add-white-shadow::after {
+    border-color: white !important;
 }
-.shortcut-line-right.add-white-shadow, .shortcut-line-left.add-white-shadow {
-    text-shadow: none;
-    box-shadow: 0 0 0 1px white;
+.assignment-container.add-white-shadow::before,
+.assignment-container.add-white-shadow::after {
+    mix-blend-mode: difference;
+    border-color: white !important;
 }

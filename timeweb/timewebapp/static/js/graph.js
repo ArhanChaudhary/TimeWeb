@@ -446,7 +446,7 @@ class VisualAssignment extends Assignment {
                 label_x_pos = -5;
         }
         if (screen.measureText(text).width > VisualAssignment.height - 50) {
-            text = pluralize(this,unit);
+            text = pluralize(this.sa.unit);
         }
         screen.fillText(text, (VisualAssignment.height - 50) / 2, label_x_pos);
         screen.rotate(-Math.PI / 2);
@@ -574,7 +574,7 @@ class VisualAssignment extends Assignment {
             e.preventDefault();
         }
     }
-    static changeSkewRatio() {
+    changeSkewRatio() {
         // Change skew ratio by +- 0.1 and cap it
         if (this.pressed_arrow_key === "ArrowDown") {
             this.sa.skew_ratio = precisionRound(this.sa.skew_ratio - 0.1, 1);
@@ -613,17 +613,17 @@ class VisualAssignment extends Assignment {
             graphinterval;
         $(document).keydown((e) => {
             // fixed_graph.is(":visible") to make sure it doesnt change when the assignment is closed
-            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && this.fixed_graph.is(":visible")) {
+            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.fixed_graph.is(":visible")) {
                 const rect = this.fixed_graph[0].getBoundingClientRect();
                 // Makes sure graph is on screen
                 if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
                     // "fired" makes .keydown fire only when a key is pressed, not repeatedly
                     fired = true;
                     this.pressed_arrow_key = e.key;
-                    VisualAssignment.changeSkewRatio();
+                    this.changeSkewRatio();
                     graphtimeout = setTimeout(function() {
                         clearInterval(graphinterval);
-                        graphinterval = setInterval(VisualAssignment.changeSkewRatio.bind(this), 13);
+                        graphinterval = setInterval(this.changeSkewRatio.bind(this), 13);
                     }, 500);
                 }
             }
@@ -760,6 +760,10 @@ class VisualAssignment extends Assignment {
         next_assignment_button.click(() => {
             const next_assignment = this.dom_assignment.parents(".assignment-container").next().children(".assignment");
             if (next_assignment.length && !next_assignment.hasClass("open-assignment")) {  
+                this.dom_assignment[0].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
                 this.dom_assignment.click();
                 next_assignment.click();
             }
@@ -948,7 +952,7 @@ class VisualAssignment extends Assignment {
 }
 $(function() {
 $(".assignment").click(function(e) {
-    if (!$(e.target).is(".status-message, .right-side-of-header, .relative-positioning-wrapper, .assignment, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
+    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .relative-positioning-wrapper, .assignment, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
     const dom_assignment = $(this);
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
     if (dom_assignment.hasClass("mark-as-done") && !utils.loadAssignmentData(dom_assignment).mark_as_done) {

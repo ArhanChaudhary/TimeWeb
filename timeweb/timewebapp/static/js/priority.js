@@ -52,22 +52,21 @@ priority = {
             has_autofilled = false;
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
-            const sa = new VisualAssignment(dom_assignment);
+            const sa = new Assignment(dom_assignment);
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
             sa.setParabolaValues();
             // Will document soon
-            let daysleft = utils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
+            let today_minus_ad = utils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
                 todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
-            const today_minus_dac = daysleft - sa.sa.blue_line_start;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index);
-            if (params.autofill_all_work_done && today_minus_dac > len_works && !params.do_not_autofill) {
-                const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
+            if (params.autofill_all_work_done && today_minus_ad > sa.sa.blue_line_start + len_works && !params.do_not_autofill) {
+                const number_of_forgotten_days = today_minus_ad - sa.sa.blue_line_start - len_works; // Make this a variable so len_works++ doesn't affect this
                 for (i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                     has_autofilled = true;
@@ -82,7 +81,7 @@ priority = {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                 }
             }
-            let strdaysleft, status_value, status_message, status_image;
+            let str_daysleft, status_value, status_message, status_image;
             if (last_work_input >= sa.sa.y) {
                 status_image = "completely-finished";
                 status_message = 'You are Completely Finished with this Assignment';
@@ -91,25 +90,25 @@ priority = {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = 1;
-                strdaysleft = '';
-            } else if (daysleft < 0) {
+                str_daysleft = '';
+            } else if (today_minus_ad < 0) {
                 status_image = "not-assigned";
                 status_message = 'This Assignment has Not Yet been Assigned';
                 dom_status_image.attr({
                     width: 18,
                     height: 20,
                 }).css("margin-left", -3);
-                if (daysleft === -1) {
-                    strdaysleft = 'Assigned Tomorrow';
-                } else if (daysleft > -7) {
-                    strdaysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                if (today_minus_ad === -1) {
+                    str_daysleft = 'Assigned Tomorrow';
+                } else if (today_minus_ad > -7) {
+                    str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
                 } else {
-                    strdaysleft = `Assigned in ${-daysleft}d`;
+                    str_daysleft = `Assigned in ${-today_minus_ad}d`;
                 }
                 status_value = 2;
             } else {
-                if (today_minus_dac > len_works && !params.do_not_autofill) {
-                    const number_of_forgotten_days = today_minus_dac-len_works; // Make this a variable so len_works++ doesn't affect this
+                if (today_minus_ad > len_works + sa.sa.blue_line_start && !params.do_not_autofill) {
+                    const number_of_forgotten_days = today_minus_ad - sa.sa.blue_line_start - len_works; // Make this a variable so len_works++ doesn't affect this
                     for (i = 0; i < number_of_forgotten_days; i++) {
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                         const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.blue_line_start) % 7);
@@ -139,8 +138,8 @@ priority = {
                 if (sa.sa.break_days.length) {
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + sa.mods[x1 % 7]; // Handles break days, explained later
                 }
-                daysleft = sa.sa.x - daysleft;
-                if (today_minus_dac > len_works || !x1) {
+                var due_date_minus_today = sa.sa.x - today_minus_ad;
+                if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
@@ -152,7 +151,7 @@ priority = {
                         height: 18,
                     }).css("margin-left", 2);
                     status_value = 6;
-                } else if (todo <= 0 || today_minus_dac < len_works) {
+                } else if (todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start) {
                     status_image = 'finished';
                     status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
                     dom_status_image.attr({
@@ -185,24 +184,24 @@ priority = {
                     }
                     total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
                 }
-                if (daysleft < -1) {
-                    strdaysleft = -daysleft + "d Ago";
-                } else if (daysleft === -1) {
-                    strdaysleft = 'Yesterday';
-                } else if (daysleft === 0) {
-                    strdaysleft = 'Today';
-                } else if (daysleft === 1) {
-                    strdaysleft = 'Tomorrow';
+                if (due_date_minus_today < -1) {
+                    str_daysleft = -due_date_minus_today + "d Ago";
+                } else if (due_date_minus_today === -1) {
+                    str_daysleft = 'Yesterday';
+                } else if (due_date_minus_today === 0) {
+                    str_daysleft = 'Today';
+                } else if (due_date_minus_today === 1) {
+                    str_daysleft = 'Tomorrow';
                     tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
                     if (status_value !== 6) {
                         status_value = 5;
                     }
-                } else if (daysleft < 7) {
+                } else if (due_date_minus_today < 7) {
                     const due_date = new Date(sa.sa.assignment_date.valueOf());
                     due_date.setDate(due_date.getDate() + sa.sa.x);
-                    strdaysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                    str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {
-                    strdaysleft = daysleft + "d";
+                    str_daysleft = due_date_minus_today + "d";
                 }
             }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
@@ -212,9 +211,10 @@ priority = {
             if (status_value === 1) {
                 status_priority = -index;
             } else if (status_value === 2) {
-                status_priority = daysleft;
+                status_priority = today_minus_ad;
             } else if (status_value === 6) {
-                status_priority = -daysleft;
+                // Order by assignments closest their due date
+                status_priority = -due_date_minus_today;
             } else {
                 const original_skew_ratio = sa.sa.skew_ratio;
                 sa.sa.skew_ratio = 1;
@@ -225,9 +225,9 @@ priority = {
                 }
                 sa.setParabolaValues();
                 sa.sa.skew_ratio = original_skew_ratio;
-                if (len_works + sa.sa.blue_line_start === sa.sa.x || todo < 0 || len_works > today_minus_dac) {
+                if (len_works + sa.sa.blue_line_start === sa.sa.x || todo < 0 || len_works + sa.sa.blue_line_start > today_minus_ad) {
                     status_priority = 0;
-                } else if (len_works && daysleft !== 1) {
+                } else if (len_works && due_date_minus_today !== 1) {
                     let sum_diff_red_blue = 0;
                     for (i = 1; i < len_works + 1; i++) { // Start at one because funct(0) - works[0] is always 0
                         if (!sa.sa.break_days.includes(sa.assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - sa.funct(i + blue_line_start); is a break day
@@ -249,7 +249,7 @@ priority = {
 
             dom_status_image.attr("src", `/static/images/status_icons/${status_image}.png`)
             dom_status_message.html(status_message);
-            dom_title.attr("data-daysleft", strdaysleft);
+            dom_title.attr("data-daysleft", str_daysleft);
             if (display_format_minutes) {
                 dom_completion_time.html(utils.formatting.formatMinutes(todo * sa.sa.ctime));
             } else {

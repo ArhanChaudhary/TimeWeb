@@ -277,10 +277,14 @@ utils = {
                     }
                 });
             }
-            $(".tag-add").focusout(function() {
-                $(this).removeClass("open-tag-add-box");
-            }).focusin(function() {
-                $(this).addClass("open-tag-add-box");
+            $(".tag-add").focusout(function(e) {
+                console.log(e);
+                const $this = $(this);
+                setTimeout(function() {
+                    const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
+                    if ($(document.activeElement).parents(".tag-add").length || tag_add_text_clicked) return;
+                    $this.removeClass("open-tag-add-box");
+                });
             });
         },
         setKeybinds: function() {
@@ -291,7 +295,51 @@ utils = {
                     $("#image-new-container").click();
                     return false;
                 } else if (e.key === "Escape") {
-                    hideForm();
+                    hideForm()
+                } else if (e.key === "ArrowDown" && e.shiftKey) {
+                    // If there is an open assignment in view, select that one and 
+                    const first_open_assignment = $(".assignment.open-assignment").first();
+                    if (first_open_assignment.length) {
+                        var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
+                        first_open_assignment[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                    } else {
+                        var assignment_to_be_opened = $(".assignment").first();
+                        assignment_to_be_opened[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                    }
+                    first_open_assignment.click();
+                    if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                        assignment_to_be_opened.click();
+                    }
+                } else if (e.key === "ArrowUp" && e.shiftKey) {
+                    // If there is an open assignment in view, select that one and 
+                    const last_open_assignment = $(".assignment.open-assignment").last();
+                    if (last_open_assignment.length) {
+                        var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
+                        if (assignment_to_be_opened.length) {
+                            assignment_to_be_opened[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                            });
+                        }
+                    } else {
+                        var assignment_to_be_opened = $(".assignment").last();
+                    }
+                    last_open_assignment.click();
+                    if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                        assignment_to_be_opened.click();
+                    }
+                    if (!last_open_assignment.length) {
+                        assignment_to_be_opened[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'end',
+                        });        
+                    }
                 }
             });
             $(".tag-add-input").keydown(function(e) {
@@ -514,6 +562,7 @@ for (let sa of dat) {
     sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
+    sa.tags = sa.tags || [];
 }
 ({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
