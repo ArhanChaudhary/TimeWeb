@@ -130,7 +130,7 @@ if os.getenv('GAE_APPLICATION', None):
         }
     }
 else:
-    proxy = 1
+    proxy = 0
     if proxy:
         # If running locally and connecting to server database, connect via the proxy.
         #
