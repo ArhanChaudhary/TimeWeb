@@ -410,12 +410,8 @@ utils = {
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
-    loadAssignmentData: function($element_with_assignment_name_attribute, params={}) {
-        if (params.load_original_data) {
-            return org_dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
-        } else {
-            return dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
-        }
+    loadAssignmentData: function($element_with_assignment_name_attribute) {
+        return dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
     },
     // Resolves a resolver promise function when automatic scrolling ends
     // Scrolling detected with $("main").scroll(scroll);
@@ -467,14 +463,10 @@ ajaxUtils = {
             if (example_assignment === undefined) {
                 data["days_since_example_ad"] = 0;
             } else {
-                const days_since_example_ad = utils.daysBetweenTwoDates(date_now, utils.formatting.parseDate(example_assignment.assignment_date));
+                const days_since_example_ad = utils.daysBetweenTwoDates(date_now, example_assignment.assignment_date);
                 data["days_since_example_ad"] = days_since_example_ad;
-                const assignment_date = new Date(utils.formatting.parseDate(example_assignment.assignment_date));
-                assignment_date.setDate(assignment_date.getDate() + days_since_example_ad);
-                example_assignment.assignment_date = utils.formatting.stringifyDate(assignment_date);
-                const x = new Date(utils.formatting.parseDate(example_assignment.x));
-                x.setDate(x.getDate() + days_since_example_ad);
-                example_assignment.x = utils.formatting.stringifyDate(x);
+                // Change example assignment date locally
+                example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
             }
             $.ajax({
                 type: "POST",
@@ -551,7 +543,6 @@ if ( window.history.replaceState ) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
-org_dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
     sa.assignment_date = new Date(utils.formatting.parseDate(sa.assignment_date));
     sa.x = utils.daysBetweenTwoDates(utils.formatting.parseDate(sa.x), sa.assignment_date);

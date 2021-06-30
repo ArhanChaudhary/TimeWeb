@@ -50,7 +50,6 @@ function replaceUnit() {
     const units_of_time = {"minute": 1, "hour": 60};
     const chose_units_of_time = units_of_time[singular.toLowerCase()];
     // Replace fields
-    // onlyText is defined at the bottom
     if (val) {
         if (chose_units_of_time) {
             $("label[for='id_y']").text(`Estimate how many ${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} this assignment will Take to Complete`);
@@ -112,18 +111,20 @@ $(function() {
         $("#new-title").html("Re-enter Assignment");
         $("#submit-assignment-button").html("Modify Assignment");
         // Find which assignment in dat was clicked
-        const sa = utils.loadAssignmentData($(this), {load_original_data: true});
+        const sa = utils.loadAssignmentData($(this));
         // Reentered form fields
+        const x = new Date(sa.assignment_name.valueOf());
+        x.setDate(x.getDate() + sa.x);
         const form_data = [
             sa.assignment_name,
-            sa.assignment_date,
-            sa.x,
+            utils.formatting.stringifyDate(sa.assignment_date),
+            utils.formatting.stringifyDate(x),
             sa.unit,
-            +sa.y,
-            +sa.works[0],
-            +sa.ctime,
+            sa.y,
+            sa.works[0],
+            sa.ctime,
             sa.funct_round-1 ? +sa.funct_round : '', // Displays nothing if it is 1
-            +sa.min_work_time||'',
+            (sa.min_work_time*sa.ctime)||'',
         ];
         // Set reentered form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
