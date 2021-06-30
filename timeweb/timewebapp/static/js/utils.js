@@ -278,13 +278,19 @@ utils = {
                 });
             }
             $(".tag-add").focusout(function(e) {
-                console.log(e);
                 const $this = $(this);
                 setTimeout(function() {
                     const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
                     if ($(document.activeElement).parents(".tag-add").length || tag_add_text_clicked) return;
                     $this.removeClass("open-tag-add-box");
                 });
+            });
+            $(".tag-sortable-container").sortable().on("sortstop", function() {
+                const sa = utils.loadAssignmentData($(this));
+                sa.tags = $(this).find(".tag-name").map(function() {
+                    return $(this).text();
+                }).toArray();
+                ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id)
             });
         },
         setKeybinds: function() {

@@ -8,6 +8,7 @@
 {{ settings_model_as_json|json_script:"settings-model" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
+<script src="{% static 'vendor/jquery-ui.min.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
@@ -106,15 +107,17 @@
                 <div class="tags">
                   {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
                   {% spaceless %}
-                  {% for tag in assignment.tags %}
-                    <div class="tag-wrapper">
-                      <div class="tag-name">{{ tag }}</div>
-                      <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-name="{{ assignment.assignment_name }}">
-                        <span class="icon-slash x-icon-first-slash"></span>
-                        <span class="icon-slash x-icon-second-slash"></span>
+                  <span class="tag-sortable-container" data-assignment-name="{{ assignment.assignment_name }}">
+                    {% for tag in assignment.tags %}
+                      <div class="tag-wrapper">
+                        <div class="tag-name">{{ tag }}</div>
+                        <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-name="{{ assignment.assignment_name }}">
+                          <span class="icon-slash x-icon-first-slash"></span>
+                          <span class="icon-slash x-icon-second-slash"></span>
+                        </div>
                       </div>
-                    </div>
-                  {% endfor %}
+                    {% endfor %}
+                  </span>
                   <div class="tag-add" data-assignment-name="{{ assignment.assignment_name }}" >
                   {% endspaceless %}
                     <span class="icon-slash plus-first-slash"></span>

@@ -423,6 +423,8 @@ class TimewebView(LoginRequiredMixin, View):
                     log_message = f'User \"{request.user}\" modified works for assignment "{self.sm.assignment_name}"'
                 elif key == 'mark_as_done':
                     log_message = f'User \"{request.user}\" marked or unmarked assignment "{self.sm.assignment_name}" as completed'
+                elif key == 'tags':
+                    log_message = f'User \"{request.user}\" reordered tags for assignment "{self.sm.assignment_name}"'
                 if request.user != self.sm.user:
                     logger.warning(f"User \"{request.user}\" cannot save an assignment that isn't theirs")
                     return HttpResponseForbidden("This assignment isn't yours")
