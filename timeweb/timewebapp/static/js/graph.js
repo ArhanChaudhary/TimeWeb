@@ -974,9 +974,7 @@ $(".assignment").click(function(e) {
         }, 750, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");
-            graph_container.removeAttr("style")
-            // Used in crud.js to begin transitioning an assignment's deletion
-            .trigger("transitionend");
+            graph_container.removeAttr("style");
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
