@@ -102,6 +102,7 @@ class SettingsView(LoginRequiredMixin, View):
     def post(self, request):
         self.isExampleAccount = request.user.username == example_account_name
         self.form = SettingsForm(data=request.POST, files=request.FILES)
+        self.checked_background_image_clear = request.POST.get("background_image-clear") or False
         form_is_valid = True
         if not self.form.is_valid():
             form_is_valid = False
@@ -135,7 +136,10 @@ class SettingsView(LoginRequiredMixin, View):
         settings_model.text_priority = self.form.cleaned_data.get("text_priority")
         settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
         settings_model.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
-        settings_model.background_image = self.form.cleaned_data.get("background_image") or None
+        if self.checked_background_image_clear:
+            settings_model.background_image = None
+        elif self.form.cleaned_data.get("background_image"):
+            settings_model.background_image = self.form.cleaned_data.get("background_image")
         settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
@@ -188,17 +192,17 @@ class TimewebView(LoginRequiredMixin, View):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
-        if self.isExampleAccount: return HttpResponse(status=204)
         # AJAX requests
         action = request.POST['action']
+        if action == 'update_date_now':
+            return self.updated_date_now_and_example_assignment(request)
+        if self.isExampleAccount: return HttpResponse(status=204)
         if action == 'delete_assignment':
             return self.deleted_assignment(request)
         elif action == 'save_assignment':
             return self.saved_assignment(request)
         elif action == 'finished_tutorial':
             return self.finished_tutorial(request)
-        elif action == 'update_date_now':
-            return self.updated_date_now_and_example_assignment(request)
         elif action == "tag_add" or action == "tag_delete":
             return self.tag_add_or_delete(request, action)
     def assignment_form_submitted(self, request):
@@ -214,7 +218,7 @@ class TimewebView(LoginRequiredMixin, View):
 
         # Parts of the form that can only validate in views
         form_is_valid = True
-        if self.isExampleAccount:
+        if self.isExampleAccount:# and 0:
             self.form.add_error("assignment_name", forms.ValidationError(_('You cannot create or modify assignments in the example account') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
             form_is_valid = False
         else:
@@ -249,7 +253,7 @@ class TimewebView(LoginRequiredMixin, View):
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" cannot modify an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you are trying to modify isn't yours")
-            if self.isExampleAccount:
+            if self.isExampleAccount:# and 0:
                 # post-get
                 # Don't make this return a 204 when submitting from the example account because there are too many assignments
                 return redirect(request.path_info)
@@ -456,10 +460,14 @@ class TimewebView(LoginRequiredMixin, View):
                 assignment.save()
         days_since_example_ad = int(request.POST["days_since_example_ad"], 10)
         if days_since_example_ad > 0:
-            example_assignment = get_object_or_404(TimewebModel, assignment_name=example_assignment_name, user__username=request.user)
-            example_assignment.assignment_date += datetime.timedelta(days_since_example_ad)
-            example_assignment.x += datetime.timedelta(days_since_example_ad)
-            example_assignment.save()
+            if self.isExampleAccount:
+                example_assignments = TimewebModel.objects.filter(user__username=request.user)
+            else:
+                example_assignments = (get_object_or_404(TimewebModel, assignment_name=example_assignment_name, user__username=request.user),)
+            for example_assignment in example_assignments:
+                example_assignment.assignment_date += datetime.timedelta(days_since_example_ad)
+                example_assignment.x += datetime.timedelta(days_since_example_ad)
+                example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
         return HttpResponse(status=204)
     
@@ -469,14 +477,17 @@ class TimewebView(LoginRequiredMixin, View):
         if request.user != self.sm.user:
             logger.warning(f"User \"{request.user}\" cannot save add a tag to an assignment that isn't theirs")
             return HttpResponseForbidden("This assignment isn't yours")
+
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
             tag_names = [tag_name for tag_name in tag_names if tag_name not in self.sm.tags]
-            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponse("tooManyTags")
+            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponse("Too many tags!")
             self.sm.tags.extend(tag_names)
+
         elif action == "tag_delete":
             # Remove tag_names from self.sm.tags
             self.sm.tags = [tag_name for tag_name in self.sm.tags if tag_name not in tag_names]
+
         self.sm.save()
         if action == "tag_add":
             logger.info(f"User \"{request.user}\" added tags \"{tag_names}\" to \"{self.sm.assignment_name}\"")

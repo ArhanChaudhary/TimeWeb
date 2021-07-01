@@ -178,7 +178,7 @@ utils = {
                             const tag = $(tag_template);
                             tag.find(".tag-name").text(tag_name);
                             tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-name", sa.assignment_name);
-                            tag.insertBefore($this);
+                            tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                             tag.addClass("tag-add-transition-disabler");
                             // Need to use jquery to set css for marginLeft
@@ -199,6 +199,9 @@ utils = {
                             tag.one("transitionend", function() {
                                 tag.prev().css("z-index", "");
                             });
+                        }
+                        if (tag_names.length) {
+                            $this.parents(".tags").find(".tag-sortable-container").sortable("refresh");
                         }
                     }
                     
@@ -280,8 +283,8 @@ utils = {
             $(".tag-add").focusout(function(e) {
                 const $this = $(this);
                 setTimeout(function() {
-                    const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
-                    if ($(document.activeElement).parents(".tag-add").length || tag_add_text_clicked) return;
+                    // const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
+                    if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this)) return;
                     $this.removeClass("open-tag-add-box");
                 });
             });
@@ -290,7 +293,7 @@ utils = {
                 sa.tags = $(this).find(".tag-name").map(function() {
                     return $(this).text();
                 }).toArray();
-                ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id)
+                ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
             });
         },
         setKeybinds: function() {
@@ -351,7 +354,7 @@ utils = {
             $(".tag-add-input").keydown(function(e) {
                 if (e.key === "Enter") {
                     // blur so it hides the tag add box
-                    $(this).blur().siblings(".tag-add-button").click();
+                    $(this).blur().parents(".tags").find(".tag-add-button").click();
                 }
             });
         },
@@ -431,7 +434,7 @@ utils = {
     },
 }
 
-isExampleAccount = username === example_account_name;
+isExampleAccount = username === example_account_name// && 0;
 ajaxUtils = {
     disable_ajax: isExampleAccount, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     hour_to_update: hour_to_update,
@@ -453,26 +456,35 @@ ajaxUtils = {
         }
     },
     changeDateNowAndExampleAssignmentDates: function() {
-        if (!ajaxUtils.disable_ajax && date_now.valueOf() + 1000*60*60*(24 + ajaxUtils.hour_to_update) < new Date().valueOf()) {
+        if (date_now.valueOf() + 1000*60*60*(24 + ajaxUtils.hour_to_update) < new Date().valueOf()) {
+            const old_date_now = new Date(date_now.valueOf());
             date_now = new Date(new Date().toDateString());
             // If this runs after midnight, set date_now to yesterday
             if (new Date().getHours() < ajaxUtils.hour_to_update) {
-                date_now = date_now.setDate(date_now.getDate() - 1);
+                date_now.setDate(date_now.getDate() - 1);
             }
-
             const data = {
                 'csrfmiddlewaretoken': csrf_token,
                 'action': 'update_date_now',
                 'date_now': utils.formatting.stringifyDate(date_now),
             }
-            const example_assignment = dat.find(sa_iter => sa_iter.assignment_name === example_assignment_name);
-            if (example_assignment === undefined) {
-                data["days_since_example_ad"] = 0;
-            } else {
-                const days_since_example_ad = utils.daysBetweenTwoDates(date_now, example_assignment.assignment_date);
+            const days_since_example_ad = utils.daysBetweenTwoDates(date_now, old_date_now);
+            if (isExampleAccount) {
                 data["days_since_example_ad"] = days_since_example_ad;
-                // Change example assignment date locally
-                example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
+                for (example_assignment of dat) {
+                    example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
+                }
+            } else {
+                const example_assignment = dat.find(sa_iter => sa_iter.assignment_name === example_assignment_name);
+                if (example_assignment === undefined) {
+                    data["days_since_example_ad"] = 0;
+                } else {
+                    data["days_since_example_ad"] = days_since_example_ad;
+                    // Change example assignment date locally
+                    // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
+                    // In this case, changing the assignment date automatically changes the due date
+                    example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
+                }
             }
             $.ajax({
                 type: "POST",

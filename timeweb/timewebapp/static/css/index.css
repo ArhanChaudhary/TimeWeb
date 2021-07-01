@@ -1,6 +1,7 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 #assignments-container {
     position: relative;
+    opacity: 0;
 }
 main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
@@ -314,6 +315,17 @@ header.animate::after {
     opacity: 0;
     transition: opacity 0.1s linear;
 }
+.tag-delete::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 50%;
+    border: 8px solid transparent;
+}
 .tag-add {
     position: relative;
     vertical-align: top;
@@ -340,6 +352,8 @@ header.animate::after {
     text-overflow: ellipsis;
 }
 .tag-name {
+    position: relative;
+    z-index: 1;
     transition: margin-right 0.15s ease-in-out;
 }
 .tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
@@ -382,10 +396,9 @@ header.animate::after {
     position: absolute;
     width: 30px;
     height: 30px;
-    right: 0;
+    right: 3px;
+    top: 4px;
     border-radius: 50%;
-    margin-top: 4px;
-    margin-right: 3px;
     background-color: rgb(195,195,195);
 }
 .tag-add-button::after {
@@ -398,7 +411,7 @@ header.animate::after {
     opacity: 0;
     transition: opacity 0.15s ease-out;
 }
-.tag-add-button:hover::after, .tag-add-button:focus::after {
+.tag-add-button:hover::after {
     opacity: 0.75;
 }
 .tag-add-button:focus {
@@ -805,7 +818,7 @@ label[for='id_ad']::after {
 #overlay {
     overflow: auto;
     background-color: rgba(0,0,0,0.4);
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     height: 100%;

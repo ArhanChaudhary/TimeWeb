@@ -113,7 +113,7 @@ $(function() {
         // Find which assignment in dat was clicked
         const sa = utils.loadAssignmentData($(this));
         // Reentered form fields
-        const x = new Date(sa.assignment_name.valueOf());
+        const x = new Date(sa.assignment_date.valueOf());
         x.setDate(x.getDate() + sa.x);
         const form_data = [
             sa.assignment_name,

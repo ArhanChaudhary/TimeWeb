@@ -952,7 +952,7 @@ class VisualAssignment extends Assignment {
 }
 $(function() {
 $(".assignment").click(function(e) {
-    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .relative-positioning-wrapper, .assignment, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
+    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .relative-positioning-wrapper, .assignment, .assignment-header, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
     const dom_assignment = $(this);
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
     if (dom_assignment.hasClass("mark-as-done") && !utils.loadAssignmentData(dom_assignment).mark_as_done) {

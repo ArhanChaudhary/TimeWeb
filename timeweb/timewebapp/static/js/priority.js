@@ -385,6 +385,7 @@ priority = {
         if (params.first_sort) {
             setInterval(utils.ui.displayClock, 1000);
         }
+        $("#assignments-container").css("opacity", "1");
     },
 }
 ordering = {

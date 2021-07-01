@@ -78,7 +78,7 @@ original_favicon.png
 original_maskable_favicon.png
 Original splash screens
 .gcloudignore
-example_assignment_load.md
+example_assignment_load.py
 TODO.md
 
 # Flask stuff:

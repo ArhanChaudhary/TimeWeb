@@ -7,9 +7,6 @@ from colorfield.fields import ColorField
 from decimal import Decimal
 import datetime
 
-
-def create_path(instance, filename):
-    return f"images/{instance.user.username}/{filename}"
 WEEKDAYS = (
     ("1",_("Monday")),
     ("2",_("Tuesday")),
@@ -23,6 +20,8 @@ def default_works():
     return 0
 def default_tags():
     return []
+def create_path(instance, filename):
+    return f"images/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
     assignment_name = models.CharField(
         max_length=100,
