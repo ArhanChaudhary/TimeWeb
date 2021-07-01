@@ -365,7 +365,7 @@ utils = {
             $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
         },
         handleTutorialIntroduction: function() {
-            if (first_login) {
+            if (enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
                     return $(this).attr("data-assignment-name") !== example_assignment_name;
                 });
@@ -380,7 +380,7 @@ utils = {
         saveStatesOnClose: function() {
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
             $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
-                if (!first_login) {
+                if (!enable_tutorial) {
                     // Save current open assignments
                     sessionStorage.setItem("open_assignments", JSON.stringify(
                         $(".assignment.open-assignment").map(function() {
@@ -573,7 +573,7 @@ for (let sa of dat) {
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 }
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, first_login, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(utils.formatting.parseDate(date_now));
 highest_priority_color = utils.formatting.hexToRgb(highest_priority_color)

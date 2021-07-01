@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='settingsmodel',
             name='background_image',
-            field=models.ImageField(blank=True, null=True, upload_to=timewebapp.models.create_path),
+            field=models.ImageField(blank=True, null=True, upload_to=timewebapp.models.create_image_path),
         ),
     ]

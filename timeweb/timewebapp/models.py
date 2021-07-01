@@ -20,7 +20,7 @@ def default_works():
     return 0
 def default_tags():
     return []
-def create_path(instance, filename):
+def create_image_path(instance, filename):
     return f"images/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
     assignment_name = models.CharField(
@@ -163,11 +163,11 @@ class SettingsModel(models.Model):
         verbose_name=_('Lowest Priority Color'),
     )
     background_image = models.ImageField(
-        upload_to=create_path,
+        upload_to=create_image_path,
         null=True,
         blank=True,
     )
-    first_login = models.BooleanField(
+    enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Enable Tutorial'),
     )

@@ -442,7 +442,7 @@ class TimewebView(LoginRequiredMixin, View):
         
     def finished_tutorial(self, request):
         settings_model = SettingsModel.objects.get(user__username=request.user)
-        settings_model.first_login = False
+        settings_model.enable_tutorial = False
         settings_model.save()
         logger.info(f"User \"{request.user}\" finished their tutorial")
         return HttpResponse(status=204)

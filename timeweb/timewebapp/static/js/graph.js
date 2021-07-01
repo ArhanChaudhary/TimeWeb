@@ -1006,7 +1006,7 @@ $(".assignment").click(function(e) {
         sa.addAssignmentInfoButtons();
     }
     sa.resize();
-    if (first_login) {
+    if (enable_tutorial) {
         $(".assignment").next().remove(); // Remove "Click this assignment"
         setTimeout(function() {
             alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
@@ -1018,7 +1018,7 @@ $(".assignment").click(function(e) {
             }
             alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
             alert("Now that you have finished reading this, check out the settings to set your preferences");
-            first_login = false;
+            enable_tutorial = false;
             ajaxUtils.ajaxFinishedTutorial();
         }, 200);
     }
