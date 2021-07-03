@@ -8,7 +8,7 @@ urlpatterns = [
     path('settings', views.SettingsView.as_view(),name='settings'),
     path('contact', views.ContactView.as_view(),name='contact'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
-    path('policies', RedirectView.as_view(url='/static/policies/policies.html')),
+    path('policies', RedirectView.as_view(url='/static/policies/policies.html'), name='policies'),
     path('cookies', RedirectView.as_view(url='/static/policies/cookies.html')),
     path('disclaimer', RedirectView.as_view(url='/static/policies/disclaimer.html')),
     path('licenses-and-credits', RedirectView.as_view(url='/static/policies/licenses-and-credits.html')),

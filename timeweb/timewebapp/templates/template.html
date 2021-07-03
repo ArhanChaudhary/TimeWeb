@@ -86,12 +86,12 @@
                         {% if user.is_authenticated %}
                         <a href="{% url 'settings' %}">Settings</a>
                         {% endif %}
-                        <a href="#" id="nav-usage">User Guide</a>   
+                        <a href="#" id="nav-usage">User Guide</a>
                         <span>Install on Home Screen</span>
+                        <a href="{% url 'changelog' %}">Changelog</a>
                         <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                        <a href="{% static 'policies/policies.html' %}">Policies</a>
-                        <a href="/changelog">Changelog</a>
-                        <a href="/contact">Contact Me</a>
+                        <a href="{% url 'policies' %}">Policies</a>
+                        <a href="{% url 'contant' %}">Contact Me</a>
                     </div>
                 </nav>
                 <a href="{% url 'home' %}"  id="logo-container">

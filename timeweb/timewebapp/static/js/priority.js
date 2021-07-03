@@ -372,13 +372,13 @@ priority = {
             $("#simulated-date").css("margin-top", "");
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time").hide();
-            $("#hide-button").css("visibility", "hidden"); // Preserve layout positioning
+            $("#hide-button").css("display", "none"); // Preserve layout positioning
         } else {
             $("#current-time, #tomorrow-time, #info").show();
             $("#simulated-date").css("margin-top", "");
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
-            $("#hide-button").css("visibility", "");
+            $("#hide-button").css("display", "");
         }
         utils.ui.old_minute_value = undefined; // Force displayClock to update. Without this, it may not update and display (Invalid Date)
         utils.ui.displayClock();

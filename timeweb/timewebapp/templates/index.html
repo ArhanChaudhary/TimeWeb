@@ -60,17 +60,9 @@
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
-      <div id="advanced" tabindex="0">
-        Advanced
-        <svg width="17px" height="10px"{% if not background_image %} id="move-advanced-arrow"{% endif %}>
-          <polygon points="12,2.5 2,2.5 7,7.5"></polygon>
-        </svg>
-        <div id="advanced-options" class="hidden">
-          <span id="next-day" tabindex="0">Go to Next Day</span>
-          <span id="open-assignments" tabindex="0">Open all Assignments</span>
-          <span id="close-assignments" tabindex="0">Close all Assignments</span>
-        </div>
-      </div>
+      <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="27" src="{% static 'images/close_all_assignments.png' %}">
+      <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="27" src="{% static 'images/open_all_assignments.png' %}">
+      <img id="next-day" tabindex="0" alt="Go to Next Day" height="22" width="27" src="{% static 'images/next_day.png' %}">
     </div>
     <div id="simulated-date"{% if background_image %} class="add-white-shadow"{% endif %}></div>
     <div id="autofill-work-done">

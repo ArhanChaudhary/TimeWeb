@@ -1,6 +1,9 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 #assignments-container {
     position: relative;
+    /* Ensure things dont get cutoff when crud.js puts overflow: hidden on this when an assignment is being deleted */
+    top: -10px;
+    padding-top: 10px;
     opacity: 0;
 }
 main:not(.animate) {
@@ -33,6 +36,17 @@ header.animate::after {
     display: flex;
     flex-wrap: wrap;
 }
+#assignments-header img {
+    cursor: pointer;
+    margin-bottom: -3px;
+    margin-left: 10px;
+}
+#assignments-header img:first-of-type {
+    margin-left: auto;
+}
+#assignments-header #open-assignments, #assignments-header #close-assignments {
+    margin-top: -3px;
+}
 #info {
     display: inline;
     font-size: 17px;
@@ -40,53 +54,6 @@ header.animate::after {
 #simulated-date {
     padding: 0 10px;
     font-size: 17px;
-}
-#advanced {
-    position: relative;
-    margin-left: auto;
-    border-bottom: 1px solid;
-    cursor: pointer;
-}
-#advanced:focus {
-    outline: 0;
-}
-#move-advanced-arrow {
-    margin-left: -2px;
-}
-#advanced-options {
-    text-shadow: none; /* Override parent text shadow if user has a background image */
-    width: 169px;
-    transform: translateY(16px);
-    right: -5px;
-    z-index: 100;
-    position: absolute;
-    background: rgb(155,155,155);
-    display: block;
-    color: black;
-    border: 2px solid rgb(140,140,140);
-}
-#advanced-options::before {
-    content: '';
-    border-width: 10px;
-    border-style: solid;
-    border-color: transparent transparent rgb(155,155,155) transparent;
-    bottom: 100%;
-    right: 40px;
-    position: absolute;
-}
-#advanced-options > * {
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
-    display: block;
-    padding: 6px;
-    font-size: 15px;
-    text-align: right;
-}
-#advanced-options > *:hover, #advanced-options > *:focus {
-    background: gray;
-    outline: 0;
 }
 #hide-button {
     cursor: pointer;
@@ -109,9 +76,6 @@ header.animate::after {
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-}
-#assignments-container > :not(.assignment-container) + .assignment-container {
-    margin-top: 10px;
 }
 .assignment-container.transform-instantly {
     transition: none;
@@ -179,6 +143,7 @@ header.animate::after {
 }
 #autofill-work-done {
     padding: 0 10px;
+    margin-bottom: 8px;
 }
 #autofill-work-done-text {
     margin-top: -12px;
@@ -410,6 +375,9 @@ header.animate::after {
     box-shadow: 0 0 4px 1px rgb(60, 60, 60);
     opacity: 0;
     transition: opacity 0.15s ease-out;
+}
+.tag-add-button:focus::after {
+    opacity: 0.35;
 }
 .tag-add-button:hover::after {
     opacity: 0.75;

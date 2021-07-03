@@ -105,17 +105,22 @@ utils = {
                 $("#form-wrapper #advanced-inputs").click();
                 sessionStorage.removeItem("advanced_inputs");
             }
-            // Advanced inputs in home
-            $("#advanced").click(function(e) {
-                // Ignore propagation
-                if (e.target === this) {
-                    $("#advanced-options").toggleClass("hidden");
+    
+            $("#open-assignments").click(function() {
+                if ($(".incomplete-works").length) {
+                    $(".assignment-container.incomplete-works .assignment:not(.open-assignment)").click();
+                } else {
+                    $(".assignment:not(.open-assignment)").click();
                 }
             });
     
-            $("#open-assignments").click(() => $(".assignment:not(.open-assignment)").click());
-    
-            $("#close-assignments").click(() => $(".assignment.open-assignment").click());
+            $("#close-assignments").click(function() {
+                if ($(".incomplete-works").length) {
+                    $(".assignment-container.incomplete-works .assignment.open-assignment").click();
+                } else {
+                    $(".assignment.open-assignment").click();
+                }
+            });
     
             $("#simulated-date").hide();
             $("#next-day").click(function() {
@@ -403,7 +408,7 @@ utils = {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".assignment").filter(function() {
+                    ($(".incomplete-works").length ? $(".assignment.incomplete-works") : $(".assignment")).filter(function() {
                         return open_assignments.includes($(this).attr("data-assignment-name"))
                     }).click();
                 }

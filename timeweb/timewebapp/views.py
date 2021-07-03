@@ -193,11 +193,11 @@ class TimewebView(LoginRequiredMixin, View):
         self.isExampleAccount = request.user.username == example_account_name
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
+        if self.isExampleAccount: return HttpResponse(status=204)
         action = request.POST['action']
         if action == 'update_date_now':
             return self.updated_date_now_and_example_assignment(request)
-        if self.isExampleAccount: return HttpResponse(status=204)
-        if action == 'delete_assignment':
+        elif action == 'delete_assignment':
             return self.deleted_assignment(request)
         elif action == 'save_assignment':
             return self.saved_assignment(request)
@@ -460,14 +460,10 @@ class TimewebView(LoginRequiredMixin, View):
                 assignment.save()
         days_since_example_ad = int(request.POST["days_since_example_ad"], 10)
         if days_since_example_ad > 0:
-            if self.isExampleAccount:
-                example_assignments = TimewebModel.objects.filter(user__username=request.user)
-            else:
-                example_assignments = (get_object_or_404(TimewebModel, assignment_name=example_assignment_name, user__username=request.user),)
-            for example_assignment in example_assignments:
-                example_assignment.assignment_date += datetime.timedelta(days_since_example_ad)
-                example_assignment.x += datetime.timedelta(days_since_example_ad)
-                example_assignment.save()
+            example_assignment = get_object_or_404(TimewebModel, assignment_name=example_assignment_name, user__username=request.user)
+            example_assignment.assignment_date += datetime.timedelta(days_since_example_ad)
+            example_assignment.x += datetime.timedelta(days_since_example_ad)
+            example_assignment.save()
         logger.info(f"User \"{request.user}\" changed their date")
         return HttpResponse(status=204)
     

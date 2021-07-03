@@ -97,7 +97,7 @@ class VisualAssignment extends Assignment {
     }
     resize() {
         // If date_now changes, redefine variables dependent on them
-        // This also means works may change because of autofill in priority.js
+        // If so, works may also change because of autofill in priority.js
         this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js

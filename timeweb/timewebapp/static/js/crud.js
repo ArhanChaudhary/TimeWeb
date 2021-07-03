@@ -130,10 +130,8 @@ $(function() {
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
-            // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_break_days.includes(break_day));
-            
-            // Since loading original data, break_days are string instead of int
-            $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day.toString()));
+            // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_breawk_days.includes(break_day));
+            $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
         // Set button pk
         $("#submit-assignment-button").val(sa.id);
