@@ -273,11 +273,11 @@ nav:focus-within #nav-menu::after {
     text-align: center;
     line-height: 15px;
 }
-.info-button:hover {
+.info-button:hover, #next-day-icon-label .info-button {
     background: rgb(16,135,148);
     outline: 0;
 }
-.info-button:hover .info-button-text {
+.info-button:hover .info-button-text, #next-day-icon-label .info-button .info-button-text {
     height: unset;
     border: 2px solid black;
     overflow: visible;

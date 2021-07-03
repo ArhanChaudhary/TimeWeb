@@ -129,11 +129,12 @@ utils = {
                 $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}))
                 $(window).trigger("resize");
                 priority.sort({ ignore_timeout: true });
-            }).info("left",
+            })
+            $("#next-day-icon-label").info("bottom",
                 `Simulates the next day for ALL assignments
                 
-                All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`, 'prepend'
-            ).css("left", -3);
+                All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`
+            );
         },
         addTagHandlers: function() {
             const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
@@ -408,7 +409,7 @@ utils = {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    ($(".incomplete-works").length ? $(".assignment.incomplete-works") : $(".assignment")).filter(function() {
+                    ($(".incomplete-works").length ? $(".assignment-container.incomplete-works .assignment") : $(".assignment")).filter(function() {
                         return open_assignments.includes($(this).attr("data-assignment-name"))
                     }).click();
                 }

@@ -44,7 +44,27 @@ header.animate::after {
 #assignments-header img:first-of-type {
     margin-left: auto;
 }
-#assignments-header #open-assignments, #assignments-header #close-assignments {
+#close-assignments {
+    order: 2;
+}
+#open-assignments {
+    order: 3;
+}
+#next-day {
+    order: 4;
+}
+#assignments-header img ~ div {
+    position: absolute;
+    order: 1;
+    right: 150px;
+    opacity: 0;
+}
+#assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
+#assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
+#assignments-header img#next-day:hover ~ div#next-day-icon-label {
+    opacity: 1;
+}
+#open-assignments, #close-assignments {
     margin-top: -3px;
 }
 #info {
@@ -187,7 +207,7 @@ header.animate::after {
 .assignment-container.last-incomplete-works::after, .assignment-container.last-finished::after {
     content: '';
     position: absolute;
-    width: 23px;
+    width: 22px;
     left: 5px;
     bottom: -1px;
     border-bottom: 2px solid black;
@@ -530,33 +550,37 @@ header.animate::after {
 .button:active {
     transform: scale(0.95);
 }
-.graph-container {
+.assignment-footer {
     position: relative;
     top: 10px;
     display: none;
     /* firefox acts weirdly without this */
     width: 100%;
 }
-canvas {
-    padding: 0;
+.graph-container {
+    overflow: scroll;
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
     width: calc(100% - 34px);
-    /* positioned really weirdly but still works */
+    position: relative;
     margin: 5px;
     margin-left: 13px;
+    border: 4px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
 }
-canvas:focus {
+.graph-container:focus {
     box-shadow: 0 0 0 3px rgb(0,95,204);
     outline: 0;
 }
+.graph-container * {
+    width: 100%;
+    height: 100%;
+}
 .fixed-graph {
-    border: 4px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
     position: absolute;
 }
 .graph {
     position: relative;
-    border: 4px solid transparent;
+    margin-bottom: -5px;
 }
 .graph-footer .info-button {
     /* Prevent graph buttons from oversizing */

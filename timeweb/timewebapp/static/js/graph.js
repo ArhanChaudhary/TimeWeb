@@ -70,6 +70,16 @@ class VisualAssignment extends Assignment {
         this.dom_assignment = dom_assignment;
         this.graph = dom_assignment.find(".graph");
         this.fixed_graph = dom_assignment.find(".fixed-graph");
+        this.graph.css({
+            width: '',
+            height: '',
+        });
+        this.fixed_graph.css({
+            width: '',
+            height: '',
+        });
+        this.fixed_graph.css("width", this.width*2);
+        this.fixed_graph.css("height", this.height*2);
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
         this.due_date = new Date(this.sa.assignment_date.valueOf());
@@ -86,6 +96,8 @@ class VisualAssignment extends Assignment {
             min: 1 - this.skew_ratio_lim,
             max: this.skew_ratio_lim - 1,
         });
+        this.scale = window.devicePixelRatio || 2;
+        this.scale *= 2;
     }
     calcSkewRatioLimVisually() {
         const skew_ratio_lim = super.calcSkewRatioLim();
@@ -111,24 +123,33 @@ class VisualAssignment extends Assignment {
         }
         if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
             // Static properties
-            VisualAssignment.width = this.fixed_graph.width();
-            VisualAssignment.height = this.fixed_graph.height();
-            if (VisualAssignment.width > 500) {
+            this.width = this.fixed_graph.width();
+            this.height = this.fixed_graph.height();
+            this.graph.css({
+                width: this.width*2,
+                height: this.height*2,
+            });
+            this.fixed_graph.css({
+                width: this.width*2,
+                height: this.height*2,
+            });
+            if (this.width > 500) {
                 VisualAssignment.font_size = 13.9;
             } else {
-                VisualAssignment.font_size = Math.round((VisualAssignment.width + 450) / 47 * 0.6875);
+                VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
             }
-            this.wCon = (VisualAssignment.width - 55) / this.sa.x;
-            this.hCon = (VisualAssignment.height - 55) / this.sa.y;
-            this.graph[0].width = VisualAssignment.width * VisualAssignment.scale;
-            this.graph[0].height = VisualAssignment.height * VisualAssignment.scale;
-            this.fixed_graph[0].width = VisualAssignment.width * VisualAssignment.scale;
-            this.fixed_graph[0].height = VisualAssignment.height * VisualAssignment.scale;
+            this.wCon = (this.width - 55) / this.sa.x;
+            this.hCon = (this.height - 55) / this.sa.y;
+            this.graph[0].width = this.width * this.scale;
+            this.graph[0].height = this.height * this.scale;
+            this.fixed_graph[0].width = this.width * this.scale;
+            this.fixed_graph[0].height = this.height * this.scale;
             this.drawfixed();
             this.draw();
         }
     }
     mousemove(e) {
+        console.log(e.pageX);
         const x2 = e.pageX - this.fixed_graph.offset().left;
         const y2 = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
@@ -141,7 +162,7 @@ class VisualAssignment extends Assignment {
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
             let x2 = (x2 - 53.7) / this.wCon - this.red_line_start_x;
-            const y2 = (VisualAssignment.height - y2 - 44.5) / this.hCon - this.red_line_start_y;
+            const y2 = (this.height - y2 - 44.5) / this.hCon - this.red_line_start_y;
             // Handles break days
             if (this.sa.break_days.length) {
                 const floorx2 = Math.floor(x2);
@@ -211,7 +232,7 @@ class VisualAssignment extends Assignment {
         if (this.draw_mouse_point && x2) {
             // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
             var mouse_x = Math.round((x2 - 53.7) / this.wCon),
-                mouse_y = (VisualAssignment.height - y2 - 44.5) / this.hCon;
+                mouse_y = (this.height - y2 - 44.5) / this.hCon;
             if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start)) {
                 mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
             } else if (mouse_x > this.sa.x) {
@@ -232,44 +253,44 @@ class VisualAssignment extends Assignment {
         }
         this.setParabolaValues();
         const screen = this.graph[0].getContext("2d");
-        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
-        screen.clearRect(0, 0, VisualAssignment.width, VisualAssignment.height);
+        screen.scale(this.scale, this.scale);
+        screen.clearRect(0, 0, this.width, this.height);
         let move_info_down,
             todo = this.funct(len_works+this.sa.blue_line_start+1);
         if (show_progress_bar) {
             move_info_down = 0;
-            let should_be_done_x = VisualAssignment.width - 155 + todo / this.sa.y * 146,
-                bar_move_left = should_be_done_x - VisualAssignment.width + 17;
+            let should_be_done_x = this.width - 155 + todo / this.sa.y * 146,
+                bar_move_left = should_be_done_x - this.width + 17;
             if (bar_move_left < 0 || this.sa.x <= this.today_minus_ad || last_work_input >= this.sa.y) {
                 bar_move_left = 0
-            } else if (should_be_done_x > VisualAssignment.width - 8) {
-                bar_move_left = VisualAssignment.width - 8;
+            } else if (should_be_done_x > this.width - 8) {
+                bar_move_left = this.width - 8;
             }
             // bar move left
             screen.fillStyle = "rgb(55,55,55)";
-            screen.fillRect(VisualAssignment.width-155-bar_move_left, VisualAssignment.height-121,148,50);
+            screen.fillRect(this.width-155-bar_move_left, this.height-121,148,50);
             screen.fillStyle = "lime";
-            screen.fillRect(VisualAssignment.width-153-bar_move_left, VisualAssignment.height-119,144,46);
+            screen.fillRect(this.width-153-bar_move_left, this.height-119,144,46);
 
             screen.fillStyle = "rgb(0,128,0)";
-            const slash_x = VisualAssignment.width - 142 - bar_move_left;
+            const slash_x = this.width - 142 - bar_move_left;
             screen.beginPath();
-            screen.moveTo(slash_x,VisualAssignment.height-119);
-            screen.lineTo(slash_x+15,VisualAssignment.height-119);
-            screen.lineTo(slash_x+52.5,VisualAssignment.height-73);
-            screen.lineTo(slash_x+37.5,VisualAssignment.height-73);
+            screen.moveTo(slash_x,this.height-119);
+            screen.lineTo(slash_x+15,this.height-119);
+            screen.lineTo(slash_x+52.5,this.height-73);
+            screen.lineTo(slash_x+37.5,this.height-73);
             screen.fill();
             screen.beginPath();
-            screen.moveTo(slash_x+35,VisualAssignment.height-119);
-            screen.lineTo(slash_x+50,VisualAssignment.height-119);
-            screen.lineTo(slash_x+87.5,VisualAssignment.height-73);
-            screen.lineTo(slash_x+72.5,VisualAssignment.height-73);
+            screen.moveTo(slash_x+35,this.height-119);
+            screen.lineTo(slash_x+50,this.height-119);
+            screen.lineTo(slash_x+87.5,this.height-73);
+            screen.lineTo(slash_x+72.5,this.height-73);
             screen.fill();
             screen.beginPath();
-            screen.moveTo(slash_x+70,VisualAssignment.height-119);
-            screen.lineTo(slash_x+85,VisualAssignment.height-119);
-            screen.lineTo(slash_x+122.5,VisualAssignment.height-73);
-            screen.lineTo(slash_x+107.5,VisualAssignment.height-73);
+            screen.moveTo(slash_x+70,this.height-119);
+            screen.lineTo(slash_x+85,this.height-119);
+            screen.lineTo(slash_x+122.5,this.height-73);
+            screen.lineTo(slash_x+107.5,this.height-73);
             screen.fill();
 
             screen.textAlign = "center";
@@ -277,24 +298,24 @@ class VisualAssignment extends Assignment {
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
             if (this.sa.x > this.today_minus_ad && last_work_input < this.sa.y) {
-                screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, VisualAssignment.width-81, VisualAssignment.height-68);
-                const done_x = VisualAssignment.width-153+last_work_input/this.sa.y*144-bar_move_left;
+                screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, this.width-81, this.height-68);
+                const done_x = this.width-153+last_work_input/this.sa.y*144-bar_move_left;
                 screen.fillStyle = "white";
-                screen.fillRect(done_x, VisualAssignment.height-119, VisualAssignment.width-9-bar_move_left-done_x, 46);
-                if (should_be_done_x >= VisualAssignment.width - 153) {
+                screen.fillRect(done_x, this.height-119, this.width-9-bar_move_left-done_x, 46);
+                if (should_be_done_x >= this.width - 153) {
                     screen.fillStyle = "black";
-                    if (should_be_done_x > VisualAssignment.width - 17) {
-                        should_be_done_x = VisualAssignment.width - 17;
+                    if (should_be_done_x > this.width - 17) {
+                        should_be_done_x = this.width - 17;
                     }
                     screen.rotate(Math.PI / 2);
                     // Since rotate, swap x and y, make x negative
-                    screen.fillText("Goal", VisualAssignment.height-95, -should_be_done_x-14);
+                    screen.fillText("Goal", this.height-95, -should_be_done_x-14);
                     screen.rotate(-Math.PI / 2);
                     screen.fillStyle = "rgb(55,55,55)";
-                    screen.fillRect(should_be_done_x, VisualAssignment.height-119, 2, 46);
+                    screen.fillRect(should_be_done_x, this.height-119, 2, 46);
                 }
             } else {
-                screen.fillText("Completed!", VisualAssignment.width-81-bar_move_left, VisualAssignment.height-68);
+                screen.fillText("Completed!", this.width-81-bar_move_left, this.height-68);
             }
         } else {
             move_info_down = 72;
@@ -313,10 +334,10 @@ class VisualAssignment extends Assignment {
         screen.beginPath();
         for (let point = this.red_line_start_x; point < line_end; point += Math.ceil(1 / this.wCon)) {
             circle_x = point * this.wCon + 50;
-            if (circle_x > VisualAssignment.width - 5) {
-                circle_x = VisualAssignment.width - 5;
+            if (circle_x > this.width - 5) {
+                circle_x = this.width - 5;
             }
-            circle_y = VisualAssignment.height - this.funct(point) * this.hCon - 50;
+            circle_y = this.height - this.funct(point) * this.hCon - 50;
             screen.lineTo(circle_x - (point === this.red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
             screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
             screen.moveTo(circle_x, circle_y);
@@ -332,9 +353,9 @@ class VisualAssignment extends Assignment {
         for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
             circle_x = (point + this.sa.blue_line_start) * this.wCon + 50;
             if (point > len_works) {
-                circle_y = VisualAssignment.height - this.sa.works[len_works] * this.hCon - 50;
+                circle_y = this.height - this.sa.works[len_works] * this.hCon - 50;
             } else {
-                circle_y = VisualAssignment.height - this.sa.works[point] * this.hCon - 50;
+                circle_y = this.height - this.sa.works[point] * this.hCon - 50;
             }
             screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
             screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
@@ -355,18 +376,18 @@ class VisualAssignment extends Assignment {
             let str_mouse_x = new Date(this.sa.assignment_date);
             str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
             str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
-            if (this.wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`).width > VisualAssignment.width - 5) {
+            if (this.wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`).width > this.width - 5) {
                 screen.textAlign = "end";
             }
-            if (VisualAssignment.height - funct_mouse_x * this.hCon - 50 + screen.measureText(0).width * 2 > VisualAssignment.height - 50) {
+            if (this.height - funct_mouse_x * this.hCon - 50 + screen.measureText(0).width * 2 > this.height - 50) {
                 screen.textBaseline = "bottom";
             }
             screen.fillStyle = "black";
-            screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x}) `, this.wCon * mouse_x + 50, VisualAssignment.height - funct_mouse_x * this.hCon - 50);
+            screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x}) `, this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50);
             screen.fillStyle = "lime";
             screen.strokeStyle = "lime";
             screen.beginPath();
-            screen.arc(this.wCon * mouse_x + 50, VisualAssignment.height - funct_mouse_x * this.hCon - 50, radius, 0, 2 * Math.PI);
+            screen.arc(this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50, radius, 0, 2 * Math.PI);
             screen.stroke();
             screen.fill();
             screen.fillStyle = "black";
@@ -376,8 +397,8 @@ class VisualAssignment extends Assignment {
         screen.fillStyle = "black";
         screen.textBaseline = "top";
         screen.font = '13.75px Open Sans';
-        screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", VisualAssignment.width-2, VisualAssignment.height-155+move_info_down);
-        screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, VisualAssignment.width-2, VisualAssignment.height-138+move_info_down);
+        screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
+        screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, this.width-2, this.height-138+move_info_down);
 
         const daysleft = this.sa.x - this.today_minus_ad;
         let strdaysleft = '';
@@ -400,7 +421,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "bottom";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
-        const center = (str, y_pos) => screen.fillText(str, 50+(VisualAssignment.width-50)/2, row_height*y_pos);
+        const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
         center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
         if (last_work_input < this.sa.y) {
             todo -= last_work_input;
@@ -439,27 +460,27 @@ class VisualAssignment extends Assignment {
         } else {
             center('You are Completely Finished with this Assignment!', 5);
         }
-        screen.scale(1 / VisualAssignment.scale, 1 / VisualAssignment.scale);
+        screen.scale(1 / this.scale, 1 / this.scale);
     }
     drawfixed() {
         const screen = this.fixed_graph[0].getContext("2d");
-        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
-        let gradient = screen.createLinearGradient(0, 0, 0, VisualAssignment.height * 4 / 3);
+        screen.scale(this.scale, this.scale);
+        let gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
         gradient.addColorStop(0, "white");
         gradient.addColorStop(1, "lightgray");
         screen.fillStyle = gradient;
-        screen.fillRect(0, 0, VisualAssignment.width, VisualAssignment.height * 4 / 3);
+        screen.fillRect(0, 0, this.width, this.height * 4 / 3);
 
         // x and y axis rectangles
         screen.fillStyle = "rgb(185,185,185)";
-        screen.fillRect(40, 0, 10, VisualAssignment.height);
-        screen.fillRect(0, VisualAssignment.height - 50, VisualAssignment.width, 10);
+        screen.fillRect(40, 0, 10, this.height);
+        screen.fillRect(0, this.height - 50, this.width, 10);
 
         // x axis label
         screen.fillStyle = "black";
         screen.textAlign = "center";
         screen.font = '17.1875px Open Sans';
-        screen.fillText("Days", (VisualAssignment.width - 50) / 2 + 50, VisualAssignment.height - 5);
+        screen.fillText("Days", (this.width - 50) / 2 + 50, this.height - 5);
 
         // y axis label
         screen.rotate(Math.PI / 2);
@@ -471,17 +492,17 @@ class VisualAssignment extends Assignment {
             var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.ctime)} per ${pluralize(this.sa.unit,1)})`,
                 label_x_pos = -5;
         }
-        if (screen.measureText(text).width > VisualAssignment.height - 50) {
+        if (screen.measureText(text).width > this.height - 50) {
             text = pluralize(this.sa.unit);
         }
-        screen.fillText(text, (VisualAssignment.height - 50) / 2, label_x_pos);
+        screen.fillText(text, (this.height - 50) / 2, label_x_pos);
         screen.rotate(-Math.PI / 2);
 
         screen.font = '13.75px Open Sans';
         screen.textBaseline = "top";
-        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.x))) * Math.ceil(this.sa.x.toString()[0] / Math.ceil((VisualAssignment.width - 100) / 100));
+        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.x))) * Math.ceil(this.sa.x.toString()[0] / Math.ceil((this.width - 100) / 100));
         if (this.sa.x >= 10) {
-            gradient = screen.createLinearGradient(0, 0, 0, VisualAssignment.height * 4 / 3);
+            gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
             gradient.addColorStop(0, "gainsboro");
             gradient.addColorStop(1, "silver");
             const small_x_axis_scale = x_axis_scale / 5,
@@ -490,15 +511,15 @@ class VisualAssignment extends Assignment {
                 if (smaller_index % 5) {
                     const displayed_number = smaller_index * small_x_axis_scale;
                     screen.fillStyle = gradient; // Line color
-                    screen.fillRect(displayed_number * this.wCon + 48.5, 0, 2, VisualAssignment.height - 50); // Draws line index
+                    screen.fillRect(displayed_number * this.wCon + 48.5, 0, 2, this.height - 50); // Draws line index
                     screen.fillStyle = "rgb(80,80,80)"; // Number color
                     if (label_index) {
                         const numberwidth = screen.measureText(displayed_number).width;
                         let number_x_pos = displayed_number * this.wCon + 50;
-                        if (number_x_pos + numberwidth / 2 > VisualAssignment.width - 1) {
-                            number_x_pos = VisualAssignment.width - numberwidth / 2 - 1;
+                        if (number_x_pos + numberwidth / 2 > this.width - 1) {
+                            number_x_pos = this.width - numberwidth / 2 - 1;
                         }
-                        screen.fillText(displayed_number, number_x_pos, VisualAssignment.height - 39);
+                        screen.fillText(displayed_number, number_x_pos, this.height - 39);
                     }
                 }
             }
@@ -506,7 +527,7 @@ class VisualAssignment extends Assignment {
 
         screen.textBaseline = "alphabetic";
         screen.textAlign = "right";
-        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((VisualAssignment.height - 100) / 100));
+        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
         let font_size2 = 16.90625 - Math.ceil(this.sa.y - this.sa.y % y_axis_scale).toString().length * 1.71875;
         if (this.sa.y >= 10) {
             const small_y_axis_scale = y_axis_scale / 5;
@@ -519,12 +540,12 @@ class VisualAssignment extends Assignment {
             for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
                 const displayed_number = smaller_index * small_y_axis_scale;
                 if (smaller_index % 5) {
-                    const gradient_percent = 1 - (displayed_number * this.hCon) / (VisualAssignment.height - 50);
+                    const gradient_percent = 1 - (displayed_number * this.hCon) / (this.height - 50);
                     screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
-                    screen.fillRect(50, VisualAssignment.height - 51.5 - displayed_number * this.hCon, VisualAssignment.width - 50, 2);
+                    screen.fillRect(50, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
                     screen.fillStyle = "rgb(80,80,80)";
                     if (label_index) {
-                        let number_y_pos = VisualAssignment.height - displayed_number * this.hCon - 54 + text_height / 2;
+                        let number_y_pos = this.height - displayed_number * this.hCon - 54 + text_height / 2;
                         if (number_y_pos < 4 + text_height / 2) {
                             number_y_pos = 4 + text_height / 2;
                         }
@@ -547,9 +568,9 @@ class VisualAssignment extends Assignment {
                 break;
             }
             screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(50, VisualAssignment.height - bigger_index * this.hCon - 52.5, VisualAssignment.width - 50, 5);
+            screen.fillRect(50, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
             screen.fillStyle = "black";
-            let number_y_pos = VisualAssignment.height - bigger_index * this.hCon - 54 + text_height / 2;
+            let number_y_pos = this.height - bigger_index * this.hCon - 54 + text_height / 2;
             if (number_y_pos < 4 + text_height / 2) {
                 number_y_pos = 4 + text_height / 2;
             }
@@ -561,36 +582,36 @@ class VisualAssignment extends Assignment {
                 screen.fillText(bigger_index, 38.5, number_y_pos);
             }
         }
-        screen.fillText(0, 39, VisualAssignment.height - 52);
+        screen.fillText(0, 39, this.height - 52);
 
         screen.textBaseline = "top";
         screen.textAlign = "center";
         screen.font = '16.5px Open Sans';
         for (let bigger_index = Math.ceil(this.sa.x - this.sa.x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
             screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(bigger_index * this.wCon + 47.5, 0, 5, VisualAssignment.height - 50);
+            screen.fillRect(bigger_index * this.wCon + 47.5, 0, 5, this.height - 50);
             screen.fillStyle = "black";
             const numberwidth = screen.measureText(bigger_index).width;
             let number_x_pos = bigger_index * this.wCon + 50;
-            if (number_x_pos + numberwidth / 2 > VisualAssignment.width - 1) {
-                number_x_pos = VisualAssignment.width - numberwidth / 2 - 1;
+            if (number_x_pos + numberwidth / 2 > this.width - 1) {
+                number_x_pos = this.width - numberwidth / 2 - 1;
             }
-            screen.fillText(bigger_index, number_x_pos, VisualAssignment.height - 39);
+            screen.fillText(bigger_index, number_x_pos, this.height - 39);
         }
-        screen.fillText(0, 55.5, VisualAssignment.height - 38.5);
+        screen.fillText(0, 55.5, this.height - 38.5);
         if (this.today_minus_ad > -1 && this.today_minus_ad <= this.sa.x) {
             let today_x = this.today_minus_ad*this.wCon+47.5;
             screen.fillStyle = "rgb(150,150,150)";
-            screen.fillRect(today_x, 0, 5, VisualAssignment.height-50);
+            screen.fillRect(today_x, 0, 5, this.height-50);
             screen.fillStyle = "black";
             screen.rotate(Math.PI / 2);
             screen.textAlign = "center";
             screen.textBaseline = "middle";
             screen.font = '17.1875px Open Sans';
-            if (today_x > VisualAssignment.width - 12.5) {
-                today_x = VisualAssignment.width - 12.5;
+            if (today_x > this.width - 12.5) {
+                today_x = this.width - 12.5;
             }
-            screen.fillText("Today Line", (VisualAssignment.height-50)/2, -today_x-2.5);
+            screen.fillText("Today Line", (this.height-50)/2, -today_x-2.5);
             screen.rotate(-Math.PI / 2);
         }
     }
@@ -603,7 +624,9 @@ class VisualAssignment extends Assignment {
                 hide_assignment_button = this.dom_assignment.find(".mark-as-finished-button"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button"),
-                next_assignment_button = this.dom_assignment.find(".next-assignment-button");
+                next_assignment_button = this.dom_assignment.find(".next-assignment-button"),
+                graph_draggable_wrapper = this.dom_assignment.find(".graph-draggable-wrapper");
+        graph_draggable_wrapper.draggable();
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
@@ -965,16 +988,16 @@ $(".assignment").click(function(e) {
     }
     const first_click = !dom_assignment.hasClass('has-been-clicked');
     dom_assignment.addClass("has-been-clicked");
-    const graph_container = dom_assignment.find(".graph-container");
+    const assignment_footer = dom_assignment.find(".assignment-footer");
     // Close assignment
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
-        graph_container.animate({
-            marginBottom: -graph_container.height()
+        assignment_footer.animate({
+            marginBottom: -assignment_footer.height()
         }, 750, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");
-            graph_container.removeAttr("style");
+            assignment_footer.removeAttr("style");
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
@@ -986,7 +1009,7 @@ $(".assignment").click(function(e) {
     }
     const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
-    graph_container.stop().css({
+    assignment_footer.stop().css({
         display: "",
         marginBottom: "",
     });
@@ -995,7 +1018,7 @@ $(".assignment").click(function(e) {
     if ($(".open-assignment").length === 0) {
         $(document).keydown(VisualAssignment.preventArrowScroll);
     }
-    graph_container.css("display", "block");
+    assignment_footer.css("display", "block");
     dom_assignment.addClass("open-assignment");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click

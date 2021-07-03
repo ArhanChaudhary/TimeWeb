@@ -63,6 +63,9 @@
       <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="27" src="{% static 'images/close_all_assignments.png' %}">
       <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="27" src="{% static 'images/open_all_assignments.png' %}">
       <img id="next-day" tabindex="0" alt="Go to Next Day" height="22" width="27" src="{% static 'images/next_day.png' %}">
+      <div id="next-day-icon-label">Go to Next Day</div>
+      <div id="open-assignments-icon-label">Open all Assignments</div>
+      <div id="close-assignments-icon-label">Close all Assignments</div>
     </div>
     <div id="simulated-date"{% if background_image %} class="add-white-shadow"{% endif %}></div>
     <div id="autofill-work-done">
@@ -138,9 +141,13 @@
             </div>
           </div>
           <div class="relative-positioning-wrapper">
-            <div class="graph-container">
-              <canvas class="fixed-graph"></canvas>
-              <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+            <div class="assignment-footer">
+              <div class="graph-container">
+                <div class="graph-draggable-wrapper">
+                  <canvas class="fixed-graph"></canvas>
+                  <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+                </div>
+              </div>
               <div class="graph-footer">
                 <button class="delete-work-input-button">Delete Work Input</button>
                 <input class="work-input-button" placeholder="Enter Units Done"/>
