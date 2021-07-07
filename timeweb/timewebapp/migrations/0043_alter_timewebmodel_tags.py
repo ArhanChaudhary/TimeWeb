@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='timewebmodel',
             name='tags',
-            field=models.JSONField(blank=True, default=timewebapp.models.default_tags, null=True),
+            field=models.JSONField(blank=True, default=timewebapp.models.empty_list, null=True),
         ),
     ]

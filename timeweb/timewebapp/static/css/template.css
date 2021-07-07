@@ -11,9 +11,6 @@ input {
     -webkit-appearance: none;
     padding: 1px 2px
 }
-.relative-positioning-wrapper {
-    position: relative;
-}
 header {
     width: 100%;
     background: rgb(13,26,38);

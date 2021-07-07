@@ -9,7 +9,7 @@ Deleting assignments
 
 This only runs on index.html
 */
-// Note: modified assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
+// Note: edited assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
 function showForm(show_instantly=false) {
     if (show_instantly) {
         $('#overlay').show().children("#form-wrapper").css("top", 15);
@@ -105,14 +105,13 @@ $(function() {
         // Show form
         showForm();
     });
-    // Populate reentered form on modify
+    // Populate form on edit
     $('.update-button').parent().click(function() {
         // Set form text
-        $("#new-title").html("Re-enter Assignment");
-        $("#submit-assignment-button").html("Modify Assignment");
+        $("#new-title").html("Edit Assignment");
+        $("#submit-assignment-button").html("Edit Assignment");
         // Find which assignment in dat was clicked
         const sa = utils.loadAssignmentData($(this));
-        // Reentered form fields
         const x = new Date(sa.assignment_date.valueOf());
         x.setDate(x.getDate() + sa.x);
         const form_data = [
@@ -120,22 +119,21 @@ $(function() {
             utils.formatting.stringifyDate(sa.assignment_date),
             utils.formatting.stringifyDate(x),
             sa.unit,
-            sa.y,
+            sa.needs_more_info ? '' : sa.y,
             sa.works[0],
-            sa.ctime,
+            sa.needs_more_info ? '' : sa.ctime,
             sa.funct_round-1 ? +sa.funct_round : '', // Displays nothing if it is 1
             (sa.min_work_time*sa.ctime)||'',
         ];
-        // Set reentered form fields
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
             // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_breawk_days.includes(break_day));
             $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
-        // Set button pk
+        $("#id_unit, #id_y, #id_works, #id_ctime").toggleClass("invalid", sa.needs_more_info);
+        // Set button pk so it gets sent on post
         $("#submit-assignment-button").val(sa.id);
-        // Show form
         showForm();
     });
     // Hide form when cancel is clicked
@@ -271,7 +269,7 @@ $(function() {
             // Send data to backend and animates its deletion
             const sa = utils.loadAssignmentData(dom_assignment);
             const success = function() {
-                // Make overflow hidden because trying transitioning margin bottom off the screen as done below still allows it to be scrolled to
+                // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
                 $("#assignments-container").css("overflow", "hidden");
                 // Opacity CSS transition
                 dom_assignment.css("opacity", "0");
@@ -280,20 +278,19 @@ $(function() {
                 // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
 
                 // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
-                // let c = 0;
                 assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
-                        $("#assignments-container").css("overflow", "");
-                        // Remove assignment data from dat
-                        dat = dat.filter(sa_iter => sa.assignment_name !== sa_iter.assignment_name);
-                        // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
-                        if (assignment_container.children("#delete-starred-assignments").length) {
-                            $("#delete-starred-assignments").insertBefore(assignment_container);
-                        }
-                        // Remove assignment from DOM
-                        assignment_container.remove();
-                        // Although nothing needs to be swapped, priority.sort() still needs to be run
-                        // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
-                        priority.sort({ ignore_timeout: true });
+                    $("#assignments-container").css("overflow", "");
+                    // Remove assignment data from dat
+                    dat = dat.filter(sa_iter => sa.id !== sa_iter.id);
+                    // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
+                    if (assignment_container.children("#delete-starred-assignments").length) {
+                        $("#delete-starred-assignments").insertBefore(assignment_container);
+                    }
+                    // Remove assignment from DOM
+                    assignment_container.remove();
+                    // Although nothing needs to be swapped, priority.sort() still needs to be run
+                    // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
+                    priority.sort({ ignore_timeout: true });
                 });
                 if (!ajaxUtils.disable_ajax) {
                     gtag("event","delete_assignment");

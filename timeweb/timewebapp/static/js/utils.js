@@ -16,19 +16,6 @@ This only runs on index.html
 gtag("event", "home");
 utils = {
     formatting: {
-        // Reverses stringifyDate
-        // cite
-        // https://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
-        // Converts YYYY-MM-DD to Date objects reliably on safari
-        // This also adds "T00:00" to the end of the inputted date string before parsing
-        parseDate: function(date) {
-            date += "T00:00";
-            const parsed = Date.parse(date);
-            if (!isNaN(parsed)) {
-                return parsed;
-            }
-            return Date.parse(date.replace(/-/g, '/').replace(/[a-z]+/gi, ' '));
-        },
         // Reverses parseDate
         // Converts Date objects to YYYY-MM-DD
         stringifyDate: function(date) {
@@ -107,16 +94,16 @@ utils = {
             }
     
             $("#open-assignments").click(function() {
-                if ($(".incomplete-works").length) {
-                    $(".assignment-container.incomplete-works .assignment:not(.open-assignment)").click();
+                if ($(".question-mark").length) {
+                    $(".assignment-container.question-mark .assignment:not(.open-assignment)").click();
                 } else {
                     $(".assignment:not(.open-assignment)").click();
                 }
             });
     
             $("#close-assignments").click(function() {
-                if ($(".incomplete-works").length) {
-                    $(".assignment-container.incomplete-works .assignment.open-assignment").click();
+                if ($(".question-mark").length) {
+                    $(".assignment-container.question-mark .assignment.open-assignment").click();
                 } else {
                     $(".assignment.open-assignment").click();
                 }
@@ -133,7 +120,7 @@ utils = {
             $("#next-day-icon-label").info("bottom",
                 `Simulates the next day for ALL assignments
                 
-                All changes made in the simulation are NOT saved, except for adding or modifying assignments. Your assignments can be restored by refreshing this page`
+                All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
             );
         },
         addTagHandlers: function() {
@@ -183,7 +170,7 @@ utils = {
                         for (let tag_name of tag_names) {
                             const tag = $(tag_template);
                             tag.find(".tag-name").text(tag_name);
-                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-name", sa.assignment_name);
+                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.assignment_name);
                             tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                             tag.addClass("tag-add-transition-disabler");
@@ -373,7 +360,7 @@ utils = {
         handleTutorialIntroduction: function() {
             if (enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return $(this).attr("data-assignment-name") !== example_assignment_name;
+                    return utils.loadAssignmentData($(this)).assignment_name !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
                     assignments_excluding_example.first().after("<span>Click your assignment<br></span>");
@@ -390,7 +377,7 @@ utils = {
                     // Save current open assignments
                     sessionStorage.setItem("open_assignments", JSON.stringify(
                         $(".assignment.open-assignment").map(function() {
-                            return $(this).attr("data-assignment-name")
+                            return $(this).attr("data-assignment-id")
                         }).toArray()
                     ));
                 }
@@ -409,8 +396,8 @@ utils = {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    ($(".incomplete-works").length ? $(".assignment-container.incomplete-works .assignment") : $(".assignment")).filter(function() {
-                        return open_assignments.includes($(this).attr("data-assignment-name"))
+                    ($(".question-mark").length ? $(".assignment-container.question-mark .assignment") : $(".assignment")).filter(function() {
+                        return open_assignments.includes($(this).attr("data-assignment-id"))
                     }).click();
                 }
                 // Scroll to original position
@@ -426,7 +413,7 @@ utils = {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
     loadAssignmentData: function($element_with_assignment_name_attribute) {
-        return dat.find(assignment => assignment.assignment_name === $element_with_assignment_name_attribute.attr("data-assignment-name"));
+        return dat.find(assignment => assignment.id == $element_with_assignment_name_attribute.attr("data-assignment-id"));
     },
     // Resolves a resolver promise function when automatic scrolling ends
     // Scrolling detected with $("main").scroll(scroll);
@@ -469,35 +456,19 @@ ajaxUtils = {
             if (new Date().getHours() < ajaxUtils.hour_to_update) {
                 date_now.setDate(date_now.getDate() - 1);
             }
-            const data = {
-                'csrfmiddlewaretoken': csrf_token,
-                'action': 'update_date_now',
-                'date_now': utils.formatting.stringifyDate(date_now),
-            }
             const days_since_example_ad = utils.daysBetweenTwoDates(date_now, old_date_now);
             if (isExampleAccount) {
-                data["days_since_example_ad"] = days_since_example_ad;
                 for (example_assignment of dat) {
                     example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
                 }
             } else {
                 const example_assignment = dat.find(sa_iter => sa_iter.assignment_name === example_assignment_name);
-                if (example_assignment === undefined) {
-                    data["days_since_example_ad"] = 0;
-                } else {
-                    data["days_since_example_ad"] = days_since_example_ad;
-                    // Change example assignment date locally
+                if (example_assignment) {
                     // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
                     // In this case, changing the assignment date automatically changes the due date
                     example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
                 }
             }
-            $.ajax({
-                type: "POST",
-                data: data,
-                error: ajaxUtils.error,
-            });
-            // Unmark all assignments as finished
             for (let sa of dat) {
                 sa.mark_as_done = false;
             }
@@ -568,8 +539,8 @@ if ( window.history.replaceState ) {
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
-    sa.assignment_date = new Date(utils.formatting.parseDate(sa.assignment_date));
-    sa.x = utils.daysBetweenTwoDates(utils.formatting.parseDate(sa.x), sa.assignment_date);
+    sa.assignment_date = new Date(sa.assignment_date);
+    sa.x = utils.daysBetweenTwoDates(Date.parse(sa.x), sa.assignment_date);
     sa.y = +sa.y;
     sa.ctime = +sa.ctime;
     sa.funct_round = +sa.funct_round;
@@ -581,7 +552,10 @@ for (let sa of dat) {
 }
 ({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
-date_now = new Date(utils.formatting.parseDate(date_now));
+date_now = new Date(new Date().toDateString());
+if (date_now.getHours() < hour_to_update) {
+    date_now.setDate(date_now.getDate() - 1);
+}
 highest_priority_color = utils.formatting.hexToRgb(highest_priority_color)
 lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color)
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason

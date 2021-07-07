@@ -60,9 +60,9 @@
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
-      <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="27" src="{% static 'images/close_all_assignments.png' %}">
-      <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="27" src="{% static 'images/open_all_assignments.png' %}">
-      <img id="next-day" tabindex="0" alt="Go to Next Day" height="22" width="27" src="{% static 'images/next_day.png' %}">
+      <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close_all_assignments.png' %}">
+      <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open_all_assignments.png' %}">
+      <img id="next-day" tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next_day.png' %}">
       <div id="next-day-icon-label">Go to Next Day</div>
       <div id="open-assignments-icon-label">Open all Assignments</div>
       <div id="close-assignments-icon-label">Close all Assignments</div>
@@ -86,8 +86,8 @@
       <span id="delete-starred-assignments-text" class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container{% if background_image %} add-white-shadow{% endif %}"{% if assignment.assignment_name == request.session.added_assignment %} id="animate-in"{% elif assignment.assignment_name == request.session.reentered_assignment %} id="animate-color"{% endif %}>
-        <div class="assignment" data-assignment-name="{{ assignment.assignment_name }}" tabindex="0">
+      <div class="assignment-container{% if background_image %} add-white-shadow{% endif %}"{% if assignment.assignment_name == request.session.added_assignment %} id="animate-in"{% elif assignment.assignment_name == request.session.edited_assignment %} id="animate-color"{% endif %}>
+        <div class="assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <span class="title">{{ assignment.assignment_name }}</span>
             <svg width="30px" height="20px" class="arrow-container">
@@ -102,18 +102,18 @@
                 <div class="tags">
                   {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
                   {% spaceless %}
-                  <span class="tag-sortable-container" data-assignment-name="{{ assignment.assignment_name }}">
+                  <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
                     {% for tag in assignment.tags %}
                       <div class="tag-wrapper">
                         <div class="tag-name">{{ tag }}</div>
-                        <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-name="{{ assignment.assignment_name }}">
+                        <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
                           <span class="icon-slash x-icon-first-slash"></span>
                           <span class="icon-slash x-icon-second-slash"></span>
                         </div>
                       </div>
                     {% endfor %}
                   </span>
-                  <div class="tag-add" data-assignment-name="{{ assignment.assignment_name }}" tabindex="-1">
+                  <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
                   {% endspaceless %}
                     <span class="icon-slash plus-first-slash"></span>
                     <span class="icon-slash plus-second-slash"></span>
@@ -133,45 +133,43 @@
               </div>
               <span class="completion-time"></span>
             </div>
-            <div class="button" data-assignment-name="{{ assignment.assignment_name }}">
+            <div class="button" data-assignment-id="{{ assignment.pk }}">
               <img class="update-button" width="22" height="22" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </div>
             <div class="button">
               <img class="delete-button" height="25" src="{% static 'images/delete.png' %}" alt="edit" draggable="false"/>
             </div>
           </div>
-          <div class="relative-positioning-wrapper">
-            <div class="assignment-footer">
-              <div class="graph-container">
-                <div class="graph-draggable-wrapper">
-                  <canvas class="fixed-graph"></canvas>
-                  <canvas class="graph">Your browser does not support the canvas tag.</canvas>
-                </div>
+          <div class="assignment-footer">
+            <div class="graph-container">
+              <div class="graph-draggable-wrapper">
+                <canvas class="fixed-graph"></canvas>
+                <canvas class="graph">Your browser does not support the canvas tag.</canvas>
               </div>
-              <div class="graph-footer">
-                <button class="delete-work-input-button">Delete Work Input</button>
-                <input class="work-input-button" placeholder="Enter Units Done"/>
-                <button class="submit-work-button">Submit Work Input</button>
-                <br>
-                <button class="display-button">Display in Text</button>
-                <button class="mark-as-finished-button"></button>
-                <button class="next-assignment-button">Next Assignment</button>
-                <br>
-                <div class="advanced-buttons">
-                  Advanced Options
-                  <svg width="15px" height="10px">
-                    <polygon points="10,2.5 0,2.5 5,7.5"></polygon>
-                  </svg>
-                </div>
-                <button class="skew-ratio-button">Set Skew Ratio using Graph</button>
-                <input type="number" step="0.1" placeholder="Enter Skew Ratio" class="skew-ratio-textbox"/>
-                <button class="fixed-mode-button"></button>
-                <div class="advanced-buttons second-advanced-button">
-                  Advanced Options
-                  <svg width="15px" height="10px">
-                    <polygon points="10,10 0,10 5,5"></polygon>
-                  </svg>
-                </div>
+            </div>
+            <div class="graph-footer">
+              <button class="delete-work-input-button">Delete Work Input</button>
+              <input class="work-input-button" placeholder="Enter Units Done"/>
+              <button class="submit-work-button">Submit Work Input</button>
+              <br>
+              <button class="display-button">Display in Text</button>
+              <button class="mark-as-finished-button"></button>
+              <button class="next-assignment-button">Next Assignment</button>
+              <br>
+              <div class="advanced-buttons">
+                Advanced Options
+                <svg width="15px" height="10px">
+                  <polygon points="10,2.5 0,2.5 5,7.5"></polygon>
+                </svg>
+              </div>
+              <button class="skew-ratio-button">Set Skew Ratio using Graph</button>
+              <input type="number" step="0.1" placeholder="Enter Skew Ratio" class="skew-ratio-textbox"/>
+              <button class="fixed-mode-button"></button>
+              <div class="advanced-buttons second-advanced-button">
+                Advanced Options
+                <svg width="15px" height="10px">
+                  <polygon points="10,10 0,10 5,5"></polygon>
+                </svg>
               </div>
             </div>
           </div>
@@ -197,7 +195,7 @@
   <template id="tag-template">
     <div class="tag-wrapper">
       <div class="tag-name"></div>
-      <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-name="{{ assignment.assignment_name }}">
+      <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
         <span class="icon-slash x-icon-first-slash"></span>
         <span class="icon-slash x-icon-second-slash"></span>
       </div>

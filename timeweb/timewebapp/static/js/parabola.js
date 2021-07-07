@@ -183,8 +183,8 @@ Assignment.prototype.setParabolaValues = function() {
         }
     }
 }
-Assignment.prototype.funct = function(x, translateX) {
-    if (translateX !== false) {
+Assignment.prototype.funct = function(x, translateX=true) {
+    if (translateX === true) {
         // Translate x coordinate 
         x -= this.red_line_start_x;
         if (this.sa.break_days.length) {

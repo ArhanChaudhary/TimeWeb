@@ -68,6 +68,7 @@ class VisualAssignment extends Assignment {
     constructor(dom_assignment) {
         super(dom_assignment);
         this.dom_assignment = dom_assignment;
+        this.zoom = 1;
         this.graph = dom_assignment.find(".graph");
         this.fixed_graph = dom_assignment.find(".fixed-graph");
         this.graph.css({
@@ -78,8 +79,8 @@ class VisualAssignment extends Assignment {
             width: '',
             height: '',
         });
-        this.fixed_graph.css("width", this.width*2);
-        this.fixed_graph.css("height", this.height*2);
+        this.fixed_graph.css("width", this.width*this.zoom);
+        this.fixed_graph.css("height", this.height*this.zoom);
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
         this.due_date = new Date(this.sa.assignment_date.valueOf());
@@ -97,7 +98,7 @@ class VisualAssignment extends Assignment {
             max: this.skew_ratio_lim - 1,
         });
         this.scale = window.devicePixelRatio || 2;
-        this.scale *= 2;
+        this.scale *= this.zoom;
     }
     calcSkewRatioLimVisually() {
         const skew_ratio_lim = super.calcSkewRatioLim();
@@ -126,12 +127,12 @@ class VisualAssignment extends Assignment {
             this.width = this.fixed_graph.width();
             this.height = this.fixed_graph.height();
             this.graph.css({
-                width: this.width*2,
-                height: this.height*2,
+                width: this.width*this.zoom,
+                height: this.height*this.zoom,
             });
             this.fixed_graph.css({
-                width: this.width*2,
-                height: this.height*2,
+                width: this.width*this.zoom,
+                height: this.height*this.zoom,
             });
             if (this.width > 500) {
                 VisualAssignment.font_size = 13.9;
@@ -149,9 +150,8 @@ class VisualAssignment extends Assignment {
         }
     }
     mousemove(e) {
-        console.log(e.pageX);
-        const x2 = e.pageX - this.fixed_graph.offset().left;
-        const y2 = e.pageY - this.fixed_graph.offset().top;
+        const raw_x = e.pageX - this.fixed_graph.offset().left;
+        const raw_y = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
         if (this.set_skew_ratio_using_graph) {
             let x1 = this.sa.x - this.red_line_start_x;
@@ -161,8 +161,8 @@ class VisualAssignment extends Assignment {
             }
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
-            let x2 = (x2 - 53.7) / this.wCon - this.red_line_start_x;
-            const y2 = (this.height - y2 - 44.5) / this.hCon - this.red_line_start_y;
+            let x2 = (raw_x - 53.7) / this.wCon - this.red_line_start_x;
+            const y2 = (this.height - raw_y - 44.5) / this.hCon - this.red_line_start_y;
             // Handles break days
             if (this.sa.break_days.length) {
                 const floorx2 = Math.floor(x2);
@@ -196,7 +196,7 @@ class VisualAssignment extends Assignment {
             }
         }
         // Passes mouse x and y coords so mouse point can be drawn
-        this.draw(x2, y2);
+        this.draw(raw_x, raw_y);
     }
     static scale = window.devicePixelRatio || 2; // Resolution of every graph
     static preventArrowScroll(e) {
@@ -225,14 +225,14 @@ class VisualAssignment extends Assignment {
         priority.sort();
         this.draw();
     }
-    draw(x2, y2) {
+    draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
-        // && x2 is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
-        if (this.draw_mouse_point && x2) {
+        // && raw_x && raw_y is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
+        if (this.draw_mouse_point && raw_x && raw_y) {
             // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-            var mouse_x = Math.round((x2 - 53.7) / this.wCon),
-                mouse_y = (this.height - y2 - 44.5) / this.hCon;
+            var mouse_x = Math.round((raw_x - 53.7) / this.wCon),
+                mouse_y = (this.height - raw_y - 44.5) / this.hCon;
             if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start)) {
                 mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
             } else if (mouse_x > this.sa.x) {
@@ -366,7 +366,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.textAlign = "start";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
-        if (this.draw_mouse_point && x2) {
+        if (this.draw_mouse_point && raw_x && raw_y) {
             let funct_mouse_x;
             if (mouse_y) {
                 funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];
@@ -626,7 +626,18 @@ class VisualAssignment extends Assignment {
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button"),
                 next_assignment_button = this.dom_assignment.find(".next-assignment-button"),
                 graph_draggable_wrapper = this.dom_assignment.find(".graph-draggable-wrapper");
-        graph_draggable_wrapper.draggable();
+        //     console.log([
+        //         this.fixed_graph.offset().top - this.fixed_graph.height(),
+        //         this.fixed_graph.offset().left - this.fixed_graph.width(),
+        //         this.fixed_graph.offset().top + this.fixed_graph.height() * 2,
+        //         this.fixed_graph.offset().left + this.fixed_graph.width() * 2,
+        //     ]);
+        // graph_draggable_wrapper.draggable({ containment: [
+        //     this.fixed_graph.offset().top - this.fixed_graph.height(),
+        //     this.fixed_graph.offset().left - this.fixed_graph.width(),
+        //     this.fixed_graph.offset().top + this.fixed_graph.height() * 2,
+        //     this.fixed_graph.offset().left + this.fixed_graph.width() * 2,
+        // ]});
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
@@ -975,11 +986,18 @@ class VisualAssignment extends Assignment {
 }
 $(function() {
 $(".assignment").click(function(e) {
-    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .relative-positioning-wrapper, .assignment, .assignment-header, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
+    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
     const dom_assignment = $(this);
-    // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days or an incomplete work schedule
-    if (dom_assignment.hasClass("mark-as-done") && !utils.loadAssignmentData(dom_assignment).mark_as_done) {
-        $(".assignment").first().focus().animate({left: -5}, 75, "easeOutCubic", function() {
+    const sa_to_check_to_shake = utils.loadAssignmentData(dom_assignment);
+    let assignment_to_shake;
+    // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
+    if (dom_assignment.hasClass("mark-as-done") && !sa_to_check_to_shake.mark_as_done) {
+        assignment_to_shake = $(".assignment").first().focus();
+    } else if (sa_to_check_to_shake.needs_more_info) {
+        assignment_to_shake = dom_assignment;
+    }
+    if (assignment_to_shake) {
+        assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
             $(this).animate({left: 5}, 75, "easeOutCubic", function() {
                 $(this).animate({left: 0}, 75, "easeOutCubic");
             });
@@ -993,7 +1011,7 @@ $(".assignment").click(function(e) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         assignment_footer.animate({
-            marginBottom: -assignment_footer.height()
+            marginBottom: -(assignment_footer.height() + 5)
         }, 750, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");

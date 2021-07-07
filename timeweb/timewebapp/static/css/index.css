@@ -34,12 +34,15 @@ header.animate::after {
 #assignments-header {
     padding: 0 10px;
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
+    margin-bottom: 4px;
 }
 #assignments-header img {
     cursor: pointer;
+    margin-top: -3px;
     margin-bottom: -3px;
-    margin-left: 10px;
+    margin-left: 14px;
 }
 #assignments-header img:first-of-type {
     margin-left: auto;
@@ -56,7 +59,8 @@ header.animate::after {
 #assignments-header img ~ div {
     position: absolute;
     order: 1;
-    right: 150px;
+    right: 180px;
+    top: 12px;
     opacity: 0;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
@@ -64,14 +68,13 @@ header.animate::after {
 #assignments-header img#next-day:hover ~ div#next-day-icon-label {
     opacity: 1;
 }
-#open-assignments, #close-assignments {
-    margin-top: -3px;
-}
 #info {
     display: inline;
     font-size: 17px;
 }
 #simulated-date {
+    position: relative;
+    z-index: -1;
     padding: 0 10px;
     font-size: 17px;
 }
@@ -102,7 +105,7 @@ header.animate::after {
 }
 .assignment {
     box-shadow: 0 0 4px rgb(115,115,115);
-    background: white;
+    background: white; /* Set white so it doesnt transition background initially if added by priority.js */
     /*  background: rgb(226,91,80);
     background: rgb(132,200,65); */
     padding: 15px;
@@ -316,8 +319,8 @@ header.animate::after {
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
     border-radius: 10px;
     background-color: rgb(231, 231, 231);
     border: 1px dashed rgb(24, 24, 24);
@@ -598,6 +601,7 @@ header.animate::after {
 .graph-footer {
     padding: 0 13px;
     position: relative;
+    margin-top: 10px;
     padding-bottom: 7px;
     margin-bottom: -7px;
 }

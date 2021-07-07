@@ -18,20 +18,20 @@ WEEKDAYS = (
 )
 def default_works():
     return 0
-def default_tags():
+def empty_list():
     return []
 def create_image_path(instance, filename):
     return f"images/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
     assignment_name = models.CharField(
-        max_length=100,
+        max_length=200,
         verbose_name=_('Name of this Assignment'),
     )
-    assignment_date = models.DateField(
+    assignment_date = models.DateTimeField(
         null=True,
         verbose_name=_('Date Assigned'),
     )
-    x = models.DateField(
+    x = models.DateTimeField(
         null=True,
         blank=True,
         verbose_name=_('Due Date'),
@@ -46,7 +46,7 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(1,_("This field's value can't be less than %(limit_value)s"))],
     )
     works = models.JSONField(
-        default=default_works,
+        default=empty_list,
     )
     blue_line_start = models.IntegerField(
         blank=True,
@@ -67,8 +67,8 @@ class TimewebModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
+        default=1,
         blank=True,
-        null=True,
     )
     min_work_time = models.DecimalField(
         max_digits=15,
@@ -83,7 +83,9 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    fixed_mode = models.BooleanField()
+    fixed_mode = models.BooleanField(
+        default=False,
+    )
     dynamic_start = models.IntegerField(
         null=True,
         blank=True,
@@ -92,9 +94,12 @@ class TimewebModel(models.Model):
         default=False,
     )
     tags = models.JSONField(
-        default=default_tags,
+        default=empty_list,
         null=True,
         blank=True,
+    )
+    needs_more_info = models.BooleanField(
+        default=False,
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -171,9 +176,8 @@ class SettingsModel(models.Model):
         default=True,
         verbose_name=_('Enable Tutorial'),
     )
-    date_now = models.DateField(
-        default=datetime.date.today
-    )
+    oauth_token = models.JSONField(default=empty_list)
+    added_gc_assignment_ids = models.JSONField(default=empty_list)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

@@ -64,22 +64,28 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-cloud_sql_proxy
+# Misc
 .vscode
 timeweb/static/**
 timeweb/media/**
-app.yaml
-main.py
-sa-private-key.json
-env_variables.yaml
 updateinstructions.md
-gcldeployment.md
 original_favicon.png
 original_maskable_favicon.png
 Original splash screens
-.gcloudignore
 example_assignment_load.py
-TODO.md
+
+# GCP stuff
+cloud_sql_proxy
+app.yaml
+main.py
+env_variables.yaml
+gcldeployment.md
+.gcloudignore
+
+# API requests
+sa-private-key.json
+gc-credentials.json
+token.json
 
 # Flask stuff:
 instance/

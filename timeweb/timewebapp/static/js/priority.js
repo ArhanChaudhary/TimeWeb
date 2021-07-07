@@ -2,7 +2,7 @@
 This file includes the code for:
 
 Prioritizing, swapping, and coloring assignments
-Animating assignments that were just created or modified
+Animating assignments that were just created or edited
 
 This only runs on index.html
 */
@@ -10,10 +10,10 @@ This only runs on index.html
 priority = {
     sort_timeout_duration: 2000,
     get_color: function(p) {
-        if (isNaN(p)) return "";
+        if (isNaN(p)) return "white";
         return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
     },
-    // Handles coloring and animating assignments that were just created or modified
+    // Handles coloring and animating assignments that were just created or edited
     color_or_animate_assignment: function(dom_assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
         if ($("#animate-in").length && is_element_submitted) {
             // If a new assignment was created and the assignment that color_or_animate_assignment() was called on is the assignment that was created, animate it easing in
@@ -81,7 +81,15 @@ priority = {
                 }
             }
             let str_daysleft, status_value, status_message, status_image;
-            if (last_work_input >= sa.sa.y) {
+            if (sa.sa.needs_more_info) {
+                status_image = 'question-mark';
+                status_message = "This Assignment needs more Info!<br>Please Edit this Assignment";
+                status_value = 6;
+                dom_status_image.attr({
+                    width: 11,
+                    height: 18,
+                }).css("margin-left", 2);
+            } else if (last_work_input >= sa.sa.y) {
                 status_image = "completely-finished";
                 status_message = 'You are Completely Finished with this Assignment';
                 dom_status_image.attr({
@@ -141,15 +149,16 @@ priority = {
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
-                        status_message = 'This Assignment has no Working Days! Please Re-enter this assignment\'s Break Days';
+                        status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s break days';
+                        status_value = 7;
                     } else {
-                        status_message = "You haven't Entered your past Work inputs! Please Enter your Progress to Continue";
+                        status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
+                        status_value = 8;
                     }
                     dom_status_image.attr({
                         width: 11,
                         height: 18,
                     }).css("margin-left", 2);
-                    status_value = 6;
                 } else if (todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start) {
                     status_image = 'finished';
                     status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
@@ -192,7 +201,7 @@ priority = {
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
                     tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
-                    if (status_value !== 6) {
+                    if (![6,7,8].includes(status_value)) {
                         status_value = 5;
                     }
                 } else if (due_date_minus_today < 7) {
@@ -205,14 +214,15 @@ priority = {
             }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === 1);
-            assignment_container.toggleClass("incomplete-works", status_value === 6);
+            assignment_container.toggleClass("incomplete-works", status_value === 8);
+            assignment_container.toggleClass("question-mark", [6,7,8].includes(status_value));
             let status_priority;
             if (status_value === 1) {
                 status_priority = -index;
             } else if (status_value === 2) {
                 status_priority = today_minus_ad;
-            } else if (status_value === 6) {
-                // Order by assignments closest their due date
+            } else if ([6,7,8].includes(status_value)) {
+                // Order by assignments closest to their due date
                 status_priority = -due_date_minus_today;
             } else {
                 const original_skew_ratio = sa.sa.skew_ratio;
@@ -241,7 +251,7 @@ priority = {
                 }
             }
             let priority_data = [status_value, status_priority, index];
-            if (sa.sa.mark_as_done && status_value !== 6) {
+            if (sa.sa.mark_as_done && ![6,7,8].includes(status_value)) {
                 priority_data.push(true);
             }
             ordered_assignments.push(priority_data);
@@ -277,11 +287,11 @@ priority = {
             }
         }));
         for (let sa of ordered_assignments) {
-            // originally sa[0] !== 6 && (sa[3] || $(".incomplete-works").length); if sa[3] is true then sa[0] !== 6;
-            const mark_as_done = !!(sa[3] || $(".incomplete-works").length && sa[0] !== 6);
+            // originally ![6,7,8].includes(sa[0]) && (sa[3] || $(".question-mark").length); if sa[3] is true then ![6,7,8].includes(sa[0])
+            const mark_as_done = !!(sa[3] || $(".question-mark").length && ![6,7,8].includes(sa[0]));
             const dom_assignment = $(".assignment").eq(sa[2]);
             let priority_percentage;
-            if (sa[0] === 6) {
+            if ([6,7,8].includes(sa[0])) {
                 priority_percentage = NaN;
             } else if (mark_as_done || sa[0] === 3 || sa[0] === 1 || sa[0] === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                 priority_percentage = 0;
@@ -364,18 +374,27 @@ priority = {
         $(".finished").last().addClass("last-finished");
         $(".last-incomplete-works").removeClass("last-incomplete-works");
         $(".incomplete-works").last().addClass("last-incomplete-works");
-        if ($(".incomplete-works").length) {
+        if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
-            $("#simulated-date").css("margin-top", -23);
+            $("#simulated-date").css({
+                marginTop: -23, 
+                transform: "translateY(-6px)",
+            });
         } else if (!total) {
             $("#info").show();
-            $("#simulated-date").css("margin-top", "");
+            $("#simulated-date").css({
+                marginTop: "", 
+                transform: "",
+            });
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time").hide();
-            $("#hide-button").css("display", "none"); // Preserve layout positioning
+            $("#hide-button").css("display", "none");
         } else {
             $("#current-time, #tomorrow-time, #info").show();
-            $("#simulated-date").css("margin-top", "");
+            $("#simulated-date").css({
+                marginTop: "", 
+                transform: ""
+            });
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
             $("#hide-button").css("display", "");
@@ -455,10 +474,11 @@ ordering = {
                     'assignments': JSON.stringify(finished_assignments),
                 }
                 const success = function() {
-                    const assignment_names_to_delete = $(".finished").map(function() {
-                        return $(this).children(".assignment").attr("data-assignment-name")
+                    const assignment_ids_to_delete = $(".finished").map(function() {
+                        return utils.loadAssignmentData($(this).children(".assignment")).id;
                     }).toArray();
-                    dat = dat.filter(iter_sa => !assignment_names_to_delete.includes(iter_sa.assignment_name));
+                    // Remove ids to delete from dat
+                    dat = dat.filter(iter_sa => !assignment_ids_to_delete.includes(iter_sa.id));
                     $(".finished").remove();
                     if (!ajaxUtils.disable_ajax) {
                         for (let i = 0; i < finished_assignments.length; i++) {

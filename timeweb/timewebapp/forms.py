@@ -18,6 +18,7 @@ class TimewebForm(forms.ModelForm):
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),
             'mark_as_done': forms.HiddenInput(),
+            'needs_more_info': forms.HiddenInput(),
             'tags': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question"}),
@@ -30,11 +31,11 @@ class TimewebForm(forms.ModelForm):
         error_messages = {
             'assignment_name': {
                 'required': _("Please enter an assignment name"),
-                'max_length': _("This assignment's name is too long (>100 characters)"),
+                'max_length': _("This assignment's name is too long (>200 characters)"),
                 'invalid': _("This assignment's name is invalid"),
             },
             'assignment_date': {
-                'required': _('You must enter an assignment date'),
+                'required': _('Please enter an assignment date'),
                 'invalid': _('The assignment date is out of range or invalid'),
             },
             'x': {
@@ -116,6 +117,7 @@ class SettingsForm(forms.ModelForm):
             'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'warning_acceptance': forms.NumberInput(attrs={"min":"1","max":"100"}),
             'date_now': forms.HiddenInput(),
+            'oauth_token': forms.HiddenInput(),
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
