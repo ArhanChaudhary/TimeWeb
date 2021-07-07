@@ -290,7 +290,7 @@ class TimewebView(LoginRequiredMixin, View):
         if date_now.hour < hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        if self.created_assignment:
+        if self.created_assignment or self.sm.needs_more_info:
             self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
             if self.sm.blue_line_start < 0:
                 self.sm.blue_line_start = 0
@@ -298,15 +298,14 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             self.sm.blue_line_start = old_data.blue_line_start + (old_data.assignment_date-self.sm.assignment_date).days
             if date_now < old_data.assignment_date or self.sm.blue_line_start < 0:
-                self.sm.blue_line_start = 0 
+                self.sm.blue_line_start = 0
+            removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
+            if removed_works_start < 0:
+                removed_works_start = 0
         if not self.sm.funct_round:
             self.sm.funct_round = 1
         if self.sm.min_work_time != None:
-            self.sm.min_work_time /= self.sm.ctime
-        if not self.created_assignment:
-            removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position on graph to 0 so that it can be used in accessing works
-            if removed_works_start < 0:
-                removed_works_start = 0
+            self.sm.min_work_time /= self.sm.ctime            
 
         if self.sm.x == None:
             # y - first work = min_work_time_funct_round * x
@@ -330,8 +329,10 @@ class TimewebView(LoginRequiredMixin, View):
             x_num = ceil(x_num)
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
-                if self.created_assignment:
-                    self.sm.dynamic_start = self.sm.blue_line_start
+                # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
+                # might rewrite
+                if self.created_assignment or self.sm.needs_more_info:
+                    self.sm.dynamic_start = 0
             if not x_num or len(self.sm.break_days) == 7:
                 x_num = 1
             elif self.sm.break_days:
@@ -371,8 +372,8 @@ class TimewebView(LoginRequiredMixin, View):
             x_num = (self.sm.x - self.sm.assignment_date).days
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
-                if self.created_assignment:
-                    self.sm.dynamic_start = self.sm.blue_line_start
+                if self.created_assignment or self.sm.needs_more_info:
+                    self.sm.dynamic_start = 0
         if self.sm.min_work_time != None:
             self.sm.min_work_time *= self.sm.ctime
         if self.sm.needs_more_info:
@@ -570,7 +571,6 @@ class TimewebView(LoginRequiredMixin, View):
                         "y": 1,
                         "ctime": 1,
                     })
-                    
             except HttpError: # Permission denied
                 pass
         if new_gc_assignment_ids != set_added_gc_assignment_ids:
