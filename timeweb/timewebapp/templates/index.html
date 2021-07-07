@@ -86,10 +86,10 @@
       <span id="delete-starred-assignments-text" class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container{% if background_image %} add-white-shadow{% endif %}"{% if assignment.assignment_name == request.session.added_assignment %} id="animate-in"{% elif assignment.assignment_name == request.session.edited_assignment %} id="animate-color"{% endif %}>
+      <div class="assignment-container{% if background_image %} add-white-shadow{% endif %}"{% if assignment.name == request.session.added_assignment %} id="animate-in"{% elif assignment.name == request.session.edited_assignment %} id="animate-color"{% endif %}>
         <div class="assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
-            <span class="title">{{ assignment.assignment_name }}</span>
+            <span class="title">{{ assignment.name }}</span>
             <svg width="30px" height="20px" class="arrow-container">
               <polygon points="5,0 5,20 15,10">
                 <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>

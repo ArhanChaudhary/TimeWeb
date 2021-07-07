@@ -170,7 +170,7 @@ utils = {
                         for (let tag_name of tag_names) {
                             const tag = $(tag_template);
                             tag.find(".tag-name").text(tag_name);
-                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.assignment_name);
+                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.name);
                             tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                             tag.addClass("tag-add-transition-disabler");
@@ -360,7 +360,7 @@ utils = {
         handleTutorialIntroduction: function() {
             if (enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return utils.loadAssignmentData($(this)).assignment_name !== example_assignment_name;
+                    return utils.loadAssignmentData($(this)).name !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
                     assignments_excluding_example.first().after("<span>Click your assignment<br></span>");
@@ -412,8 +412,8 @@ utils = {
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
-    loadAssignmentData: function($element_with_assignment_name_attribute) {
-        return dat.find(assignment => assignment.id == $element_with_assignment_name_attribute.attr("data-assignment-id"));
+    loadAssignmentData: function($element_with_id_attribute) {
+        return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
     },
     // Resolves a resolver promise function when automatic scrolling ends
     // Scrolling detected with $("main").scroll(scroll);
@@ -462,7 +462,7 @@ ajaxUtils = {
                     example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
                 }
             } else {
-                const example_assignment = dat.find(sa_iter => sa_iter.assignment_name === example_assignment_name);
+                const example_assignment = dat.find(sa_iter => sa_iter.name === example_assignment_name);
                 if (example_assignment) {
                     // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
                     // In this case, changing the assignment date automatically changes the due date

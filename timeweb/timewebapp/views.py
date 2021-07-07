@@ -36,11 +36,10 @@ from django.dispatch import receiver
 @receiver(post_save, sender=get_user_model())
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
-        date_now = datetime.datetime.now()
+        date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        date_now = timezone.make_aware(date_now)
         TimewebModel.objects.create(**{
-            "assignment_name": example_assignment_name,
+            "name": example_assignment_name,
             "assignment_date": date_now,
             "x": date_now + datetime.timedelta(30),
             "unit": "Page",
@@ -170,7 +169,7 @@ class TimewebView(LoginRequiredMixin, View):
         if self.settings_model.oauth_token:
             self.create_gc_assignments(request)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        if timezone.localtime(get_user_model().objects.get(username=request.user).last_login).day != timezone.make_aware(datetime.datetime.now()).day:
+        if timezone.localtime(get_user_model().objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
@@ -230,16 +229,16 @@ class TimewebView(LoginRequiredMixin, View):
         # Parts of the form that can only validate in views
         form_is_valid = True
         if self.isExampleAccount:# and 0:
-            self.form.add_error("assignment_name", forms.ValidationError(_('You cannot create or edit assignments in the example account') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+            self.form.add_error("name", forms.ValidationError(_('You cannot create or edit assignments in the example account') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
             form_is_valid = False
         else:
             # Ensure that the user's assignment name doesn't match with any other assignment
             # Can't use unique=True because it doesn't exclude itself if its name doesnt change when edited
-            if self.assignment_models.exclude(pk=self.pk).filter(assignment_name=request.POST['assignment_name'].strip()).exists():
-                self.form.add_error("assignment_name", forms.ValidationError(_('An assignment with this name already exists')))
+            if self.assignment_models.exclude(pk=self.pk).filter(name=request.POST['name'].strip()).exists():
+                self.form.add_error("name", forms.ValidationError(_('An assignment with this name already exists')))
                 form_is_valid = False
             if self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-                self.form.add_error("assignment_name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+                self.form.add_error("name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
                 form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
@@ -270,7 +269,7 @@ class TimewebView(LoginRequiredMixin, View):
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
             # Update model values
-            self.sm.assignment_name = self.form.cleaned_data.get("assignment_name")
+            self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
             self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             # self.sm.assignment_date = timezone.make_aware(self.sm.assignment_date) dont include because it's already aware
@@ -286,11 +285,10 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
-        date_now = datetime.datetime.now()
+        date_now = timezone.localtime(timezone.now())
         if date_now.hour < hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        date_now = timezone.make_aware(date_now)
         if self.created_assignment:
             self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
             if self.sm.blue_line_start < 0:
@@ -401,11 +399,11 @@ class TimewebView(LoginRequiredMixin, View):
         self.sm.needs_more_info = False
         self.sm.save()
         if self.created_assignment:
-            request.session['added_assignment'] = self.sm.assignment_name
-            logger.info(f'User \"{request.user}\" added assignment "{self.sm.assignment_name}"')
+            request.session['added_assignment'] = self.sm.name
+            logger.info(f'User \"{request.user}\" added assignment "{self.sm.name}"')
         else:
-            request.session['edited_assignment'] = self.sm.assignment_name    
-            logger.info(f'User \"{request.user}\" updated assignment "{self.sm.assignment_name}"')
+            request.session['edited_assignment'] = self.sm.name    
+            logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
         # post-get
         # Don't make this return a 204 when submitting from the example account because there are too many assignments
         return redirect(request.path_info)
@@ -489,11 +487,10 @@ class TimewebView(LoginRequiredMixin, View):
             self.settings_model.oauth_token = json.loads(creds.to_json())
             self.settings_model.save()
 
-        date_now = datetime.datetime.now()
+        date_now = timezone.localtime(timezone.now())
         if date_now.hour < hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        date_now = timezone.make_aware(date_now)
 
         service = build('classroom', 'v1', credentials=creds)
         courses = service.courses().list().execute().get('courses', [])
@@ -510,13 +507,13 @@ class TimewebView(LoginRequiredMixin, View):
                     if assignment_id in self.settings_model.added_gc_assignment_ids:
                         continue
                     if assignment['workType'] == "ASSIGNMENT":
-                        assignment_name = "Google Classroom Assignment: "
+                        name = "Google Classroom Assignment: "
                     elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
-                        assignment_name = "Google Classroom Short Answer: "
+                        name = "Google Classroom Short Answer: "
                     elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
-                        assignment_name = "Google Classroom Multiple Choice Question: "
-                    assignment_name += assignment['title']
-                    assignment_name = assignment_name[:TimewebModel.assignment_name.field.max_length]
+                        name = "Google Classroom Multiple Choice Question: "
+                    name += assignment['title']
+                    name = name[:TimewebModel.name.field.max_length]
                     assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
                     assignment_date = timezone.localtime(datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=datetime.timezone.utc))
                     assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -548,7 +545,7 @@ class TimewebView(LoginRequiredMixin, View):
                     dynamic_start = blue_line_start
                     user = get_user_model().objects.get(username=request.user)
                     TimewebModel.objects.create(**{
-                        "assignment_name": assignment_name,
+                        "name": name,
                         "assignment_date": assignment_date,
                         "x": x,
                         "blue_line_start": blue_line_start,
@@ -585,7 +582,7 @@ class TimewebView(LoginRequiredMixin, View):
                 logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
             self.sm.delete()
-            logger.info(f'User \"{request.user}\" deleted assignment "{self.sm.assignment_name}"')
+            logger.info(f'User \"{request.user}\" deleted assignment "{self.sm.name}"')
         return HttpResponse(status=204)
         
     def saved_assignment(self, request):
@@ -595,15 +592,15 @@ class TimewebView(LoginRequiredMixin, View):
             del assignment['pk'] # Don't loop through the assignment's pk value
             for key, value in assignment.items():
                 if key == "skew_ratio":
-                    log_message = f'User \"{request.user}\" saved skew ratio for assignment "{self.sm.assignment_name}"'             
+                    log_message = f'User \"{request.user}\" saved skew ratio for assignment "{self.sm.name}"'             
                 elif key == 'fixed_mode':
-                    log_message = f'User \"{request.user}\" saved fixed mode for assignment "{self.sm.assignment_name}"'
+                    log_message = f'User \"{request.user}\" saved fixed mode for assignment "{self.sm.name}"'
                 elif key == 'works' or key == 'dynamic_start':
-                    log_message = f'User \"{request.user}\" modified works for assignment "{self.sm.assignment_name}"'
+                    log_message = f'User \"{request.user}\" modified works for assignment "{self.sm.name}"'
                 elif key == 'mark_as_done':
-                    log_message = f'User \"{request.user}\" marked or unmarked assignment "{self.sm.assignment_name}" as completed'
+                    log_message = f'User \"{request.user}\" marked or unmarked assignment "{self.sm.name}" as completed'
                 elif key == 'tags':
-                    log_message = f'User \"{request.user}\" reordered tags for assignment "{self.sm.assignment_name}"'
+                    log_message = f'User \"{request.user}\" reordered tags for assignment "{self.sm.name}"'
                 if request.user != self.sm.user:
                     logger.warning(f"User \"{request.user}\" cannot save an assignment that isn't theirs")
                     return HttpResponseForbidden("This assignment isn't yours")
@@ -640,9 +637,9 @@ class TimewebView(LoginRequiredMixin, View):
 
         self.sm.save()
         if action == "tag_add":
-            logger.info(f"User \"{request.user}\" added tags \"{tag_names}\" to \"{self.sm.assignment_name}\"")
+            logger.info(f"User \"{request.user}\" added tags \"{tag_names}\" to \"{self.sm.name}\"")
         elif action == "tag_delete":
-            logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{self.sm.assignment_name}\"")
+            logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{self.sm.name}\"")
         return HttpResponse(status=204)
 
     # Unused but I'll keep it here just in case

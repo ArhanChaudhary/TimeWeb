@@ -17,7 +17,7 @@ function showForm(show_instantly=false) {
         $("#overlay").fadeIn(300).children("#form-wrapper").animate({top: 15}, 300);
         if (!isMobile) {
             // Focus on first field
-            $("#id_assignment_name").focus();
+            $("#id_name").focus();
         }
         // Mobile
         $("#image-new-container").blur();
@@ -115,7 +115,7 @@ $(function() {
         const x = new Date(sa.assignment_date.valueOf());
         x.setDate(x.getDate() + sa.x);
         const form_data = [
-            sa.assignment_name,
+            sa.name,
             utils.formatting.stringifyDate(sa.assignment_date),
             utils.formatting.stringifyDate(x),
             sa.unit,
@@ -175,7 +175,7 @@ $(function() {
         let message;
         if (e.type === "invalid") {
             switch ($(this).attr("id")) {
-                case "id_assignment_name":
+                case "id_name":
                     message = 'Please enter an assignment name';
                     break;
                 case "id_ad":

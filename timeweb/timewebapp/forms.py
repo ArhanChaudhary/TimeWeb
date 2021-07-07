@@ -10,7 +10,7 @@ class TimewebForm(forms.ModelForm):
         model = TimewebModel
         fields = "__all__"
         widgets = {
-            'assignment_name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
+            'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'assignment_date': DateInput(),
             'x': DateInput(),
             'blue_line_start': forms.HiddenInput(),
@@ -29,7 +29,7 @@ class TimewebForm(forms.ModelForm):
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
         }
         error_messages = {
-            'assignment_name': {
+            'name': {
                 'required': _("Please enter an assignment name"),
                 'max_length': _("This assignment's name is too long (>200 characters)"),
                 'invalid': _("This assignment's name is invalid"),

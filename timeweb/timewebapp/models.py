@@ -23,7 +23,7 @@ def empty_list():
 def create_image_path(instance, filename):
     return f"images/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
-    assignment_name = models.CharField(
+    name = models.CharField(
         max_length=200,
         verbose_name=_('Name of this Assignment'),
     )
@@ -108,7 +108,7 @@ class TimewebModel(models.Model):
         blank=True,
     )
     def __str__(self):
-        return self.assignment_name
+        return self.name
 
 class SettingsModel(models.Model):
     warning_acceptance = models.IntegerField(
