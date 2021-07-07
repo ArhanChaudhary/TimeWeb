@@ -132,6 +132,7 @@ $(function() {
             $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
         $("#id_unit, #id_y, #id_works, #id_ctime").toggleClass("invalid", sa.needs_more_info);
+        $("#id_x").toggleClass("invalid", isNaN(x.getTime()));
         // Set button pk so it gets sent on post
         $("#submit-assignment-button").val(sa.id);
         showForm();
@@ -143,7 +144,7 @@ $(function() {
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
         
-        e.g: If this assignment is reading a book, enter "Chapter"
+        e.g: If this assignment is reading a book, enter "Page" or "Chapter"
 
         If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute" or "Hour"`
     );

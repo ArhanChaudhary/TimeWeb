@@ -31,7 +31,7 @@ class TimewebForm(forms.ModelForm):
         error_messages = {
             'name': {
                 'required': _("Please enter an assignment name"),
-                'max_length': _("This assignment's name is too long (>200 characters)"),
+                'max_length': _("This assignment's name is too long (>%(n)d characters)") % {"n": TimewebModel.name.field.max_length},
                 'invalid': _("This assignment's name is invalid"),
             },
             'assignment_date': {

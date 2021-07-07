@@ -126,23 +126,26 @@ utils = {
         addTagHandlers: function() {
             const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
             const tag_template = $("#tag-template").html();
+            function transitionCloseTagBox($tag_add) {
+                const tag_add_box = $tag_add.find(".tag-add-box");
+                tag_add_box.css({
+                    height: "unset",
+                    overflow: "visible",
+                });
+                tag_add_box.one("transitionend", function() {
+                    tag_add_box.css({
+                        height: "",
+                        overflow: "",
+                    });
+                });
+            }
             $(".tag-add").click(tagAddClick);
             function tagAddClick(e) {
                 const $this = $(this);
                 // Close add tag box if "Add Tag" is clicked again
                 if ($(e.target).parent().hasClass("tag-add") && $this.hasClass("open-tag-add-box")) {
                     $this.removeClass("open-tag-add-box");
-                    const tag_add_box = $this.find(".tag-add-box");
-                    tag_add_box.css({
-                        height: "unset",
-                        overflow: "visible",
-                    });
-                    tag_add_box.one("transitionend", function() {
-                        tag_add_box.css({
-                            height: "",
-                            overflow: "",
-                        });
-                    });
+                    transitionCloseTagBox($this);
                     return;
                 }
                 // Plus button was clicked
@@ -167,10 +170,11 @@ utils = {
                         sa.tags.push(...tag_names);
                         // Close box and add tags visually
                         $this.removeClass("open-tag-add-box");
+                        transitionCloseTagBox($this);
                         for (let tag_name of tag_names) {
                             const tag = $(tag_template);
                             tag.find(".tag-name").text(tag_name);
-                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.name);
+                            tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
                             tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                             tag.addClass("tag-add-transition-disabler");
@@ -273,12 +277,13 @@ utils = {
                     }
                 });
             }
-            $(".tag-add").focusout(function(e) {
+            $(".tag-add").focusout(function() {
                 const $this = $(this);
                 setTimeout(function() {
                     // const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
                     if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this)) return;
                     $this.removeClass("open-tag-add-box");
+                    transitionCloseTagBox($this);
                 });
             });
             $(".tag-sortable-container").sortable().on("sortstop", function() {

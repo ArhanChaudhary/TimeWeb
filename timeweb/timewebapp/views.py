@@ -9,6 +9,7 @@ from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
 import logging
+from django.utils.text import Truncator
 from django import forms
 from django.forms.models import model_to_dict
 import datetime
@@ -426,7 +427,9 @@ class TimewebView(LoginRequiredMixin, View):
         # time.
         if self.settings_model.oauth_token:
             self.settings_model.oauth_token = []
+            self.settings_model.added_gc_assignment_ids = []
             self.settings_model.save()
+            logger.info(f"User {request.user} disabled google classroom API")
             return HttpResponse(status=204)
         SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
         flow = InstalledAppFlow.from_client_secrets_file(
@@ -436,10 +439,10 @@ class TimewebView(LoginRequiredMixin, View):
             # Save the credentials for the next run
             self.settings_model.oauth_token = json.loads(creds.to_json())
             self.settings_model.save()
-            return HttpResponse(status=204)
         except Warning as e:
             logger.warning("Google classroom api warning: " + e)
-            return HttpResponse(status=204)
+        logger.info(f"User {request.user} enabled google classroom API")
+        return HttpResponse(status=204)
         # For reference:
         # If modifying these scopes, delete the file token.json.
         # SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
@@ -496,16 +499,16 @@ class TimewebView(LoginRequiredMixin, View):
         courses = service.courses().list().execute().get('courses', [])
         coursework = service.courses().courseWork()
 
-        deleted_course_assignments = self.settings_model.added_gc_assignment_ids[:] # Serves to remove deleted assignment ids to ensure old ids dont build up over time
-        save = False
+        # Make "in" faster
+        set_added_gc_assignment_ids = set(self.settings_model.added_gc_assignment_ids)
+        # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
+        new_gc_assignment_ids = set()
         for course in courses:
             try:
                 course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
                 for assignment in course_coursework:
+                    # Load and interpret json data
                     assignment_id = int(assignment['id'], 10)
-                    deleted_course_assignments.remove(assignment_id)
-                    if assignment_id in self.settings_model.added_gc_assignment_ids:
-                        continue
                     if assignment['workType'] == "ASSIGNMENT":
                         name = "Google Classroom Assignment: "
                     elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
@@ -513,7 +516,7 @@ class TimewebView(LoginRequiredMixin, View):
                     elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
                         name = "Google Classroom Multiple Choice Question: "
                     name += assignment['title']
-                    name = name[:TimewebModel.name.field.max_length]
+                    name = Truncator(name).chars(TimewebModel.name.field.max_length)
                     assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
                     assignment_date = timezone.localtime(datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=datetime.timezone.utc))
                     assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -537,6 +540,11 @@ class TimewebView(LoginRequiredMixin, View):
                         if x < date_now:
                             continue
                     tags = [course['name']]
+
+                    # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
+                    new_gc_assignment_ids.add(assignment_id)
+                    if assignment_id in set_added_gc_assignment_ids:
+                        continue
 
                     # Create assignment
                     blue_line_start = (date_now-assignment_date).days
@@ -562,16 +570,11 @@ class TimewebView(LoginRequiredMixin, View):
                         "y": 1,
                         "ctime": 1,
                     })
-                    if assignment_id not in self.settings_model.added_gc_assignment_ids:
-                        self.settings_model.added_gc_assignment_ids.append(assignment_id)
-                        save = True
                     
             except HttpError: # Permission denied
                 pass
-        for id in deleted_course_assignments:
-            self.settings_model.added_gc_assignment_ids.remove(id)
-            save = True
-        if save:
+        if new_gc_assignment_ids != set_added_gc_assignment_ids:
+            self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
             self.settings_model.save()
         return HttpResponse(status=204)
     def deleted_assignment(self, request):
