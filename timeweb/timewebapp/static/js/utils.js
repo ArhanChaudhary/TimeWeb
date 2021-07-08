@@ -132,8 +132,6 @@ utils = {
                 $.ajax({type: "POST", data: {csrfmiddlewaretoken: csrf_token, action: "toggle_gc_api"}}).done(function(responseText) {
                     if (responseText === "Disabled gc api") {
                         $("#toggle-gc-label").html("Enable Google Classroom API");
-                    } else if (responseText === "Enabled gc api") {
-                        window.location.reload();
                     }
                 });
             })
