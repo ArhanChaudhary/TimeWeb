@@ -121,7 +121,7 @@ class SettingsForm(forms.ModelForm):
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
-            'added_gc_assignments': forms.HiddenInput(),
+            'added_gc_assignment_ids': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {

@@ -95,7 +95,6 @@ class TimewebModel(models.Model):
     )
     tags = models.JSONField(
         default=empty_list,
-        null=True,
         blank=True,
     )
     needs_more_info = models.BooleanField(
