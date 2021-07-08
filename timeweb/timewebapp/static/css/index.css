@@ -824,7 +824,7 @@ label[for='id_ad']::after {
     margin: -1em 50px 0;
 }
 #toggle-gc-container {
-    position: absolute;
+    position: fixed;
     height: 41px;
     border-radius: 20px;
     right: 10px;
