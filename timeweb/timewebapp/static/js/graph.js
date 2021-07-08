@@ -72,12 +72,12 @@ class VisualAssignment extends Assignment {
         this.graph = dom_assignment.find(".graph");
         this.fixed_graph = dom_assignment.find(".fixed-graph");
         this.graph.css({
-            width: '',
-            height: '',
+            width: this.zoom*100+"%",
+            height: this.zoom*100+"%",
         });
         this.fixed_graph.css({
-            width: '',
-            height: '',
+            width: this.zoom*100+"%",
+            height: this.zoom*100+"%",
         });
         this.fixed_graph.css("width", this.width*this.zoom);
         this.fixed_graph.css("height", this.height*this.zoom);
@@ -126,14 +126,6 @@ class VisualAssignment extends Assignment {
             // Static properties
             this.width = this.fixed_graph.width();
             this.height = this.fixed_graph.height();
-            this.graph.css({
-                width: this.width*this.zoom,
-                height: this.height*this.zoom,
-            });
-            this.fixed_graph.css({
-                width: this.width*this.zoom,
-                height: this.height*this.zoom,
-            });
             if (this.width > 500) {
                 VisualAssignment.font_size = 13.9;
             } else {
@@ -141,10 +133,10 @@ class VisualAssignment extends Assignment {
             }
             this.wCon = (this.width - 55) / this.sa.x;
             this.hCon = (this.height - 55) / this.sa.y;
-            this.graph[0].width = this.width * this.scale;
-            this.graph[0].height = this.height * this.scale;
-            this.fixed_graph[0].width = this.width * this.scale;
-            this.fixed_graph[0].height = this.height * this.scale;
+            this.graph[0].width = this.width * this.scale / this.zoom;
+            this.graph[0].height = this.height * this.scale / this.zoom;
+            this.fixed_graph[0].width = this.width * this.scale / this.zoom;
+            this.fixed_graph[0].height = this.height * this.scale / this.zoom;
             this.drawfixed();
             this.draw();
         }

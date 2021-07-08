@@ -574,16 +574,11 @@ header.animate::after {
     box-shadow: 0 0 0 3px rgb(0,95,204);
     outline: 0;
 }
-.graph-container * {
-    width: 100%;
-    height: 100%;
-}
 .fixed-graph {
     position: absolute;
 }
 .graph {
     position: relative;
-    margin-bottom: -5px;
 }
 .graph-footer .info-button {
     /* Prevent graph buttons from oversizing */
