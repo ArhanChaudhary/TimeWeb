@@ -431,7 +431,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.settings_model.added_gc_assignment_ids = []
             self.settings_model.save()
             logger.info(f"User {request.user} disabled google classroom API")
-            return HttpResponse(status=204)
+            return HttpResponse("Disabled gc api")
         SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
         flow = InstalledAppFlow.from_client_secrets_file(
             'gc-credentials.json', SCOPES)
@@ -443,7 +443,7 @@ class TimewebView(LoginRequiredMixin, View):
         except Warning as e:
             logger.warning("Google classroom api warning: " + e)
         logger.info(f"User {request.user} enabled google classroom API")
-        return HttpResponse(status=204)
+        return HttpResponse("Enabled gc api")
         # For reference:
         # If modifying these scopes, delete the file token.json.
         # SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']

@@ -1,8 +1,10 @@
 {% extends "template.html" %}
 {% load static %}
+
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 {% endblock css %}
+
 {% block js %}
 {{ assignment_models_as_json|json_script:"assignment-models" }}
 {{ settings_model_as_json|json_script:"settings-model" }}
@@ -201,5 +203,9 @@
       </div>
     </div>
   </template>
+  <div id="toggle-gc-container">
+    <span id="toggle-gc-label">Enable Google Classroom API</span>
+    <img src="{% static 'images/gc-logo.png' %}" width="33" height="33">
+  </div>
   {% endspaceless %}
 {% endblock content %}

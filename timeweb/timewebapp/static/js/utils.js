@@ -73,7 +73,7 @@ utils = {
                 $("#hide-button").html("Show").prev().toggle();
             }
         },
-        setAdvancedClickHandlers: function() {
+        setMiscClickHandlers: function() {
             // Advanced inputs for the graph
             $(".advanced-buttons").click(function() {
                 $(".skew-ratio-button, .skew-ratio-textbox, .skew-ratio-textbox + .info-button, .fixed-mode-button").toggle();
@@ -92,7 +92,7 @@ utils = {
                 $("#form-wrapper #advanced-inputs").click();
                 sessionStorage.removeItem("advanced_inputs");
             }
-    
+            // Assignments header icons
             $("#open-assignments").click(function() {
                 if ($(".question-mark").length) {
                     $(".assignment-container.question-mark .assignment:not(.open-assignment)").click();
@@ -122,6 +122,22 @@ utils = {
                 
                 All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
             );
+            // gc api
+            if ($.isEmptyObject(oauth_token)) {
+                $("#toggle-gc-label").html("Enable Google Classroom API");
+            } else {
+                $("#toggle-gc-label").html("Disable Google Classroom API");
+            }
+            $("#toggle-gc-container").click(function() {
+                $.ajax({type: "POST", data: {csrfmiddlewaretoken: csrf_token, action: "toggle_gc_api"}}).done(function(responseText) {
+                    if (responseText === "Disabled gc api") {
+                        $("#toggle-gc-label").html("Enable Google Classroom API");
+                    } else if (responseText === "Enabled gc api") {
+                        window.location.reload();
+                    }
+                });
+            })
+            
         },
         addTagHandlers: function() {
             const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
@@ -555,7 +571,7 @@ for (let sa of dat) {
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 }
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color } = JSON.parse(document.getElementById("settings-model").textContent));
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(new Date().toDateString());
 if (date_now.getHours() < hour_to_update) {
@@ -576,7 +592,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ajaxUtils.changeDateNowAndExampleAssignmentDates();
     setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
     utils.ui.setHideEstimatedCompletionTimeButton();
-    utils.ui.setAdvancedClickHandlers();
+    utils.ui.setMiscClickHandlers();
     utils.ui.addTagHandlers();
     ordering.deleteStarredAssignmentsListener();
     ordering.autofillAssignmentsListener();

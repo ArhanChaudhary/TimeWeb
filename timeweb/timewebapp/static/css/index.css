@@ -828,7 +828,41 @@ label[for='id_ad']::after {
     flex-wrap: wrap;
     margin: -1em 50px 0;
 }
-
+#toggle-gc-container {
+    position: absolute;
+    height: 41px;
+    border-radius: 20px;
+    right: 10px;
+    bottom: 10px;
+    padding: 4px;
+    box-sizing: border-box;
+    text-align: right;
+    background-color: white;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 0 5px 1px black;
+}
+#toggle-gc-label {
+    position: relative;
+    bottom: 6px;
+    width: 0;
+    opacity: 0;
+    display: inline-block;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    transform: translateX(30px);
+    transition: width 0.7s cubic-bezier(0, 0, 0.5, 1);
+}
+#toggle-gc-container img {
+    position: relative;
+}
+#toggle-gc-container:hover #toggle-gc-label {
+    width: 245px;
+    opacity: 1;
+    transform: translateX(10px);
+    transition: width 0.7s cubic-bezier(0, 0, 0.5, 1), opacity 0.3s linear 0.35s, transform 0.25s linear 0.35s;
+}
 
 :not(.assignment-container).add-white-shadow {
     mix-blend-mode: difference;
