@@ -20,7 +20,11 @@ import json
 import os
 
 from google.cloud import storage
-
+for model in SettingsModel.objects.all():
+    if model.oauth_token == []:
+        model.oauth_token = {}
+        model.save()
+        print(model)
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
@@ -382,7 +386,7 @@ class TimewebView(LoginRequiredMixin, View):
             try:
                 self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
             except OverflowError:
-                self.sm.x = datetime.datetime.max - datetime.timedelta(months=1) # Prevent some overflow errors
+                self.sm.x = datetime.datetime.max - datetime.timedelta(10) # Prevent some overflow errors
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
                 self.sm.x = timezone.make_aware(self.sm.x)
         else:
@@ -443,12 +447,13 @@ class TimewebView(LoginRequiredMixin, View):
         # created automatically when the authorization flow completes for the first
         # time.
         SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
+        print(f"token (for debugging): {self.settings_model.oauth_token}")
         credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, SCOPES)
         # If there are no valid credentials available, let the user log in.
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
                 credentials.refresh(Request())
-                self.settings_model.oauth_token = json.loads(credentials.to_json())
+                self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
                 self.settings_model.save()
             else:
                 flow = Flow.from_client_secrets_file(
@@ -623,7 +628,7 @@ class TimewebView(LoginRequiredMixin, View):
     # Unused but I'll keep it here just in case
 
     # def tag_update(self, request):
-    #     old_tag_name = request.POST['old_tag_name'].strip()
+    #     old_tag_name = request.POST['old_tag_namestrip()
     #     new_tag_name = request.POST['new_tag_name'].strip()
     #     assignment_models = TimewebModel.objects.filter(user__username=request.user)
     #     for assignment in assignment_models:
@@ -666,7 +671,8 @@ class GCOAuthView(LoginRequiredMixin, View):
         except Exception as e:
             return HttpResponse(f"An error occurred: {e}")
         credentials = flow.credentials
-        self.settings_model.oauth_token = json.loads(credentials.to_json())
+        # Use .update() instead of = so the refresh token isnt overwritten
+        self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
@@ -677,7 +683,7 @@ class GCOAuthView(LoginRequiredMixin, View):
         if self.isExampleAccount: return HttpResponse(status=204)
         # self.settings_model.oauth_token stores the user's access and refresh tokens
         if self.settings_model.oauth_token:
-            self.settings_model.oauth_token = []
+            self.settings_model.oauth_token = {}
             self.settings_model.added_gc_assignment_ids = []
             self.settings_model.save()
             logger.info(f"User {request.user} disabled google classroom API")

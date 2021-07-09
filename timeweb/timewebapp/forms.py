@@ -43,12 +43,12 @@ class TimewebForm(forms.ModelForm):
             },
             'unit': {
                 'required': _("Please enter a name"),
-                'max_length': _("This field's name is too long (>40 characters)"),
+                'max_length': _("This field's name is too long (>%(n)d characters)") % {"n": TimewebModel.unit.field.max_length},
                 'invalid': _("This field's value is invalid"),
             },
             'y': {
                 'required': _("Please enter a value"),
-                'max_digits': _("This field's value is too long (>15 digits)"),
+                # 'max_digits': _("This field's value is too long (>15 digits)"), do i need
                 'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
                 'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
             },

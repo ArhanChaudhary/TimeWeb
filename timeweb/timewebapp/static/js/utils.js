@@ -129,6 +129,9 @@ utils = {
                 $("#toggle-gc-label").html("Disable Google Classroom API");
             }
             $("#toggle-gc-container").click(function() {
+                const $this = $(this);
+                if ($this.hasClass("clickeed")) return;
+                $this.addClass("clicked");
                 $.ajax({
                     type: "POST",
                     url: "gc-api-auth-init",
@@ -136,6 +139,7 @@ utils = {
                     success: function(authentication_url) {
                         if (authentication_url === "Disabled gc api") {
                             $("#toggle-gc-label").html("Enable Google Classroom API");
+                            $this.removeClass("clicked");
                         } else {
                             window.location.href = authentication_url;
                         }

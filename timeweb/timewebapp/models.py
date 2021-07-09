@@ -5,7 +5,6 @@ from multiselectfield import MultiSelectField
 from django.conf import settings
 from colorfield.fields import ColorField
 from decimal import Decimal
-import datetime
 
 WEEKDAYS = (
     ("1",_("Monday")),
@@ -20,6 +19,8 @@ def default_works():
     return 0
 def empty_list():
     return []
+def empty_dict():
+    return {}
 def create_image_path(instance, filename):
     return f"images/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
@@ -175,7 +176,7 @@ class SettingsModel(models.Model):
         default=True,
         verbose_name=_('Enable Tutorial'),
     )
-    oauth_token = models.JSONField(default=empty_list)
+    oauth_token = models.JSONField(default=empty_dict)
     added_gc_assignment_ids = models.JSONField(default=empty_list)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
