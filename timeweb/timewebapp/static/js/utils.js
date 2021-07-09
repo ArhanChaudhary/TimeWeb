@@ -129,10 +129,17 @@ utils = {
                 $("#toggle-gc-label").html("Disable Google Classroom API");
             }
             $("#toggle-gc-container").click(function() {
-                $.ajax({type: "POST", data: {csrfmiddlewaretoken: csrf_token, action: "toggle_gc_api"}}).done(function(responseText) {
-                    if (responseText === "Disabled gc api") {
-                        $("#toggle-gc-label").html("Enable Google Classroom API");
-                    }
+                $.ajax({
+                    type: "POST",
+                    url: "gc-auth-init",
+                    data: {csrfmiddlewaretoken: csrf_token},
+                    success: function(authentication_url) {
+                        if (authentication_url === "Disabled gc api") {
+                            $("#toggle-gc-label").html("Enable Google Classroom API");
+                        } else {
+                            window.location.href = authentication_url;
+                        }
+                    },
                 });
             })
             

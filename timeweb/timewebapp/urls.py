@@ -14,7 +14,9 @@ urlpatterns = [
     path('licenses-and-credits', RedirectView.as_view(url='/static/policies/licenses-and-credits.html')),
     path('privacy', RedirectView.as_view(url='/static/policies/privacy.html')),
     path('terms', RedirectView.as_view(url='/static/policies/terms.html')),
-    
+    path('gc-auth-init', views.GCOAuthView.as_view()),
+    path('gc-auth-callback', views.GCOAuthView.as_view()),
+
     path('robots.txt', lambda x: HttpResponse("# If you came from the discord gg you get a super duper secret role\n# pm me this message at Arch#5808\n# also, pls don't tell anyone as it'll ruin the fun of this small game\nUser-Agent: *\nDisallow:", content_type="text/plain"), name="robots_file"),
     path('android-chrome-192x192.png', RedirectView.as_view(url='/static/images/icons/android-chrome-192x192.png')),
     path('android-chrome-512x512.png', RedirectView.as_view(url='/static/images/icons/android-chrome-512x512.png')),

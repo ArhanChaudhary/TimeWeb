@@ -21,12 +21,14 @@ except KeyError:
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Dont sent to google analytics in debug
-if not DEBUG:
-    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', )
+if DEBUG:
+    CSP_CONNECT_SRC = ("'self'", 'https://accounts.google.com')
+    CSP_SCRIPT_SRC = ("'self'", )
+else:
+    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://accounts.google.com')
     CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com') # Needs to be set so nonce can be added
     CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com')
-    CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
+CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
 CSP_IMG_SRC = ("'self'", )
@@ -73,8 +75,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'timewebapp',
     'multiselectfield',
-    # Admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
-    'django.contrib.admin',
+    'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'pwa',
     'colorfield',
     'django_cleanup.apps.CleanupConfig',

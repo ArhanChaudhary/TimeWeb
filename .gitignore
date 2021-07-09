@@ -64,7 +64,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Misc
+# Local stuff
 .vscode
 timeweb/static/**
 timeweb/media/**
@@ -82,10 +82,9 @@ env_variables.yaml
 gcldeployment.md
 .gcloudignore
 
-# API requests
+# Google API requests
 sa-private-key.json
 gc-credentials.json
-token.json
 
 # Flask stuff:
 instance/

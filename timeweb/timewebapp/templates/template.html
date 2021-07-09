@@ -5,10 +5,14 @@
     <head>
         <meta charset="UTF-8">
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
+        <script async src="{% static 'vendor/gtag.js' %}"></script>
         <script nonce="{{request.csp_nonce}}">
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
+            if ("{{ DEBUG }}" !== "False") {
+                function gtag(){}
+            } else {
+                function gtag(){dataLayer.push(arguments);}
+            }
             gtag('js', new Date());
 
             gtag('config', 'G-3K1HRD42V7');

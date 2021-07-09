@@ -8,23 +8,39 @@ from django.http import HttpResponse, HttpResponseForbidden
 from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
-import logging
 from django.utils.text import Truncator
 from django import forms
 from django.forms.models import model_to_dict
-import datetime
 from decimal import Decimal as d
 from math import ceil, floor
-import json
-from google.cloud import storage
 from django.views.decorators.cache import cache_control
-import os.path
+import datetime
+import logging
+import json
+import os
+
+from google.cloud import storage
 
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
+from oauthlib.oauth2.rfc6749.errors import InvalidGrantError
+from django.conf import settings
+User = get_user_model()
+
+# cite later
+# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
+GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
+GC_CREDENTIALS_PATH = os.path.join(os.getcwd(), "gc-credentials.json")
+if settings.DEBUG:
+    GC_REDIRECT_URI = "http://localhost:8000/gc-auth-callback"
+    #we don't have ssl on local host
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+else:
+    GC_REDIRECT_URI = "https://www.timeweb.io/gc-auth-callback"
+
 hour_to_update = 4
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
@@ -34,7 +50,7 @@ MAX_UPLOAD_SIZE = 5242880
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-@receiver(post_save, sender=get_user_model())
+@receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
         date_now = timezone.localtime(timezone.now())
@@ -73,6 +89,7 @@ def get_default_context():
         "hour_to_update": hour_to_update,
         "example_assignment_name": example_assignment_name,
         "max_number_tags": MAX_NUMBER_TAGS,
+        "DEBUG": settings.DEBUG,
     }
 class SettingsView(LoginRequiredMixin, View):
     login_url = '/login/login/'
@@ -170,7 +187,7 @@ class TimewebView(LoginRequiredMixin, View):
         if self.settings_model.oauth_token:
             self.create_gc_assignments(request)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        if timezone.localtime(get_user_model().objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
+        if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
@@ -205,9 +222,7 @@ class TimewebView(LoginRequiredMixin, View):
         # AJAX requests
         if self.isExampleAccount: return HttpResponse(status=204)
         action = request.POST['action']
-        if action == "toggle_gc_api":
-            return self.toggle_gc_api(request)
-        elif action == 'delete_assignment':
+        if action == 'delete_assignment':
             return self.deleted_assignment(request)
         elif action == 'save_assignment':
             return self.saved_assignment(request)
@@ -257,7 +272,7 @@ class TimewebView(LoginRequiredMixin, View):
             # Convert this to a decimal object because it can be a float
             first_work = d(self.sm.works)
             # Fill in foreignkey
-            self.sm.user = get_user_model().objects.get(username=request.user)
+            self.sm.user = User.objects.get(username=request.user)
         else:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
@@ -420,60 +435,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['form'] = self.form
         self.add_user_models_to_context(request)
         return render(request, "index.html", self.context)
-    
-
-    def toggle_gc_api(self, request):
-        # The file token.json stores the user's access and refresh tokens, and is
-        # created automatically when the authorization flow completes for the first
-        # time.
-        if self.settings_model.oauth_token:
-            self.settings_model.oauth_token = []
-            self.settings_model.added_gc_assignment_ids = []
-            self.settings_model.save()
-            logger.info(f"User {request.user} disabled google classroom API")
-            return HttpResponse("Disabled gc api")
-        SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'gc-credentials.json', SCOPES)
-        try:
-            creds = flow.run_local_server(port=0)
-            # Save the credentials for the next run
-            self.settings_model.oauth_token = json.loads(creds.to_json())
-            self.settings_model.save()
-        except Warning as e:
-            logger.warning("Google classroom api warning: " + e)
-        logger.info(f"User {request.user} enabled google classroom API")
-        return HttpResponse("Enabled gc api")
-        # For reference:
-        # If modifying these scopes, delete the file token.json.
-        # SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-
-        # creds = None
-        # # The file token.json stores the user's access and refresh tokens, and is
-        # # created automatically when the authorization flow completes for the first
-        # # time.
-        # if os.path.exists('token.json'):
-        #     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-        # # If there are no (valid) credentials available, let the user log in.
-        # if not creds or not creds.valid:
-        #     if creds and creds.expired and creds.refresh_token:
-        #         creds.refresh(Request())
-        #     else:
-        #         flow = InstalledAppFlow.from_client_secrets_file(
-        #             'gc-credentials.json', SCOPES)
-        #         creds = flow.run_local_server(port=0)
-        #     # Save the credentials for the next run
-        #     with open('token.json', 'w') as token:
-        #         token.write(creds.to_json())
-
-        # service = build('classroom', 'v1', credentials=creds)
-        # courses = service.courses().list().execute().get('courses', [])
-        # coursework = service.courses().courseWork()
-        # for course in courses:
-        #     try:
-        #         course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
-        #     except HttpError:
-        #         pass
+ 
     def create_gc_assignments(self, request):
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -485,7 +447,7 @@ class TimewebView(LoginRequiredMixin, View):
             if creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(
+                flow = Flow.from_client_secrets_file(
                     'gc-credentials.json', SCOPES)
                 creds = flow.run_local_server(port=0)
             self.settings_model.oauth_token = json.loads(creds.to_json())
@@ -552,7 +514,7 @@ class TimewebView(LoginRequiredMixin, View):
                     if blue_line_start < 0:
                         blue_line_start = 0
                     dynamic_start = blue_line_start
-                    user = get_user_model().objects.get(username=request.user)
+                    user = User.objects.get(username=request.user)
                     TimewebModel.objects.create(**{
                         "name": name,
                         "assignment_date": assignment_date,
@@ -577,6 +539,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
             self.settings_model.save()
         return HttpResponse(status=204)
+  
     def deleted_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])
         for pk in assignments:
@@ -663,6 +626,90 @@ class TimewebView(LoginRequiredMixin, View):
     #     logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
     #     return HttpResponse(status=204)
 
+class GCOAuthView(LoginRequiredMixin, View):
+    login_url = '/login/login/'
+    redirect_field_name = 'redirect_to'
+    def get(self, request):
+        self.settings_model = SettingsModel.objects.get(user__username=request.user)
+        # Callback URI
+        state = request.GET.get('state',None)
+
+        flow = Flow.from_client_secrets_file(
+            GC_CREDENTIALS_PATH,
+            scopes=GC_SCOPES,
+            state=state)
+        flow.redirect_uri = GC_REDIRECT_URI
+
+        #get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us.
+        authorization_response = request.build_absolute_uri()        
+        try:
+            #now turn those parameters into a token.
+            flow.fetch_token(authorization_response=authorization_response)
+        except InvalidGrantError as e:
+            # In case users deny a permission
+            logger.warn(f"Google classroom warning: {e}")
+            return redirect("home")
+        credentials = flow.credentials
+        self.settings_model.oauth_token = json.loads(credentials.to_json())
+        self.settings_model.save()
+        logger.info(f"User {request.user} enabled google classroom API")
+        return redirect("home")
+        
+    def post(self, request):
+        self.settings_model = SettingsModel.objects.get(user__username=request.user)
+        self.isExampleAccount = request.user.username == example_account_name
+        if self.isExampleAccount: return HttpResponse(status=204)
+        # self.settings_model.oauth_token stores the user's access and refresh tokens
+        if self.settings_model.oauth_token:
+            self.settings_model.oauth_token = []
+            self.settings_model.added_gc_assignment_ids = []
+            self.settings_model.save()
+            logger.info(f"User {request.user} disabled google classroom API")
+            return HttpResponse("Disabled gc api")
+        flow = Flow.from_client_secrets_file(
+            GC_CREDENTIALS_PATH, scopes=GC_SCOPES)
+        flow.redirect_uri = GC_REDIRECT_URI
+        # Generate URL for request to Google's OAuth 2.0 server.
+        # Use kwargs to set optional request parameters.
+        authorization_url, state = flow.authorization_url(
+            # Enable offline access so that you can refresh an access token without
+            # re-prompting the user for permission. Recommended for web server apps.
+            access_type='offline',
+            # Enable incremental authorization. Recommended as a best practice.
+            include_granted_scopes='true')
+        logger.info(f"User {request.user} enabled google classroom API")
+        return HttpResponse(authorization_url)
+        # For reference:
+        # If modifying these scopes, delete the file token.json.
+        # SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
+
+        # creds = None
+        # # The file token.json stores the user's access and refresh tokens, and is
+        # # created automatically when the authorization flow completes for the first
+        # # time.
+        # if os.path.exists('token.json'):
+        #     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        # # If there are no (valid) credentials available, let the user log in.
+        # if not creds or not creds.valid:
+        #     if creds and creds.expired and creds.refresh_token:
+        #         creds.refresh(Request())
+        #     else:
+        #         flow = InstalledAppFlow.from_client_secrets_file(
+        #             'gc-credentials.json', SCOPES)
+        #         creds = flow.run_local_server(port=0)
+        #     # Save the credentials for the next run
+        #     with open('token.json', 'w') as token:
+        #         token.write(creds.to_json())
+
+        # service = build('classroom', 'v1', credentials=creds)
+        # courses = service.courses().list().execute().get('courses', [])
+        # coursework = service.courses().courseWork()
+        # for course in courses:
+        #     try:
+        #         course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
+        #     except HttpError:
+        #         pass
+
 class ImagesView(LoginRequiredMixin, View):
     login_url = '/login/login/'
     redirect_field_name = 'redirect_to'
@@ -682,6 +729,7 @@ class ImagesView(LoginRequiredMixin, View):
             return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
         else:
             return HttpResponse(status=204)
+
 class ContactView(View):
     def __init__(self):
         self.context = get_default_context()
