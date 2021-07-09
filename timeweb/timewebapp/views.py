@@ -477,6 +477,7 @@ class TimewebView(LoginRequiredMixin, View):
         set_added_gc_assignment_ids = set(self.settings_model.added_gc_assignment_ids)
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
+        gc_models_to_create = []
         for course in courses:
             try:
                 course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
@@ -526,7 +527,7 @@ class TimewebView(LoginRequiredMixin, View):
                         blue_line_start = 0
                     dynamic_start = blue_line_start
                     user = User.objects.get(username=request.user)
-                    TimewebModel.objects.create(**{
+                    gc_models_to_create.append(TimewebModel(**{
                         "name": name,
                         "assignment_date": assignment_date,
                         "x": x,
@@ -543,9 +544,10 @@ class TimewebView(LoginRequiredMixin, View):
                         # y and ctime need to be passed anyways because they have non-null constraints
                         "y": 1,
                         "ctime": 1,
-                    })
+                    }))
             except HttpError: # Permission denied
                 pass
+        TimewebModel.objects.bulk_create(gc_models_to_create)
         if new_gc_assignment_ids != set_added_gc_assignment_ids:
             self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
             self.settings_model.save()
