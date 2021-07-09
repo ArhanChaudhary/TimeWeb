@@ -131,7 +131,7 @@ utils = {
             $("#toggle-gc-container").click(function() {
                 $.ajax({
                     type: "POST",
-                    url: "gc-auth-init",
+                    url: "gc-api-auth-init",
                     data: {csrfmiddlewaretoken: csrf_token},
                     success: function(authentication_url) {
                         if (authentication_url === "Disabled gc api") {

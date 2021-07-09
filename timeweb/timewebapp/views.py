@@ -26,20 +26,20 @@ from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
-from oauthlib.oauth2.rfc6749.errors import InvalidGrantError
+from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, MissingCodeError
 from django.conf import settings
 User = get_user_model()
 
 # cite later
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = os.path.join(os.getcwd(), "gc-credentials.json")
+GC_CREDENTIALS_PATH = os.path.join(os.getcwd(), "gc-api-credentials.json")
 if settings.DEBUG:
-    GC_REDIRECT_URI = "http://localhost:8000/gc-auth-callback"
+    GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
     #we don't have ssl on local host
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
-    GC_REDIRECT_URI = "https://www.timeweb.io/gc-auth-callback"
+    GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
 
 hour_to_update = 4
 example_account_name = "Example"
@@ -185,7 +185,9 @@ class TimewebView(LoginRequiredMixin, View):
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         if self.settings_model.oauth_token:
-            self.create_gc_assignments(request)
+            redirect_url_if_creds_invalid = self.create_gc_assignments(request)
+            if redirect_url_if_creds_invalid:
+                return redirect(redirect_url_if_creds_invalid)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
@@ -441,24 +443,33 @@ class TimewebView(LoginRequiredMixin, View):
         # created automatically when the authorization flow completes for the first
         # time.
         SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-        creds = Credentials.from_authorized_user_info(self.settings_model.oauth_token, SCOPES)
+        credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, SCOPES)
         # If there are no valid credentials available, let the user log in.
-        if not creds.valid:
-            if creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+        if not credentials.valid:
+            if credentials.expired and credentials.refresh_token:
+                credentials.refresh(Request())
+                self.settings_model.oauth_token = json.loads(credentials.to_json())
+                self.settings_model.save()
             else:
                 flow = Flow.from_client_secrets_file(
-                    'gc-credentials.json', SCOPES)
-                creds = flow.run_local_server(port=0)
-            self.settings_model.oauth_token = json.loads(creds.to_json())
-            self.settings_model.save()
+                    GC_CREDENTIALS_PATH, scopes=GC_SCOPES)
+                flow.redirect_uri = GC_REDIRECT_URI
+                # Generate URL for request to Google's OAuth 2.0 server.
+                # Use kwargs to set optional request parameters.
+                authorization_url, state = flow.authorization_url(
+                    # Enable offline access so that you can refresh an access token without
+                    # re-prompting the user for permission. Recommended for web server apps.
+                    access_type='offline',
+                    # Enable incremental authorization. Recommended as a best practice.
+                    include_granted_scopes='true')
+                return authorization_url
 
         date_now = timezone.localtime(timezone.now())
         if date_now.hour < hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
 
-        service = build('classroom', 'v1', credentials=creds)
+        service = build('classroom', 'v1', credentials=credentials)
         courses = service.courses().list().execute().get('courses', [])
         coursework = service.courses().courseWork()
 
@@ -538,7 +549,6 @@ class TimewebView(LoginRequiredMixin, View):
         if new_gc_assignment_ids != set_added_gc_assignment_ids:
             self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
             self.settings_model.save()
-        return HttpResponse(status=204)
   
     def deleted_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])
@@ -649,6 +659,10 @@ class GCOAuthView(LoginRequiredMixin, View):
             # In case users deny a permission
             logger.warn(f"Google classroom warning: {e}")
             return redirect("home")
+        except MissingCodeError:
+            return HttpResponse("Missing code in url")
+        except Exception as e:
+            return HttpResponse(f"An error occurred: {e}")
         credentials = flow.credentials
         self.settings_model.oauth_token = json.loads(credentials.to_json())
         self.settings_model.save()
@@ -695,7 +709,7 @@ class GCOAuthView(LoginRequiredMixin, View):
         #         creds.refresh(Request())
         #     else:
         #         flow = InstalledAppFlow.from_client_secrets_file(
-        #             'gc-credentials.json', SCOPES)
+        #             'gc-api-credentials.json', SCOPES)
         #         creds = flow.run_local_server(port=0)
         #     # Save the credentials for the next run
         #     with open('token.json', 'w') as token:

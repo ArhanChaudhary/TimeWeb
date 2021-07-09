@@ -84,7 +84,7 @@ gcldeployment.md
 
 # Google API requests
 sa-private-key.json
-gc-credentials.json
+gc-api-credentials.json
 
 # Flask stuff:
 instance/
