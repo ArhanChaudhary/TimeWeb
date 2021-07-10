@@ -20,11 +20,7 @@ import json
 import os
 
 from google.cloud import storage
-for model in SettingsModel.objects.all():
-    if model.oauth_token == []:
-        model.oauth_token = {}
-        model.save()
-        print(model)
+
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
@@ -447,7 +443,6 @@ class TimewebView(LoginRequiredMixin, View):
         # created automatically when the authorization flow completes for the first
         # time.
         SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-        print(f"token (for debugging): {self.settings_model.oauth_token}")
         credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, SCOPES)
         # If there are no valid credentials available, let the user log in.
         if not credentials.valid:
@@ -485,7 +480,11 @@ class TimewebView(LoginRequiredMixin, View):
         gc_models_to_create = []
         for course in courses:
             try:
-                course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
+                course_coursework = coursework.list(courseId=course['id']).execute()
+                if course_coursework:
+                    course_coursework = course_coursework['courseWork']
+                else:
+                    continue
                 for assignment in course_coursework:
                     # Load and interpret json data
                     assignment_id = int(assignment['id'], 10)
@@ -502,7 +501,8 @@ class TimewebView(LoginRequiredMixin, View):
                     assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                     x = assignment.get('dueDate', None)
                     if x:
-                        assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
+                        if "hours" in assignment['dueTime']:
+                            assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                         if "minutes" in assignment['dueTime']:
                             assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
                         x = datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=datetime.timezone.utc)
