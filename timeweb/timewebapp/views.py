@@ -662,14 +662,11 @@ class GCOAuthView(LoginRequiredMixin, View):
         try:
             #now turn those parameters into a token.
             flow.fetch_token(authorization_response=authorization_response)
-        except InvalidGrantError as e:
+        except InvalidGrantError:
             # In case users deny a permission
-            logger.warn(f"Google classroom warning: {e}")
             return redirect("home")
         except MissingCodeError:
             return HttpResponse("Missing code in url")
-        except Exception as e:
-            return HttpResponse(f"An error occurred: {e}")
         credentials = flow.credentials
         # Use .update() instead of = so the refresh token isnt overwritten
         self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
