@@ -417,7 +417,7 @@ utils = {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
                 // Send ajax before close if it's on timeout
-                if (ajaxUtils.data['assignments'].length) {
+                if (ajaxUtils.attributeData['assignments'].length) {
                     ajaxUtils.SendAttributeAjax();
                 }
             });
@@ -552,15 +552,10 @@ ajaxUtils = {
         if (ajaxUtils.disable_ajax) return;
         // Add key and values to the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-        let sa;
-        for (let iter_sa of ajaxUtils.data['assignments']) {
-            if (iter_sa.pk === pk) {
-                sa = iter_sa;
-            }
-        }
+        let sa = ajaxUtils.attributeData['assignments'].find(iter_sa => iter_sa.pk === pk);
         if (!sa) {
             sa = {pk: pk};
-            ajaxUtils.data['assignments'].push(sa);
+            ajaxUtils.attributeData['assignments'].push(sa);
         }
         sa[key] = value;
         clearTimeout(ajaxUtils.ajaxTimeout);
@@ -575,15 +570,15 @@ ajaxUtils = {
         // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
         // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
         // Plus, a pointless ajax of this sort won't happen frequently and will have a minimal impact on the server's performance
-        ajaxUtils.data['assignments'] = JSON.stringify(ajaxUtils.data['assignments']);
+        ajaxUtils.attributeData['assignments'] = JSON.stringify(ajaxUtils.attributeData['assignments']);
         $.ajax({
             type: "POST",
-            data: ajaxUtils.data,
+            data: ajaxUtils.attributeData,
             success: success,
             error: ajaxUtils.error,
         });
         // Reset data
-        ajaxUtils.data = {
+        ajaxUtils.attributeData = {
             'csrfmiddlewaretoken': csrf_token,
             'action': 'save_assignment',
             'assignments': [],
@@ -625,7 +620,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
     csrf_token = $("form input:first-of-type").val();
     // Initial ajax data for SendAttributeAjax
-    ajaxUtils.data = {
+    ajaxUtils.attributeData = {
         'csrfmiddlewaretoken': csrf_token,
         'action': 'save_assignment',
         'assignments': [],

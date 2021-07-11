@@ -526,26 +526,11 @@ header.animate::after {
     margin: -13px 0;
     margin-right: -4px;
     min-width: 40px;
-    min-height: 40px;
     cursor: pointer;
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
 .button + .button {
     margin-right: -7px;
-}
-.button::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(255,255,255,0.6);
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.15s ease-in-out;
-}
-.button:hover::after {
-    opacity: 0.75;
 }
 .button:focus {
     outline: 0;

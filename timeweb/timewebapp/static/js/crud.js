@@ -304,7 +304,6 @@ $(function() {
                 'assignments': [sa.id], // Primary key value
             }
             // Send ajax to avoid a page reload
-            data.assignments = JSON.stringify(data['assignments']);
             $.ajax({
                 type: "POST",
                 data: data,

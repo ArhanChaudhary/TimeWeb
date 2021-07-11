@@ -176,8 +176,14 @@ class SettingsModel(models.Model):
         default=True,
         verbose_name=_('Enable Tutorial'),
     )
-    oauth_token = models.JSONField(default=empty_dict)
-    added_gc_assignment_ids = models.JSONField(default=empty_list)
+    oauth_token = models.JSONField(
+        default=empty_dict,
+        blank=True,
+    )
+    added_gc_assignment_ids = models.JSONField(
+        default=empty_list,
+        blank=True,
+    )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

@@ -113,6 +113,7 @@ class SettingsView(LoginRequiredMixin, View):
             'highest_priority_color': self.settings_model.highest_priority_color,
             'lowest_priority_color': self.settings_model.lowest_priority_color,
             'background_image': self.settings_model.background_image,
+            'enable_tutorial': self.settings_model.enable_tutorial,
         }
         self.context['form'] = SettingsForm(initial=initial)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
@@ -139,7 +140,7 @@ class SettingsView(LoginRequiredMixin, View):
         if self.isExampleAccount: return redirect("home")
         self.settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
         self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
-        self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")+1 # A skew ratio entered as 0 is stored as 1
+        self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         self.settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
         self.settings_model.def_unit_to_minute = self.form.cleaned_data.get("def_unit_to_minute")
         self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
@@ -159,6 +160,7 @@ class SettingsView(LoginRequiredMixin, View):
             self.settings_model.background_image = None
         elif self.form.cleaned_data.get("background_image"):
             self.settings_model.background_image = self.form.cleaned_data.get("background_image")
+        self.settings_model.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
@@ -477,14 +479,6 @@ class TimewebView(LoginRequiredMixin, View):
             for assignment in course_coursework:
                 # Load and interpret json data
                 assignment_id = int(assignment['id'], 10)
-                if assignment['workType'] == "ASSIGNMENT":
-                    name = "Google Classroom Assignment: "
-                elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
-                    name = "Google Classroom Short Answer: "
-                elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
-                    name = "Google Classroom Multiple Choice Question: "
-                name += assignment['title']
-                name = Truncator(name).chars(TimewebModel.name.field.max_length)
                 assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
                 assignment_date = timezone.localtime(datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=datetime.timezone.utc))
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -507,6 +501,14 @@ class TimewebView(LoginRequiredMixin, View):
                         x = assignment_date + datetime.timedelta(1)
                     if x < date_now:
                         continue
+                if assignment['workType'] == "ASSIGNMENT":
+                    name = "Google Classroom Assignment: "
+                elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
+                    name = "Google Classroom Short Answer: "
+                elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
+                    name = "Google Classroom Multiple Choice Question: "
+                name += assignment['title']
+                name = Truncator(name).chars(TimewebModel.name.field.max_length)
                 tags = [course['name']]
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
@@ -556,7 +558,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
             self.settings_model.save()
     def deleted_assignment(self, request):
-        assignments = json.loads(request.POST['assignments'])
+        assignments = request.POST.getlist('assignments[]')
         for pk in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=int(pk))
             if request.user != self.sm.user:

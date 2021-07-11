@@ -353,6 +353,7 @@ priority = {
             $(".assignment").each(function(index) {
                 // Fixes the tag add box going behind the below assignment on scale
                 $(this).css("z-index", number_of_assignments - index);
+                $(this).find(".button").css("height", $(this).innerHeight());
             });
         } else {
             ordering.transitionSwapsAndSetZIndex();
