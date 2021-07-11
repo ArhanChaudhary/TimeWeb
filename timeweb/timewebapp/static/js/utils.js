@@ -123,14 +123,14 @@ utils = {
                 All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
             );
             // gc api
-            if ($.isEmptyObject(oauth_token)) {
-                $("#toggle-gc-label").html("Enable Google Classroom API");
-            } else {
+            if (oauth_token.token) {
                 $("#toggle-gc-label").html("Disable Google Classroom API");
+            } else {
+                $("#toggle-gc-label").html("Enable Google Classroom API");
             }
             $("#toggle-gc-container").click(function() {
                 const $this = $(this);
-                if ($this.hasClass("clickeed")) return;
+                if ($this.hasClass("clicked")) return;
                 $this.addClass("clicked");
                 $.ajax({
                     type: "POST",
@@ -141,7 +141,7 @@ utils = {
                             $("#toggle-gc-label").html("Enable Google Classroom API");
                             $this.removeClass("clicked");
                         } else {
-                            window.location.href = authentication_url;
+                            utils.ui.OAuth.openSignInWindow(authentication_url, 'Enable Google Classroom API');
                         }
                     },
                 });
@@ -438,6 +438,38 @@ utils = {
                 }
             });
         },
+        // cite later
+        // https://dev.to/dinkydani21/how-we-use-a-popup-for-google-and-outlook-oauth-oci
+        OAuth: {
+            openSignInWindow: function(url, name) {
+                const strWindowFeatures = 'toolbar=no, menubar=no, width=600, height=700, top=100, left=100';
+             
+                if (utils.ui.OAuth.windowObjectReference === undefined || utils.ui.OAuth.windowObjectReference.closed) {
+                    /* if the pointer to the window object in memory does not exist
+                    or if such pointer exists but the window was closed */
+                    utils.ui.OAuth.windowObjectReference = window.open(url, name, strWindowFeatures);
+                } else if (utils.ui.OAuth.previousUrl !== url) {
+                    /* if the resource to load is different,
+                    then we load it in the already opened secondary window and then
+                    we bring such window back on top/in front of its parent window. */
+                    utils.ui.OAuth.windowObjectReference = window.open(url, name, strWindowFeatures);
+                    utils.ui.OAuth.windowObjectReference.focus();
+                } else {
+                    /* else the window reference must exist and the window
+                    is not closed; therefore, we can bring it back on top of any other
+                    window with the focus() method. There would be no need to re-create
+                    the window or to reload the referenced resource. */
+                    utils.ui.OAuth.windowObjectReference.focus();
+                }
+                utils.ui.OAuth.previousUrl = url;
+                utils.ui.OAuth.checkIfClosed = setInterval(function() {
+                    if (utils.ui.OAuth.windowObjectReference.closed) {
+                        clearInterval(utils.ui.OAuth.checkIfClosed);
+                        window.location.reload();
+                    }
+                }, 100);
+            },
+        }
     },
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST

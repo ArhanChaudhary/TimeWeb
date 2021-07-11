@@ -184,7 +184,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
-        if self.settings_model.oauth_token:
+        if 'token' in self.settings_model.oauth_token:
             redirect_url_if_creds_invalid = self.create_gc_assignments(request)
             if redirect_url_if_creds_invalid:
                 return redirect(redirect_url_if_creds_invalid)
@@ -468,95 +468,93 @@ class TimewebView(LoginRequiredMixin, View):
         if date_now.hour < hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-
         service = build('classroom', 'v1', credentials=credentials)
-        courses = service.courses().list().execute().get('courses', [])
-        coursework = service.courses().courseWork()
 
+        def added_gc_assignments_from_response(response_id, course_coursework, exception):
+            if not course_coursework or type(exception) is HttpError: # HttpError if permission denied (if you are the teacher of a class)
+                return
+            course_coursework = course_coursework['courseWork']
+            for assignment in course_coursework:
+                # Load and interpret json data
+                assignment_id = int(assignment['id'], 10)
+                if assignment['workType'] == "ASSIGNMENT":
+                    name = "Google Classroom Assignment: "
+                elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
+                    name = "Google Classroom Short Answer: "
+                elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
+                    name = "Google Classroom Multiple Choice Question: "
+                name += assignment['title']
+                name = Truncator(name).chars(TimewebModel.name.field.max_length)
+                assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
+                assignment_date = timezone.localtime(datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=datetime.timezone.utc))
+                assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+                x = assignment.get('dueDate', None)
+                if x:
+                    if "hours" in assignment['dueTime']:
+                        assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
+                    if "minutes" in assignment['dueTime']:
+                        assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
+                    x = timezone.localtime(datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=datetime.timezone.utc))
+                    if x.hour == 11 and x.minute == 59:
+                        x += datetime.timedelta(minutes=1)
+                    else:
+                        x = x.replace(hour=0, minute=0, second=0, microsecond=0)
+                    
+                    # Validation
+                    if assignment_date == x:
+                        x += datetime.timedelta(1)
+                    elif assignment_date > x:
+                        x = assignment_date + datetime.timedelta(1)
+                    if x < date_now:
+                        continue
+                tags = [course['name']]
+
+                # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
+                new_gc_assignment_ids.add(assignment_id)
+                if assignment_id in set_added_gc_assignment_ids:
+                    continue
+
+                # Create assignment
+                blue_line_start = (date_now-assignment_date).days
+                if blue_line_start < 0:
+                    blue_line_start = 0
+                dynamic_start = blue_line_start
+                user = User.objects.get(username=request.user)
+                gc_models_to_create.append(TimewebModel(
+                    name=name,
+                    assignment_date=assignment_date,
+                    x=x,
+                    blue_line_start=blue_line_start,
+                    skew_ratio=self.settings_model.def_skew_ratio,
+                    min_work_time=self.settings_model.def_min_work_time,
+                    break_days=self.settings_model.def_break_days,
+                    dynamic_start=dynamic_start,
+                    tags=tags,
+                    needs_more_info=True,
+                    user=user,
+
+                    # y, ctime, works[0], and unit are missing
+                    # y and ctime need to be passed anyways because they have non-null constraints
+                    y=1,
+                    ctime=1,
+                ))
+        courses = service.courses().list().execute().get('courses', [])
+        coursework_lazy = service.courses().courseWork()
+        batch = service.new_batch_http_request(callback=added_gc_assignments_from_response)
+        for course in courses:
+            if course['courseState'] == "ARCHIVED":
+                continue
+            batch.add(coursework_lazy.list(courseId=course['id']))
         # Make "in" faster
         set_added_gc_assignment_ids = set(self.settings_model.added_gc_assignment_ids)
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
         gc_models_to_create = []
-        for course in courses:
-            try:
-                course_coursework = coursework.list(courseId=course['id']).execute()
-                if course_coursework:
-                    course_coursework = course_coursework['courseWork']
-                else:
-                    continue
-                for assignment in course_coursework:
-                    # Load and interpret json data
-                    assignment_id = int(assignment['id'], 10)
-                    if assignment['workType'] == "ASSIGNMENT":
-                        name = "Google Classroom Assignment: "
-                    elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
-                        name = "Google Classroom Short Answer: "
-                    elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
-                        name = "Google Classroom Multiple Choice Question: "
-                    name += assignment['title']
-                    name = Truncator(name).chars(TimewebModel.name.field.max_length)
-                    assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
-                    assignment_date = timezone.localtime(datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=datetime.timezone.utc))
-                    assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-                    x = assignment.get('dueDate', None)
-                    if x:
-                        if "hours" in assignment['dueTime']:
-                            assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
-                        if "minutes" in assignment['dueTime']:
-                            assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                        x = datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=datetime.timezone.utc)
-                        x = timezone.localtime(x)
-                        if x.hour == 11 and x.minute == 59:
-                            x += datetime.timedelta(minutes=1)
-                        else:
-                            x = x.replace(hour=0, minute=0, second=0, microsecond=0)
-                        
-                        # Validation
-                        if assignment_date == x:
-                            x += datetime.timedelta(1)
-                        elif assignment_date > x:
-                            x = assignment_date + datetime.timedelta(1)
-                        if x < date_now:
-                            continue
-                    tags = [course['name']]
-
-                    # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
-                    new_gc_assignment_ids.add(assignment_id)
-                    if assignment_id in set_added_gc_assignment_ids:
-                        continue
-
-                    # Create assignment
-                    blue_line_start = (date_now-assignment_date).days
-                    if blue_line_start < 0:
-                        blue_line_start = 0
-                    dynamic_start = blue_line_start
-                    user = User.objects.get(username=request.user)
-                    gc_models_to_create.append(TimewebModel(**{
-                        "name": name,
-                        "assignment_date": assignment_date,
-                        "x": x,
-                        "blue_line_start": blue_line_start,
-                        "skew_ratio": self.settings_model.def_skew_ratio,
-                        "min_work_time": self.settings_model.def_min_work_time,
-                        "break_days": self.settings_model.def_break_days,
-                        "dynamic_start": dynamic_start,
-                        "tags": tags,
-                        "needs_more_info": True,
-                        "user": user,
-
-                        # y, ctime, works[0], and unit are missing
-                        # y and ctime need to be passed anyways because they have non-null constraints
-                        "y": 1,
-                        "ctime": 1,
-                    }))
-            except HttpError: # Permission denied
-                pass
+        batch.execute()
         TimewebModel.objects.bulk_create(gc_models_to_create)
         if new_gc_assignment_ids != set_added_gc_assignment_ids:
             self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
             self.settings_model.save()
-  
     def deleted_assignment(self, request):
         assignments = json.loads(request.POST['assignments'])
         for pk in assignments:
@@ -664,7 +662,7 @@ class GCOAuthView(LoginRequiredMixin, View):
             flow.fetch_token(authorization_response=authorization_response)
         except InvalidGrantError:
             # In case users deny a permission
-            return redirect("home")
+            return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.close()</script>")
         except MissingCodeError:
             return HttpResponse("Missing code in url")
         credentials = flow.credentials
@@ -672,15 +670,15 @@ class GCOAuthView(LoginRequiredMixin, View):
         self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
-        return redirect("home")
+        return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.close()</script>")
         
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
         if self.isExampleAccount: return HttpResponse(status=204)
         # self.settings_model.oauth_token stores the user's access and refresh tokens
-        if self.settings_model.oauth_token:
-            self.settings_model.oauth_token = {}
+        if 'token' in self.settings_model.oauth_token:
+            self.settings_model.oauth_token = {"refresh_token": self.settings_model.oauth_token['refresh_token']}
             self.settings_model.added_gc_assignment_ids = []
             self.settings_model.save()
             logger.info(f"User {request.user} disabled google classroom API")
