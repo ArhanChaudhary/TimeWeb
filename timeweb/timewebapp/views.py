@@ -472,7 +472,7 @@ class TimewebView(LoginRequiredMixin, View):
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         service = build('classroom', 'v1', credentials=credentials)
 
-        def added_gc_assignments_from_response(response_id, course_coursework, exception):
+        def add_gc_assignments_from_response(response_id, course_coursework, exception):
             if not course_coursework or type(exception) is HttpError: # HttpError if permission denied (if you are the teacher of a class)
                 return
             course_coursework = course_coursework['courseWork']
@@ -542,7 +542,7 @@ class TimewebView(LoginRequiredMixin, View):
                 ))
         courses = service.courses().list().execute().get('courses', [])
         coursework_lazy = service.courses().courseWork()
-        batch = service.new_batch_http_request(callback=added_gc_assignments_from_response)
+        batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
         for course in courses:
             if course['courseState'] == "ARCHIVED":
                 continue

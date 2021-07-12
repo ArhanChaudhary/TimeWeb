@@ -363,7 +363,7 @@ class VisualAssignment extends Assignment {
             if (mouse_y) {
                 funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];
             } else {
-                funct_mouse_x = precisionRound(this.funct(mouse_x), 6);
+                funct_mouse_x = this.funct(mouse_x);
             }
             let str_mouse_x = new Date(this.sa.assignment_date);
             str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
@@ -797,11 +797,12 @@ class VisualAssignment extends Assignment {
         // END Next assignment button
 
         // BEGIN Set skew ratio using graph button
+        const _this = this;
         function cancel_set_skew_ratio_using_graph() {
             skew_ratio_button.onlyText("Set skew ratio using graph");
-            this.set_skew_ratio_using_graph = false;
-            this.sa.skew_ratio = old_skew_ratio;
-            draw();
+            _this.set_skew_ratio_using_graph = false;
+            _this.sa.skew_ratio = old_skew_ratio;
+            _this.draw();
             // No need to ajax since skew ratio is the same
         }
         let not_applicable_timeout_skew_ratio_button;
@@ -818,7 +819,7 @@ class VisualAssignment extends Assignment {
                 }, 1000);
                 return;
             }
-            skew_ratio_button.onlyText("(Click again to cancel)").one("click", cancel_set_skew_ratio_using_graph.bind(this));
+            skew_ratio_button.onlyText("(Click again to cancel)").one("click", cancel_set_skew_ratio_using_graph);
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.set_skew_ratio_using_graph = true;
@@ -829,7 +830,7 @@ class VisualAssignment extends Assignment {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 this.set_skew_ratio_using_graph = false;
                 // stop set skew ratio if canvas is clicked
-                skew_ratio_button.onlyText("Set skew ratio using graph").off("click", cancel_set_skew_ratio_using_graph.bind(this));
+                skew_ratio_button.onlyText("Set skew ratio using graph").off("click", cancel_set_skew_ratio_using_graph);
                 old_skew_ratio = this.sa.skew_ratio;
                 ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 // Disable mousemove if only skew ratio is running

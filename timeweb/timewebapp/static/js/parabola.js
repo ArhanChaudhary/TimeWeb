@@ -93,7 +93,7 @@ Assignment.prototype.setParabolaValues = function() {
         }
         this.return_y_cutoff = precisionRound(this.return_y_cutoff, 10);
     } else {
-        this.return_y_cutoff = 0;
+        this.return_y_cutoff = 1;
     }
     if (this.return_y_cutoff < 2500) {
         if (this.return_y_cutoff < 1) {
@@ -111,7 +111,7 @@ Assignment.prototype.setParabolaValues = function() {
                 this.return_y_cutoff++;
             }
         }
-        if (this.ignore_ends_mwt) {
+        if (ignore_ends && this.sa.min_work_time) {
             const lower = [this.return_y_cutoff, this.sa.y - output];
 
             let did_loop = false;
@@ -146,7 +146,7 @@ Assignment.prototype.setParabolaValues = function() {
         }
         this.return_0_cutoff = precisionRound(this.return_0_cutoff, 10);
     } else {
-        this.return_0_cutoff = 1;
+        this.return_0_cutoff = 0;
     }
     if (x1 - this.return_0_cutoff < 2500) {
         if (x1 - this.return_0_cutoff < 1) {
@@ -163,7 +163,7 @@ Assignment.prototype.setParabolaValues = function() {
                 this.return_0_cutoff--;
             }
         }
-        if (this.ignore_ends_mwt) {
+        if (ignore_ends && this.sa.min_work_time) {
             const upper = [this.return_0_cutoff, output];
 
             let did_loop = false;
@@ -206,7 +206,7 @@ Assignment.prototype.funct = function(x, translateX=true) {
     }
     // Return untranslated y coordinate
     // No point in untranslating x coordinate
-    return output + this.red_line_start_y;
+    return precisionRound(output + this.red_line_start_y, max_length_funct_round);
 }
 Assignment.prototype.calcModDays = function() {
     let mods = [0],

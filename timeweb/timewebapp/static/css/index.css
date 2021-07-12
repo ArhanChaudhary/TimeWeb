@@ -40,8 +40,6 @@ header.animate::after {
 }
 #assignments-header img {
     cursor: pointer;
-    margin-top: -3px;
-    margin-bottom: -3px;
     margin-left: 14px;
 }
 #assignments-header img:first-of-type {
@@ -219,6 +217,16 @@ header.animate::after {
     display: flex;
     align-items: center;
 }
+.relative-positioning-wrapper {
+    display: inherit; /* things position weirdly when assignments are open without this for some reason */
+    position: relative;
+}
+.assignment:not(.open-assignment) .title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
 .title {
     min-width: calc(20px + 13vw);
     max-width: calc(20px + 13vw);
@@ -248,8 +256,9 @@ header.animate::after {
     content: attr(data-daysleft) !important;
     position: absolute;
     font-size: 0.7em;
-    transform: translateY(100%) translateY(5px);
-    left: 15px;
+    transform: translateY(100%) translateY(-2px);
+    left: 0;
+    bottom: 0;
 }
 .arrow-container {
     float: left;
@@ -274,7 +283,7 @@ header.animate::after {
 }
 .tags {
     position: absolute;
-    top: 2px;
+    transform: translateY(-100%) translateY(2px);
     white-space: nowrap;
     font-size: min(10px, 0.7em);
 }
@@ -522,8 +531,9 @@ header.animate::after {
     position: relative;
     display: flex;
     align-items: center;
+    align-self: normal;
     justify-content: center;
-    margin: -13px 0;
+    margin: -17px 0;
     margin-right: -4px;
     min-width: 40px;
     cursor: pointer;
@@ -563,6 +573,7 @@ header.animate::after {
     position: absolute;
 }
 .graph {
+    display: block;
     position: relative;
 }
 .graph-footer .info-button {
@@ -690,7 +701,7 @@ label[for='id_ad']::after {
     position: absolute;
     cursor: pointer;
     right: 10px;
-    top: 22px;
+    top: 26px;
     border: 7px solid white;
     z-index: 1;
     min-height: unset;
