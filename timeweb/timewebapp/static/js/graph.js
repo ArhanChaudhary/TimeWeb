@@ -637,7 +637,7 @@ class VisualAssignment extends Assignment {
         let graphtimeout,
             fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
             graphinterval;
-        $(document).keydown((e) => {
+        $(document).keydown(e => {
             // fixed_graph.is(":visible") to make sure it doesnt change when the assignment is closed
             if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.fixed_graph.is(":visible")) {
                 const rect = this.fixed_graph[0].getBoundingClientRect();
@@ -653,7 +653,7 @@ class VisualAssignment extends Assignment {
                     }, 500);
                 }
             }
-        }).keyup((e) => {
+        }).keyup(e => {
             // Ensures the same key pressed fires the keyup to stop change skew ratio
             // Without this, you could press another key while the down arrow is being pressed for example and stop graphinterval
             if (e.key === this.pressed_arrow_key) {
@@ -1023,13 +1023,14 @@ $(function() {
 $(".assignment").click(function(e) {
     if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
     const dom_assignment = $(this);
-    const sa_to_check_to_shake = utils.loadAssignmentData(dom_assignment);
+    const sa_used_to_check_to_shake = utils.loadAssignmentData(dom_assignment);
     let assignment_to_shake;
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
-    if (dom_assignment.hasClass("mark-as-done") && !sa_to_check_to_shake.mark_as_done) {
+    if (dom_assignment.hasClass("mark-as-done") && !sa_used_to_check_to_shake.mark_as_done) {
         assignment_to_shake = $(".assignment").first().focus();
-    } else if (sa_to_check_to_shake.needs_more_info) {
+    } else if (sa_used_to_check_to_shake.needs_more_info) {
         assignment_to_shake = dom_assignment;
+        dom_assignment.find(".update-button").parents(".button").focus();
     }
     if (assignment_to_shake) {
         assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {

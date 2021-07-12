@@ -162,6 +162,9 @@ utils = {
                         height: "",
                         overflow: "",
                     });
+                    tag_add_box.find(".tag-add-selection-item").remove();
+                    tag_add_box.find(".tag-add-button").removeAttr("tabindex");
+                    tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
                 });
             }
             $(".tag-add").click(tagAddClick);
@@ -246,8 +249,8 @@ utils = {
                 // Tag add textbox was selected or tags were selected
                 if ($this.hasClass("open-tag-add-box")) return;
                 $this.addClass("open-tag-add-box");
-                $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow");
-                $this.find(".tag-add-input").focus().val("");
+                $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
+                $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
                 $this.find(".tag-add-selection-item").remove();
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
                 let allTags = [];
@@ -266,6 +269,7 @@ utils = {
             function tagDelete() {
                 const $this = $(this);
                 const tag_wrapper = $this.parents(".tag-wrapper");
+                if (tag_wrapper.hasClass("tag-is-deleting")) return;
                 tag_wrapper.addClass("keep-delete-open");
                 const sa = utils.loadAssignmentData($this);
                 const data = {
@@ -277,6 +281,7 @@ utils = {
                 const success = function() {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+                    tag_wrapper.addClass("tag-is-deleting");
                     // Transition the deletion
                     // Need to use jquery to set css for marginLeft
                     tag_wrapper.css({
@@ -313,17 +318,22 @@ utils = {
             });
             $(".tag-sortable-container").sortable().on("sortstop", function() {
                 const sa = utils.loadAssignmentData($(this));
-                sa.tags = $(this).find(".tag-name").map(function() {
-                    return $(this).text();
+                sa.tags = $(this).find(".tag-wrapper").filter(function() {
+                    return !$(this).hasClass("tag-is-deleting");
+                }).map(function() {
+                    return $(this).children(".tag-name").text();
                 }).toArray();
                 ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
             });
         },
         setKeybinds: function() {
-            // Keybind
+            const screen = $("#site")[0];
             utils.form_is_showing = false;
             $(document).keydown(function(e) {
-                if (!utils.form_is_showing && e.shiftKey /* shiftKey needed if the user presses caps lock */ && e.key === 'N') {
+                if (e.key === "Tab") {
+                    // Prevent tabbing dispositioning screen
+                    setTimeout(() => screen.scrollTo(0,0), 0);
+                } else if (!utils.form_is_showing && e.shiftKey /* shiftKey needed if the user presses caps lock */ && e.key === 'N') {
                     $("#image-new-container").click();
                     return false;
                 } else if (e.key === "Escape") {

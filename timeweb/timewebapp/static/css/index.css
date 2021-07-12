@@ -58,12 +58,14 @@ header.animate::after {
     position: absolute;
     order: 1;
     right: 180px;
-    top: 12px;
     opacity: 0;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
-#assignments-header img#next-day:hover ~ div#next-day-icon-label {
+#assignments-header img#next-day:hover ~ div#next-day-icon-label,
+#assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
+#assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
+#assignments-header img#next-day:focus ~ div#next-day-icon-label {
     opacity: 1;
 }
 #info {
@@ -283,9 +285,13 @@ header.animate::after {
 }
 .tags {
     position: absolute;
-    transform: translateY(-100%) translateY(2px);
+    top: 2px;
     white-space: nowrap;
     font-size: min(10px, 0.7em);
+}
+.assignment.open-assignment .tags {
+    transform: translateY(-100%) translateY(2.75px);
+    top: unset;
 }
 .tag-wrapper {
     position: relative;
@@ -342,7 +348,7 @@ header.animate::after {
     text-align: right;
     direction: rtl;
     margin-right: 4px;
-    margin-left: 5px;
+    margin-left: 7px;
 
     overflow: hidden;
     white-space: nowrap;
@@ -410,6 +416,9 @@ header.animate::after {
 }
 .tag-add-button:focus::after {
     opacity: 0.35;
+}
+.tag-add-button:focus:not(:hover)::after {
+    box-shadow: 0 0 4px 2px rgb(30, 30, 30);
 }
 .tag-add-button:hover::after {
     opacity: 0.75;
@@ -533,20 +542,25 @@ header.animate::after {
     align-items: center;
     align-self: normal;
     justify-content: center;
-    margin: -17px 0;
+    margin: -15px 0;
     margin-right: -4px;
     min-width: 40px;
     cursor: pointer;
-    transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
+    transition: background-color 0.15s cubic-bezier(.29,.81,.37,.99);
 }
 .button + .button {
     margin-right: -7px;
 }
-.button:focus {
+.button:focus, .button:hover  {
     outline: 0;
+    background-color: rgb(173, 216, 230);
+    z-index: 1;
 }
-.button:active {
+.button:active img {
     transform: scale(0.95);
+}
+.button img {
+    transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
 .assignment-footer {
     position: relative;
@@ -701,12 +715,16 @@ label[for='id_ad']::after {
     position: absolute;
     cursor: pointer;
     right: 10px;
-    top: 26px;
+    top: 9px;
     border: 7px solid white;
     z-index: 1;
     min-height: unset;
     min-width: unset;
     background-color: white;
+    transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
+}
+#form-wrapper #cancel-button:active {
+    transform: scale(0.95);
 }
 #form-wrapper #new-title-line {
     width: calc(100% - 20px);
