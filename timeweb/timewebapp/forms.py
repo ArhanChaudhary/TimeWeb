@@ -48,9 +48,9 @@ class TimewebForm(forms.ModelForm):
             },
             'y': {
                 'required': _("Please enter a value"),
-                # 'max_digits': _("This field's value is too long (>15 digits)"), do i need
-                'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
+                'max_digits': _("This field can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": TimewebModel.y.field.max_digits - TimewebModel.y.field.decimal_places, "n2": TimewebModel.y.field.decimal_places},
+                'max_decimal_places': _("This field's value has too many decimal places (>%(n)d decimal places)") % {"n": TimewebModel.y.field.decimal_places},
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>%(n)d digits)")% {"n": TimewebModel.y.field.max_digits - TimewebModel.y.field.decimal_places},
             },
             'works': {
                 'required': _("Please enter a value"),
@@ -58,21 +58,21 @@ class TimewebForm(forms.ModelForm):
             },
             'ctime': {
                 'required': _("Please enter a value"),
-                'max_digits': _("This field's value is too long (>15 digits)"),
-                'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
+                'max_digits': _("This field's value is too long (>%(n)d digits)") % {"n": TimewebModel.ctime.field.max_digits},
+                'max_decimal_places': _("This field's value has too many decimal places (>%(n)d decimal places)") % {"n": TimewebModel.ctime.field.decimal_places},
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>%(n)d digits)") % {"n": TimewebModel.ctime.field.max_digits - TimewebModel.ctime.field.decimal_places},
                 'invalid': _("This field's value is invalid"),
             },
             'funct_round': {
-                'max_digits': _("This field's value is too long (>15 digits)"),
-                'max_decimal_places': _("This field's value has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("This field's value has too many digits before its decimal point (>13 digits)"),
+                'max_digits': _("This field can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": TimewebModel.funct_round.field.max_digits - TimewebModel.funct_round.field.decimal_places, "n2": TimewebModel.funct_round.field.decimal_places},
+                'max_decimal_places': _("This field's value has too many digits after its decimal point (>%(n)d digits)") % {"n": TimewebModel.funct_round.field.decimal_places},
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>%(n)d digits)") % {"n": TimewebModel.funct_round.field.max_digits - TimewebModel.funct_round.field.decimal_places},
                 'invalid': _("This field's value is invalid"),
             },
             'min_work_time': {
-                'max_digits': _('The minimum work time is too long (>15 digits)'),
-                'max_decimal_places': _("The minimum work time has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("The minimum work time has too many digits before its decimal point (>13 digits)"),
+                'max_digits': _("This field can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": TimewebModel.min_work_time.field.max_digits - TimewebModel.min_work_time.field.decimal_places, "n2": TimewebModel.min_work_time.field.decimal_places},
+                'max_decimal_places': _("The minimum work time has too many decimal places (>%(n)d decimal places)") % {"n": TimewebModel.min_work_time.field.decimal_places},
+                'max_whole_digits': _("The minimum work time has too many digits before its decimal point (>%(n)d digits)") % {"n": TimewebModel.min_work_time.field.max_digits - TimewebModel.min_work_time.field.decimal_places},
                 'invalid': _("The minimum work time is invalid"),
             },
         }
@@ -90,8 +90,8 @@ class TimewebForm(forms.ModelForm):
             if works >= y >= 1:
                 self.add_error("works",
                     forms.ValidationError(_("This field's value of %(value)g cannot be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
-                        'value':works,
-                        'y':y,
+                        'value': works,
+                        'y': y,
                         'equal_to_or_greater_than': "equal to" if works == y else "greater than",
                     })
                 )
@@ -125,15 +125,15 @@ class SettingsForm(forms.ModelForm):
         }
         error_messages = {
             'def_min_work_time': {
-                'max_digits': _('The default minimum work time is too long (>15 digits)'),
-                'max_decimal_places': _("The default minimum work time has too many decimal places (>2 decimal places)"),
-                'max_whole_digits': _("The default minimum work time has too many digits before its decimal point (>13 digits)"),
+                'max_digits': _("This field can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": SettingsModel.def_min_work_time.field.max_digits - SettingsModel.def_min_work_time.field.decimal_places, "n2": SettingsModel.def_min_work_time.field.decimal_places},
+                'max_decimal_places': _("The default minimum work time has too many decimal places (>%(n)d decimal places)") % {"n": SettingsModel.def_min_work_time.field.decimal_places},
+                'max_whole_digits': _("The default minimum work time has too many digits before its decimal point (>%(n)d digits)") % {"n": SettingsModel.def_min_work_time.field.max_digits - SettingsModel.def_min_work_time.field.decimal_places},
                 'invalid': _("The default minimum work time is invalid"),
             },
             'def_skew_ratio': {
-                'max_digits': _('The default skew ratio is too long (>17 digits)'),
-                'max_decimal_places': _("The default skew ratio has too many decimal places (>10 decimal places)"),
-                'max_whole_digits': _("The default skew ratio has too many digits before its decimal point (>7 digits)"),
+                'max_digits': _("The default skew ratio can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": SettingsModel.def_skew_ratio.field.max_digits - SettingsModel.def_skew_ratio.field.decimal_places, "n2": SettingsModel.def_skew_ratio.field.decimal_places},
+                'max_decimal_places': _("The default skew ratio has too many decimal places (>%(n)d decimal places)") % {"n": SettingsModel.def_skew_ratio.field.decimal_places},
+                'max_whole_digits': _("The default skew ratio has too many digits before its decimal point (>%(n)d digits)") % {"n": SettingsModel.def_skew_ratio.field.max_digits - SettingsModel.def_skew_ratio.field.decimal_places},
                 'invalid': _("The default skew ratio is invalid"),
             }
         }
