@@ -613,11 +613,11 @@ class VisualAssignment extends Assignment {
                 display_button = this.dom_assignment.find(".display-button"),
                 skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 submit_work_button = this.dom_assignment.find(".submit-work-button"),
-                hide_assignment_button = this.dom_assignment.find(".mark-as-finished-button"),
+                ignore_assignment_button = this.dom_assignment.find(".mark-as-finished-button"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button"),
-                next_assignment_button = this.dom_assignment.find(".next-assignment-button"),
-                graph_draggable_wrapper = this.dom_assignment.find(".graph-draggable-wrapper");
+                next_assignment_button = this.dom_assignment.find(".next-assignment-button");
+                // graph_draggable_wrapper = this.dom_assignment.find(".graph-draggable-wrapper");
         //     console.log([
         //         this.fixed_graph.offset().top - this.fixed_graph.height(),
         //         this.fixed_graph.offset().left - this.fixed_graph.width(),
@@ -665,9 +665,17 @@ class VisualAssignment extends Assignment {
         // END Up and down arrow event handler
 
         // BEGIN Delete work input button
+        let not_applicable_timeout_delete_work_input_button;
         delete_work_input_button.click(() => {
             let len_works = this.sa.works.length - 1;
-            if (!len_works) return;
+            if (!len_works) {
+                delete_work_input_button.html("Nothing to Delete");
+                clearTimeout(not_applicable_timeout_delete_work_input_button);
+                not_applicable_timeout_delete_work_input_button = setTimeout(function() {
+                    delete_work_input_button.html("Delete Work Input");
+                }, 1000);
+                return;
+            }
             this.sa.works.pop();
             len_works--;
 
@@ -717,12 +725,27 @@ class VisualAssignment extends Assignment {
         // END Delete work input button
 
         // BEGIN Submit work button
+        let not_applicable_timeout_submit_work_button;
         submit_work_button.click(() => {
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
-            if (!work_input_button.val()) return;
-            if (last_work_input >= this.sa.y) return alert("You have already finished this assignment");
-            if (this.today_minus_ad < this.sa.blue_line_start) return alert("Please wait until this is assigned");
+
+            let not_applicable_message;
+            if (!work_input_button.val()) {
+                not_applicable_message = "Enter a Value";
+            } else if (last_work_input >= this.sa.y) {
+                not_applicable_message = "Already Finished";
+            } else if (this.today_minus_ad < this.sa.blue_line_start) {
+                not_applicable_message = "Not Yet Assigned";
+            }
+            if (not_applicable_message) {
+                submit_work_button.html(not_applicable_message);
+                clearTimeout(not_applicable_timeout_submit_work_button);
+                not_applicable_timeout_submit_work_button = setTimeout(function() {
+                    submit_work_button.html("Submit Work Input");
+                }, 1000);
+                return;
+            }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_button.val().trim().toLowerCase();
             switch (input_done) {
@@ -774,18 +797,36 @@ class VisualAssignment extends Assignment {
         // END Display button
 
         // BEGIN ignore button
-        hide_assignment_button.click(() => {
+        let not_applicable_timeout_ignore_assignment_button;
+        ignore_assignment_button.click(() => {
+            if (this.dom_assignment.parents(".assignment-container").hasClass("question-mark")) {
+                ignore_assignment_button.html("Not Applicable");
+                clearTimeout(not_applicable_timeout_ignore_assignment_button);
+                not_applicable_timeout_ignore_assignment_button = setTimeout(function() {
+                    ignore_assignment_button.html("Ignore for Today only");
+                }, 1000);
+                return;
+            }
             this.sa.mark_as_done = !this.sa.mark_as_done;
-            hide_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
+            ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
             ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
             priority.sort({ ignore_timeout: true });
         }).html(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
         // END ignore button
 
         // BEGIN Next assignment button
+        let not_applicable_timeout_next_assignment_button;
         next_assignment_button.click(() => {
             const next_assignment = this.dom_assignment.parents(".assignment-container").next().children(".assignment");
-            if (next_assignment.length && !next_assignment.hasClass("open-assignment")) {  
+            if (!next_assignment.length) {
+                next_assignment.html("No More Assignments");
+                clearTimeout(not_applicable_timeout_next_assignment_button);
+                not_applicable_timeout_next_assignment_button = setTimeout(function() {
+                    next_assignment.html("Next Assignment");
+                }, 1000);
+                return;
+            }
+            if (!next_assignment.hasClass("open-assignment")) {  
                 this.dom_assignment[0].scrollIntoView({
                     behavior: 'smooth',
                     block: 'start',
@@ -861,7 +902,7 @@ class VisualAssignment extends Assignment {
         // END Set skew ratio button using graph button
 
         // BEGIN Skew ratio textbox
-        let not_applicable_timeout;
+        let not_applicable_timeout_skew_ratio_textbox;
         skew_ratio_textbox.on("keydown paste click keyup", () => { // keydown for normal sr and keyup for delete
             if (old_skew_ratio === undefined) {
                 // Sets old_skew_ratio
@@ -873,10 +914,11 @@ class VisualAssignment extends Assignment {
             }
             if (x1 <= 1) {
                 skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
-                clearTimeout(not_applicable_timeout);
-                not_applicable_timeout = setTimeout(function() {
+                clearTimeout(not_applicable_timeout_skew_ratio_textbox);
+                not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
                     skew_ratio_textbox.attr("placeholder", "Enter Skew Ratio");
                 }, 1000);
+                return;
             }
             if (skew_ratio_textbox.val()) {
                 // Sets and caps skew ratio
