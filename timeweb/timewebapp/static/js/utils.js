@@ -82,10 +82,10 @@ utils = {
             $(".second-advanced-button").toggle();
             $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
             // Advanced inputs for form
-            $("#id_funct_round, #id_min_work_time, #break-days-label-title").parent().addClass("hidden");
+            $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden");
             $("#break-days-wrapper").addClass("hidden");
             $("#form-wrapper #advanced-inputs").insertBefore($("#form-wrapper .hidden").first()).click(function() {
-                $("#id_funct_round, #id_min_work_time, #break-days-label-title").parent().toggleClass("hidden");
+                $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().toggleClass("hidden");
                 $("#break-days-wrapper").toggleClass("hidden");
             })
             if ("advanced_inputs" in sessionStorage) {
@@ -394,8 +394,8 @@ utils = {
         setAssignmentScaleUtils: function() {
             // width * percent = width+10
             // percent = 1 + 10/width
-            $(window).resize(() => $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`));
-            $("#assignments-container")[0].style.setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
+            $(window).resize(() => $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`));
+            $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
         },
         handleTutorialIntroduction: function() {
             if (enable_tutorial) {
@@ -500,6 +500,9 @@ utils = {
 }
 
 isExampleAccount = username === example_account_name// && 0;
+if (isExampleAccount) {
+    window.gtag = function(){};
+}
 ajaxUtils = {
     disable_ajax: isExampleAccount, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     hour_to_update: hour_to_update,

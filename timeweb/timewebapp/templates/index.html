@@ -93,6 +93,9 @@
           <div class="assignment-header">
             <div class="relative-positioning-wrapper">
               <span class="title">{{ assignment.name }}</span>
+              {% if assignment.description %}
+                <div class="description">{{ assignment.description }}</div>
+              {% endif %}
             </div>
             <svg width="30px" height="20px" class="arrow-container">
               <polygon points="5,0 5,20 15,10">

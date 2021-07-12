@@ -1016,12 +1016,12 @@ class VisualAssignment extends Assignment {
             position: "absolute",
         // Initially hide or show this if "Advanced Options" is visible or not
         // Only need to do this here because this info button is absolutely positioned
-        }).toggle($(".second-advanced-button").is(":visible"));
+        }).toggle(this.dom_assignment.find(".second-advanced-button").is(":visible"));
     }
 }
 $(function() {
 $(".assignment").click(function(e) {
-    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, .title, .tags, .tag-wrapper, .tag-name")) return;
+    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title, .tags, .tag-wrapper, .tag-name")) return;
     const dom_assignment = $(this);
     const sa_used_to_check_to_shake = utils.loadAssignmentData(dom_assignment);
     let assignment_to_shake;
@@ -1034,8 +1034,8 @@ $(".assignment").click(function(e) {
     }
     if (assignment_to_shake) {
         assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
-            $(this).animate({left: 5}, 75, "easeOutCubic", function() {
-                $(this).animate({left: 0}, 75, "easeOutCubic");
+            assignment_to_shake.animate({left: 5}, 75, "easeOutCubic", function() {
+                assignment_to_shake.animate({left: 0}, 75, "easeOutCubic");
             });
         });
         return;

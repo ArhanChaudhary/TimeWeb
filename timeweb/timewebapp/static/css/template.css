@@ -2,7 +2,7 @@
 * {
     font-family: "Open Sans", sans-serif;
 }
-input {
+input, textarea {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;

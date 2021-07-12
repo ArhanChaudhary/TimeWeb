@@ -42,7 +42,7 @@ function hideForm(hide_instantly=false) {
     form_is_showing = false;
     $("main").css("overflow", "overlay");
 }
-// Replace fields with unit when unit is "Minute"
+// Replace fields with unit when unit is any value or "Minute" or "Hour"
 function replaceUnit() {
     const val = $("#id_unit").val().trim();
     const plural = pluralize(val),
@@ -68,7 +68,6 @@ function replaceUnit() {
         $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
     }
     if (chose_units_of_time) {
-        // Disable fields
         $("#id_ctime").val(chose_units_of_time);
         $("#id_ctime").prop("disabled",true).addClass("disabled-field");
         $("label[for='id_ctime']").addClass("disabled-field");
@@ -90,7 +89,7 @@ $(function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
-        const default_form_fields = ['', utils.formatting.stringifyDate(date_now), '', def_unit_to_minute ? "Minute" : '', '', '0', '', '', +def_min_work_time||''];
+        const default_form_fields = ['', utils.formatting.stringifyDate(date_now), '', def_unit_to_minute ? "Minute" : '', '', '0', '', '', '', +def_min_work_time||''];
         default_form_fields.forEach(function(element, index) {
             $(form_inputs[index]).val(element);
         });
@@ -122,6 +121,7 @@ $(function() {
             sa.needs_more_info ? '' : sa.y,
             sa.works[0],
             sa.needs_more_info ? '' : sa.ctime,
+            sa.description,
             sa.funct_round-1 ? +sa.funct_round : '', // Displays nothing if it is 1
             (sa.min_work_time*sa.ctime)||'',
         ];
@@ -137,9 +137,12 @@ $(function() {
         $("#submit-assignment-button").val(sa.id);
         showForm();
     });
-    // Hide form when cancel is clicked
     $("#form-wrapper #cancel-button").click(() => hideForm());
     $("#id_unit").on('input', replaceUnit);
+    $("#id_description").on("input", function() {
+        $(this).css("height", "auto"); // Needed for expanding with text
+        $(this).css("height", $(this).prop("scrollHeight") + +$(this).css("padding-top").replace("px", "") + +$(this).css("padding-bottom").replace("px", ""));
+    });
     // Add info buttons ($.info defined in template.js)
     $('label[for="id_unit"]').info('right',
         `This is how your assignment will be split and divided up
@@ -157,7 +160,7 @@ $(function() {
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     );
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
-    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days'])");
+    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
     // Auto field scrolling
     form_inputs.focus(function() {
         this.scrollIntoView({
@@ -228,7 +231,7 @@ $(function() {
             $(this).val(pr_data[index]);
         });
         $("#form-wrapper #break-days-wrapper input").each(function(index) {
-            $(this).prop('checked',pr_data[9][index]);
+            $(this).prop('checked',pr_data[pr_data.length - 1][index]);
         });
     }
     // Form submission
@@ -237,27 +240,29 @@ $(function() {
         // Prevent submit button spam clicking
         if (submitted) {
             e.preventDefault();
-        } else {
-            submitted = true;
-            // Enable disabled field on submit so it's sent with post
-            $("#id_ctime, #id_funct_round").removeAttr("disabled");
-            // JSON fields are picky with their number inputs, convert them to standard form
-            if (+$("#id_works").val()) {
-                $("#id_works").val(+$("#id_works").val());
-            }
+            return;
+        }
+        submitted = true;
+        // Enable disabled field on submit so it's sent with post
+        $("#id_ctime, #id_funct_round").removeAttr("disabled");
+        // JSON fields are picky with their number inputs, convert them to standard form
+        if (+$("#id_works").val()) {
+            $("#id_works").val(+$("#id_works").val());
+        }
+        if (!ajaxUtils.disable_ajax) {
             gtag("event","modify_assignment");
         }
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
-        $(this).prev().children("input").first().addClass("invalid");
+        $(this).prev().children("input, textarea").first().addClass("invalid");
         // Give the previous field an error if appropriate
         if (this.id === "error_id_x" && $(this).text().includes("assignment") || this.id === "error_id_works" && $(this).text().includes("of")) {
-            $(this).prev().prev().children("input").first().addClass("invalid");
+            $(this).prev().prev().children("input, textarea").first().addClass("invalid");
         }
     });
     // Focus on first invalid field
-    $("#form-wrapper .error-note").first().prev().children("input").first().focus();
+    $("#form-wrapper .error-note").first().prev().children("input, textarea").first().focus();
     // Delete assignment
     $('.delete-button').parent().click(function(e) {
         const $this = $(this),

@@ -25,6 +25,7 @@ class TimewebForm(forms.ModelForm):
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
             'y': forms.NumberInput(attrs={"min":"1"}),
             'ctime': forms.NumberInput(attrs={"min":"0"}),
+            'description': forms.Textarea(attrs={"rows": "1"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
         }

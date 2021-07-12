@@ -301,6 +301,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.y = self.form.cleaned_data.get("y")
             first_work = d(self.form.cleaned_data.get("works"))
             self.sm.ctime = self.form.cleaned_data.get("ctime")
+            self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")

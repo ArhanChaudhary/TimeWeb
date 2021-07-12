@@ -220,8 +220,22 @@ header.animate::after {
     align-items: center;
 }
 .relative-positioning-wrapper {
-    display: inherit; /* things position weirdly when assignments are open without this for some reason */
+    display: flex; /* things position weirdly when assignments are open without this for some reason */
+    flex-direction: column; /* put description below name */
     position: relative;
+}
+.description {
+    display: none;
+    opacity: 0.6;
+    white-space: pre;
+    transform: translateY(-2px);
+    min-width: calc(20px + 13vw);
+    max-width: calc(20px + 13vw);
+    overflow-wrap: break-word;
+    font-size: 0.7em;
+}
+.assignment.open-assignment .description {
+    display: block;
 }
 .assignment:not(.open-assignment) .title {
     display: -webkit-box;
@@ -327,7 +341,7 @@ header.animate::after {
     bottom: 0;
     margin: auto;
     border-radius: 50%;
-    border: 8px solid transparent;
+    border: 10px solid transparent;
 }
 .tag-add {
     position: relative;
@@ -680,7 +694,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 
 
-#form-wrapper input:focus, #form-wrapper label:focus {
+#form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {
     outline: 0;
     box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
 }
@@ -756,7 +770,7 @@ label[for='id_ad']::after {
 #form-wrapper label:not(.break-days-label) {
     margin: 0 25px;
 }
-#form-wrapper input {
+#form-wrapper input, #form-wrapper textarea {
     box-sizing: border-box; 
     display: block;
     margin-left: auto;
@@ -782,8 +796,11 @@ label[for='id_ad']::after {
     opacity: 0.6 !important;
     transition: opacity .25s ease-out;
 }
-#form-wrapper input:not(.disabled-field) {
+#form-wrapper input:not(.disabled-field), #form-wrapper textarea {
     padding: 1px;
+}
+#form-wrapper textarea {
+    resize: none;
 }
 #form-wrapper input.disabled-field {
     opacity: 0.75 !important;
