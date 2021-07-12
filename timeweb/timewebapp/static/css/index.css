@@ -728,7 +728,7 @@ label[for='id_ad']::after {
 #form-wrapper #cancel-button {
     position: absolute;
     cursor: pointer;
-    right: 10px;
+    right: 7px;
     top: 9px;
     border: 7px solid white;
     z-index: 1;

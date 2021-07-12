@@ -510,7 +510,7 @@ class TimewebView(LoginRequiredMixin, View):
                     name = "Google Classroom Multiple Choice Question: "
                 name += assignment['title']
                 name = Truncator(name).chars(TimewebModel.name.field.max_length)
-                tags = [course['name']]
+                tags = [course_names[assignment['courseId']]]
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
                 new_gc_assignment_ids.add(assignment_id)
@@ -544,9 +544,12 @@ class TimewebView(LoginRequiredMixin, View):
         courses = service.courses().list().execute().get('courses', [])
         coursework_lazy = service.courses().courseWork()
         batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
+
+        course_names = {}
         for course in courses:
             if course['courseState'] == "ARCHIVED":
                 continue
+            course_names[course['id']] = course['name']
             batch.add(coursework_lazy.list(courseId=course['id']))
         # Make "in" faster
         set_added_gc_assignment_ids = set(self.settings_model.added_gc_assignment_ids)
