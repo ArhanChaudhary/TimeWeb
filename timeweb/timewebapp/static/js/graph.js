@@ -79,8 +79,6 @@ class VisualAssignment extends Assignment {
             width: this.zoom*100+"%",
             height: this.zoom*100+"%",
         });
-        this.fixed_graph.css("width", this.width*this.zoom);
-        this.fixed_graph.css("height", this.height*this.zoom);
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
         this.due_date = new Date(this.sa.assignment_date.valueOf());
@@ -133,12 +131,16 @@ class VisualAssignment extends Assignment {
             }
             this.wCon = (this.width - 55) / this.sa.x;
             this.hCon = (this.height - 55) / this.sa.y;
-            this.graph[0].width = this.width * this.scale / this.zoom;
-            this.graph[0].height = this.height * this.scale / this.zoom;
-            this.fixed_graph[0].width = this.width * this.scale / this.zoom;
-            this.fixed_graph[0].height = this.height * this.scale / this.zoom;
+            this.graph[0].width = this.width * this.scale;
+            this.graph[0].height = this.height * this.scale;
+            this.fixed_graph[0].width = this.width * this.scale;
+            this.fixed_graph[0].height = this.height * this.scale;
             this.drawfixed();
             this.draw();
+            // this.graph[0].width *= this.zoom;
+            // this.graph[0].height *= this.zoom;
+            // this.fixed_graph[0].width *= this.zoom;
+            // this.fixed_graph[0].height *= this.zoom;
         }
     }
     mousemove(e) {
@@ -153,8 +155,8 @@ class VisualAssignment extends Assignment {
             }
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
-            let x2 = (raw_x - 53.7) / this.wCon - this.red_line_start_x;
-            const y2 = (this.height - raw_y - 44.5) / this.hCon - this.red_line_start_y;
+            let x2 = (raw_x - 50.1) / this.wCon - this.red_line_start_x;
+            const y2 = (this.height - raw_y - 48.7) / this.hCon - this.red_line_start_y;
             // Handles break days
             if (this.sa.break_days.length) {
                 const floorx2 = Math.floor(x2);
@@ -178,7 +180,7 @@ class VisualAssignment extends Assignment {
                     this.sa.skew_ratio = this.skew_ratio_lim;
                 } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
                     this.sa.skew_ratio = 2 - this.skew_ratio_lim;
-                } else if (Math.abs(this.sa.skew_ratio) % 1 < 0.05) {
+                } else if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
                     // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
@@ -222,9 +224,9 @@ class VisualAssignment extends Assignment {
         const last_work_input = this.sa.works[len_works];
         // && raw_x && raw_y is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && raw_x && raw_y) {
-            // -53.7 and -44.5 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-            var mouse_x = Math.round((raw_x - 53.7) / this.wCon),
-                mouse_y = (this.height - raw_y - 44.5) / this.hCon;
+            // -50.1 and -48.7 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
+            var mouse_x = Math.round((raw_x - 50.1) / this.wCon),
+                mouse_y = (this.height - raw_y - 48.7) / this.hCon;
             if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start)) {
                 mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
             } else if (mouse_x > this.sa.x) {
@@ -617,19 +619,6 @@ class VisualAssignment extends Assignment {
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button"),
                 next_assignment_button = this.dom_assignment.find(".next-assignment-button");
-                // graph_draggable_wrapper = this.dom_assignment.find(".graph-draggable-wrapper");
-        //     console.log([
-        //         this.fixed_graph.offset().top - this.fixed_graph.height(),
-        //         this.fixed_graph.offset().left - this.fixed_graph.width(),
-        //         this.fixed_graph.offset().top + this.fixed_graph.height() * 2,
-        //         this.fixed_graph.offset().left + this.fixed_graph.width() * 2,
-        //     ]);
-        // graph_draggable_wrapper.draggable({ containment: [
-        //     this.fixed_graph.offset().top - this.fixed_graph.height(),
-        //     this.fixed_graph.offset().left - this.fixed_graph.width(),
-        //     this.fixed_graph.offset().top + this.fixed_graph.height() * 2,
-        //     this.fixed_graph.offset().left + this.fixed_graph.width() * 2,
-        // ]});
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
@@ -708,7 +697,7 @@ class VisualAssignment extends Assignment {
                 // ++ for three cases:
                 // if for loop doesnt run, do ++ to fix red_line_start_x
                 // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
-                // if for loop doesnt find, do ++; cond was originally > blue_line_start instead of >= blue_line_start
+                // if for loop doesnt find, do ++; red_line_start_x is less than blue_line_start which is illegal
                 this.red_line_start_x++;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
                 if (this.sa.break_days.length) {
@@ -866,7 +855,7 @@ class VisualAssignment extends Assignment {
             this.set_skew_ratio_using_graph = true;
         });
         let old_skew_ratio = this.sa.skew_ratio; // Old skew ratio is the old original value of the skew ratio if the user decides to cancel
-        this.graph.click((e) => {
+        this.graph.click(e => {
             if (this.set_skew_ratio_using_graph) {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 this.set_skew_ratio_using_graph = false;
@@ -935,7 +924,7 @@ class VisualAssignment extends Assignment {
                 old_skew_ratio = undefined;
             }
             this.draw();
-        }).keypress((e) => {
+        }).keypress(e => {
             // Saves skew ratio on enter
             if (e.key === "Enter") {
                 // Also triggers below

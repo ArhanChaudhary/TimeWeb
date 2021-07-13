@@ -668,7 +668,7 @@ class GCOAuthView(LoginRequiredMixin, View):
             flow.fetch_token(authorization_response=authorization_response)
         except InvalidGrantError:
             # In case users deny a permission
-            return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.close()</script>")
+            return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.opener.location.reload();window.close()</script>")
         except MissingCodeError:
             return HttpResponse("Missing code in url")
         credentials = flow.credentials
@@ -676,7 +676,7 @@ class GCOAuthView(LoginRequiredMixin, View):
         self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
-        return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.close()</script>")
+        return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.opener.location.reload();window.close()</script>")
         
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
@@ -744,7 +744,7 @@ class ImagesView(LoginRequiredMixin, View):
     @cache_control(public=True, max_age=604800)
     def get(self, request, imageUser, imageName):
         if request.user.username != imageUser:
-            return HttpResponseForbidden("You do not have access to this image")
+            return HttpResponseForbidden("You do not have access to this media")
         client = storage.Client()
         bucket = client.bucket("timeweb-308201.appspot.com")
         blob = bucket.get_blob(f"images/{imageUser}/{imageName}")

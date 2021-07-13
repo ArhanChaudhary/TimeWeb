@@ -32,11 +32,12 @@ header.animate::after {
     padding: 0 10px;
 }
 #assignments-header {
+    position: relative;
     padding: 0 10px;
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 4px;
 }
 #assignments-header img {
     cursor: pointer;
@@ -58,6 +59,7 @@ header.animate::after {
     position: absolute;
     order: 1;
     right: 180px;
+    bottom: 5px;
     opacity: 0;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
@@ -67,6 +69,11 @@ header.animate::after {
 #assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label {
     opacity: 1;
+}
+#assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
+#assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
+#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label) {
+    opacity: 0 !important;
 }
 #info {
     display: inline;
@@ -460,7 +467,7 @@ header.animate::after {
     border: none;
     background-color: rgb(220,220,220);
     padding: 10px 12px;
-    padding-right: 41px;
+    padding-right: 38px;
 }
 .tag-add-input:focus {
     outline: 0;
@@ -560,7 +567,7 @@ header.animate::after {
     margin-right: -4px;
     min-width: 40px;
     cursor: pointer;
-    transition: background-color 0.15s cubic-bezier(.29,.81,.37,.99);
+    transition: background-color 0.25s ease-out;
 }
 .button + .button {
     margin-right: -7px;

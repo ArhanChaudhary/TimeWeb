@@ -472,12 +472,6 @@ utils = {
                     utils.ui.OAuth.windowObjectReference.focus();
                 }
                 utils.ui.OAuth.previousUrl = url;
-                utils.ui.OAuth.checkIfClosed = setInterval(function() {
-                    if (utils.ui.OAuth.windowObjectReference.closed) {
-                        clearInterval(utils.ui.OAuth.checkIfClosed);
-                        window.location.reload();
-                    }
-                }, 100);
             },
         }
     },
