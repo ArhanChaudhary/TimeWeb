@@ -131,7 +131,7 @@ body {
     transform: scale(1.04);
 }
 
-.hidden *, .hidden {
+.hidden-field, .hide-account-dropdown {
     display: none !important;
 }
 
@@ -286,10 +286,6 @@ nav:focus-within #nav-menu::after {
     position: absolute;
     width: 265px;
     z-index: 100;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
     background: rgb(245,245,245) !important;
     box-shadow: 0 0 5px rgba(0,0,0,0.75);
     border-radius: 5px !important;

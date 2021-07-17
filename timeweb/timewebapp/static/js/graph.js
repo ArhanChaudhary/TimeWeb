@@ -192,7 +192,6 @@ class VisualAssignment extends Assignment {
         // Passes mouse x and y coords so mouse point can be drawn
         this.draw(raw_x, raw_y);
     }
-    static scale = window.devicePixelRatio || 2; // Resolution of every graph
     static preventArrowScroll(e) {
         // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {

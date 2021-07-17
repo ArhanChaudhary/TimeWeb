@@ -213,9 +213,14 @@ priority = {
                 }
             }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            assignment_container.toggleClass("finished", status_value === 1);
-            assignment_container.toggleClass("incomplete-works", status_value === 8);
-            assignment_container.toggleClass("question-mark", [6,7,8].includes(status_value));
+            const add_finished_condition = status_value === 1;
+            const add_incomplete_works_condition = status_value === 8;
+            const add_question_mark_condition = [6,7,8].includes(status_value);
+            assignment_container.toggleClass("finished", add_finished_condition);
+            assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
+            assignment_container.toggleClass("question-mark", add_question_mark_condition);
+            assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition);
+
             let status_priority;
             if (status_value === 1) {
                 status_priority = -index;
@@ -370,10 +375,10 @@ priority = {
         // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
         $(".first-finished").removeClass("first-finished");
         $(".finished").first().addClass("first-finished");
-        $(".last-finished").removeClass("last-finished");
-        $(".finished").last().addClass("last-finished");
-        $(".last-incomplete-works").removeClass("last-incomplete-works");
-        $(".incomplete-works").last().addClass("last-incomplete-works");
+
+        $(".last-add-line-wrapper").removeClass("last-add-line-wrapper");
+        $(".finished").last().addClass("last-add-line-wrapper");
+        $(".incomplete-works").last().addClass("last-add-line-wrapper");
         if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css({

@@ -58,9 +58,10 @@ header.animate::after {
 #assignments-header img ~ div {
     position: absolute;
     order: 1;
+    z-index: 100;
     right: 180px;
     bottom: 5px;
-    opacity: 0;
+    visibility: hidden;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
@@ -68,12 +69,12 @@ header.animate::after {
 #assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label {
-    opacity: 1;
+    visibility: visible;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
 #assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
 #assignments-header img#next-day:hover ~ div:not(#next-day-icon-label) {
-    opacity: 0 !important;
+    visibility: hidden !important;
 }
 #info {
     display: inline;
@@ -203,7 +204,7 @@ header.animate::after {
     left: -1px;
     height: 12px;
 }
-.assignment-container.incomplete-works::before, .assignment-container.finished::before {
+.assignment-container.add-line-wrapper::before {
     content: '';
     position: absolute;
     height: 100%;
@@ -214,7 +215,7 @@ header.animate::after {
 .assignment-container.first-finished::before {
     height: calc(100% - 20px);
 }
-.assignment-container.last-incomplete-works::after, .assignment-container.last-finished::after {
+.assignment-container.last-add-line-wrapper::after {
     content: '';
     position: absolute;
     width: 22px;
@@ -234,11 +235,11 @@ header.animate::after {
 .description {
     display: none;
     opacity: 0.6;
-    white-space: pre;
+    white-space: pre-wrap;
     transform: translateY(-2px);
     min-width: calc(20px + 13vw);
     max-width: calc(20px + 13vw);
-    overflow-wrap: break-word;
+    word-wrap: break-word;
     font-size: 0.7em;
 }
 .assignment.open-assignment .description {
@@ -306,6 +307,7 @@ header.animate::after {
 }
 .tags {
     position: absolute;
+    z-index: 1;
     top: 2px;
     white-space: nowrap;
     font-size: min(10px, 0.7em);
@@ -369,7 +371,7 @@ header.animate::after {
     text-align: right;
     direction: rtl;
     margin-right: 4px;
-    margin-left: 7px;
+    margin-left: 10px;
 
     overflow: hidden;
     white-space: nowrap;
@@ -765,6 +767,13 @@ label[for='id_ad']::after {
     left: 50%;
     transform: translateX(-50%);
 }
+#form-wrapper #fields-wrapper {
+    height: 439px;
+    overflow: scroll;
+}
+#form-wrapper .field-wrapper {
+    margin-top: 10px;
+}
 #form-wrapper .field {
     width: calc(100% - 50px);
     margin: 5px;
@@ -794,7 +803,7 @@ label[for='id_ad']::after {
     border-bottom: 1px solid;
     cursor: pointer;
     width: 149px;
-    margin: 0 auto 10px auto
+    margin: 10px auto;
 }
 #form-wrapper input.disabled-field, #form-wrapper label.disabled-field {
     opacity: 1;
@@ -821,7 +830,7 @@ label[for='id_ad']::after {
 }
 #submit-assignment-button {
     width: calc(100% - 140px);
-    margin: 0 auto;
+    margin: 15px auto 0;
     display: block;
     padding: 20px 45px;
     font-size: 19px;
@@ -841,7 +850,6 @@ label[for='id_ad']::after {
 #form-wrapper .error-note {
     text-align: center;
     font-size: 13px;
-    margin-top: -15px;
     color: rgb(226,30,54);
 }
 #overlay {
@@ -859,12 +867,12 @@ label[for='id_ad']::after {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: -1em 50px 0;
+    margin: 0 50px;
 }
 #toggle-gc-container {
     position: fixed;
-    height: 41px;
-    border-radius: 20px;
+    height: 50px;
+    border-radius: 25px;
     right: 10px;
     bottom: 10px;
     padding: 4px;
@@ -877,7 +885,7 @@ label[for='id_ad']::after {
 }
 #toggle-gc-label {
     position: relative;
-    bottom: 6px;
+    bottom: 10px;
     width: 0;
     opacity: 0;
     display: inline-block;

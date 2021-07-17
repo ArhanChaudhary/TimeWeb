@@ -82,11 +82,20 @@ utils = {
             $(".second-advanced-button").toggle();
             $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
             // Advanced inputs for form
-            $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden");
-            $("#break-days-wrapper").addClass("hidden");
-            $("#form-wrapper #advanced-inputs").insertBefore($("#form-wrapper .hidden").first()).click(function() {
-                $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().toggleClass("hidden");
-                $("#break-days-wrapper").toggleClass("hidden");
+            $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
+            $("#break-days-wrapper").addClass("hidden-field");
+            $("#form-wrapper #advanced-inputs").click(function() {
+                if ($("#break-days-wrapper").hasClass("hidden-field")) {
+                    var field_to_scroll_to = $(".hidden-field").first();
+                }
+                $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().toggleClass("hidden-field");
+                $("#break-days-wrapper").toggleClass("hidden-field");
+                if (field_to_scroll_to) {
+                    field_to_scroll_to[0].scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    });
+                }
             })
             if ("advanced_inputs" in sessionStorage) {
                 $("#form-wrapper #advanced-inputs").click();
@@ -141,7 +150,7 @@ utils = {
                             $("#toggle-gc-label").html("Enable Google Classroom API");
                             $this.removeClass("clicked");
                         } else {
-                            utils.ui.OAuth.openSignInWindow(authentication_url, 'Enable Google Classroom API');
+                            window.location.href = authentication_url;
                         }
                     },
                 });
@@ -314,7 +323,7 @@ utils = {
                     if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this)) return;
                     $this.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
-                });
+                }, 0);
             });
             $(".tag-sortable-container").sortable().on("sortstop", function() {
                 const sa = utils.loadAssignmentData($(this));
@@ -423,7 +432,7 @@ utils = {
                 }
                 // Save scroll position
                 localStorage.setItem("scroll", $("main").scrollTop());
-                if (!$("#form-wrapper .hidden").length) {
+                if (!$("#form-wrapper .hidden-field").length) {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
                 // Send ajax before close if it's on timeout
@@ -448,32 +457,6 @@ utils = {
                 }
             });
         },
-        // cite later
-        // https://dev.to/dinkydani21/how-we-use-a-popup-for-google-and-outlook-oauth-oci
-        OAuth: {
-            openSignInWindow: function(url, name) {
-                const strWindowFeatures = 'toolbar=no, menubar=no, width=600, height=700, top=100, left=100';
-             
-                if (utils.ui.OAuth.windowObjectReference === undefined || utils.ui.OAuth.windowObjectReference.closed) {
-                    /* if the pointer to the window object in memory does not exist
-                    or if such pointer exists but the window was closed */
-                    utils.ui.OAuth.windowObjectReference = window.open(url, name, strWindowFeatures);
-                } else if (utils.ui.OAuth.previousUrl !== url) {
-                    /* if the resource to load is different,
-                    then we load it in the already opened secondary window and then
-                    we bring such window back on top/in front of its parent window. */
-                    utils.ui.OAuth.windowObjectReference = window.open(url, name, strWindowFeatures);
-                    utils.ui.OAuth.windowObjectReference.focus();
-                } else {
-                    /* else the window reference must exist and the window
-                    is not closed; therefore, we can bring it back on top of any other
-                    window with the focus() method. There would be no need to re-create
-                    the window or to reload the referenced resource. */
-                    utils.ui.OAuth.windowObjectReference.focus();
-                }
-                utils.ui.OAuth.previousUrl = url;
-            },
-        }
     },
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
@@ -555,6 +538,22 @@ ajaxUtils = {
             error: ajaxUtils.error,
         });
     },
+    createGCAssignments: function() {
+        if (ajaxUtils.disable_ajax) return;
+        const data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'create_gc_assignments',
+        }
+        $.ajax({
+            type: "POST",
+            data: data,
+            error: ajaxUtils.error,
+        }).done(authentication_url => {
+            if (authentication_url === "No new gc assignments were added") return;
+            if (authentication_url) window.location.href = authentication_url; // Invalid creds
+            window.location.reload();
+        });
+    },
     SendAttributeAjaxWithTimeout: function(key, value, pk) {
         if (ajaxUtils.disable_ajax) return;
         // Add key and values to the data being sent
@@ -634,6 +633,7 @@ document.addEventListener("DOMContentLoaded", function() {
         'assignments': [],
     },
     ajaxUtils.changeDateNowAndExampleAssignmentDates();
+    if (oauth_token.token) ajaxUtils.createGCAssignments();
     setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
     utils.ui.setHideEstimatedCompletionTimeButton();
     utils.ui.setMiscClickHandlers();

@@ -1,9 +1,5 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 #login {
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
     position: relative;
     width: clamp(290px, calc(100vw - 160px), 1000px);
     height: clamp(440px, calc(100vh - 310px), 500px);

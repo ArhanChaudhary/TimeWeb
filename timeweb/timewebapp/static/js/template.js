@@ -139,7 +139,7 @@ $(function() {
     }
     if ($("#user-greeting").length) {
         $("#username").click(function() {
-            $("#account-dropdown").toggleClass("hidden");
+            $("#account-dropdown").toggleClass("hide-account-dropdown");
         });
     }
     // cite

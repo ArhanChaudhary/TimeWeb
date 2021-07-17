@@ -78,7 +78,6 @@ example_assignment_load.py
 cloud_sql_proxy
 app.yaml
 main.py
-env_variables.yaml
 gcldeployment.md
 .gcloudignore
 

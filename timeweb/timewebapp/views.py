@@ -36,7 +36,6 @@ GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.r
 GC_CREDENTIALS_PATH = os.path.join(os.getcwd(), "gc-api-credentials.json")
 if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
-    #we don't have ssl on local host
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
     GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
@@ -46,7 +45,6 @@ example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 25
 MAX_NUMBER_TAGS = 5
-MAX_UPLOAD_SIZE = 5242880
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -127,8 +125,8 @@ class SettingsView(LoginRequiredMixin, View):
         form_is_valid = True
         if not self.form.is_valid():
             form_is_valid = False
-        elif self.form.cleaned_data.get("background_image") and self.form.cleaned_data.get("background_image").size > MAX_UPLOAD_SIZE:
-            self.form.add_error("background_image", forms.ValidationError(_('This file is too big (>%(amount)d bytes)') % {'amount': MAX_UPLOAD_SIZE}))
+        elif self.form.cleaned_data.get("background_image") and self.form.cleaned_data.get("background_image").size > settings.MAX_UPLOAD_SIZE:
+            self.form.add_error("background_image", forms.ValidationError(_('This file is too big (>%(amount)d bytes)') % {'amount': settings.MAX_UPLOAD_SIZE}))
             form_is_valid = False
         if form_is_valid:
             return self.valid_form(request)
@@ -186,10 +184,6 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
-        if 'token' in self.settings_model.oauth_token:
-            redirect_url_if_creds_invalid = self.create_gc_assignments(request)
-            if redirect_url_if_creds_invalid:
-                return redirect(redirect_url_if_creds_invalid)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
@@ -232,6 +226,11 @@ class TimewebView(LoginRequiredMixin, View):
             return self.saved_assignment(request)
         elif action == 'finished_tutorial':
             return self.finished_tutorial(request)
+        elif action == 'create_gc_assignments':
+            if 'token' in self.settings_model.oauth_token:
+                redirect_url_if_creds_invalid = self.create_gc_assignments(request)
+                if redirect_url_if_creds_invalid:
+                    return HttpResponse(redirect_url_if_creds_invalid)
         elif action == "tag_add" or action == "tag_delete":
             return self.tag_add_or_delete(request, action)
         return HttpResponse(status=204)
@@ -445,8 +444,7 @@ class TimewebView(LoginRequiredMixin, View):
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-        credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, SCOPES)
+        credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, GC_SCOPES)
         # If there are no valid credentials available, let the user log in.
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
@@ -474,14 +472,20 @@ class TimewebView(LoginRequiredMixin, View):
         service = build('classroom', 'v1', credentials=credentials)
 
         def add_gc_assignments_from_response(response_id, course_coursework, exception):
-            if not course_coursework or type(exception) is HttpError: # HttpError if permission denied (if you are the teacher of a class)
+            if not course_coursework or type(exception) is HttpError: # HttpError for permission denied (ex if you are the teacher of a class)
                 return
             course_coursework = course_coursework['courseWork']
             for assignment in course_coursework:
+                self.gc_assignment += 1
+
                 # Load and interpret json data
                 assignment_id = int(assignment['id'], 10)
                 assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
-                assignment_date = timezone.localtime(datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=datetime.timezone.utc))
+                try:
+                    assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
+                except ValueError:
+                    assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
+                assignment_date = timezone.localtime(assignment_date.replace(tzinfo=datetime.timezone.utc))
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
                 if x:
@@ -496,11 +500,10 @@ class TimewebView(LoginRequiredMixin, View):
                         x = x.replace(hour=0, minute=0, second=0, microsecond=0)
                     
                     # Validation
-                    if assignment_date == x:
-                        x += datetime.timedelta(1)
-                    elif assignment_date > x:
+                    if assignment_date >= x:
                         x = assignment_date + datetime.timedelta(1)
                     if x < date_now:
+                        self.gc_skipped_assignment += 1
                         continue
                 if assignment['workType'] == "ASSIGNMENT":
                     name = "Google Classroom Assignment: "
@@ -546,8 +549,14 @@ class TimewebView(LoginRequiredMixin, View):
         batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
 
         course_names = {}
+        self.gc_course = 0
+        self.gc_skipped_course = 0
+        self.gc_assignment = 0
+        self.gc_skipped_assignment = 0
         for course in courses:
+            self.gc_course += 1
             if course['courseState'] == "ARCHIVED":
+                self.gc_skipped_course += 1
                 continue
             course_names[course['id']] = course['name']
             batch.add(coursework_lazy.list(courseId=course['id']))
@@ -556,11 +565,13 @@ class TimewebView(LoginRequiredMixin, View):
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
         gc_models_to_create = []
+        logger.info(f"Requested for {self.gc_course} courses ({self.gc_skipped_course} skipped)")
         batch.execute()
+        logger.info(f"Requested for {self.gc_assignment} assignments ({self.gc_skipped_assignment} skipped) and created {len(gc_models_to_create)} assignments")
         TimewebModel.objects.bulk_create(gc_models_to_create)
-        if new_gc_assignment_ids != set_added_gc_assignment_ids:
-            self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
-            self.settings_model.save()
+        if not gc_models_to_create: return "No new gc assignments were added" # or do new_gc_assignment_ids == set_added_gc_assignment_ids
+        self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
+        self.settings_model.save()
     def deleted_assignment(self, request):
         assignments = request.POST.getlist('assignments[]')
         for pk in assignments:
@@ -595,7 +606,7 @@ class TimewebView(LoginRequiredMixin, View):
                 logger.info(log_message)
             try:
                 self.sm.save()
-            except NameError:
+            except NameError: # Forgot why I put this here
                 pass
         return HttpResponse(status=204)
         
@@ -668,15 +679,15 @@ class GCOAuthView(LoginRequiredMixin, View):
             flow.fetch_token(authorization_response=authorization_response)
         except InvalidGrantError:
             # In case users deny a permission
-            return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.opener.location.reload();window.close()</script>")
+            return redirect("home")
         except MissingCodeError:
             return HttpResponse("Missing code in url")
         credentials = flow.credentials
-        # Use .update() instead of = so the refresh token isnt overwritten
+        # Use .update() (dict method) instead of = so the refresh token isnt overwritten
         self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
-        return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">window.opener.location.reload();window.close()</script>")
+        return redirect("home")
         
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)

@@ -144,29 +144,33 @@ $(function() {
         $(this).css("height", $(this).prop("scrollHeight") + +$(this).css("padding-top").replace("px", "") + +$(this).css("padding-bottom").replace("px", ""));
     });
     // Add info buttons ($.info defined in template.js)
-    $('label[for="id_unit"]').info('right',
+    $('label[for="id_unit"]').info('left',
         `This is how your assignment will be split and divided up
         
         e.g: If this assignment is reading a book, enter "Page" or "Chapter"
 
         If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute" or "Hour"`
     );
-    $('label[for="id_works"]').info('right',
+    $('label[for="id_works"]').info('left',
         `The following is only relevant if you are re-entering this field
 
         This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`
     );
-    $('label[for="id_funct_round"]').info('right',
+    $('label[for="id_funct_round"]').info('left',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     );
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
     // Auto field scrolling
     form_inputs.focus(function() {
-        this.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-        });
+        const _this = this;
+        setTimeout(function() {
+            // scrollIntoView sometimes doesn't work without setTimeout
+            _this.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }, 0);
     });
     // "$(".error-note").length" is the same thing as {% field.errors %} in the template
     if ($(".error-note").length) {
@@ -246,19 +250,18 @@ $(function() {
         // Enable disabled field on submit so it's sent with post
         $("#id_ctime, #id_funct_round").removeAttr("disabled");
         // JSON fields are picky with their number inputs, convert them to standard form
-        if (+$("#id_works").val()) {
-            $("#id_works").val(+$("#id_works").val());
-        }
+        $("#id_works").val(+$("#id_works").val());
         if (!ajaxUtils.disable_ajax) {
             gtag("event","modify_assignment");
         }
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
-        $(this).prev().children("input, textarea").first().addClass("invalid");
+        $(this).siblings("input, textarea").addClass("invalid");
         // Give the previous field an error if appropriate
         if (this.id === "error_id_x" && $(this).text().includes("assignment") || this.id === "error_id_works" && $(this).text().includes("of")) {
-            $(this).prev().prev().children("input, textarea").first().addClass("invalid");
+            // Style invalid form for previous cousin
+            $(this).parents(".field-wrapper").prev().children("input, textarea").first().addClass("invalid");
         }
     });
     // Focus on first invalid field
