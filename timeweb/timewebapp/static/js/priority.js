@@ -221,25 +221,17 @@ priority = {
             assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
             assignment_container.toggleClass("question-mark", add_question_mark_condition);
             assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition || sa.sa.needs_more_info);
-            if (sa.sa.needs_more_info) {
-                const gc_assignments_with_same_tag_name = dat.filter(_sa => _sa.needs_more_info && _sa.tags[0] === sa.sa.tags[0]);
-                const index = gc_assignments_with_same_tag_name.indexOf(sa.sa);
-                if (index === 0) {
-                    dom_assignment.before($("#delete-gc-assignments-of-class-template").html());
-                    assignment_container.addClass("first-add-line-wrapper");
-                }
-                if (index === gc_assignments_with_same_tag_name.length - 1) {
-                    assignment_container.addClass("last-add-line-wrapper");
-                }
-            }
 
             let status_priority;
             if (status_value === 1) {
                 status_priority = -index;
             } else if (status_value === 2) {
                 status_priority = today_minus_ad;
+            } else if (status_value === 6) {
+                // Order assignments that need more info lexicographically
+                status_priority = sa.sa.tags[0].toLowerCase();
             } else if (add_question_mark_condition) {
-                // Order by assignments closest to their due date
+                // Order question mark assignments by their closeness to their due date
                 status_priority = -due_date_minus_today;
             } else {
                 const original_skew_ratio = sa.sa.skew_ratio;
@@ -284,11 +276,20 @@ priority = {
         }
         ordered_assignments.sort(function(a, b) {
             // Sort from max to min
+            // Status value
             if (a[0] < b[0]) return 1;
             if (a[0] > b[0]) return -1;
-            if (a[1] < b[1]) return 1;
-            if (a[1] > b[1]) return -1;
-
+            // Status priority
+            if (a[0] === 6) {
+                // If the assignment is a google classroom assignment, sort from min to max because the status priority is now their first tag
+                if (a[1] < b[1]) return -1;
+                if (a[1] > b[1]) return 1;
+            } else {
+                if (a[1] < b[1]) return 1;
+                if (a[1] > b[1]) return -1;
+            }
+            // If the status value and status priority are the same, sort them by their index, which will always be different from each other
+            // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
             if (a[2] < b[2]) return -1;
             if (a[2] > b[2]) return 1;
         });
@@ -349,7 +350,6 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
         }
-        utils.ui.setClickHandlers.deleteAssignmentsFromClass();
         if ($(".finished").length) {
             $("#delete-starred-assignments").show().insertBefore($(".finished").first().children(".assignment"));
         } else {
@@ -362,7 +362,33 @@ priority = {
         }
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
-        ordering.transitionSwapsAndSetZIndex();
+        const number_of_assignments = $(".assignment").length;
+
+        let prev_assignment_container;
+        let prev_tag;
+        $(".assignment-container").each(function(index) {
+            const assignment_container = $(this);
+            if (!params.first_sort) {
+                ordering.transitionSwap(assignment_container);
+            }
+            // Fixes the tag add box going behind the below assignment on scale
+            const dom_assignment = assignment_container.children(".assignment");
+            dom_assignment.css("z-index", number_of_assignments - index);
+
+            const sa = utils.loadAssignmentData(dom_assignment);
+            const current_tag = sa.tags[0];
+            if (sa.needs_more_info) {
+                if (current_tag !== prev_tag) {
+                    if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
+                    assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-of-class-template").html());
+                }
+                prev_tag = current_tag;
+                prev_assignment_container = assignment_container;
+            }
+        });
+        prev_assignment_container.addClass("last-add-line-wrapper");
+        utils.ui.setClickHandlers.deleteAssignmentsFromClass();
+        
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
@@ -378,6 +404,7 @@ priority = {
         $(".finished").last().addClass("last-add-line-wrapper");
         // don't need first-add-line-wrapper for .incomplete-works because i implemented that differently for some reason
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
+
         if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css({
@@ -443,28 +470,21 @@ ordering = {
         swap_temp.remove();
     },
 
-    transitionSwapsAndSetZIndex: function() {
-        const number_of_assignments = $(".assignment").length;
-        $(".assignment-container").each(function(index) {
-            if (!params.first_sort) {
-                const initial_height = $(this).attr("data-initial-top-offset");
-                const current_translate_value = ($(this).css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
-                // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
-                const final_height = $(this).offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
-                const transform_value = initial_height - final_height;
-                $(this).removeAttr("data-initial-top-offset");
-                $(this).addClass("transform-instantly")
-                        .css("transform", `translateY(${transform_value}px)`)
-                        [0].offsetHeight;
-                $(this).removeClass("transform-instantly")
-                        .css({
-                            transform: "",
-                            transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
-                        });
-            }
-            // Fixes the tag add box going behind the below assignment on scale
-            $(this).children(".assignment").css("z-index", number_of_assignments - index);
-        });
+    transitionSwap: function(assignment_container) {
+        const initial_height = assignment_container.attr("data-initial-top-offset");
+        const current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
+        // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
+        const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
+        const transform_value = initial_height - final_height;
+        assignment_container.removeAttr("data-initial-top-offset");
+        assignment_container.addClass("transform-instantly")
+                .css("transform", `translateY(${transform_value}px)`)
+                [0].offsetHeight;
+        assignment_container.removeClass("transform-instantly")
+                .css({
+                    transform: "",
+                    transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
+                });
     },
     
 }

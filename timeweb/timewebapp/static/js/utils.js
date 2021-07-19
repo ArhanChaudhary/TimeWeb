@@ -247,7 +247,6 @@ utils = {
                         const _sa = utils.loadAssignmentData(dom_assignment);
                         return _sa.id;
                     }).toArray();
-                    debugger;
                     const data = {
                         'csrfmiddlewaretoken': csrf_token,
                         'action': 'delete_assignment',
