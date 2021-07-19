@@ -360,21 +360,13 @@ priority = {
         } else {
             $("#autofill-work-done").hide();
         }
-        if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
-        ordering.sortAssignments(ordered_assignments);
-        const number_of_assignments = $(".assignment").length;
 
         let prev_assignment_container;
         let prev_tag;
         $(".assignment-container").each(function(index) {
             const assignment_container = $(this);
-            if (!params.first_sort) {
-                ordering.transitionSwap(assignment_container);
-            }
             // Fixes the tag add box going behind the below assignment on scale
             const dom_assignment = assignment_container.children(".assignment");
-            dom_assignment.css("z-index", number_of_assignments - index);
-
             const sa = utils.loadAssignmentData(dom_assignment);
             const current_tag = sa.tags[0];
             if (sa.needs_more_info) {
@@ -389,6 +381,19 @@ priority = {
         prev_assignment_container.addClass("last-add-line-wrapper");
         utils.ui.setClickHandlers.deleteAssignmentsFromClass();
         
+        if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
+        ordering.sortAssignments(ordered_assignments);
+        const number_of_assignments = $(".assignment").length;
+        $(".assignment-container").each(function(index) {
+            const assignment_container = $(this);
+            // Fixes the tag add box going behind the below assignment on scale
+            const dom_assignment = assignment_container.children(".assignment");
+            dom_assignment.css("z-index", number_of_assignments - index);
+            if (!params.first_sort) {
+                ordering.transitionSwap(assignment_container);
+            }
+        });
+
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
