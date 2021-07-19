@@ -158,8 +158,7 @@ header.animate::after {
     box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
-#delete-starred-assignments {
-    font-size: 14px;
+#delete-starred-assignments, .delete-gc-assignments-of-class {
     position: relative;
     margin-bottom: 15px;
     margin-top: -7px;
@@ -176,7 +175,7 @@ header.animate::after {
     padding: 0 10px;
     margin-bottom: 8px;
 }
-#autofill-work-done-text {
+#autofill-work-done .shortcut-text {
     margin-top: -12px;
 }
 #autofill-selection {
@@ -184,7 +183,6 @@ header.animate::after {
     font-size: 12px;
 }
 .shortcut-line-left {
-    width: calc(50% - 101px);
     left: -6px;
     margin-top: 9px;
     border-top: 2px solid black;
@@ -192,10 +190,28 @@ header.animate::after {
     position: relative;
 }
 .shortcut-line-right {
-    width: calc(50% - 107px);
     float: right;
     border-top: 2px solid black;
 }
+#autofill-work-done .shortcut-line-left {
+    width: calc(50% - 101px);
+}
+#autofill-work-done .shortcut-line-right {
+    width: calc(50% - 107px);
+}
+#delete-starred-assignments .shortcut-line-left {
+    width: calc(50% - 116px);
+}
+#delete-starred-assignments .shortcut-line-right {
+    width: calc(50% - 121px);
+}
+.delete-gc-assignments-of-class .shortcut-line-left {
+    width: calc(50% - 146px);
+}
+.delete-gc-assignments-of-class .shortcut-line-right {
+    width: calc(50% - 152px);
+}
+
 .shortcut-line-left::after {
     content: '';
     position: absolute;
@@ -212,7 +228,7 @@ header.animate::after {
     bottom: -1px;
     border-left: 2px solid black;
 }
-.assignment-container.first-finished::before {
+.assignment-container.first-add-line-wrapper::before {
     height: calc(100% - 20px);
 }
 .assignment-container.last-add-line-wrapper::after {
@@ -777,6 +793,9 @@ label[for='id_ad']::after {
 #form-wrapper .field {
     width: calc(100% - 50px);
     margin: 5px;
+}
+#form-wrapper .hidden-field {
+    display: none !important;
 }
 #form-wrapper label, #form-wrapper #break-days-label-title {
     text-align: center;

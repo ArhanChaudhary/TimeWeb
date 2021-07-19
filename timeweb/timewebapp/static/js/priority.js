@@ -50,6 +50,8 @@ priority = {
             total = 0,
             tomorrow_total = 0,
             has_autofilled = false;
+        $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
+        $(".delete-gc-assignments-of-class").remove();
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
@@ -64,8 +66,8 @@ priority = {
                 dom_status_message = $(".status-message").eq(index),
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index);
-            if (params.autofill_all_work_done && today_minus_ad > sa.sa.blue_line_start + len_works && !params.do_not_autofill) {
-                const number_of_forgotten_days = today_minus_ad - sa.sa.blue_line_start - len_works; // Make this a variable so len_works++ doesn't affect this
+            const number_of_forgotten_days = today_minus_ad - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
+            if (params.autofill_all_work_done && !params.do_not_autofill && number_of_forgotten_days > 0) {
                 for (i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                     has_autofilled = true;
@@ -77,13 +79,13 @@ priority = {
                 if (has_autofilled) {
                     ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
+                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
             let str_daysleft, status_value, status_message, status_image;
             if (sa.sa.needs_more_info) {
                 status_image = 'question-mark';
-                status_message = "This Assignment needs more Info!<br>Please Edit this Assignment";
+                status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
                 status_value = 6;
                 dom_status_image.attr({
                     width: 11,
@@ -114,8 +116,7 @@ priority = {
                 }
                 status_value = 2;
             } else {
-                if (today_minus_ad > len_works + sa.sa.blue_line_start && !params.do_not_autofill) {
-                    const number_of_forgotten_days = today_minus_ad - sa.sa.blue_line_start - len_works; // Make this a variable so len_works++ doesn't affect this
+                if (number_of_forgotten_days > 0 && !params.do_not_autofill) {
                     for (i = 0; i < number_of_forgotten_days; i++) {
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                         const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.blue_line_start) % 7);
@@ -219,14 +220,25 @@ priority = {
             assignment_container.toggleClass("finished", add_finished_condition);
             assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
             assignment_container.toggleClass("question-mark", add_question_mark_condition);
-            assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition);
+            assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition || sa.sa.needs_more_info);
+            if (sa.sa.needs_more_info) {
+                const gc_assignments_with_same_tag_name = dat.filter(_sa => _sa.needs_more_info && _sa.tags[0] === sa.sa.tags[0]);
+                const index = gc_assignments_with_same_tag_name.indexOf(sa.sa);
+                if (index === 0) {
+                    dom_assignment.before($("#delete-gc-assignments-of-class-template").html());
+                    assignment_container.addClass("first-add-line-wrapper");
+                }
+                if (index === gc_assignments_with_same_tag_name.length - 1) {
+                    assignment_container.addClass("last-add-line-wrapper");
+                }
+            }
 
             let status_priority;
             if (status_value === 1) {
                 status_priority = -index;
             } else if (status_value === 2) {
                 status_priority = today_minus_ad;
-            } else if ([6,7,8].includes(status_value)) {
+            } else if (add_question_mark_condition) {
                 // Order by assignments closest to their due date
                 status_priority = -due_date_minus_today;
             } else {
@@ -256,21 +268,17 @@ priority = {
                 }
             }
             let priority_data = [status_value, status_priority, index];
-            if (sa.sa.mark_as_done && ![6,7,8].includes(status_value)) {
+            if (sa.sa.mark_as_done && !add_question_mark_condition) {
                 priority_data.push(true);
             }
             ordered_assignments.push(priority_data);
 
-            dom_status_image.attr("src", `/static/images/status_icons/${status_image}.png`)
+            dom_status_image.attr("src", `/static/images/status_icons/${status_image}.png`);
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
-            if (display_format_minutes) {
-                dom_completion_time.html(utils.formatting.formatMinutes(todo * sa.sa.ctime));
-            } else {
-                dom_completion_time.html('');
-            }
+            dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.ctime) : '');
         });
-        // fixes graph not updating from skew ratio causing autofill
+        // Updates graph if skew ratio caused autofill
         if (has_autofilled) {
             $(window).trigger("resize");
         }
@@ -341,6 +349,7 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
         }
+        utils.ui.setClickHandlers.deleteAssignmentsFromClass();
         if ($(".finished").length) {
             $("#delete-starred-assignments").show().insertBefore($(".finished").first().children(".assignment"));
         } else {
@@ -353,15 +362,7 @@ priority = {
         }
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
-        if (params.first_sort) {
-            const number_of_assignments = $(".assignment").length;
-            $(".assignment").each(function(index) {
-                // Fixes the tag add box going behind the below assignment on scale
-                $(this).css("z-index", number_of_assignments - index);
-            });
-        } else {
-            ordering.transitionSwapsAndSetZIndex();
-        }
+        ordering.transitionSwapsAndSetZIndex();
         // Make sure this is set after assignments are sorted and swapped
         if (params.first_sort && $("#animate-in").length) {
             // Set initial transition values for "#animate-in"
@@ -373,11 +374,9 @@ priority = {
             });
         }
         // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
-        $(".first-finished").removeClass("first-finished");
-        $(".finished").first().addClass("first-finished");
-
-        $(".last-add-line-wrapper").removeClass("last-add-line-wrapper");
+        $(".finished").first().addClass("first-add-line-wrapper");
         $(".finished").last().addClass("last-add-line-wrapper");
+        // don't need first-add-line-wrapper for .incomplete-works because i implemented that differently for some reason
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
         if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
@@ -404,10 +403,10 @@ priority = {
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
             $("#hide-button").css("display", "");
         }
-        utils.ui.old_minute_value = undefined; // Force displayClock to update. Without this, it may not update and display (Invalid Date)
-        utils.ui.displayClock();
+        utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
+        utils.ui.tickClock();
         if (params.first_sort) {
-            setInterval(utils.ui.displayClock, 1000);
+            setInterval(utils.ui.tickClock, 1000);
         }
         $("#assignments-container").css("opacity", "1");
     },
@@ -447,98 +446,27 @@ ordering = {
     transitionSwapsAndSetZIndex: function() {
         const number_of_assignments = $(".assignment").length;
         $(".assignment-container").each(function(index) {
-            const initial_height = $(this).attr("data-initial-top-offset");
-            const current_translate_value = ($(this).css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
-            // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
-            const final_height = $(this).offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
-            const transform_value = initial_height - final_height;
-            $(this).removeAttr("data-initial-top-offset");
-            $(this).addClass("transform-instantly")
-                    .css("transform", `translateY(${transform_value}px)`)
-                    [0].offsetHeight;
-            $(this).removeClass("transform-instantly")
-                    .css({
-                        transform: "",
-                        transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
-                    });
+            if (!params.first_sort) {
+                const initial_height = $(this).attr("data-initial-top-offset");
+                const current_translate_value = ($(this).css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
+                // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
+                const final_height = $(this).offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
+                const transform_value = initial_height - final_height;
+                $(this).removeAttr("data-initial-top-offset");
+                $(this).addClass("transform-instantly")
+                        .css("transform", `translateY(${transform_value}px)`)
+                        [0].offsetHeight;
+                $(this).removeClass("transform-instantly")
+                        .css({
+                            transform: "",
+                            transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
+                        });
+            }
             // Fixes the tag add box going behind the below assignment on scale
             $(this).children(".assignment").css("z-index", number_of_assignments - index);
         });
     },
-    deleteStarredAssignmentsListener: function() {
-        $("#delete-starred-assignments-text").click(function() {
-            if (isMobile ? confirm(`This will delete ${$(".finished").length} starred assignments. Are you sure?`) : confirm(`This will delete ${$(".finished").length} finished assignments. Are you sure? (Press enter)`)) {
-                const finished_assignments = $(".assignment-container").map(function() {
-                    if ($(this).hasClass("finished")) {
-                        return utils.loadAssignmentData($(this).children(".assignment")).id;
-                    }
-                }).toArray();
-                const data = {
-                    'csrfmiddlewaretoken': csrf_token,
-                    'action': 'delete_assignment',
-                    'assignments': JSON.stringify(finished_assignments),
-                }
-                const success = function() {
-                    const assignment_ids_to_delete = $(".finished").map(function() {
-                        return utils.loadAssignmentData($(this).children(".assignment")).id;
-                    }).toArray();
-                    // Remove ids to delete from dat
-                    dat = dat.filter(iter_sa => !assignment_ids_to_delete.includes(iter_sa.id));
-                    $(".finished").remove();
-                    if (!ajaxUtils.disable_ajax) {
-                        for (let i = 0; i < finished_assignments.length; i++) {
-                            gtag("event","delete_assignment");
-                        }
-                    }
-                    priority.sort({ ignore_timeout: true });
-                }
-                if (ajaxUtils.disable_ajax) return success();
-                // Send ajax to avoid a page reload
-                $.ajax({
-                    type: "POST",
-                    data: data,
-                    success: success,
-                    error: ajaxUtils.error,
-                });
-            }
-        });
-    },
-    autofillAssignmentsListener: function() {
-        $("#autofill-work-done").click(function(e) {
-            if ($(e.target).is("#autofill-selection")) return;
-            switch ($("#autofill-selection").val()) {
-                case "No":
-                    if (confirm("This will autofill no work done until today for ALL assignments with missing work inputs. Are you sure?")) {
-                        priority.sort({autofill_no_work_done: true, ignore_timeout: true});
-                    }
-                    break;
-                case "All":
-                    if (confirm("This will autofill all work done until today for ALL assignments with missing work inputs. Are you sure?")) {
-                        priority.sort({autofill_all_work_done: true, ignore_timeout: true});
-                    }
-                    break;
-            }
-        });
-        replaceAutofillInfo();
-        $("#autofill-selection").on("change", replaceAutofillInfo);
-        function replaceAutofillInfo() {
-            $("#autofill-work-done-text").find(".info-button").remove();
-            let message;
-            switch ($("#autofill-selection").val()) {
-                case "No":
-                    message = `Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for
-                    
-                    Click the horizontal line to perform this action`;
-                    break;
-                case "All":
-                    message = `Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for
-                    
-                    Click the horizontal line to perform this action`;
-                    break;
-            }
-            $("#autofill-work-done-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});
-        }
-    }
+    
 }
 document.addEventListener("DOMContentLoaded", function() {
     priority.sort({ first_sort: true, ignore_timeout: true });

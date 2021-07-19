@@ -160,7 +160,8 @@ $(function() {
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
     );
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
-    const form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
+    // Make this global so it can be used in saveAndLoadStates in utils.js
+    form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
     // Auto field scrolling
     form_inputs.focus(function() {
         const _this = this;
@@ -214,30 +215,6 @@ $(function() {
         }
         this.setCustomValidity(message);
     });
-    // Handles unloading and reloading of form
-    // lighthouse says to use onpagehide instead of unload
-    $(window).on('onpagehide' in self ? 'pagehide' : 'unload',function() {
-        if ($("#form-wrapper").is(":visible")) {
-            // Save form data to localStorage before unload
-            localStorage.setItem("form_fields",
-                JSON.stringify([
-                    ...form_inputs.toArray().map(field => field.value),
-                    $("#form-wrapper #break-days-wrapper input").toArray().map(break_day_field => break_day_field.checked),
-                ])
-            );
-        }
-    });
-    if ("form_fields" in localStorage) {
-        // Restore form on refresh or invalid
-        const pr_data = JSON.parse(localStorage.getItem("form_fields"));
-        localStorage.removeItem('form_fields');
-        form_inputs.each(function(index) {
-            $(this).val(pr_data[index]);
-        });
-        $("#form-wrapper #break-days-wrapper input").each(function(index) {
-            $(this).prop('checked',pr_data[pr_data.length - 1][index]);
-        });
-    }
     // Form submission
     let submitted = false;
     $("#form-wrapper form").submit(function(e) {
@@ -270,7 +247,7 @@ $(function() {
     $('.delete-button').parent().click(function(e) {
         const $this = $(this),
             dom_assignment = $this.parents(".assignment");
-        if (e.shiftKey || confirm(isMobile ? 'Are you sure you want to delete this assignment?' : 'Are you sure you want to delete this assignment? (Press Enter)')) {
+        if (e.shiftKey || confirm('Are you sure you want to delete this assignment?' + (isMobile ? '' : ' (Press Enter)'))) {
             // Unfocus to prevent pressing enter to click again
             $this.blur();
             // Deny updating or deleting again after queued
@@ -290,7 +267,7 @@ $(function() {
                 assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
                     $("#assignments-container").css("overflow", "");
                     // Remove assignment data from dat
-                    dat = dat.filter(sa_iter => sa.id !== sa_iter.id);
+                    dat = dat.filter(_sa => sa.id !== _sa.id);
                     // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
                     if (assignment_container.children("#delete-starred-assignments").length) {
                         $("#delete-starred-assignments").insertBefore(assignment_container);

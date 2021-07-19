@@ -131,20 +131,19 @@ body {
     transform: scale(1.04);
 }
 
-.hidden-field, .hide-account-dropdown {
-    display: none !important;
-}
-
 #account-dropdown {
-    transform: translate(50%, 16px);
+    display: none;
     right: 50%;
     width: 150px;
     position: absolute;
     background: rgb(43, 56, 68);
-    display: block;
     color: white;
+    transform: translate(50%, 16px);
     border: 2px solid transparent;
     -webkit-text-fill-color: currentcolor;
+}
+#username:focus-within #account-dropdown {
+    display: block;
 }
 #account-dropdown::before {
     content: '';

@@ -71,7 +71,7 @@
                         <span id="welcome">Welcome, </span>
                         <div tabindex="1" id="username">
                             {{ user.get_username }}
-                            <div id="account-dropdown" class="hide-account-dropdown">
+                            <div id="account-dropdown">
                                 <span id="account-settings">Account settings</span>
                                 <a href="{% url 'logout' %}?redirect_to={{request.path}}">Log out</a>
                             </div>

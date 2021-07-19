@@ -505,14 +505,7 @@ class TimewebView(LoginRequiredMixin, View):
                     if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
-                if assignment['workType'] == "ASSIGNMENT":
-                    name = "Google Classroom Assignment: "
-                elif assignment['workType'] == "SHORT_ANSWER_QUESTION":
-                    name = "Google Classroom Short Answer: "
-                elif assignment['workType'] == "MULTIPLE_CHOICE_QUESTION":
-                    name = "Google Classroom Multiple Choice Question: "
-                name += assignment['title']
-                name = Truncator(name).chars(TimewebModel.name.field.max_length)
+                name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length)
                 tags = [course_names[assignment['courseId']]]
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
@@ -696,7 +689,9 @@ class GCOAuthView(LoginRequiredMixin, View):
         # self.settings_model.oauth_token stores the user's access and refresh tokens
         if 'token' in self.settings_model.oauth_token:
             self.settings_model.oauth_token = {"refresh_token": self.settings_model.oauth_token['refresh_token']}
-            self.settings_model.added_gc_assignment_ids = []
+            if settings.DEBUG:
+                # Re-add gc assignments in debug
+                self.settings_model.added_gc_assignment_ids = []
             self.settings_model.save()
             logger.info(f"User {request.user} disabled google classroom API")
             return HttpResponse("Disabled gc api")

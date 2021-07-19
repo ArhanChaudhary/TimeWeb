@@ -45,8 +45,8 @@ utils = {
           
     },
     ui: {
-        displayClock: function() {
-            const estimated_completion_time = new Date();
+        tickClock: function() {
+            const estimated_completion_time = new Date(date_now.valueOf());
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
@@ -57,105 +57,219 @@ utils = {
                 utils.ui.old_minute_value = minute_value;
             }
         },
-        setHideEstimatedCompletionTimeButton: function() {
-            // Hide and show estimated completion time
-            $("#hide-button").click(function() {
-                if ($(this).html() === "Hide") {
-                    $(this).html("Show");
-                    localStorage.setItem("hide-button", true);
-                } else {
-                    $(this).html("Hide");
-                    localStorage.removeItem("hide-button");
-                }
-                $("#estimated-total-time, #current-time, #tomorrow-time").toggle();
-            });
-            if ("hide-button" in localStorage) {
-                $("#hide-button").html("Show").prev().toggle();
-            }
-        },
-        setMiscClickHandlers: function() {
-            // Advanced inputs for the graph
-            $(".advanced-buttons").click(function() {
-                $(".skew-ratio-button, .skew-ratio-textbox, .skew-ratio-textbox + .info-button, .fixed-mode-button").toggle();
-                $(".advanced-buttons").toggle();
-            });
-            $(".second-advanced-button").toggle();
-            $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
-            // Advanced inputs for form
-            $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
-            $("#break-days-wrapper").addClass("hidden-field");
-            $("#form-wrapper #advanced-inputs").click(function() {
-                if ($("#break-days-wrapper").hasClass("hidden-field")) {
-                    var field_to_scroll_to = $(".hidden-field").first();
-                }
-                $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().toggleClass("hidden-field");
-                $("#break-days-wrapper").toggleClass("hidden-field");
-                if (field_to_scroll_to) {
-                    field_to_scroll_to[0].scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                    });
-                }
-            })
-            if ("advanced_inputs" in sessionStorage) {
-                $("#form-wrapper #advanced-inputs").click();
-                sessionStorage.removeItem("advanced_inputs");
-            }
-            // Assignments header icons
-            $("#open-assignments").click(function() {
-                if ($(".question-mark").length) {
-                    $(".assignment-container.question-mark .assignment:not(.open-assignment)").click();
-                } else {
-                    $(".assignment:not(.open-assignment)").click();
-                }
-            });
-    
-            $("#close-assignments").click(function() {
-                if ($(".question-mark").length) {
-                    $(".assignment-container.question-mark .assignment.open-assignment").click();
-                } else {
-                    $(".assignment.open-assignment").click();
-                }
-            });
-    
-            $("#simulated-date").hide();
-            $("#next-day").click(function() {
-                ajaxUtils.disable_ajax = true;
-                date_now.setDate(date_now.getDate() + 1);
-                $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}))
-                $(window).trigger("resize");
-                priority.sort({ ignore_timeout: true });
-            })
-            $("#next-day-icon-label").info("bottom",
-                `Simulates the next day for ALL assignments
-                
-                All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
-            );
-            // gc api
-            if (oauth_token.token) {
-                $("#toggle-gc-label").html("Disable Google Classroom API");
-            } else {
-                $("#toggle-gc-label").html("Enable Google Classroom API");
-            }
-            $("#toggle-gc-container").click(function() {
-                const $this = $(this);
-                if ($this.hasClass("clicked")) return;
-                $this.addClass("clicked");
-                $.ajax({
-                    type: "POST",
-                    url: "gc-api-auth-init",
-                    data: {csrfmiddlewaretoken: csrf_token},
-                    success: function(authentication_url) {
-                        if (authentication_url === "Disabled gc api") {
-                            $("#toggle-gc-label").html("Enable Google Classroom API");
-                            $this.removeClass("clicked");
-                        } else {
-                            window.location.href = authentication_url;
-                        }
-                    },
+        setClickHandlers: {
+            toggleEstimatedCompletionTimeButton: function() {
+                // Hide and show estimated completion time
+                $("#hide-button").click(function() {
+                    if ($(this).html() === "Hide") {
+                        $(this).html("Show");
+                        localStorage.setItem("hide-button", true);
+                    } else {
+                        $(this).html("Hide");
+                        localStorage.removeItem("hide-button");
+                    }
+                    $("#estimated-total-time, #current-time, #tomorrow-time").toggle();
                 });
-            })
-            
+                if ("hide-button" in localStorage) {
+                    $("#hide-button").html("Show").prev().toggle();
+                }
+            },
+
+            advancedInputs: function() {
+                // Advanced inputs for the graph
+                $(".advanced-buttons").click(function() {
+                    $(".skew-ratio-button, .skew-ratio-textbox, .skew-ratio-textbox + .info-button, .fixed-mode-button").toggle();
+                    $(".advanced-buttons").toggle();
+                });
+                $(".second-advanced-button").toggle();
+                $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
+                // Advanced inputs for form
+                $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
+                $("#break-days-wrapper").addClass("hidden-field");
+                $("#form-wrapper #advanced-inputs").click(function() {
+                    if ($("#break-days-wrapper").hasClass("hidden-field")) {
+                        var field_to_scroll_to = $(".hidden-field").first();
+                    }
+                    $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().toggleClass("hidden-field");
+                    $("#break-days-wrapper").toggleClass("hidden-field");
+                    if (field_to_scroll_to) {
+                        field_to_scroll_to[0].scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                    }
+                });
+            },
+
+            headerIcons: function() {
+                // Assignments header icons
+                $("#open-assignments").click(function() {
+                    if ($(".question-mark").length) {
+                        $(".assignment-container.question-mark .assignment:not(.open-assignment)").click();
+                    } else {
+                        $(".assignment:not(.open-assignment)").click();
+                    }
+                });
+        
+                $("#close-assignments").click(function() {
+                    if ($(".question-mark").length) {
+                        $(".assignment-container.question-mark .assignment.open-assignment").click();
+                    } else {
+                        $(".assignment.open-assignment").click();
+                    }
+                });
+        
+                $("#simulated-date").hide();
+                $("#next-day").click(function() {
+                    ajaxUtils.disable_ajax = true;
+                    date_now.setDate(date_now.getDate() + 1);
+                    $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}))
+                    $(window).trigger("resize");
+                    priority.sort({ ignore_timeout: true });
+                })
+                $("#next-day-icon-label").info("bottom",
+                    `Simulates the next day for ALL assignments
+                    
+                    All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
+                );
+            },
+
+            googleClassroomAPI: function() {
+                if (oauth_token.token) {
+                    $("#toggle-gc-label").html("Disable Google Classroom API");
+                } else {
+                    $("#toggle-gc-label").html("Enable Google Classroom API");
+                }
+                $("#toggle-gc-container").click(function() {
+                    const $this = $(this);
+                    if ($this.hasClass("clicked")) return;
+                    $this.addClass("clicked");
+                    $.ajax({
+                        type: "POST",
+                        url: "gc-api-auth-init",
+                        data: {csrfmiddlewaretoken: csrf_token},
+                        success: function(authentication_url) {
+                            if (authentication_url === "Disabled gc api") {
+                                $("#toggle-gc-label").html("Enable Google Classroom API");
+                                $this.removeClass("clicked");
+                            } else {
+                                window.location.href = authentication_url;
+                            }
+                        },
+                    });
+                });
+            },
+
+            deleteAllStarredAssignments: function() {
+                $("#delete-starred-assignments .shortcut-text").click(function() {
+                    if (!confirm(`This will delete ${$(".finished").length} starred assignments. Are you sure?` + (isMobile ? '' : ' (Press Enter)'))) return;
+                    const assignment_ids_to_delete = $(".assignment-container.finished").map(function() {
+                        const dom_assignment = $(this).children(".assignment");
+                        const _sa = utils.loadAssignmentData(dom_assignment);
+                        return _sa.id;
+                    }).toArray();
+                    const data = {
+                        'csrfmiddlewaretoken': csrf_token,
+                        'action': 'delete_assignment',
+                        'assignments': assignment_ids_to_delete,
+                    }
+                    const success = function() {
+                        // Remove ids to delete from dat
+                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
+                        $(".finished").remove();
+                        if (!ajaxUtils.disable_ajax) {
+                            for (let i = 0; i < assignment_ids_to_delete.length; i++) {
+                                gtag("event","delete_assignment");
+                            }
+                        }
+                        priority.sort({ ignore_timeout: true });
+                    }
+                    if (ajaxUtils.disable_ajax) return success();
+                    // Send ajax to avoid a page reload
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        success: success,
+                        error: ajaxUtils.error,
+                    });
+                });
+            },
+
+            autofillAssignments: function() {
+                $("#autofill-work-done").click(function(e) {
+                    if ($(e.target).is("#autofill-selection")) return;
+                    switch ($("#autofill-selection").val()) {
+                        case "No":
+                            if (confirm("This will autofill no work done until today for ALL assignments with missing work inputs. Are you sure?")) {
+                                priority.sort({autofill_no_work_done: true, ignore_timeout: true});
+                            }
+                            break;
+                        case "All":
+                            if (confirm("This will autofill all work done until today for ALL assignments with missing work inputs. Are you sure?")) {
+                                priority.sort({autofill_all_work_done: true, ignore_timeout: true});
+                            }
+                            break;
+                    }
+                });
+                replaceAutofillInfo();
+                $("#autofill-selection").on("change", replaceAutofillInfo);
+                function replaceAutofillInfo() {
+                    $("#autofill-work-done .shortcut-text").find(".info-button").remove();
+                    let message;
+                    switch ($("#autofill-selection").val()) {
+                        case "No":
+                            message = `Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for
+                            
+                            Click the horizontal line to perform this action`;
+                            break;
+                        case "All":
+                            message = `Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for
+                            
+                            Click the horizontal line to perform this action`;
+                            break;
+                    }
+                    $("#autofill-work-done .shortcut-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});
+                }
+            },
+
+            deleteAssignmentsFromClass: function() {
+                $(".delete-gc-assignments-of-class").click(function() {
+                    const dom_assignment = $(this).siblings(".assignment");
+                    const sa = utils.loadAssignmentData(dom_assignment);
+                    const assignments_to_delete = $(".assignment-container").filter(function() {
+                        const dom_assignment = $(this).children(".assignment");
+                        const _sa = utils.loadAssignmentData(dom_assignment);
+                        return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
+                    });
+                    if (!confirm(`This will delete ${assignments_to_delete.length} assignments from class "${sa.tags[0]}". Are you sure?` + (isMobile ? '' : ' (Press Enter)'))) return;
+                    const assignment_ids_to_delete = assignments_to_delete.map(function() {
+                        const dom_assignment = $(this).children(".assignment");
+                        const _sa = utils.loadAssignmentData(dom_assignment);
+                        return _sa.id;
+                    }).toArray();
+                    debugger;
+                    const data = {
+                        'csrfmiddlewaretoken': csrf_token,
+                        'action': 'delete_assignment',
+                        'assignments': assignment_ids_to_delete,
+                    }
+                    const success = function() {
+                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
+                        assignments_to_delete.remove();
+                        // Don't gtag here because the users technically didn't create the gc assignments (using the form)
+                        priority.sort({ ignore_timeout: true });
+                    }
+
+                    if (ajaxUtils.disable_ajax) return success();
+                    // Send ajax to avoid a page reload
+                    $.ajax({
+                        type: "POST",
+                        data: data,
+                        success: success,
+                        error: ajaxUtils.error,
+                    });
+                });
+            },
         },
         addTagHandlers: function() {
             const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
@@ -205,6 +319,9 @@ utils = {
                     const success = function() {
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
+                        if (sa.needs_more_info) {
+                            priority.sort({ ignore_timeout: true });
+                        }
                         // Close box and add tags visually
                         $this.removeClass("open-tag-add-box");
                         transitionCloseTagBox($this);
@@ -290,6 +407,9 @@ utils = {
                 const success = function() {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+                    if (sa.needs_more_info) {
+                        priority.sort({ ignore_timeout: true });
+                    }
                     tag_wrapper.addClass("tag-is-deleting");
                     // Transition the deletion
                     // Need to use jquery to set css for marginLeft
@@ -332,6 +452,9 @@ utils = {
                 }).map(function() {
                     return $(this).children(".tag-name").text();
                 }).toArray();
+                if (sa.needs_more_info) {
+                    priority.sort({ ignore_timeout: true });
+                }
                 ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
             });
         },
@@ -419,7 +542,7 @@ utils = {
                 }
             }
         },
-        saveStatesOnClose: function() {
+        saveAndLoadStates: function() {
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
             $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
                 if (!enable_tutorial) {
@@ -435,11 +558,24 @@ utils = {
                 if (!$("#form-wrapper .hidden-field").length) {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
+                if ($("#form-wrapper").is(":visible")) {
+                    // Save form data to localStorage before unload
+                    localStorage.setItem("form_fields",
+                        JSON.stringify([
+                            ...form_inputs.toArray().map(field => field.value),
+                            $("#form-wrapper #break-days-wrapper input").toArray().map(break_day_field => break_day_field.checked),
+                        ])
+                    );
+                }
                 // Send ajax before close if it's on timeout
                 if (ajaxUtils.attributeData['assignments'].length) {
                     ajaxUtils.SendAttributeAjax();
                 }
             });
+            if ("advanced_inputs" in sessionStorage) {
+                $("#form-wrapper #advanced-inputs").click();
+                sessionStorage.removeItem("advanced_inputs");
+            }
             // Ensure fonts load for the graph
             document.fonts.ready.then(function() {
                 // Reopen closed assignments
@@ -454,6 +590,17 @@ utils = {
                 if ("scroll" in localStorage) {
                     $("main").scrollTop(localStorage.getItem("scroll"));
                     localStorage.removeItem("scroll");
+                }
+                if ("form_fields" in localStorage) {
+                    // Restore form on refresh or invalid
+                    const pr_data = JSON.parse(localStorage.getItem("form_fields"));
+                    localStorage.removeItem('form_fields');
+                    form_inputs.each(function(index) {
+                        $(this).val(pr_data[index]);
+                    });
+                    $("#form-wrapper #break-days-wrapper input").each(function(index) {
+                        $(this).prop('checked',pr_data[pr_data.length - 1][index]);
+                    });
                 }
             });
         },
@@ -514,7 +661,7 @@ ajaxUtils = {
                     example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
                 }
             } else {
-                const example_assignment = dat.find(sa_iter => sa_iter.name === example_assignment_name);
+                const example_assignment = dat.find(_sa => _sa.name === example_assignment_name);
                 if (example_assignment) {
                     // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
                     // In this case, changing the assignment date automatically changes the due date
@@ -635,14 +782,16 @@ document.addEventListener("DOMContentLoaded", function() {
     ajaxUtils.changeDateNowAndExampleAssignmentDates();
     if (oauth_token.token) ajaxUtils.createGCAssignments();
     setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
-    utils.ui.setHideEstimatedCompletionTimeButton();
-    utils.ui.setMiscClickHandlers();
+    utils.ui.setClickHandlers.toggleEstimatedCompletionTimeButton();
+    utils.ui.setClickHandlers.advancedInputs();
+    utils.ui.setClickHandlers.headerIcons();
+    utils.ui.setClickHandlers.googleClassroomAPI();
+    utils.ui.setClickHandlers.deleteAllStarredAssignments();
+    utils.ui.setClickHandlers.autofillAssignments();
     utils.ui.addTagHandlers();
-    ordering.deleteStarredAssignmentsListener();
-    ordering.autofillAssignmentsListener();
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();
-    utils.ui.saveStatesOnClose();
+    utils.ui.saveAndLoadStates();
     utils.ui.handleTutorialIntroduction();
 });
 // Lock to landscape

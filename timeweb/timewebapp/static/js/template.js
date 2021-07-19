@@ -137,11 +137,6 @@ $(function() {
         }
         $(window).resize(resize).one("load", resize);
     }
-    if ($("#user-greeting").length) {
-        $("#username").click(function() {
-            $("#account-dropdown").toggleClass("hide-account-dropdown");
-        });
-    }
     // cite
     // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
     isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
