@@ -141,6 +141,7 @@ utils = {
                     $("#toggle-gc-label").html("Enable Google Classroom API");
                 }
                 $("#toggle-gc-container").click(function() {
+                    if (ajaxUtils.disable_ajax) return alert("You cannot do this on the example account!");
                     const $this = $(this);
                     if ($this.hasClass("clicked")) return;
                     $this.addClass("clicked");

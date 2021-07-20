@@ -293,31 +293,33 @@ priority = {
             if (a[2] < b[2]) return -1;
             if (a[2] > b[2]) return 1;
         });
-        const highest_priority = Math.max(...ordered_assignments.map(function(sa) {
-            if ((sa[0] === 5 || sa[0] === 4) && !sa[3]) {
-                return sa[1];
+        const highest_priority = Math.max(...ordered_assignments.map(function(pd) {
+            if ((pd[0] === 5 || pd[0] === 4) && !pd[3]) {
+                return pd[1];
             } else {
                 return -Infinity;
             }
         }));
-        for (let sa of ordered_assignments) {
-            // originally ![6,7,8].includes(sa[0]) && (sa[3] || $(".question-mark").length); if sa[3] is true then ![6,7,8].includes(sa[0])
-            const mark_as_done = !!(sa[3] || $(".question-mark").length && ![6,7,8].includes(sa[0]));
-            const dom_assignment = $(".assignment").eq(sa[2]);
+        let prev_assignment_container;
+        let prev_tag;
+        for (let pd of ordered_assignments) {
+            // originally ![6,7,8].includes(pd[0]) && (pd[3] || $(".question-mark").length); if pd[3] is true then ![6,7,8].includes(pd[0])
+            const mark_as_done = !!(pd[3] || $(".question-mark").length && ![6,7,8].includes(pd[0]));
+            const dom_assignment = $(".assignment").eq(pd[2]);
             let priority_percentage;
-            if ([6,7,8].includes(sa[0])) {
+            if ([6,7,8].includes(pd[0])) {
                 priority_percentage = NaN;
-            } else if (mark_as_done || sa[0] === 3 || sa[0] === 1 || sa[0] === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+            } else if (mark_as_done || pd[0] === 3 || pd[0] === 1 || pd[0] === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                 priority_percentage = 0;
             } else {
-                priority_percentage = Math.max(1, Math.floor(sa[1] / highest_priority * 100 + 1e-10));
+                priority_percentage = Math.max(1, Math.floor(pd[1] / highest_priority * 100 + 1e-10));
                 if (isNaN(priority_percentage)) {
                     priority_percentage = 100;
                 }
             }
             if (text_priority) {
-                const dom_title = $(".title").eq(sa[2]);
-                if ((sa[0] === 5 || sa[0] === 4) && !mark_as_done) {
+                const dom_title = $(".title").eq(pd[2]);
+                if ((pd[0] === 5 || pd[0] === 4) && !mark_as_done) {
                     dom_title.attr("data-priority", `Priority: ${priority_percentage}%`);               
                 } else {
                     dom_title.attr("data-priority", "");       
@@ -349,6 +351,26 @@ priority = {
             } else {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
+
+            // Loops through every google classroom assignment that needs more info
+            // This has to be looped before they are sorted so setInitialTopAssignmentOffsets is accurate
+            // This means we can't loop through ".assignment-container" but instead ordered_assignments
+            // The current looped assignment's tag is compared with the previous looped assignment's tag
+            // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
+            const sa = utils.loadAssignmentData(dom_assignment);
+            if (sa.needs_more_info) {
+                const current_tag = sa.tags[0];
+                if (current_tag !== prev_tag) {
+                    if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
+                    assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-of-class-template").html());
+                }
+                prev_tag = current_tag;
+                prev_assignment_container = assignment_container;
+            }
+        }
+        if (prev_assignment_container) {
+            prev_assignment_container.addClass("last-add-line-wrapper");
+            utils.ui.setClickHandlers.deleteAssignmentsFromClass();
         }
         if ($(".finished").length) {
             $("#delete-starred-assignments").show().insertBefore($(".finished").first().children(".assignment"));
@@ -360,27 +382,6 @@ priority = {
         } else {
             $("#autofill-work-done").hide();
         }
-
-        let prev_assignment_container;
-        let prev_tag;
-        $(".assignment-container").each(function(index) {
-            const assignment_container = $(this);
-            // Fixes the tag add box going behind the below assignment on scale
-            const dom_assignment = assignment_container.children(".assignment");
-            const sa = utils.loadAssignmentData(dom_assignment);
-            const current_tag = sa.tags[0];
-            if (sa.needs_more_info) {
-                if (current_tag !== prev_tag) {
-                    if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
-                    assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-of-class-template").html());
-                }
-                prev_tag = current_tag;
-                prev_assignment_container = assignment_container;
-            }
-        });
-        prev_assignment_container.addClass("last-add-line-wrapper");
-        utils.ui.setClickHandlers.deleteAssignmentsFromClass();
-        
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
         const number_of_assignments = $(".assignment").length;
