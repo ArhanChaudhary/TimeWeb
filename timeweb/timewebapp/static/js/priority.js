@@ -425,16 +425,17 @@ priority = {
             });
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time").hide();
-            $("#hide-button").css("display", "none");
+            // Use opacity instead of display to preverse layout and 
+            $("#hide-button").css("opacity", "0");
         } else {
             $("#current-time, #tomorrow-time, #info").show();
             $("#simulated-date").css({
                 marginTop: "", 
-                transform: ""
+                transform: "",
             });
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
-            $("#hide-button").css("display", "");
+            $("#hide-button").css("opacity", "");
         }
         utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
         utils.ui.tickClock();

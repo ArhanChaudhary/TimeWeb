@@ -87,9 +87,6 @@
                         </svg>
                     </div>
                     <div id="nav-items">
-                        {% if user.is_authenticated %}
-                        <a href="{% url 'settings' %}">Settings</a>
-                        {% endif %}
                         <a href="#" id="nav-usage">User Guide</a>
                         <span>Install on Home Screen</span>
                         <a href="{% url 'changelog' %}">Changelog</a>

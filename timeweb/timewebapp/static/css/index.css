@@ -55,25 +55,31 @@ header.animate::after {
 #next-day {
     order: 4;
 }
+#settings {
+    order: 5;
+}
 #assignments-header img ~ div {
     position: absolute;
     order: 1;
     z-index: 100;
-    right: 180px;
+    right: 225px;
     bottom: 5px;
     visibility: hidden;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
 #assignments-header img#next-day:hover ~ div#next-day-icon-label,
+#assignments-header img#settings:hover ~ div#settings-icon-label,
 #assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
-#assignments-header img#next-day:focus ~ div#next-day-icon-label {
+#assignments-header img#next-day:focus ~ div#next-day-icon-label,
+#assignments-header img#settings:focus ~ div#settings-icon-label {
     visibility: visible;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
 #assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
-#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label) {
+#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
+#assignments-header img#settings:hover ~ div:not(#settings-icon-label) {
     visibility: hidden !important;
 }
 #info {

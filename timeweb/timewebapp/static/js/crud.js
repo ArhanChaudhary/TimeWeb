@@ -228,9 +228,7 @@ $(function() {
         $("#id_ctime, #id_funct_round").removeAttr("disabled");
         // JSON fields are picky with their number inputs, convert them to standard form
         $("#id_works").val(+$("#id_works").val());
-        if (!ajaxUtils.disable_ajax) {
-            gtag("event","modify_assignment");
-        }
+        gtag("event","modify_assignment");
     });
     // Style errors if form is invalid
     $("#form-wrapper .error-note").each(function() {
@@ -278,9 +276,7 @@ $(function() {
                     // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
                     priority.sort({ ignore_timeout: true });
                 });
-                if (!ajaxUtils.disable_ajax) {
-                    gtag("event","delete_assignment");
-                }
+                gtag("event","delete_assignment");
             }
             if (ajaxUtils.disable_ajax) return success();
             const data = {

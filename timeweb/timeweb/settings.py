@@ -91,6 +91,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
+    'timewebapp.middleware.catch_request_data_too_big.catchRequestDataTooBig',
 ]
 
 ROOT_URLCONF = 'timeweb.urls'
@@ -115,8 +116,8 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 
-MAX_UPLOAD_SIZE = 5242880
-DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE
+MAX_UPLOAD_SIZE = 5242880 # 40 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1310720 # 10 MB (max size for data sent by ajax by assignments)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

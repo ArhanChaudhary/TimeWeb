@@ -16,11 +16,11 @@ This only runs on index.html
 gtag("event", "home");
 utils = {
     formatting: {
-        // Reverses parseDate
+        // Reverses utils.formatting.parseDate
         // Converts Date objects to YYYY-MM-DD
         stringifyDate: function(date) {
             return [
-                date.getFullYear(),
+                ('000' + date.getFullYear()).slice(-4),
                 ('0' + (date.getMonth() + 1)).slice(-2),
                 ('0' + date.getDate()).slice(-2),
             ].join('-');
@@ -132,6 +132,9 @@ utils = {
                     
                     All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
                 );
+                $("#settings").click(function() {
+                    window.location.href = "/settings";
+                });
             },
 
             googleClassroomAPI: function() {
@@ -178,10 +181,8 @@ utils = {
                         // Remove ids to delete from dat
                         dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
                         $(".finished").remove();
-                        if (!ajaxUtils.disable_ajax) {
-                            for (let i = 0; i < assignment_ids_to_delete.length; i++) {
-                                gtag("event","delete_assignment");
-                            }
+                        for (let i = 0; i < assignment_ids_to_delete.length; i++) {
+                            gtag("event","delete_assignment");
                         }
                         priority.sort({ ignore_timeout: true });
                     }
@@ -715,7 +716,8 @@ ajaxUtils = {
         ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.SendAttributeAjax, 1000);
     },
     SendAttributeAjax: function() {
-        const success = function() {
+        const success = function(responseText) {
+            if (responseText === "RequestDataTooBig") return alert("An assignment takes up too much space and can no longer be saved");
             gtag("event","save_assignment");
         }
         // Send data along with the assignment's primary key
@@ -751,6 +753,11 @@ dat = JSON.parse(document.getElementById("assignment-models").textContent);
 const max_length_funct_round = dat.length ? dat[0]['funct_round'].split(".")[1].length : undefined;
 for (let sa of dat) {
     sa.assignment_date = new Date(sa.assignment_date);
+    // Don't really know what to do for assignment dates on different tzs so i'll just round it to the nearest day
+    // Add half a day and flooring it rounds it
+    sa.assignment_date = new Date(sa.assignment_date.valueOf() + 43200000);
+    sa.assignment_date.setHours(0,0,0,0);
+
     sa.x = utils.daysBetweenTwoDates(Date.parse(sa.x), sa.assignment_date);
     sa.y = +sa.y;
     sa.ctime = +sa.ctime;
