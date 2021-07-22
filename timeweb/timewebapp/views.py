@@ -706,7 +706,6 @@ class GCOAuthView(LoginRequiredMixin, View):
             access_type='offline',
             # Enable incremental authorization. Recommended as a best practice.
             include_granted_scopes='true')
-        logger.info(f"User {request.user} enabled google classroom API")
         return HttpResponse(authorization_url)
         # For reference:
         # If modifying these scopes, delete the file token.json.

@@ -242,6 +242,69 @@ $(function() {
     // Focus on first invalid field
     $("#form-wrapper .error-note").first().prev().children("input, textarea").first().focus();
     // Delete assignment
+    transitionDeleteAssignment = function(dom_assignment) {
+        const sa = utils.loadAssignmentData(dom_assignment);
+        // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
+        $("#assignments-container").css("overflow", "hidden");
+        // Opacity CSS transition
+        dom_assignment.css("opacity", "0");
+        const assignment_container = dom_assignment.parents(".assignment-container");
+        // Animate height on assignment_container because it doesn't have a transition
+        // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
+
+        // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
+        assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
+            $("#assignments-container").css("overflow", "");
+            // Remove assignment data from dat
+            dat = dat.filter(_sa => sa.id !== _sa.id);
+            // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
+            if (assignment_container.children("#delete-starred-assignments").length) {
+                $("#delete-starred-assignments").insertBefore(assignment_container);
+            }
+            // Remove assignment from DOM
+            assignment_container.remove();
+            // Although nothing needs to be swapped, priority.sort() still needs to be run
+            // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
+            priority.sort({ ignore_timeout: true });
+        });
+        gtag("event","delete_assignment");
+    }
+    transitionDeleteAssignments = function($assignment_container) {
+        // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
+        $("#assignments-container").css("overflow", "hidden");
+        $assignment_container.each(function(i) {
+            gtag("event","delete_assignment");
+            const assignment_container = $(this);
+            const dom_assignment = assignment_container.children(".assignment");
+            // Opacity CSS transition
+            dom_assignment.css("opacity", "0");
+            // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
+
+            // Animate height on assignment_container because it doesn't have a transition
+            // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
+            assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", i === 0 ? function() {
+                // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
+                if (assignment_container.children("#delete-starred-assignments").length) {
+                    $("#delete-starred-assignments").insertBefore(assignment_container);
+                }
+                // Remove assignment from DOM
+                assignment_container.remove();
+            } : function() {
+                $("#assignments-container").css("overflow", "");
+                // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
+                if (assignment_container.children("#delete-starred-assignments").length) {
+                    $("#delete-starred-assignments").insertBefore(assignment_container);
+                }
+                // Remove assignment from DOM
+                assignment_container.remove();
+                // Although nothing needs to be swapped, priority.sort() still needs to be run
+                // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
+                priority.sort({ ignore_timeout: true });
+            });
+        });
+        
+        
+    }
     $('.delete-button').parent().click(function(e) {
         const $this = $(this),
             dom_assignment = $this.parents(".assignment");
@@ -251,34 +314,11 @@ $(function() {
             // Deny updating or deleting again after queued
             dom_assignment.css("pointer-events", "none");
             // Send data to backend and animates its deletion
-            const sa = utils.loadAssignmentData(dom_assignment);
             const success = function() {
-                // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
-                $("#assignments-container").css("overflow", "hidden");
-                // Opacity CSS transition
-                dom_assignment.css("opacity", "0");
-                const assignment_container = dom_assignment.parents(".assignment-container");
-                // Animate height on assignment_container because it doesn't have a transition
-                // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
-
-                // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
-                assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
-                    $("#assignments-container").css("overflow", "");
-                    // Remove assignment data from dat
-                    dat = dat.filter(_sa => sa.id !== _sa.id);
-                    // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
-                    if (assignment_container.children("#delete-starred-assignments").length) {
-                        $("#delete-starred-assignments").insertBefore(assignment_container);
-                    }
-                    // Remove assignment from DOM
-                    assignment_container.remove();
-                    // Although nothing needs to be swapped, priority.sort() still needs to be run
-                    // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
-                    priority.sort({ ignore_timeout: true });
-                });
-                gtag("event","delete_assignment");
+                transitionDeleteAssignment(dom_assignment);
             }
             if (ajaxUtils.disable_ajax) return success();
+            const sa = utils.loadAssignmentData(dom_assignment);
             const data = {
                 'csrfmiddlewaretoken': csrf_token,
                 'action': 'delete_assignment',

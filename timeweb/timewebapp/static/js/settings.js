@@ -45,6 +45,8 @@ $(function() {
         $("#id_text_priority").prop("checked", true);
         $("#id_highest_priority_color").val("#E25B50").trigger("input");
         $("#id_lowest_priority_color").val("#84C841").trigger("keydown");
+        $("#id_background_image").val("");
+        // $("#id_enable_tutorial").prop("checked", )
     });
     $("form").submit(function() {
         $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val() ? precisionRound($("#id_def_skew_ratio").val()+1, 10) : 0);

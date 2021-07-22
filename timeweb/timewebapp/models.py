@@ -116,46 +116,6 @@ class TimewebModel(models.Model):
         return self.name
 
 class SettingsModel(models.Model):
-    warning_acceptance = models.IntegerField(
-        default=50,
-        validators=[MinValueValidator(1,_("This field's value must be an integer from 1 to 100")), MaxValueValidator(100,_("This field's value must be an integer from 1 to 100"))],
-        verbose_name=_('Warning Threshold'),
-    )
-    def_min_work_time = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"),_("The default minimum work time must be positive"))],
-        blank=True,
-        null=True,
-        verbose_name=_('Default Minimum Daily Work Time in Minutes'),
-    )
-    def_skew_ratio = models.DecimalField(
-        max_digits=17,
-        decimal_places=10,
-        default=1,
-        verbose_name=_('Default Skew Ratio'),
-    )
-    def_break_days = MultiSelectField(
-        choices=WEEKDAYS,
-        blank=True,
-        null=True,
-    )
-    def_unit_to_minute = models.BooleanField(
-        default=False,
-        verbose_name=_('Set the Default Unit of Work to "Minute"'),
-    )
-    def_funct_round_minute = models.BooleanField(
-        default=False,
-        verbose_name=_('Round to Multiples of 5 Minutes'),
-    )
-    ignore_ends = models.BooleanField(
-        default=False,
-        verbose_name=_('Ignore Minimum Work Time Ends'),
-    )
-    show_progress_bar = models.BooleanField(
-        default=False,
-        verbose_name=_('Show Graph Progress Bar'),
-    )
     color_priority = models.BooleanField(
         default=True,
         verbose_name=_('Show Priority Colors'),
@@ -172,14 +132,54 @@ class SettingsModel(models.Model):
         default="#84c841",
         verbose_name=_('Lowest Priority Color'),
     )
-    background_image = models.ImageField(
-        upload_to=create_image_path,
-        null=True,
+    def_unit_to_minute = models.BooleanField(
+        default=False,
+        verbose_name=_('Set the Default Unit of Work to "Minute"'),
+    )
+    def_skew_ratio = models.DecimalField(
+        max_digits=17,
+        decimal_places=10,
+        default=1,
+        verbose_name=_('Default Skew Ratio'),
+    )
+    def_break_days = MultiSelectField(
+        choices=WEEKDAYS,
         blank=True,
+        null=True,
+    )
+    def_min_work_time = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"),_("The default minimum work time must be positive"))],
+        blank=True,
+        null=True,
+        verbose_name=_('Default Minimum Daily Work Time in Minutes'),
+    )
+    ignore_ends = models.BooleanField(
+        default=False,
+        verbose_name=_('Ignore Minimum Work Time Ends'),
+    )
+    def_funct_round_minute = models.BooleanField(
+        default=False,
+        verbose_name=_('Round to Multiples of 5 Minutes'),
+    )
+    show_progress_bar = models.BooleanField(
+        default=False,
+        verbose_name=_('Show Graph Progress Bar'),
+    )
+    warning_acceptance = models.IntegerField(
+        default=50,
+        validators=[MinValueValidator(1,_("This field's value must be an integer from 1 to 100")), MaxValueValidator(100,_("This field's value must be an integer from 1 to 100"))],
+        verbose_name=_('Warning Threshold'),
     )
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Enable Tutorial'),
+    )
+    background_image = models.ImageField(
+        upload_to=create_image_path,
+        null=True,
+        blank=True,
     )
     oauth_token = models.JSONField(
         default=empty_dict,

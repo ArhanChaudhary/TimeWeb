@@ -180,11 +180,7 @@ utils = {
                     const success = function() {
                         // Remove ids to delete from dat
                         dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                        $(".finished").remove();
-                        for (let i = 0; i < assignment_ids_to_delete.length; i++) {
-                            gtag("event","delete_assignment");
-                        }
-                        priority.sort({ ignore_timeout: true });
+                        transitionDeleteAssignments($(".finished"));
                     }
                     if (ajaxUtils.disable_ajax) return success();
                     // Send ajax to avoid a page reload
@@ -256,9 +252,7 @@ utils = {
                     }
                     const success = function() {
                         dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                        assignments_to_delete.remove();
-                        // Don't gtag here because the users technically didn't create the gc assignments (using the form)
-                        priority.sort({ ignore_timeout: true });
+                        transitionDeleteAssignments(assignments_to_delete);
                     }
 
                     if (ajaxUtils.disable_ajax) return success();
@@ -460,15 +454,11 @@ utils = {
             });
         },
         setKeybinds: function() {
-            const screen = $("#site")[0];
             utils.form_is_showing = false;
             $(document).keydown(function(e) {
                 if (e.key === "Tab") {
                     // Prevent tabbing dispositioning screen
-                    setTimeout(() => screen.scrollTo(0,0), 0);
-                } else if (!utils.form_is_showing && e.shiftKey /* shiftKey needed if the user presses caps lock */ && e.key === 'N') {
-                    $("#image-new-container").click();
-                    return false;
+                    setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
                 } else if (e.key === "Escape") {
                     hideForm()
                 } else if (e.key === "ArrowDown" && e.shiftKey) {
