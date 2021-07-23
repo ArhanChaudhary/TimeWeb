@@ -726,14 +726,6 @@ class VisualAssignment extends Assignment {
             } else if (this.today_minus_ad < this.sa.blue_line_start) {
                 not_applicable_message = "Not Yet Assigned";
             }
-            if (not_applicable_message) {
-                submit_work_button.html(not_applicable_message);
-                clearTimeout(not_applicable_timeout_submit_work_button);
-                not_applicable_timeout_submit_work_button = setTimeout(function() {
-                    submit_work_button.html("Submit Work Input");
-                }, 1000);
-                return;
-            }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_button.val().trim().toLowerCase();
             switch (input_done) {
@@ -742,10 +734,22 @@ class VisualAssignment extends Assignment {
                     break;
                 default: {
                     input_done = +input_done;
-                    if (isNaN(input_done)) return alert("Value isn't a number or keyword");
+                    if (isNaN(input_done)) {
+                        not_applicable_message = "Invalid Value";
+                    }
                 }
             }
-            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y) return alert("Your last work input must complete this assignment");
+            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y) {
+                not_applicable_message = "Last work input must finish this assignment";
+            }
+            if (not_applicable_message) {
+                submit_work_button.html(not_applicable_message);
+                clearTimeout(not_applicable_timeout_submit_work_button);
+                not_applicable_timeout_submit_work_button = setTimeout(function() {
+                    submit_work_button.html("Submit Work Input");
+                }, 1000);
+                return;
+            }
             if (input_done + last_work_input < 0) {
                 input_done = -last_work_input;
             }
@@ -780,7 +784,7 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Display button
         display_button.click(() => {
-            alert("This feature has not yet been implented");
+            $.alert("This feature has not yet been implented");
         }).css("text-decoration", "line-through");
         // END Display button
 
@@ -1072,17 +1076,46 @@ $(".assignment").click(function(e) {
     if (enable_tutorial) {
         $(".assignment").next().remove(); // Remove "Click this assignment"
         setTimeout(function() {
-            alert("Welcome to the graph, a visualization of how your assignment's work schedule will look like");
-            alert("The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment");
-            alert("As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis");
-            alert("The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs");
-            if (sa.sa.x <= 2) {
-                alert(`Note: since this assignment is due in only ${sa.sa.x} day${sa.sa.x-sa.blue_line_start === 1 ? '' : 's'}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates`);
-            }
-            alert("Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates");
-            alert("Now that you have finished reading this, check out the settings to set your preferences");
-            enable_tutorial = false;
-            ajaxUtils.ajaxFinishedTutorial();
+            $.alert({
+                title: "Welcome to the graph, a visualization of how your assignment's work schedule will look like",
+                alignTop: true, // Custom extension I added
+                onClose: function() {
+                    const days_until_due = sa.sa.x-sa.sa.blue_line_start
+                    $.alert({
+                        title: "The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment",
+                        content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates` : '',
+                        alignTop: true,
+                        onClose: function() {
+                            $.alert({
+                                title: "As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis",
+                                alignTop: true,
+                                onClose: function() {
+                                    $.alert({
+                                        title: "The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs",
+                                        alignTop: true,
+                                        onClose: function() {
+                                            $.alert({
+                                                title: "Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates",
+                                                alignTop: true,
+                                                onClose: function() {
+                                                    $.alert({
+                                                        title: "Now that you have finished reading this, check out the settings to set your preferences",
+                                                        alignTop: true,
+                                                        onClose: function() {
+                                                            enable_tutorial = false;
+                                                            ajaxUtils.ajaxFinishedTutorial();
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         }, 200);
     }
 });

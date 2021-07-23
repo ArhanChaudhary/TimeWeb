@@ -144,7 +144,10 @@ utils = {
                     $("#toggle-gc-label").html("Enable Google Classroom API");
                 }
                 $("#toggle-gc-container").click(function() {
-                    if (ajaxUtils.disable_ajax) return alert("You cannot do this on the example account!");
+                    if (ajaxUtils.disable_ajax) {
+                        $.alert("You cannot do this on the example account!");
+                        return;
+                    }
                     const $this = $(this);
                     if ($this.hasClass("clicked")) return;
                     $this.addClass("clicked");
@@ -166,29 +169,44 @@ utils = {
 
             deleteAllStarredAssignments: function() {
                 $("#delete-starred-assignments .shortcut-text").click(function() {
-                    if (!confirm(`This will delete ${$(".finished").length} starred assignments. Are you sure?` + (isMobile ? '' : ' (Press Enter)'))) return;
-                    const assignment_ids_to_delete = $(".assignment-container.finished").map(function() {
-                        const dom_assignment = $(this).children(".assignment");
-                        const _sa = utils.loadAssignmentData(dom_assignment);
-                        return _sa.id;
-                    }).toArray();
-                    const data = {
-                        'csrfmiddlewaretoken': csrf_token,
-                        'action': 'delete_assignment',
-                        'assignments': assignment_ids_to_delete,
-                    }
-                    const success = function() {
-                        // Remove ids to delete from dat
-                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                        transitionDeleteAssignments($(".finished"));
-                    }
-                    if (ajaxUtils.disable_ajax) return success();
-                    // Send ajax to avoid a page reload
-                    $.ajax({
-                        type: "POST",
-                        data: data,
-                        success: success,
-                        error: ajaxUtils.error,
+                    $.confirm({
+                        title: `Are you sure you want to delete ${$(".finished").length} starred assignments?`,
+                        content: 'This is an irreversible action',
+                        buttons: {
+                            confirm: {
+                                keys: ['Enter'],
+                                action: function() {
+                                    const assignment_ids_to_delete = $(".assignment-container.finished").map(function() {
+                                        const dom_assignment = $(this).children(".assignment");
+                                        const _sa = utils.loadAssignmentData(dom_assignment);
+                                        return _sa.id;
+                                    }).toArray();
+                                    const data = {
+                                        'csrfmiddlewaretoken': csrf_token,
+                                        'action': 'delete_assignment',
+                                        'assignments': assignment_ids_to_delete,
+                                    }
+                                    const success = function() {
+                                        // Remove ids to delete from dat
+                                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
+                                        transitionDeleteAssignments($(".finished"));
+                                    }
+                                    if (ajaxUtils.disable_ajax) {
+                                        success();
+                                        return;
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        data: data,
+                                        success: success,
+                                        error: ajaxUtils.error,
+                                    });
+                                }
+                            },
+                            cancel: function() {
+                                
+                            }
+                        }
                     });
                 });
             },
@@ -196,18 +214,24 @@ utils = {
             autofillAssignments: function() {
                 $("#autofill-work-done").click(function(e) {
                     if ($(e.target).is("#autofill-selection")) return;
-                    switch ($("#autofill-selection").val()) {
-                        case "No":
-                            if (confirm("This will autofill no work done until today for ALL assignments with missing work inputs. Are you sure?")) {
-                                priority.sort({autofill_no_work_done: true, ignore_timeout: true});
+
+                    $.confirm({
+                        title: `This will autofill ${$("#autofill-selection").val().toLowerCase()} work done until today for ALL assignments with missing work inputs. Are you sure?`,
+                        content: 'This is an irreversible action',
+                        buttons: {
+                            confirm: {
+                                keys: ['Enter'],
+                                action: function() {
+                                    const params = {ignore_timeout: true};
+                                    params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = true;
+                                    priority.sort(params);
+                                }
+                            },
+                            cancel: function() {
+                                
                             }
-                            break;
-                        case "All":
-                            if (confirm("This will autofill all work done until today for ALL assignments with missing work inputs. Are you sure?")) {
-                                priority.sort({autofill_all_work_done: true, ignore_timeout: true});
-                            }
-                            break;
-                    }
+                        }
+                    });                    
                 });
                 replaceAutofillInfo();
                 $("#autofill-selection").on("change", replaceAutofillInfo);
@@ -239,29 +263,44 @@ utils = {
                         const _sa = utils.loadAssignmentData(dom_assignment);
                         return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
                     });
-                    if (!confirm(`This will delete ${assignments_to_delete.length} assignments from class "${sa.tags[0]}". Are you sure?` + (isMobile ? '' : ' (Press Enter)'))) return;
-                    const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                        const dom_assignment = $(this).children(".assignment");
-                        const _sa = utils.loadAssignmentData(dom_assignment);
-                        return _sa.id;
-                    }).toArray();
-                    const data = {
-                        'csrfmiddlewaretoken': csrf_token,
-                        'action': 'delete_assignment',
-                        'assignments': assignment_ids_to_delete,
-                    }
-                    const success = function() {
-                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                        transitionDeleteAssignments(assignments_to_delete);
-                    }
-
-                    if (ajaxUtils.disable_ajax) return success();
-                    // Send ajax to avoid a page reload
-                    $.ajax({
-                        type: "POST",
-                        data: data,
-                        success: success,
-                        error: ajaxUtils.error,
+                    $.confirm({
+                        title: `This will delete ${assignments_to_delete.length} assignments from class "${sa.tags[0]}". Are you sure?`,
+                        content: 'This is an irreversible action',
+                        buttons: {
+                            confirm: {
+                                keys: ['Enter'],
+                                action: function() {
+                                    const assignment_ids_to_delete = assignments_to_delete.map(function() {
+                                        const dom_assignment = $(this).children(".assignment");
+                                        const _sa = utils.loadAssignmentData(dom_assignment);
+                                        return _sa.id;
+                                    }).toArray();
+                                    const data = {
+                                        'csrfmiddlewaretoken': csrf_token,
+                                        'action': 'delete_assignment',
+                                        'assignments': assignment_ids_to_delete,
+                                    }
+                                    const success = function() {
+                                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
+                                        transitionDeleteAssignments(assignments_to_delete);
+                                    }
+                
+                                    if (ajaxUtils.disable_ajax) {
+                                        success();
+                                        return;
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        data: data,
+                                        success: success,
+                                        error: ajaxUtils.error,
+                                    });
+                                }
+                            },
+                            cancel: function() {
+                                
+                            }
+                        }
                     });
                 });
             },
@@ -352,7 +391,10 @@ utils = {
                     }
                     
                     // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
-                    if (ajaxUtils.disable_ajax || !tag_names.length) return success();
+                    if (ajaxUtils.disable_ajax || !tag_names.length) {
+                        success();
+                        return;
+                    }
                     const data = {
                         csrfmiddlewaretoken: csrf_token,
                         pk: sa.id,
@@ -420,7 +462,10 @@ utils = {
                     });
                     $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
                 }
-                if (ajaxUtils.disable_ajax) return success();
+                if (ajaxUtils.disable_ajax) {
+                    success();
+                    return;
+                }
                 $.ajax({
                     type: "POST",
                     data: data,
@@ -623,17 +668,17 @@ ajaxUtils = {
     hour_to_update: hour_to_update,
     error: function(response, exception) {
         if (response.status == 0) {
-            alert('Failed to connect');
+            $.alert('Failed to connect');
         } else if (response.status == 404) {
-            alert('Not found, try refreshing');
+            $.alert('Not found, try refreshing');
         } else if (response.status == 500) {
-            alert('Internal server error. Please contact me if you see this');
+            $.alert('Internal server error. Please contact me if you see this');
         } else if (exception === 'parsererror') {
-            alert('JSON parse failed');
+            $.alert('JSON parse failed');
         } else if (exception === 'timeout') {
-            alert('Timed out, try again');
+            $.alert('Timed out, try again');
         } else if (exception === 'abort') {
-            alert('Request aborted, try again');
+            $.alert('Request aborted, try again');
         } else {
             $("html").html(response.responseText);
         }
@@ -707,7 +752,10 @@ ajaxUtils = {
     },
     SendAttributeAjax: function() {
         const success = function(responseText) {
-            if (responseText === "RequestDataTooBig") return alert("An assignment takes up too much space and can no longer be saved");
+            if (responseText === "RequestDataTooBig") {
+                $.alert("An assignment takes up too much space and can no longer be saved");
+                return;
+            }
             gtag("event","save_assignment");
         }
         // Send data along with the assignment's primary key
@@ -758,14 +806,25 @@ for (let sa of dat) {
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 }
+jconfirm.defaults = {
+    escapeKey: true,
+    backgroundDismiss: true,
+
+    boxWidth: '50%',
+    useBootstrap: false,
+
+    animation: 'zoom',
+    closeAnimation: 'scale',
+    animateFromElement: false,
+};
 ({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(new Date().toDateString());
 if (date_now.getHours() < hour_to_update) {
     date_now.setDate(date_now.getDate() - 1);
 }
-highest_priority_color = utils.formatting.hexToRgb(highest_priority_color)
-lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color)
+highest_priority_color = utils.formatting.hexToRgb(highest_priority_color);
+lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color);
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend

@@ -116,6 +116,10 @@ class TimewebModel(models.Model):
         return self.name
 
 class SettingsModel(models.Model):
+    enable_tutorial = models.BooleanField(
+        default=True,
+        verbose_name=_('Enable Tutorial'),
+    )
     color_priority = models.BooleanField(
         default=True,
         verbose_name=_('Show Priority Colors'),
@@ -171,10 +175,6 @@ class SettingsModel(models.Model):
         default=50,
         validators=[MinValueValidator(1,_("This field's value must be an integer from 1 to 100")), MaxValueValidator(100,_("This field's value must be an integer from 1 to 100"))],
         verbose_name=_('Warning Threshold'),
-    )
-    enable_tutorial = models.BooleanField(
-        default=True,
-        verbose_name=_('Enable Tutorial'),
     )
     background_image = models.ImageField(
         upload_to=create_image_path,

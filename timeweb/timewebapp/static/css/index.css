@@ -256,7 +256,7 @@ header.animate::after {
 }
 .description {
     display: none;
-    opacity: 0.6;
+    opacity: 0.75;
     white-space: pre-wrap;
     transform: translateY(-2px);
     min-width: calc(20px + 13vw);

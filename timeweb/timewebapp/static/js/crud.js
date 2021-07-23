@@ -244,8 +244,11 @@ $(function() {
     // Delete assignment
     transitionDeleteAssignment = function(dom_assignment) {
         const sa = utils.loadAssignmentData(dom_assignment);
+
         // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
-        $("#assignments-container").css("overflow", "hidden");
+        // $("#assignments-container").css("overflow", "hidden");
+        // NOTE: removed because of bugginess and just looking bad overall
+
         // Opacity CSS transition
         dom_assignment.css("opacity", "0");
         const assignment_container = dom_assignment.parents(".assignment-container");
@@ -254,7 +257,7 @@ $(function() {
 
         // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
         assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
-            $("#assignments-container").css("overflow", "");
+            // $("#assignments-container").css("overflow", "");
             // Remove assignment data from dat
             dat = dat.filter(_sa => sa.id !== _sa.id);
             // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
@@ -270,8 +273,6 @@ $(function() {
         gtag("event","delete_assignment");
     }
     transitionDeleteAssignments = function($assignment_container) {
-        // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
-        $("#assignments-container").css("overflow", "hidden");
         $assignment_container.each(function(i) {
             gtag("event","delete_assignment");
             const assignment_container = $(this);
@@ -282,68 +283,81 @@ $(function() {
 
             // Animate height on assignment_container because it doesn't have a transition
             // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
-            assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", i === 0 ? function() {
+            assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
                 // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
                 if (assignment_container.children("#delete-starred-assignments").length) {
                     $("#delete-starred-assignments").insertBefore(assignment_container);
                 }
                 // Remove assignment from DOM
                 assignment_container.remove();
-            } : function() {
-                $("#assignments-container").css("overflow", "");
-                // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
-                if (assignment_container.children("#delete-starred-assignments").length) {
-                    $("#delete-starred-assignments").insertBefore(assignment_container);
+                // Run on last callback
+                if (i === $assignment_container.length - 1) {
+                    // Although nothing needs to be swapped, priority.sort() still needs to be run
+                    // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
+                    priority.sort({ ignore_timeout: true });
                 }
-                // Remove assignment from DOM
-                assignment_container.remove();
-                // Although nothing needs to be swapped, priority.sort() still needs to be run
-                // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
-                priority.sort({ ignore_timeout: true });
             });
+        }); 
+    }
+    function deleteAssignment($button) {
+        // Unfocus to prevent pressing enter to click again
+        $button.blur();
+        const dom_assignment = $button.parents(".assignment");
+        // Deny updating or deleting again after queued
+        dom_assignment.css("pointer-events", "none");
+        // Send data to backend and animates its deletion
+        const success = function() {
+            transitionDeleteAssignment(dom_assignment);
+        }
+        if (ajaxUtils.disable_ajax) {
+            success();
+            return;
+        }
+        const sa = utils.loadAssignmentData(dom_assignment);
+        const data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'delete_assignment',
+            'assignments': [sa.id], // Primary key value
+        }
+        // Send ajax to avoid a page reload
+        $.ajax({
+            type: "POST",
+            data: data,
+            success: success,
+            error: function() {
+                // If ajax failed, allow updating or deleting again and dequeue
+                dom_assignment.css("pointer-events", "auto");
+                ajaxUtils.error(...arguments);
+            }
         });
-        
-        
     }
     $('.delete-button').parent().click(function(e) {
-        const $this = $(this),
-            dom_assignment = $this.parents(".assignment");
-        if (e.shiftKey || confirm('Are you sure you want to delete this assignment?' + (isMobile ? '' : ' (Press Enter)'))) {
-            // Unfocus to prevent pressing enter to click again
-            $this.blur();
-            // Deny updating or deleting again after queued
-            dom_assignment.css("pointer-events", "none");
-            // Send data to backend and animates its deletion
-            const success = function() {
-                transitionDeleteAssignment(dom_assignment);
-            }
-            if (ajaxUtils.disable_ajax) return success();
-            const sa = utils.loadAssignmentData(dom_assignment);
-            const data = {
-                'csrfmiddlewaretoken': csrf_token,
-                'action': 'delete_assignment',
-                'assignments': [sa.id], // Primary key value
-            }
-            // Send ajax to avoid a page reload
-            $.ajax({
-                type: "POST",
-                data: data,
-                success: success,
-                error: function() {
-                    // If ajax failed, allow updating or deleting again and dequeue
-                    dom_assignment.css("pointer-events", "auto");
-                    ajaxUtils.error(...arguments);
-                }
-            });
+        const $this = $(this);
+        if (e.shiftKey) {
+            deleteAssignment($this);
+            return;
         }
+        $.confirm({
+            title: 'Are you sure you want to delete this assignment?',
+            content: 'This is an irreversible action',
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: function() {
+                        deleteAssignment($this);
+                    }
+                },
+                cancel: function() {
+                    
+                }
+            }
+        });
     });
 });
 // Only change text of form label
-(function($) {
-    $.fn.onlyText = function(text) {
-        $(this).contents().filter(function() {
-            return this.nodeType === Node.TEXT_NODE;
-        }).first()[0].nodeValue = text;
-        return $(this);
-    };
-}(jQuery));
+$.fn.onlyText = function(text) {
+    $(this).contents().filter(function() {
+        return this.nodeType === Node.TEXT_NODE;
+    }).first()[0].nodeValue = text;
+    return $(this);
+};
