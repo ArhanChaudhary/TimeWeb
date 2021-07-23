@@ -134,7 +134,7 @@ header.animate::after {
 .assignment.mark-as-done {
     opacity: 0.6;
 }
-.assignment-container:not(#animate-in, #animate-color) .assignment.color-instantly {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly {
     transition: none;
 }
 .assignment:not(.open-assignment):hover {
@@ -333,6 +333,16 @@ header.animate::after {
     top: 2px;
     white-space: nowrap;
     font-size: min(10px, 0.7em);
+}
+.tags-right {
+    right: 2px;
+    z-index: 2;
+}
+.tags-left {
+    left: 15px;
+}
+.tags-left .tag-add-box {
+    left: 23px;
 }
 .assignment.open-assignment .tags {
     transform: translateY(-100%) translateY(2.75px);

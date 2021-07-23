@@ -13,8 +13,14 @@ WEEKDAYS = (
     ("4",_("Thursday")),
     ("5",_("Friday")),
     ("6",_("Saturday")),
-    ("0",_("Sunday"))
+    ("0",_("Sunday")),
 )
+TAG_POSITIONS = (
+    ("Left", "Left"),
+    ("Middle", "Middle"),
+    ("Right", "Right"),
+)
+MAX_TAG_POSITIONS_LENGTH = len(max([i[0] for i in TAG_POSITIONS], key=len))
 def default_works():
     return 0
 def empty_list():
@@ -166,6 +172,11 @@ class SettingsModel(models.Model):
     def_funct_round_minute = models.BooleanField(
         default=False,
         verbose_name=_('Round to Multiples of 5 Minutes'),
+    )
+    tag_position = models.CharField(
+        max_length=MAX_TAG_POSITIONS_LENGTH,
+        choices=TAG_POSITIONS,
+        default="Middle",
     )
     show_progress_bar = models.BooleanField(
         default=False,

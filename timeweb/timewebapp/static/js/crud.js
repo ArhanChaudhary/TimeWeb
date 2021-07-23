@@ -228,6 +228,7 @@ $(function() {
         $("#id_ctime, #id_funct_round").removeAttr("disabled");
         // JSON fields are picky with their number inputs, convert them to standard form
         $("#id_works").val(+$("#id_works").val());
+        $("#submit-assignment-button").text("Submitting...");
         gtag("event","modify_assignment");
     });
     // Style errors if form is invalid

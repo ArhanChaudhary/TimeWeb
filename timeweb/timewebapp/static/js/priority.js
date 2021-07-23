@@ -27,13 +27,13 @@ priority = {
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
         if (color_priority) {
             if (color_instantly) {
-                dom_assignment.addClass("color-instantly");
+                dom_assignment.addClass("transition-instantly");
             }
             dom_assignment.css("background", priority.get_color(priority_percentage));
             dom_assignment.toggleClass("mark-as-done", mark_as_done);
             if (color_instantly) {
                 dom_assignment[0].offsetHeight;
-                dom_assignment.removeClass("color-instantly");
+                dom_assignment.removeClass("transition-instantly");
             }
         }
     },
@@ -441,6 +441,23 @@ priority = {
         utils.ui.tickClock();
         if (params.first_sort) {
             setInterval(utils.ui.tickClock, 1000);
+            if ($(".tags-left").length) {
+                $(window).one("load", function() {
+                    $(".assignment").each(function() {
+                        const dom_assignment = $(this);
+                        
+                        const tags = dom_assignment.find(".tags");
+                        const title = dom_assignment.find(".title");
+                        const tag_bottom = tags.offset().top + tags.height();
+                        const title_top = title.offset().top;
+                        
+                        dom_assignment.addClass("transition-instantly");
+                        dom_assignment.css({paddingTop: "+=" + (11 - (title_top - tag_bottom)), paddingBottom: "+=" + (11 - (title_top - tag_bottom))});
+                        dom_assignment[0].offsetHeight;
+                        dom_assignment.removeClass("transition-instantly");
+                    });
+                });
+            }
         }
         $("#assignments-container").css("opacity", "1");
     },

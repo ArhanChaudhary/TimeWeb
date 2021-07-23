@@ -1,5 +1,5 @@
 from django import forms
-from .models import TimewebModel, SettingsModel
+from .models import TimewebModel, SettingsModel, TAG_POSITIONS
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 class DateInput(forms.DateInput):
@@ -110,6 +110,7 @@ class TimewebForm(forms.ModelForm):
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):
+    tag_position = forms.ChoiceField(widget=forms.Select, choices=TAG_POSITIONS)
     class Meta:
         model = SettingsModel
         fields = "__all__"
@@ -122,7 +123,7 @@ class SettingsForm(forms.ModelForm):
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
-            'added_gc_assignment_ids': forms.HiddenInput(),
+            'added_gc_assignment_ids': forms.HiddenInput()
         }
         error_messages = {
             'def_min_work_time': {

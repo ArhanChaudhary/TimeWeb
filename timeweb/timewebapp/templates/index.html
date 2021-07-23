@@ -116,7 +116,7 @@
             <div class="right-side-of-header">
               <img class="status-image">
               <div class="align-to-status-message-container">
-                <div class="tags">
+                <div class="tags tags-{{ tag_position }}">
                   {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
                   {% spaceless %}
                   <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">

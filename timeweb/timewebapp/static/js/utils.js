@@ -37,9 +37,9 @@ utils = {
         hexToRgb: function(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16),
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16),
             }
         }
           
@@ -418,7 +418,8 @@ utils = {
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
                 let allTags = [];
                 dat.forEach(sa => allTags.push(...sa.tags));
-                for (let tag of Array.from(new Set(allTags))) {
+                unique_allTags = Array.from(new Set(allTags));
+                for (let tag of unique_allTags) {
                     const tag_add_selection_item = $(tag_add_selection_item_template);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
                     container_for_tags.append(tag_add_selection_item);

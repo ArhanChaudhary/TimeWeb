@@ -112,6 +112,7 @@ class SettingsView(LoginRequiredMixin, View):
             'lowest_priority_color': self.settings_model.lowest_priority_color,
             'background_image': self.settings_model.background_image,
             'enable_tutorial': self.settings_model.enable_tutorial,
+            'tag_position': self.settings_model.tag_position,
         }
         self.context['form'] = SettingsForm(initial=initial)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
@@ -159,6 +160,7 @@ class SettingsView(LoginRequiredMixin, View):
         elif self.form.cleaned_data.get("background_image"):
             self.settings_model.background_image = self.form.cleaned_data.get("background_image")
         self.settings_model.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
+        self.settings_model.tag_position = self.form.cleaned_data.get("tag_position")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
@@ -182,6 +184,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['background_image'] = self.settings_model.background_image
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
+        self.context['tag_position'] = self.settings_model.tag_position.lower()
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
