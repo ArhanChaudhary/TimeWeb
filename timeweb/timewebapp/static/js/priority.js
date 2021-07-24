@@ -352,7 +352,7 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
 
-            // Loops through every google classroom assignment that needs more info
+            // Loops through every google classroom assignment that needs more info and adds "delete all assignments of this class"
             // This has to be looped before they are sorted so setInitialTopAssignmentOffsets is accurate
             // This means we can't loop through ".assignment-container" but instead ordered_assignments
             // The current looped assignment's tag is compared with the previous looped assignment's tag
@@ -414,8 +414,8 @@ priority = {
         if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css({
-                marginTop: -23, 
-                transform: "translateY(-6px)",
+                marginTop: -27,
+                transform: "translateY(-4px)",
             });
         } else if (!total) {
             $("#info").show();
@@ -450,9 +450,11 @@ priority = {
                         const title = dom_assignment.find(".title");
                         const tag_bottom = tags.offset().top + tags.height();
                         const title_top = title.offset().top;
-                        
+                        const padding_to_add = 11 - (title_top - tag_bottom);
                         dom_assignment.addClass("transition-instantly");
-                        dom_assignment.css({paddingTop: "+=" + (11 - (title_top - tag_bottom)), paddingBottom: "+=" + (11 - (title_top - tag_bottom))});
+                        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
+                        dom_assignment.find(".button").css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
+                        dom_assignment.find(".assignment-footer").css("top", dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
                         dom_assignment[0].offsetHeight;
                         dom_assignment.removeClass("transition-instantly");
                     });

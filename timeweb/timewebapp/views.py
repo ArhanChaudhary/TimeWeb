@@ -185,6 +185,10 @@ class TimewebView(LoginRequiredMixin, View):
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
         self.context['tag_position'] = self.settings_model.tag_position.lower()
+        if not request.session.get("already_created_gc_assignments_from_frontend", False):
+            self.context['create_gc_assignments_from_frontend'] = bool(self.settings_model.oauth_token)
+        else:
+            del request.session["already_created_gc_assignments_from_frontend"]
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
@@ -568,6 +572,8 @@ class TimewebView(LoginRequiredMixin, View):
         if not gc_models_to_create: return "No new gc assignments were added" # or do new_gc_assignment_ids == set_added_gc_assignment_ids
         self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
         self.settings_model.save()
+
+        request.session["already_created_gc_assignments_from_frontend"] = True
     def deleted_assignment(self, request):
         assignments = request.POST.getlist('assignments[]')
         for pk in assignments:

@@ -784,7 +784,7 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Display button
         display_button.click(() => {
-            $.alert("This feature has not yet been implented");
+            $.alert({title: "This feature has not yet been implented"});
         }).css("text-decoration", "line-through");
         // END Display button
 
@@ -1043,7 +1043,10 @@ $(".assignment").click(function(e) {
         }, 750, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");
-            assignment_footer.removeAttr("style");
+            assignment_footer.css({
+                display: "",
+                marginBottom: "",
+            });
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         dom_assignment.removeClass("open-assignment").css("overflow", "hidden");

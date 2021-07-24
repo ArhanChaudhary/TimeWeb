@@ -104,10 +104,11 @@ utils = {
             headerIcons: function() {
                 // Assignments header icons
                 $("#open-assignments").click(function() {
+                    // Use .reverse() for gc assignemnts so the first assignment is focused
                     if ($(".question-mark").length) {
-                        $(".assignment-container.question-mark .assignment:not(.open-assignment)").click();
+                        $(".assignment-container.question-mark .assignment:not(.open-assignment)").reverse().click();
                     } else {
-                        $(".assignment:not(.open-assignment)").click();
+                        $(".assignment:not(.open-assignment)").reverse().click();
                     }
                 });
         
@@ -138,14 +139,16 @@ utils = {
             },
 
             googleClassroomAPI: function() {
-                if (oauth_token.token) {
-                    $("#toggle-gc-label").html("Disable Google Classroom API");
-                } else {
-                    $("#toggle-gc-label").html("Enable Google Classroom API");
+                if (!create_gc_assignments_from_frontend) {
+                    if (oauth_token.token) {
+                        $("#toggle-gc-label").html("Disable Google Classroom API");
+                    } else {
+                        $("#toggle-gc-label").html("Enable Google Classroom API");
+                    }
                 }
                 $("#toggle-gc-container").click(function() {
-                    if (ajaxUtils.disable_ajax) {
-                        $.alert("You cannot do this on the example account!");
+                    if (isExampleAccount) {
+                        $.alert({title: "You cannot do this on the example account!"});
                         return;
                     }
                     const $this = $(this);
@@ -216,7 +219,7 @@ utils = {
                     if ($(e.target).is("#autofill-selection")) return;
 
                     $.confirm({
-                        title: `This will autofill ${$("#autofill-selection").val().toLowerCase()} work done until today for ALL assignments with missing work inputs. Are you sure?`,
+                        title: `This will autofill ${$("#autofill-selection").val().toLowerCase()} work done until today for ALL assignments with missing work inputs<br>Are you sure?`,
                         content: 'This is an irreversible action',
                         buttons: {
                             confirm: {
@@ -264,7 +267,7 @@ utils = {
                         return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
                     });
                     $.confirm({
-                        title: `This will delete ${assignments_to_delete.length} assignments from class "${sa.tags[0]}". Are you sure?`,
+                        title: `This will delete ${assignments_to_delete.length} assignments from class "${sa.tags[0]}"<br>Are you sure?`,
                         content: 'This is an irreversible action',
                         buttons: {
                             confirm: {
@@ -669,17 +672,17 @@ ajaxUtils = {
     hour_to_update: hour_to_update,
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert('Failed to connect');
+            $.alert({title: "Failed to connect"});
         } else if (response.status == 404) {
-            $.alert('Not found, try refreshing');
+            $.alert({title: "Not found, try refreshing"});
         } else if (response.status == 500) {
-            $.alert('Internal server error. Please contact me if you see this');
+            $.alert({title: "Internal server error. Please contact me if you see this"});
         } else if (exception === 'parsererror') {
-            $.alert('JSON parse failed');
+            $.alert({title: "JSON parse failed"});
         } else if (exception === 'timeout') {
-            $.alert('Timed out, try again');
+            $.alert({title: "Timed out, try again"});
         } else if (exception === 'abort') {
-            $.alert('Request aborted, try again');
+            $.alert({title: "Request aborted, try again"});
         } else {
             $("html").html(response.responseText);
         }
@@ -723,7 +726,7 @@ ajaxUtils = {
         });
     },
     createGCAssignments: function() {
-        if (ajaxUtils.disable_ajax) return;
+        if (ajaxUtils.disable_ajax || !create_gc_assignments_from_frontend) return;
         const data = {
             'csrfmiddlewaretoken': csrf_token,
             'action': 'create_gc_assignments',
@@ -732,8 +735,17 @@ ajaxUtils = {
             type: "POST",
             data: data,
             error: ajaxUtils.error,
-        }).done(authentication_url => {
-            if (authentication_url === "No new gc assignments were added") return;
+        }).done(function(authentication_url) {
+            if (authentication_url === "No new gc assignments were added") {
+                $("#toggle-gc-label").html("");
+                $("#toggle-gc-container").removeClass("open");
+                if (oauth_token.token) {
+                    $("#toggle-gc-label").html("Disable Google Classroom API");
+                } else {
+                    $("#toggle-gc-label").html("Enable Google Classroom API");
+                }
+                return;
+            }
             if (authentication_url) window.location.href = authentication_url; // Invalid creds
             window.location.reload();
         });
@@ -754,7 +766,7 @@ ajaxUtils = {
     SendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
-                $.alert("An assignment takes up too much space and can no longer be saved");
+                $.alert({title: "An assignment takes up too much space and can no longer be saved"});
                 return;
             }
             gtag("event","save_assignment");
@@ -779,14 +791,24 @@ ajaxUtils = {
         }
     },
 }
-
-
 // Prevents submitting form on refresh
 // cite 
 // https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
+jQuery.fn.reverse = Array.prototype.reverse;
+jconfirm.defaults = {
+    escapeKey: true,
+    backgroundDismiss: true,
+
+    boxWidth: '50%',
+    useBootstrap: false,
+
+    animation: 'zoom',
+    closeAnimation: 'scale',
+    animateFromElement: false,
+};
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 const max_length_funct_round = dat.length ? dat[0]['funct_round'].split(".")[1].length : undefined;
@@ -806,17 +828,6 @@ for (let sa of dat) {
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
-}
-jconfirm.defaults = {
-    escapeKey: true,
-    backgroundDismiss: true,
-
-    boxWidth: '50%',
-    useBootstrap: false,
-
-    animation: 'zoom',
-    closeAnimation: 'scale',
-    animateFromElement: false,
 };
 ({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);

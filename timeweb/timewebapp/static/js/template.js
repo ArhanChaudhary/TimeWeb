@@ -165,21 +165,21 @@ $(function() {
                 // Wait for the user to respond to the prompt
                 prompt.userChoice.then(choiceResult => {
                     if (choiceResult.outcome === 'accepted') {
-                        $.alert("Thanks for installing the app");
+                        $.alert({title: "Thanks for installing the app"});
                     }
                 });
             } else {
                 if (isMobile) {
-                    $.alert('Click the share icon on your screen (up arrow in a square) and scroll to "Add to Home Screen"\n\nPlease use the Safari browser if this isn\'t an option');
+                    $.alert({title: "Click the share icon on your screen (up arrow in a square) and scroll to \"Add to Home Screen\"\n\nPlease use the Safari browser if this isn\'t an option"});
                 } else {
-                    $.alert("Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed");
+                    $.alert({title: "Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed"});
                 }
             }
         });
     }
-    $("#nav-usage").click(() => $.alert("This has not yet been written, please contact me directly")).css("text-decoration", "line-through");
-    $("#nav-about").click(() => $.alert("This has not yet been written")).css("text-decoration", "line-through");
-    $("#account-settings").click(() => $.alert("Please contact me regarding your account settings"));
+    $("#nav-usage").click(() => $.alert({title: "This has not yet been written, please contact me directly"})).css("text-decoration", "line-through");
+    $("#nav-about").click(() => $.alert({title: "This has not yet been written"})).css("text-decoration", "line-through");
+    $("#account-settings").click(() => $.alert({title: "Please contact me regarding your account settings"}));
 });
 // Info tooltip
 $.fn.info = function(facing,text,position) {

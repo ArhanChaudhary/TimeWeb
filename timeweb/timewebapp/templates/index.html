@@ -44,7 +44,7 @@
                 {{ field }}
               {% endif %}
               {% for error in field.errors %}
-                <p class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</p>
+                <div class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</div>
               {% endfor %}
             </div>
             {% if field.name == "ctime" %}
@@ -223,8 +223,8 @@
       </div>
     </div>
   </template>
-  <div id="toggle-gc-container">
-    <span id="toggle-gc-label"></span>
+  <div id="toggle-gc-container"{% if create_gc_assignments_from_frontend %} class="open"{% endif %}>
+    <span id="toggle-gc-label">{% if create_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% endif %}</span>
     <img src="{% static 'images/gc-logo.png' %}" width="42" height="42">
   </div>
   {% endspaceless %}

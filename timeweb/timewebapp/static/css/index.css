@@ -344,7 +344,7 @@ header.animate::after {
 .tags-left .tag-add-box {
     left: 23px;
 }
-.assignment.open-assignment .tags {
+.assignment.open-assignment .tags:not(.tags-left) {
     transform: translateY(-100%) translateY(2.75px);
     top: unset;
 }
@@ -800,7 +800,7 @@ label[for='id_ad']::after {
     transform: translateX(-50%);
 }
 #form-wrapper #fields-wrapper {
-    height: 439px;
+    height: 460px;
     overflow: scroll;
 }
 #form-wrapper .field-wrapper {
@@ -838,7 +838,7 @@ label[for='id_ad']::after {
     border-bottom: 1px solid;
     cursor: pointer;
     width: 149px;
-    margin: 10px auto;
+    margin: 10px auto 0;
 }
 #form-wrapper input.disabled-field, #form-wrapper label.disabled-field {
     opacity: 1;
@@ -865,7 +865,7 @@ label[for='id_ad']::after {
 }
 #submit-assignment-button {
     width: calc(100% - 140px);
-    margin: 15px auto 0;
+    margin: 5px auto 0;
     display: block;
     padding: 20px 45px;
     font-size: 19px;
@@ -933,13 +933,17 @@ label[for='id_ad']::after {
 #toggle-gc-container img {
     position: relative;
 }
-#toggle-gc-container:hover #toggle-gc-label {
-    width: 245px;
+#toggle-gc-container:hover #toggle-gc-label, #toggle-gc-container.open #toggle-gc-label {
     opacity: 1;
     transform: translateX(10px);
     transition: width 0.7s cubic-bezier(0, 0, 0.5, 1), opacity 0.3s linear 0.35s, transform 0.25s linear 0.35s;
 }
-
+#toggle-gc-container:hover #toggle-gc-label {
+    width: 245px;
+}
+#toggle-gc-container.open #toggle-gc-label {
+    width: 333px;
+}
 :not(.assignment-container).add-white-shadow {
     mix-blend-mode: difference;
     color: white;
