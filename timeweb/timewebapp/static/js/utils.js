@@ -119,15 +119,17 @@ utils = {
                         $(".assignment.open-assignment").click();
                     }
                 });
-        
-                $("#simulated-date").hide();
+                if (isExampleAccount) {
+                    $("#simulated-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                } else {
+                    $("#simulated-date").hide(); 
+                }
                 $("#next-day").click(function() {
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
-                    $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}))
-                    $(window).trigger("resize");
+                    $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                     priority.sort({ ignore_timeout: true });
-                })
+                });
                 $("#next-day-icon-label").info("bottom",
                     `Simulates the next day for ALL assignments
                     
@@ -148,7 +150,7 @@ utils = {
                 }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
-                        $.alert({title: "You cannot do this on the example account!"});
+                        $.alert({title: "You cannot do this on the example account"});
                         return;
                     }
                     const $this = $(this);
@@ -664,9 +666,6 @@ utils = {
 }
 
 isExampleAccount = username === example_account_name// && 0;
-if (isExampleAccount) {
-    window.gtag = function(){};
-}
 ajaxUtils = {
     disable_ajax: isExampleAccount, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     hour_to_update: hour_to_update,
@@ -688,7 +687,9 @@ ajaxUtils = {
         }
     },
     changeDateNowAndExampleAssignmentDates: function() {
+        if (isExampleAccount) return;
         if (date_now.valueOf() + 1000*60*60*(24 + ajaxUtils.hour_to_update) < new Date().valueOf()) {
+            $.alert({title: "log: after midnight"});
             const old_date_now = new Date(date_now.valueOf());
             date_now = new Date(new Date().toDateString());
             // If this runs after midnight, set date_now to yesterday
@@ -696,21 +697,16 @@ ajaxUtils = {
                 date_now.setDate(date_now.getDate() - 1);
             }
             const days_since_example_ad = utils.daysBetweenTwoDates(date_now, old_date_now);
-            if (isExampleAccount) {
-                for (example_assignment of dat) {
-                    example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
-                }
-            } else {
-                const example_assignment = dat.find(_sa => _sa.name === example_assignment_name);
-                if (example_assignment) {
-                    // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
-                    // In this case, changing the assignment date automatically changes the due date
-                    example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
-                }
+            const example_assignment = dat.find(_sa => _sa.name === example_assignment_name);
+            if (example_assignment) {
+                // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
+                // In this case, changing the assignment date automatically changes the due date
+                example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
             }
             for (let sa of dat) {
                 sa.mark_as_done = false;
             }
+            priority.sort({ ignore_timeout: true });
         }
     },
     ajaxFinishedTutorial: function() {
@@ -837,6 +833,10 @@ if (date_now.getHours() < hour_to_update) {
 }
 highest_priority_color = utils.formatting.hexToRgb(highest_priority_color);
 lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color);
+if (isExampleAccount) {
+    window.gtag = function(){};
+    date_now = new Date(2021, 4, 3);
+}
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend

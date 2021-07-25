@@ -254,10 +254,8 @@ $(function() {
         dom_assignment.css("opacity", "0");
         const assignment_container = dom_assignment.parents(".assignment-container");
         // Animate height on assignment_container because it doesn't have a transition
-        // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
-
-        // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
-        assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
+        const boxHeightMinusShortcuts = dom_assignment.outerHeight() + +assignment_container.css("padding-top").replace("px", "") + +assignment_container.css("padding-bottom").replace("px", "");
+        assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, 750, "easeOutCubic", function() {
             // $("#assignments-container").css("overflow", "");
             // Remove assignment data from dat
             dat = dat.filter(_sa => sa.id !== _sa.id);
@@ -280,11 +278,9 @@ $(function() {
             const dom_assignment = assignment_container.children(".assignment");
             // Opacity CSS transition
             dom_assignment.css("opacity", "0");
-            // Use the height of dom_assignment instead of assignment_container to ignore the height of #delete-starred-assignments
-
-            // Animate height on assignment_container because it doesn't have a transition
-            // Add +10 because of "padding-top: 5px; padding-bottom: 5px;"
-            assignment_container.animate({marginBottom: -(dom_assignment.outerHeight()+10)}, 750, "easeOutCubic", function() {
+            // Use the height of dom_assignment instead of assignment_container to ignore the height of shortcuts
+            const boxHeightMinusShortcuts = dom_assignment.outerHeight() + +assignment_container.css("padding-top").replace("px", "") + +assignment_container.css("padding-bottom").replace("px", "");
+            assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, 750, "easeOutCubic", function() {
                 // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
                 if (assignment_container.children("#delete-starred-assignments").length) {
                     $("#delete-starred-assignments").insertBefore(assignment_container);

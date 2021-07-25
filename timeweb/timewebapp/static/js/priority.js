@@ -220,7 +220,7 @@ priority = {
             assignment_container.toggleClass("finished", add_finished_condition);
             assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
             assignment_container.toggleClass("question-mark", add_question_mark_condition);
-            assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition || sa.sa.needs_more_info);
+            assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition);
 
             let status_priority;
             if (status_value === 1) {
@@ -228,8 +228,8 @@ priority = {
             } else if (status_value === 2) {
                 status_priority = today_minus_ad;
             } else if (status_value === 6) {
-                // Order assignments that need more info lexicographically
-                status_priority = sa.sa.tags[0].toLowerCase();
+                // Order assignments that need more info by their tags lexicographically
+                status_priority = (sa.sa.tags[0]||"").toLowerCase();
             } else if (add_question_mark_condition) {
                 // Order question mark assignments by their closeness to their due date
                 status_priority = -due_date_minus_today;
@@ -319,10 +319,36 @@ priority = {
             }
             if (text_priority) {
                 const dom_title = $(".title").eq(pd[2]);
-                if ((pd[0] === 5 || pd[0] === 4) && !mark_as_done) {
-                    dom_title.attr("data-priority", `Priority: ${priority_percentage}%`);               
+                const add_priority_percentage = (pd[0] === 5 || pd[0] === 4) && !mark_as_done;
+                if (add_priority_percentage) {
+                    dom_title.attr("data-priority", `Priority: ${priority_percentage}%`);
                 } else {
                     dom_title.attr("data-priority", "");       
+                }
+                if ($(".tag-left").length) {
+                    new Promise(function(resolve) {
+                        if (params.first_sort) {
+                            $(window).one("load", () => resolve());
+                        } else {
+                            resolve();
+                        }
+                    }).then(function() {
+                        const dom_tags = dom_assignment.find(".tags");
+                        const dom_button = dom_assignment.find(".button");
+                        const dom_assignment_footer = dom_assignment.find(".assignment-footer");
+                        // really inefficient but whatever
+                        dom_assignment.addClass("transition-instantly");
+                        dom_assignment.css({paddingTop: "", paddingBottom: ""});
+                        dom_button.css({marginTop: "", marginBottom: ""});
+                        const tag_bottom = dom_tags.offset().top + dom_tags.height();
+                        const title_top = dom_title.offset().top;
+                        const padding_to_add = Math.max(0, add_priority_percentage ? 11 : -3 - (title_top - tag_bottom));
+                        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
+                        dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
+                        dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
+                        dom_assignment[0].offsetHeight;
+                        dom_assignment.removeClass("transition-instantly");
+                    });
                 }
             }
             const assignment_container = dom_assignment.parents(".assignment-container");
@@ -343,7 +369,7 @@ priority = {
                                 block: 'nearest',
                             });
                         }, 0);
-                        // The scroll function determines when the page has stopped scrolling and internally resolves the promise via "resolver"
+                        // The scroll function determines when the page has stopped scrolling and internally resolves the promise
                         $("main").scroll(() => utils.scroll(resolve));
                         utils.scroll(resolve);
                     });
@@ -352,15 +378,16 @@ priority = {
                 priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
 
-            // Loops through every google classroom assignment that needs more info and adds "delete all assignments of this class"
+            // Loops through every google classroom assignment that needs more info AND have a tag (representing their class) to add "delete all assignments of this class"
             // This has to be looped before they are sorted so setInitialTopAssignmentOffsets is accurate
             // This means we can't loop through ".assignment-container" but instead ordered_assignments
             // The current looped assignment's tag is compared with the previous looped assignment's tag
             // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
             const sa = utils.loadAssignmentData(dom_assignment);
-            if (sa.needs_more_info) {
-                const current_tag = sa.tags[0];
-                if (current_tag !== prev_tag) {
+            const current_tag = sa.tags[0];
+            if (sa.needs_more_info && current_tag) {
+                assignment_container.addClass("add-line-wrapper");
+                if (current_tag !== prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                     if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
                     assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-of-class-template").html());
                 }
@@ -414,8 +441,8 @@ priority = {
         if ($(".question-mark").length) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css({
-                marginTop: -27,
-                transform: "translateY(-4px)",
+                marginTop: -23,
+                transform: "translateY(-8px)",
             });
         } else if (!total) {
             $("#info").show();
@@ -441,25 +468,6 @@ priority = {
         utils.ui.tickClock();
         if (params.first_sort) {
             setInterval(utils.ui.tickClock, 1000);
-            if ($(".tags-left").length) {
-                $(window).one("load", function() {
-                    $(".assignment").each(function() {
-                        const dom_assignment = $(this);
-                        
-                        const tags = dom_assignment.find(".tags");
-                        const title = dom_assignment.find(".title");
-                        const tag_bottom = tags.offset().top + tags.height();
-                        const title_top = title.offset().top;
-                        const padding_to_add = 11 - (title_top - tag_bottom);
-                        dom_assignment.addClass("transition-instantly");
-                        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
-                        dom_assignment.find(".button").css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
-                        dom_assignment.find(".assignment-footer").css("top", dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
-                        dom_assignment[0].offsetHeight;
-                        dom_assignment.removeClass("transition-instantly");
-                    });
-                });
-            }
         }
         $("#assignments-container").css("opacity", "1");
     },

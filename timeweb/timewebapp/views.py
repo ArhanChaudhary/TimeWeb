@@ -192,11 +192,11 @@ class TimewebView(LoginRequiredMixin, View):
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
+        if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day or 1:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
-                    assignment.save()
+            TimewebModel.objects.bulk_update(self.assignment_models, ['mark_as_done'])
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
 
