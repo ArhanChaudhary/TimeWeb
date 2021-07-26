@@ -40,8 +40,8 @@ if settings.DEBUG:
 else:
     GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
 
-hour_to_update = 4
-example_account_name = "Example"
+after_midnight_hour_to_update = 4
+example_account_name = "Example"#+"e"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 25
 MAX_NUMBER_TAGS = 5
@@ -84,7 +84,7 @@ logger.propagate = False
 def get_default_context():
     return {
         "example_account_name": example_account_name,
-        "hour_to_update": hour_to_update,
+        "after_midnight_hour_to_update": after_midnight_hour_to_update,
         "example_assignment_name": example_assignment_name,
         "max_number_tags": MAX_NUMBER_TAGS,
         "DEBUG": settings.DEBUG,
@@ -186,7 +186,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
         self.context['tag_position'] = self.settings_model.tag_position.lower()
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
-            self.context['create_gc_assignments_from_frontend'] = bool(self.settings_model.oauth_token)
+            self.context['creating_gc_assignments_from_frontend'] = bool(self.settings_model.oauth_token)
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
     def get(self,request):
@@ -255,7 +255,7 @@ class TimewebView(LoginRequiredMixin, View):
         # Parts of the form that can only validate in views
         form_is_valid = True
         if self.isExampleAccount:# and 0:
-            self.form.add_error("name", forms.ValidationError(_('You cannot create or edit assignments in the example account') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+            self.form.add_error("name", forms.ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
         else:
             # Ensure that the user's assignment name doesn't match with any other assignment
@@ -286,7 +286,7 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
-                logger.warning(f"User \"{request.user}\" cannot edit an assignment that isn't their's")
+                logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you are trying to edit isn't yours")
             if self.isExampleAccount:# and 0:
                 # post-get
@@ -313,7 +313,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.break_days = self.form.cleaned_data.get("break_days")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
         date_now = timezone.localtime(timezone.now())
-        if date_now.hour < hour_to_update:
+        if date_now.hour < after_midnight_hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         if self.created_assignment or self.sm.needs_more_info:
@@ -473,7 +473,7 @@ class TimewebView(LoginRequiredMixin, View):
                 return authorization_url
 
         date_now = timezone.localtime(timezone.now())
-        if date_now.hour < hour_to_update:
+        if date_now.hour < after_midnight_hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         service = build('classroom', 'v1', credentials=credentials)
@@ -579,7 +579,7 @@ class TimewebView(LoginRequiredMixin, View):
         for pk in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=int(pk))
             if request.user != self.sm.user:
-                logger.warning(f"User \"{request.user}\" cannot delete an assignment that isn't their's")
+                logger.warning(f"User \"{request.user}\" can't delete an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
             self.sm.delete()
             logger.info(f'User \"{request.user}\" deleted assignment "{self.sm.name}"')
@@ -602,7 +602,7 @@ class TimewebView(LoginRequiredMixin, View):
                 elif key == 'tags':
                     log_message = f'User \"{request.user}\" reordered tags for assignment "{self.sm.name}"'
                 if request.user != self.sm.user:
-                    logger.warning(f"User \"{request.user}\" cannot save an assignment that isn't theirs")
+                    logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
                     return HttpResponseForbidden("This assignment isn't yours")
                 setattr(self.sm, key, value)
                 logger.info(log_message)
@@ -622,7 +622,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.pk = request.POST['pk']
         self.sm = get_object_or_404(TimewebModel, pk=self.pk)
         if request.user != self.sm.user:
-            logger.warning(f"User \"{request.user}\" cannot save add a tag to an assignment that isn't theirs")
+            logger.warning(f"User \"{request.user}\" can't save add a tag to an assignment that isn't theirs")
             return HttpResponseForbidden("This assignment isn't yours")
 
         tag_names = request.POST.getlist('tag_names[]')

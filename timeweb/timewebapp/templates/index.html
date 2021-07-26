@@ -223,8 +223,8 @@
       </div>
     </div>
   </template>
-  <div id="toggle-gc-container"{% if create_gc_assignments_from_frontend %} class="open"{% endif %}>
-    <span id="toggle-gc-label">{% if create_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% endif %}</span>
+  <div id="toggle-gc-container"{% if creating_gc_assignments_from_frontend %} class="open"{% endif %}>
+    <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% endif %}</span>
     <img src="{% static 'images/gc-logo.png' %}" width="42" height="42">
   </div>
   {% endspaceless %}

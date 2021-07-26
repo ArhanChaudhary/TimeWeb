@@ -830,12 +830,12 @@ class VisualAssignment extends Assignment {
         // END Next assignment button
 
         // BEGIN Set skew ratio using graph button
-        const _this = this;
+        const $this = this;
         function cancel_set_skew_ratio_using_graph() {
             skew_ratio_button.onlyText("Set skew ratio using graph");
-            _this.set_skew_ratio_using_graph = false;
-            _this.sa.skew_ratio = old_skew_ratio;
-            _this.draw();
+            $this.set_skew_ratio_using_graph = false;
+            $this.sa.skew_ratio = old_skew_ratio;
+            $this.draw();
             // No need to ajax since skew ratio is the same
         }
         let not_applicable_timeout_skew_ratio_button;

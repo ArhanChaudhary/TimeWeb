@@ -20,9 +20,9 @@
             username = "{{ user.get_username }}";
             example_account_name = "{{ example_account_name }}";
             example_assignment_name = "{{ example_assignment_name }}";
-            hour_to_update = {{ hour_to_update }};
+            after_midnight_hour_to_update = {{ after_midnight_hour_to_update }};
             max_number_tags = {{ max_number_tags }};
-            create_gc_assignments_from_frontend = {% if create_gc_assignments_from_frontend %}{{ create_gc_assignments_from_frontend|lower }}{% else %}false{% endif %};
+            creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}{{ creating_gc_assignments_from_frontend|lower }}{% else %}false{% endif %};
             {% endif %}
         </script>
         <title>TimeWeb</title>

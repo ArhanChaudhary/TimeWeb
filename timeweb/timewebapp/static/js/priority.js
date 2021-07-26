@@ -302,6 +302,9 @@ priority = {
         }));
         let prev_assignment_container;
         let prev_tag;
+        let already_found_first_incomplete_works = false;
+        let already_found_first_finished = false;
+        $("#autofill-work-done, #delete-starred-assignments").hide();
         for (let pd of ordered_assignments) {
             // originally ![6,7,8].includes(pd[0]) && (pd[3] || $(".question-mark").length); if pd[3] is true then ![6,7,8].includes(pd[0])
             const mark_as_done = !!(pd[3] || $(".question-mark").length && ![6,7,8].includes(pd[0]));
@@ -369,7 +372,7 @@ priority = {
                                 block: 'nearest',
                             });
                         }, 0);
-                        // The scroll function determines when the page has stopped scrolling and internally resolves the promise
+                        // utils.scroll determines when the page has stopped scrolling and internally resolves the promise
                         $("main").scroll(() => utils.scroll(resolve));
                         utils.scroll(resolve);
                     });
@@ -384,6 +387,7 @@ priority = {
             // The current looped assignment's tag is compared with the previous looped assignment's tag
             // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
             const sa = utils.loadAssignmentData(dom_assignment);
+
             const current_tag = sa.tags[0];
             if (sa.needs_more_info && current_tag) {
                 assignment_container.addClass("add-line-wrapper");
@@ -394,20 +398,20 @@ priority = {
                 prev_tag = current_tag;
                 prev_assignment_container = assignment_container;
             }
+
+            if (pd[0] === 8 && !already_found_first_incomplete_works) {
+                $("#autofill-work-done").show().insertBefore(dom_assignment);
+                already_found_first_incomplete_works = true;
+            }
+
+            if (pd[0] === 1 && !already_found_first_finished) {
+                $("#delete-starred-assignments").show().insertBefore(dom_assignment);
+                already_found_first_finished = true;
+            }
         }
         if (prev_assignment_container) {
             prev_assignment_container.addClass("last-add-line-wrapper");
             utils.ui.setClickHandlers.deleteAssignmentsFromClass();
-        }
-        if ($(".finished").length) {
-            $("#delete-starred-assignments").show().insertBefore($(".finished").first().children(".assignment"));
-        } else {
-            $("#delete-starred-assignments").hide();
-        }
-        if ($(".incomplete-works").length) {
-            $("#autofill-work-done").show();
-        } else {
-            $("#autofill-work-done").hide();
         }
         if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
         ordering.sortAssignments(ordered_assignments);
@@ -435,7 +439,7 @@ priority = {
         // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
         $(".finished").first().addClass("first-add-line-wrapper");
         $(".finished").last().addClass("last-add-line-wrapper");
-        // don't need first-add-line-wrapper for .incomplete-works because i implemented that differently for some reason
+        $(".incomplete-works").first().addClass("first-add-line-wrapper");
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
 
         if ($(".question-mark").length) {

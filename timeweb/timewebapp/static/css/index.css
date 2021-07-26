@@ -164,7 +164,7 @@ header.animate::after {
     box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
-#delete-starred-assignments, .delete-gc-assignments-of-class {
+#delete-starred-assignments, #autofill-work-done,.delete-gc-assignments-of-class {
     position: relative;
     margin-bottom: 15px;
     margin-top: -7px;
@@ -176,13 +176,6 @@ header.animate::after {
     text-align: center;
     position: absolute;
     cursor: pointer;
-}
-#autofill-work-done {
-    padding: 0 10px;
-    margin-bottom: 8px;
-}
-#autofill-work-done .shortcut-text {
-    margin-top: -12px;
 }
 #autofill-selection {
     vertical-align: top;
@@ -200,10 +193,10 @@ header.animate::after {
     border-top: 2px solid black;
 }
 #autofill-work-done .shortcut-line-left {
-    width: calc(50% - 101px);
+    width: calc(50% - 103px);
 }
 #autofill-work-done .shortcut-line-right {
-    width: calc(50% - 107px);
+    width: calc(50% - 110px);
 }
 #delete-starred-assignments .shortcut-line-left {
     width: calc(50% - 116px);

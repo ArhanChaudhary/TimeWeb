@@ -259,10 +259,8 @@ $(function() {
             // $("#assignments-container").css("overflow", "");
             // Remove assignment data from dat
             dat = dat.filter(_sa => sa.id !== _sa.id);
-            // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
-            if (assignment_container.children("#delete-starred-assignments").length) {
-                $("#delete-starred-assignments").insertBefore(assignment_container);
-            }
+            // If a shorcut is in assignment_container, take it out so it doesn't get deleted
+            assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
             // Remove assignment from DOM
             assignment_container.remove();
             // Although nothing needs to be swapped, priority.sort() still needs to be run
@@ -271,7 +269,7 @@ $(function() {
         });
         gtag("event","delete_assignment");
     }
-    transitionDeleteAssignments = function($assignment_container) {
+    transitionDeleteAssignments = function($assignment_container, assignment_ids_to_delete) {
         $assignment_container.each(function(i) {
             gtag("event","delete_assignment");
             const assignment_container = $(this);
@@ -281,14 +279,14 @@ $(function() {
             // Use the height of dom_assignment instead of assignment_container to ignore the height of shortcuts
             const boxHeightMinusShortcuts = dom_assignment.outerHeight() + +assignment_container.css("padding-top").replace("px", "") + +assignment_container.css("padding-bottom").replace("px", "");
             assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, 750, "easeOutCubic", function() {
-                // If "delete all starred assignments" is in assignment_container, take it out so it doesn't get deleted
-                if (assignment_container.children("#delete-starred-assignments").length) {
-                    $("#delete-starred-assignments").insertBefore(assignment_container);
-                }
+                // If a shortcut is in assignment_container, take it out so it doesn't get deleted
+                assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
                 // Remove assignment from DOM
                 assignment_container.remove();
                 // Run on last callback
                 if (i === $assignment_container.length - 1) {
+                    // Remove from dat
+                    dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
                     // Although nothing needs to be swapped, priority.sort() still needs to be run
                     // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
                     priority.sort({ ignore_timeout: true });

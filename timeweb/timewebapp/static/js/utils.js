@@ -125,6 +125,7 @@ utils = {
                     $("#simulated-date").hide(); 
                 }
                 $("#next-day").click(function() {
+                    in_next_day = true;
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
                     $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
@@ -141,7 +142,7 @@ utils = {
             },
 
             googleClassroomAPI: function() {
-                if (!create_gc_assignments_from_frontend) {
+                if (!creating_gc_assignments_from_frontend) {
                     if (oauth_token.token) {
                         $("#toggle-gc-label").html("Disable Google Classroom API");
                     } else {
@@ -150,9 +151,10 @@ utils = {
                 }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
-                        $.alert({title: "You cannot do this on the example account"});
+                        $.alert({title: "You can't do this on the example account"});
                         return;
                     }
+                    if (creating_gc_assignments_from_frontend) return;
                     const $this = $(this);
                     if ($this.hasClass("clicked")) return;
                     $this.addClass("clicked");
@@ -173,7 +175,7 @@ utils = {
             },
 
             deleteAllStarredAssignments: function() {
-                $("#delete-starred-assignments .shortcut-text").click(function() {
+                $("#delete-starred-assignments").click(function() {
                     $.confirm({
                         title: `Are you sure you want to delete ${$(".finished").length} starred assignments?`,
                         content: 'This is an irreversible action',
@@ -192,9 +194,7 @@ utils = {
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
-                                        // Remove ids to delete from dat
-                                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                                        transitionDeleteAssignments($(".finished"));
+                                        transitionDeleteAssignments($(".finished"), assignment_ids_to_delete);
                                     }
                                     if (ajaxUtils.disable_ajax) {
                                         success();
@@ -261,7 +261,8 @@ utils = {
 
             deleteAssignmentsFromClass: function() {
                 $(".delete-gc-assignments-of-class").click(function() {
-                    const dom_assignment = $(this).siblings(".assignment");
+                    const $this = $(this);
+                    const dom_assignment = $this.siblings(".assignment");
                     const sa = utils.loadAssignmentData(dom_assignment);
                     const assignments_to_delete = $(".assignment-container").filter(function() {
                         const dom_assignment = $(this).children(".assignment");
@@ -286,8 +287,8 @@ utils = {
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
-                                        dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                                        transitionDeleteAssignments(assignments_to_delete);
+                                        $this.off("click");
+                                        transitionDeleteAssignments(assignments_to_delete, assignment_ids_to_delete);
                                     }
                 
                                     if (ajaxUtils.disable_ajax) {
@@ -647,14 +648,23 @@ utils = {
             });
         },
     },
+    after_midnight_hour_to_update: after_midnight_hour_to_update,
+    reloadAfterMidnightHourToUpdate: function() {
+        // Don't reload in the next day to preserve changes made in the simulation
+        // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
+        if (window.in_next_day || isExampleAccount) return;
+        if (date_now.valueOf() + 1000*60*60*(24 + utils.after_midnight_hour_to_update) < new Date().valueOf()) {
+            window.location.reload();
+        }
+    },
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
     loadAssignmentData: function($element_with_id_attribute) {
         return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
     },
-    // Resolves a resolver promise function when automatic scrolling ends
-    // Scrolling detected with $("main").scroll(scroll);
+    // Resolves a promise function when automatic scrolling ends
+    // Scrolling detected with $("main").scroll(utils.scroll);
     scroll: function(resolver) {
         clearTimeout(utils.scrollTimeout);
         // Runs when scroll ends
@@ -665,10 +675,9 @@ utils = {
     },
 }
 
-isExampleAccount = username === example_account_name// && 0;
+isExampleAccount = username === example_account_name// || 1;
 ajaxUtils = {
-    disable_ajax: isExampleAccount, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
-    hour_to_update: hour_to_update,
+    disable_ajax: isExampleAccount,// && 0, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
             $.alert({title: "Failed to connect"});
@@ -686,29 +695,6 @@ ajaxUtils = {
             $("html").html(response.responseText);
         }
     },
-    changeDateNowAndExampleAssignmentDates: function() {
-        if (isExampleAccount) return;
-        if (date_now.valueOf() + 1000*60*60*(24 + ajaxUtils.hour_to_update) < new Date().valueOf()) {
-            $.alert({title: "log: after midnight"});
-            const old_date_now = new Date(date_now.valueOf());
-            date_now = new Date(new Date().toDateString());
-            // If this runs after midnight, set date_now to yesterday
-            if (new Date().getHours() < ajaxUtils.hour_to_update) {
-                date_now.setDate(date_now.getDate() - 1);
-            }
-            const days_since_example_ad = utils.daysBetweenTwoDates(date_now, old_date_now);
-            const example_assignment = dat.find(_sa => _sa.name === example_assignment_name);
-            if (example_assignment) {
-                // No need to change the due date locally because it is stored as the distance from the due date to the assignment date
-                // In this case, changing the assignment date automatically changes the due date
-                example_assignment.assignment_date.setDate(example_assignment.assignment_date.getDate() + days_since_example_ad);
-            }
-            for (let sa of dat) {
-                sa.mark_as_done = false;
-            }
-            priority.sort({ ignore_timeout: true });
-        }
-    },
     ajaxFinishedTutorial: function() {
         if (ajaxUtils.disable_ajax) return;
         const data = {
@@ -722,7 +708,7 @@ ajaxUtils = {
         });
     },
     createGCAssignments: function() {
-        if (ajaxUtils.disable_ajax || !create_gc_assignments_from_frontend) return;
+        if (ajaxUtils.disable_ajax || !creating_gc_assignments_from_frontend) return;
         const data = {
             'csrfmiddlewaretoken': csrf_token,
             'action': 'create_gc_assignments',
@@ -740,6 +726,7 @@ ajaxUtils = {
                 } else {
                     $("#toggle-gc-label").html("Enable Google Classroom API");
                 }
+                creating_gc_assignments_from_frontend = false;
                 return;
             }
             if (authentication_url) window.location.href = authentication_url; // Invalid creds
@@ -805,17 +792,32 @@ jconfirm.defaults = {
     closeAnimation: 'scale',
     animateFromElement: false,
 };
+({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
+def_break_days = def_break_days.map(Number);
+date_now = new Date(new Date().toDateString());
+highest_priority_color = utils.formatting.hexToRgb(highest_priority_color);
+lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color);
+if (isExampleAccount) {
+    window.gtag = function(){};
+    date_now = new Date(2021, 4, 3);
+}
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
 const max_length_funct_round = dat.length ? dat[0]['funct_round'].split(".")[1].length : undefined;
 for (let sa of dat) {
     sa.assignment_date = new Date(sa.assignment_date);
-    // Don't really know what to do for assignment dates on different tzs so i'll just round it to the nearest day
+    // Don't really know what to do for assignment dates on different tzs (since they are stored in utc) so i'll just round it to the nearest day
     // Add half a day and flooring it rounds it
-    sa.assignment_date = new Date(sa.assignment_date.valueOf() + 43200000);
+    sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
     sa.assignment_date.setHours(0,0,0,0);
 
-    sa.x = utils.daysBetweenTwoDates(Date.parse(sa.x), sa.assignment_date);
+    sa.x = new Date(sa.x);
+    sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
+    sa.x.setHours(0,0,0,0);
+    sa.x = utils.daysBetweenTwoDates(sa.x, sa.assignment_date);
+    if (sa.name === example_assignment_name) {
+        sa.assignment_date = new Date(date_now.valueOf());
+    }
     sa.y = +sa.y;
     sa.ctime = +sa.ctime;
     sa.funct_round = +sa.funct_round;
@@ -825,18 +827,6 @@ for (let sa of dat) {
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 };
-({ warning_acceptance, def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
-def_break_days = def_break_days.map(Number);
-date_now = new Date(new Date().toDateString());
-if (date_now.getHours() < hour_to_update) {
-    date_now.setDate(date_now.getDate() - 1);
-}
-highest_priority_color = utils.formatting.hexToRgb(highest_priority_color);
-lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color);
-if (isExampleAccount) {
-    window.gtag = function(){};
-    date_now = new Date(2021, 4, 3);
-}
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
@@ -847,9 +837,9 @@ document.addEventListener("DOMContentLoaded", function() {
         'action': 'save_assignment',
         'assignments': [],
     },
-    ajaxUtils.changeDateNowAndExampleAssignmentDates();
+    utils.reloadAfterMidnightHourToUpdate();
     if (oauth_token.token) ajaxUtils.createGCAssignments();
-    setInterval(ajaxUtils.changeDateNowAndExampleAssignmentDates, 1000*60);
+    setInterval(utils.reloadAfterMidnightHourToUpdate, 1000*60);
     utils.ui.setClickHandlers.toggleEstimatedCompletionTimeButton();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();

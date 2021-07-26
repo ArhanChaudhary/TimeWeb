@@ -90,7 +90,7 @@ class TimewebForm(forms.ModelForm):
         try:
             if works >= y >= 1:
                 self.add_error("works",
-                    forms.ValidationError(_("This field's value of %(value)g cannot be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
+                    forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
                         'value': works,
                         'y': y,
                         'equal_to_or_greater_than': "equal to" if works == y else "greater than",
@@ -101,7 +101,7 @@ class TimewebForm(forms.ModelForm):
         try:
             if x <= assignment_date:
                 self.add_error("x",
-                    forms.ValidationError(_("The due date cannot be %(on_or_before)s the assignment date"),code='invalid',params={
+                    forms.ValidationError(_("The due date can't be %(on_or_before)s the assignment date"),code='invalid',params={
                         'on_or_before': "on" if x == assignment_date else "before",
                     })
                 )
