@@ -189,7 +189,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
         self.context['tag_position'] = self.settings_model.tag_position.lower()
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
-            self.context['creating_gc_assignments_from_frontend'] = bool(self.settings_model.oauth_token)
+            self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
     def get(self,request):
