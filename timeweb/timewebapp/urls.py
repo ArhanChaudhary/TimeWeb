@@ -6,7 +6,6 @@ from django.http import HttpResponse
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
     path('settings', views.SettingsView.as_view(),name='settings'),
-    path('contact', views.ContactView.as_view(),name='contact'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
     path('policies', RedirectView.as_view(url='/static/policies/policies.html'), name='policies'),
     path('cookies', RedirectView.as_view(url='/static/policies/cookies.html')),

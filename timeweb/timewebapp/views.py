@@ -766,12 +766,6 @@ class ImagesView(LoginRequiredMixin, View):
         else:
             return HttpResponse(status=204)
 
-class ContactView(View):
-    def __init__(self):
-        self.context = get_default_context()
-    def get(self, request):
-        return render(request, "contact.html", self.context)
-
 class ChangelogView(View):
     def __init__(self):
         self.context = get_default_context()

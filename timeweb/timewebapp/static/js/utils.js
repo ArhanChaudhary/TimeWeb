@@ -718,7 +718,7 @@ ajaxUtils = {
         } else if (response.status == 404) {
             $.alert({title: "Not found, try refreshing"});
         } else if (response.status == 500) {
-            $.alert({title: "Internal server error. Please contact me if you see this"});
+            $.alert({title: "Internal server error. Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
         } else if (exception === 'parsererror') {
             $.alert({title: "JSON parse failed"});
         } else if (exception === 'timeout') {

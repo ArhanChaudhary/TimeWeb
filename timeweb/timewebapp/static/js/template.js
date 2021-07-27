@@ -177,9 +177,9 @@ $(function() {
             }
         });
     }
-    $("#nav-usage").click(() => $.alert({title: "This has not yet been written, please contact me directly"})).css("text-decoration", "line-through");
+    $("#nav-usage").click(() => $.alert({title: "This has not yet been written, please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> directly"})).css("text-decoration", "line-through");
     $("#nav-about").click(() => $.alert({title: "This has not yet been written"})).css("text-decoration", "line-through");
-    $("#account-settings").click(() => $.alert({title: "Please contact me regarding your account settings"}));
+    $("#account-settings").click(() => $.alert({title: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> regarding your account settings"}));
 });
 // Info tooltip
 $.fn.info = function(facing,text,position) {
