@@ -40,6 +40,8 @@ if settings.DEBUG:
 else:
     GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
 
+editing_example_account = False
+
 after_midnight_hour_to_update = 4
 example_account_name = "Example"#+"e"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
@@ -87,6 +89,7 @@ def get_default_context():
         "after_midnight_hour_to_update": after_midnight_hour_to_update,
         "example_assignment_name": example_assignment_name,
         "max_number_tags": MAX_NUMBER_TAGS,
+        "editing_example_account": editing_example_account,
         "DEBUG": settings.DEBUG,
     }
 class SettingsView(LoginRequiredMixin, View):
@@ -225,7 +228,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.isExampleAccount = request.user.username == example_account_name
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
-        if self.isExampleAccount: return HttpResponse(status=204)
+        if self.isExampleAccount and not editing_example_account: return HttpResponse(status=204)
         action = request.POST['action']
         if action == 'delete_assignment':
             return self.deleted_assignment(request)
@@ -254,7 +257,7 @@ class TimewebView(LoginRequiredMixin, View):
 
         # Parts of the form that can only validate in views
         form_is_valid = True
-        if self.isExampleAccount:# and 0:
+        if self.isExampleAccount and not editing_example_account:
             self.form.add_error("name", forms.ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
         else:
@@ -288,9 +291,7 @@ class TimewebView(LoginRequiredMixin, View):
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you are trying to edit isn't yours")
-            if self.isExampleAccount:# and 0:
-                # post-get
-                # Don't make this return a 204 when submitting from the example account because there are too many assignments
+            if self.isExampleAccount and not editing_example_account:
                 return redirect(request.path_info)
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
@@ -323,7 +324,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.dynamic_start = self.sm.blue_line_start
         else:
             self.sm.blue_line_start = old_data.blue_line_start + (old_data.assignment_date-self.sm.assignment_date).days
-            if date_now < old_data.assignment_date or self.sm.blue_line_start < 0:
+            if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or editing_example_account:
                 self.sm.blue_line_start = 0
             removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
             if removed_works_start < 0:
@@ -432,8 +433,6 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             request.session['edited_assignment'] = self.sm.name    
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
-        # post-get
-        # Don't make this return a 204 when submitting from the example account because there are too many assignments
         return redirect(request.path_info)
 
     def invalid_form(self, request):
@@ -628,7 +627,7 @@ class TimewebView(LoginRequiredMixin, View):
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
             tag_names = [tag_name for tag_name in tag_names if tag_name not in self.sm.tags]
-            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponse("Too many tags!")
+            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponseForbidden("Too Many Tags!")
             self.sm.tags.extend(tag_names)
 
         elif action == "tag_delete":

@@ -23,6 +23,7 @@
             after_midnight_hour_to_update = {{ after_midnight_hour_to_update }};
             max_number_tags = {{ max_number_tags }};
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}{{ creating_gc_assignments_from_frontend|lower }}{% else %}false{% endif %};
+            editing_example_account = {{ editing_example_account|lower }};
             {% endif %}
         </script>
         <title>TimeWeb</title>
@@ -42,7 +43,6 @@
         <meta property="twitter:image" content="{% static 'images/icons/og.png' %}">
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=0.5">
-        <!-- Don't use defer or async because it causes the first paint to be before DOMContentLoaded and mess up the transition -->
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
         {% block css %}{% endblock css %}
         <!-- Note: JQuery has been modified such that overflow: hidden isn't applied during an animation -->

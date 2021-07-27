@@ -87,17 +87,10 @@ utils = {
                 $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
                 $("#break-days-wrapper").addClass("hidden-field");
                 $("#form-wrapper #advanced-inputs").click(function() {
-                    if ($("#break-days-wrapper").hasClass("hidden-field")) {
-                        var field_to_scroll_to = $(".hidden-field").first();
-                    }
-                    $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().toggleClass("hidden-field");
-                    $("#break-days-wrapper").toggleClass("hidden-field");
-                    if (field_to_scroll_to) {
-                        field_to_scroll_to[0].scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                        });
-                    }
+                    $("#form-wrapper .field-wrapper").last()[0].scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    });
                 });
             },
 
@@ -151,7 +144,7 @@ utils = {
                 }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
-                        $.alert({title: "You can't do this on the example account"});
+                        $.alert({title: "You can't enable the Google Classroom API on the example account"});
                         return;
                     }
                     if (creating_gc_assignments_from_frontend) return;
@@ -177,7 +170,7 @@ utils = {
             deleteAllStarredAssignments: function() {
                 $("#delete-starred-assignments").click(function() {
                     $.confirm({
-                        title: `Are you sure you want to delete ${$(".finished").length} starred assignments?`,
+                        title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
                         content: 'This is an irreversible action',
                         buttons: {
                             confirm: {
@@ -270,7 +263,7 @@ utils = {
                         return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
                     });
                     $.confirm({
-                        title: `This will delete ${assignments_to_delete.length} assignments from class "${sa.tags[0]}"<br>Are you sure?`,
+                        title: `This will delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"<br>Are you sure?`,
                         content: 'This is an irreversible action',
                         buttons: {
                             confirm: {
@@ -585,6 +578,47 @@ utils = {
                 }
             }
         },
+        graphAlertTutorial: function(days_until_due) {
+            $.alert({
+                title: "Welcome to the graph, a visualization of how your assignment's work schedule will look like",
+                alignTop: true, // Custom extension I added
+                onClose: function() {
+                    $.alert({
+                        title: "The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment",
+                        content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates` : '',
+                        alignTop: true,
+                        onClose: function() {
+                            $.alert({
+                                title: "As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis",
+                                alignTop: true,
+                                onClose: function() {
+                                    $.alert({
+                                        title: "The blue line will be your daily work inputs for this assignment" + (isExampleAccount ? "" : ". This may not yet visible because you haven't entered any work inputs"),
+                                        alignTop: true,
+                                        onClose: function() {
+                                            $.alert({
+                                                title: "Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates",
+                                                alignTop: true,
+                                                onClose: function() {
+                                                    $.alert({
+                                                        title: "Now that you have finished reading this, check out the settings to set your preferences",
+                                                        alignTop: true,
+                                                        onClose: function() {
+                                                            enable_tutorial = false;
+                                                            ajaxUtils.ajaxFinishedTutorial();
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        },
         saveAndLoadStates: function() {
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
             $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
@@ -675,9 +709,9 @@ utils = {
     },
 }
 
-isExampleAccount = username === example_account_name// || 1;
+isExampleAccount = username === example_account_name || editing_example_account;
 ajaxUtils = {
-    disable_ajax: isExampleAccount,// && 0, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
+    disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
             $.alert({title: "Failed to connect"});

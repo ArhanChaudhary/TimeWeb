@@ -366,7 +366,7 @@ header.animate::after {
     opacity: 0;
     transition: opacity 0.1s linear;
 }
-.tag-delete::after {
+.tag-delete:hover::after {
     content: '';
     position: absolute;
     top: 0;
@@ -477,9 +477,6 @@ header.animate::after {
 .tag-add-button.tag-add-red-box-shadow::after {
     box-shadow: 0 0 4px 1px rgb(170, 0, 0);
 }
-
-
-
 
 .tag-add-plus {
     background-color: rgb(65,65,65) !important;
@@ -736,17 +733,30 @@ input[type=number]::-webkit-inner-spin-button {
     box-shadow: none; /* Firefox */
 }
 #form-wrapper label::after {
+    position: absolute;
     display: block;
-    font-style: italic;
-    font-size: 10px;
+    font-size: 12px;
+    right: -10px;
+    bottom: -3px;
+    transform: translateY(100%);
 }
-label[for='id_x']::after {
+#form-wrapper input::-webkit-datetime-edit {
+    display: contents;
+}
+#form-wrapper input::-webkit-calendar-picker-indicator {
+    margin-left: unset;
+}
+#form-wrapper label[for='id_x']::after {
     content: '(Predicted if left empty)';
 }
-label[for='id_min_work_time']::after, label[for='id_funct_round']::after {
-    content: '(Disabled if left empty)';
+#form-wrapper label[for='id_funct_round']::after {
+    right: 7px;
 }
-label[for='id_ad']::after {
+#form-wrapper label[for='id_min_work_time']::after, label[for='id_funct_round']::after {
+    content: '(Disabled if left empty)';
+    bottom: -2px !important;
+}
+#form-wrapper label[for='id_assignment_date']::after {
     content: "(Enter today if you don't remember)";
 }
 #form-wrapper {
@@ -793,7 +803,6 @@ label[for='id_ad']::after {
     transform: translateX(-50%);
 }
 #form-wrapper #fields-wrapper {
-    height: 460px;
     overflow: scroll;
 }
 #form-wrapper .field-wrapper {
@@ -802,9 +811,6 @@ label[for='id_ad']::after {
 #form-wrapper .field {
     width: calc(100% - 50px);
     margin: 5px;
-}
-#form-wrapper .hidden-field {
-    display: none !important;
 }
 #form-wrapper label, #form-wrapper #break-days-label-title {
     text-align: center;

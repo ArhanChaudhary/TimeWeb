@@ -1079,46 +1079,8 @@ $(".assignment").click(function(e) {
     if (enable_tutorial) {
         $(".assignment").next().remove(); // Remove "Click this assignment"
         setTimeout(function() {
-            $.alert({
-                title: "Welcome to the graph, a visualization of how your assignment's work schedule will look like",
-                alignTop: true, // Custom extension I added
-                onClose: function() {
-                    const days_until_due = sa.sa.x-sa.sa.blue_line_start
-                    $.alert({
-                        title: "The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment",
-                        content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates` : '',
-                        alignTop: true,
-                        onClose: function() {
-                            $.alert({
-                                title: "As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis",
-                                alignTop: true,
-                                onClose: function() {
-                                    $.alert({
-                                        title: "The blue line will be your daily work inputs for this assignment. This is not yet visible because you haven't entered any work inputs",
-                                        alignTop: true,
-                                        onClose: function() {
-                                            $.alert({
-                                                title: "Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates",
-                                                alignTop: true,
-                                                onClose: function() {
-                                                    $.alert({
-                                                        title: "Now that you have finished reading this, check out the settings to set your preferences",
-                                                        alignTop: true,
-                                                        onClose: function() {
-                                                            enable_tutorial = false;
-                                                            ajaxUtils.ajaxFinishedTutorial();
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
+            const days_until_due = sa.sa.x-sa.sa.blue_line_start;
+            utils.ui.graphAlertTutorial(days_until_due);
         }, 200);
     }
 });

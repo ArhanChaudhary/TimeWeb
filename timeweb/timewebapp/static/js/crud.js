@@ -10,6 +10,10 @@ Deleting assignments
 This only runs on index.html
 */
 // Note: edited assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
+
+
+
+// really really badly written code that I dont have time to rewrite
 function showForm(show_instantly=false) {
     if (show_instantly) {
         $('#overlay').show().children("#form-wrapper").css("top", 15);
@@ -84,6 +88,7 @@ function replaceUnit() {
             $("label[for='id_funct_round']").removeClass("disabled-field");
         }
     }
+    $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#fields-wrapper").scrollTop());
 }
 $(function() {
     // Create and show a new form when user clicks new assignment
@@ -149,30 +154,34 @@ $(function() {
         
         e.g: If this assignment is reading a book, enter "Page" or "Chapter"
 
-        If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute" or "Hour"`
-    );
+        If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute" or "Hour"`, 
+    "after").css({
+        marginBottom: -14,
+        float: 'right',
+        left: -15,
+        bottom: -3,
+    });
     $('label[for="id_works"]').info('left',
         `The following is only relevant if you are re-entering this field
 
-        This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`
-    );
+        This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`,
+    "after").css({
+        marginBottom: -14,
+        float: 'right',
+        left: -15,
+        bottom: -3,
+    });
     $('label[for="id_funct_round"]').info('left',
-        "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)"
-    );
+        "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)",
+    "after").css({
+        marginBottom: -14,
+        float: 'right',
+        left: -15,
+        bottom: -3,
+    });
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     // Make this global so it can be used in saveAndLoadStates in utils.js
     form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
-    // Auto field scrolling
-    form_inputs.focus(function() {
-        const _this = this;
-        setTimeout(function() {
-            // scrollIntoView sometimes doesn't work without setTimeout
-            _this.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
-        }, 0);
-    });
     // "$(".error-note").length" is the same thing as {% field.errors %} in the template
     if ($(".error-note").length) {
         showForm(true); // Show instantly
