@@ -154,7 +154,7 @@ $(function() {
         
         e.g: If this assignment is reading a book, enter "Page" or "Chapter"
 
-        If you're unsure how to split up your assignment, divide it up into units of time instead. Please enter "Minute" or "Hour"`, 
+        If you're unsure how to split up your assignment, divide it up into units of time instead. Enter "Minute" or "Hour"`, 
     "after").css({
         marginBottom: -14,
         float: 'right',

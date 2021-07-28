@@ -61,7 +61,7 @@ header.animate::after {
 #assignments-header img ~ div {
     position: absolute;
     order: 1;
-    z-index: 100;
+    z-index: 1000;
     right: 225px;
     bottom: 5px;
     visibility: hidden;
@@ -894,7 +894,7 @@ input[type=number]::-webkit-inner-spin-button {
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 102;
+    z-index: 1002;
     display: none;
 }
 #break-days-wrapper {
@@ -914,7 +914,7 @@ input[type=number]::-webkit-inner-spin-button {
     text-align: right;
     background-color: white;
     cursor: pointer;
-    z-index: 100;
+    z-index: 1000;
     box-shadow: 0 0 5px 1px black;
 }
 #toggle-gc-label {

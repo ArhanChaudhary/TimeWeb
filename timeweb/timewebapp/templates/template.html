@@ -31,16 +31,16 @@
         <meta name="title" content="TimeWeb">
         <meta name="description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
 
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@TimeWebOfficial">
+        <meta name="twitter:creator" content="@TimeWebOfficial">
+        <meta name="twitter:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}{% static 'images/icons/icon-512x512.png' %}">
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://timeweb.io/">
-        <meta property="og:title" content="TimeWeb">
+        <meta property="og:title" content="Introducing TimeWeb!">
         <meta property="og:description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
-        <meta property="og:image" content="{% static 'images/icons/og.png' %}">
-        <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content="https://timeweb.io/">
-        <meta property="twitter:title" content="TimeWeb">
-        <meta property="twitter:description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
-        <meta property="twitter:image" content="{% static 'images/icons/og.png' %}">
+        <meta property="og:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}{% static 'images/icons/og.png' %}">
+
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=0.5">
         <link rel="stylesheet" href="{% static 'css/template.css' %}">

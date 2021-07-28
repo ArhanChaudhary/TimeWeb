@@ -18,7 +18,7 @@ header {
     height: 70px;
     padding: 5px;
     position: absolute;
-    z-index: 101;
+    z-index: 1001;
     box-sizing: border-box;
 }
 header::after {
@@ -116,7 +116,6 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 500;
     border: 2px solid rgb(22, 177, 185);
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
@@ -285,7 +284,7 @@ nav:focus-within #nav-menu::after {
 .info-button-text {
     position: absolute;
     width: 265px;
-    z-index: 100;
+    z-index: 1000;
     background: rgb(245,245,245) !important;
     box-shadow: 0 0 5px rgba(0,0,0,0.75);
     border-radius: 5px !important;

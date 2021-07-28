@@ -244,6 +244,7 @@ class VisualAssignment extends Assignment {
             this.last_mouse_x = mouse_x;
             this.last_mouse_y = mouse_y;
         }
+        // draw() always runs setParabolaValues but I'll leave it like this because it'll require a lot of maintence
         this.setParabolaValues();
         const screen = this.graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
@@ -830,12 +831,12 @@ class VisualAssignment extends Assignment {
         // END Next assignment button
 
         // BEGIN Set skew ratio using graph button
-        const $this = this;
+        const _this = this;
         function cancel_set_skew_ratio_using_graph() {
             skew_ratio_button.onlyText("Set skew ratio using graph");
-            $this.set_skew_ratio_using_graph = false;
-            $this.sa.skew_ratio = old_skew_ratio;
-            $this.draw();
+            _this.set_skew_ratio_using_graph = false;
+            _this.sa.skew_ratio = old_skew_ratio;
+            _this.draw();
             // No need to ajax since skew ratio is the same
         }
         let not_applicable_timeout_skew_ratio_button;

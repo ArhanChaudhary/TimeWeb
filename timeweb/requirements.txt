@@ -8,7 +8,7 @@ django-cleanup==5.2.0
 django-colorfield==0.4.1
 django-csp==3.7
 django-multiselectfield==0.1.12
-django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@795eb318c33f06d2e19e7b6cc9cec444bf698c00
+django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@b52c0c43a71fc51e3a104a43164c0481bc7da781
 django-storages==1.11.1
 google-api-core==1.30.0
 google-api-python-client==2.11.0
