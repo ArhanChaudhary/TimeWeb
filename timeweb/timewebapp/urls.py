@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from . import views
 from django.views.generic import RedirectView
 from django.http import HttpResponse
+from django.conf import settings
 
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
@@ -17,6 +18,7 @@ urlpatterns = [
     path('gc-api-auth-callback', views.GCOAuthView.as_view()),
 
     path('robots.txt', lambda x: HttpResponse("# If you came from the discord gg you get a super duper secret role\n# pm me this message at Arch#5808\n# also, pls don't tell anyone as it'll ruin the fun of this small game\nUser-Agent: *\nDisallow:", content_type="text/plain"), name="robots_file"),
+    path('.well-known/security.txt', RedirectView.as_view(url='/static/.well-known/security.txt')),
     path('android-chrome-192x192.png', RedirectView.as_view(url='/static/images/icons/android-chrome-192x192.png')),
     path('android-chrome-512x512.png', RedirectView.as_view(url='/static/images/icons/android-chrome-512x512.png')),
     path('apple-touch-icon-precomposed.png', RedirectView.as_view(url='/static/images/icons/apple-touch-icon-precomposed.png')),
@@ -31,7 +33,6 @@ urlpatterns = [
     path('stackpile', views.stackpileView.as_view(),name='stackpile'),
     re_path(r"^(wp|wordpress)", views.rickView.as_view()),
 ]
-from django.conf import settings
 if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
