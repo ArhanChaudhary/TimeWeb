@@ -9,7 +9,7 @@ This only runs on settings.html
 */
 $(function() {
     gtag("event","settings_view");
-    $("#id_def_skew_ratio").val(precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
+    $("#id_def_skew_ratio").val(utils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
 
     $("#id_warning_acceptance").parent().info('bottom',
@@ -50,6 +50,6 @@ $(function() {
         // $("#id_enable_tutorial").prop("checked", true);
     });
     $("form").submit(function() {
-        $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val() ? precisionRound($("#id_def_skew_ratio").val()+1, 10) : 0);
+        $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val() ? utils.precisionRound($("#id_def_skew_ratio").val()+1, 10) : 0);
     });
 });

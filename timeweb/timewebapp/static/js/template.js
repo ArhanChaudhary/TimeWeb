@@ -189,8 +189,3 @@ $.fn.info = function(facing,text,position) {
             return info_button.appendTo(this);
     }
 }
-// from math.round mdn docs
-function precisionRound(number, precision) {
-    const factor = Math.pow(10, precision);
-    return Math.round(number * factor) / factor;
-}

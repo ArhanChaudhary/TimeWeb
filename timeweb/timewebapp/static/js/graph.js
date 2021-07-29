@@ -201,12 +201,12 @@ class VisualAssignment extends Assignment {
     changeSkewRatio() {
         // Change skew ratio by +- 0.1 and cap it
         if (this.pressed_arrow_key === "ArrowDown") {
-            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio - 0.1, 1);
+            this.sa.skew_ratio = utils.precisionRound(this.sa.skew_ratio - 0.1, 1);
             if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
                 this.sa.skew_ratio = this.skew_ratio_lim;
             }
         } else {
-            this.sa.skew_ratio = precisionRound(this.sa.skew_ratio + 0.1, 1);
+            this.sa.skew_ratio = utils.precisionRound(this.sa.skew_ratio + 0.1, 1);
             if (this.sa.skew_ratio > this.skew_ratio_lim) {
                 this.sa.skew_ratio = 2 - this.skew_ratio_lim;
             }
