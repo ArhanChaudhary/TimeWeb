@@ -564,9 +564,9 @@ class TimewebView(LoginRequiredMixin, View):
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
         gc_models_to_create = []
-        logger.info(f"Requested for {self.gc_course} courses ({self.gc_skipped_course} skipped)")
+        logger.info(f"Requested for {self.gc_course} courses ({self.gc_skipped_course} due dates passed)")
         batch.execute()
-        logger.info(f"Requested for {self.gc_assignment} assignments ({self.gc_skipped_assignment} skipped) and created {len(gc_models_to_create)} assignments")
+        logger.info(f"Requested for {self.gc_assignment} assignments ({self.gc_skipped_assignment} due dates passed) and created {len(gc_models_to_create)} assignments")
         TimewebModel.objects.bulk_create(gc_models_to_create)
         if not gc_models_to_create: return "No new gc assignments were added" # or do new_gc_assignment_ids == set_added_gc_assignment_ids
         self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
