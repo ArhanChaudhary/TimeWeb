@@ -68,9 +68,9 @@
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
-      <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close_all_assignments.png' %}">
-      <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open_all_assignments.png' %}">
-      <img id="next-day" tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next_day.png' %}">
+      <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close-all-assignments.png' %}">
+      <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open-all-assignments.png' %}">
+      <img id="next-day" tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
       <img id="settings" tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
       <div id="settings-icon-label"{% if background_image %} class="add-white-shadow"{% endif %}>Settings</div>
       <div id="next-day-icon-label"{% if background_image %} class="add-white-shadow"{% endif %}>Go to Next Day</div>
@@ -223,7 +223,7 @@
   </template>
   <div id="toggle-gc-container"{% if creating_gc_assignments_from_frontend %} class="open"{% endif %}>
     <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% endif %}</span>
-    <img src="{% static 'images/gc-logo.png' %}" width="42" height="42">
+    <img src="{% static 'images/gc-icon.png' %}" width="42" height="42">
   </div>
   {% endspaceless %}
 {% endblock content %}

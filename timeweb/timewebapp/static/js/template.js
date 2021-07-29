@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Note: Using keyframes still required this same process
         $("main, header, #assignments-container").addClass("animate");
         sessionStorage.setItem("animation-ran", true);
-        // Use "$(window).on('load', function() {"" of "$(function) { "instead because "$(function() {" fires too early
         $(window).one('load', function() {
             // Only start loading background image after window.one("load")
             $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
@@ -137,10 +136,8 @@ $(function() {
         }
         $(window).resize(resize).one("load", resize);
     }
-    // cite
     // https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
     isMobile = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    // cite
     // https://web.dev/customize-install/
     let prompt;
     window.addEventListener('beforeinstallprompt', function(e) {
@@ -149,7 +146,6 @@ $(function() {
         // Stash the event so it can be triggered later.
         prompt = e;
     });
-    // cite
     // https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
     function isPwa() {
         var displayModes = ["fullscreen", "standalone", "minimal-ui"];

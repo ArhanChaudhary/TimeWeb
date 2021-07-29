@@ -32,7 +32,6 @@ utils = {
             if (!minute) return hour + "h";
             return hour + "h " + minute + "m";
         },
-        // cite
         // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
         hexToRgb: function(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -809,12 +808,11 @@ ajaxUtils = {
     },
 }
 // Prevents submitting form on refresh
-// cite 
 // https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
-jQuery.fn.reverse = Array.prototype.reverse;
+$.fn.reverse = Array.prototype.reverse;
 jconfirm.defaults = {
     escapeKey: true,
     backgroundDismiss: true,

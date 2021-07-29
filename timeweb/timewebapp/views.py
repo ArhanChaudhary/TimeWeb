@@ -30,7 +30,6 @@ from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, MissingCodeError
 from django.conf import settings
 User = get_user_model()
 
-# cite later
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
 GC_CREDENTIALS_PATH = os.path.join(os.getcwd(), "gc-api-credentials.json")
@@ -94,7 +93,6 @@ def get_default_context():
     }
 class SettingsView(LoginRequiredMixin, View):
     login_url = '/login/login/'
-    redirect_field_name = 'redirect_to'
 
     def __init__(self):
         self.context = get_default_context()
@@ -174,7 +172,6 @@ class SettingsView(LoginRequiredMixin, View):
 
 class TimewebView(LoginRequiredMixin, View):
     login_url = '/login/login/'
-    redirect_field_name = 'redirect_to'
 
     def __init__(self):
         self.context = get_default_context()
@@ -661,7 +658,6 @@ class TimewebView(LoginRequiredMixin, View):
 
 class GCOAuthView(LoginRequiredMixin, View):
     login_url = '/login/login/'
-    redirect_field_name = 'redirect_to'
     def get(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         # Callback URI
@@ -673,10 +669,10 @@ class GCOAuthView(LoginRequiredMixin, View):
             state=state)
         flow.redirect_uri = GC_REDIRECT_URI
 
-        #get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us.
+        # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
         authorization_response = request.build_absolute_uri()        
         try:
-            #now turn those parameters into a token.
+            # turn those parameters into a token
             flow.fetch_token(authorization_response=authorization_response)
         except InvalidGrantError:
             # In case users deny a permission
@@ -748,7 +744,6 @@ class GCOAuthView(LoginRequiredMixin, View):
 
 class ImagesView(LoginRequiredMixin, View):
     login_url = '/login/login/'
-    redirect_field_name = 'redirect_to'
 
     def __init__(self):
         self.context = get_default_context()

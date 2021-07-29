@@ -31,7 +31,7 @@ else:
 CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
-CSP_IMG_SRC = ("'self'", )
+CSP_IMG_SRC = ("'self'", "data:")
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
@@ -60,7 +60,6 @@ else:
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = 'None'
 
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 604800 # 7 days
@@ -112,7 +111,6 @@ TEMPLATES = [
     },
 ]
 # Redirect to home URL after login
-LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 

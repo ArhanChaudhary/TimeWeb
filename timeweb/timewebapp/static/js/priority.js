@@ -101,12 +101,8 @@ priority = {
                 status_value = 1;
                 str_daysleft = '';
             } else if (today_minus_ad < 0) {
-                status_image = "not-assigned";
+                status_image = "no-status-image";
                 status_message = 'This Assignment has Not Yet been Assigned';
-                dom_status_image.attr({
-                    width: 18,
-                    height: 20,
-                }).css("margin-left", -3);
                 if (today_minus_ad === -1) {
                     str_daysleft = 'Assigned Tomorrow';
                 } else if (today_minus_ad > -7) {
@@ -265,7 +261,12 @@ priority = {
             }
             ordered_assignments.push(priority_data);
 
-            dom_status_image.attr("src", `/static/images/status_icons/${status_image}.png`);
+            if (status_image === "no-status-image") {
+                // https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
+                dom_status_image.attr("src", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=");
+            } else {
+                dom_status_image.attr("src", `/static/images/status-icons/${status_image}.png`);
+            }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.ctime) : '');
