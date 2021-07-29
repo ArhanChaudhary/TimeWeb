@@ -11,7 +11,7 @@ urlpatterns = [
     path('policies', RedirectView.as_view(url='/static/policies/policies.html'), name='policies'),
     path('cookies', RedirectView.as_view(url='/static/policies/cookies.html')),
     path('disclaimer', RedirectView.as_view(url='/static/policies/disclaimer.html')),
-    path('licenses-and-credits', RedirectView.as_view(url='/static/policies/licenses-and-credits.html')),
+    path('credits', RedirectView.as_view(url='/static/policies/credits.html'), name='credits'),
     path('privacy', RedirectView.as_view(url='/static/policies/privacy.html')),
     path('terms', RedirectView.as_view(url='/static/policies/terms.html')),
     path('gc-api-auth-init', views.GCOAuthView.as_view()),
