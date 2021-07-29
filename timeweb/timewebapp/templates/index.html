@@ -3,7 +3,6 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
-<link rel="stylesheet" href="{% static 'vendor/jquery-confirm.min.css' %}">
 {% endblock css %}
 
 {% block js %}
@@ -12,7 +11,6 @@
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'vendor/jquery-ui.min.js' %}"></script>
-<script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
@@ -72,10 +70,10 @@
       <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open-all-assignments.png' %}">
       <img id="next-day" tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
       <img id="settings" tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
-      <div id="settings-icon-label"{% if background_image %} class="add-white-shadow"{% endif %}>Settings</div>
-      <div id="next-day-icon-label"{% if background_image %} class="add-white-shadow"{% endif %}>Go to Next Day</div>
-      <div id="open-assignments-icon-label"{% if background_image %} class="add-white-shadow"{% endif %}>Open all Assignments</div>
-      <div id="close-assignments-icon-label"{% if background_image %} class="add-white-shadow"{% endif %}>Close all Assignments</div>
+      <div id="settings-icon-label">Settings</div>
+      <div id="next-day-icon-label">Go to Next Day</div>
+      <div id="open-assignments-icon-label">Open all Assignments</div>
+      <div id="close-assignments-icon-label">Close all Assignments</div>
     </div>
     <div id="simulated-date"{% if background_image %} class="add-white-shadow"{% endif %}></div>
     <div id="autofill-work-done">

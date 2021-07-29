@@ -44,9 +44,11 @@
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=0.5">
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
+        <link rel="stylesheet" href="{% static 'vendor/jquery-confirm.min.css' %}">
         {% block css %}{% endblock css %}
         <!-- Note: JQuery has been modified such that overflow: hidden isn't applied during an animation -->
         <script src="{% static 'vendor/jquery.min.js' %}"></script>
+        <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
         <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>

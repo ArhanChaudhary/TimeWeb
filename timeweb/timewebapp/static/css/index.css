@@ -64,7 +64,11 @@ header.animate::after {
     z-index: 1000;
     right: 225px;
     bottom: 5px;
+    background: white;
     visibility: hidden;
+}
+#next-day-icon-label {
+    padding-right: 5px;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,

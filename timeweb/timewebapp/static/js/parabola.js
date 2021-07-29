@@ -96,20 +96,17 @@ Assignment.prototype.setParabolaValues = function() {
         this.return_y_cutoff = 1;
     }
     if (this.return_y_cutoff < 2500) {
-        if (this.return_y_cutoff < 1) {
-            var output = 0;
-        } else {
-            // do ceil -1 instead of floor because ceil -1 is inclusive of ints; without this integer return cutoffs are glitchy
-            for (let n = Math.ceil(this.return_y_cutoff - 1); n > 0; n--) {
-                var output = this.funct(n, false);
-                if (output <= this.sa.y - this.min_work_time_funct_round) {
-                    break;
-                }
-                this.return_y_cutoff--;
+        let output = 0; // define in case loop doesnt run
+        // do ceil -1 instead of floor because ceil -1 is inclusive of ints; without this integer return cutoffs are glitchy
+        for (let n = Math.ceil(this.return_y_cutoff - 1); n > 0; n--) {
+            output = this.funct(n, false);
+            if (output <= this.sa.y - this.min_work_time_funct_round) {
+                break;
             }
-            if (this.return_y_cutoff <= 0) {
-                this.return_y_cutoff++;
-            }
+            this.return_y_cutoff--;
+        }
+        if (this.return_y_cutoff <= 0) {
+            this.return_y_cutoff++;
         }
         if (ignore_ends && this.sa.min_work_time) {
             const lower = [this.return_y_cutoff, this.sa.y - output];
@@ -149,19 +146,16 @@ Assignment.prototype.setParabolaValues = function() {
         this.return_0_cutoff = 0;
     }
     if (x1 - this.return_0_cutoff < 2500) {
-        if (x1 - this.return_0_cutoff < 1) {
-            var output = 0;
-        } else {
-            for (let n = Math.ceil(this.return_0_cutoff); n < x1; n++) {
-                var output = this.funct(n, false);
-                if (output >= this.min_work_time_funct_round + this.red_line_start_y) {
-                    break;
-                }
-                this.return_0_cutoff++;
+        let output = 0;
+        for (let n = Math.ceil(this.return_0_cutoff); n < x1; n++) {
+            output = this.funct(n, false);
+            if (output >= this.min_work_time_funct_round + this.red_line_start_y) {
+                break;
             }
-            if (this.return_0_cutoff >= x1) {
-                this.return_0_cutoff--;
-            }
+            this.return_0_cutoff++;
+        }
+        if (this.return_0_cutoff >= x1) {
+            this.return_0_cutoff--;
         }
         if (ignore_ends && this.sa.min_work_time) {
             const upper = [this.return_0_cutoff, output];

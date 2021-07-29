@@ -321,39 +321,40 @@ priority = {
                     priority_percentage = 100;
                 }
             }
-            if (text_priority) {
-                const dom_title = $(".title").eq(pd[2]);
-                const add_priority_percentage = (pd[0] === 5 || pd[0] === 4) && !mark_as_done;
-                if (add_priority_percentage) {
-                    dom_title.attr("data-priority", `Priority: ${priority_percentage}%`);
-                } else {
-                    dom_title.attr("data-priority", "");       
-                }
-                if ($(".tag-left").length) {
-                    new Promise(function(resolve) {
-                        if (params.first_sort) {
-                            $(window).one("load", () => resolve());
-                        } else {
-                            resolve();
-                        }
-                    }).then(function() {
-                        const dom_tags = dom_assignment.find(".tags");
-                        const dom_button = dom_assignment.find(".button");
-                        const dom_assignment_footer = dom_assignment.find(".assignment-footer");
-                        // really inefficient but whatever
-                        dom_assignment.addClass("transition-instantly");
-                        dom_assignment.css({paddingTop: "", paddingBottom: ""});
-                        dom_button.css({marginTop: "", marginBottom: ""});
-                        const tag_bottom = dom_tags.offset().top + dom_tags.height();
-                        const title_top = dom_title.offset().top;
-                        const padding_to_add = Math.max(0, add_priority_percentage ? 11 : -3 - (title_top - tag_bottom));
-                        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
-                        dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
-                        dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
-                        dom_assignment[0].offsetHeight;
-                        dom_assignment.removeClass("transition-instantly");
-                    });
-                }
+            const add_priority_percentage = text_priority && (pd[0] === 5 || pd[0] === 4) && !mark_as_done;
+            const dom_title = $(".title").eq(pd[2]);
+            if (add_priority_percentage) {
+                dom_title.attr("data-priority", `Priority: ${priority_percentage}%`);
+            } else {
+                dom_title.attr("data-priority", "");       
+            }
+            if ($(".tags-left").length) {
+                new Promise(function(resolve) {
+                    if (params.first_sort) {
+                        $(window).one("load", () => resolve());
+                    } else {
+                        resolve();
+                    }
+                }).then(function() {
+                    const dom_tags = dom_assignment.find(".tags");
+                    const dom_button = dom_assignment.find(".button");
+                    const dom_assignment_footer = dom_assignment.find(".assignment-footer");
+                    // really inefficient but whatever
+                    dom_assignment.addClass("transition-instantly");
+                    dom_assignment.css({paddingTop: "", paddingBottom: ""});
+                    dom_button.css({marginTop: "", marginBottom: ""});
+                    const tag_bottom = dom_tags.offset().top + dom_tags.height();
+                    const title_top = dom_title.offset().top;
+                    
+                    // set title_top to below dom_assignment_top - tag_bottom
+
+                    const padding_to_add = Math.max(0, add_priority_percentage ? 3 : -3 - (title_top - tag_bottom));
+                    dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
+                    dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
+                    dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
+                    dom_assignment[0].offsetHeight;
+                    dom_assignment.removeClass("transition-instantly");
+                });
             }
             const assignment_container = dom_assignment.parents(".assignment-container");
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
