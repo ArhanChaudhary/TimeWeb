@@ -32,7 +32,7 @@ User = get_user_model()
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = os.path.join(os.getcwd(), "gc-api-credentials.json")
+GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc-api-credentials.json"
 if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -705,6 +705,7 @@ class GCOAuthView(LoginRequiredMixin, View):
         # Generate URL for request to Google's OAuth 2.0 server.
         # Use kwargs to set optional request parameters.
         authorization_url, state = flow.authorization_url(
+            approval_prompt='force',
             # Enable offline access so that you can refresh an access token without
             # re-prompting the user for permission. Recommended for web server apps.
             access_type='offline',

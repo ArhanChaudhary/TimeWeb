@@ -167,7 +167,7 @@ Assignment.prototype.setParabolaValues = function() {
                     break;
                 }
                 did_loop = true;
-                var output = pre_output;
+                output = pre_output;
                 this.return_0_cutoff--;
             }
             if (did_loop) {
@@ -179,7 +179,7 @@ Assignment.prototype.setParabolaValues = function() {
 }
 Assignment.prototype.funct = function(x, translateX=true) {
     if (translateX === true) {
-        // Translate x coordinate 
+        // Translate x coordinate
         x -= this.red_line_start_x;
         if (this.sa.break_days.length) {
             x -= Math.floor(x / 7) * this.sa.break_days.length + this.mods[x % 7];
