@@ -340,20 +340,17 @@ priority = {
                     const dom_button = dom_assignment.find(".button");
                     const dom_assignment_footer = dom_assignment.find(".assignment-footer");
                     // really inefficient but whatever
-                    dom_assignment.addClass("transition-instantly");
-                    dom_assignment.css({paddingTop: "", paddingBottom: ""});
-                    dom_button.css({marginTop: "", marginBottom: ""});
+                    // dom_assignment.css({paddingTop: "", paddingBottom: ""});
+                    // dom_button.css({marginTop: "", marginBottom: ""});
                     const tag_bottom = dom_tags.offset().top + dom_tags.height();
                     const title_top = dom_title.offset().top;
                     
                     // set title_top to below dom_assignment_top - tag_bottom
 
-                    const padding_to_add = Math.max(0, add_priority_percentage ? 3 : -3 - (title_top - tag_bottom));
-                    dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
-                    dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
+                    const padding_to_add = Math.max(5, add_priority_percentage ? 3 : -3 - (title_top - tag_bottom));
+                    dom_assignment.css({paddingTop: padding_to_add, paddingBottom: padding_to_add});
+                    dom_button.css({marginTop: -padding_to_add, marginBottom: -padding_to_add});
                     dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
-                    dom_assignment[0].offsetHeight;
-                    dom_assignment.removeClass("transition-instantly");
                 });
             }
             const assignment_container = dom_assignment.parents(".assignment-container");

@@ -87,7 +87,8 @@ header.animate::after {
     position: absolute;
     order: 1;
     z-index: 1000;
-    padding: 0 10px;
+    padding-right: 5px;
+    padding-left: 5px;
     right: 225px;
     bottom: 5px;
     background: rgb(214, 214, 214);
@@ -133,7 +134,7 @@ header.animate::after {
     width: 100%; /* Needed for when it becomes position: absolute during deletion */
     box-sizing: border-box;
     scroll-margin: 20px;
-    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s, left 0s;
+    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s, left 0s, padding 0s;
 }
 .assignment.mark-as-done {
     opacity: 0.6;
