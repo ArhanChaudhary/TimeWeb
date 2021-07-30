@@ -237,14 +237,10 @@ utils = {
                     let message;
                     switch ($("#autofill-selection").val()) {
                         case "No":
-                            message = `Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for
-                            
-                            Click the horizontal line to perform this action`;
+                            message = "Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for";
                             break;
                         case "All":
-                            message = `Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for
-                            
-                            Click the horizontal line to perform this action`;
+                            message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for";
                             break;
                     }
                     $("#autofill-work-done .shortcut-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});

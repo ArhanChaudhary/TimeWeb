@@ -173,7 +173,6 @@ $(function() {
             }
         });
     }
-    $("#nav-usage").click(() => $.alert({title: "This has not yet been written, please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> directly"})).css("text-decoration", "line-through");
     $("#nav-about").click(() => $.alert({title: "This has not yet been written"})).css("text-decoration", "line-through");
     $("#account-settings").click(() => $.alert({title: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> regarding your account settings"}));
 });

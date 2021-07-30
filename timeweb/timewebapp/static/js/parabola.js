@@ -67,10 +67,10 @@ Assignment.prototype.setParabolaValues = function() {
                 // const prev_output = clamp(0, this.funct(Math.floor(this.cutoff_to_use_round)), this.sa.y)
                 // const output = clamp(0, this.funct(Math.ceil(this.cutoff_to_use_round)), this.sa.y)
                 const prev_output = Math.min(Math.max(
-                    this.funct(Math.floor(this.cutoff_to_use_round), false)
+                    this.funct(Math.floor(this.cutoff_to_use_round), {translateX: false})
                 , 0), this.sa.y),
                     output = Math.min(Math.max(
-                        this.funct(Math.ceil(this.cutoff_to_use_round), false)
+                        this.funct(Math.ceil(this.cutoff_to_use_round), {translateX: false})
                     , 0), this.sa.y);
                 if (output - prev_output) {
                     this.cutoff_transition_value = this.min_work_time_funct_round - output + prev_output;
@@ -96,35 +96,32 @@ Assignment.prototype.setParabolaValues = function() {
         this.return_y_cutoff = 1;
     }
     if (this.return_y_cutoff < 2500) {
-        let output = 0; // define in case loop doesnt run
-        // do ceil -1 instead of floor because ceil -1 is inclusive of ints; without this integer return cutoffs are glitchy
-        for (let n = Math.ceil(this.return_y_cutoff - 1); n > 0; n--) {
-            output = this.funct(n, false);
-            if (output <= this.sa.y - this.min_work_time_funct_round) {
-                break;
-            }
-            this.return_y_cutoff--;
-        }
-        if (this.return_y_cutoff <= 0) {
-            this.return_y_cutoff++;
+        // If loop doesn't run, then 0 < return_y_cutoff <= 1, meaning the untranslated output must be 0
+        let output = this.red_line_start_y;
+        for (;this.return_y_cutoff > 1; this.return_y_cutoff--) {
+            // do ceil-1 instead of floor because ceil-1 is inclusive of ints; lower_output_diff is the difference between y and the output of the value one less than lower_return_y_cutoff
+            output = this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
+            if (output <= this.sa.y - this.min_work_time_funct_round) break;
         }
         if (ignore_ends && this.sa.min_work_time) {
-            const lower = [this.return_y_cutoff, this.sa.y - output];
-
-            let did_loop = false;
-            for (let n = Math.floor(this.return_y_cutoff + 1); n < x1; n++) {
-                const pre_output = this.funct(n, false);
-                if (pre_output >= this.sa.y) {
-                    break;
-                }
-                did_loop = true;
-                output = pre_output;
-                this.return_y_cutoff++;
+            const lower_return_y_cutoff = this.return_y_cutoff;
+            const lower_output_diff = this.sa.y - output;
+            // If loop doesn't run, then x1 - 1 < return_y_cutoff <= x1
+            output = this.sa.y - this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
+            for (;this.return_y_cutoff <= x1 - 1; this.return_y_cutoff++) {
+                const next_output = this.funct(Math.floor(this.return_y_cutoff + 1), {translateX: false});
+                // Leave output at the value before this
+                if (next_output >= this.sa.y) break;
+                output = next_output;
             }
-            if (did_loop) {
-                const upper = [this.return_y_cutoff, this.sa.y - output];
-                this.return_y_cutoff = [upper, lower][+(this.min_work_time_funct_round * 2 - lower[1] > upper[1])][0];
+            const upper_return_y_cutoff = this.return_y_cutoff;
+            const upper_output_diff = this.sa.y - output;
+            if (this.min_work_time_funct_round * 2 - lower_output_diff > upper_output_diff) {
+                this.return_y_cutoff = lower_return_y_cutoff;
+            } else {
+                this.return_y_cutoff = upper_return_y_cutoff;
             }
+            this.return_y_cutoff++;
         }
     }
     if (ignore_ends && this.sa.min_work_time) {
@@ -146,39 +143,36 @@ Assignment.prototype.setParabolaValues = function() {
         this.return_0_cutoff = 0;
     }
     if (x1 - this.return_0_cutoff < 2500) {
-        let output = 0;
-        for (let n = Math.ceil(this.return_0_cutoff); n < x1; n++) {
-            output = this.funct(n, false);
-            if (output >= this.min_work_time_funct_round + this.red_line_start_y) {
-                break;
-            }
-            this.return_0_cutoff++;
-        }
-        if (this.return_0_cutoff >= x1) {
-            this.return_0_cutoff--;
+        // If loop doesn't run, then x1 - 1 <= this.return_0_cutoff < x1, meaning that the output must be this.sa.y
+        let output = this.sa.y;
+        for (;this.return_0_cutoff < x1 - 1; this.return_0_cutoff++) {
+            output = this.funct(Math.floor(this.return_0_cutoff + 1), {translateX: false});
+            if (output >= this.min_work_time_funct_round + this.red_line_start_y) break;
         }
         if (ignore_ends && this.sa.min_work_time) {
-            const upper = [this.return_0_cutoff, output];
+            const upper_return_0_cutoff = this.return_0_cutoff;
+            const upper_output_diff = output;
 
-            let did_loop = false;
-            for (let n = Math.floor(this.return_0_cutoff); n > 0; n--) {
-                const pre_output = this.funct(n, false);
-                if (pre_output <= this.red_line_start_y) {
-                    break;
-                }
-                did_loop = true;
-                output = pre_output;
-                this.return_0_cutoff--;
+            // If loop doesn't run, then 0 <= this.return_0_cutoff < 1
+            output = this.funct(Math.floor(this.return_0_cutoff + 1), {translateX: false}) - this.red_line_start_y;
+            for (;this.return_0_cutoff >= 1; this.return_0_cutoff--) {
+                const next_output = this.funct(Math.ceil(this.return_0_cutoff - 1), {translateX: false});
+                if (next_output <= this.red_line_start_y) break;
+                output = next_output;
             }
-            if (did_loop) {
-                const lower = [this.return_0_cutoff, output];
-                this.return_0_cutoff = [lower, upper][+(this.min_work_time_funct_round * 2 - upper[1] > lower[1])][0];
+            const lower_return_0_cutoff = this.return_0_cutoff;
+            const lower_output_diff = output;
+            // Pick whichever cutoff its output diff is closest to
+            if (this.min_work_time_funct_round * 2 - upper_output_diff > lower_output_diff) {
+                this.return_0_cutoff = upper_return_0_cutoff;
+            } else {
+                this.return_0_cutoff = lower_return_0_cutoff;
             }
         }
     }
 }
-Assignment.prototype.funct = function(x, translateX=true) {
-    if (translateX === true) {
+Assignment.prototype.funct = function(x, params={}) {
+    if (params.translateX !== false) {
         // Translate x coordinate
         x -= this.red_line_start_x;
         if (this.sa.break_days.length) {

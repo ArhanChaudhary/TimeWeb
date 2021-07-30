@@ -561,7 +561,7 @@ class TimewebView(LoginRequiredMixin, View):
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
         gc_models_to_create = []
-        logger.info(f"Requested for {self.gc_course} courses ({self.gc_skipped_course} due dates passed)")
+        logger.info(f"Requested for {self.gc_course} courses ({self.gc_skipped_course} archieved)")
         batch.execute()
         logger.info(f"Requested for {self.gc_assignment} assignments ({self.gc_skipped_assignment} due dates passed) and created {len(gc_models_to_create)} assignments")
         TimewebModel.objects.bulk_create(gc_models_to_create)
@@ -761,6 +761,12 @@ class ImagesView(LoginRequiredMixin, View):
             return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
         else:
             return HttpResponse(status=204)
+
+class UserguideView(View):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request):
+        return render(request, "user-guide.html", self.context)
 
 class ChangelogView(View):
     def __init__(self):

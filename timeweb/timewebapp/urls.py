@@ -7,11 +7,12 @@ from django.conf import settings
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
     path('settings', views.SettingsView.as_view(),name='settings'),
+    path('user-guide', views.UserguideView.as_view(), name='user-guide'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
+    path('credits', RedirectView.as_view(url='/static/credits.html'), name='credits'),
     path('policies', RedirectView.as_view(url='/static/policies/policies.html'), name='policies'),
     path('cookies', RedirectView.as_view(url='/static/policies/cookies.html')),
     path('disclaimer', RedirectView.as_view(url='/static/policies/disclaimer.html')),
-    path('credits', RedirectView.as_view(url='/static/policies/credits.html'), name='credits'),
     path('privacy', RedirectView.as_view(url='/static/policies/privacy.html')),
     path('terms', RedirectView.as_view(url='/static/policies/terms.html')),
     path('gc-api-auth-init', views.GCOAuthView.as_view()),
