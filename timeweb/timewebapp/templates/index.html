@@ -66,14 +66,16 @@
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
-      <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close-all-assignments.png' %}">
-      <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open-all-assignments.png' %}">
-      <img id="next-day" tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
-      <img id="settings" tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
-      <div id="settings-icon-label">Settings</div>
-      <div id="next-day-icon-label">Go to Next Day</div>
-      <div id="open-assignments-icon-label">Open all Assignments</div>
-      <div id="close-assignments-icon-label">Close all Assignments</div>
+      <div id="icon-label-container">
+        <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close-all-assignments.png' %}">
+        <img id="open-assignments" tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open-all-assignments.png' %}">
+        <img id="next-day" tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
+        <img id="settings" tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
+        <div id="settings-icon-label">Settings</div>
+        <div id="next-day-icon-label">Go to Next Day</div>
+        <div id="open-assignments-icon-label">Open all Assignments</div>
+        <div id="close-assignments-icon-label">Close all Assignments</div>
+      </div>
     </div>
     <div id="simulated-date"{% if background_image %} class="add-white-shadow"{% endif %}></div>
     <div id="autofill-work-done">

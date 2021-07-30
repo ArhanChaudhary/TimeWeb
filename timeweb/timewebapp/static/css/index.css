@@ -31,6 +31,11 @@ header.animate::after {
 #introduction-message {
     padding: 0 10px;
 }
+#icon-label-container {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
 #assignments-header {
     position: relative;
     padding: 0 10px;
@@ -38,53 +43,6 @@ header.animate::after {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-}
-#assignments-header img {
-    cursor: pointer;
-    margin-left: 14px;
-}
-#assignments-header img:first-of-type {
-    margin-left: auto;
-}
-#close-assignments {
-    order: 2;
-}
-#open-assignments {
-    order: 3;
-}
-#next-day {
-    order: 4;
-}
-#settings {
-    order: 5;
-}
-#assignments-header img ~ div {
-    position: absolute;
-    order: 1;
-    z-index: 1000;
-    right: 225px;
-    bottom: 5px;
-    background: white;
-    visibility: hidden;
-}
-#next-day-icon-label {
-    padding-right: 5px;
-}
-#assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
-#assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
-#assignments-header img#next-day:hover ~ div#next-day-icon-label,
-#assignments-header img#settings:hover ~ div#settings-icon-label,
-#assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
-#assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
-#assignments-header img#next-day:focus ~ div#next-day-icon-label,
-#assignments-header img#settings:focus ~ div#settings-icon-label {
-    visibility: visible;
-}
-#assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
-#assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
-#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
-#assignments-header img#settings:hover ~ div:not(#settings-icon-label) {
-    visibility: hidden !important;
 }
 #info {
     display: inline;
@@ -108,6 +66,48 @@ header.animate::after {
 }
 #tomorrow-time {
     white-space: nowrap;
+}
+#assignments-header img {
+    cursor: pointer;
+    margin-left: 14px;
+}
+#close-assignments {
+    order: 2;
+}
+#open-assignments {
+    order: 3;
+}
+#next-day {
+    order: 4;
+}
+#settings {
+    order: 5;
+}
+#assignments-header #icon-label-container img ~ div {
+    position: absolute;
+    order: 1;
+    z-index: 1000;
+    padding: 0 10px;
+    right: 225px;
+    bottom: 5px;
+    background: rgb(214, 214, 214);
+    visibility: hidden;
+}
+#assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
+#assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
+#assignments-header img#next-day:hover ~ div#next-day-icon-label,
+#assignments-header img#settings:hover ~ div#settings-icon-label,
+#assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
+#assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
+#assignments-header img#next-day:focus ~ div#next-day-icon-label,
+#assignments-header img#settings:focus ~ div#settings-icon-label {
+    visibility: visible;
+}
+#assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
+#assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
+#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
+#assignments-header img#settings:hover ~ div:not(#settings-icon-label) {
+    visibility: hidden !important;
 }
 .assignment-container {
     transition: transform 2s ease-in-out;
