@@ -122,9 +122,15 @@ class TimewebModel(models.Model):
         return self.name
 
 class SettingsModel(models.Model):
-    enable_tutorial = models.BooleanField(
-        default=True,
-        verbose_name=_('Enable Tutorial'),
+
+    # Group "Assignment priority"
+    highest_priority_color = ColorField(
+        default="#e25b50",
+        verbose_name=_('Highest Priority Color'),
+    )
+    lowest_priority_color = ColorField(
+        default="#84c841",
+        verbose_name=_('Lowest Priority Color'),
     )
     color_priority = models.BooleanField(
         default=True,
@@ -134,24 +140,8 @@ class SettingsModel(models.Model):
         default=True,
         verbose_name=_('Show Priority Text'),
     )
-    highest_priority_color = ColorField(
-        default="#e25b50",
-        verbose_name=_('Highest Priority Color'),
-    )
-    lowest_priority_color = ColorField(
-        default="#84c841",
-        verbose_name=_('Lowest Priority Color'),
-    )
-    def_unit_to_minute = models.BooleanField(
-        default=False,
-        verbose_name=_('Set the Default Unit of Work to "Minute"'),
-    )
-    def_skew_ratio = models.DecimalField(
-        max_digits=17,
-        decimal_places=10,
-        default=1,
-        verbose_name=_('Default Skew Ratio'),
-    )
+
+    # Group "Assignment form"
     def_break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
@@ -165,28 +155,50 @@ class SettingsModel(models.Model):
         null=True,
         verbose_name=_('Default Minimum Daily Work Time in Minutes'),
     )
-    ignore_ends = models.BooleanField(
+    def_unit_to_minute = models.BooleanField(
         default=False,
-        verbose_name=_('Ignore Minimum Work Time Ends'),
+        verbose_name=_('Set the Default Unit of Work to "Minute"'),
     )
     def_funct_round_minute = models.BooleanField(
         default=False,
         verbose_name=_('Round to Multiples of 5 Minutes'),
     )
-    tag_position = models.CharField(
-        max_length=MAX_TAG_POSITIONS_LENGTH,
-        choices=TAG_POSITIONS,
-        default="Middle",
+
+    # Group "Assignment graph"
+    def_skew_ratio = models.DecimalField(
+        max_digits=17,
+        decimal_places=10,
+        default=1,
+        verbose_name=_('Default Skew Ratio'),
+    )
+    ignore_ends = models.BooleanField(
+        default=False,
+        verbose_name=_('Ignore Minimum Work Time Ends'),
     )
     show_progress_bar = models.BooleanField(
         default=False,
         verbose_name=_('Show Graph Progress Bar'),
+    )
+
+    # Group "Customization"
+    tag_position = models.CharField(
+        max_length=MAX_TAG_POSITIONS_LENGTH,
+        choices=TAG_POSITIONS,
+        default="Middle",
     )
     background_image = models.ImageField(
         upload_to=create_image_path,
         null=True,
         blank=True,
     )
+    # dark_mode
+    
+    # No group
+    enable_tutorial = models.BooleanField(
+        default=True,
+        verbose_name=_('Enable Tutorial'),
+    )
+
     oauth_token = models.JSONField(
         default=empty_dict,
         blank=True,
