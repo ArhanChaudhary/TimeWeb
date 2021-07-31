@@ -783,7 +783,7 @@ class VisualAssignment extends Assignment {
         // BEGIN Display button
         display_button.click(() => {
             $.alert({title: "This feature has not yet been implented"});
-        }).css("text-decoration", "line-through");
+        });
         // END Display button
 
         // BEGIN ignore button

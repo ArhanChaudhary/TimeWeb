@@ -176,6 +176,17 @@ $(function() {
     $("#nav-about").click(() => $.alert({title: "This has not yet been written"})).css("text-decoration", "line-through");
     $("#account-settings").click(() => $.alert({title: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> regarding your account settings"}));
 });
+jconfirm.defaults = {
+    escapeKey: true,
+    backgroundDismiss: true,
+
+    boxWidth: '50%',
+    useBootstrap: false,
+
+    animation: 'zoom',
+    closeAnimation: 'scale',
+    animateFromElement: false,
+};
 // Info tooltip
 $.fn.info = function(facing,text,position) {
     const info_button = $(`<div class="info-button" tabindex="-1">i<span class="info-button-text info-${facing}">${text}</span></div>`);

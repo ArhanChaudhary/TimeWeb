@@ -180,7 +180,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Show Graph Progress Bar'),
     )
 
-    # Group "Customization"
+    # Group "Personalize"
     tag_position = models.CharField(
         max_length=MAX_TAG_POSITIONS_LENGTH,
         choices=TAG_POSITIONS,
@@ -191,7 +191,10 @@ class SettingsModel(models.Model):
         null=True,
         blank=True,
     )
-    # dark_mode
+    dark_mode = models.BooleanField(
+        default=False,
+        verbose_name=_('Dark Mode'),
+    )
     
     # No group
     enable_tutorial = models.BooleanField(

@@ -40,6 +40,10 @@ $(function() {
         $("#id_tag_position").val("Middle");
         // $("#id_enable_tutorial").prop("checked", true);
     });
+    $("#id_dark_mode").click(function(e) {
+        e.preventDefault();
+        $.alert({title: "This feature has not yet been implented"});
+    });
     $("form").submit(function() {
         $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val() ? mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10) : 0);
     });
