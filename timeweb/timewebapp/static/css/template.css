@@ -1,7 +1,6 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 * {
     font-family: "Open Sans", sans-serif;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 input, textarea {
     -webkit-user-select: text;

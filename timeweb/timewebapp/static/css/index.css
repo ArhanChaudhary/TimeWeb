@@ -619,7 +619,6 @@ header.animate::after {
     width: 100%;
 }
 .graph-container {
-    overflow: scroll;
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
     width: calc(100% - 34px);
@@ -808,6 +807,9 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper #fields-wrapper {
     overflow: scroll;
+}
+#form-wrapper #fields-wrapper::-webkit-scrollbar {
+    display: none;
 }
 #form-wrapper .field-wrapper {
     margin-top: 10px;
