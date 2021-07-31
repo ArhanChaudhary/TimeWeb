@@ -170,7 +170,7 @@ utils = {
                 $("#delete-starred-assignments").click(function() {
                     $.confirm({
                         title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
-                        content: 'This is an irreversible action',
+                        content: 'This action is irreversible',
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -213,8 +213,8 @@ utils = {
                     if ($(e.target).is("#autofill-selection")) return;
 
                     $.confirm({
-                        title: `This will autofill ${$("#autofill-selection").val().toLowerCase()} work done until today for ALL assignments with missing work inputs<br>Are you sure?`,
-                        content: 'This is an irreversible action',
+                        title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done until today for ALL assignments with missing work inputs?`,
+                        content: 'This action is irreversible',
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -258,8 +258,8 @@ utils = {
                         return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
                     });
                     $.confirm({
-                        title: `This will delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"<br>Are you sure?`,
-                        content: 'This is an irreversible action',
+                        title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"`,
+                        content: 'This action is irreversible',
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],

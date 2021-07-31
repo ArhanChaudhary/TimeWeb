@@ -48,7 +48,9 @@ Assignment.prototype.setParabolaValues = function() {
         this.return_0_cutoff = 0;
         return;
     }
-    // funct_y and funct_zero may not always be accurate in that 
+    // funct_y and funct_zero may not always be accurate in that -b/a and y1 may not be the actual funct_zero and funct_y
+    // Trying to make these more accurate would require knowing whether funct rounds to min_work_time_funct_round or funct_round at -b/a and y1
+    // It probably is possible to avoid a deadlock, but I don't have the time to attempt fixing this
     if (this.a <= 0 || this.b > 0) {
         var funct_zero = 0;
     } else {
@@ -98,16 +100,32 @@ Assignment.prototype.setParabolaValues = function() {
         this.return_y_cutoff = 1;
     }
     if (this.return_y_cutoff < 2500) {
-        // If loop doesn't run, then 0 < return_y_cutoff <= 1, meaning the untranslated output must be 0
         let output;
         for (;this.return_y_cutoff > 1; this.return_y_cutoff--) {
             // do ceil-1 instead of floor because ceil-1 is inclusive of ints; lower_output_diff is the difference between y and the output of the value one less than lower_return_y_cutoff
             output = this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
             if (output <= this.sa.y - this.min_work_time_funct_round) break;
         }
+        // If loop doesn't run, then 0 < return_y_cutoff <= 1, meaning the untranslated output must be 0
         if (!(this.return_y_cutoff > 1)) {
             output = this.red_line_start_y;
         }
+
+        // let left = 1;
+        // let right = this.return_y_cutoff;
+        // while (left < right) {
+        //     const mid = left + Math.floor((right - left) / 2);
+
+        //     output = this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
+        //     if (!(output <= this.sa.y - this.min_work_time_funct_round)) {
+        //         right = mid;
+        //     } else {
+        //         left = mid + 1;
+        //     }
+        // }
+        // output = left;
+
+
         if (ignore_ends && this.sa.min_work_time) {
             const lower_return_y_cutoff = this.return_y_cutoff;
             const lower_output_diff = this.sa.y - output;
@@ -121,7 +139,7 @@ Assignment.prototype.setParabolaValues = function() {
             }
             const upper_return_y_cutoff = this.return_y_cutoff;
             const upper_output_diff = this.sa.y - output;
-            if (this.min_work_time_funct_round * 2 - lower_output_diff > upper_output_diff) {
+            if (this.min_work_time_funct_round > (upper_output_diff + lower_output_diff) / 2) {
                 this.return_y_cutoff = lower_return_y_cutoff;
             } else {
                 this.return_y_cutoff = upper_return_y_cutoff;
@@ -171,7 +189,7 @@ Assignment.prototype.setParabolaValues = function() {
             const lower_return_0_cutoff = this.return_0_cutoff;
             const lower_output_diff = output;
             // Pick whichever cutoff its output diff is closest to
-            if (this.min_work_time_funct_round * 2 - upper_output_diff > lower_output_diff) {
+            if (this.min_work_time_funct_round > (lower_output_diff + upper_output_diff) / 2) {
                 this.return_0_cutoff = upper_return_0_cutoff;
             } else {
                 this.return_0_cutoff = lower_return_0_cutoff;

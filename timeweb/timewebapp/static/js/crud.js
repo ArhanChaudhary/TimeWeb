@@ -343,7 +343,7 @@ $(function() {
         }
         $.confirm({
             title: 'Are you sure you want to delete this assignment?',
-            content: 'This is an irreversible action',
+            content: 'This action is irreversible',
             buttons: {
                 confirm: {
                     keys: ['Enter'],

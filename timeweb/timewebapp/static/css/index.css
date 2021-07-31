@@ -592,7 +592,6 @@ header.animate::after {
     align-items: center;
     align-self: normal;
     justify-content: center;
-    margin: -15px 0;
     margin-right: -4px;
     min-width: 40px;
     cursor: pointer;

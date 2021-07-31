@@ -310,6 +310,7 @@ priority = {
             // originally ![6,7,8].includes(pd[0]) && (pd[3] || $(".question-mark").length); if pd[3] is true then ![6,7,8].includes(pd[0])
             const mark_as_done = !!(pd[3] || $(".question-mark").length && ![6,7,8].includes(pd[0]));
             const dom_assignment = $(".assignment").eq(pd[2]);
+            const assignment_container = dom_assignment.parents(".assignment-container");
             let priority_percentage;
             if ([6,7,8].includes(pd[0])) {
                 priority_percentage = NaN;
@@ -339,21 +340,18 @@ priority = {
                     const dom_tags = dom_assignment.find(".tags");
                     const dom_button = dom_assignment.find(".button");
                     const dom_assignment_footer = dom_assignment.find(".assignment-footer");
+                    dom_assignment.css({paddingTop: "", paddingBottom: ""});
+                    dom_button.css({marginTop: "", marginBottom: ""});
                     // really inefficient but whatever
-                    // dom_assignment.css({paddingTop: "", paddingBottom: ""});
-                    // dom_button.css({marginTop: "", marginBottom: ""});
-                    const tag_bottom = dom_tags.offset().top + dom_tags.height();
-                    const title_top = dom_title.offset().top;
-                    
-                    // set title_top to below dom_assignment_top - tag_bottom
-
-                    const padding_to_add = Math.max(5, add_priority_percentage ? 3 : -3 - (title_top - tag_bottom));
+                    const tag_top = dom_tags.offset().top;
+                    const tag_height = dom_tags.height();
+                    const title_top = dom_title.offset().top + (add_priority_percentage ? -10 : 3);
+                    const padding_to_add = Math.max(0, tag_top - title_top + tag_height) + 15;
                     dom_assignment.css({paddingTop: padding_to_add, paddingBottom: padding_to_add});
                     dom_button.css({marginTop: -padding_to_add, marginBottom: -padding_to_add});
                     dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
                 });
             }
-            const assignment_container = dom_assignment.parents(".assignment-container");
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {
