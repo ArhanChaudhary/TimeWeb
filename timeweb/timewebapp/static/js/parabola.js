@@ -54,17 +54,17 @@ Assignment.prototype.setParabolaValues = function() {
     if (this.a <= 0 || this.b > 0) {
         var funct_zero = 0;
     } else {
-        var funct_zero = utils.precisionRound(-this.b / this.a, 10)
+        var funct_zero = mathUtils.precisionRound(-this.b / this.a, 10)
     }
     if (this.a >= 0) {
         var funct_y = x1;
     } else {
-        var funct_y = utils.precisionRound((Math.sqrt(this.b * this.b + 4 * this.a * y1) - this.b) / this.a / 2, 10);
+        var funct_y = mathUtils.precisionRound((Math.sqrt(this.b * this.b + 4 * this.a * y1) - this.b) / this.a / 2, 10);
     }
     if (this.sa.funct_round < this.sa.min_work_time) {
         this.cutoff_transition_value = 0;
         if (this.a) {
-            this.cutoff_to_use_round = utils.precisionRound((this.min_work_time_funct_round - this.b) / this.a / 2, 10) - 1e-10;
+            this.cutoff_to_use_round = mathUtils.precisionRound((this.min_work_time_funct_round - this.b) / this.a / 2, 10) - 1e-10;
             // Needs to be here or else the entire graph may unintentionally translated this.cutoff_transition_value units
             if (funct_zero < this.cutoff_to_use_round && this.cutoff_to_use_round < funct_y) {
                 // Same thing as:
@@ -95,7 +95,7 @@ Assignment.prototype.setParabolaValues = function() {
         } else {
             this.return_y_cutoff = y_value_to_cutoff/this.b;
         }
-        this.return_y_cutoff = utils.precisionRound(this.return_y_cutoff, 10);
+        this.return_y_cutoff = mathUtils.precisionRound(this.return_y_cutoff, 10);
     } else {
         this.return_y_cutoff = 1;
     }
@@ -160,7 +160,7 @@ Assignment.prototype.setParabolaValues = function() {
         } else {
             this.return_0_cutoff = y_value_to_cutoff / this.b;
         }
-        this.return_0_cutoff = utils.precisionRound(this.return_0_cutoff, 10);
+        this.return_0_cutoff = mathUtils.precisionRound(this.return_0_cutoff, 10);
     } else {
         this.return_0_cutoff = 0;
     }
@@ -220,7 +220,7 @@ Assignment.prototype.funct = function(x, params={}) {
     }
     // Return untranslated y coordinate
     // No point in untranslating x coordinate
-    return utils.precisionRound(output + this.red_line_start_y, max_length_funct_round);
+    return mathUtils.precisionRound(output + this.red_line_start_y, max_length_funct_round);
 }
 Assignment.prototype.calcModDays = function() {
     let mods = [0],

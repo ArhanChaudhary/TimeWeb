@@ -686,14 +686,6 @@ utils = {
             window.location.reload();
         }
     },
-    daysBetweenTwoDates: function(larger_date, smaller_date) {
-        return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
-    },
-    // from math.round mdn docs
-    precisionRound: function(number, precision) {
-        const factor = Math.pow(10, precision);
-        return Math.round(number * factor) / factor;
-    },
     loadAssignmentData: function($element_with_id_attribute) {
         return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
     },
@@ -847,7 +839,7 @@ for (let sa of dat) {
     sa.x = new Date(sa.x);
     sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
     sa.x.setHours(0,0,0,0);
-    sa.x = utils.daysBetweenTwoDates(sa.x, sa.assignment_date);
+    sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
     if (sa.name === example_assignment_name) {
         sa.assignment_date = new Date(date_now.valueOf());
     }

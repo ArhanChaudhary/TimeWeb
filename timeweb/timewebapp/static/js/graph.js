@@ -90,7 +90,7 @@ class VisualAssignment extends Assignment {
             this.date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
         }
-        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+        this.today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         this.dom_assignment.find(".skew-ratio-textbox").attr({
             min: 1 - this.skew_ratio_lim,
             max: this.skew_ratio_lim - 1,
@@ -109,7 +109,7 @@ class VisualAssignment extends Assignment {
     resize() {
         // If date_now changes, redefine variables dependent on them
         // If so, works may also change because of autofill in priority.js
-        this.today_minus_ad = utils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+        this.today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js
             this.red_line_start_x = this.sa.dynamic_start;
@@ -201,12 +201,12 @@ class VisualAssignment extends Assignment {
     changeSkewRatio() {
         // Change skew ratio by +- 0.1 and cap it
         if (this.pressed_arrow_key === "ArrowDown") {
-            this.sa.skew_ratio = utils.precisionRound(this.sa.skew_ratio - 0.1, 1);
+            this.sa.skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 0.1, 1);
             if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
                 this.sa.skew_ratio = this.skew_ratio_lim;
             }
         } else {
-            this.sa.skew_ratio = utils.precisionRound(this.sa.skew_ratio + 0.1, 1);
+            this.sa.skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio + 0.1, 1);
             if (this.sa.skew_ratio > this.skew_ratio_lim) {
                 this.sa.skew_ratio = 2 - this.skew_ratio_lim;
             }
