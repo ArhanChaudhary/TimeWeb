@@ -117,7 +117,6 @@ class SettingsForm(forms.ModelForm):
         widgets = {
             "user": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
-            'warning_acceptance': forms.NumberInput(attrs={"min":"1","max":"100"}),
             'date_now': forms.HiddenInput(),
             'oauth_token': forms.HiddenInput(),
             'highest_priority_color': ColorWidget,

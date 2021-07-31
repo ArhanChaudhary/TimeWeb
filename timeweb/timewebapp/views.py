@@ -99,7 +99,6 @@ class SettingsView(LoginRequiredMixin, View):
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         initial = {
-            'warning_acceptance': self.settings_model.warning_acceptance,
             'def_min_work_time': self.settings_model.def_min_work_time,
             'def_skew_ratio': self.settings_model.def_skew_ratio,
             'def_break_days': self.settings_model.def_break_days,
@@ -138,7 +137,6 @@ class SettingsView(LoginRequiredMixin, View):
     
     def valid_form(self, request):
         if self.isExampleAccount: return redirect("home")
-        self.settings_model.warning_acceptance = self.form.cleaned_data.get("warning_acceptance")
         self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
         self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         self.settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")

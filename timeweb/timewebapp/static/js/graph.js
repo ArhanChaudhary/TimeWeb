@@ -447,9 +447,6 @@ class VisualAssignment extends Assignment {
                 center("Please Enter your Progress to Continue", 7);
             } else if (this.sa.break_days.includes((this.assign_day_of_week+this.sa.blue_line_start+len_works) % 7) || displayed_day.valueOf() > date_now.valueOf()) {
                 center("You have Completed your Work for Today", 6);
-            } else if (len_works && (last_work_input - this.sa.works[len_works-1]) / warning_acceptance * 100 < this.funct(len_works + this.sa.blue_line_start) - this.sa.works[len_works-1]) {
-                center("!!! ALERT !!!", 6);
-                center("You are Behind Schedule!", 7);
             }
         } else {
             center('You are Completely Finished with this Assignment!', 5);

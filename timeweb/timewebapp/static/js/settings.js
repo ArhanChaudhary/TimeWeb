@@ -11,14 +11,6 @@ $(function() {
     gtag("event","settings_view");
     $("#id_def_skew_ratio").val(utils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
-
-    $("#id_warning_acceptance").parent().info('bottom',
-        `Determines when to display a warning on an assignment if you fall behind on an assignment's work schedule
-
-        e.g: If you enter 75, then you have to complete less than 75% of an assignment's work on any day to trigger a warning
-
-        NOTE: Warnings do not affect anything and are there just for you to see`
-    );
     $("#id_def_funct_round_minute").parent().info('right',
         `If your unit of work for any assignment is "Minute," meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes
         
@@ -34,7 +26,6 @@ $(function() {
         This is recommended to be enabled`
     );
     $("#reset-button").click(function() {
-        $("#id_warning_acceptance").val(50);
         $("#id_def_min_work_time").val("");
         $("#id_def_skew_ratio").val(0);
         $("#break-days-wrapper input").prop("checked", false);

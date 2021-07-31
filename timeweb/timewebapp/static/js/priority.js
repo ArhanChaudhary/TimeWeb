@@ -167,21 +167,12 @@ priority = {
                 } else {
                     status_value = 4;
                     display_format_minutes = true;
-                    if (len_works && (last_work_input - sa.sa.works[len_works - 1]) / warning_acceptance * 100 < sa.funct(len_works + sa.sa.blue_line_start) - sa.sa.works[len_works - 1]) {
-                        status_image = 'warning';
-                        dom_status_image.attr({
-                            width: 7,
-                            height: 22,
-                        }).css("margin-left", 5);
-                        status_message = 'Warning! You are behind your Work schedule!';
-                    } else {
-                        status_image = 'unfinished';
-                        status_message = "This Assignment's Daily Work is Unfinished";
-                        dom_status_image.attr({
-                            width: 15,
-                            height: 15,
-                        }).css("margin-left", -2);
-                    }
+                    status_image = 'unfinished';
+                    status_message = "This Assignment's Daily Work is Unfinished";
+                    dom_status_image.attr({
+                        width: 15,
+                        height: 15,
+                    }).css("margin-left", -2);
                     if (sa.unit_is_of_time) {
                         status_message += `<br>Complete ${todo} ${pluralize(sa.sa.unit,todo)} of Work Today`;
                     } else {

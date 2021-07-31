@@ -182,11 +182,6 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Show Graph Progress Bar'),
     )
-    warning_acceptance = models.IntegerField(
-        default=50,
-        validators=[MinValueValidator(1,_("This field's value must be an integer from 1 to 100")), MaxValueValidator(100,_("This field's value must be an integer from 1 to 100"))],
-        verbose_name=_('Warning Threshold'),
-    )
     background_image = models.ImageField(
         upload_to=create_image_path,
         null=True,
