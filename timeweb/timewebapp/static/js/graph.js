@@ -288,7 +288,7 @@ class VisualAssignment extends Assignment {
                         should_be_done_x = this.width - 17;
                     }
                     screen.rotate(Math.PI / 2);
-                    // Since rotate, swap x and y, make x negative
+                    // (x, y) => (y, -x)
                     screen.fillText("Goal", this.height-95, -should_be_done_x-14);
                     screen.rotate(-Math.PI / 2);
                     screen.fillStyle = "rgb(55,55,55)";

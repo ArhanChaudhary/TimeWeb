@@ -210,6 +210,8 @@ if not DEBUG:
         BASE_DIR / "sa-private-key.json"
     )
 # Django Logging config
+ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'WARNING'
+DJANGO_LOG_LEVEL = 'INFO' if DEBUG else 'WARNING'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -221,21 +223,13 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'DEBUG' if DEBUG else 'INFO',
+        'level': ROOT_LOG_LEVEL,
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        },
-        # 'django.request': {
-        #     'handlers': ['console'],
-        #     'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-        # },
-        # 'django.server': {
-        #     'handlers': ['console'],
-        #     'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
-        # },
+            'level': DJANGO_LOG_LEVEL,
+        }
     },
     'formatters': {
         'verbose': {
