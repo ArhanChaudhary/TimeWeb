@@ -592,6 +592,7 @@ header.animate::after {
     align-items: center;
     align-self: normal;
     justify-content: center;
+    margin: -15px 0;
     margin-right: -4px;
     min-width: 40px;
     cursor: pointer;
@@ -627,6 +628,10 @@ header.animate::after {
     margin-left: 13px;
     border: 4px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
 }
+.graph-container canvas {
+    width: 100%;
+    height: 100%;
+}
 .graph-container:focus {
     box-shadow: 0 0 0 3px rgb(0,95,204);
     outline: 0;
@@ -659,6 +664,7 @@ header.animate::after {
     margin-bottom: -7px;
 }
 .graph-footer * {
+    font-size: 13.3333px;
     border-radius: 20px;
     border: none;
     padding: 3px 6px;
@@ -910,6 +916,8 @@ input[type=number]::-webkit-inner-spin-button {
     margin: 0 50px;
 }
 #toggle-gc-container {
+    display: flex;
+    align-items: center;
     position: fixed;
     height: 50px;
     border-radius: 25px;
@@ -924,13 +932,11 @@ input[type=number]::-webkit-inner-spin-button {
     box-shadow: 0 0 5px 1px black;
 }
 #toggle-gc-label {
-    position: relative;
-    bottom: 10px;
     width: 0;
+    overflow: hidden;
     opacity: 0;
     display: inline-block;
     text-align: left;
-    overflow: hidden;
     white-space: nowrap;
     transform: translateX(30px);
     transition: width 0.7s cubic-bezier(0, 0, 0.5, 1);

@@ -189,7 +189,8 @@ jconfirm.defaults = {
 };
 // Info tooltip
 $.fn.info = function(facing,text,position) {
-    const info_button = $(`<div class="info-button" tabindex="-1">i<span class="info-button-text info-${facing}">${text}</span></div>`);
+    const info_button = $($("#info-button-template").html());
+    info_button.find(".info-button-text").addClass(`info-${facing}`).text(text);
     switch (position) {
         case "prepend":
             return info_button.prependTo(this);
@@ -200,7 +201,7 @@ $.fn.info = function(facing,text,position) {
     }
 }
 mathUtils = {
-    // from math.round mdn docs
+    // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
     precisionRound: function(number, precision) {
         const factor = Math.pow(10, precision);
         return Math.round(number * factor) / factor;
@@ -208,4 +209,7 @@ mathUtils = {
     daysBetweenTwoDates: function(larger_date, smaller_date) {
         return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
     },
+    clamp: function(low, value, high) {
+        return Math.min(Math.max(value, low), high)
+    }
 }

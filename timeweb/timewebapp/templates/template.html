@@ -110,6 +110,11 @@
                 <img id="background-image" ignored-window-onload-src="/media/images/{{ user.get_username }}/{{ background_image_name }}" width="{{background_image.width}}" height="{{background_image.height}}" draggable="false">
                 {% endif %}
                 {% block content %}{% endblock content %}
+                <template id="info-button-template">
+                    <div class="info-button" tabindex="-1">
+                        i<span class="info-button-text"></span>
+                    </div>
+                </template>
             </main>
         </div>
     </body>

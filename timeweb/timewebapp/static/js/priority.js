@@ -218,8 +218,8 @@ priority = {
                 // Order assignments that need more info by their tags lexicographically
                 status_priority = (sa.sa.tags[0]||"").toLowerCase();
             } else if (add_question_mark_condition) {
-                // Order question mark assignments by their closeness to their due date
-                status_priority = -due_date_minus_today;
+                // Order question mark assignments by their absolute distance to their due date
+                status_priority = -Math.abs(due_date_minus_today);
             } else {
                 const original_skew_ratio = sa.sa.skew_ratio;
                 sa.sa.skew_ratio = 1;
@@ -285,6 +285,9 @@ priority = {
             if (a[2] < b[2]) return -1;
             if (a[2] > b[2]) return 1;
         });
+        // Source code lurkers, uncomment these two for some fun
+        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}}
+        // shuffleArray(ordered_assignments);
         const highest_priority = Math.max(...ordered_assignments.map(function(pd) {
             if ((pd[0] === 5 || pd[0] === 4) && !pd[3]) {
                 return pd[1];
@@ -337,9 +340,9 @@ priority = {
                     const tag_top = dom_tags.offset().top;
                     const tag_height = dom_tags.height();
                     const title_top = dom_title.offset().top + (add_priority_percentage ? -10 : 3);
-                    const padding_to_add = Math.max(0, tag_top - title_top + tag_height) + 15;
-                    dom_assignment.css({paddingTop: padding_to_add, paddingBottom: padding_to_add});
-                    dom_button.css({marginTop: -padding_to_add, marginBottom: -padding_to_add});
+                    const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
+                    dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
+                    dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
                     dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
                 });
             }

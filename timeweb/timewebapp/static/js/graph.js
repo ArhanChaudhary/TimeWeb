@@ -68,17 +68,8 @@ class VisualAssignment extends Assignment {
     constructor(dom_assignment) {
         super(dom_assignment);
         this.dom_assignment = dom_assignment;
-        this.zoom = 1;
         this.graph = dom_assignment.find(".graph");
         this.fixed_graph = dom_assignment.find(".fixed-graph");
-        this.graph.css({
-            width: this.zoom*100+"%",
-            height: this.zoom*100+"%",
-        });
-        this.fixed_graph.css({
-            width: this.zoom*100+"%",
-            height: this.zoom*100+"%",
-        });
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
         this.due_date = new Date(this.sa.assignment_date.valueOf());
@@ -96,7 +87,6 @@ class VisualAssignment extends Assignment {
             max: this.skew_ratio_lim - 1,
         });
         this.scale = window.devicePixelRatio || 2;
-        this.scale *= this.zoom;
     }
     calcSkewRatioLimVisually() {
         const skew_ratio_lim = super.calcSkewRatioLim();
@@ -121,7 +111,7 @@ class VisualAssignment extends Assignment {
             this.setParabolaValues();
         }
         if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
-            // Static properties
+            this.scale = window.devicePixelRatio || 2; // Zoom in/out
             this.width = this.fixed_graph.width();
             this.height = this.fixed_graph.height();
             if (this.width > 500) {
@@ -137,10 +127,6 @@ class VisualAssignment extends Assignment {
             this.fixed_graph[0].height = this.height * this.scale;
             this.drawfixed();
             this.draw();
-            // this.graph[0].width *= this.zoom;
-            // this.graph[0].height *= this.zoom;
-            // this.fixed_graph[0].width *= this.zoom;
-            // this.fixed_graph[0].height *= this.zoom;
         }
     }
     mousemove(e) {
@@ -169,7 +155,7 @@ class VisualAssignment extends Assignment {
             // NOTE: x2 can be NaN from being outside of the graph caused by negative indexing by floorx2. Doesn't matter if this happens
             if (0 < x2 & x2 < x1) {
                 // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
-                // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                 this.a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
                 this.b = (y1 - x1 * x1 * this.a) / x1;
 
@@ -183,7 +169,7 @@ class VisualAssignment extends Assignment {
                 } else if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
-                    // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+                    // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                     this.a = y1 * (1 - this.sa.skew_ratio) / ((x1 - 1) * x1);
                     this.b = (y1 - x1 * x1 * this.a) / x1;
                 }

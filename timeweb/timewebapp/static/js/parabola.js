@@ -35,7 +35,7 @@ Assignment.prototype.setParabolaValues = function() {
     if (this.sa.break_days.length) {
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
     }
-    // cite http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+    // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
     this.a = y1 * (1 - this.sa.skew_ratio) / ((x1 - 1) * x1);
     this.b = (y1 - x1 * x1 * this.a) / x1;
     if (!Number.isFinite(this.a)) {
@@ -64,20 +64,14 @@ Assignment.prototype.setParabolaValues = function() {
     if (this.sa.funct_round < this.sa.min_work_time) {
         this.cutoff_transition_value = 0;
         if (this.a) {
+            // - 1e-10 to ensure cutoff_to_use_round isn't exactly an integer, at that makes output and prev_output the same and to ensure other < and > checks work
             this.cutoff_to_use_round = mathUtils.precisionRound((this.min_work_time_funct_round - this.b) / this.a / 2, 10) - 1e-10;
-            // Needs to be here or else the entire graph may unintentionally translated this.cutoff_transition_value units
+            // Condition needs to be here or else the entire graph may unintentionally translated this.cutoff_transition_value units
             if (funct_zero < this.cutoff_to_use_round && this.cutoff_to_use_round < funct_y) {
-                // Same thing as:
-                // const prev_output = clamp(0, this.funct(Math.floor(this.cutoff_to_use_round)), this.sa.y)
-                // const output = clamp(0, this.funct(Math.ceil(this.cutoff_to_use_round)), this.sa.y)
-                const prev_output = Math.min(Math.max(
-                    this.funct(Math.floor(this.cutoff_to_use_round), {translateX: false})
-                , 0), this.sa.y),
-                    output = Math.min(Math.max(
-                        this.funct(Math.ceil(this.cutoff_to_use_round), {translateX: false})
-                    , 0), this.sa.y);
+                const prev_output = mathUtils.clamp(0, this.funct(Math.floor(this.cutoff_to_use_round), {translateX: false}), this.sa.y);
+                const output = mathUtils.clamp(0, this.funct(Math.ceil(this.cutoff_to_use_round), {translateX: false}), this.sa.y);
                 if (output - prev_output) {
-                    this.cutoff_transition_value = this.min_work_time_funct_round - output + prev_output;
+                    this.cutoff_transition_value = this.min_work_time_funct_round - (output - prev_output);
                 }
             }
         }

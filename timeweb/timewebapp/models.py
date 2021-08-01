@@ -123,24 +123,6 @@ class TimewebModel(models.Model):
 
 class SettingsModel(models.Model):
 
-    # Group "Assignment priority"
-    highest_priority_color = ColorField(
-        default="#e25b50",
-        verbose_name=_('Highest Priority Color'),
-    )
-    lowest_priority_color = ColorField(
-        default="#84c841",
-        verbose_name=_('Lowest Priority Color'),
-    )
-    color_priority = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Priority Colors'),
-    )
-    text_priority = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Priority Text'),
-    )
-
     # Group "Assignment form"
     def_break_days = MultiSelectField(
         choices=WEEKDAYS,
@@ -180,6 +162,24 @@ class SettingsModel(models.Model):
         verbose_name=_('Show Graph Progress Bar'),
     )
 
+    # Group "Assignment priority"
+    highest_priority_color = ColorField(
+        default="#e25b50",
+        verbose_name=_('Highest Priority Color'),
+    )
+    lowest_priority_color = ColorField(
+        default="#84c841",
+        verbose_name=_('Lowest Priority Color'),
+    )
+    color_priority = models.BooleanField(
+        default=True,
+        verbose_name=_('Show Priority Colors'),
+    )
+    text_priority = models.BooleanField(
+        default=True,
+        verbose_name=_('Show Priority Text'),
+    )
+    
     # Group "Personalize"
     tag_position = models.CharField(
         max_length=MAX_TAG_POSITIONS_LENGTH,
