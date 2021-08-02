@@ -659,7 +659,7 @@ class GCOAuthView(LoginRequiredMixin, View):
     def get(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         # Callback URI
-        state = request.GET.get('state',None)
+        state = request.GET.get('state', None)
 
         flow = Flow.from_client_secrets_file(
             GC_CREDENTIALS_PATH,
@@ -683,7 +683,6 @@ class GCOAuthView(LoginRequiredMixin, View):
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
-        
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name

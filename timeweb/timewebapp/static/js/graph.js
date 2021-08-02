@@ -63,6 +63,59 @@ class Assignment {
         */
         return Math.round((y1 + this.min_work_time_funct_round) * x1 / y1 * 10)/10;
     }
+    set_dynamic_start_if_in_dynamic_mode(params={}) {
+        if (this.sa.fixed_mode) return;
+        const len_works = this.sa.works.length - 1;
+        if (len_works + this.sa.blue_line_start === this.sa.x) {
+            this.red_line_start_x = len_works + this.sa.blue_line_start - 1; // If users enter a value >y on the last day dont change dynamic start
+        } else {
+            this.red_line_start_x = len_works + this.sa.blue_line_start;
+        }
+        // No need to define dynamic_start nor red_line_start_y because they are both redfined later anyways
+
+        // Reverses the logic of work inputs in and recursively decreases red_line_start_x
+        // The outer for loop decrements red_line_start_x if the inner for loop didn't break
+        outer: 
+        for (this.red_line_start_x = this.red_line_start_x - 1; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
+            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+            if (this.sa.break_days.length) {
+                this.mods = this.calcModDays();
+            }
+            if (params.base_class) {
+                this.skew_ratio_lim = this.calcSkewRatioLim();
+            } else {
+                this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
+            }
+            this.setParabolaValues();
+            // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+            let next_funct = this.funct(this.red_line_start_x),
+                next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+            for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
+                const this_funct = next_funct,
+                    this_work = next_work;
+                next_funct = this.funct(i + 1),
+                next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+                // When a day is found where the work input isn't the same as the red line for that red_line_start_x, break and then increase it by 1 to where it doesnt happen
+                if (next_funct - this_funct !== next_work - this_work) break outer;
+            }
+        }
+        // ++ for three cases:
+        // if for loop doesnt run, do ++ to fix red_line_start_x
+        // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
+        // if for loop doesnt find, do ++; red_line_start_x is less than blue_line_start which is illegal
+        this.red_line_start_x++;
+        this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        this.sa.dynamic_start = this.red_line_start_x;
+        if (this.sa.break_days.length) {
+            this.mods = this.calcModDays();
+        }
+        if (params.base_class) {
+            this.skew_ratio_lim = this.calcSkewRatioLim();
+        } else {
+            this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
+        }
+        this.setParabolaValues();
+    }
 }
 class VisualAssignment extends Assignment {
     constructor(dom_assignment) {
@@ -88,7 +141,7 @@ class VisualAssignment extends Assignment {
         });
         this.scale = window.devicePixelRatio || 2;
     }
-    calcSkewRatioLimVisually() {
+    calc_skew_ratio_lim_and_clamp_textbox() {
         const skew_ratio_lim = super.calcSkewRatioLim();
         this.dom_assignment.find(".skew-ratio-textbox").attr({
             min: 1 - skew_ratio_lim,
@@ -100,16 +153,7 @@ class VisualAssignment extends Assignment {
         // If date_now changes, redefine variables dependent on them
         // If so, works may also change because of autofill in priority.js
         this.today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-        if (!this.sa.fixed_mode) {
-            // Use sa because dynamic_start is changed in priority.js
-            this.red_line_start_x = this.sa.dynamic_start;
-            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-            if (this.sa.break_days.length) {
-                this.mods = this.calcModDays();
-            }
-            this.skew_ratio_lim = this.calcSkewRatioLim();
-            this.setParabolaValues();
-        }
+        super.set_dynamic_start_if_in_dynamic_mode();
         if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
             this.scale = window.devicePixelRatio || 2; // Zoom in/out
             this.width = this.fixed_graph.width();
@@ -169,10 +213,8 @@ class VisualAssignment extends Assignment {
                 } else if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
-                    // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-                    this.a = y1 * (1 - this.sa.skew_ratio) / ((x1 - 1) * x1);
-                    this.b = (y1 - x1 * x1 * this.a) / x1;
                 }
+                super.set_dynamic_start_if_in_dynamic_mode();
             }
         }
         // Passes mouse x and y coords so mouse point can be drawn
@@ -651,45 +693,8 @@ class VisualAssignment extends Assignment {
             this.sa.works.pop();
             len_works--;
 
-            // If the deleted work input cut the dynamic start, run this
-            // Reverses the logic of work inputs in and recursively decreases red_line_start_x
-            if (this.red_line_start_x > len_works + this.sa.blue_line_start) {
-                // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-                outer: 
-                for (this.red_line_start_x = this.red_line_start_x - 2; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
-                    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-                    if (this.sa.break_days.length) {
-                        this.mods = this.calcModDays();
-                    }
-                    this.skew_ratio_lim = this.calcSkewRatioLimVisually();
-                    this.setParabolaValues();
-                    // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
-                    let next_funct = this.funct(this.red_line_start_x),
-                        next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-                    for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
-                        const this_funct = next_funct,
-                            this_work = next_work;
-                        next_funct = this.funct(i + 1),
-                        next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-                        // When a day is found where the work input isn't the same as the red line for that red_line_start_x, break and then increase it by 1 to where it doesnt happen
-                        if (next_funct - this_funct !== next_work - this_work) {
-                            break outer;
-                        }
-                    }
-                }
-                // ++ for three cases:
-                // if for loop doesnt run, do ++ to fix red_line_start_x
-                // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
-                // if for loop doesnt find, do ++; red_line_start_x is less than blue_line_start which is illegal
-                this.red_line_start_x++;
-                this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-                if (this.sa.break_days.length) {
-                    this.mods = this.calcModDays();
-                }
-                this.skew_ratio_lim = this.calcSkewRatioLimVisually();
-                this.sa.dynamic_start = this.red_line_start_x;
-                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id)
-            }
+            super.set_dynamic_start_if_in_dynamic_mode();
+            ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort({do_not_autofill: true}); // Don't autofill on delete work input because it'll just undo the delete in some cases
             this.draw();
@@ -743,23 +748,11 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 todo = 0;
             }
-            if (input_done !== todo) {
-                if (len_works + this.sa.blue_line_start === this.sa.x) {
-                    this.sa.dynamic_start = len_works + this.sa.blue_line_start - 1; // If users enter a value >y on the last day dont change dynamic start
-                } else {
-                    this.sa.dynamic_start = len_works + this.sa.blue_line_start;
-                }
-                ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
-                if (!this.sa.fixed_mode) {
-                    this.red_line_start_x = this.sa.dynamic_start;
-                    this.red_line_start_y = this.sa.works[this.sa.dynamic_start - this.sa.blue_line_start];
-                    if (this.sa.break_days.length) {
-                        this.mods = this.calcModDays();
-                    }
-                    this.skew_ratio_lim = this.calcSkewRatioLimVisually();
-                    this.setParabolaValues();
-                }
-            }
+            // Don't add this check for set_dynamic_mode_if_in_dynamic_mode
+            // if (input_done !== todo) {
+            // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
+            super.set_dynamic_start_if_in_dynamic_mode();
+            ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort();
             this.draw();
@@ -910,6 +903,7 @@ class VisualAssignment extends Assignment {
                 this.sa.skew_ratio = old_skew_ratio;
                 old_skew_ratio = undefined;
             }
+            super.set_dynamic_start_if_in_dynamic_mode();
             this.draw();
         }).keypress(e => {
             // Saves skew ratio on enter
@@ -936,18 +930,14 @@ class VisualAssignment extends Assignment {
             fixed_mode_button.onlyText(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
             ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
             if (this.sa.fixed_mode) {
-                // Set start of red line and setParabolaValues()
+                // Set start of the red line
                 this.red_line_start_x = 0;
                 this.red_line_start_y = 0;
-                this.setParabolaValues();
             } else {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-                // No need to setParabolaValues()
             }
-            if (this.sa.break_days.length) {
-                this.mods = this.calcModDays();
-            }
+            super.set_dynamic_start_if_in_dynamic_mode();
             priority.sort({ ignore_timeout: true });
             this.draw();
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");

@@ -121,15 +121,7 @@ priority = {
                         sa.sa.works.push(last_work_input);
                         len_works++;
                         if (todo) {
-                            sa.sa.dynamic_start = len_works + sa.sa.blue_line_start;
-                            if (!sa.sa.fixed_mode) {
-                                sa.red_line_start_x = sa.sa.dynamic_start;
-                                sa.red_line_start_y = sa.sa.works[sa.red_line_start_x - sa.sa.blue_line_start];
-                                if (sa.sa.break_days.length) {
-                                    sa.mods = sa.calcModDays();
-                                }
-                                sa.setParabolaValues();
-                            }
+                            sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
                         }
                     }
                     if (has_autofilled) {
@@ -142,6 +134,7 @@ priority = {
                 if (sa.sa.break_days.length) {
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + sa.mods[x1 % 7]; // Handles break days, explained later
                 }
+                sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
