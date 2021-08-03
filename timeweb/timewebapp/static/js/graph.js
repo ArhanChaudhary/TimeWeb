@@ -17,25 +17,7 @@ class Assignment {
         this.sa = utils.loadAssignmentData(dom_assignment);
         this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
         this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
-        // Not sure if these if stataments are actually needed but I included them in the original program, and there doesnt seem to be any harm
-        // Caps values
-        const y1 = this.sa.y - this.red_line_start_y;
-        if (this.sa.funct_round > y1) {
-            this.sa.funct_round = y1;
-        }
-        if (this.sa.min_work_time > y1) {
-            this.sa.min_work_time = y1;
-        }
-        // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
-        // Set it to 0 to pretend it isn't enabled for calculations in setParabolaValues()
-        if (this.sa.min_work_time <= this.sa.funct_round) {
-            this.sa.min_work_time = 0;
-        // Suppose funct_round is 4, min_work_time is 5, f(4) = 18, and f(5) = 23
-        // f(4) gets rounded to 20 and f(5) gets rounded to 24, violating the min_work_time of 5
-        // This fixes the problem
-        } else if (this.sa.funct_round < this.sa.min_work_time && this.sa.min_work_time < 2 * this.sa.funct_round) {
-            this.sa.min_work_time = this.sa.funct_round * 2;
-        }
+        
         this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
         this.assign_day_of_week = this.sa.assignment_date.getDay();
         if (this.sa.break_days.length) {
@@ -66,17 +48,12 @@ class Assignment {
     set_dynamic_start_if_in_dynamic_mode(params={}) {
         if (this.sa.fixed_mode) return;
         const len_works = this.sa.works.length - 1;
-        if (len_works + this.sa.blue_line_start === this.sa.x) {
-            this.red_line_start_x = len_works + this.sa.blue_line_start - 1; // If users enter a value >y on the last day dont change dynamic start
-        } else {
-            this.red_line_start_x = len_works + this.sa.blue_line_start;
-        }
-        // No need to define dynamic_start nor red_line_start_y because they are both redfined later anyways
-
-        // Reverses the logic of work inputs in and recursively decreases red_line_start_x
-        // The outer for loop decrements red_line_start_x if the inner for loop didn't break
-        outer: 
-        for (this.red_line_start_x = this.red_line_start_x - 1; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
+        
+        let low = this.sa.blue_line_start;
+        let high = len_works + this.sa.blue_line_start - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start
+        while (low < high) {
+            const mid = Math.floor((low + high)/ 2);
+            this.red_line_start_x = mid;
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             if (this.sa.break_days.length) {
                 this.mods = this.calcModDays();
@@ -87,6 +64,8 @@ class Assignment {
                 this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
             }
             this.setParabolaValues();
+
+            let valid_red_line_start_x = true;
             // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
             let next_funct = this.funct(this.red_line_start_x),
                 next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
@@ -96,14 +75,18 @@ class Assignment {
                 next_funct = this.funct(i + 1),
                 next_work = this.sa.works[i - this.sa.blue_line_start + 1];
                 // When a day is found where the work input isn't the same as the red line for that red_line_start_x, break and then increase it by 1 to where it doesnt happen
-                if (next_funct - this_funct !== next_work - this_work) break outer;
+                if (next_funct - this_funct !== next_work - this_work) {
+                    valid_red_line_start_x = false;
+                    break;
+                }
+            }
+            if (valid_red_line_start_x) {
+                high = mid;
+            } else {
+                low = mid + 1;
             }
         }
-        // ++ for three cases:
-        // if for loop doesnt run, do ++ to fix red_line_start_x
-        // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
-        // if for loop doesnt find, do ++; red_line_start_x is less than blue_line_start which is illegal
-        this.red_line_start_x++;
+        this.red_line_start_x = low;
         this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
         this.sa.dynamic_start = this.red_line_start_x;
         if (this.sa.break_days.length) {
@@ -134,7 +117,6 @@ class VisualAssignment extends Assignment {
             this.date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
         }
-        this.today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         this.dom_assignment.find(".skew-ratio-textbox").attr({
             min: 1 - this.skew_ratio_lim,
             max: this.skew_ratio_lim - 1,
@@ -150,10 +132,16 @@ class VisualAssignment extends Assignment {
         return skew_ratio_lim;
     }
     resize() {
-        // If date_now changes, redefine variables dependent on them
-        // If so, works may also change because of autofill in priority.js
-        this.today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-        super.set_dynamic_start_if_in_dynamic_mode();
+        if (!this.sa.fixed_mode) {
+            // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
+            this.red_line_start_x = this.sa.dynamic_start;
+            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+            if (this.sa.break_days.length) {
+                this.mods = this.calcModDays();
+            }
+            this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
+            this.setParabolaValues();
+        }
         if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
             this.scale = window.devicePixelRatio || 2; // Zoom in/out
             this.width = this.fixed_graph.width();
@@ -196,16 +184,16 @@ class VisualAssignment extends Assignment {
                 x2 -= Math.floor(x2 / 7) * this.sa.break_days.length + this.mods[floorx2 % 7];
             }
             // If the mouse is outside the graph to the left or right, ignore it
-            // NOTE: x2 can be NaN from being outside of the graph caused by negative indexing by floorx2. Doesn't matter if this happens
-            if (0 < x2 & x2 < x1) {
+            // x2 can be NaN from being outside of the graph caused by negative indexing by floorx2. Doesn't matter if this happens
+            if (0 < x2 && x2 < x1) {
                 // If the parabola is being set by the graph, connect (0,0), (x1,y1), (x2,y2)
                 // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
                 this.a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
                 this.b = (y1 - x1 * x1 * this.a) / x1;
-
+                
                 // Redefine skew ratio
                 this.sa.skew_ratio = (this.a + this.b) * x1 / y1;
-                // Cap skew ratio
+                // Adjusts and caps skew ratio
                 if (this.sa.skew_ratio > this.skew_ratio_lim) {
                     this.sa.skew_ratio = this.skew_ratio_lim;
                 } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
@@ -214,8 +202,12 @@ class VisualAssignment extends Assignment {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
                 }
-                super.set_dynamic_start_if_in_dynamic_mode();
+            } else if (0 >= x2) {
+                this.sa.skew_ratio = this.skew_ratio_lim;
+            } else if (x2 >= x1) {
+                this.sa.skew_ratio = 2 - this.skew_ratio_lim;
             }
+            super.set_dynamic_start_if_in_dynamic_mode();
         }
         // Passes mouse x and y coords so mouse point can be drawn
         this.draw(raw_x, raw_y);
@@ -239,7 +231,7 @@ class VisualAssignment extends Assignment {
                 this.sa.skew_ratio = 2 - this.skew_ratio_lim;
             }
         }
-        this.setParabolaValues();
+        super.set_dynamic_start_if_in_dynamic_mode();
         // Save skew ratio and draw
         this.old_skew_ratio = this.sa.skew_ratio;
         ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
@@ -249,6 +241,7 @@ class VisualAssignment extends Assignment {
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
+        const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         // && raw_x && raw_y is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && raw_x && raw_y) {
             // -50.1 and -48.7 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
@@ -283,7 +276,7 @@ class VisualAssignment extends Assignment {
             move_info_down = 0;
             let should_be_done_x = this.width - 155 + todo / this.sa.y * 146,
                 bar_move_left = should_be_done_x - this.width + 17;
-            if (bar_move_left < 0 || this.sa.x <= this.today_minus_ad || last_work_input >= this.sa.y) {
+            if (bar_move_left < 0 || this.sa.x <= today_minus_assignment_date || last_work_input >= this.sa.y) {
                 bar_move_left = 0
             } else if (should_be_done_x > this.width - 8) {
                 bar_move_left = this.width - 8;
@@ -319,7 +312,7 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
-            if (this.sa.x > this.today_minus_ad && last_work_input < this.sa.y) {
+            if (this.sa.x > today_minus_assignment_date && last_work_input < this.sa.y) {
                 screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, this.width-81, this.height-68);
                 const done_x = this.width-153+last_work_input/this.sa.y*144-bar_move_left;
                 screen.fillStyle = "white";
@@ -422,7 +415,7 @@ class VisualAssignment extends Assignment {
         screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
         screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, this.width-2, this.height-138+move_info_down);
 
-        const daysleft = this.sa.x - this.today_minus_ad;
+        const daysleft = this.sa.x - today_minus_assignment_date;
         let strdaysleft = '';
         if (daysleft < -1) {
             strdaysleft = ` (${-daysleft} Days Ago)`;
@@ -452,7 +445,7 @@ class VisualAssignment extends Assignment {
             }
             let displayed_day = new Date(this.sa.assignment_date.valueOf());
             displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
-            const distance_today_from_displayed_day = this.today_minus_ad - this.sa.blue_line_start - len_works;
+            const distance_today_from_displayed_day = today_minus_assignment_date - this.sa.blue_line_start - len_works;
             let str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
             switch (distance_today_from_displayed_day) {
                 case -1:
@@ -468,7 +461,7 @@ class VisualAssignment extends Assignment {
             str_day += ':';
             center(str_day, 3);
             center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${last_work_input + todo}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
-            if (this.today_minus_ad < 0) {
+            if (today_minus_assignment_date < 0) {
                 center("This Assignment has Not Yet been Assigned", 6);
             } else if (distance_today_from_displayed_day > 0) {
                 center("You haven't Entered your Work from Previous Days", 6);
@@ -618,8 +611,9 @@ class VisualAssignment extends Assignment {
             screen.fillText(bigger_index, number_x_pos, this.height - 39);
         }
         screen.fillText(0, 55.5, this.height - 38.5);
-        if (this.today_minus_ad > -1 && this.today_minus_ad <= this.sa.x) {
-            let today_x = this.today_minus_ad*this.wCon+47.5;
+        const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);;
+        if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.x) {
+            let today_x = today_minus_assignment_date*this.wCon+47.5;
             screen.fillStyle = "rgb(150,150,150)";
             screen.fillRect(today_x, 0, 5, this.height-50);
             screen.fillStyle = "black";
@@ -647,6 +641,7 @@ class VisualAssignment extends Assignment {
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
+        const _this = this;
         // BEGIN Up and down arrow event handler
         let graphtimeout,
             fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
@@ -664,7 +659,7 @@ class VisualAssignment extends Assignment {
                     graphtimeout = setTimeout(function() {
                         clearInterval(graphinterval);
                         graphinterval = setInterval(this.changeSkewRatio.bind(this), 13);
-                    }, 500);
+                    }.bind(this), 500);
                 }
             }
         }).keyup(e => {
@@ -706,13 +701,13 @@ class VisualAssignment extends Assignment {
         submit_work_button.click(() => {
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
-
+            const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             let not_applicable_message;
             if (!work_input_button.val()) {
                 not_applicable_message = "Enter a Value";
             } else if (last_work_input >= this.sa.y) {
                 not_applicable_message = "Already Finished";
-            } else if (this.today_minus_ad < this.sa.blue_line_start) {
+            } else if (today_minus_assignment_date < this.sa.blue_line_start) {
                 not_applicable_message = "Not Yet Assigned";
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
@@ -748,10 +743,10 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 todo = 0;
             }
-            // Don't add this check for set_dynamic_mode_if_in_dynamic_mode
-            // if (input_done !== todo) {
+            // Add this check for set_dynamic_mode_if_in_dynamic_mode
             // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
-            super.set_dynamic_start_if_in_dynamic_mode();
+            // However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
+            if (input_done !== todo) super.set_dynamic_start_if_in_dynamic_mode();
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort();
@@ -807,7 +802,6 @@ class VisualAssignment extends Assignment {
         // END Next assignment button
 
         // BEGIN Set skew ratio using graph button
-        const _this = this;
         function cancel_set_skew_ratio_using_graph() {
             skew_ratio_button.onlyText("Set skew ratio using graph");
             _this.set_skew_ratio_using_graph = false;
@@ -930,13 +924,13 @@ class VisualAssignment extends Assignment {
             fixed_mode_button.onlyText(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
             ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
             if (this.sa.fixed_mode) {
-                // Set start of the red line
                 this.red_line_start_x = 0;
                 this.red_line_start_y = 0;
             } else {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
+            // Skew ratio can be changed in fixed mode, making dynamic_start inaccurate
             super.set_dynamic_start_if_in_dynamic_mode();
             priority.sort({ ignore_timeout: true });
             this.draw();

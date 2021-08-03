@@ -68,15 +68,16 @@ priority = {
                 dom_completion_time = $(".completion-time").eq(index);
             const number_of_forgotten_days = today_minus_ad - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (params.autofill_all_work_done && !params.do_not_autofill && number_of_forgotten_days > 0) {
-                for (i = 0; i < number_of_forgotten_days; i++) {
+                for (let i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
-                    has_autofilled = true;
                     if (len_works + sa.sa.blue_line_start === sa.sa.x) break; // Don't autofill past completion
+                    has_autofilled = true;
                     last_work_input += Math.max(0, todo);
                     sa.sa.works.push(last_work_input);
                     len_works++;
                 }
                 if (has_autofilled) {
+                    sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
                     ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
@@ -112,19 +113,15 @@ priority = {
                 }
                 status_value = 2;
             } else {
-                if (number_of_forgotten_days > 0 && !params.do_not_autofill) {
-                    for (i = 0; i < number_of_forgotten_days; i++) {
-                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
-                        const autofill_this_loop = params.autofill_no_work_done || todo <= 0 || sa.sa.break_days.includes((sa.assign_day_of_week + len_works + sa.sa.blue_line_start) % 7);
-                        if (!autofill_this_loop || len_works + sa.sa.blue_line_start === sa.sa.x - 1) break;
+                if (params.autofill_no_work_done && !params.do_not_autofill && number_of_forgotten_days > 0) {
+                    for (let i = 0; i < number_of_forgotten_days; i++) {
+                        if (len_works + sa.sa.blue_line_start === sa.sa.x - 1) break;
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
-                        if (todo) {
-                            sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
-                        }
                     }
                     if (has_autofilled) {
+                        sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
                         ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
@@ -134,7 +131,8 @@ priority = {
                 if (sa.sa.break_days.length) {
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + sa.mods[x1 % 7]; // Handles break days, explained later
                 }
-                sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
+                // Fix dynamic start if y changed
+                if (params.first_sort) sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';

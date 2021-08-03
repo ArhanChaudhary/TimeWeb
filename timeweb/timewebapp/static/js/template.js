@@ -161,7 +161,7 @@ $(function() {
                 // Wait for the user to respond to the prompt
                 prompt.userChoice.then(choiceResult => {
                     if (choiceResult.outcome === 'accepted') {
-                        $.alert({title: "Thanks for installing the app"});
+                        $.alert({title: "Thanks for installing TimeWeb on your home screen"});
                     }
                 });
             } else {

@@ -840,6 +840,29 @@ for (let sa of dat) {
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
+
+    const red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start; // X-coordinate of the start of the red line
+    const red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - sa.blue_line_start]; // Y-coordinate of the start of the red line
+    // Caps and adjusts min_work_time and funct_round
+    const y1 = sa.y - red_line_start_y;
+    // Might not be needed
+    if (sa.funct_round > y1) {
+        sa.funct_round = y1;
+    }
+    // Might not be needed
+    if (sa.min_work_time > y1) {
+        sa.min_work_time = y1;
+    }
+    // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
+    // Set it to 0 to pretend it isn't enabled for calculations in setParabolaValues()
+    if (sa.min_work_time <= sa.funct_round) {
+        sa.min_work_time = 0;
+    // Suppose funct_round is 4, min_work_time is 5, f(4) = 18, and f(5) = 23
+    // f(4) gets rounded to 20 and f(5) gets rounded to 24, violating the min_work_time of 5
+    // This fixes the problem
+    } else if (sa.funct_round < sa.min_work_time && sa.min_work_time < 2 * sa.funct_round) {
+        sa.min_work_time = sa.funct_round * 2;
+    }
 };
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
 document.addEventListener("DOMContentLoaded", function() {

@@ -98,6 +98,7 @@ class TimewebModel(models.Model):
     fixed_mode = models.BooleanField(
         default=False,
     )
+    # Though this can be calculated from using the data from the other fields, I'll keep this as a field to increase client side speed (because it will need to be redefined for every loop in priority.js)
     dynamic_start = models.IntegerField(
         null=True,
         blank=True,
