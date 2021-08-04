@@ -33,7 +33,7 @@ utils = {
             return hour + "h " + minute + "m";
         },
         // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-        hexToRgb: function(hex) {
+        hexToRGB: function(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return {
                 r: parseInt(result[1], 16),
@@ -57,7 +57,7 @@ utils = {
             }
         },
         setClickHandlers: {
-            toggleEstimatedCompletionTimeButton: function() {
+            toggleEstimatedCompletionTime: function() {
                 // Hide and show estimated completion time
                 $("#hide-button").click(function() {
                     if ($(this).html() === "Hide") {
@@ -208,7 +208,7 @@ utils = {
                 });
             },
 
-            autofillAssignments: function() {
+            autofillWorkDone: function() {
                 $("#autofill-work-done").click(function(e) {
                     if ($(e.target).is("#autofill-selection")) return;
 
@@ -248,7 +248,7 @@ utils = {
             },
 
             deleteAssignmentsFromClass: function() {
-                $(".delete-gc-assignments-of-class").click(function() {
+                $(".delete-gc-assignments-from-class").click(function() {
                     const $this = $(this);
                     const dom_assignment = $this.siblings(".assignment");
                     const sa = utils.loadAssignmentData(dom_assignment);
@@ -494,7 +494,6 @@ utils = {
             });
         },
         setKeybinds: function() {
-            utils.form_is_showing = false;
             $(document).keydown(function(e) {
                 if (e.key === "Tab") {
                     // Prevent tabbing dispositioning screen
@@ -575,8 +574,8 @@ utils = {
         },
         graphAlertTutorial: function(days_until_due) {
             $.alert({
-                title: "Welcome to the graph, a visualization of how your assignment's work schedule will look like",
-                alignTop: true, // Custom extension I added
+                title: "Welcome to the graph, a visualization of your assignment's entire work schedule",
+                alignTop: true, // alignTop is a custom extension
                 onClose: function() {
                     $.alert({
                         title: "The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment",
@@ -584,25 +583,20 @@ utils = {
                         alignTop: true,
                         onClose: function() {
                             $.alert({
-                                title: "As you progress through your assignment, you will have to enter your own work inputs to measure your progress on a daily basis",
+                                title: "As you progress through your assignment, you will have to enter your own work inputs to measure how much you've done on a daily basis. This will be represented with a blue line",
+                                content: isExampleAccount ? "" : "This may not yet visible because you haven't entered any work inputs",
                                 alignTop: true,
-                                onClose: function() {
+                                onClose: function() { 
                                     $.alert({
-                                        title: "The blue line will be your daily work inputs for this assignment" + (isExampleAccount ? "" : ". This may not yet visible because you haven't entered any work inputs"),
+                                        title: "Once you add more assignments, they are automatically prioritized based on their daily estimated completion times and due dates",
                                         alignTop: true,
                                         onClose: function() {
                                             $.alert({
-                                                title: "Once you add more assignments, they are prioritized by color based on their estimated completion times and due dates",
+                                                title: "Now that you have finished reading this, check out the settings to set your preferences",
                                                 alignTop: true,
                                                 onClose: function() {
-                                                    $.alert({
-                                                        title: "Now that you have finished reading this, check out the settings to set your preferences",
-                                                        alignTop: true,
-                                                        onClose: function() {
-                                                            enable_tutorial = false;
-                                                            ajaxUtils.ajaxFinishedTutorial();
-                                                        }
-                                                    });
+                                                    enable_tutorial = false;
+                                                    ajaxUtils.ajaxFinishedTutorial();
                                                 }
                                             });
                                         }
@@ -809,8 +803,8 @@ $.fn.reverse = Array.prototype.reverse;
 ({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(new Date().toDateString());
-highest_priority_color = utils.formatting.hexToRgb(highest_priority_color);
-lowest_priority_color = utils.formatting.hexToRgb(lowest_priority_color);
+highest_priority_color = utils.formatting.hexToRGB(highest_priority_color);
+lowest_priority_color = utils.formatting.hexToRGB(lowest_priority_color);
 if (isExampleAccount) {
     window.gtag = function(){};
     date_now = new Date(2021, 4, 3);
@@ -877,12 +871,12 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.reloadAfterMidnightHourToUpdate();
     if (oauth_token.token) ajaxUtils.createGCAssignments();
     setInterval(utils.reloadAfterMidnightHourToUpdate, 1000*60);
-    utils.ui.setClickHandlers.toggleEstimatedCompletionTimeButton();
+    utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();
     utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
-    utils.ui.setClickHandlers.autofillAssignments();
+    utils.ui.setClickHandlers.autofillWorkDone();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();

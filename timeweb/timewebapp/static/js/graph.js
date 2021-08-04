@@ -23,15 +23,15 @@ class Assignment {
         if (this.sa.break_days.length) {
             this.mods = this.calcModDays();
         }
-        this.skew_ratio_lim = this.calcSkewRatioLim();
-        if (this.sa.skew_ratio > this.skew_ratio_lim) {
-            this.sa.skew_ratio = this.skew_ratio_lim;
-        } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
-            this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+        this.skew_ratio_bound = this.calcSkewRatioBound();
+        if (this.sa.skew_ratio > this.skew_ratio_bound) {
+            this.sa.skew_ratio = this.skew_ratio_bound;
+        } else if (this.sa.skew_ratio < 2 - this.skew_ratio_bound) {
+            this.sa.skew_ratio = 2 - this.skew_ratio_bound;
         }
         this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
     }
-    calcSkewRatioLim() {
+    calcSkewRatioBound() {
         const y1 = this.sa.y - this.red_line_start_y;
         if (!y1) return 0;
         let x1 = this.sa.x - this.red_line_start_x;
@@ -45,23 +45,24 @@ class Assignment {
         */
         return Math.round((y1 + this.min_work_time_funct_round) * x1 / y1 * 10)/10;
     }
-    set_dynamic_start_if_in_dynamic_mode(params={}) {
+    setDynamicStartIfInDynamicMode() {
         if (this.sa.fixed_mode) return;
         const len_works = this.sa.works.length - 1;
-        
+        const base_class = !("calcSkewRatioBoundAndClampTextbox" in this);
+
         let low = this.sa.blue_line_start;
         let high = len_works + this.sa.blue_line_start - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start
         while (low < high) {
-            const mid = Math.floor((low + high)/ 2);
+            const mid = Math.floor((low + high) / 2);
             this.red_line_start_x = mid;
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             if (this.sa.break_days.length) {
                 this.mods = this.calcModDays();
             }
-            if (params.base_class) {
-                this.skew_ratio_lim = this.calcSkewRatioLim();
+            if (base_class) {
+                this.skew_ratio_bound = this.calcSkewRatioBound();
             } else {
-                this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
+                this.skew_ratio_bound = this.calcSkewRatioBoundAndClampTextbox();
             }
             this.setParabolaValues();
 
@@ -74,7 +75,6 @@ class Assignment {
                     this_work = next_work;
                 next_funct = this.funct(i + 1),
                 next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-                // When a day is found where the work input isn't the same as the red line for that red_line_start_x, break and then increase it by 1 to where it doesnt happen
                 if (next_funct - this_funct !== next_work - this_work) {
                     valid_red_line_start_x = false;
                     break;
@@ -92,10 +92,10 @@ class Assignment {
         if (this.sa.break_days.length) {
             this.mods = this.calcModDays();
         }
-        if (params.base_class) {
-            this.skew_ratio_lim = this.calcSkewRatioLim();
+        if (base_class) {
+            this.skew_ratio_bound = this.calcSkewRatioBound();
         } else {
-            this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
+            this.skew_ratio_bound = this.calcSkewRatioBoundAndClampTextbox();
         }
         this.setParabolaValues();
     }
@@ -118,18 +118,18 @@ class VisualAssignment extends Assignment {
             this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
         }
         this.dom_assignment.find(".skew-ratio-textbox").attr({
-            min: 1 - this.skew_ratio_lim,
-            max: this.skew_ratio_lim - 1,
+            min: 1 - this.skew_ratio_bound,
+            max: this.skew_ratio_bound - 1,
         });
         this.scale = window.devicePixelRatio || 2;
     }
-    calc_skew_ratio_lim_and_clamp_textbox() {
-        const skew_ratio_lim = super.calcSkewRatioLim();
+    calcSkewRatioBoundAndClampTextbox() {
+        const skew_ratio_bound = this.calcSkewRatioBound();
         this.dom_assignment.find(".skew-ratio-textbox").attr({
-            min: 1 - skew_ratio_lim,
-            max: skew_ratio_lim - 1,
+            min: 1 - skew_ratio_bound,
+            max: skew_ratio_bound - 1,
         });
-        return skew_ratio_lim;
+        return skew_ratio_bound;
     }
     resize() {
         if (!this.sa.fixed_mode) {
@@ -139,7 +139,7 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.length) {
                 this.mods = this.calcModDays();
             }
-            this.skew_ratio_lim = this.calc_skew_ratio_lim_and_clamp_textbox();
+            this.skew_ratio_bound = this.calcSkewRatioBoundAndClampTextbox();
             this.setParabolaValues();
         }
         if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
@@ -157,7 +157,7 @@ class VisualAssignment extends Assignment {
             this.graph[0].height = this.height * this.scale;
             this.fixed_graph[0].width = this.width * this.scale;
             this.fixed_graph[0].height = this.height * this.scale;
-            this.drawfixed();
+            this.drawFixed();
             this.draw();
         }
     }
@@ -194,20 +194,20 @@ class VisualAssignment extends Assignment {
                 // Redefine skew ratio
                 this.sa.skew_ratio = (this.a + this.b) * x1 / y1;
                 // Adjusts and caps skew ratio
-                if (this.sa.skew_ratio > this.skew_ratio_lim) {
-                    this.sa.skew_ratio = this.skew_ratio_lim;
-                } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
-                    this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+                if (this.sa.skew_ratio > this.skew_ratio_bound) {
+                    this.sa.skew_ratio = this.skew_ratio_bound;
+                } else if (this.sa.skew_ratio < 2 - this.skew_ratio_bound) {
+                    this.sa.skew_ratio = 2 - this.skew_ratio_bound;
                 } else if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
                 }
             } else if (0 >= x2) {
-                this.sa.skew_ratio = this.skew_ratio_lim;
+                this.sa.skew_ratio = this.skew_ratio_bound;
             } else if (x2 >= x1) {
-                this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+                this.sa.skew_ratio = 2 - this.skew_ratio_bound;
             }
-            super.set_dynamic_start_if_in_dynamic_mode();
+            this.setDynamicStartIfInDynamicMode();
         }
         // Passes mouse x and y coords so mouse point can be drawn
         this.draw(raw_x, raw_y);
@@ -222,16 +222,16 @@ class VisualAssignment extends Assignment {
         // Change skew ratio by +- 0.1 and cap it
         if (this.pressed_arrow_key === "ArrowDown") {
             this.sa.skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 0.1, 1);
-            if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
-                this.sa.skew_ratio = this.skew_ratio_lim;
+            if (this.sa.skew_ratio < 2 - this.skew_ratio_bound) {
+                this.sa.skew_ratio = this.skew_ratio_bound;
             }
         } else {
             this.sa.skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio + 0.1, 1);
-            if (this.sa.skew_ratio > this.skew_ratio_lim) {
-                this.sa.skew_ratio = 2 - this.skew_ratio_lim;
+            if (this.sa.skew_ratio > this.skew_ratio_bound) {
+                this.sa.skew_ratio = 2 - this.skew_ratio_bound;
             }
         }
-        super.set_dynamic_start_if_in_dynamic_mode();
+        this.setDynamicStartIfInDynamicMode();
         // Save skew ratio and draw
         this.old_skew_ratio = this.sa.skew_ratio;
         ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
@@ -474,7 +474,7 @@ class VisualAssignment extends Assignment {
         }
         screen.scale(1 / this.scale, 1 / this.scale);
     }
-    drawfixed() {
+    drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
         let gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
@@ -628,7 +628,7 @@ class VisualAssignment extends Assignment {
             screen.rotate(-Math.PI / 2);
         }
     }
-    setAssignmentEventListeners() {
+    setGraphButtonEventListeners() {
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_button = this.dom_assignment.find(".work-input-button"),
                 display_button = this.dom_assignment.find(".display-button"),
@@ -688,7 +688,7 @@ class VisualAssignment extends Assignment {
             this.sa.works.pop();
             len_works--;
 
-            super.set_dynamic_start_if_in_dynamic_mode();
+            this.setDynamicStartIfInDynamicMode();
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort({do_not_autofill: true}); // Don't autofill on delete work input because it'll just undo the delete in some cases
@@ -746,7 +746,9 @@ class VisualAssignment extends Assignment {
             // Add this check for set_dynamic_mode_if_in_dynamic_mode
             // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
             // However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
-            if (input_done !== todo) super.set_dynamic_start_if_in_dynamic_mode();
+            // However, this is fixed with autotune
+            // if (input_done !== todo) 
+            this.setDynamicStartIfInDynamicMode();
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort();
@@ -783,10 +785,10 @@ class VisualAssignment extends Assignment {
         next_assignment_button.click(() => {
             const next_assignment = this.dom_assignment.parents(".assignment-container").next().children(".assignment");
             if (!next_assignment.length) {
-                next_assignment.html("No More Assignments");
+                next_assignment_button.html("No More Assignments");
                 clearTimeout(not_applicable_timeout_next_assignment_button);
                 not_applicable_timeout_next_assignment_button = setTimeout(function() {
-                    next_assignment.html("Next Assignment");
+                    next_assignment_button.html("Next Assignment");
                 }, 1000);
                 return;
             }
@@ -806,6 +808,7 @@ class VisualAssignment extends Assignment {
             skew_ratio_button.onlyText("Set skew ratio using graph");
             _this.set_skew_ratio_using_graph = false;
             _this.sa.skew_ratio = old_skew_ratio;
+            _this.setDynamicStartIfInDynamicMode();
             _this.draw();
             // No need to ajax since skew ratio is the same
         }
@@ -887,17 +890,17 @@ class VisualAssignment extends Assignment {
                 // Sets and caps skew ratio
                 // The skew ratio in the code is 1 more than the displayed skew ratio
                 this.sa.skew_ratio = +skew_ratio_textbox.val() + 1;
-                if (this.sa.skew_ratio > this.skew_ratio_lim) {
-                    this.sa.skew_ratio = 2 - this.skew_ratio_lim;
-                } else if (this.sa.skew_ratio < 2 - this.skew_ratio_lim) {
-                    this.sa.skew_ratio = this.skew_ratio_lim;
+                if (this.sa.skew_ratio > this.skew_ratio_bound) {
+                    this.sa.skew_ratio = 2 - this.skew_ratio_bound;
+                } else if (this.sa.skew_ratio < 2 - this.skew_ratio_bound) {
+                    this.sa.skew_ratio = this.skew_ratio_bound;
                 }
             } else {
                 // Reset skew ratio to old value if blank
                 this.sa.skew_ratio = old_skew_ratio;
                 old_skew_ratio = undefined;
             }
-            super.set_dynamic_start_if_in_dynamic_mode();
+            this.setDynamicStartIfInDynamicMode();
             this.draw();
         }).keypress(e => {
             // Saves skew ratio on enter
@@ -931,13 +934,13 @@ class VisualAssignment extends Assignment {
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
             // Skew ratio can be changed in fixed mode, making dynamic_start inaccurate
-            super.set_dynamic_start_if_in_dynamic_mode();
+            this.setDynamicStartIfInDynamicMode();
             priority.sort({ ignore_timeout: true });
             this.draw();
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
         // END Fixed/dynamic mode button        
     }
-    addAssignmentInfoButtons() {
+    addGraphInfoButtons() {
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_button = this.dom_assignment.find(".work-input-button"),
                 skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
@@ -1040,8 +1043,8 @@ $(".assignment").click(function(e) {
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click
     if (first_click) {
-        sa.setAssignmentEventListeners();
-        sa.addAssignmentInfoButtons();
+        sa.setGraphButtonEventListeners();
+        sa.addGraphInfoButtons();
     }
     sa.resize();
     if (enable_tutorial) {

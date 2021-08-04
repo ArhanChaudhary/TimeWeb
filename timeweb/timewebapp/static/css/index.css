@@ -169,7 +169,7 @@ header.animate::after {
     box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
-#delete-starred-assignments, #autofill-work-done,.delete-gc-assignments-of-class {
+#delete-starred-assignments, #autofill-work-done,.delete-gc-assignments-from-class {
     position: relative;
     margin-bottom: 15px;
     margin-top: -7px;
@@ -209,10 +209,10 @@ header.animate::after {
 #delete-starred-assignments .shortcut-line-right {
     width: calc(50% - 121px);
 }
-.delete-gc-assignments-of-class .shortcut-line-left {
+.delete-gc-assignments-from-class .shortcut-line-left {
     width: calc(50% - 146px);
 }
-.delete-gc-assignments-of-class .shortcut-line-right {
+.delete-gc-assignments-from-class .shortcut-line-right {
     width: calc(50% - 152px);
 }
 
@@ -672,7 +672,7 @@ header.animate::after {
     background: rgba(219,219,219,0.9);
     box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
-.graph-footer *:not(.info-button):focus {
+.graph-footer *:not(.info-button):not(.advanced-buttons):focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
@@ -819,6 +819,9 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper .field-wrapper {
     margin-top: 10px;
+}
+#form-wrapper .field-wrapper .invalid ~ .info-button {
+    margin-top: -1px;
 }
 #form-wrapper .field {
     width: calc(100% - 50px);

@@ -11,6 +11,7 @@
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'vendor/jquery-ui.min.js' %}"></script>
+<script src="{% static 'vendor/math.min.js' %}"></script>
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/priority.js' %}"></script>
 <script src="{% static 'js/graph.js' %}"></script>
@@ -190,8 +191,8 @@
       </div>
     {% endfor %}
   </div>
-  <template id="delete-gc-assignments-of-class-template">
-    <div class="delete-gc-assignments-of-class">
+  <template id="delete-gc-assignments-from-class-template">
+    <div class="delete-gc-assignments-from-class">
       <div class="shortcut-line-left{% if background_image %} add-white-shadow{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} add-white-shadow{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Assignments from this Class</span>

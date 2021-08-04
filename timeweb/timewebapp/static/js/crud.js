@@ -26,8 +26,6 @@ function showForm(show_instantly=false) {
         // Mobile
         $("#image-new-container").blur();
     }
-    // Used in utils.js for handling the user typing "N" when showing the form via shift + N
-    form_is_showing = true;
     $("main").css("overflow", "hidden");
     replaceUnit();
 }
@@ -42,8 +40,6 @@ function hideForm(hide_instantly=false) {
             $(".error-note").remove();
         }).children("#form-wrapper").animate({top: "0"}, 300);
     }
-    // Used in utils.js for handling the user typing "N" when showing the form via shift + N
-    form_is_showing = false;
     $("main").css("overflow", "overlay");
 }
 // Replace fields with unit when unit is any value or "Minute" or "Hour"
@@ -149,7 +145,7 @@ $(function() {
         $(this).css("height", $(this).prop("scrollHeight") + +$(this).css("padding-top").replace("px", "") + +$(this).css("padding-bottom").replace("px", ""));
     });
     // Add info buttons ($.info defined in template.js)
-    $('label[for="id_unit"]').info('left',
+    $("#id_unit").info('left',
         `This is how your assignment will be split and divided up
         
         e.g: If this assignment is reading a book, enter "Page" or "Chapter"
@@ -159,9 +155,9 @@ $(function() {
         marginBottom: -14,
         float: 'right',
         left: -15,
-        bottom: -3,
+        bottom: 18,
     });
-    $('label[for="id_works"]').info('left',
+    $("#id_works").info('left',
         `The following is only relevant if you are re-entering this field
 
         This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`,
@@ -169,15 +165,15 @@ $(function() {
         marginBottom: -14,
         float: 'right',
         left: -15,
-        bottom: -3,
+        bottom: 18,
     });
-    $('label[for="id_funct_round"]').info('left',
+    $("#id_funct_round").info('left',
         "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)",
     "after").css({
         marginBottom: -14,
         float: 'right',
         left: -15,
-        bottom: -3,
+        bottom: 18,
     });
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     // Make this global so it can be used in saveAndLoadStates in utils.js

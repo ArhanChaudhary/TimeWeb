@@ -9,14 +9,14 @@ This only runs on index.html
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 priority = {
     sort_timeout_duration: 2000,
-    get_color: function(p) {
+    percentageToColor: function(p) {
         if (isNaN(p)) return "white";
         return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
     },
     // Handles coloring and animating assignments that were just created or edited
-    color_or_animate_assignment: function(dom_assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
+    colorOrTransitionAssignment: function(dom_assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
         if ($("#animate-in").length && is_element_submitted) {
-            // If a new assignment was created and the assignment that color_or_animate_assignment() was called on is the assignment that was created, animate it easing in
+            // If a new assignment was created and the assignment that colorOrTransitionAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
             dom_assignment.parents(".assignment-container").animate({
                 top: "0", 
@@ -29,7 +29,7 @@ priority = {
             if (color_instantly) {
                 dom_assignment.addClass("transition-instantly");
             }
-            dom_assignment.css("background", priority.get_color(priority_percentage));
+            dom_assignment.css("background", priority.percentageToColor(priority_percentage));
             dom_assignment.toggleClass("mark-as-done", mark_as_done);
             if (color_instantly) {
                 dom_assignment[0].offsetHeight;
@@ -37,6 +37,53 @@ priority = {
             }
         }
     },
+    setInitialTopOffsets: function() {
+        $(".assignment-container").each(function() {
+            $(this).attr("data-initial-top-offset", $(this).offset().top);
+        });
+    },
+
+    domSortAssignments: function(ordered_assignments) {
+        // Selection sort
+        for (let [index, sa] of ordered_assignments.entries()) {
+            // index represents the selected assignment's final position
+            // sa[2] represents the selected assignment's current position
+            if (index !== sa[2]) {
+                // Swap them in the dom
+                priority.domSwapAssignments(index, sa[2]);
+                // Swap them in ordered_assignments
+                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
+                sa[2] = index; // Adjust index of current swapped assignment
+            }
+        }
+    },
+
+    domSwapAssignments: function(tar1_index, tar2_index) {  
+        const tar1 = $(".assignment-container").eq(tar1_index),
+                tar2 = $(".assignment-container").eq(tar2_index);
+        const swap_temp = $("<span></span>").insertAfter(tar2);
+        tar1.after(tar2);
+        swap_temp.after(tar1);
+        swap_temp.remove();
+    },
+
+    transitionSwap: function(assignment_container) {
+        const initial_height = assignment_container.attr("data-initial-top-offset");
+        const current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned matrix
+        // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
+        const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
+        const transform_value = initial_height - final_height;
+        assignment_container.removeAttr("data-initial-top-offset");
+        assignment_container.addClass("transform-instantly")
+                .css("transform", `translateY(${transform_value}px)`)
+                [0].offsetHeight;
+        assignment_container.removeClass("transform-instantly")
+                .css({
+                    transform: "",
+                    transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
+                });
+    },
+
     sort: function(params={}) {
         clearTimeout(priority.sort_timeout);
         if (params.ignore_timeout) {
@@ -45,13 +92,14 @@ priority = {
             priority.sort_timeout = setTimeout(() => priority.sort_without_timeout(params), priority.sort_timeout_duration);
         }
     },
+
     sort_without_timeout: function(params) {
         let ordered_assignments = [],
             total = 0,
             tomorrow_total = 0,
             has_autofilled = false;
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
-        $(".delete-gc-assignments-of-class").remove();
+        $(".delete-gc-assignments-from-class").remove();
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
@@ -77,7 +125,7 @@ priority = {
                     len_works++;
                 }
                 if (has_autofilled) {
-                    sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
+                    sa.setDynamicStartIfInDynamicMode();
                     ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
@@ -121,7 +169,7 @@ priority = {
                         len_works++;
                     }
                     if (has_autofilled) {
-                        sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
+                        sa.setDynamicStartIfInDynamicMode();
                         ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
@@ -132,7 +180,7 @@ priority = {
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + sa.mods[x1 % 7]; // Handles break days, explained later
                 }
                 // Fix dynamic start if y changed
-                if (params.first_sort) sa.set_dynamic_start_if_in_dynamic_mode({ base_class: true });
+                if (params.first_sort) sa.setDynamicStartIfInDynamicMode();
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
@@ -253,7 +301,7 @@ priority = {
             dom_title.attr("data-daysleft", str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.ctime) : '');
         });
-        // Updates graph if skew ratio caused autofill
+        // Updates open graphs
         if (has_autofilled) {
             $(window).trigger("resize");
         }
@@ -276,9 +324,8 @@ priority = {
             if (a[2] < b[2]) return -1;
             if (a[2] > b[2]) return 1;
         });
-        // Source code lurkers, uncomment these two for some fun
-        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}}
-        // shuffleArray(ordered_assignments);
+        // Source code lurkers, uncomment this for some fun
+        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(ordered_assignments);
         const highest_priority = Math.max(...ordered_assignments.map(function(pd) {
             if ((pd[0] === 5 || pd[0] === 4) && !pd[3]) {
                 return pd[1];
@@ -286,6 +333,7 @@ priority = {
                 return -Infinity;
             }
         }));
+        const tags_left = $(".tags-left").length; 
         let prev_assignment_container;
         let prev_tag;
         let already_found_first_incomplete_works = false;
@@ -307,14 +355,10 @@ priority = {
                     priority_percentage = 100;
                 }
             }
-            const add_priority_percentage = text_priority && (pd[0] === 5 || pd[0] === 4) && !mark_as_done;
+            const add_priority_percentage = text_priority && [4, 5].includes(pd[0]) && !mark_as_done;
             const dom_title = $(".title").eq(pd[2]);
-            if (add_priority_percentage) {
-                dom_title.attr("data-priority", `Priority: ${priority_percentage}%`);
-            } else {
-                dom_title.attr("data-priority", "");       
-            }
-            if ($(".tags-left").length) {
+            dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
+            if (tags_left) {
                 new Promise(function(resolve) {
                     if (params.first_sort) {
                         $(window).one("load", () => resolve());
@@ -327,7 +371,7 @@ priority = {
                     const dom_assignment_footer = dom_assignment.find(".assignment-footer");
                     dom_assignment.css({paddingTop: "", paddingBottom: ""});
                     dom_button.css({marginTop: "", marginBottom: ""});
-                    // really inefficient but whatever
+
                     const tag_top = dom_tags.offset().top;
                     const tag_height = dom_tags.height();
                     const title_top = dom_title.offset().top + (add_priority_percentage ? -10 : 3);
@@ -344,7 +388,7 @@ priority = {
                         // So, scroll to the next assignment instead
                         let assignment_to_scroll_to = $("#animate-in").next();
                         if (!assignment_to_scroll_to.length) {
-                            // If "#animate-color" or "#animate-in" is the last assignment on the list, scroll to itself instead
+                            // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = dom_assignment;
                         }
                         setTimeout(function() {
@@ -358,14 +402,16 @@ priority = {
                         $("main").scroll(() => utils.scroll(resolve));
                         utils.scroll(resolve);
                     });
-                }).then(() => priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, true, params.first_sort, mark_as_done));
+                }).then(() => priority.colorOrTransitionAssignment(dom_assignment, priority_percentage/100, true, params.first_sort, mark_as_done));
             } else {
-                priority.color_or_animate_assignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
+                priority.colorOrTransitionAssignment(dom_assignment, priority_percentage/100, false, params.first_sort, mark_as_done);
             }
 
-            // Loops through every google classroom assignment that needs more info AND have a tag (representing their class) to add "delete all assignments of this class"
-            // This has to be looped before they are sorted so setInitialTopAssignmentOffsets is accurate
-            // This means we can't loop through ".assignment-container" but instead ordered_assignments
+            // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
+            // Uses the same below logic for delete starred assignments and autoill work done
+
+            // This has to be looped before they are sorted so setInitialTopOffsets is accurate
+            // This means we can't loop through ".assignment-container" because it's currently unsorted, so we instead have to loop through ordered_assignments
             // The current looped assignment's tag is compared with the previous looped assignment's tag
             // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
             const sa = utils.loadAssignmentData(dom_assignment);
@@ -375,7 +421,7 @@ priority = {
                 assignment_container.addClass("add-line-wrapper");
                 if (current_tag !== prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                     if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
-                    assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-of-class-template").html());
+                    assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-from-class-template").html());
                 }
                 prev_tag = current_tag;
                 prev_assignment_container = assignment_container;
@@ -395,8 +441,8 @@ priority = {
             prev_assignment_container.addClass("last-add-line-wrapper");
             utils.ui.setClickHandlers.deleteAssignmentsFromClass();
         }
-        if (!params.first_sort) ordering.setInitialTopAssignmentOffsets();
-        ordering.sortAssignments(ordered_assignments);
+        if (!params.first_sort) priority.setInitialTopOffsets();
+        priority.domSortAssignments(ordered_assignments);
         const number_of_assignments = $(".assignment").length;
         $(".assignment-container").each(function(index) {
             const assignment_container = $(this);
@@ -404,7 +450,7 @@ priority = {
             const dom_assignment = assignment_container.children(".assignment");
             dom_assignment.css("z-index", number_of_assignments - index);
             if (!params.first_sort) {
-                ordering.transitionSwap(assignment_container);
+                priority.transitionSwap(assignment_container);
             }
         });
 
@@ -456,57 +502,7 @@ priority = {
             setInterval(utils.ui.tickClock, 1000);
         }
         $("#assignments-container").css("opacity", "1");
-    },
-}
-ordering = {
-
-    setInitialTopAssignmentOffsets: function() {
-        $(".assignment-container").each(function() {
-            $(this).attr("data-initial-top-offset", $(this).offset().top);
-        });
-    },
-
-    sortAssignments: function(ordered_assignments) {
-        // Selection sort
-        for (let [index, sa] of ordered_assignments.entries()) {
-            // index represents the selected assignment's final position
-            // sa[2] represents the selected assignment's current position
-            if (index !== sa[2]) {
-                // Swap them in the dom
-                ordering.domSwapAssignments(index, sa[2]);
-                // Swap them in ordered_assignments
-                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
-                sa[2] = index; // Adjust index of current swapped assignment
-            }
-        }
-    },
-
-    domSwapAssignments: function(tar1_index, tar2_index) {  
-        const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index);
-        const swap_temp = $("<span></span>").insertAfter(tar2);
-        tar1.after(tar2);
-        swap_temp.after(tar1);
-        swap_temp.remove();
-    },
-
-    transitionSwap: function(assignment_container) {
-        const initial_height = assignment_container.attr("data-initial-top-offset");
-        const current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Reads the translateY value from the returned matrix
-        // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
-        const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
-        const transform_value = initial_height - final_height;
-        assignment_container.removeAttr("data-initial-top-offset");
-        assignment_container.addClass("transform-instantly")
-                .css("transform", `translateY(${transform_value}px)`)
-                [0].offsetHeight;
-        assignment_container.removeClass("transform-instantly")
-                .css({
-                    transform: "",
-                    transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
-                });
-    },
-    
+    }
 }
 document.addEventListener("DOMContentLoaded", function() {
     priority.sort({ first_sort: true, ignore_timeout: true });
