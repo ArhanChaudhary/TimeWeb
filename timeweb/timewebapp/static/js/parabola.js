@@ -36,7 +36,7 @@ Assignment.prototype.setParabolaValues = function() {
         const mods = this.calcModDays();
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
     }
-    const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * skew_ratio], [x1, y1]);
+    const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
     this.a = parabola.a;
     this.b = parabola.b;
 

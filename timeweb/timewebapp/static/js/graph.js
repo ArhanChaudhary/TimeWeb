@@ -927,10 +927,10 @@ class VisualAssignment extends Assignment {
 
         fixed_mode_button.info("top",
             `Fixed mode:
-            The red line always starts at the assignment date, meaning if you don't finish a day's work, you'll have to make it up on the next day
+            The red line always starts at the date this assignment was assigned, meaning if you don't finish a day's work, you'll have to make it up on the next day
 
             Dynamic mode (default):
-            If you don't finish a day's work, the red line will readjust itself and adapt to your work schedule`, "prepend"
+            After every work input, the red line readjusts itself and the skew ratio is auto-tuned to adapt to your work schedule`, "prepend"
         ).css("left", -3);
 
         skew_ratio_textbox.info("top", 
