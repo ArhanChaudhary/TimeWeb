@@ -713,10 +713,12 @@ header.animate::after {
     margin: 7px 0;
 }
 .work-input-button {
-    width: 131px;
+    width: 111px;
+    padding-right: 26px;
 }
 .skew-ratio-textbox {
-    width: 150px;
+    width: 125px;
+    padding-right: 31px;
     /* Position it behind info button */
     z-index: 0;
 }
@@ -730,7 +732,7 @@ input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
 .skew-ratio-textbox::-webkit-inner-spin-button {
-    transform: translateX(-22px);
+    transform: translateX(3px);
 }
 
 

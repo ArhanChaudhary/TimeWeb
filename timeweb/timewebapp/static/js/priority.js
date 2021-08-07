@@ -177,10 +177,9 @@ priority = {
                 }
                 let x1 = sa.sa.x - sa.red_line_start_x;
                 if (sa.sa.break_days.length) {
-                    x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + sa.mods[x1 % 7]; // Handles break days, explained later
+                    const mods = sa.calcModDays();
+                    x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
                 }
-                // Fix dynamic start if y changed
-                if (params.first_sort) sa.setDynamicStartIfInDynamicMode();
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
@@ -191,6 +190,8 @@ priority = {
                         status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                         status_value = 8;
                     }
+                    sa.sa.mark_as_done = false;
+                    ajaxUtils.SendAttributeAjaxWithTimeout("mark_as_done", sa.sa.mark_as_done, sa.sa.id);
                     dom_status_image.attr({
                         width: 11,
                         height: 18,
@@ -264,9 +265,6 @@ priority = {
                 sa.sa.skew_ratio = 1;
                 sa.red_line_start_x = sa.sa.blue_line_start;
                 sa.red_line_start_y = sa.sa.works[0];
-                if (sa.sa.break_days.length) {
-                    sa.mods = sa.calcModDays();
-                }
                 sa.setParabolaValues();
                 sa.sa.skew_ratio = original_skew_ratio;
                 if (len_works + sa.sa.blue_line_start === sa.sa.x || todo < 0 || len_works + sa.sa.blue_line_start > today_minus_ad) {
@@ -351,7 +349,7 @@ priority = {
                 priority_percentage = 0;
             } else {
                 priority_percentage = Math.max(1, Math.floor(pd[1] / highest_priority * 100 + 1e-10));
-                if (isNaN(priority_percentage)) {
+                if (!Number.isFinite(priority_percentage)) {
                     priority_percentage = 100;
                 }
             }
@@ -484,8 +482,8 @@ priority = {
             });
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time").hide();
-            // Use opacity instead of display to preverse layout and 
-            $("#hide-button").css("opacity", "0");
+            // Use visibility instead of display
+            $("#hide-button").css("visibility", "hidden");
         } else {
             $("#current-time, #tomorrow-time, #info").show();
             $("#simulated-date").css({
@@ -494,7 +492,7 @@ priority = {
             });
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
-            $("#hide-button").css("opacity", "");
+            $("#hide-button").css("visibility", "");
         }
         utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
         utils.ui.tickClock();

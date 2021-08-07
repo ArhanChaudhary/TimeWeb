@@ -45,6 +45,6 @@ $(function() {
         $.alert({title: "This feature has not yet been implented"});
     });
     $("form").submit(function() {
-        $("#id_def_skew_ratio").val($("#id_def_skew_ratio").val() ? mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10) : 0);
+        $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
     });
 });

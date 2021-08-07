@@ -838,9 +838,9 @@ for (let sa of dat) {
     const red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start; // X-coordinate of the start of the red line
     const red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - sa.blue_line_start]; // Y-coordinate of the start of the red line
     // Caps and adjusts min_work_time and funct_round
-    const y1 = sa.y - red_line_start_y;
+    let y1 = sa.y - red_line_start_y;
     // Might not be needed
-    if (sa.funct_round > y1) {
+    if (sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
         sa.funct_round = y1;
     }
     // Might not be needed

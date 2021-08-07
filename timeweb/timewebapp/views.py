@@ -387,7 +387,7 @@ class TimewebView(LoginRequiredMixin, View):
             try:
                 self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
             except OverflowError:
-                self.sm.x = datetime.datetime.max - datetime.timedelta(10) # Prevent some overflow errors
+                self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
                 self.sm.x = timezone.make_aware(self.sm.x)
         else:
@@ -407,14 +407,15 @@ class TimewebView(LoginRequiredMixin, View):
             removed_works_end = len(old_data.works) - 1
             end_of_works = (self.sm.x - old_data.assignment_date).days
 
-            # If the edited due date cuts off some of the work inputs, remove the work input for the last day because that must complete assignment
+            # If the edited due date cuts off some of the work inputs
             if removed_works_end >= end_of_works:
                 removed_works_end = end_of_works
-                if d(old_data.works[removed_works_end]) != self.sm.y:
+                # Remove the work input for the last day if the cut off work input doesn't complete the assignment OR the newly generated work input doesn't complete the assignment
+                if d(old_data.works[removed_works_end]) != self.sm.y or d(old_data.works[removed_works_end]) - d(old_data.works[0]) + first_work < self.sm.y:
                     removed_works_end -= 1
             if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
                 self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
-
+            
             self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
             if self.sm.dynamic_start < 0:
                 self.sm.dynamic_start = 0

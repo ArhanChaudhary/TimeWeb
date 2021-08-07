@@ -95,7 +95,7 @@ $(function() {
             $(form_inputs[index]).val(element);
         });
         for (let break_day of Array(7).keys()) {
-            // (break_days+6)%7) is for an ordering issue i think
+            // (break_days+6)%7) is for ordering I think
             // Treat this as: $("#id_break_days_"+break_days).prop("checked", def_break_days.includes(break_days));
             $("#id_break_days_"+((break_day+6)%7)).prop("checked", def_break_days.includes(break_day));
         }

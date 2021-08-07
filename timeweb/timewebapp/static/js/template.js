@@ -166,9 +166,9 @@ $(function() {
                 });
             } else {
                 if (isMobile) {
-                    $.alert({title: "Click the share icon on your screen (up arrow in a square) and scroll to \"Add to Home Screen\"\n\nPlease use the Safari browser if this isn\'t an option"});
+                    $.alert({title: "Click the share icon on your screen (up arrow in a square) and scroll to \"Add to Home Screen\"<br><br>Please use the Safari browser if this isn\'t an option"});
                 } else {
-                    $.alert({title: "Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge\n\nIgnore this if you already have this installed"});
+                    $.alert({title: "Progressive web apps are not supported on your web browser, please use Google Chrome or Microsoft Edge<br><br>Ignore this if you already have this installed"});
                 }
             }
         });

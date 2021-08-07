@@ -26,18 +26,20 @@ Assignment.prototype.setParabolaValues = function() {
     The second point is (x1,y1), where x1 is the amount of days and y1 is the amount of units
 
     If set skew ratio is enabled, the third point is (x2,y2). skew_ratio will also be redefined
-    If set skew ratio isn't enabled, the third point is now (1,x1/y1 * skew_ratio)
+    If set skew ratio isn't enabled, the third point is now (1,y1/x1 * skew_ratio)
     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
     */
     // Define (x1, y1) and translate both variables to (0,0)
     let x1 = this.sa.x - this.red_line_start_x,
         y1 = this.sa.y - this.red_line_start_y;
     if (this.sa.break_days.length) {
-        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + this.mods[x1 % 7];
+        const mods = this.calcModDays();
+        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
     }
-    // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
-    this.a = y1 * (1 - this.sa.skew_ratio) / ((x1 - 1) * x1);
-    this.b = (y1 - x1 * x1 * this.a) / x1;
+    const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * skew_ratio], [x1, y1]);
+    this.a = parabola.a;
+    this.b = parabola.b;
+
     if (!Number.isFinite(this.a)) {
         // If there was a zero division somewhere, where x2 === 1 or something else happened, make a line with the slope of y1
         this.a = 0;
@@ -196,7 +198,8 @@ Assignment.prototype.funct = function(x, params={}) {
         // Translate x coordinate
         x -= this.red_line_start_x;
         if (this.sa.break_days.length) {
-            x -= Math.floor(x / 7) * this.sa.break_days.length + this.mods[x % 7];
+            const mods = this.calcModDays();
+            x -= Math.floor(x / 7) * this.sa.break_days.length + mods[x % 7];
         }
         if (x >= this.return_y_cutoff) return this.sa.y;
         if (x <= this.return_0_cutoff) return this.red_line_start_y;
@@ -217,6 +220,7 @@ Assignment.prototype.funct = function(x, params={}) {
     return mathUtils.precisionRound(output + this.red_line_start_y, max_length_funct_round);
 }
 Assignment.prototype.calcModDays = function() {
+    // 
     let mods = [0],
         mod_counter = 0;
     for (let mod_day = 0; mod_day < 6; mod_day++) {
@@ -226,4 +230,111 @@ Assignment.prototype.calcModDays = function() {
         mods.push(mod_counter);
     }
     return mods;
+}
+Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2) {
+    // Connect (0,0), (point_1[0], point_1[1]), and (point_2[0], point_2[1])
+    const x1 = point_1[0];
+    const y1 = point_1[1];
+    const x2 = point_2[0];
+    const y2 = point_2[1];
+    // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
+    const a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
+    const b = (y1 - x1 * x1 * a) / x1;
+    return {a: a, b: b};
+}
+Assignment.prototype.autotuneSkewRatio = function() {
+    if (this.sa.fixed_mode) return;
+    const works_without_break_days = this.sa.works.filter(function(work_input, work_input_index) {
+        // If break days are enabled, filter out work inputs that are on break days
+        // Use the same logic in calcModDays to detemine whether a work input is on a break day and add -1 at the end to select the work input after every non break day
+        // Add work_input_index === 0 because the above logic may skip over the first work input
+        return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
+    }.bind(this));
+    const original_red_line_start_x = this.red_line_start_x;
+    const original_red_line_start_y = this.red_line_start_y;
+    // red_line_start_x needs to be set for calcModDays; also set red_line_start_y for consistency
+    this.red_line_start_x = this.sa.blue_line_start;
+    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+    let x1_from_blue_line_start = this.sa.x - this.red_line_start_x;
+    let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
+    if (this.sa.break_days.length) {
+        const mods = this.calcModDays();
+        x1_from_blue_line_start -= Math.floor(x1_from_blue_line_start / 7) * this.sa.break_days.length + mods[x1_from_blue_line_start % 7]; // Handles break days, explained later
+    }
+
+    // The first part calculates the a and b values for the least squares curve from works_without_break_days using WLS quadratic regression
+    // Using WLS, we can put a lot of weight on (0,0) and (x1_from_blue_line_start, y1_from_blue_line_start) to ensure the curve is valid by passing through these two points
+    // NOTE: don't worry about the fact that a large weight doesn't cause the parabola to exactly pass through these points. The a and b values are converted to skew ratio value, which must pass through these points
+
+    // Thanks to RedBlueBird (https://github.com/RedBlueBird) for this algorithm!
+    // https://github.com/ArhanChaudhary/TimeWeb/issues/3
+    const x_matrix = works_without_break_days.map((work_input, work_input_index) => [work_input_index, Math.pow(work_input_index, 2)]);
+    x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
+
+    const y_matrix = works_without_break_days.map(work_input => work_input - this.sa.works[0]);
+    y_matrix.push(y1_from_blue_line_start);
+
+    const weight = Array(works_without_break_days.length + 1).fill(1); // Add +1 for the y_matrix.push(y1)
+    weight[0] = 1e5;
+    weight[weight.length - 1] = 1e5;
+    const X = math.matrix(x_matrix);
+    const Y = math.matrix(y_matrix);
+    const W = math.diag(weight);
+    
+    let result = math.multiply(math.multiply(math.transpose(X),W),X);
+    try {
+        result = math.inv(result);
+    } catch {
+        // In case there are less than three unique points to form a skew ratio
+        this.red_line_start_x = original_red_line_start_x;
+        this.red_line_start_y = original_red_line_start_y;
+        return;
+    }
+    result = math.multiply(math.multiply(result, math.multiply(math.transpose(X),W)),Y);
+    let a = result._data[1];
+    let b = result._data[0];
+    // The second part's goal is to now transfer the skew ratio value from x1_from_blue_line_start to x1
+    // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
+    // For instance, low skew ratios never allow users to do work because the start keeps changing
+    // Instead, we need to do this a different way
+    // We take the point of x1_from_blue_line_start and subtract it by a small value, in this case 0.01
+    // Then, once the scope of the skew ratio changes to x1, connect (0,0), the point, and (x1, y1) to get the autotuned skew ratio
+    const third_point_step = 0.01;
+    let x2 = x1_from_blue_line_start - third_point_step;
+    let y2 = x2 * (a * x2 + b);
+
+    // Change the scope of the skew ratio to x1
+    this.red_line_start_x = original_red_line_start_x;
+    this.red_line_start_y = original_red_line_start_y;
+    let x1 = this.sa.x - this.red_line_start_x;
+    let y1 = this.sa.y - this.red_line_start_y;
+    if (this.sa.break_days.length) {
+        const mods = this.calcModDays();
+        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7]; // Handles break days, explained later
+    }
+    // x1_from_blue_line_start - x1
+    // (x - blue) - (x - red)
+    // x - blue - x + red
+    // red - blue
+
+    // y1_from_blue_line_start - y1
+    // (y - [0]) - (y - red)
+    // y - [0] - y + red
+    // red - [0]
+    // Translate the point to the scope of x1
+    x2 -= x1_from_blue_line_start - x1;
+    y2 -= y1_from_blue_line_start - y1;
+    const parabola = this.calcAandBfromOriginAndTwoPoints([x2, y2], [x1, y1]);
+    // Finally, we need to set an autotune factor
+    // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
+    // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
+    // This way ensures the autotune becomes more effective as more data points are made available for the regression
+    let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+    let autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+
+    // Zero division somewhere
+    if (!Number.isFinite(autotuned_skew_ratio)) return;
+
+    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+    ajaxUtils.SendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
 }
