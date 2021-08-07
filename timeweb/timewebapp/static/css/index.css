@@ -631,6 +631,7 @@ header.animate::after {
 .graph-container canvas {
     width: 100%;
     height: 100%;
+    border-radius: 7px;
 }
 .graph-container:focus {
     box-shadow: 0 0 0 3px rgb(0,95,204);
@@ -690,7 +691,7 @@ header.animate::after {
     left: 0;
 }
 /* 2nd column */
-.work-input-button, .mark-as-finished-button, .skew-ratio-textbox, .advanced-buttons  {
+.work-input-textbox, .mark-as-finished-button, .skew-ratio-textbox, .advanced-buttons  {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -712,7 +713,7 @@ header.animate::after {
 .display-button, .mark-as-finished-button, .next-assignment-button {
     margin: 7px 0;
 }
-.work-input-button {
+.work-input-textbox {
     width: 111px;
     padding-right: 26px;
 }

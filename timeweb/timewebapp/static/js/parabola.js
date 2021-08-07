@@ -264,7 +264,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
 
     // The first part calculates the a and b values for the least squares curve from works_without_break_days using WLS quadratic regression
     // Using WLS, we can put a lot of weight on (0,0) and (x1_from_blue_line_start, y1_from_blue_line_start) to ensure the curve is valid by passing through these two points
-    // NOTE: don't worry about the fact that a large weight doesn't cause the parabola to exactly pass through these points. The a and b values are converted to skew ratio value, which must pass through these points
+    // NOTE: don't worry about the fact that a large weight doesn't cause the parabola to exactly pass through these points. The a and b values are converted to valid skew ratio values
 
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for this algorithm!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3

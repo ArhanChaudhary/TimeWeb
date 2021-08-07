@@ -39,16 +39,7 @@ class Assignment {
     }
     setDynamicStartIfInDynamicMode() {
         if (this.sa.fixed_mode) return;
-
         const len_works = this.sa.works.length - 1;
-        this.red_line_start_x = len_works + this.sa.blue_line_start - (len_works + this.sa.blue_line_start === this.sa.x);
-        this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-        this.sa.dynamic_start = this.red_line_start_x;
-        this.setParabolaValues();
-        return;
-        // Unused but I'll still keep this
-        // Uses binary search to find the lowest red_line_start_x value
-        /*const */len_works = this.sa.works.length - 1;
 
         let low = this.sa.blue_line_start;
         let high = len_works + this.sa.blue_line_start - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start
@@ -178,6 +169,7 @@ class VisualAssignment extends Assignment {
             } else if (x2 >= x1) {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
+            this.setDynamicStartIfInDynamicMode();
         }
         // Passes mouse x and y coords so mouse point can be drawn
         this.draw(raw_x, raw_y);
@@ -202,8 +194,9 @@ class VisualAssignment extends Assignment {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
         }
+        this.setDynamicStartIfInDynamicMode();
         ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-        priority.sort();
+        priority.sort({ timeout: true });
         this.draw();
     }
     draw(raw_x, raw_y) {
@@ -239,10 +232,10 @@ class VisualAssignment extends Assignment {
         screen.scale(this.scale, this.scale);
         screen.clearRect(0, 0, this.width, this.height);
         let move_info_down,
-            todo = this.funct(len_works+this.sa.blue_line_start+1);
+            goal_for_this_day = this.funct(len_works+this.sa.blue_line_start+1);
         if (show_progress_bar) {
             move_info_down = 0;
-            let should_be_done_x = this.width - 155 + todo / this.sa.y * 146,
+            let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
                 bar_move_left = should_be_done_x - this.width + 17;
             if (bar_move_left < 0 || this.sa.x <= today_minus_assignment_date || last_work_input >= this.sa.y) {
                 bar_move_left = 0
@@ -315,13 +308,13 @@ class VisualAssignment extends Assignment {
         screen.strokeStyle = "rgb(233,68,46)"; // red
         screen.lineWidth = radius;
         screen.beginPath();
-        for (let point = this.red_line_start_x; point < line_end; point += Math.ceil(1 / this.wCon)) {
+        for (let point = this.sa.fixed_mode ? this.red_line_start_x : this.sa.blue_line_start + len_works; point < line_end; point += Math.ceil(1 / this.wCon)) {
             circle_x = point * this.wCon + 50;
             if (circle_x > this.width - 5) {
                 circle_x = this.width - 5;
             }
             circle_y = this.height - this.funct(point) * this.hCon - 50;
-            screen.lineTo(circle_x - (point === this.red_line_start_x) * radius / 2, circle_y); // (point===0)*radius/2 makes sure the first point is filled in properly
+            screen.lineTo(circle_x - (point === this.red_line_start_x) * radius / 2, circle_y); // (point === this.red_line_start_x) * radius / 2 makes sure the first point is filled in properly
             screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
             screen.moveTo(circle_x, circle_y);
         }
@@ -407,9 +400,8 @@ class VisualAssignment extends Assignment {
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
         center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
         if (last_work_input < this.sa.y) {
-            todo -= last_work_input;
-            if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week+this.sa.blue_line_start+len_works) % 7)) {
-                todo = 0;
+            if (goal_for_this_day < last_work_input || this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
+                goal_for_this_day = last_work_input;
             }
             let displayed_day = new Date(this.sa.assignment_date.valueOf());
             displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
@@ -428,7 +420,7 @@ class VisualAssignment extends Assignment {
             }
             str_day += ':';
             center(str_day, 3);
-            center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${last_work_input + todo}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
+            center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${goal_for_this_day}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
         }
         screen.scale(1 / this.scale, 1 / this.scale);
     }
@@ -588,7 +580,7 @@ class VisualAssignment extends Assignment {
     }
     setGraphButtonEventListeners() {
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
-                work_input_button = this.dom_assignment.find(".work-input-button"),
+                work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
                 display_button = this.dom_assignment.find(".display-button"),
                 skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 submit_work_button = this.dom_assignment.find(".submit-work-button"),
@@ -599,7 +591,6 @@ class VisualAssignment extends Assignment {
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
-        const _this = this;
         // BEGIN Up and down arrow event handler
         let graphtimeout,
             fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
@@ -646,14 +637,25 @@ class VisualAssignment extends Assignment {
             this.sa.works.pop();
             len_works--;
 
+            this.setDynamicStartIfInDynamicMode();
             this.autotuneSkewRatio();
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
-            priority.sort({do_not_autofill: true}); // Don't autofill on delete work input because it'll just undo the delete in some cases
+            priority.sort({ timeout: true });
             this.draw();
         });
         // END Delete work input button
+
+        // BEGIN Work input textbox
+        work_input_textbox.keydown(e => {
+            if (e.key === "Enter") {
+               submit_work_button.click();
+            } else if (e.key === "Backspace" && !work_input_textbox.val()) {
+               delete_work_input_button.click();
+            } 
+        });
+        // END Work input textbox
 
         // BEGIN Submit work button
         let not_applicable_timeout_submit_work_button;
@@ -662,7 +664,7 @@ class VisualAssignment extends Assignment {
             let last_work_input = this.sa.works[len_works];
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             let not_applicable_message;
-            if (!work_input_button.val()) {
+            if (!work_input_textbox.val()) {
                 not_applicable_message = "Enter a Value";
             } else if (last_work_input >= this.sa.y) {
                 not_applicable_message = "Already Finished";
@@ -670,7 +672,7 @@ class VisualAssignment extends Assignment {
                 not_applicable_message = "Not Yet Assigned";
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
-            let input_done = work_input_button.val().trim().toLowerCase();
+            let input_done = work_input_textbox.val().trim().toLowerCase();
             switch (input_done) {
                 case "fin":
                     input_done = todo;
@@ -681,6 +683,9 @@ class VisualAssignment extends Assignment {
                         not_applicable_message = "Invalid Value";
                     }
                 }
+            }
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
+                todo = 0;
             }
             if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y) {
                 not_applicable_message = "Last work input must finish this assignment";
@@ -697,21 +702,21 @@ class VisualAssignment extends Assignment {
                 input_done = -last_work_input;
             }
             this.sa.works.push(input_done + last_work_input);
-            // last_work_input += input_done; No point in redefining last_work_input since it's not used from here
+            last_work_input += input_done;
             len_works++;
-            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
-                todo = 0;
-            }
-            // Add this check for set_dynamic_mode_if_in_dynamic_mode
+            
+            // Add this check for setDynamicModeIfInDynamicMode
             // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
             // However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
-            // However, this is fixed with autotune
-            // if (input_done !== todo)
-            this.setDynamicStartIfInDynamicMode();
-            this.autotuneSkewRatio();
+            // Autotune amd setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
+            if (input_done !== todo) {
+                this.setDynamicStartIfInDynamicMode();
+                this.autotuneSkewRatio();
+                this.setDynamicStartIfInDynamicMode();
+            }
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
-            priority.sort();
+            priority.sort({ timeout: true });
             this.draw();
         });
         // END Submit work button
@@ -736,7 +741,7 @@ class VisualAssignment extends Assignment {
             this.sa.mark_as_done = !this.sa.mark_as_done;
             ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
             ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
-            priority.sort({ ignore_timeout: true });
+            priority.sort();
         }).html(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
         // END ignore button
 
@@ -764,15 +769,19 @@ class VisualAssignment extends Assignment {
         // END Next assignment button
 
         // BEGIN Set skew ratio using graph button
-        function cancel_set_skew_ratio_using_graph() {
-            skew_ratio_button.onlyText("Set skew ratio using graph");
-            _this.set_skew_ratio_using_graph = false;
-            _this.sa.skew_ratio = this.old_skew_ratio;
-            _this.draw();
-            // No need to ajax since skew ratio is the same
-        }
+        let original_skew_ratio;
         let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
+            if (original_skew_ratio) {
+                skew_ratio_button.onlyText("Set skew ratio using graph");
+                this.set_skew_ratio_using_graph = false;
+                this.sa.skew_ratio = original_skew_ratio;
+                original_skew_ratio = undefined;
+                this.setDynamicStartIfInDynamicMode();
+                this.draw();
+                // No need to ajax since skew ratio is the same
+                return;
+            }
             let x1 = this.sa.x - this.red_line_start_x;
             if (this.sa.break_days.length) {
                 const mods = this.calcModDays();
@@ -786,7 +795,8 @@ class VisualAssignment extends Assignment {
                 }, 1000);
                 return;
             }
-            skew_ratio_button.onlyText("(Click again to cancel)").one("click", cancel_set_skew_ratio_using_graph);
+            original_skew_ratio = this.sa.skew_ratio;
+            skew_ratio_button.onlyText("(Click again to cancel)");
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.set_skew_ratio_using_graph = true;
@@ -794,16 +804,14 @@ class VisualAssignment extends Assignment {
         this.graph.click(e => {
             if (this.set_skew_ratio_using_graph) {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
+                original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                // stop set skew ratio if canvas is clicked
-                skew_ratio_button.onlyText("Set skew ratio using graph").off("click", cancel_set_skew_ratio_using_graph);
-
+                skew_ratio_button.onlyText("Set skew ratio using graph");
                 ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-                // Disable mousemove if only skew ratio is running
                 if (!this.draw_mouse_point) {
                     this.graph.off("mousemove");
                 }
-                priority.sort({ ignore_timeout: true });
+                priority.sort();
                 this.draw();
             } else if (this.draw_mouse_point) {
                 if (!isMobile) {
@@ -836,10 +844,6 @@ class VisualAssignment extends Assignment {
                 max: max_textbox_value,
             });
 
-            if (this.old_skew_ratio === undefined) {
-                // Sets this.old_skew_ratio
-                this.old_skew_ratio = this.sa.skew_ratio;
-            }
             let x1 = this.sa.x - this.red_line_start_x;
             if (this.sa.break_days.length) {
                 const mods = this.calcModDays();
@@ -862,12 +866,7 @@ class VisualAssignment extends Assignment {
                 } else if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
                     this.sa.skew_ratio = skew_ratio_bound;
                 }
-            } else {
-                // Reset skew ratio to old value if blank
-                this.sa.skew_ratio = this.old_skew_ratio;
-                this.old_skew_ratio = undefined;
             }
-            this.setDynamicStartIfInDynamicMode();
             this.draw();
         }).keypress(e => {
             if (e.key === "Enter") {
@@ -876,11 +875,8 @@ class VisualAssignment extends Assignment {
             }
         }).focusout(() => {
             skew_ratio_textbox.val('');
-            // Not a necessary check, but ensures unnecessary ajaxs aren't sent
-            if (this.old_skew_ratio !== undefined) {
-                ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-            }
-            priority.sort({ ignore_timeout: true });
+            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+            priority.sort();
         });
         // END Skew ratio textbox
 
@@ -899,14 +895,15 @@ class VisualAssignment extends Assignment {
             // Skew ratio can be changed in fixed mode, making dynamic_start inaccurate
             this.setDynamicStartIfInDynamicMode();
             this.autotuneSkewRatio();
-            priority.sort({ ignore_timeout: true });
+            this.setDynamicStartIfInDynamicMode();
+            priority.sort();
             this.draw();
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
         // END Fixed/dynamic mode button        
     }
     addGraphInfoButtons() {
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
-                work_input_button = this.dom_assignment.find(".work-input-button"),
+                work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
                 skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button");
         skew_ratio_button.info("top", 
@@ -915,7 +912,7 @@ class VisualAssignment extends Assignment {
             Click this button and hover and click the graph`
         ).css("margin-right", 1);
 
-        work_input_button.info("top",
+        work_input_textbox.info("top",
             `Enter the number of units done on the graph's displayed date and submit
             
             Keyword: enter "fin" if you've completed an assignment's work for its displayed date`,"after"
@@ -930,7 +927,7 @@ class VisualAssignment extends Assignment {
             The red line always starts at the date this assignment was assigned, meaning if you don't finish a day's work, you'll have to make it up on the next day
 
             Dynamic mode (default):
-            After every work input, the red line readjusts itself and the skew ratio is auto-tuned to adapt to your work schedule`, "prepend"
+            The red line and skew ratio readjust themselves after every work input to adapt to your work schedule`, "prepend"
         ).css("left", -3);
 
         skew_ratio_textbox.info("top", 
@@ -950,12 +947,12 @@ $(function() {
 $(".assignment").click(function(e) {
     if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title, .tags, .tag-wrapper, .tag-name")) return;
     const dom_assignment = $(this);
-    const sa_used_to_check_to_shake = utils.loadAssignmentData(dom_assignment);
+    const pre_sa = utils.loadAssignmentData(dom_assignment);
     let assignment_to_shake;
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
-    if (dom_assignment.hasClass("mark-as-done") && !sa_used_to_check_to_shake.mark_as_done) {
+    if (dom_assignment.hasClass("mark-as-done") && !pre_sa.mark_as_done) {
         assignment_to_shake = $(".assignment").first().focus();
-    } else if (sa_used_to_check_to_shake.needs_more_info) {
+    } else if (pre_sa.needs_more_info) {
         assignment_to_shake = dom_assignment;
         dom_assignment.find(".update-button").parents(".button").focus();
     }
@@ -985,6 +982,9 @@ $(".assignment").click(function(e) {
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
+        if (pre_sa.description) {
+            priority.positionTagLeft(dom_assignment);
+        }
         // If no graphs are open, allow arrow scroll
         if ($(".open-assignment").length === 0) {
             $(document).off("keydown", VisualAssignment.preventArrowScroll);
@@ -1004,6 +1004,9 @@ $(".assignment").click(function(e) {
     }
     assignment_footer.css("display", "block");
     dom_assignment.addClass("open-assignment");
+    if (pre_sa.description) {
+        priority.positionTagLeft(dom_assignment);
+    }
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click
     if (first_click) {

@@ -270,7 +270,7 @@ $(function() {
             assignment_container.remove();
             // Although nothing needs to be swapped, priority.sort() still needs to be run
             // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
-            priority.sort({ ignore_timeout: true });
+            priority.sort();
         });
         gtag("event","delete_assignment");
     }
@@ -294,7 +294,7 @@ $(function() {
                     dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
                     // Although nothing needs to be swapped, priority.sort() still needs to be run
                     // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
-                    priority.sort({ ignore_timeout: true });
+                    priority.sort();
                 }
             });
         }); 

@@ -84,12 +84,29 @@ priority = {
                 });
     },
 
+    positionTagLeft: function(dom_assignment) {
+        const dom_title = dom_assignment.find(".title");
+        const dom_tags = dom_assignment.find(".tags");
+        const dom_button = dom_assignment.find(".button");
+        const dom_assignment_footer = dom_assignment.find(".assignment-footer");
+        const add_priority_percentage = !!dom_title.attr("data-priority");
+        dom_assignment.css({paddingTop: "", paddingBottom: ""});
+        dom_button.css({marginTop: "", marginBottom: ""});
+
+        const tag_top = dom_tags.offset().top;
+        const tag_height = dom_tags.height();
+        const title_top = dom_title.offset().top + (add_priority_percentage ? -10 : 3);
+        const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
+        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
+        dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
+        dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
+    },
     sort: function(params={}) {
         clearTimeout(priority.sort_timeout);
-        if (params.ignore_timeout) {
-            priority.sort_without_timeout(params);
-        } else {
+        if (params.timeout) {
             priority.sort_timeout = setTimeout(() => priority.sort_without_timeout(params), priority.sort_timeout_duration);
+        } else {
+            priority.sort_without_timeout(params);
         }
     },
 
@@ -115,7 +132,7 @@ priority = {
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index);
             const number_of_forgotten_days = today_minus_ad - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
-            if (params.autofill_all_work_done && !params.do_not_autofill && number_of_forgotten_days > 0) {
+            if (params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 for (let i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                     if (len_works + sa.sa.blue_line_start === sa.sa.x) break; // Don't autofill past completion
@@ -161,7 +178,7 @@ priority = {
                 }
                 status_value = 2;
             } else {
-                if (params.autofill_no_work_done && !params.do_not_autofill && number_of_forgotten_days > 0) {
+                if (params.autofill_no_work_done && number_of_forgotten_days > 0) {
                     for (let i = 0; i < number_of_forgotten_days; i++) {
                         if (len_works + sa.sa.blue_line_start === sa.sa.x - 1) break;
                         has_autofilled = true;
@@ -190,8 +207,8 @@ priority = {
                         status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                         status_value = 8;
                     }
+                    if (sa.sa.mark_as_done === true) ajaxUtils.SendAttributeAjaxWithTimeout("mark_as_done", false, sa.sa.id);
                     sa.sa.mark_as_done = false;
-                    ajaxUtils.SendAttributeAjaxWithTimeout("mark_as_done", sa.sa.mark_as_done, sa.sa.id);
                     dom_status_image.attr({
                         width: 11,
                         height: 18,
@@ -363,21 +380,7 @@ priority = {
                     } else {
                         resolve();
                     }
-                }).then(function() {
-                    const dom_tags = dom_assignment.find(".tags");
-                    const dom_button = dom_assignment.find(".button");
-                    const dom_assignment_footer = dom_assignment.find(".assignment-footer");
-                    dom_assignment.css({paddingTop: "", paddingBottom: ""});
-                    dom_button.css({marginTop: "", marginBottom: ""});
-
-                    const tag_top = dom_tags.offset().top;
-                    const tag_height = dom_tags.height();
-                    const title_top = dom_title.offset().top + (add_priority_percentage ? -10 : 3);
-                    const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
-                    dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
-                    dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
-                    dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
-                });
+                }).then(() => priority.positionTagLeft(dom_assignment));
             }
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
@@ -503,5 +506,5 @@ priority = {
     }
 }
 document.addEventListener("DOMContentLoaded", function() {
-    priority.sort({ first_sort: true, ignore_timeout: true });
+    priority.sort({ first_sort: true });
 });

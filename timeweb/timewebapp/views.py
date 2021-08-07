@@ -309,6 +309,9 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.break_days = self.form.cleaned_data.get("break_days")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
         date_now = timezone.localtime(timezone.now())
+        if editing_example_account:
+            # Example account date (for below logic purposes)
+            date_now = timezone.localtime(timezone.make_aware(datetime.datetime(2021, 5, 3)))
         if date_now.hour < after_midnight_hour_to_update:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)

@@ -121,7 +121,7 @@ utils = {
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
                     $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                    priority.sort({ ignore_timeout: true });
+                    priority.sort();
                 });
                 $("#next-day-icon-label").info("bottom",
                     `Simulates the next day for ALL assignments
@@ -219,7 +219,7 @@ utils = {
                             confirm: {
                                 keys: ['Enter'],
                                 action: function() {
-                                    const params = {ignore_timeout: true};
+                                    const params = {};
                                     params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = true;
                                     priority.sort(params);
                                 }
@@ -347,8 +347,9 @@ utils = {
                     const success = function() {
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
+                        // GC class tags
                         if (sa.needs_more_info) {
-                            priority.sort({ ignore_timeout: true });
+                            priority.sort();
                         }
                         // Close box and add tags visually
                         $this.removeClass("open-tag-add-box");
@@ -412,7 +413,8 @@ utils = {
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
                 let allTags = [];
                 dat.forEach(sa => allTags.push(...sa.tags));
-                unique_allTags = Array.from(new Set(allTags));
+                // Remove duplicate tags and sort alphabetically
+                unique_allTags = Array.from(new Set(allTags)).sort();
                 for (let tag of unique_allTags) {
                     const tag_add_selection_item = $(tag_add_selection_item_template);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
@@ -439,8 +441,9 @@ utils = {
                 const success = function() {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+                    // GC class tags
                     if (sa.needs_more_info) {
-                        priority.sort({ ignore_timeout: true });
+                        priority.sort();
                     }
                     tag_wrapper.addClass("tag-is-deleting");
                     // Transition the deletion
@@ -487,8 +490,9 @@ utils = {
                 }).map(function() {
                     return $(this).children(".tag-name").text();
                 }).toArray();
+                // GC class tags
                 if (sa.needs_more_info) {
-                    priority.sort({ ignore_timeout: true });
+                    priority.sort();
                 }
                 ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
             });
@@ -700,17 +704,15 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert({title: "Failed to connect"});
+            $.alert({title: "Failed to connect", content: "You're seeing this because we can't establish a connection with the server. Check your connection and try again"});
         } else if (response.status == 404) {
-            $.alert({title: "Not found, try refreshing"});
+            $.alert({title: "Not found", content: "Try refreshing or trying again"});
         } else if (response.status == 500) {
-            $.alert({title: "Internal server error. Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
-        } else if (exception === 'parsererror') {
-            $.alert({title: "JSON parse failed"});
+            $.alert({title: "Internal server error", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
         } else if (exception === 'timeout') {
-            $.alert({title: "Timed out, try again"});
+            $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again"});
         } else if (exception === 'abort') {
-            $.alert({title: "Request aborted, try again"});
+            $.alert({title: "Request aborted", content: "Try refreshing or try again"});
         } else {
             $("html").html(response.responseText);
         }
