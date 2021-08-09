@@ -577,7 +577,7 @@ utils = {
                     return utils.loadAssignmentData($(this)).name !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
-                    assignments_excluding_example.first().after("<span>Click your assignment<br></span>");
+                    assignments_excluding_example.first().after("<span>Click your assignment to open it<br></span>");
                 } else {
                     $("#assignments-header").replaceWith('<div id="introduction-message"><div>Welcome to TimeWeb Beta! Thank you for your interest in using this app.</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container").hide();

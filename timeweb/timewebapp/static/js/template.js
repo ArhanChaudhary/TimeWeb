@@ -80,21 +80,21 @@ $(function() {
                 welcome = $("#welcome"),
                 newassignmenttext = $("#new-assignment-text");
         function resize() {
+            // Check if the username protrudes into the logo
+            if (username.offset().left-10 < window.innerWidth/2+115) {
+                logo.hide();
+                // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the username protrudes into it
+                newassignmenttext.css("max-width",Math.max(0, username.offset().left-69-10));
+                // If it does, checks if 
+            } else {
+                logo.show();
+                // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the logo protrudes into it
+                newassignmenttext.css("max-width",window.innerWidth/2-115-69);
+            }
             // Checks if "Welcome, " protrudes into the logo
             if (username.offset().left-10 - 100 < window.innerWidth/2+115) {
                 // If it does, hide welcome
                 welcome.hide();
-                // If it does, checks if the username protrudes into the logo
-                if (username.offset().left-10 < window.innerWidth/2+115) {
-                    logo.hide();
-                    // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the username protrudes into it
-                    newassignmenttext.css("max-width",Math.max(0, username.offset().left-69-10));
-                    // If it does, checks if 
-                } else {
-                    logo.show();
-                    // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the logo protrudes into it
-                    newassignmenttext.css("max-width",window.innerWidth/2-115-69);
-                }
             } else {
                 newassignmenttext.css("max-width","");
                 welcome.show();
