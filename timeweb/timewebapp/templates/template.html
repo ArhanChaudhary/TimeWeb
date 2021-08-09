@@ -8,7 +8,8 @@
         <script async src="{% static 'vendor/gtag.js' %}"></script>
         <script nonce="{{request.csp_nonce}}">
             window.dataLayer = window.dataLayer || [];
-            if ("{{ DEBUG }}" !== "False") {
+            const DEBUG = "{{ DEBUG }}";
+            if (DEBUG !== "False") {
                 function gtag(){}
             } else {
                 function gtag(){dataLayer.push(arguments);}
@@ -42,7 +43,8 @@
         <meta property="og:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}{% static 'images/icons/og.png' %}">
 
         <meta name="author" content="Arhan Chaudhary">
-        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+        <meta name="viewport" content="width=device-width, initial-scale=0.65, maximum-scale=0.65">
+        <link rel="stylesheet" href="{% static 'vendor/normalize.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
         <link rel="stylesheet" href="{% static 'vendor/jquery-confirm.min.css' %}">
         {% block css %}{% endblock css %}
@@ -54,6 +56,7 @@
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
     <body tabindex="-1">
+        <div id="portrait-denial">Please change your device's orientation to landscape.</div>
         <div id="site">
             <header>
                 {% if user.is_authenticated and request.path == "/" %}

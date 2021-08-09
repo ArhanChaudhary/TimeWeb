@@ -42,7 +42,7 @@ $(function() {
     });
     $("#id_dark_mode").click(function(e) {
         e.preventDefault();
-        $.alert({title: "This feature has not yet been implented"});
+        $.alert({title: "This feature hasn't yet been implented"});
     });
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));

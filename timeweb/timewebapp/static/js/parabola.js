@@ -293,7 +293,8 @@ Assignment.prototype.autotuneSkewRatio = function() {
     result = math.multiply(math.multiply(result, math.multiply(math.transpose(X),W)),Y);
     let a = result._data[1];
     let b = result._data[0];
-    // The second part's goal is to now transfer the skew ratio value from x1_from_blue_line_start to x1
+
+    // The second part's goal is to now "transfer" the skew ratio value from x1_from_blue_line_start to x1
     // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
     // For instance, low skew ratios never allow users to do work because the start keeps changing
     // Instead, we need to do this a different way
@@ -312,15 +313,8 @@ Assignment.prototype.autotuneSkewRatio = function() {
         const mods = this.calcModDays();
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7]; // Handles break days, explained later
     }
-    // x1_from_blue_line_start - x1
-    // (x - blue) - (x - red)
-    // x - blue - x + red
-    // red - blue
-
-    // y1_from_blue_line_start - y1
-    // (y - [0]) - (y - red)
-    // y - [0] - y + red
-    // red - [0]
+    // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
+    // y1_from_blue_line_start - y1 simplifies to red_line_start_y - works[0]
     // Translate the point to the scope of x1
     x2 -= x1_from_blue_line_start - x1;
     y2 -= y1_from_blue_line_start - y1;

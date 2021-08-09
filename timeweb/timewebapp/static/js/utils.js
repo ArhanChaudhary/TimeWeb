@@ -298,6 +298,14 @@ utils = {
                     });
                 });
             },
+            mailtoLinks: function() {
+                $("a[href^='mdailto']").click(function(e) {
+                    e.preventDefault();
+                    const href = $(this).attr("href");
+                    const target = $(this).attr("target") || '_self';
+                    window.open(href, target);
+                });
+            },
         },
         addTagHandlers: function() {
             const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
@@ -322,7 +330,7 @@ utils = {
             function tagAddClick(e) {
                 const $this = $(this);
                 // Close add tag box if "Add Tag" is clicked again
-                if ($(e.target).parent().hasClass("tag-add") && $this.hasClass("open-tag-add-box")) {
+                if ($(e.target).hasClass("tag-add") && $this.hasClass("open-tag-add-box")) {
                     $this.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
                     return;
@@ -334,7 +342,7 @@ utils = {
                         return $(this).text();
                     }).toArray();
                     const inputted_tag_name = $this.find(".tag-add-input").val().trim();
-                    if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!") {
+                    if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.includes(inputted_tag_name)) {
                         tag_names.push(inputted_tag_name);
                     }
                     if (!tag_names.length) return;
@@ -669,7 +677,7 @@ utils = {
                         $(this).val(pr_data[index]);
                     });
                     $("#form-wrapper #break-days-wrapper input").each(function(index) {
-                        $(this).prop('checked',pr_data[pr_data.length - 1][index]);
+                        $(this).prop('checked', pr_data[pr_data.length - 1][index]);
                     });
                 }
             });
@@ -704,13 +712,14 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert({title: "Failed to connect", content: "You're seeing this because we can't establish a connection with the server. Check your connection and try again"});
+            $.alert({title: "Failed to connect", content: "You're seeing this because we can't establish a connection with the server<br>Check your connection and try again"});
         } else if (response.status == 404) {
             $.alert({title: "Not found", content: "Try refreshing or trying again"});
         } else if (response.status == 500) {
             $.alert({title: "Internal server error", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
+            utils.ui.setClickHandlers.mailtoLinks();
         } else if (exception === 'timeout') {
-            $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again"});
+            $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server<br>Try refreshing or try again"});
         } else if (exception === 'abort') {
             $.alert({title: "Request aborted", content: "Try refreshing or try again"});
         } else {
@@ -879,6 +888,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.autofillWorkDone();
+    utils.ui.setClickHandlers.mailtoLinks();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();

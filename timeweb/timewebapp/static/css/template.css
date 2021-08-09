@@ -2,6 +2,25 @@
 * {
     font-family: "Open Sans", sans-serif;
 }
+#portrait-denial {
+    display: none;
+    position: absolute;
+    align-items: center;
+    text-align: center;
+    z-index: 9999;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    font-size: 6vw;
+    font-family: 'Roboto Slab';
+    background: white;
+}
+@media only screen and (hover: none) and (pointer: coarse) and (orientation: portrait) {
+    #portrait-denial {
+        display: flex;
+    }
+}
 input, textarea {
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -93,11 +112,11 @@ body {
     overflow: hidden;
 }
 #user-greeting {
-    float: right;
+    position: absolute;
+    right: 104px;
     font-size: 20px;
     color: white;
     padding-top: 14.6px;
-    margin-right: 5px;
 }
 #user-greeting #username {
     text-decoration: none;
@@ -391,10 +410,16 @@ nav:focus-within #nav-menu::after {
     font-style: normal;
     font-weight: 600;
     src: local(''),
-         url('../fonts/open-sans-v18-latin-600.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
-         url('../fonts/open-sans-v18-latin-600.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+         url('../fonts/open-sans-v18-latin-600.woff2') format('woff2'); /* Chrome 26+, Opera 23+, Firefox 39+ */
 }
 
+@font-face {
+    font-family: 'Roboto Slab';
+    font-style: normal;
+	font-weight: 700;
+    src: local(''),
+         url('../fonts/roboto-slab-v7-bold.woff2') format('woff2');
+}
 #changelog-container {
     padding: 0 10px;
 }

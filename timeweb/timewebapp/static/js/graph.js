@@ -12,6 +12,12 @@ This only runs on index.html
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 //
 
+// There is a deadlock netween autotuneSkewRatio and setDynamicStartInDynamicMode:
+// When dynamic start is set, skew ratio needs to be re-autotuned
+// But when skew ratio is re-autotuned, it may mess up dynamic start
+// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
+const AUTOTUNE_ITERATIONS = 3;
+
 class Assignment {
     constructor(dom_assignment) {
         this.sa = utils.loadAssignmentData(dom_assignment);
@@ -308,7 +314,7 @@ class VisualAssignment extends Assignment {
         screen.strokeStyle = "rgb(233,68,46)"; // red
         screen.lineWidth = radius;
         screen.beginPath();
-        for (let point = this.sa.fixed_mode ? this.red_line_start_x : this.sa.blue_line_start + len_works; point < line_end; point += Math.ceil(1 / this.wCon)) {
+        for (let point = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point < line_end; point += Math.ceil(1 / this.wCon)) {
             circle_x = point * this.wCon + 50;
             if (circle_x > this.width - 5) {
                 circle_x = this.width - 5;
@@ -636,9 +642,10 @@ class VisualAssignment extends Assignment {
             }
             this.sa.works.pop();
             len_works--;
-
-            this.setDynamicStartIfInDynamicMode();
-            this.autotuneSkewRatio();
+            for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                this.setDynamicStartIfInDynamicMode();
+                this.autotuneSkewRatio();
+            }
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
@@ -651,9 +658,7 @@ class VisualAssignment extends Assignment {
         work_input_textbox.keydown(e => {
             if (e.key === "Enter") {
                submit_work_button.click();
-            } else if (e.key === "Backspace" && !work_input_textbox.val()) {
-               delete_work_input_button.click();
-            } 
+            }
         });
         // END Work input textbox
 
@@ -710,8 +715,10 @@ class VisualAssignment extends Assignment {
             // However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
             // Autotune amd setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
             if (input_done !== todo) {
-                this.setDynamicStartIfInDynamicMode();
-                this.autotuneSkewRatio();
+                for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                    this.setDynamicStartIfInDynamicMode();
+                    this.autotuneSkewRatio();
+                }
                 this.setDynamicStartIfInDynamicMode();
             }
             ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
@@ -723,7 +730,7 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Display button
         display_button.click(() => {
-            $.alert({title: "This feature has not yet been implented"});
+            $.alert({title: "This feature hasn't yet been implented"});
         });
         // END Display button
 
@@ -893,8 +900,10 @@ class VisualAssignment extends Assignment {
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
             // Skew ratio can be changed in fixed mode, making dynamic_start inaccurate
-            this.setDynamicStartIfInDynamicMode();
-            this.autotuneSkewRatio();
+            for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                this.setDynamicStartIfInDynamicMode();
+                this.autotuneSkewRatio();
+            }
             this.setDynamicStartIfInDynamicMode();
             priority.sort();
             this.draw();

@@ -254,7 +254,7 @@ header.animate::after {
 }
 .description {
     display: none;
-    opacity: 0.75;
+    opacity: 0.6;
     white-space: pre-wrap;
     transform: translateY(-2px);
     min-width: calc(20px + 13vw);
@@ -330,7 +330,7 @@ header.animate::after {
     z-index: 1;
     top: 2px;
     white-space: nowrap;
-    font-size: min(10px, 0.7em);
+    font-size: min(10.25px, 0.87em);
 }
 .tags-right {
     right: 2px;
@@ -341,10 +341,6 @@ header.animate::after {
 }
 .tags-left .tag-add-box {
     left: 23px;
-}
-.assignment.open-assignment .tags:not(.tags-left) {
-    transform: translateY(-100%) translateY(2.75px);
-    top: unset;
 }
 .tag-wrapper {
     position: relative;
@@ -371,14 +367,13 @@ header.animate::after {
     opacity: 0;
     transition: opacity 0.1s linear;
 }
-.tag-delete:hover::after {
+/* Don't do :hover::after because the ::after doesnt then become pointless */
+.tag-delete::after {
     content: '';
     position: absolute;
     top: 0;
-    right: 0;
     left: 0;
-    bottom: 0;
-    margin: auto;
+    transform: translate(-25%, -25%);
     border-radius: 50%;
     border: 10px solid transparent;
 }
@@ -394,6 +389,16 @@ header.animate::after {
     border: 1px dashed rgb(24, 24, 24);
     cursor: pointer;
     transition: width 0.25s ease-out;
+}
+.tag-add::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    transform: translate(-25%, -25%);
+    border-radius: 17px;
+    border: 17px solid transparent;
 }
 .tag-add-text {
     opacity: 0;
@@ -872,13 +877,14 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper input.disabled-field {
     opacity: 0.75 !important;
-    transition: all .25s ease-out, border-width 0s, padding 0s;
     background-color: rgb(228,228,228);
     border-color: rgb(103,103,103);
     border-width: 2px;
     padding: 0;
     padding-left: 1px;
+    cursor: not-allowed;
     color: black;
+    transition: all .25s ease-out, border-width 0s, padding 0s;
 }
 #submit-assignment-button {
     width: calc(100% - 140px);

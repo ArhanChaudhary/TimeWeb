@@ -168,7 +168,7 @@ priority = {
                 str_daysleft = '';
             } else if (today_minus_ad < 0) {
                 status_image = "no-status-image";
-                status_message = 'This Assignment has Not Yet been Assigned';
+                status_message = 'This Assignment hasn\'t yet been Assigned';
                 if (today_minus_ad === -1) {
                     str_daysleft = 'Assigned Tomorrow';
                 } else if (today_minus_ad > -7) {
@@ -197,6 +197,8 @@ priority = {
                     const mods = sa.calcModDays();
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
                 }
+                // Fix dynamic start if y or anything else was changed
+                if (params.first_sort) sa.setDynamicStartIfInDynamicMode();
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';

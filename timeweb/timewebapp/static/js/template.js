@@ -173,8 +173,8 @@ $(function() {
             }
         });
     }
-    $("#nav-about").click(() => $.alert({title: "This has not yet been written"})).css("text-decoration", "line-through");
-    $("#account-settings").click(() => $.alert({title: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> regarding your account settings"}));
+    $("#nav-about").click(() => $.alert({title: "This hasn't yet been written"})).css("text-decoration", "line-through");
+    $("#account-settings").click(() => $.alert({title: "change username"}));
 });
 jconfirm.defaults = {
     escapeKey: true,
