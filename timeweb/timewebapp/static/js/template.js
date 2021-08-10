@@ -157,9 +157,9 @@ $(function() {
         return displayModes.some((displayMode) => window.matchMedia('(display-mode: ' + displayMode + ')').matches); 
     }
     if (isPwa()) {
-        $("#nav-items span").hide();
+        $("#nav-a2hs").hide();
     } else {
-        $("#nav-items span").click(function() {
+        $("#nav-a2hs").click(function() {
             if (prompt) {
                 // Show the install prompt
                 prompt.prompt();
@@ -179,6 +179,7 @@ $(function() {
         });
     }
     $("#nav-about").click(() => $.alert({title: "This hasn't yet been written"})).css("text-decoration", "line-through");
+    $("#nav-credits").click(() => $.alert({title: $("#credits-template").html()}));
     $("#account-settings").click(() => $.alert({title: "change username"}));
 });
 jconfirm.defaults = {

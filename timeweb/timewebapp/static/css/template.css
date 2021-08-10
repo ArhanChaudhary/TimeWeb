@@ -239,6 +239,7 @@ rect {
     display: block;
     padding: 10px;
     color: white;
+    cursor: pointer;
     font-family: "Open Sans";
     font-size: 12.5px;
     background: rgb(45,59,71);

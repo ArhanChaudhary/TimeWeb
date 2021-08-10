@@ -95,9 +95,9 @@
                     <div id="nav-items">
                         <a href="{% url 'user-guide' %}">User Guide</a>
                         <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
-                        <span>Install on Home Screen</span>
+                        <span id="nav-a2hs">Install on Home Screen</span>
                         <a href="{% url 'changelog' %}">Changelog</a>
-                        <a href="{% url 'credits' %}">Credits</a>
+                        <span id="nav-credits">Credits</span>
                         <a href="{% url 'policies' %}">Policies</a>
                         <a target='_blank' href='mailto:arhan.ch@gmail.com'>Contact Me</a>
                     </div>
@@ -117,6 +117,31 @@
                     <div class="info-button" tabindex="-1">
                         i<span class="info-button-text"></span>
                     </div>
+                </template>
+                <template id="credits-template">
+                    Images used:
+                    <ul>
+                        <li><a href="https://fontmeme.com/fonts/alba-font/">TimeWeb logo</a></li>
+                        <li><a href="https://www.pngitem.com/middle/TiRihwJ_plus-button-green-png-download-plus-button-green/">Plus icon</a></li>
+                        <li><a href="https://adioma.com/icons/question-mark" target="_blank">Question mark icon</a> by <a href="https://adioma.com">Adioma</a></li>
+                        <li><a href="https://iconscout.com/icon/edit-1780339" target="_blank">Edit icon</a> by <a href="https://iconscout.com/contributors/google-inc">Google Inc.</a> on <a href="https://iconscout.com">Iconscout</a></li>
+                        <li><a href="https://www.flaticon.com/free-icon/trash_3096687" target="_blank">Trash icon</a> by <a href="https://www.flaticon.com/authors/bqlqn" title="bqlqn">bqlqn</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></li>
+                        <li><a href="https://iconscout.com/icon/caret-double-down-3609859" target="_blank">Caret double down icon</a> by <a href="https://iconscout.com/contributors/phosphoricons">Phosphor Icons</a> on <a href="https://iconscout.com">Iconscout</a></li>
+                        <li><a title="icona x png 6" href="https://pngimage.net/icona-x-png-6/">icona x png 6</a>
+                    </ul>
+                    Special thanks to these amazing people for directly contributing!
+                    <ul>
+                        <li><a href="/favicon.ico">Favicon</a> designed by Charles P.</li>
+                        <li><a href="https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">Skew ratio autotuning algorithm</a> by <a href="https://github.com/RedBlueBird" target="_blank">Jeffrey Zhang</a></li>
+                    </ul>
+                    <!--
+                    completely-finished.png: ascii character
+                    finished.png: ascii character
+                    unfinished.png: ascii character
+                    open-all-assignments.png: made myself
+                    close-all-assignments.png: made myself
+                    settings.png: citation not needed (https://www.iconfinder.com/icons/326699/settings_icon)
+                    -->
                 </template>
             </main>
         </div>
