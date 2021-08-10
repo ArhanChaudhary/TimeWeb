@@ -350,10 +350,14 @@ header.animate::after {
     border: 1px solid black;
     border-radius: 10px;
     opacity: 1;
+    cursor: ew-resize;
     margin-right: 3px;
     background: linear-gradient(135deg, rgb(255,255,255) 0%, rgb(222,222,222) 100%);
     transform-origin: right;
     transition: margin-left 0.75s ease-in-out, opacity 0.7s linear, transform 0.5s linear 0.2s;
+}
+.tag-wrapper.ghost {
+    background: rgb(226, 241, 248);
 }
 .tag-delete {
     position: absolute;
@@ -741,13 +745,16 @@ input[type=number]::-webkit-inner-spin-button {
     transform: translateX(3px);
 }
 
-
 #form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {
     outline: 0;
     box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
 }
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
+}
+#form-wrapper input[type=date] {
+    /* Mobile */
+    background: white !important;
 }
 #form-wrapper label::after {
     position: absolute;

@@ -658,6 +658,7 @@ class VisualAssignment extends Assignment {
         work_input_textbox.keydown(e => {
             if (e.key === "Enter") {
                submit_work_button.click();
+               work_input_textbox.val('');
             }
         });
         // END Work input textbox
@@ -873,6 +874,7 @@ class VisualAssignment extends Assignment {
                 } else if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
                     this.sa.skew_ratio = skew_ratio_bound;
                 }
+                ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
             }
             this.draw();
         }).keypress(e => {
@@ -882,7 +884,6 @@ class VisualAssignment extends Assignment {
             }
         }).focusout(() => {
             skew_ratio_textbox.val('');
-            ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
             priority.sort();
         });
         // END Skew ratio textbox
@@ -954,7 +955,7 @@ class VisualAssignment extends Assignment {
 }
 $(function() {
 $(".assignment").click(function(e) {
-    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title, .tags, .tag-wrapper, .tag-name")) return;
+    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title")) return;
     const dom_assignment = $(this);
     const pre_sa = utils.loadAssignmentData(dom_assignment);
     let assignment_to_shake;

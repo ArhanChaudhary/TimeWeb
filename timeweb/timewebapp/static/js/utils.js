@@ -1,18 +1,3 @@
-/* 
-This file includes the code for:
-
-Preventing submitting form on refresh
-Parsing date on safari
-Resolving a promise passed to a scroll function that determines when a scroll ends
-Hide button
-Advanced options
-Sending attribute AJAX
-Preserving page state before refresh
-Setting up the tutorial
-Other minor utilities
-
-This only runs on index.html
-*/
 gtag("event", "home");
 utils = {
     formatting: {
@@ -45,7 +30,7 @@ utils = {
     },
     ui: {
         tickClock: function() {
-            const estimated_completion_time = new Date(date_now.valueOf());
+            const estimated_completion_time = new Date();
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
@@ -369,7 +354,7 @@ utils = {
                             tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                             tag.addClass("tag-add-transition-disabler");
-                            // Need to use jquery to set css for marginLeft
+                            // Need to use jquery instead of css to set marginLeft
                             tag.css({
                                 marginLeft: -tag.outerWidth(true),
                                 opacity: "0",
@@ -387,9 +372,6 @@ utils = {
                             tag.one("transitionend", function() {
                                 tag.prev().css("z-index", "");
                             });
-                        }
-                        if (tag_names.length) {
-                            $this.parents(".tags").find(".tag-sortable-container").sortable("refresh");
                         }
                     }
                     
@@ -491,18 +473,24 @@ utils = {
                     transitionCloseTagBox($this);
                 }, 0);
             });
-            $(".tag-sortable-container").sortable().on("sortstop", function() {
-                const sa = utils.loadAssignmentData($(this));
-                sa.tags = $(this).find(".tag-wrapper").filter(function() {
-                    return !$(this).hasClass("tag-is-deleting");
-                }).map(function() {
-                    return $(this).children(".tag-name").text();
-                }).toArray();
-                // GC class tags
-                if (sa.needs_more_info) {
-                    priority.sort();
+            $(".tag-sortable-container").sortable({
+                animation: 150,
+                ghostClass: "ghost",
+                direction: "horizontal",
+                onEnd: function() {
+                    const $this = $(this.el);
+                    const sa = utils.loadAssignmentData($this);
+                    sa.tags = $this.find(".tag-wrapper").filter(function() {
+                        return !$(this).hasClass("tag-is-deleting");
+                    }).map(function() {
+                        return $(this).children(".tag-name").text();
+                    }).toArray();
+                    // GC class tags
+                    if (sa.needs_more_info) {
+                        priority.sort();
+                    }
+                    ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
                 }
-                ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
             });
         },
         setKeybinds: function() {
@@ -712,7 +700,7 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert({title: "Failed to connect", content: "You're seeing this because we can't establish a connection with the server<br>Check your connection and try again"});
+            $.alert({title: "Failed to connect", content: "We can't establish a connection with the server, check your connection and try again"});
         } else if (response.status == 404) {
             $.alert({title: "Not found", content: "Try refreshing or trying again"});
         } else if (response.status == 500) {
