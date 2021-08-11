@@ -317,7 +317,7 @@ class TimewebView(LoginRequiredMixin, View):
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         if self.created_assignment or self.sm.needs_more_info:
             self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
-            if self.sm.blue_line_start < 0:
+            if self.sm.blue_line_start < 0 or editing_example_account:
                 self.sm.blue_line_start = 0
             self.sm.dynamic_start = self.sm.blue_line_start
         else:

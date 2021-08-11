@@ -711,7 +711,7 @@ ajaxUtils = {
         } else if (exception === 'abort') {
             $.alert({title: "Request aborted", content: "Try refreshing or try again"});
         } else {
-            $("html").html(response.responseText);
+            $.alert({title: "<p>Uncaught error while trying to save an assignment:</p>" + response.responseText});
         }
     },
     ajaxFinishedTutorial: function() {
@@ -768,7 +768,7 @@ ajaxUtils = {
     SendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
-                $.alert({title: "An assignment takes up too much space and can no longer be saved"});
+                $.alert({title: "An assignment takes up too much space and can no longer be saved", content: "An assignment has too many work inputs, try changing its assignment date to today to reset its work inputs"});
                 return;
             }
             gtag("event","save_assignment");

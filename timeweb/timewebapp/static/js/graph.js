@@ -681,7 +681,7 @@ class VisualAssignment extends Assignment {
             let input_done = work_input_textbox.val().trim().toLowerCase();
             switch (input_done) {
                 case "fin":
-                    input_done = todo;
+                    input_done = Math.max(0, todo);
                     break;
                 default: {
                     input_done = +input_done;
@@ -925,7 +925,7 @@ class VisualAssignment extends Assignment {
         work_input_textbox.info("top",
             `Enter the number of units done on the graph's displayed date and submit
             
-            Keyword: enter "fin" if you've completed an assignment's work for its displayed date`,"after"
+            Enter "fin" if you've completed an assignment's work on its displayed date`,"after"
         ).css({
             left: "calc(50% + 47px)",
             top: 3,

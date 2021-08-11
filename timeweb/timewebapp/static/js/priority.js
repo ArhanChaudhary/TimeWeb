@@ -142,7 +142,7 @@ priority = {
                     len_works++;
                 }
                 if (has_autofilled) {
-                    sa.setDynamicStartIfInDynamicMode();
+                    // don't sa.setDynamicStartIfInDynamicMode(); because of the (input_done !== todo) check
                     ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;

@@ -2,8 +2,9 @@
 * {
     font-family: "Open Sans", sans-serif;
 }
+/* Unused for now but won't remove */
 #portrait-denial {
-    display: none;
+    display: none !important;
     position: absolute;
     align-items: center;
     text-align: center;

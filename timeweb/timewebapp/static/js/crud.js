@@ -43,15 +43,15 @@ function hideForm(hide_instantly=false) {
     $("main").css("overflow", "overlay");
 }
 // Replace fields with unit when unit is any value or "Minute" or "Hour"
+let old_input_value;
 function replaceUnit() {
     const val = $("#id_unit").val().trim();
     const plural = pluralize(val),
-        singular = pluralize(val,1);
+        singular = pluralize(val,1),
+        singularToLowerCase = singular.toLowerCase();
     const units_of_time = {"minute": 1, "hour": 60};
-    const chose_units_of_time = units_of_time[singular.toLowerCase()];
-    // Replace fields
     if (val) {
-        if (chose_units_of_time) {
+        if (singularToLowerCase in units_of_time) {
             $("label[for='id_y']").text(`Estimate how many ${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} this assignment will Take to Complete`);
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
@@ -67,23 +67,26 @@ function replaceUnit() {
         $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
         $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
     }
-    if (chose_units_of_time) {
-        $("#id_ctime").val(chose_units_of_time);
+    if (singularToLowerCase in units_of_time) {
+        $("#id_ctime").val(units_of_time[singularToLowerCase]);
         $("#id_ctime").prop("disabled",true).addClass("disabled-field");
         $("label[for='id_ctime']").addClass("disabled-field");
-        if (def_funct_round_minute) {
+        if (def_funct_round_minute && singularToLowerCase === "minute") {
             $("#id_funct_round").val(5);
             $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_funct_round']").addClass("disabled-field");
         }
     } else {
+        old_input_value in units_of_time && $("#id_ctime").val("");
         $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
-        $("label[for='id_ctime']").removeClass("disabled-field");
-        if (def_funct_round_minute) {
-            $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
-            $("label[for='id_funct_round']").removeClass("disabled-field");
-        }
+        $("label[for='id_ctime']").removeClass("disabled-field");   
     }
+    if (def_funct_round_minute && singularToLowerCase !== "minute") {
+        old_input_value in units_of_time && $("#id_funct_round").val("");
+        $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
+        $("label[for='id_funct_round']").removeClass("disabled-field");
+    }
+    old_input_value = singularToLowerCase;
     $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#fields-wrapper").scrollTop());
 }
 $(function() {
@@ -150,7 +153,7 @@ $(function() {
         
         e.g: If this assignment is reading a book, enter "Page" or "Chapter"
 
-        If you're unsure how to split up your assignment, divide it up into units of time instead. Enter "Minute" or "Hour"`, 
+        If you're unsure how to split up your assignment, divide it up into units of time instead by entering "Minute" or "Hour"`, 
     "after").css({
         marginBottom: -14,
         float: 'right',

@@ -36,9 +36,15 @@ Assignment.prototype.setParabolaValues = function() {
         const mods = this.calcModDays();
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
     }
-    const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
-    this.a = parabola.a;
-    this.b = parabola.b;
+    if (this.sa.skew_ratio === 1) {
+        // Needed for roundoff errors
+        this.a = 0;
+        this.b = y1 / x1;
+    } else {
+        const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
+        this.a = parabola.a;
+        this.b = parabola.b;
+    }
 
     if (!Number.isFinite(this.a)) {
         // If there was a zero division somewhere, where x2 === 1 or something else happened, make a line with the slope of y1
@@ -250,6 +256,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
         // Add work_input_index === 0 because the above logic may skip over the first work input
         return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
     }.bind(this));
+    if (works_without_break_days.length > 2500) return;
     const original_red_line_start_x = this.red_line_start_x;
     const original_red_line_start_y = this.red_line_start_y;
     // red_line_start_x needs to be set for calcModDays; also set red_line_start_y for consistency
@@ -280,7 +287,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
     const X = math.matrix(x_matrix);
     const Y = math.matrix(y_matrix);
     const W = math.diag(weight);
-    
+
     let result = math.multiply(math.multiply(math.transpose(X),W),X);
     try {
         result = math.inv(result);
