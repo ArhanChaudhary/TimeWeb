@@ -130,6 +130,9 @@ $(function() {
             (sa.min_work_time*sa.ctime)||'',
         ];
         form_inputs.each((index, element) => $(element).val(form_data[index]));
+        setTimeout(function() {
+            $("#id_description").trigger("input");
+        }, 0);
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
             // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_breawk_days.includes(break_day));

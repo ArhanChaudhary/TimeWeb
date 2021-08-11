@@ -121,6 +121,11 @@ priority = {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
             sa.setParabolaValues();
+            if (params.first_sort) {
+                // Fix dynamic start if y or anything else was changed
+                // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
+                sa.setDynamicStartIfInDynamicMode();
+            }
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
@@ -197,8 +202,6 @@ priority = {
                     const mods = sa.calcModDays();
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
                 }
-                // Fix dynamic start if y or anything else was changed
-                if (params.first_sort) sa.setDynamicStartIfInDynamicMode();
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
