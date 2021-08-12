@@ -624,15 +624,6 @@ utils = {
                 if (!$("#form-wrapper .hidden-field").length) {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
-                if ($("#form-wrapper").is(":visible")) {
-                    // Save form data to localStorage before unload
-                    localStorage.setItem("form_fields",
-                        JSON.stringify([
-                            ...form_inputs.toArray().map(field => field.value),
-                            $("#form-wrapper #break-days-wrapper input").toArray().map(break_day_field => break_day_field.checked),
-                        ])
-                    );
-                }
                 // Send ajax before close if it's on timeout
                 if (ajaxUtils.attributeData['assignments'].length) {
                     ajaxUtils.SendAttributeAjax();
@@ -656,17 +647,6 @@ utils = {
                 if ("scroll" in localStorage) {
                     $("main").scrollTop(localStorage.getItem("scroll"));
                     localStorage.removeItem("scroll");
-                }
-                if ("form_fields" in localStorage) {
-                    // Restore form on refresh or invalid
-                    const pr_data = JSON.parse(localStorage.getItem("form_fields"));
-                    localStorage.removeItem('form_fields');
-                    form_inputs.each(function(index) {
-                        $(this).val(pr_data[index]);
-                    });
-                    $("#form-wrapper #break-days-wrapper input").each(function(index) {
-                        $(this).prop('checked', pr_data[pr_data.length - 1][index]);
-                    });
                 }
             });
         },
@@ -700,14 +680,14 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert({title: "Failed to connect", content: "We can't establish a connection with the server, check your connection and try again"});
+            $.alert({title: "Failed to connect", content: "We can't establish a connection with the server. Check your connection and try again"});
         } else if (response.status == 404) {
             $.alert({title: "Not found", content: "Try refreshing or trying again"});
         } else if (response.status == 500) {
             $.alert({title: "Internal server error", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
             utils.ui.setClickHandlers.mailtoLinks();
         } else if (exception === 'timeout') {
-            $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server<br>Try refreshing or try again"});
+            $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again"});
         } else if (exception === 'abort') {
             $.alert({title: "Request aborted", content: "Try refreshing or try again"});
         } else {
@@ -768,7 +748,7 @@ ajaxUtils = {
     SendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
-                $.alert({title: "An assignment takes up too much space and can no longer be saved", content: "An assignment has too many work inputs, try changing its assignment date to today to reset its work inputs"});
+                $.alert({title: "An assignment takes up too much space and can no longer be saved", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs"});
                 return;
             }
             gtag("event","save_assignment");

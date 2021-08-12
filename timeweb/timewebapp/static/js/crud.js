@@ -1,19 +1,5 @@
-/*
-This file includes the code for:
-
-Swapping assignments in real time
-Showing and hiding the new assignment form
-Form utilities to make inputs more convenient
-Updating assignments
-Deleting assignments
-
-This only runs on index.html
-*/
-// Note: edited assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
-
-
-
-// really really badly written code that I dont have time to rewrite
+// Edited assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
+// really really badly written code that I dont have time to rewrite :c
 function showForm(show_instantly=false) {
     if (show_instantly) {
         $('#overlay').show().children("#form-wrapper").css("top", 15);
@@ -89,7 +75,7 @@ function replaceUnit() {
     old_input_value = singularToLowerCase;
     $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#fields-wrapper").scrollTop());
 }
-$(function() {
+$(window).on("load", function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         // Set default values for a new form
@@ -184,12 +170,6 @@ $(function() {
     // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
     // Make this global so it can be used in saveAndLoadStates in utils.js
     form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
-    // "$(".error-note").length" is the same thing as {% field.errors %} in the template
-    if ($(".error-note").length) {
-        showForm(true); // Show instantly
-    } else {
-        hideForm(true); // Hide instantly
-    }
     // Sets custom error message
     form_inputs.on("input invalid",function(e) {
         let message;
@@ -251,8 +231,6 @@ $(function() {
             $(this).parents(".field-wrapper").prev().children("input, textarea").first().addClass("invalid");
         }
     });
-    // Focus on first invalid field
-    $("#form-wrapper .error-note").first().prev().children("input, textarea").first().focus();
     // Delete assignment
     transitionDeleteAssignment = function(dom_assignment) {
         const sa = utils.loadAssignmentData(dom_assignment);
@@ -359,6 +337,19 @@ $(function() {
             }
         });
     });
+    if ($(".error-note").length) {
+        showForm(true); // Show instantly
+    } else {
+        hideForm(true); // Hide instantly
+    }
+    invalidOnlyInAdvanced = function() {
+        return !!$("#form-wrapper .error-note").first().parents(".field-wrapper").prevAll().filter(function() {
+            return $(this).is("#form-wrapper #advanced-inputs");
+        }).length;
+    }
+    if (invalidOnlyInAdvanced()) {
+        $("#form-wrapper #advanced-inputs").click();
+    }
 });
 // Only change text of form label
 $.fn.onlyText = function(text) {

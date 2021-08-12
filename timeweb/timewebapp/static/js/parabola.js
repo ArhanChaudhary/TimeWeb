@@ -256,7 +256,15 @@ Assignment.prototype.autotuneSkewRatio = function() {
         // Add work_input_index === 0 because the above logic may skip over the first work input
         return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
     }.bind(this));
-    if (works_without_break_days.length > 2500) return;
+    const len_works_without_break_days = works_without_break_days.length - 1;
+
+    // In case there are less than three unique points to form a skew ratio
+    if (!len_works_without_break_days) {
+        this.sa.skew_ratio = 1;
+        ajaxUtils.SendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
+        return;
+    }
+
     const original_red_line_start_x = this.red_line_start_x;
     const original_red_line_start_y = this.red_line_start_y;
     // red_line_start_x needs to be set for calcModDays; also set red_line_start_y for consistency
@@ -268,6 +276,8 @@ Assignment.prototype.autotuneSkewRatio = function() {
         const mods = this.calcModDays();
         x1_from_blue_line_start -= Math.floor(x1_from_blue_line_start / 7) * this.sa.break_days.length + mods[x1_from_blue_line_start % 7]; // Handles break days, explained later
     }
+    // Roundoff errors happen at this many days
+    if (x1_from_blue_line_start > 10000) return;
 
     // The first part calculates the a and b values for the least squares curve from works_without_break_days using WLS quadratic regression
     // Using WLS, we can put a lot of weight on (0,0) and (x1_from_blue_line_start, y1_from_blue_line_start) to ensure the curve is valid by passing through these two points
@@ -276,28 +286,23 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for this algorithm!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3
     const x_matrix = works_without_break_days.map((work_input, work_input_index) => [work_input_index, Math.pow(work_input_index, 2)]);
-    x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
-
     const y_matrix = works_without_break_days.map(work_input => work_input - this.sa.works[0]);
-    y_matrix.push(y1_from_blue_line_start);
 
-    const weight = Array(works_without_break_days.length + 1).fill(1); // Add +1 for the y_matrix.push(y1)
-    weight[0] = 1e5;
-    weight[weight.length - 1] = 1e5;
+    // Don't add the same point again
+    if (len_works_without_break_days !== x1_from_blue_line_start) {
+        x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
+        y_matrix.push(y1_from_blue_line_start);
+    }
+
+    const transposed = math.clone(x_matrix);
+    transposed[transposed.length-1][0] *= 1e5;
+    transposed[transposed.length-1][1] *= 1e5;
+
     const X = math.matrix(x_matrix);
     const Y = math.matrix(y_matrix);
-    const W = math.diag(weight);
+    const T = math.transpose(math.matrix(transposed));
 
-    let result = math.multiply(math.multiply(math.transpose(X),W),X);
-    try {
-        result = math.inv(result);
-    } catch {
-        // In case there are less than three unique points to form a skew ratio
-        this.red_line_start_x = original_red_line_start_x;
-        this.red_line_start_y = original_red_line_start_y;
-        return;
-    }
-    result = math.multiply(math.multiply(result, math.multiply(math.transpose(X),W)),Y);
+    result = math.multiply(math.multiply(math.inv(math.multiply(T,X)),T),Y);
     let a = result._data[1];
     let b = result._data[0];
 
@@ -337,5 +342,11 @@ Assignment.prototype.autotuneSkewRatio = function() {
     if (!Number.isFinite(autotuned_skew_ratio)) return;
 
     this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+    const skew_ratio_bound = this.calcSkewRatioBound();
+    if (this.sa.skew_ratio > skew_ratio_bound) {
+        this.sa.skew_ratio = skew_ratio_bound;
+    } else if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
+        this.sa.skew_ratio = 2 - skew_ratio_bound;
+    }
     ajaxUtils.SendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
 }
