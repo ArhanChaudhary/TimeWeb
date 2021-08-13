@@ -130,7 +130,7 @@ $(function() {
             }
         }
     }
-    $(window).resize(resize).one("load", function() {
+    typeof resize !== 'undefined' && $(window).resize(resize).one("load", function() {
         resize();
         // Resize does nothing after load on mobile for some reason
         setTimeout(function() {

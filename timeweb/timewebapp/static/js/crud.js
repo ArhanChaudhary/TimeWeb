@@ -13,6 +13,7 @@ function showForm(show_instantly=false) {
         $("#image-new-container").blur();
     }
     $("main").css("overflow", "hidden");
+    old_input_value = undefined;
     replaceUnit();
 }
 function hideForm(hide_instantly=false) {

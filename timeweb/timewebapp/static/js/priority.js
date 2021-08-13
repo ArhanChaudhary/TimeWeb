@@ -203,6 +203,8 @@ priority = {
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
                 }
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
+                const todo_is_completed = todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start;
+                const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + sa.sa.blue_line_start + len_works) % 7) && due_date_minus_today !== 1;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
@@ -218,9 +220,13 @@ priority = {
                         width: 11,
                         height: 18,
                     }).css("margin-left", 2);
-                } else if (todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start) {
+                } else if (todo_is_completed || current_work_input_is_break_day) {
                     status_image = 'finished';
-                    status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
+                    if (todo_is_completed) {
+                        status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
+                    } else {
+                        status_message = 'Today is this Assignment\'s Break Day'
+                    }
                     dom_status_image.attr({
                         width: 15,
                         height: 15,
