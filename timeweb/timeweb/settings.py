@@ -39,9 +39,9 @@ PWA_APP_NAME = "TimeWeb PS" if DEBUG else "TimeWeb"
 PWA_APP_DESCRIPTION = "TimeWeb PS APP" if DEBUG else "TimeWeb App"
 PWA_APP_THEME_COLOR = '#ffffff'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
-PWA_APP_DISPLAY = 'minimal-ui'
+PWA_APP_DISPLAY = 'fullscreen'
 PWA_APP_SCOPE = '/'
-PWA_APP_ORIENTATION = 'landscape'
+PWA_APP_ORIENTATION = 'portrait'
 PWA_APP_START_URL = '/'
 PWA_APP_DIR = 'ltr'
 PWA_APP_LANG = 'en-US'
@@ -114,8 +114,8 @@ TEMPLATES = [
 LOGOUT_REDIRECT_URL = '/'
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 
-MAX_UPLOAD_SIZE = 5242880 # 40 MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1310720 # 10 MB (max size for data sent by ajax by assignments)
+MAX_UPLOAD_SIZE = 5242880 # 40 MiB (max background image size)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1310720 # 10 MiB (max size for data sent by ajax by assignments)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

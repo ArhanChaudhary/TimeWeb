@@ -1,19 +1,30 @@
 // Edited assignment transitions for easing in and color are handled in priority.js because that part of the code was more fitting to put there
-// really really badly written code that I dont have time to rewrite :c
+const FORM_ANIMATION_DURATION = 300;
+const DEFAULT_FORM_FIELDS = {
+    "#id_name": '',
+    "#id_assignment_date": utils.formatting.stringifyDate(date_now),
+    "#id_x": '',
+    "#id_unit": def_unit_to_minute ? "Minute" : '',
+    "#id_y": '',
+    "#id_works": '0',
+    "#id_ctime": '',
+    "#id_description": '',
+    "#id_funct_round": '',
+    "#id_min_work_time": +def_min_work_time||'',
+}
 function showForm(show_instantly=false) {
     if (show_instantly) {
         $('#overlay').show().children("#form-wrapper").css("top", 15);
     } else {
-        $("#overlay").fadeIn(300).children("#form-wrapper").animate({top: 15}, 300);
+        $("#overlay").fadeIn(FORM_ANIMATION_DURATION).children("#form-wrapper").animate({top: 15}, FORM_ANIMATION_DURATION);
         if (!isMobile) {
-            // Focus on first field
-            $("#id_name").focus();
+            form_inputs.first().focus();
+        } else {
+            $(document.activeElement).blur();
         }
-        // Mobile
-        $("#image-new-container").blur();
     }
     $("main").css("overflow", "hidden");
-    old_input_value = undefined;
+    old_unit_value = undefined;
     replaceUnit();
 }
 function hideForm(hide_instantly=false) {
@@ -21,16 +32,15 @@ function hideForm(hide_instantly=false) {
         $("#overlay").hide().children("#form-wrapper");
         $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
     } else {
-        $("#overlay").fadeOut(300,function() {
+        $("#overlay").fadeOut(FORM_ANIMATION_DURATION, function() {
             // Remove all error notes when form is exited
             $(".invalid").removeClass("invalid");
             $(".error-note").remove();
-        }).children("#form-wrapper").animate({top: "0"}, 300);
+        }).children("#form-wrapper").animate({top: 0}, FORM_ANIMATION_DURATION);
     }
     $("main").css("overflow", "overlay");
 }
-// Replace fields with unit when unit is any value or "Minute" or "Hour"
-let old_input_value;
+let old_unit_value;
 function replaceUnit() {
     const val = $("#id_unit").val().trim();
     const plural = pluralize(val),
@@ -64,26 +74,24 @@ function replaceUnit() {
             $("label[for='id_funct_round']").addClass("disabled-field");
         }
     } else {
-        old_input_value in units_of_time && $("#id_ctime").val("");
+        old_unit_value in units_of_time && $("#id_ctime").val("");
         $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
         $("label[for='id_ctime']").removeClass("disabled-field");   
     }
     if (def_funct_round_minute && singularToLowerCase !== "minute") {
-        old_input_value in units_of_time && $("#id_funct_round").val("");
+        old_unit_value in units_of_time && $("#id_funct_round").val("");
         $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
         $("label[for='id_funct_round']").removeClass("disabled-field");
     }
-    old_input_value = singularToLowerCase;
+    old_unit_value = singularToLowerCase;
     $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#fields-wrapper").scrollTop());
 }
-$(window).on("load", function() {
+$(window).one("load", function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
-        // Set default values for a new form
-        const default_form_fields = ['', utils.formatting.stringifyDate(date_now), '', def_unit_to_minute ? "Minute" : '', '', '0', '', '', '', +def_min_work_time||''];
-        default_form_fields.forEach(function(element, index) {
-            $(form_inputs[index]).val(element);
-        });
+        for (const field in DEFAULT_FORM_FIELDS) {
+            $(field).val(DEFAULT_FORM_FIELDS[field]);
+        }
         for (let break_day of Array(7).keys()) {
             // (break_days+6)%7) is for ordering I think
             // Treat this as: $("#id_break_days_"+break_days).prop("checked", def_break_days.includes(break_days));
@@ -107,7 +115,7 @@ $(window).on("load", function() {
         const form_data = [
             sa.name,
             utils.formatting.stringifyDate(sa.assignment_date),
-            utils.formatting.stringifyDate(x),
+            sa.x ? utils.formatting.stringifyDate(x) : '',
             sa.unit,
             sa.needs_more_info ? '' : sa.y,
             sa.works[0],
@@ -126,7 +134,7 @@ $(window).on("load", function() {
             $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
         $("#id_unit, #id_y, #id_works, #id_ctime").toggleClass("invalid", sa.needs_more_info);
-        $("#id_x").toggleClass("invalid", isNaN(x.getTime()));
+        $("#id_x").toggleClass("invalid", !sa.x);
         // Set button pk so it gets sent on post
         $("#submit-assignment-button").val(sa.id);
         showForm();
@@ -151,7 +159,7 @@ $(window).on("load", function() {
         bottom: 18,
     });
     $("#id_works").info('left',
-        `The following is only relevant if you are re-entering this field
+        `The following is only relevant if you're re-entering this field
 
         This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`,
     "after").css({
@@ -183,11 +191,7 @@ $(window).on("load", function() {
                     message = 'The assignment date is either out of range or invalid';
                     break;
                 case "id_x":
-                    if ($(this).val()) {
-                        message = 'The due date is either out of range or invalid';
-                    } else {
-                        return; // Allow blank field
-                    }
+                    message = 'The due date is either out of range or invalid';
                     break;
                 case "id_unit":
                     message = 'Please enter a name';

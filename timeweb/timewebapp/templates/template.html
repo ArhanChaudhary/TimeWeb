@@ -43,7 +43,7 @@
         <meta property="og:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}{% static 'images/icons/og.png' %}">
 
         <meta name="author" content="Arhan Chaudhary">
-        <meta name="viewport" content="width=device-width, initial-scale=0.55, maximum-scale=0.75">
+        <meta name="viewport" content="width=device-width, initial-scale=0.55, maximum-scale=1">
         <link rel="stylesheet" href="{% static 'vendor/normalize.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
         <link rel="stylesheet" href="{% static 'vendor/jquery-confirm.min.css' %}">
@@ -56,7 +56,6 @@
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
     <body tabindex="-1">
-        <div id="portrait-denial">Please change your device's orientation to landscape.</div>
         <div id="site">
             <header>
                 {% if user.is_authenticated and request.path == "/" %}
@@ -78,7 +77,6 @@
                         <div tabindex="1" id="username">
                             {{ user.get_username }}
                             <div id="account-dropdown">
-                                <span id="account-settings">Account settings</span>
                                 <a href="{% url 'logout' %}?next={{request.path}}">Log out</a>
                             </div>
                         </div>
@@ -93,10 +91,10 @@
                         </svg>
                     </div>
                     <div id="nav-items">
-                        <a href="{% url 'user-guide' %}">User Guide</a>
-                        <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
                         <span id="nav-a2hs">Install on Home Screen</span>
+                        <a href="{% url 'user-guide' %}">User Guide</a>
                         <a href="{% url 'changelog' %}">Changelog</a>
+                        <a href="#" id="nav-about">About Me</a> {% comment %} (credits, motives, etc) {% endcomment %}
                         <span id="nav-credits">Credits</span>
                         <a href="{% url 'policies' %}">Policies</a>
                         <a target='_blank' href='mailto:arhan.ch@gmail.com'>Contact Me</a>
@@ -124,9 +122,9 @@
                         <li><a href="https://fontmeme.com/fonts/alba-font/">TimeWeb logo</a></li>
                         <li><a href="https://www.pngitem.com/middle/TiRihwJ_plus-button-green-png-download-plus-button-green/">Plus icon</a></li>
                         <li><a href="https://adioma.com/icons/question-mark" target="_blank">Question mark icon</a> by <a href="https://adioma.com">Adioma</a></li>
-                        <li><a href="https://iconscout.com/icon/edit-1780339" target="_blank">Edit icon</a> by <a href="https://iconscout.com/contributors/google-inc">Google Inc.</a> on <a href="https://iconscout.com">Iconscout</a></li>
+                        <li><a href="https://iconscout.com/icon/edit-1780339" target="_blank">Edit icon</a> by <a href="https://iconscout.com/contributors/google-inc">Google Inc.</a> from <a href="https://iconscout.com">Iconscout</a></li>
                         <li><a href="https://www.flaticon.com/free-icon/trash_3096687" target="_blank">Trash icon</a> by <a href="https://www.flaticon.com/authors/bqlqn" title="bqlqn">bqlqn</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></li>
-                        <li><a href="https://iconscout.com/icon/caret-double-down-3609859" target="_blank">Caret double down icon</a> by <a href="https://iconscout.com/contributors/phosphoricons">Phosphor Icons</a> on <a href="https://iconscout.com">Iconscout</a></li>
+                        <li><a href="https://iconscout.com/icon/caret-double-down-3609859" target="_blank">Caret double down icon</a> by <a href="https://iconscout.com/contributors/phosphoricons">Phosphor Icons</a> from <a href="https://iconscout.com">Iconscout</a></li>
                         <li><a title="icona x png 6" href="https://pngimage.net/icona-x-png-6/">icona x png 6</a>
                     </ul>
                     Special thanks to these awesome people for contributing!

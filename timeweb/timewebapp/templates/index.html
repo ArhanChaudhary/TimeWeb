@@ -58,13 +58,13 @@
             {% endif %}
           {% endfor %}
         </div>
-        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %} type="submit" name="submit-button" id="submit-assignment-button" title="(Enter)">{{submit}}</button>
+        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" title="(Enter)">{{submit}}</button>
       </form>
     </div>
   </div>
   <div id="assignments-container">
     <div id="assignments-header">
-      <div id="info"{% if background_image %} class="add-white-shadow"{% endif %}>
+      <div id="info">
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
@@ -79,11 +79,13 @@
         <div id="close-assignments-icon-label">Close all Assignments</div>
       </div>
     </div>
-    <div id="simulated-date"{% if background_image %} class="add-white-shadow"{% endif %}></div>
+    <div id="simulated-date">
+      <span id="simulated-date-text"></span>
+    </div>
     <div id="autofill-work-done">
-      <div class="shortcut-line-left{% if background_image %} add-white-shadow{% endif %}"></div>
-      <div class="shortcut-line-right{% if background_image %} add-white-shadow{% endif %}"></div>
-      <span class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">
+      <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
+      <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
+      <span class="shortcut-text">
         Autofill
         <select id="autofill-selection">
           <option>No</option>
@@ -93,12 +95,12 @@
       </span>
     </div>
     <div id="delete-starred-assignments">
-      <div class="shortcut-line-left{% if background_image %} add-white-shadow{% endif %}"></div>
-      <div class="shortcut-line-right{% if background_image %} add-white-shadow{% endif %}"></div>
-      <span class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Starred Assignments</span>
+      <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
+      <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
+      <span class="shortcut-text">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container{% if background_image %} add-white-shadow{% endif %}"{% if assignment.name == request.session.added_assignment %} id="animate-in"{% elif assignment.name == request.session.edited_assignment %} id="animate-color"{% endif %}>
+      <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}"{% if assignment.name == just_created_assignment_name %} id="animate-in"{% elif assignment.name == just_updated_assignment_name %} id="animate-color"{% endif %}>
         <div class="assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <div class="relative-positioning-wrapper">
@@ -194,9 +196,9 @@
   </div>
   <template id="delete-gc-assignments-from-class-template">
     <div class="delete-gc-assignments-from-class">
-      <div class="shortcut-line-left{% if background_image %} add-white-shadow{% endif %}"></div>
-      <div class="shortcut-line-right{% if background_image %} add-white-shadow{% endif %}"></div>
-      <span class="shortcut-text{% if background_image %} add-white-shadow{% endif %}">Delete all Assignments from this Class</span>
+      <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
+      <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
+      <span class="shortcut-text">Delete all Assignments from this Class</span>
     </div>
   </template>
   <template id="tag-add-selection-item-template">

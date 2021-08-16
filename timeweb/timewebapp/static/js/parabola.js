@@ -258,13 +258,6 @@ Assignment.prototype.autotuneSkewRatio = function() {
     }.bind(this));
     const len_works_without_break_days = works_without_break_days.length - 1;
 
-    // In case there are less than three unique points to form a skew ratio
-    if (!len_works_without_break_days) {
-        this.sa.skew_ratio = 1;
-        ajaxUtils.SendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
-        return;
-    }
-
     const original_red_line_start_x = this.red_line_start_x;
     const original_red_line_start_y = this.red_line_start_y;
     // red_line_start_x needs to be set for calcModDays; also set red_line_start_y for consistency
@@ -276,9 +269,8 @@ Assignment.prototype.autotuneSkewRatio = function() {
         const mods = this.calcModDays();
         x1_from_blue_line_start -= Math.floor(x1_from_blue_line_start / 7) * this.sa.break_days.length + mods[x1_from_blue_line_start % 7]; // Handles break days, explained later
     }
-    // Roundoff errors happen at this many days
+    // Roundoff errors
     if (x1_from_blue_line_start > 10000) return;
-
     // The first part calculates the a and b values for the least squares curve from works_without_break_days using WLS quadratic regression
     // Using WLS, we can put a lot of weight on (0,0) and (x1_from_blue_line_start, y1_from_blue_line_start) to ensure the curve is valid by passing through these two points
     // NOTE: don't worry about the fact that a large weight doesn't cause the parabola to exactly pass through these points. The a and b values are converted to valid skew ratio values
@@ -288,55 +280,62 @@ Assignment.prototype.autotuneSkewRatio = function() {
     const x_matrix = works_without_break_days.map((work_input, work_input_index) => [work_input_index, Math.pow(work_input_index, 2)]);
     const y_matrix = works_without_break_days.map(work_input => work_input - this.sa.works[0]);
 
-    // Don't add the same point again
+    // Add the last point if it wasn't already added (to ensure the next statement doesn't yield a false positive)
     if (len_works_without_break_days !== x1_from_blue_line_start) {
         x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
         y_matrix.push(y1_from_blue_line_start);
     }
 
-    const transposed = math.clone(x_matrix);
-    transposed[transposed.length-1][0] *= 1e5;
-    transposed[transposed.length-1][1] *= 1e5;
+    let autotuned_skew_ratio;
+    if (y_matrix.length >= 3) {
+        const transposed = math.clone(x_matrix);
+        transposed[transposed.length-1][0] *= 1e5;
+        transposed[transposed.length-1][1] *= 1e5;
 
-    const X = math.matrix(x_matrix);
-    const Y = math.matrix(y_matrix);
-    const T = math.transpose(math.matrix(transposed));
+        const X = math.matrix(x_matrix);
+        const Y = math.matrix(y_matrix);
+        const T = math.transpose(math.matrix(transposed));
 
-    result = math.multiply(math.multiply(math.inv(math.multiply(T,X)),T),Y);
-    let a = result._data[1];
-    let b = result._data[0];
+        result = math.multiply(math.multiply(math.inv(math.multiply(T,X)),T),Y);
+        let a = result._data[1];
+        let b = result._data[0];
 
-    // The second part's goal is to now "transfer" the skew ratio value from x1_from_blue_line_start to x1
-    // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
-    // For instance, low skew ratios never allow users to do work because the start keeps changing
-    // Instead, we need to do this a different way
-    // We take the point of x1_from_blue_line_start and subtract it by a small value, in this case 0.01
-    // Then, once the scope of the skew ratio changes to x1, connect (0,0), the point, and (x1, y1) to get the autotuned skew ratio
-    const third_point_step = 0.01;
-    let x2 = x1_from_blue_line_start - third_point_step;
-    let y2 = x2 * (a * x2 + b);
+        // The second part's goal is to now "transfer" the skew ratio value from x1_from_blue_line_start to x1
+        // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
+        // For instance, low skew ratios never allow users to do work because the start keeps changing
+        // Instead, we need to do this a different way
+        // We take the point of x1_from_blue_line_start and subtract it by a small value, in this case 0.01
+        // Then, once the scope of the skew ratio changes to x1, connect (0,0), the point, and (x1, y1) to get the autotuned skew ratio
+        const third_point_step = 0.01;
+        let x2 = x1_from_blue_line_start - third_point_step;
+        let y2 = x2 * (a * x2 + b);
 
-    // Change the scope of the skew ratio to x1
-    this.red_line_start_x = original_red_line_start_x;
-    this.red_line_start_y = original_red_line_start_y;
-    let x1 = this.sa.x - this.red_line_start_x;
-    let y1 = this.sa.y - this.red_line_start_y;
-    if (this.sa.break_days.length) {
-        const mods = this.calcModDays();
-        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7]; // Handles break days, explained later
+        // Change the scope of the skew ratio to x1
+        this.red_line_start_x = original_red_line_start_x;
+        this.red_line_start_y = original_red_line_start_y;
+        let x1 = this.sa.x - this.red_line_start_x;
+        let y1 = this.sa.y - this.red_line_start_y;
+        if (this.sa.break_days.length) {
+            const mods = this.calcModDays();
+            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7]; // Handles break days, explained later
+        }
+        // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
+        // y1_from_blue_line_start - y1 simplifies to red_line_start_y - works[0]
+        // Translate the point to the scope of x1
+        x2 -= x1_from_blue_line_start - x1;
+        y2 -= y1_from_blue_line_start - y1;
+        const parabola = this.calcAandBfromOriginAndTwoPoints([x2, y2], [x1, y1]);
+        autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+    } else {
+        // A parabola cannot be defined by two or less points; instead connect a line
+        autotuned_skew_ratio = 1;
     }
-    // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
-    // y1_from_blue_line_start - y1 simplifies to red_line_start_y - works[0]
-    // Translate the point to the scope of x1
-    x2 -= x1_from_blue_line_start - x1;
-    y2 -= y1_from_blue_line_start - y1;
-    const parabola = this.calcAandBfromOriginAndTwoPoints([x2, y2], [x1, y1]);
+    
     // Finally, we need to set an autotune factor
     // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
     // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
     // This way ensures the autotune becomes more effective as more data points are made available for the regression
     let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
-    let autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
 
     // Zero division somewhere
     if (!Number.isFinite(autotuned_skew_ratio)) return;

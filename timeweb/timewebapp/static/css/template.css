@@ -2,26 +2,6 @@
 * {
     font-family: "Open Sans", sans-serif;
 }
-/* Unused for now but won't remove */
-#portrait-denial {
-    display: none !important;
-    position: absolute;
-    align-items: center;
-    text-align: center;
-    z-index: 9999;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    font-size: 6vw;
-    font-family: 'Roboto Slab';
-    background: white;
-}
-@media only screen and (hover: none) and (pointer: coarse) and (orientation: portrait) {
-    #portrait-denial {
-        display: flex;
-    }
-}
 input, textarea {
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -155,7 +135,7 @@ body {
 #account-dropdown {
     display: none;
     right: 50%;
-    width: 150px;
+    width: 100px;
     position: absolute;
     background: rgb(43, 56, 68);
     color: white;

@@ -25,7 +25,7 @@ $(function() {
         
         This is recommended to be enabled`
     );
-    $("#reset-button").click(function() {
+    $("#reset-settings-button").click(function() {
         $("#id_def_min_work_time").val("");
         $("#id_def_skew_ratio").val(0);
         $("#break-days-wrapper input").prop("checked", false);
@@ -46,5 +46,6 @@ $(function() {
     });
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
+        $("#submit-settings-button").attr("disabled", true);
     });
 });

@@ -45,14 +45,18 @@ header.animate::after {
     flex-wrap: wrap;
 }
 #info {
+    background-color: rgb(214, 214, 214);
     display: inline;
     font-size: 17px;
 }
 #simulated-date {
     position: relative;
-    z-index: -1;
     padding: 0 10px;
     font-size: 17px;
+}
+/* Helps with background color */
+#simulated-date-text {
+    background-color: rgb(214, 214, 214);
 }
 #hide-button {
     cursor: pointer;
@@ -175,12 +179,16 @@ header.animate::after {
     margin-top: -7px;
 }
 .shortcut-text {
-    left: 0;
-    right: 0;
-    margin-top: -10px;
-    text-align: center;
     position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: -10px;
+    background-color: rgb(214, 214, 214);
     cursor: pointer;
+}
+/* Info buttons */
+.shortcut-text:hover {
+    z-index: 1000;
 }
 #autofill-selection {
     vertical-align: top;
@@ -940,8 +948,8 @@ input[type=number]::-webkit-inner-spin-button {
     position: fixed;
     height: 50px;
     border-radius: 25px;
-    right: 10px;
-    bottom: 10px;
+    right: 15px;
+    bottom: 15px;
     padding: 4px;
     box-sizing: border-box;
     text-align: right;
@@ -949,6 +957,12 @@ input[type=number]::-webkit-inner-spin-button {
     cursor: pointer;
     z-index: 1000;
     box-shadow: 0 0 5px 1px black;
+}
+#toggle-gc-container.scale-on-mobile {
+    right: 20px;
+    bottom: 30px;
+    transform: scale(1.5);
+    transform-origin: right;
 }
 #toggle-gc-label {
     width: 0;
@@ -974,16 +988,16 @@ input[type=number]::-webkit-inner-spin-button {
 #toggle-gc-container.open #toggle-gc-label {
     width: 333px;
 }
-:not(.assignment-container).add-white-shadow {
+:not(.assignment-container).difference-blend-mode {
     mix-blend-mode: difference;
     color: white;
 }
-.shortcut-line-right.add-white-shadow, .shortcut-line-left.add-white-shadow,
-.shortcut-line-left.add-white-shadow::after {
+.shortcut-line-right.difference-blend-mode, .shortcut-line-left.difference-blend-mode,
+.shortcut-line-left.difference-blend-mode::after {
     border-color: white !important;
 }
-.assignment-container.add-white-shadow::before,
-.assignment-container.add-white-shadow::after {
+.assignment-container.difference-blend-mode::before,
+.assignment-container.difference-blend-mode::after {
     mix-blend-mode: difference;
     border-color: white !important;
 }

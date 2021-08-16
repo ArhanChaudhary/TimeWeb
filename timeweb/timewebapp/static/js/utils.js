@@ -55,7 +55,8 @@ utils = {
                     $("#estimated-total-time, #current-time, #tomorrow-time").toggle();
                 });
                 if ("hide-button" in localStorage) {
-                    $("#hide-button").html("Show").prev().toggle();
+                    $("#hide-button").html("Show");
+                    $("#tomorrow-time").toggle();
                 }
             },
 
@@ -97,7 +98,7 @@ utils = {
                     }
                 });
                 if (isExampleAccount) {
-                    $("#simulated-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                    $("#simulated-date-text").text("Simulated example account date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long', year: 'numeric'}));
                 } else {
                     $("#simulated-date").hide(); 
                 }
@@ -105,7 +106,8 @@ utils = {
                     in_next_day = true;
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
-                    $("#simulated-date").show().text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                    $("#simulated-date").show();
+                    $("#simulated-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                     priority.sort();
                 });
                 $("#next-day-icon-label").info("bottom",
@@ -281,14 +283,6 @@ utils = {
                             }
                         }
                     });
-                });
-            },
-            mailtoLinks: function() {
-                $("a[href^='mdailto']").click(function(e) {
-                    e.preventDefault();
-                    const href = $(this).attr("href");
-                    const target = $(this).attr("target") || '_self';
-                    window.open(href, target);
                 });
             },
         },
@@ -495,11 +489,15 @@ utils = {
         },
         setKeybinds: function() {
             $(document).keydown(function(e) {
-                if (e.key === "Tab") {
+                if (e.shiftKey /* shiftKey needed if the user presses caps lock */ && e.key === 'N' && $(document.activeElement).prop("type") !== "text") {
+                    if (!$("#overlay").is(":visible")) {
+                        $("#image-new-container").click();
+                    }
+                } else if (e.key === "Tab") {
                     // Prevent tabbing dispositioning screen
                     setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
                 } else if (e.key === "Escape") {
-                    hideForm()
+                    hideForm();
                 } else if (e.key === "ArrowDown" && e.shiftKey) {
                     // If there is an open assignment in view, select that one and 
                     const first_open_assignment = $(".assignment.open-assignment").first();
@@ -608,6 +606,21 @@ utils = {
                 }
             });
         },
+        exampleAccountAlertTutorial: function() {
+            $.alert({
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like",
+                onClose: function() {
+                    $.alert({
+                        title: "A few things to note:<br>The example account's internal date is frozen at May 3, 2021 for consistency, and no modifications to this account are saved",
+                        onClose: function() {
+                            $.alert({
+                                title: "With that out of the way, feel free to do whatever you want over here",
+                            });
+                        }
+                    });
+                }
+            });
+        },
         saveAndLoadStates: function() {
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
             $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
@@ -650,6 +663,9 @@ utils = {
                 }
             });
         },
+        scaleGoogleClassroomAPIIconOnMobile: function() {
+            $("#toggle-gc-container").addClass("scale-on-mobile");
+        }
     },
     after_midnight_hour_to_update: after_midnight_hour_to_update,
     reloadAfterMidnightHourToUpdate: function() {
@@ -685,7 +701,6 @@ ajaxUtils = {
             $.alert({title: "Not found", content: "Try refreshing or trying again"});
         } else if (response.status == 500) {
             $.alert({title: "Internal server error", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
-            utils.ui.setClickHandlers.mailtoLinks();
         } else if (exception === 'timeout') {
             $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again"});
         } else if (exception === 'abort') {
@@ -773,11 +788,6 @@ ajaxUtils = {
         }
     },
 }
-// Prevents submitting form on refresh
-// https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
-if ( window.history.replaceState ) {
-    window.history.replaceState( null, null, window.location.href );
-}
 $.fn.reverse = Array.prototype.reverse;
 ({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
@@ -797,13 +807,14 @@ for (let sa of dat) {
     // Add half a day and flooring it rounds it
     sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
     sa.assignment_date.setHours(0,0,0,0);
-
-    sa.x = new Date(sa.x);
-    sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
-    sa.x.setHours(0,0,0,0);
-    sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
-    if (sa.name === example_assignment_name) {
-        sa.assignment_date = new Date(date_now.valueOf());
+    if (sa.x) {
+        sa.x = new Date(sa.x);
+        sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
+        sa.x.setHours(0,0,0,0);
+        sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
+        if (sa.name === example_assignment_name) {
+            sa.assignment_date = new Date(date_now.valueOf());
+        }
     }
     sa.y = +sa.y;
     sa.ctime = +sa.ctime;
@@ -856,14 +867,15 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.autofillWorkDone();
-    utils.ui.setClickHandlers.mailtoLinks();
+    if (isExampleAccount) {
+        utils.ui.exampleAccountAlertTutorial();
+    }
+    if (isMobile) {
+        utils.ui.scaleGoogleClassroomAPIIconOnMobile();
+    }
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();
     utils.ui.saveAndLoadStates();
     utils.ui.handleTutorialIntroduction();
 });
-// Lock to landscape
-if (!navigator.xr && self.isMobile && screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape');
-}

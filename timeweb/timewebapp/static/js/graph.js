@@ -48,7 +48,7 @@ class Assignment {
         const len_works = this.sa.works.length - 1;
 
         let low = this.sa.blue_line_start;
-        let high = len_works + this.sa.blue_line_start - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start
+        let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
         while (low < high) {
             const mid = Math.floor((low + high) / 2);
             this.red_line_start_x = mid;

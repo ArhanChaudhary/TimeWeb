@@ -164,7 +164,7 @@ priority = {
                 }).css("margin-left", 2);
             } else if (last_work_input >= sa.sa.y) {
                 status_image = "completely-finished";
-                status_message = 'You are Completely Finished with this Assignment';
+                status_message = 'You\'re Completely Finished with this Assignment';
                 dom_status_image.attr({
                     width: 16,
                     height: 16,
@@ -223,7 +223,7 @@ priority = {
                 } else if (todo_is_completed || current_work_input_is_break_day) {
                     status_image = 'finished';
                     if (todo_is_completed) {
-                        status_message = 'Nice Job! You are Finished with this Assignment\'s Work for Today';
+                        status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
                     } else {
                         status_message = 'Today is this Assignment\'s Break Day'
                     }
@@ -491,22 +491,19 @@ priority = {
         } else if (!total) {
             $("#info").show();
             $("#simulated-date").css({
-                marginTop: "", 
+                marginTop: "",
                 transform: "",
             });
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
-            $("#current-time, #tomorrow-time").hide();
-            // Use visibility instead of display
-            $("#hide-button").css("visibility", "hidden");
+            $("#current-time, #tomorrow-time, #hide-button").hide();
         } else {
-            $("#current-time, #tomorrow-time, #info").show();
+            $("#current-time, #tomorrow-time, #hide-button, #info").show();
             $("#simulated-date").css({
-                marginTop: "", 
+                marginTop: "",
                 transform: "",
             });
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
-            $("#hide-button").css("visibility", "");
         }
         utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
         utils.ui.tickClock();

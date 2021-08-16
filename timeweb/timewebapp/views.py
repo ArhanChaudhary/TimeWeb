@@ -42,10 +42,10 @@ else:
 editing_example_account = False
 
 after_midnight_hour_to_update = 4
-example_account_name = "Example"#+"e"
+example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 25
-MAX_NUMBER_TAGS = 5
+MAX_NUMBER_TAGS = 10
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -92,7 +92,7 @@ def get_default_context():
         "DEBUG": settings.DEBUG,
     }
 class SettingsView(LoginRequiredMixin, View):
-    login_url = '/login/login/'
+    login_url = '/login/login/?next=/'
 
     def __init__(self):
         self.context = get_default_context()
@@ -169,7 +169,7 @@ class SettingsView(LoginRequiredMixin, View):
         return render(request, "settings.html", self.context)
 
 class TimewebView(LoginRequiredMixin, View):
-    login_url = '/login/login/'
+    login_url = '/login/login/?next=/'
 
     def __init__(self):
         self.context = get_default_context()
@@ -187,10 +187,11 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
-    def get(self,request):
+    def get(self, request, just_created_assignment_name=False, just_updated_assignment_name=False):
+        
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day or 1:
+        if timezone.localtime(User.objects.get(username=request.user).last_login).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
@@ -198,24 +199,14 @@ class TimewebView(LoginRequiredMixin, View):
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
 
+        # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
+        if just_created_assignment_name:
+            self.context['just_created_assignment_name'] = just_created_assignment_name
+        elif just_updated_assignment_name:
+            self.context['just_updated_assignment_name'] = just_updated_assignment_name
+            
         logger.info(f'User \"{request.user}\" is now viewing the home page')
-        try:
-            # self.assignment_form_submitted() adds the assignment's name to request.session['added_assignment'] if it was created or request.session['edited_assignment'] if it was edited
-            # I used sessions as a way to preserve a value during a post-get request
-            # The session value is passed to index.html, which adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-            # Once the response has been rendered, delete the key value to ensure that "#animate-in" and "#animate-color" is only applied once
-            try:
-                request.session['added_assignment']
-                response = render(request, "index.html", self.context)
-                del request.session['added_assignment']
-                return response
-            except:
-                request.session['edited_assignment']
-                response = render(request, "index.html", self.context)
-                del request.session['edited_assignment']
-                return response
-        except:
-            return render(request, "index.html", self.context)
+        return render(request, "index.html", self.context)
 
     def post(self,request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
@@ -240,14 +231,15 @@ class TimewebView(LoginRequiredMixin, View):
             return self.tag_add_or_delete(request, action)
         return HttpResponse(status=204)
     def assignment_form_submitted(self, request):
-        # The frontend adds the assignment's pk as a "value" attribute to the submit button
+        # The frontend adds the assignment's pk as the "value" attribute to the submit button
         self.pk = request.POST['submit-button']
         if self.pk == '':
-            # If no pk was added, then the assignment was created
             self.pk = None
             self.created_assignment = True
+            self.updated_assignment = False
         else:
             self.created_assignment = False
+            self.updated_assignment = True
         self.form = TimewebForm(data=request.POST, files=request.FILES)
 
         # Parts of the form that can only validate in views
@@ -281,11 +273,11 @@ class TimewebView(LoginRequiredMixin, View):
             first_work = d(self.sm.works)
             # Fill in foreignkey
             self.sm.user = User.objects.get(username=request.user)
-        else:
+        elif self.updated_assignment:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
-                return HttpResponseForbidden("The assignment you are trying to edit isn't yours")
+                return HttpResponseForbidden("The assignment you're trying to edit isn't yours")
             if self.isExampleAccount and not editing_example_account:
                 return redirect(request.path_info)
             # old_data is needed for readjustments
@@ -346,7 +338,7 @@ class TimewebView(LoginRequiredMixin, View):
                     x_num = (self.sm.y - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
                 else:
                     x_num = (self.sm.y - first_work)/self.sm.funct_round
-            else:
+            elif self.updated_assignment:
                 if self.sm.min_work_time:
                     x_num = (self.sm.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
                 else:
@@ -365,7 +357,7 @@ class TimewebView(LoginRequiredMixin, View):
                 assign_day_of_week = self.sm.assignment_date.weekday()
                 red_line_start_x = self.sm.blue_line_start
 
-                # set_mod_days()
+                # Terrible implementation of inversing calcModDays
                 xday = assign_day_of_week + red_line_start_x
                 mods = [0]
                 mod_counter = 0
@@ -405,7 +397,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.works = [str(first_work)]  
         elif self.created_assignment:
             self.sm.works = [str(self.sm.works)] # Same as str(first_work)
-        else:
+        elif self.updated_assignment:
             # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
             removed_works_end = len(old_data.works) - 1
             end_of_works = (self.sm.x - old_data.assignment_date).days
@@ -427,18 +419,17 @@ class TimewebView(LoginRequiredMixin, View):
         self.sm.needs_more_info = False
         self.sm.save()
         if self.created_assignment:
-            request.session['added_assignment'] = self.sm.name
             logger.info(f'User \"{request.user}\" added assignment "{self.sm.name}"')
-        else:
-            request.session['edited_assignment'] = self.sm.name    
+            return self.get(request, just_created_assignment_name=self.sm.name)
+        elif self.updated_assignment:
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
-        return redirect(request.path_info)
+            return self.get(request, just_updated_assignment_name=self.sm.name)
 
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
         if self.created_assignment:
             self.context['submit'] = 'Create Assignment'
-        else:
+        elif self.updated_assignment:
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form
@@ -477,7 +468,7 @@ class TimewebView(LoginRequiredMixin, View):
         service = build('classroom', 'v1', credentials=credentials)
 
         def add_gc_assignments_from_response(response_id, course_coursework, exception):
-            if not course_coursework or type(exception) is HttpError: # HttpError for permission denied (ex if you are the teacher of a class)
+            if not course_coursework or type(exception) is HttpError: # HttpError for permission denied (ex if you're the teacher of a class)
                 return
             course_coursework = course_coursework['courseWork']
             for assignment in course_coursework:
@@ -578,7 +569,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm = get_object_or_404(TimewebModel, pk=int(pk))
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't delete an assignment that isn't their's")
-                return HttpResponseForbidden("The assignment you are trying to delete isn't yours")
+                return HttpResponseForbidden("The assignment you're trying to delete isn't yours")
             self.sm.delete()
             logger.info(f'User \"{request.user}\" deleted assignment "{self.sm.name}"')
         return HttpResponse(status=204)
@@ -659,8 +650,10 @@ class TimewebView(LoginRequiredMixin, View):
     #     return HttpResponse(status=204)
 
 class GCOAuthView(LoginRequiredMixin, View):
-    login_url = '/login/login/'
+    login_url = '/login/login/?next=/'
     def get(self, request):
+        self.isExampleAccount = request.user.username == example_account_name
+        if self.isExampleAccount: return redirect("home")
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         # Callback URI
         state = request.GET.get('state', None)
@@ -745,7 +738,7 @@ class GCOAuthView(LoginRequiredMixin, View):
         #         pass
 
 class ImagesView(LoginRequiredMixin, View):
-    login_url = '/login/login/'
+    login_url = '/login/login/?next=/'
 
     def __init__(self):
         self.context = get_default_context()
