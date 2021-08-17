@@ -49,9 +49,7 @@ $(function() {
         $("#id_password").val("exampleaccount");
         $("#submit-button").click();
     });
-    let submitted = false;
     $("#form-wrapper form").submit(function() {
-        if (submitted) return;
-        submitted = true;
+        $("#submit-button").attr("disabled", true);
     });
 });

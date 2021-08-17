@@ -101,51 +101,51 @@ Assignment.prototype.setParabolaValues = function() {
     } else {
         this.return_y_cutoff = 1;
     }
-    if (this.return_y_cutoff < 2500) {
-        let output;
-        for (;this.return_y_cutoff > 1; this.return_y_cutoff--) {
-            // do ceil-1 instead of floor because ceil-1 is inclusive of ints; lower_output_diff is the difference between y and the output of the value one less than lower_return_y_cutoff
-            output = this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
-            if (output <= this.sa.y - this.min_work_time_funct_round) break;
+    let output;
+    let left;
+    let right;
+
+    left = 0;
+    right = Math.ceil(this.return_y_cutoff);
+    while (left < right) {
+        const mid = left + Math.floor((right - left) / 2);
+
+        output = this.funct(mid, {translateX: false});
+        if (output <= this.sa.y - this.min_work_time_funct_round) {
+            left = mid + 1;
+        } else {
+            right = mid;
         }
-        // If loop doesn't run, then 0 < return_y_cutoff <= 1, meaning the untranslated output must be 0
-        if (!(this.return_y_cutoff > 1)) {
-            output = this.red_line_start_y;
-        }
-
-        // let left = 1;
-        // let right = this.return_y_cutoff;
-        // while (left < right) {
-        //     const mid = left + Math.floor((right - left) / 2);
-
-        //     output = this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
-        //     if (!(output <= this.sa.y - this.min_work_time_funct_round)) {
-        //         right = mid;
-        //     } else {
-        //         left = mid + 1;
-        //     }
-        // }
-        // output = left;
+    }
+    this.return_y_cutoff = left;
+    output = this.funct(this.return_y_cutoff - 1, {translateX: false});
 
 
-        if (ignore_ends && this.sa.min_work_time) {
-            const lower_return_y_cutoff = this.return_y_cutoff;
-            const lower_output_diff = this.sa.y - output;
-            // If loop doesn't run, then x1 - 1 < return_y_cutoff <= x1
-            output = this.sa.y - this.funct(Math.ceil(this.return_y_cutoff - 1), {translateX: false});
-            for (;this.return_y_cutoff <= x1 - 1; this.return_y_cutoff++) {
-                const next_output = this.funct(Math.floor(this.return_y_cutoff + 1), {translateX: false});
-                // Leave output at the value before this
-                if (next_output >= this.sa.y) break;
-                output = next_output;
-            }
-            const upper_return_y_cutoff = this.return_y_cutoff;
-            const upper_output_diff = this.sa.y - output;
-            if (this.min_work_time_funct_round > (upper_output_diff + lower_output_diff) / 2) {
-                this.return_y_cutoff = lower_return_y_cutoff;
+    if (ignore_ends && this.sa.min_work_time) {
+        const lower_return_y_cutoff = this.return_y_cutoff;
+        const lower_output_diff = this.sa.y - output;
+
+        left = lower_return_y_cutoff;
+        right = x1;
+        while (left < right) {
+            const mid = left + Math.floor((right - left) / 2);
+
+            output = this.funct(mid, {translateX: false});
+            if (output < this.sa.y) {
+                left = mid + 1;
             } else {
-                this.return_y_cutoff = upper_return_y_cutoff;
+                right = mid;
             }
+        }
+        this.return_y_cutoff = left;
+        output = this.funct(this.return_y_cutoff - 1, {translateX: false});
+
+        const upper_return_y_cutoff = this.return_y_cutoff;
+        const upper_output_diff = this.sa.y - output;
+        if (this.min_work_time_funct_round > (upper_output_diff + lower_output_diff) / 2) {
+            this.return_y_cutoff = lower_return_y_cutoff;
+        } else {
+            this.return_y_cutoff = upper_return_y_cutoff;
         }
     }
     if (ignore_ends && this.sa.min_work_time) {
@@ -166,36 +166,48 @@ Assignment.prototype.setParabolaValues = function() {
     } else {
         this.return_0_cutoff = 0;
     }
-    if (x1 - this.return_0_cutoff < 2500) {
-        let output;
-        for (;this.return_0_cutoff < x1 - 1; this.return_0_cutoff++) {
-            output = this.funct(Math.floor(this.return_0_cutoff + 1), {translateX: false});
-            if (output >= this.min_work_time_funct_round + this.red_line_start_y) break;
-        }
-        if (!(this.return_0_cutoff < x1 - 1)) {
-            // If loop doesn't run, then x1 - 1 <= this.return_0_cutoff < x1, meaning that the output must be this.sa.y
-            // If the loops reaches the end, output has to be this.sa.y as that's the end of funct
-            output = this.sa.y;
-        }
-        if (ignore_ends && this.sa.min_work_time) {
-            const upper_return_0_cutoff = this.return_0_cutoff;
-            const upper_output_diff = output;
 
-            // If loop doesn't run, then 0 <= this.return_0_cutoff < 1
-            output = this.funct(Math.floor(this.return_0_cutoff + 1), {translateX: false}) - this.red_line_start_y;
-            for (;this.return_0_cutoff >= 1; this.return_0_cutoff--) {
-                const next_output = this.funct(Math.ceil(this.return_0_cutoff - 1), {translateX: false});
-                if (next_output <= this.red_line_start_y) break;
-                output = next_output;
-            }
-            const lower_return_0_cutoff = this.return_0_cutoff;
-            const lower_output_diff = output;
-            // Pick whichever cutoff its output diff is closest to
-            if (this.min_work_time_funct_round > (lower_output_diff + upper_output_diff) / 2) {
-                this.return_0_cutoff = upper_return_0_cutoff;
+    left = Math.floor(this.return_0_cutoff);
+    right = x1;
+    while (left < right) {
+        const mid = left + Math.floor((right - left) / 2);
+
+        output = this.funct(mid, {translateX: false});
+        if (output < this.min_work_time_funct_round + this.red_line_start_y) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    this.return_0_cutoff = left - 1;
+    output = this.funct(this.return_0_cutoff + 1, {translateX: false});
+    
+    if (ignore_ends && this.sa.min_work_time) {
+        const upper_return_0_cutoff = this.return_0_cutoff;
+        const upper_output_diff = output - this.red_line_start_y;
+
+        left = 0;
+        right = upper_return_0_cutoff + 1;
+        while (left < right) {
+            const mid = left + Math.floor((right - left) / 2);
+
+            output = this.funct(mid, {translateX: false});
+            if (output <= this.red_line_start_y) {
+                left = mid + 1;
             } else {
-                this.return_0_cutoff = lower_return_0_cutoff;
+                right = mid;
             }
+        }
+        this.return_0_cutoff = left - 1;
+        output = this.funct(this.return_0_cutoff + 1, {translateX: false});
+
+        const lower_return_0_cutoff = this.return_0_cutoff;
+        const lower_output_diff = output - this.red_line_start_y;
+        // Pick whichever cutoff its output diff is closest to
+        if (this.min_work_time_funct_round > (lower_output_diff + upper_output_diff) / 2) {
+            this.return_0_cutoff = upper_return_0_cutoff;
+        } else {
+            this.return_0_cutoff = lower_return_0_cutoff;
         }
     }
 }
@@ -226,7 +238,7 @@ Assignment.prototype.funct = function(x, params={}) {
     return mathUtils.precisionRound(output + this.red_line_start_y, max_length_funct_round);
 }
 Assignment.prototype.calcModDays = function() {
-    // 
+    // explain this later
     let mods = [0],
         mod_counter = 0;
     for (let mod_day = 0; mod_day < 6; mod_day++) {

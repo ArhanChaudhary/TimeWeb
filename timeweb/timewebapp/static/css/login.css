@@ -64,15 +64,15 @@
     left: 30px;
     margin: -10px;
     position: absolute;
-    height: 4268px;
+    height: 2452px;
     width: calc(100% - 40px);
-    background-image: url(/static/images/wider-scroller.png);
+    background-image: url(/static/images/wide-scroller.png);
     background-size: 100%;
     z-index: -2;
     opacity: 0;
-    top: 75px; /* Override flexbox */
-    -webkit-animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
-            animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
+    top: 10px; /* Override flexbox */
+    -webkit-animation: slide 100s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
+            animation: slide 100s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
     -webkit-animation-fill-mode: forwards;
             animation-fill-mode: forwards;
 }
@@ -87,12 +87,7 @@
         display: flex !important;
     }
     #image {
-        -webkit-animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
-                animation: slide 200s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
-        -webkit-animation-fill-mode: forwards;
-                animation-fill-mode: forwards;
-        height: 4126px;
-        background-image: url(/static/images/shorter-scroller.png);
+        background-image: url(/static/images/narrow-scroller.png);
     }
 }
 #login span {
