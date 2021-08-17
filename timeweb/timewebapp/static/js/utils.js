@@ -47,16 +47,26 @@ utils = {
                 $("#hide-button").click(function() {
                     if ($(this).html() === "Hide") {
                         $(this).html("Show");
+                        $("#estimated-total-time, #current-time, #tomorrow-time").css({
+                            height: 0,
+                            width: 0,
+                            overflow: "hidden",
+                            position: "absolute",
+                        });
                         localStorage.setItem("hide-button", true);
                     } else {
                         $(this).html("Hide");
+                        $("#estimated-total-time, #current-time, #tomorrow-time").css({
+                            height: "",
+                            width: "",
+                            overflow: "",
+                            position: "",
+                        });
                         localStorage.removeItem("hide-button");
                     }
-                    $("#estimated-total-time, #current-time, #tomorrow-time").toggle();
                 });
                 if ("hide-button" in localStorage) {
-                    $("#hide-button").html("Show");
-                    $("#tomorrow-time").toggle();
+                    $("#hide-button").click();
                 }
             },
 
@@ -827,25 +837,23 @@ for (let sa of dat) {
 
     const red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start; // X-coordinate of the start of the red line
     const red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - sa.blue_line_start]; // Y-coordinate of the start of the red line
-    // Caps and adjusts min_work_time and funct_round
+
+    // Repopulating the form
+    sa.original_funct_round = sa.funct_round;
+    sa.original_min_work_time = sa.min_work_time;
+    // Caps and adjusts min_work_time and funct_round; might not be needed but I'll still keep this
     let y1 = sa.y - red_line_start_y;
-    // Might not be needed
     if (sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
         sa.funct_round = y1;
     }
-    // Might not be needed
     if (sa.min_work_time > y1) {
         sa.min_work_time = y1;
     }
+
     // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
-    // Set it to 0 to pretend it isn't enabled for calculations in setParabolaValues()
+    // Set it to 0 to assume it isn't enabled for calculations in setParabolaValues()
     if (sa.min_work_time <= sa.funct_round) {
         sa.min_work_time = 0;
-    // Suppose funct_round is 4, min_work_time is 5, f(4) = 18, and f(5) = 23
-    // f(4) gets rounded to 20 and f(5) gets rounded to 24, violating the min_work_time of 5
-    // This fixes the problem
-    } else if (sa.funct_round < sa.min_work_time && sa.min_work_time < 2 * sa.funct_round) {
-        sa.min_work_time = sa.funct_round * 2;
     }
 };
 // Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason

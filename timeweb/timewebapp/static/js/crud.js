@@ -121,8 +121,8 @@ $(window).one("load", function() {
             sa.works[0],
             sa.needs_more_info ? '' : sa.ctime,
             sa.description,
-            sa.funct_round-1 ? +sa.funct_round : '', // Displays nothing if it is 1
-            (sa.min_work_time*sa.ctime)||'',
+            sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
+            (sa.original_min_work_time*sa.ctime)||'',
         ];
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         setTimeout(function() {

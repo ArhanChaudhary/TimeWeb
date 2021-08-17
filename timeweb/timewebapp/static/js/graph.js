@@ -160,13 +160,8 @@ class VisualAssignment extends Assignment {
                 this.b = parabola.b;
                 
                 // Redefine skew ratio
-                this.sa.skew_ratio = (this.a + this.b) * x1 / y1;
-                // Adjusts and caps skew ratio
-                if (this.sa.skew_ratio > skew_ratio_bound) {
-                    this.sa.skew_ratio = skew_ratio_bound;
-                } else if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
-                    this.sa.skew_ratio = 2 - skew_ratio_bound;
-                } else if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
+                this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, (this.a + this.b) * x1 / y1, skew_ratio_bound);
+                if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
                 }
@@ -868,12 +863,7 @@ class VisualAssignment extends Assignment {
             if (skew_ratio_textbox.val()) {
                 // Sets and caps skew ratio
                 // The skew ratio in the code is 1 more than the displayed skew ratio
-                this.sa.skew_ratio = +skew_ratio_textbox.val() + 1;
-                if (this.sa.skew_ratio > skew_ratio_bound) {
-                    this.sa.skew_ratio = 2 - skew_ratio_bound;
-                } else if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
-                    this.sa.skew_ratio = skew_ratio_bound;
-                }
+                this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, +skew_ratio_textbox.val() + 1, skew_ratio_bound);
                 ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
             }
             this.draw();

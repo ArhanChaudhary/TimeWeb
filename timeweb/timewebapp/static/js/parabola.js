@@ -111,7 +111,13 @@ Assignment.prototype.setParabolaValues = function() {
         const mid = left + Math.floor((right - left) / 2);
 
         output = this.funct(mid, {translateX: false});
-        if (output <= this.sa.y - this.min_work_time_funct_round) {
+        // It's possible for this.sa.y - this.min_work_time_funct_round to be less than 0
+        // So when Math.ceil(this.return_y_cutoff) is 1, mid is 0, and output is also 0
+        // But in the case this.sa.y - this.min_work_time_funct_round is less than 0, right will become mid and left will stay at 0, causing the assignment to instantly complete itself
+        // To fix this, add Math.max(0, ...)
+        
+        // I've gone through every other binary search used in the cuttoff and this one is the only one that seems to have this issue
+        if (output <= Math.max(0, this.sa.y - this.min_work_time_funct_round)) {
             left = mid + 1;
         } else {
             right = mid;
@@ -352,12 +358,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // Zero division somewhere
     if (!Number.isFinite(autotuned_skew_ratio)) return;
 
-    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     const skew_ratio_bound = this.calcSkewRatioBound();
-    if (this.sa.skew_ratio > skew_ratio_bound) {
-        this.sa.skew_ratio = skew_ratio_bound;
-    } else if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
-        this.sa.skew_ratio = 2 - skew_ratio_bound;
-    }
+    this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor, skew_ratio_bound);
     ajaxUtils.SendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
 }
