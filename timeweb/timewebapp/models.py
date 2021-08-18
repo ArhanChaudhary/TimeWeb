@@ -124,11 +124,12 @@ class TimewebModel(models.Model):
 
 class SettingsModel(models.Model):
 
-    # Group "Assignment form"
+    # Group "Assignment Form"
     def_break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True,
+        verbose_name=_('Default Break Days'),
     )
     def_min_work_time = models.DecimalField(
         max_digits=15,
@@ -140,14 +141,14 @@ class SettingsModel(models.Model):
     )
     def_unit_to_minute = models.BooleanField(
         default=False,
-        verbose_name=_('Set the Default Unit of Work to "Minute"'),
+        verbose_name=_('Default Unit of Work to "Minute"'),
     )
     def_funct_round_minute = models.BooleanField(
         default=False,
         verbose_name=_('Round to Multiples of 5 Minutes'),
     )
 
-    # Group "Assignment graph"
+    # Group "Assignment Graph"
     def_skew_ratio = models.DecimalField(
         max_digits=17,
         decimal_places=10,
@@ -163,7 +164,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Show Graph Progress Bar'),
     )
 
-    # Group "Assignment priority"
+    # Group "Assignment Priority"
     highest_priority_color = ColorField(
         default="#e25b50",
         verbose_name=_('Highest Priority Color'),
@@ -185,12 +186,14 @@ class SettingsModel(models.Model):
     tag_position = models.CharField(
         max_length=MAX_TAG_POSITIONS_LENGTH,
         choices=TAG_POSITIONS,
-        default="Middle",
+        default=_("Middle"),
+        verbose_name=_('Assignment Tag Position'),
     )
     background_image = models.ImageField(
         upload_to=create_image_path,
         null=True,
         blank=True,
+        verbose_name=_('Background Image'),
     )
     dark_mode = models.BooleanField(
         default=False,

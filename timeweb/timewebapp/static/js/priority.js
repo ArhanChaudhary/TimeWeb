@@ -353,7 +353,7 @@ priority = {
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(ordered_assignments);
         const highest_priority = Math.max(...ordered_assignments.map(function(pd) {
-            if ((pd[0] === 5 || pd[0] === 4) && !pd[3]) {
+            if ([4, 5].includes(pd[0]) && !pd[3]) {
                 return pd[1];
             } else {
                 return -Infinity;

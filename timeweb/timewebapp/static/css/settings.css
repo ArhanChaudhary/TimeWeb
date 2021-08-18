@@ -1,6 +1,45 @@
+body {
+    background: rgb(218, 218, 218);
+}
 input {
     -webkit-appearance: auto;
 }
-tr {
-    border-bottom: 1px solid gray;
+form {
+    width: calc(100% - 30px);
+    transform: translateX(15px);
+}
+fieldset {
+    margin-bottom: 10px;
+}
+table {
+    width: 100%;
+    -webkit-border-horizontal-spacing: 5px;
+}
+img {
+    width: 100%;
+}
+.hitbox-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+td {
+    position: relative;
+    text-align: left;
+    width: 360px;
+}
+th {
+    text-align: left;
+}
+tr.even {
+    background: rgb(193, 193, 193);
+}
+tr.odd {
+    background: rgb(238, 238, 238);
+}
+.setting-description {
+    font-size: 0.85em;
+    opacity: 0.7;
 }

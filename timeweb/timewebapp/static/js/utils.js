@@ -856,7 +856,7 @@ for (let sa of dat) {
         sa.min_work_time = 0;
     }
 };
-// Use DOMContentLoaded because $(function() { fires too slowly on the initial animation for some reason
+// Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
     csrf_token = $("form input:first-of-type").val();

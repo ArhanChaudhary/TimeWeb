@@ -14,30 +14,50 @@
 {{ form.media }}
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
-    <h3>These are applied to all assignments</h3>
-    <table>
-        {% for field in form.visible_fields %}
-            <tr>
+    {% for field in form.visible_fields %}
+        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "tag_position" %}
+        <fieldset>
+            <legend>
                 {% if field.name == "def_break_days" %}
-                    <th id="break-days-label-title">Default Break Days</th>
-                    <td id="break-days-wrapper">
-                        {% for value, text in field.field.choices %}
-                            <input id="id_def_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in form.initial|get_def_break_days %}checked="checked"{% endif %}>
-                            <label tabindex="0" class="break-days-label" for="id_def_break_days_{{ forloop.counter0 }}">{{ text }}</label>
-                        {% endfor %}
-                    </td>
-                {% else %}
-                    <th>{{ field.label_tag }}</th>
-                    <td>
-                        {% for error in field.errors %}
-                            <h3>{{ error|escape }}</h3>
-                        {% endfor %}
-                        {{ field }}
-                    </td>
+                    Assignment Form
+                {% elif field.name == "def_skew_ratio" %}
+                    Assignment Graph
+                {% elif field.name == "highest_priority_color" %}
+                    Assignment Priority
+                {% elif field.name == "tag_position" %}
+                    Personalize
                 {% endif %}
-            </tr>
-        {% endfor %}
-    </table>
+            </legend>
+            {% endif %}
+            <table>
+                <tbody>
+                    <tr class="{% cycle 'odd' 'even' %}">
+                        <th>
+                            {{ field.label_tag }}
+                            <div class="setting-description">{{ field.help_text }}</div>
+                        </th>
+                        {% if field.name == "def_break_days" %}
+                            <td id="break-days-wrapper">
+                                {% for value, text in field.field.choices %}
+                                    <input id="id_def_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in form.initial|get_def_break_days %}checked="checked"{% endif %}>
+                                    <label tabindex="0" class="break-days-label" for="id_def_break_days_{{ forloop.counter0 }}">{{ text }}</label>
+                                {% endfor %}
+                            </td>
+                        {% else %}
+                            <td>
+                                {% for error in field.errors %}
+                                    <h3>{{ error|escape }}</h3>
+                                {% endfor %}
+                                {{ field }}
+                            </td>
+                        {% endif %}
+                    </tr>
+                </tbody>
+            </table>
+        {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "dark_mode" %}
+        </fieldset>
+        {% endif %}
+    {% endfor %}
     {% comment %} Needs to be here to form.is_valid() isnt false {% endcomment %}
     {% for hidden in form.hidden_fields %}
         {{ hidden }}

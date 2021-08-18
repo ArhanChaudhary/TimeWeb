@@ -1,30 +1,7 @@
-/* 
-This file includes the code for:
-
-Trimming trailing zeros on form fields
-Crossing out an unfinished setting
-Info buttons
-
-This only runs on settings.html
-*/
-$(function() {
+document.addEventListener("DOMContentLoaded", function() {
     gtag("event","settings_view");
     $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
-    $("#id_def_funct_round_minute").parent().info('right',
-        `If your unit of work for any assignment is "Minute," meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes
-        
-        This is because raw minute work values look ugly (e.g: 17 Minutes, 49 Minutes)`
-    );
-    $("#id_ignore_ends").parent().info('right',
-        `Only relevant for assignments with a minimum work time
-        
-        Ignores the minimum work time for the first and last working days of all assignments in exchange for making their work distributions smoother
-        
-        It does so by fixing an issue that causes you to work significantly more on the first and last working days of an assignment
-        
-        This is recommended to be enabled`
-    );
     $("#reset-settings-button").click(function() {
         $("#id_def_min_work_time").val("");
         $("#id_def_skew_ratio").val(0);
@@ -34,16 +11,22 @@ $(function() {
         $("#id_show_progress_bar").prop("checked", false);
         $("#id_color_priority").prop("checked", true);
         $("#id_text_priority").prop("checked", true);
-        $("#id_highest_priority_color").val("#E25B50").trigger("input");
-        $("#id_lowest_priority_color").val("#84C841").trigger("keydown");
+        $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");
+        $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");
         $("#id_background_image").val("");
         $("#id_tag_position").val("Middle");
-        // $("#id_enable_tutorial").prop("checked", true);
     });
+    // verbose name doesnt work on tag position for literally no reason
+    $("label[for=\"id_tag_position\"]").html("Assignment Tag Position");
     $("#id_dark_mode").click(function(e) {
         e.preventDefault();
         $.alert({title: "This feature hasn't yet been implented"});
     });
+    $("table input:not([type=\"file\"]):not(.jscolor)").each(function() {
+        $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
+    });
+    const background_image_link = $("#id_background_image").siblings("a");
+    background_image_link.replaceWith(`<img src=${background_image_link.attr("href")}>`);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
         $("#submit-settings-button").attr("disabled", true);
