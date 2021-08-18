@@ -72,6 +72,8 @@ header.animate::after {
     white-space: nowrap;
 }
 #assignments-header img {
+    position: relative;
+    z-index: 1;
     cursor: pointer;
     margin-left: 14px;
 }
@@ -959,9 +961,9 @@ input[type=number]::-webkit-inner-spin-button {
     box-shadow: 0 0 5px 1px black;
 }
 #toggle-gc-container.scale-on-mobile {
-    right: 20px;
-    bottom: 30px;
-    transform: scale(1.5);
+    right: 17px;
+    bottom: 25px;
+    transform: scale(1.25);
     transform-origin: right;
 }
 #toggle-gc-label {

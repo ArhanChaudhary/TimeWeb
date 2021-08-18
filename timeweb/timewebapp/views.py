@@ -44,7 +44,7 @@ editing_example_account = False
 after_midnight_hour_to_update = 4
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
-MAX_NUMBER_ASSIGNMENTS = 25
+MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_TAGS = 10
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
