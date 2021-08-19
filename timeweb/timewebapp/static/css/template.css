@@ -394,14 +394,6 @@ nav:focus-within #nav-menu::after {
     src: local(''),
          url('../fonts/open-sans-v18-latin-600.woff2') format('woff2'); /* Chrome 26+, Opera 23+, Firefox 39+ */
 }
-
-@font-face {
-    font-family: 'Roboto Slab';
-    font-style: normal;
-	font-weight: 700;
-    src: local(''),
-         url('../fonts/roboto-slab-v7-bold.woff2') format('woff2');
-}
 #changelog-container {
     padding: 0 10px;
 }
