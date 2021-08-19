@@ -1,5 +1,5 @@
-This is a WIP
-Introduction to timeweb, why its better than a normal planner, explain question marks (give after midnight as an example)
+{% extends "template.html" %}
+{% comment %} Introduction to timeweb, why its better than a normal planner, explain question marks (give after midnight as an example)
 Form fields
     (explain every field) (mention leaving x empty makes a line)
     !when to use minute vs hour
@@ -8,18 +8,18 @@ What is the graph
     (explain what it is)
 Graph buttons
     (explain all graph buttons)
-    ?why autotune and dynamic mode isnt perfect (it isnt meant to be)
+    !why autotune and dynamic mode isnt perfect (it isnt meant to be)
     !autotune disabled at 10000
     !skew ratio isn't always the same distribution in dynamic mode
     ?why is there a delay after entering work input
 Status messages
     (explain every status message) (difference between finished and completely finished)
-    !status value can make priority not sorted
+    ?status value can make priority not sorted
 Assignment tags
     (explain what they are and sortable)
 Shortcut wrappers
     (explain what they are)
-    how to use shortcuts (line wrapper things)
+    ?how to use shortcuts (line wrapper things)
     ?why does autofill no work done sometimes not work (because they need to do autofill all)
 Google Classroom API
     (explain what it is)
@@ -29,5 +29,32 @@ Google Classroom API
     ?why do I ask for permission to view grades
 Accessibility
     tabbing
-    keybinds
+    keybinds {% endcomment %}
+{% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/user-guide.css' %}">
+{% endblock css %}
+
+{% block js %}
+<script src="{% static 'js/user-guide.js' %}"></script>
+{% endblock js %}
+
+{% block content %}
+<div id="user-guide-container">
+    <div class="major-category">Introduction</div>
+    <div class="minor-category">Getting started</div>
+    Welcome! TimeWeb's user guide will explain in depth every feature as well as specific edge cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. In this user guide, important notes and specifc questions you may have are marked with a label. For example:
+
+    <span class="question-container">
+        <span class="question-title">Why doesn't the internal date change after midnight?</span>
+        <span class="answer">This behavior isn't a bug or a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.</span>
+    </span>
+    If you came here because you're confused about something specific, there's a good chance you'll find your answer in the tables to the right, which lists every note and question in this guide.
+</div>
+<template id="question-icon-template">
+    <div class="question-icon-container">
+        <img class="question-icon" src="/static/images/status-icons/question-mark.png" height="25">
+    </div>
+</template>
+{% endblock content %}

@@ -1,0 +1,71 @@
+body {
+    background: white;
+}
+#user-guide-container {
+    padding-left: 100px;
+    width: 100%;
+    max-width: 1000px;
+    position: relative;
+    box-sizing: border-box;
+    white-space: pre-line;
+    font-family: 'NotoSansJP';
+}
+.major-category {
+    margin-left: -50px;
+    font-family: 'Roboto Slab';
+    font-size: 40px;
+}
+.minor-category {
+    display: list-item;
+    font-family: 'Roboto Slab';
+    font-size: 30px;
+}
+.question-container {
+    display: block;
+    position: relative;
+    white-space: normal;
+    padding-bottom: 5px;
+    background-color: rgb(150, 232, 253);
+    width: 100%;
+}
+.question-container::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200vw;
+    transform: translateX(-100vw);
+    background-color: inherit; 
+}
+.question-title {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    font-size: 25px;
+    font-family: 'Roboto Slab';
+}
+.question-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 5px;
+    left: -60px;
+    width: 40px;
+    height: 40px;
+    background-color: inherit;
+    border-radius: 50%;
+    filter: brightness(0.9);
+}
+.question-icon {
+    position: absolute;
+}
+@font-face {
+    font-family: 'NotoSansJP';
+    font-style: normal;
+    font-weight: 400;
+    src: local(''),
+         url('../fonts/NotoSansJP-Regular.otf') format('opentype');
+}
