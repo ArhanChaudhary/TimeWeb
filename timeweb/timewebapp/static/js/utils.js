@@ -807,6 +807,9 @@ $.fn.reverse = Array.prototype.reverse;
 ({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date(new Date().toDateString());
+if (date_now.getHours() < utils.after_midnight_hour_to_update) {
+    date_now.setDate(date_now.getDate() - 1);
+}
 highest_priority_color = utils.formatting.hexToRGB(highest_priority_color);
 lowest_priority_color = utils.formatting.hexToRGB(lowest_priority_color);
 if (isExampleAccount) {
