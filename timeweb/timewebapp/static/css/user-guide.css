@@ -16,19 +16,25 @@ body {
     font-size: 40px;
 }
 .minor-category {
-    display: list-item;
+    cursor: pointer;
+    margin-left: -30px;
     font-family: 'Roboto Slab';
     font-size: 30px;
 }
-.question-container {
+.label-question {
+    --label-color: rgb(150, 232, 253);
+}
+.label-note {
+    --label-color: rgb(249, 209, 129);
+}
+.label-question, .label-note {
     display: block;
     position: relative;
     white-space: normal;
-    padding-bottom: 5px;
-    background-color: rgb(150, 232, 253);
+    padding-bottom: 12px;
     width: 100%;
 }
-.question-container::before {
+.label-question::before, .label-note::before {
     content: '';
     position: absolute;
     z-index: -1;
@@ -37,16 +43,16 @@ body {
     height: 100%;
     width: 200vw;
     transform: translateX(-100vw);
-    background-color: inherit; 
+    background-color: var(--label-color);
 }
-.question-title {
+.label-title {
     display: flex;
     align-items: center;
     height: 50px;
     font-size: 25px;
     font-family: 'Roboto Slab';
 }
-.question-icon-container {
+.label-icon-container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,11 +61,11 @@ body {
     left: -60px;
     width: 40px;
     height: 40px;
-    background-color: inherit;
+    background-color: var(--label-color);
     border-radius: 50%;
-    filter: brightness(0.9);
+    filter: brightness(0.85);
 }
-.question-icon {
+.label-icon {
     position: absolute;
 }
 @font-face {
@@ -68,4 +74,11 @@ body {
     font-weight: 400;
     src: local(''),
          url('../fonts/NotoSansJP-Regular.otf') format('opentype');
+}
+@font-face {
+    font-family: 'Roboto Slab';
+    font-style: normal;
+	font-weight: 700;
+    src: local(''),
+         url('../fonts/roboto-slab-v7-bold.woff2') format('woff2');
 }
