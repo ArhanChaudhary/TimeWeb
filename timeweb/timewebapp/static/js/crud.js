@@ -23,7 +23,7 @@ function showForm(show_instantly=false) {
             $(document.activeElement).blur();
         }
     }
-    $("main").css("overflow", "hidden");
+    $("main").css("overflow-y", "hidden");
     old_unit_value = undefined;
     replaceUnit();
 }
@@ -38,7 +38,7 @@ function hideForm(hide_instantly=false) {
             $(".error-note").remove();
         }).children("#form-wrapper").animate({top: 0}, FORM_ANIMATION_DURATION);
     }
-    $("main").css("overflow", "overlay");
+    $("main").css("overflow-y", "overlay");
 }
 let old_unit_value;
 function replaceUnit() {

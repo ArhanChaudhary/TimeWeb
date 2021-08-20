@@ -533,6 +533,7 @@ class TimewebView(LoginRequiredMixin, View):
                     y=1,
                     ctime=1,
                 ))
+        # .execute() rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute().get('courses', [])
         coursework_lazy = service.courses().courseWork()
         batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)

@@ -113,8 +113,7 @@ priority = {
     sort_without_timeout: function(params) {
         let ordered_assignments = [],
             total = 0,
-            tomorrow_total = 0,
-            has_autofilled = false;
+            tomorrow_total = 0;
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         $(".delete-gc-assignments-from-class").remove();
         $(".assignment").each(function(index) {
@@ -136,6 +135,7 @@ priority = {
                 dom_status_message = $(".status-message").eq(index),
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index);
+            let has_autofilled = false;
             const number_of_forgotten_days = today_minus_ad - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 for (let i = 0; i < number_of_forgotten_days; i++) {
@@ -327,10 +327,8 @@ priority = {
             dom_title.attr("data-daysleft", str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.ctime) : '');
         });
-        // Updates open graphs
-        if (has_autofilled) {
-            $(window).trigger("resize");
-        }
+        // Updates open graphs' today line
+        $(window).trigger("resize");
         ordered_assignments.sort(function(a, b) {
             // Sort from max to min
             // Status value

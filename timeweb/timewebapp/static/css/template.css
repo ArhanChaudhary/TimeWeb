@@ -65,6 +65,8 @@ main {
     padding: 80px 20px 0 20px;
     box-shadow: inset 20px 0 0 0 gray, inset -20px 0 0 0 gray;
     box-sizing: border-box;
+    /* Firefox doesnt support "overlay" */
+    overflow-y: scroll;
 }
 #background-image {
     bottom: 0;

@@ -20,13 +20,11 @@ document.addEventListener("DOMContentLoaded", function() {
     $("label[for=\"id_tag_position\"]").html("Assignment Tag Position");
     $("#id_dark_mode").click(function(e) {
         e.preventDefault();
-        $.alert({title: "This feature hasn't yet been implented"});
+        $.alert({title: "Dark mode hasn't yet been implemented"});
     });
-    $("table input:not([type=\"file\"]):not(.jscolor)").each(function() {
+    $("table input:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor)").each(function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });
-    const background_image_link = $("#id_background_image").siblings("a");
-    background_image_link.replaceWith(`<img src=${background_image_link.attr("href")}>`);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
         $("#submit-settings-button").attr("disabled", true);
