@@ -678,13 +678,16 @@ utils = {
         }
     },
     after_midnight_hour_to_update: after_midnight_hour_to_update,
+    previous_time: new Date(),
     reloadAfterMidnightHourToUpdate: function() {
         // Don't reload in the next day to preserve changes made in the simulation
         // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
         if (window.in_next_day || isExampleAccount) return;
-        if (date_now.valueOf() + 1000*60*60*(24 + utils.after_midnight_hour_to_update) < new Date().valueOf()) {
+        const current_time = new Date();
+        if (utils.previous_time.getHours() < utils.after_midnight_hour_to_update && current_time.getHours() > utils.after_midnight_hour_to_update) {
             window.location.reload();
         }
+        utils.previous_time = current_time;
     },
     loadAssignmentData: function($element_with_id_attribute) {
         return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
