@@ -44,7 +44,22 @@ Accessibility
 
 {% block content %}
 <div id="flex-container">
-    <div id="table-of-contents-container"></div>
+    <div id="table-of-contents-container">
+        <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
+        <span class="table-of-contents-header">Important labels</span>
+        <ul>
+            <li>
+                <span>Specific questions you may have</span>
+            </li>
+            <ul id="category-user-guide-labels"></ul>
+        </ul>
+        <ul>
+            <li>
+                <span>Notes</span>
+            </li>
+            <ul id="category-user-guide-notes"></ul>
+        </ul>
+    </div>
     <div id="user-guide-container">
 
         {% comment %} span groups the major and minor categories together for user-guide.js {% endcomment %}
@@ -70,6 +85,19 @@ Accessibility
 
     </div>
 </div>
+<template id="table-of-contents-major-category-template">
+    <ul>
+        <li>
+            <a></a>
+        </li>
+        <ul></ul>
+    </ul>
+</template>
+<template id="table-of-contents-minor-category-template">
+    <li>
+        <a></a>
+    </li>
+</template>
 <template id="label-icon-template">
     <div class="label-icon-container">
         <img class="label-icon" height="25">
