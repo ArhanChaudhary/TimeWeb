@@ -1,5 +1,5 @@
 {% extends "template.html" %}
-{% comment %} Introduction to timeweb, why its better than a normal planner, explain question marks (give after midnight as an example)
+{% comment %} Introduction to timeweb, why its better than a normal planner, credibility
 Assignment form
     (explain every field); mention paranthesis on fields (mention leaving x empty makes a line)
     !when to use minute vs hour
@@ -43,19 +43,32 @@ Accessibility
 {% endblock js %}
 
 {% block content %}
-<div id="user-guide-container">
-    <div class="major-category">Introduction</div>
-    <details open>
-        <summary class="minor-category">Getting started</summary>
-        Welcome! TimeWeb's user guide documents each of its features, quirks, and edge cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. 
-        In this user guide, important notes and specifc questions you may have are marked with a label. For example:
+<div id="flex-container">
+    <div id="table-of-contents-container"></div>
+    <div id="user-guide-container">
 
-        <span class="label-question">
-            <span class="label-title">Why doesn't the internal date change after midnight?</span>
-            This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
+        {% comment %} span groups the major and minor categories together for user-guide.js {% endcomment %}
+        <span>
+            <div class="major-category">Introduction</div>
+            <details open>
+                <summary class="minor-category">Getting started</summary>
+                Welcome! TimeWeb's user guide documents each of its features, quirks, and edge cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience.
+                
+                In this user guide, important notes and specifc questions you may have are marked with a label. For example:
+
+                <span class="label-question">
+                    <span class="label-title">Why doesn't the internal date change after midnight?</span>
+                    This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
+                </span>
+                If you came here because you're confused about something specific, there's a good chance you'll find your answer in the tables to the right, which lists every note and question in this guide.
+            </details>
+
+            <details open>
+                <summary class="minor-category">What is TimeWeb and why should I use it?</summary>
+            </details>
         </span>
-        If you came here because you're confused about something specific, there's a good chance you'll find your answer in the tables to the right, which lists every note and question in this guide.
-    </details>
+
+    </div>
 </div>
 <template id="label-icon-template">
     <div class="label-icon-container">

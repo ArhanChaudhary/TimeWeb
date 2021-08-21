@@ -9,4 +9,15 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         $(this).append(label_icon);
     });
+    $(".major-category").each(function(index) {
+        const $major_category = $(this);
+        $major_category.attr("id", `major-${index+1}`);
+        const major_category_li = $(`<ul><li><a href="#${$major_category.attr("id")}">${$major_category.text()}</a></li><ul></ul></ul>`);
+        $major_category.siblings().each(function(index) {
+            const $minor_category = $(this).find(".minor-category");
+            $minor_category.attr("id", `${$major_category.attr("id")}-minor-${index+1}`);
+            major_category_li.find("ul").append(`<li><a href="#${$minor_category.attr("id")}">${$minor_category.text()}</a></li>`);
+        });
+        $("#table-of-contents-container").append(major_category_li);
+    });
 });
