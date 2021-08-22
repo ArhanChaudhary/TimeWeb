@@ -1,5 +1,5 @@
 {% extends "template.html" %}
-{% comment %} Introduction to timeweb, why its better than a normal planner, credibility
+{% comment %}
 Assignment form
     (explain every field); mention paranthesis on fields (mention leaving x empty makes a line)
     !when to use minute vs hour
@@ -46,40 +46,51 @@ Accessibility
 <div id="flex-container">
     <div id="table-of-contents-container">
         <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
-        <span class="table-of-contents-header">Important labels</span>
+        <span class="table-of-contents-header" id="category-important-labels">Important labels</span>
         <ul>
-            <li>
-                <span>Specific questions you may have</span>
+            <li class="do-not-hover">
+                <span>FAQ</span>
             </li>
             <ul id="category-user-guide-labels"></ul>
         </ul>
         <ul>
-            <li>
+            <li class="do-not-hover">
                 <span>Notes</span>
             </li>
             <ul id="category-user-guide-notes"></ul>
         </ul>
     </div>
+    {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
     <div id="user-guide-container">
 
         {% comment %} span groups the major and minor categories together for user-guide.js {% endcomment %}
-        <span>
-            <div class="major-category">Introduction</div>
+        <span><br><br>
+
+            <div class="major-category">Introduction</div><br>
             <details open>
-                <summary class="minor-category">Getting started</summary>
-                Welcome! TimeWeb's user guide documents each of its features, quirks, and edge cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience.
-                
-                In this user guide, important notes and specifc questions you may have are marked with a label. For example:
+                <summary class="minor-category">Getting started</summary><br>
+                Welcome! TimeWeb's user guide documents each of its features, quirks, and edge cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience.<br><br>
+
+                In this user guide, important notes and FAQs are marked with a label. For example:<br><br>
 
                 <span class="label-question">
                     <span class="label-title">Why doesn't the internal date change after midnight?</span>
                     This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
-                </span>
-                If you came here because you're confused about something specific, there's a good chance you'll find your answer in the tables to the right, which lists every note and question in this guide.
-            </details>
-
+                </span><br>
+                If you came here because you're confused about something specific, there's a good chance you'll find your answer in either the "Table of contents," which lists every category, or "Important labels," which lists every note and FAQ in this guide.<br>
+            </details><br>
+            
             <details open>
-                <summary class="minor-category">What is TimeWeb and why should I use it?</summary>
+                <summary class="minor-category">What is TimeWeb and why should I use it?</summary><br>
+                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your inputted assignments' work is split up and neatly graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take. TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.<br><br>
+
+                A few extra things to help with TimeWeb's credibility:
+                <ul>
+                    <li>TimeWeb scored an average of <a href="https://imgur.com/a/1cGhs8W">8.3/10</a> in overall user satisfaction in its incomplete beta</li>
+                    <li>TimeWeb has been supported and received well by my school's principal</li>
+                    <li>TimeWeb is <a href="https://github.com/ArhanChaudhary/TimeWeb">open source</a></li>
+                </ul>
+                If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your home page to look like.
             </details>
         </span>
 

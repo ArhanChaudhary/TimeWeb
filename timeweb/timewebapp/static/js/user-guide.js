@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const major_category_li = $(table_of_contents_major_category_template);
         major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`).text($major_category.text());
 
-        $major_category.siblings().each(function(index) {
+        $major_category.siblings("details").each(function(index) {
             const $minor_category = $(this).find(".minor-category");
             $minor_category.attr("id", `${$major_category.attr("id")}-minor-${index+1}`);
 
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-user-guide-labels").append(minor_category_li);
     });
 
-    (".label-note").reverse().each(function(index) {
+    $(".label-note").reverse().each(function(index) {
         const $label_note = $(this);
         $label_note.attr("id", `note-${index+1}`);
 
