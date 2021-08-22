@@ -12,8 +12,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const table_of_contents_major_category_template = $("#table-of-contents-major-category-template").html();
     const table_of_contents_minor_category_template = $("#table-of-contents-minor-category-template").html();
     $(".major-category").reverse().each(function(index) {
+        index = $(".major-category").length - index;
         const $major_category = $(this);
-        $major_category.attr("id", `major-${index+1}`);
+        $major_category.attr("id", `major-${index}`);
 
         const major_category_li = $(table_of_contents_major_category_template);
         major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`).text($major_category.text());
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
     });
 
-    $(".label-question").reverse().each(function(index) {
+    $(".label-question").each(function(index) {
         const $label_question = $(this);
         $label_question.attr("id", `question-${index+1}`);
 
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-user-guide-labels").append(minor_category_li);
     });
 
-    $(".label-note").reverse().each(function(index) {
+    $(".label-note").each(function(index) {
         const $label_note = $(this);
         $label_note.attr("id", `note-${index+1}`);
 

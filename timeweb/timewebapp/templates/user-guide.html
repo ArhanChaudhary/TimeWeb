@@ -1,9 +1,5 @@
 {% extends "template.html" %}
 {% comment %}
-Assignment form
-    (explain every field); mention paranthesis on fields (mention leaving x empty makes a line)
-    !when to use minute vs hour
-    ?why is 1 and 60 greyed out
 Assignment graph
     What is the graph
         (explain what it is)
@@ -14,6 +10,7 @@ Assignment graph
         !skew ratio isn't always the same distribution in dynamic mode
         ?why is there a delay after entering work input
 Assignment priority
+    How prioritized
     Status messages
         (explain every status message) (difference between finished and completely finished)
         ?status value can make priority not sorted
@@ -44,17 +41,20 @@ Accessibility
 
 {% block content %}
 <div id="flex-container">
+    <div id="table-of-contents-container-label">
+        <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
+    </div>
     <div id="table-of-contents-container">
         <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
         <span class="table-of-contents-header" id="category-important-labels">Important labels</span>
         <ul>
-            <li class="do-not-hover">
-                <span>FAQ</span>
+            <li>
+                <span>FAQs</span>
             </li>
             <ul id="category-user-guide-labels"></ul>
         </ul>
         <ul>
-            <li class="do-not-hover">
+            <li>
                 <span>Notes</span>
             </li>
             <ul id="category-user-guide-notes"></ul>
@@ -62,38 +62,72 @@ Accessibility
     </div>
     {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
     <div id="user-guide-container">
-
-        {% comment %} span groups the major and minor categories together for user-guide.js {% endcomment %}
-        <span><br><br>
-
-            <div class="major-category">Introduction</div><br>
+        {% comment %} the span groups the major and minor categories together for user-guide.js {% endcomment %}
+        <span>
+            <div class="major-category">(THIS IS A WIP)
+            Introduction</div>
             <details open>
-                <summary class="minor-category">Getting started</summary><br>
-                Welcome! TimeWeb's user guide documents each of its features, quirks, and edge cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience.<br><br>
+                <summary class="minor-category">Getting started</summary>
+                Welcome! TimeWeb's user guide documents all of its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience.
 
-                In this user guide, important notes and FAQs are marked with a label. For example:<br><br>
+                In this user guide, important notes and FAQs are marked and labeled. FAQ labels are used for questions you may have, and note labels are used for advice and important edge cases. An example of an FAQ label:
 
                 <span class="label-question">
                     <span class="label-title">Why doesn't the internal date change after midnight?</span>
                     This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
-                </span><br>
-                If you came here because you're confused about something specific, there's a good chance you'll find your answer in either the "Table of contents," which lists every category, or "Important labels," which lists every note and FAQ in this guide.<br>
-            </details><br>
-            
+                </span>
+                The "Table of contents" section to the left shows the complete outline of this user guide, and the "Important labels" section just below that lists every note and FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
+
+            </details>
             <details open>
-                <summary class="minor-category">What is TimeWeb and why should I use it?</summary><br>
-                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your inputted assignments' work is split up and neatly graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take. TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.<br><br>
+                <summary class="minor-category">What is TimeWeb and why should I use it?</summary>
+                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take. TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
 
                 A few extra things to help with TimeWeb's credibility:
+                {% spaceless %}
                 <ul>
                     <li>TimeWeb scored an average of <a href="https://imgur.com/a/1cGhs8W">8.3/10</a> in overall user satisfaction in its incomplete beta</li>
                     <li>TimeWeb has been supported and received well by my school's principal</li>
                     <li>TimeWeb is <a href="https://github.com/ArhanChaudhary/TimeWeb">open source</a></li>
                 </ul>
-                If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your home page to look like.
+                {% endspaceless %}If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your home page to look like.
             </details>
         </span>
+        <span>
+            <div class="major-category">Assignment form</div>
+            <details open>
+                <summary class="minor-category">What is the assignment form?</summary>
+                The assignment form is what you'll use to input your assignments into TimeWeb. You can also use this form to edit assignments. Default form input values in the settings are accordingly set every time you make a new assignment, and they can be manually overridden.
+                
+            </details>
+            <details open>
+                <summary class="minor-category">Standard inputs</summary>
+                These inputs in the assignment form are mandatory for every assignment. There are 7 standard inputs:
 
+                <div class="minor-minor-category">Name of this Assignment</div>This input is simply the name of the assignment. This is always displayed at the left of the assignment header, and this is only used for you to differentiate one assignment from another.
+
+                <div class="minor-minor-category">Date Assigned</div>This input is the date in which the assignment was assigned. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
+
+                <div class="minor-minor-category">Due Date</div>This input is the date in which the assignment is due. This can't be before the assignment date. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. Note that leaving this empty should be a last resort, as the predicted due date may not always be suitable.
+
+                <div class="minor-minor-category">Name of each Unit of Work</div>This input is how the assignment is split and divided up. As an analogy, books are divided up into pages. If you have no idea how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" in this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate.
+
+                <span class="label-note">
+                    <span class="label-title">When to use "Minute" vs "Hour"</span>
+                    "Minute" and "Hour" both accomplish the same task, acting as a fallback if you don't know how to split and divide up an assignment. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
+                </span>
+                <div class="minor-minor-category">Total number of Units in this Assignment</div>This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days in which the assignment is due.
+
+                <div class="minor-minor-category">Total number of Units already Completed</div>This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
+
+                <div class="minor-minor-category">Estimated number of Minutes to complete each Unit</div>This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour."
+                
+            </details>
+            <details open>
+                <summary class="minor-category">Advanced inputs</summary>
+
+            </details>
+        </span>
     </div>
 </div>
 <template id="table-of-contents-major-category-template">

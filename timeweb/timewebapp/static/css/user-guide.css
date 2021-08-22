@@ -10,19 +10,41 @@ body {
     position: relative;
 }
 #table-of-contents-container {
-    width: 300px;
-    background-color: rgb(237, 237, 237);
+    height: 100%;
     box-shadow: 0 0 6px 2px gray;
     list-style-position: inside;
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-y: overlay;
-    box-sizing: border-box;
+}
+#table-of-contents-container-label {
+    display: none;
+    position: relative;
+    z-index: 1;
+    box-shadow: 6px 2px 6px -4px gray;
+}
+#table-of-contents-container-label:hover ~ #table-of-contents-container, #table-of-contents-container:hover {
+    transform: none;
+}
+#table-of-contents-container, #table-of-contents-container-label {
+    margin-left: -20px;
+    width: 300px;
+    background-color: rgb(237, 237, 237);
 }
 @media screen and (max-width: 950px) {
     #table-of-contents-container {
-        display: none;
+        position: absolute;
+        z-index: 2;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-out;
     }
+    #table-of-contents-container-label {
+        display: block;
+        position: absolute;
+    }
+}
+#table-of-contents-container ul {
+    font-size: 14px;
 }
 .table-of-contents-header {
     display: block;
@@ -42,15 +64,9 @@ body {
     top: 40px;
 }
 #table-of-contents-container li {
-    margin-left: -100%;
-    padding-left: 100%;
-
     padding-right: 15px;
-    margin-bottom: 8px;
-}
-#table-of-contents-container li:not(.do-not-hover):hover {
-    background-color: rgb(220, 220, 220);
-    cursor: pointer;
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 a:visited {
     color: blue;
@@ -66,6 +82,7 @@ a:visited {
     overflow-y: scroll;
     max-width: 1000px;
     position: relative;
+    white-space: pre-line;
 }
 .major-category {
     margin-left: -50px;
@@ -78,15 +95,23 @@ a:visited {
     font-family: 'Roboto Slab';
     font-size: 30px;
 }
+.minor-minor-category {
+    font-family: 'Roboto Slab';
+    font-size: 21px;
+}
 .label-question {
     --label-color: rgb(150, 232, 253);
 }
 .label-note {
-    --label-color: rgb(249, 209, 129);
+    --label-color: rgb(254, 230, 181);
+}
+.major-category, .minor-category, .label-question, .label-note {
+    scroll-margin-top: 50px;
 }
 .label-question, .label-note {
     display: block;
     position: relative;
+    white-space: normal;
     padding-bottom: 12px;
     width: 100%;
 }
