@@ -1,33 +1,216 @@
-This is a WIP
-Introduction to timeweb, why its better than a normal planner, explain question marks (give after midnight as an example)
-Form fields
-    (explain every field) (mention leaving x empty makes a line)
-    !when to use minute vs hour
-    ?why is 1 and 60 greyed out
-What is the graph
-    (explain what it is)
-Graph buttons
-    (explain all graph buttons)
-    ?why autotune and dynamic mode isnt perfect (it isnt meant to be)
-    !autotune disabled at 10000
-    !skew ratio isn't always the same distribution in dynamic mode
-    ?why is there a delay after entering work input
-Status messages
-    (explain every status message) (difference between finished and completely finished)
-    !status value can make priority not sorted
+{% extends "template.html" %}
+{% comment %}
+Assignment graph
+    Graph buttons
+        (explain all graph buttons)
+        !why autotune and dynamic mode isnt perfect (it isnt meant to be)
+        !autotune disabled at 10000
+        !skew ratio isn't always the same distribution in dynamic mode
+        ?why is there a delay after entering work input
+Assignment priority
+    How prioritized
+        colored automatically; (user doesnt needtodoanything)
+        grouped into sections and then prioritized individually; explain status messages
+        ?status value can make priority not sorted
+    Priority groups
+        (explain every status message) (difference between finished and completely finished)
 Assignment tags
     (explain what they are and sortable)
 Shortcut wrappers
     (explain what they are)
-    how to use shortcuts (line wrapper things)
+    ?how to use shortcuts (line wrapper things)
+    !how does delete assignments of class know what to delete (the class name is the first tag)
     ?why does autofill no work done sometimes not work (because they need to do autofill all)
 Google Classroom API
-    (explain what it is)
-    (criteria for adding an assignment)
-    !how does delete assignments of class know what to delete (the class name is the first tag)
-    ?why does loading take so long (unenroll)
-    ?why do I ask for permission to view grades
-Accessibility
-    tabbing
-    keybinds
+    What is the Google Classroom API?
+        how to enable
+        ?why do I ask for permission to view grades
+    Adding Google Classroom assignments
+        refresh adds them
+        ?why does loading take so long (unenroll)
+        critieria
+        old assignments are re added
+Keybinds
+     {% endcomment %}
+{% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/user-guide.css' %}">
+{% endblock css %}
+
+{% block js %}
+<script src="{% static 'js/user-guide.js' %}"></script>
+{% endblock js %}
+
+{% block content %}
+<div id="flex-container">
+    <div id="table-of-contents-container-label">
+        <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
+    </div>
+    <div id="table-of-contents-container">
+        <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
+        <span class="table-of-contents-header" id="category-important-labels">Important labels</span>
+        <ul>
+            <li>
+                <span>FAQs</span>
+            </li>
+            <ul id="category-user-guide-labels"></ul>
+        </ul>
+        <ul>
+            <li>
+                <span>Notes</span>
+            </li>
+            <ul id="category-user-guide-notes"></ul>
+        </ul>
+    </div>
+    {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
+    <div id="user-guide-container">
+        {% comment %} the span groups the major and minor categories together for user-guide.js {% endcomment %}
+        <span>
+            <div class="major-category">Introduction</div>
+            <details open>
+                <summary class="minor-category">Getting started</summary>
+                Welcome! TimeWeb's user guide documents all of its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience.
+
+                In this user guide, important notes and FAQs are marked and labeled. FAQ labels are used for questions you may have, and note labels are used for advice and important edge cases. An example of an FAQ label:
+
+                <span class="label-question">
+                    <span class="label-title">Why doesn't the internal date change after midnight?</span>
+                    This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
+                </span>
+                The "Table of contents" section to the left shows the complete outline of this user guide, and the "Important labels" section just below that lists every note and FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
+
+            </details>
+            <details open>
+                <summary class="minor-category">What is TimeWeb and why should I use it?</summary>
+                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take. TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
+
+                A few extra things to help with TimeWeb's credibility:
+                {% spaceless %}
+                <ul>
+                    <li>TimeWeb scored an average of <a href="https://imgur.com/a/1cGhs8W">8.3/10</a> in overall user satisfaction in its incomplete beta</li>
+                    <li>TimeWeb has been supported and received well by my school's principal</li>
+                    <li>TimeWeb is <a href="https://github.com/ArhanChaudhary/TimeWeb">open source</a></li>
+                </ul>
+                {% endspaceless %}
+                If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your home page to look like.
+            </details>
+        </span>
+        <span>
+            <div class="major-category">Assignment form</div>
+            <details open>
+                <summary class="minor-category">What is the assignment form?</summary>
+                The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button on an already existing assignment. The assignment form has 11 inputs in total, 4 of which are optional. Default form input values, which can be set in the settings, are accordingly set every time you make a new assignment, and they can be manually overridden.
+                
+            </details>
+            <details open>
+                <summary class="minor-category">Standard inputs</summary>
+                These inputs in the assignment form are mandatory for every assignment. There are 7 standard inputs:
+
+                <span class="minor-minor-category">Name of this Assignment</span>
+                This input is simply the name of the assignment. This is always displayed at the left of the assignment header, and this is only used for you to differentiate one assignment from another.
+
+                <span class="minor-minor-category">Date Assigned</span>
+                This input is the date in which the assignment was assigned. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
+
+                <span class="minor-minor-category">Due Date</span>
+                This input is the date in which the assignment is due. This can't be before the assignment date. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. Note that leaving this empty should be a last resort, as the predicted due date may not always be suitable.
+
+                <span class="minor-minor-category">Name of each Unit of Work</span>
+                This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" in this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
+
+                <span class="minor-minor-category">Total number of Units in this Assignment</span>
+                This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days in which the assignment is due.
+
+                <span class="minor-minor-category">Total number of Units already Completed</span>
+                This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
+
+                <span class="minor-minor-category">Estimated number of Minutes to complete each Unit</span>
+                This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour."
+                
+            </details>
+            <details open>
+                <summary class="minor-category">Advanced inputs</summary>
+                These inputs in the assignment form are option for every assignment, but they further enhance your assignments' work schedules. There are 4 advanced inputs:
+
+                <span class="minor-minor-category">Assignment Description</span>
+                This input is the description of the assignment, shown below the assignment name only when the assignment is open.
+
+                <span class="minor-minor-category">Number of Units you will Complete at a Time</span>
+                This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in a multiple of 5 pages throughout the entire assignment. You can leave this input empty to disable it.
+
+                <span class="minor-minor-category">Minimum Daily Work Time in Minutes</span>
+                This input is the minimum amount of time you will work on of an assignment every day. This doesn't apply for days in which you don't work on the assignment. You can leave this input empty to disable it.
+
+                <span class="minor-minor-category">Break Days</span>
+                This input is the days of the week in which you won't work on the assignment. Green days represent days in which you will work, and red days represent days in which you won't work.
+            </details>
+        </span>
+        <span>
+            <div class="major-category">Assignment graph</div>
+            <details open>
+                <summary class="minor-category">What is the assignment graph?</summary>
+
+            </details>
+            <details open>
+                <summary class="minor-category">Standard options</summary>
+
+            </details>
+            <details open>
+                <summary class="minor-category">Advanced options</summary>
+            </details>
+        </span>
+        <span>
+            <div class="major-category">Assignment priority</div>
+            <details open>
+                <summary class="minor-category">How are assignments prioritized?</summary>
+
+            </details>
+            <details open>
+                <summary class="minor-category">Priority groups</summary>
+            </details>
+        </span>
+        <span>
+            <div class="major-category">Assignment tags</div>
+        </span>
+        <span>
+            <div class="major-category">Assignment shortcuts</div>
+        </span>
+        <span>
+            <div class="major-category">Google Classroom API</div>
+            <details open>
+                <summary class="minor-category">What is the Google Classroom API?</summary>
+
+            </details>
+            <details open>
+                <summary class="minor-category">Enabling the Google Classroom API</summary>
+
+            </details>
+            <details open>
+                <summary class="minor-category">Adding Google Classroom assignments</summary>
+            </details>
+        </span>
+        <span>
+            <div class="major-category">Keybinds</div>
+        </span>
+    </div>
+</div>
+<template id="table-of-contents-major-category-template">
+    <ul>
+        <li>
+            <a></a>
+        </li>
+        <ul></ul>
+    </ul>
+</template>
+<template id="table-of-contents-minor-category-template">
+    <li>
+        <a></a>
+    </li>
+</template>
+<template id="label-icon-template">
+    <div class="label-icon-container">
+        <img class="label-icon" height="25">
+    </div>
+</template>
+{% endblock content %}

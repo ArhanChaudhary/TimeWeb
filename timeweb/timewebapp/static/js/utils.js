@@ -800,13 +800,7 @@ ajaxUtils = {
             'assignments': [],
         }
     },
-}
-// Prevents submitting form on refresh
-// https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
-if ( window.history.replaceState ) {
-    window.history.replaceState( null, null, window.location.href );
-}
-$.fn.reverse = Array.prototype.reverse;
+};
 ({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date();

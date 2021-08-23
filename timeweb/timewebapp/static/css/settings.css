@@ -6,6 +6,7 @@ input {
 }
 form {
     width: calc(100% - 30px);
+    font-size: 20px;
     transform: translateX(15px);
 }
 fieldset {
@@ -14,6 +15,7 @@ fieldset {
 table {
     width: 100%;
     -webkit-border-horizontal-spacing: 5px;
+    -webkit-border-vertical-spacing: 5px;
 }
 img {
     width: 100%;

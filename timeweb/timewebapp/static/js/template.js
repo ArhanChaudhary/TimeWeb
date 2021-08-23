@@ -199,6 +199,7 @@ jconfirm.defaults = {
     closeAnimation: 'scale',
     animateFromElement: false,
 };
+$.fn.reverse = Array.prototype.reverse;
 // Info tooltip
 $.fn.info = function(facing,text,position) {
     const info_button = $($("#info-button-template").html());
