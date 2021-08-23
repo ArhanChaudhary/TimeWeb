@@ -866,10 +866,6 @@ class VisualAssignment extends Assignment {
                 this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, +skew_ratio_textbox.val() + 1, skew_ratio_bound);
                 ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
             }
-            for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
-                this.setDynamicStartIfInDynamicMode();
-                this.autotuneSkewRatio();
-            }
             this.setDynamicStartIfInDynamicMode();
             this.draw();
         }).keypress(e => {
