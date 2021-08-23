@@ -43,6 +43,10 @@ body {
         position: absolute;
     }
 }
+ul {
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
 #table-of-contents-container ul {
     font-size: 14px;
 }
