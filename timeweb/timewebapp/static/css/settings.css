@@ -6,7 +6,7 @@ input {
 }
 form {
     width: calc(100% - 30px);
-    font-size: 20px;
+    font-size: 17px;
     transform: translateX(15px);
 }
 fieldset {
@@ -30,7 +30,7 @@ img {
 td {
     position: relative;
     text-align: left;
-    width: 265px;
+    width: 350px;
 }
 th {
     text-align: left;
