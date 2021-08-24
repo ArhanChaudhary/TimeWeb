@@ -8,7 +8,7 @@ This only runs on index.html
 */
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 priority = {
-    sort_timeout_duration: 2000,
+    sort_timeout_duration: 100,
     percentageToColor: function(p) {
         if (isNaN(p)) return "white";
         return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;

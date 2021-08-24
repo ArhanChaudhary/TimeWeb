@@ -681,7 +681,7 @@ class VisualAssignment extends Assignment {
                 default: {
                     input_done = +input_done;
                     if (isNaN(input_done)) {
-                        not_applicable_message = "Invalid Value";
+                        not_applicable_message = "Invalid Number";
                     }
                 }
             }
