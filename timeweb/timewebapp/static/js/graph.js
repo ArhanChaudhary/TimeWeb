@@ -910,7 +910,7 @@ class VisualAssignment extends Assignment {
         skew_ratio_button.info("top", 
             `The skew ratio determines the work distribution of the graph
 
-            Click this button and hover and click the graph`
+            Hover and click the graph after clicking this button`
         ).css("margin-right", 1);
 
         work_input_textbox.info("top",
