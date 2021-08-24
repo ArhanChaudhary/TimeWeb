@@ -12,7 +12,6 @@ body {
 #table-of-contents-container {
     height: 100%;
     box-shadow: 0 0 6px 2px gray;
-    list-style-position: inside;
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-y: overlay;
