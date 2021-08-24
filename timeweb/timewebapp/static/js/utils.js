@@ -116,6 +116,9 @@ utils = {
                     in_next_day = true;
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
+                    for (sa of dat) {
+                        sa.mark_as_done = false;
+                    }
                     $("#simulated-date").show();
                     $("#simulated-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                     priority.sort();

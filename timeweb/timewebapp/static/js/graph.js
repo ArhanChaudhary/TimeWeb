@@ -776,7 +776,7 @@ class VisualAssignment extends Assignment {
         let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
-                skew_ratio_button.onlyText("Set skew ratio using graph");
+                skew_ratio_button.onlyText("Set Skew Ratio using Graph");
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
@@ -809,7 +809,7 @@ class VisualAssignment extends Assignment {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.onlyText("Set skew ratio using graph");
+                skew_ratio_button.onlyText("Set Skew Ratio using Graph");
                 ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 if (!this.draw_mouse_point) {
                     this.graph.off("mousemove");
