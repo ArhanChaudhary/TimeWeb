@@ -231,7 +231,7 @@ $(window).one("load", function() {
     $("#form-wrapper .error-note").each(function() {
         $(this).siblings("input, textarea").addClass("invalid");
         // Give the previous field an error if appropriate
-        if (this.id === "error_id_x" && $(this).text().includes("assignment") || this.id === "error_id_works" && $(this).text().includes("of")) {
+        if (this.id === "error_id_x" && $(this).text().includes("assignment date") || this.id === "error_id_works" && $(this).text().includes("of")) {
             // Style invalid form for previous cousin
             $(this).parents(".field-wrapper").prev().children("input, textarea").first().addClass("invalid");
         }

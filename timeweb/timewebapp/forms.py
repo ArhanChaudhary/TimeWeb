@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from .models import TimewebModel, SettingsModel, TAG_POSITIONS
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
@@ -105,6 +106,10 @@ class TimewebForm(forms.ModelForm):
                         'on_or_before': "on" if x == assignment_date else "before",
                     })
                 )
+            # if x <= timezone.localtime(timezone.now()):
+            #     self.add_error("x",
+            #         forms.ValidationError(_("This assignment has already been due"),code='invalid')
+            #     )
         except:
             pass
         return cleaned_data

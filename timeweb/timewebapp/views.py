@@ -408,8 +408,12 @@ class TimewebView(LoginRequiredMixin, View):
                 # Remove the work input for the last day if the cut off work input doesn't complete the assignment OR the newly generated work input doesn't complete the assignment
                 if d(old_data.works[removed_works_end]) != self.sm.y or d(old_data.works[removed_works_end]) - d(old_data.works[0]) + first_work < self.sm.y:
                     removed_works_end -= 1
-            if removed_works_start <= removed_works_end and self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
-                self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
+            if removed_works_start <= removed_works_end:
+                if self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
+                    self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
+            else:
+                # If the assignment date cuts off every work input
+                self.sm.works = [old_data.works[removed_works_end]]
             
             self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
             if self.sm.dynamic_start < 0:
