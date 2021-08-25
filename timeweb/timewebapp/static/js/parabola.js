@@ -185,7 +185,7 @@ Assignment.prototype.setParabolaValues = function() {
             right = mid;
         }
     }
-    this.return_0_cutoff = left - 1;
+    this.return_0_cutoff = Math.max(0, left - 1);
     output = this.funct(this.return_0_cutoff + 1, {translateX: false});
     
     if (ignore_ends && this.sa.min_work_time) {
@@ -204,7 +204,7 @@ Assignment.prototype.setParabolaValues = function() {
                 right = mid;
             }
         }
-        this.return_0_cutoff = left - 1;
+        this.return_0_cutoff = Math.max(0, left - 1);
         output = this.funct(this.return_0_cutoff + 1, {translateX: false});
 
         const lower_return_0_cutoff = this.return_0_cutoff;
