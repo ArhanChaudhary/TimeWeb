@@ -222,10 +222,10 @@ priority = {
                     }).css("margin-left", 2);
                 } else if (todo_is_completed || current_work_input_is_break_day) {
                     status_image = 'finished';
-                    if (todo_is_completed) {
-                        status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
+                    if (current_work_input_is_break_day) {
+                        status_message = 'Today is this Assignment\'s Break Day';
                     } else {
-                        status_message = 'Today is this Assignment\'s Break Day'
+                        status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
                     }
                     dom_status_image.attr({
                         width: 15,
