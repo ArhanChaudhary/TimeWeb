@@ -204,7 +204,7 @@ priority = {
                 }
                 var due_date_minus_today = sa.sa.x - today_minus_ad;
                 const todo_is_completed = todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start;
-                const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + sa.sa.blue_line_start + len_works) % 7) && due_date_minus_today !== 1;
+                const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_ad) % 7) && due_date_minus_today !== 1;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
                     status_image = 'question-mark';
                     if (!x1) {
