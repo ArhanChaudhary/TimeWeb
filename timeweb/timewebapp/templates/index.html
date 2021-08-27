@@ -64,7 +64,7 @@
   </div>
   <div id="assignments-container">
     <div id="assignments-header">
-      <div id="info" class="grey-highlight">
+      <div id="info"{% if background_image %} class="grey-highlight"{% endif %}>
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
@@ -80,7 +80,7 @@
       </div>
     </div>
     <div id="simulated-date">
-      <span id="simulated-date-text" class="grey-highlight"></span>
+      <span id="simulated-date-text"{% if background_image %} class="grey-highlight"{% endif %}></span>
     </div>
     <div id="autofill-work-done">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>

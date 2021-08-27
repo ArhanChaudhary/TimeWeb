@@ -357,15 +357,18 @@ priority = {
                 return -Infinity;
             }
         }));
-        const tags_left = $(".tags-left").length; 
+        const tags_left = $(".tags-left").length;
+        const question_mark_exists_excluding_gc = ordered_assignments.some(function(pd) {
+            return [7, 8].includes(pd[0]);
+        });
         let prev_assignment_container;
         let prev_tag;
         let already_found_first_incomplete_works = false;
         let already_found_first_finished = false;
         $("#autofill-work-done, #delete-starred-assignments").hide();
         for (let pd of ordered_assignments) {
-            // originally ![6,7,8].includes(pd[0]) && (pd[3] || $(".question-mark").length); if pd[3] is true then ![6,7,8].includes(pd[0])
-            const mark_as_done = !!(pd[3] || $(".question-mark").length && ![6,7,8].includes(pd[0]));
+            // originally ![6,7,8].includes(pd[0]) && (pd[3] || question_mark_exists_excluding_gc); if pd[3] is true then ![6,7,8].includes(pd[0])
+            const mark_as_done = !!(pd[3] || question_mark_exists_excluding_gc && ![6,7,8].includes(pd[0]));
             const dom_assignment = $(".assignment").eq(pd[2]);
             const assignment_container = dom_assignment.parents(".assignment-container");
             let priority_percentage;
@@ -480,7 +483,7 @@ priority = {
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
 
-        if ($(".question-mark").length) {
+        if (question_mark_exists_excluding_gc) {
             $("#current-time, #tomorrow-time, #info").hide();
             $("#simulated-date").css({
                 marginTop: -23,

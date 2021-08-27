@@ -93,19 +93,11 @@ utils = {
                 // Assignments header icons
                 $("#open-assignments").click(function() {
                     // Use .reverse() for gc assignemnts so the first assignment is focused
-                    if ($(".question-mark").length) {
-                        $(".assignment-container.question-mark .assignment:not(.open-assignment)").reverse().click();
-                    } else {
-                        $(".assignment:not(.open-assignment)").reverse().click();
-                    }
+                    $(".assignment:not(.open-assignment)").reverse().click();
                 });
         
                 $("#close-assignments").click(function() {
-                    if ($(".question-mark").length) {
-                        $(".assignment-container.question-mark .assignment.open-assignment").click();
-                    } else {
-                        $(".assignment.open-assignment").click();
-                    }
+                    $(".assignment.open-assignment").click();
                 });
                 if (isExampleAccount) {
                     $("#simulated-date-text").text("Simulated example account date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long', year: 'numeric'}));
@@ -664,8 +656,8 @@ utils = {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    ($(".question-mark").length ? $(".assignment-container.question-mark .assignment") : $(".assignment")).filter(function() {
-                        return open_assignments.includes($(this).attr("data-assignment-id"))
+                    $(".assignment").filter(function() {
+                        return open_assignments.includes($(this).attr("data-assignment-id"));
                     }).click();
                 }
                 // Scroll to original position
