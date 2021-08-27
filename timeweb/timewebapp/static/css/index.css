@@ -45,7 +45,6 @@ header.animate::after {
     flex-wrap: wrap;
 }
 #info {
-    background-color: rgb(214, 214, 214);
     display: inline;
     font-size: 17px;
 }
@@ -53,10 +52,6 @@ header.animate::after {
     position: relative;
     padding: 0 10px;
     font-size: 17px;
-}
-/* Helps with background color */
-#simulated-date-text {
-    background-color: rgb(214, 214, 214);
 }
 #hide-button {
     cursor: pointer;
@@ -185,7 +180,6 @@ header.animate::after {
     left: 50%;
     transform: translateX(-50%);
     margin-top: -10px;
-    background-color: rgb(214, 214, 214);
     cursor: pointer;
 }
 /* Info buttons */
@@ -837,10 +831,8 @@ input[type=number]::-webkit-inner-spin-button {
     transform: translateX(-50%);
 }
 #form-wrapper #fields-wrapper {
-    overflow: scroll;
-}
-#form-wrapper #fields-wrapper::-webkit-scrollbar {
-    display: none;
+    overflow-y: scroll;
+    overflow-y: overlay;
 }
 #form-wrapper .field-wrapper {
     margin-top: 10px;
@@ -989,6 +981,10 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #toggle-gc-container.open #toggle-gc-label {
     width: 333px;
+}
+
+.grey-highlight {
+    background-color: rgb(214, 214, 214);
 }
 :not(.assignment-container).difference-blend-mode {
     mix-blend-mode: difference;

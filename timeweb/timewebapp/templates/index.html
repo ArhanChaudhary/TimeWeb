@@ -64,7 +64,7 @@
   </div>
   <div id="assignments-container">
     <div id="assignments-header">
-      <div id="info">
+      <div id="info" class="grey-highlight">
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <button id="hide-button">Hide</button>
       </div>
@@ -80,12 +80,12 @@
       </div>
     </div>
     <div id="simulated-date">
-      <span id="simulated-date-text"></span>
+      <span id="simulated-date-text" class="grey-highlight"></span>
     </div>
     <div id="autofill-work-done">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
-      <span class="shortcut-text">
+      <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
         Autofill
         <select id="autofill-selection">
           <option>No</option>
@@ -97,7 +97,7 @@
     <div id="delete-starred-assignments">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
-      <span class="shortcut-text">Delete all Starred Assignments</span>
+      <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
       <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}"{% if assignment.name == just_created_assignment_name %} id="animate-in"{% elif assignment.name == just_updated_assignment_name %} id="animate-color"{% endif %}>
@@ -198,7 +198,7 @@
     <div class="delete-gc-assignments-from-class">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
-      <span class="shortcut-text">Delete all Assignments from this Class</span>
+      <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">Delete all Assignments from this Class</span>
     </div>
   </template>
   <template id="tag-add-selection-item-template">
