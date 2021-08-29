@@ -731,10 +731,10 @@ header.animate::after {
     padding-right: 26px;
 }
 .skew-ratio-textbox {
-    width: 125px;
-    padding-right: 31px;
-    /* Position it behind info button */
-    z-index: 0;
+    width: 129px;
+}
+.skew-ratio-textbox::-webkit-inner-spin-button {
+    transform: translateX(-2px);
 }
 input[type=number]::-webkit-inner-spin-button {
     cursor: pointer;
@@ -744,9 +744,6 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
-}
-.skew-ratio-textbox::-webkit-inner-spin-button {
-    transform: translateX(3px);
 }
 
 #form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {

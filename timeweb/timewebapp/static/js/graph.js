@@ -900,10 +900,9 @@ class VisualAssignment extends Assignment {
     addGraphInfoButtons() {
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
-                skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button");
         skew_ratio_button.info("top", 
-            `The skew ratio determines the work distribution of the graph
+            `The skew ratio controls the curvature of the graph and, in turn, your work schedule
 
             Hover and click the graph after clicking this button`
         ).css("margin-right", 1);
@@ -925,18 +924,6 @@ class VisualAssignment extends Assignment {
             Dynamic mode (default):
             The red line and skew ratio readjust themselves after every work input to adapt to your work schedule`, "prepend"
         ).css("left", -3);
-
-        skew_ratio_textbox.info("top", 
-            `The skew ratio determines the work distribution of the graph
-
-            Enter this as a number. Leave this blank to cancel or press enter to save`,'after'
-        ).css({
-            left: "calc(50% + 56px)",
-            bottom: 37,
-            position: "absolute",
-        // Initially hide or show this if "Advanced Options" is visible or not
-        // Only need to do this here because this info button is absolutely positioned
-        }).toggle(this.dom_assignment.find(".second-advanced-button").is(":visible"));
     }
 }
 $(function() {

@@ -12,7 +12,6 @@ body {
 #table-of-contents-container {
     height: 100%;
     box-shadow: 0 0 6px 2px gray;
-    list-style-position: inside;
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-y: overlay;
@@ -90,6 +89,19 @@ a:visited {
     position: relative;
     white-space: pre-line;
 }
+
+#user-guide-container::-webkit-scrollbar {
+    width: 14px;
+}
+#user-guide-container::-webkit-scrollbar-track {
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+#user-guide-container::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+
 .major-category {
     margin-left: -50px;
     font-family: 'Roboto Slab';
