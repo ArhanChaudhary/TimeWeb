@@ -242,9 +242,9 @@ priority = {
                         height: 15,
                     }).css("margin-left", -2);
                     if (sa.unit_is_of_time) {
-                        status_message += `<br>Complete ${todo} ${pluralize(sa.sa.unit,todo)} of Work Today`;
+                        status_message += `<br>Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} of Work Today`;
                     } else {
-                        status_message += `<br>Complete ${todo} ${pluralize(sa.sa.unit,todo)} Today`;
+                        status_message += `<br>Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
                     }
                     total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
                 }

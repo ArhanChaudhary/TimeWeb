@@ -310,6 +310,7 @@ utils = {
                     tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
                 });
             }
+            // might be easier to attach the click to $(document) but will do later
             $(".tag-add").click(tagAddClick);
             function tagAddClick(e) {
                 const $this = $(this);
@@ -503,49 +504,59 @@ utils = {
                     setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
                 } else if (e.key === "Escape") {
                     hideForm();
-                } else if (e.key === "ArrowDown" && e.shiftKey) {
-                    // If there is an open assignment in view, select that one and 
-                    const first_open_assignment = $(".assignment.open-assignment").first();
-                    if (first_open_assignment.length) {
-                        var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
-                        first_open_assignment[0].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                        });
-                    } else {
-                        var assignment_to_be_opened = $(".assignment").first();
-                        assignment_to_be_opened[0].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                        });
-                    }
-                    first_open_assignment.click();
-                    if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                        assignment_to_be_opened.click();
-                    }
-                } else if (e.key === "ArrowUp" && e.shiftKey) {
-                    // If there is an open assignment in view, select that one and 
-                    const last_open_assignment = $(".assignment.open-assignment").last();
-                    if (last_open_assignment.length) {
-                        var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
-                        if (assignment_to_be_opened.length) {
+                } else if (e.key === "ArrowDown") {
+                    if (e.shiftKey) {
+                        // If there is an open assignment in view, select that one and 
+                        const first_open_assignment = $(".assignment.open-assignment").first();
+                        if (first_open_assignment.length) {
+                            var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
+                            first_open_assignment[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                            });
+                        } else {
+                            var assignment_to_be_opened = $(".assignment").first();
                             assignment_to_be_opened[0].scrollIntoView({
                                 behavior: 'smooth',
                                 block: 'start',
                             });
                         }
-                    } else {
-                        var assignment_to_be_opened = $(".assignment").last();
+                        first_open_assignment.click();
+                        if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                            assignment_to_be_opened.click();
+                        }
+                    } else if ($(".open-assignment").length !== 0) {
+                        // Prevent arrow scroll
+                        e.preventDefault();
                     }
-                    last_open_assignment.click();
-                    if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                        assignment_to_be_opened.click();
-                    }
-                    if (!last_open_assignment.length) {
-                        assignment_to_be_opened[0].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'end',
-                        });        
+                } else if (e.key === "ArrowUp") {
+                    if (e.shiftKey) {
+                        // If there is an open assignment in view, select that one and 
+                        const last_open_assignment = $(".assignment.open-assignment").last();
+                        if (last_open_assignment.length) {
+                            var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
+                            if (assignment_to_be_opened.length) {
+                                assignment_to_be_opened[0].scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start',
+                                });
+                            }
+                        } else {
+                            var assignment_to_be_opened = $(".assignment").last();
+                        }
+                        last_open_assignment.click();
+                        if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                            assignment_to_be_opened.click();
+                        }
+                        if (!last_open_assignment.length) {
+                            assignment_to_be_opened[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'end',
+                            });        
+                        }
+                    } else if ($(".open-assignment").length !== 0) {
+                        // Prevent arrow scroll
+                        e.preventDefault();
                     }
                 }
             });
@@ -612,18 +623,10 @@ utils = {
             });
         },
         exampleAccountAlertTutorial: function() {
+            if (sessionStorage.getItem("already-alerted-example-account")) return;
+            sessionStorage.setItem("already-alerted-example-account", true);
             $.alert({
-                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like",
-                onClose: function() {
-                    $.alert({
-                        title: "A few things to note:<br>The example account's internal date is frozen at May 3, 2021 for consistency, and no modifications to this account are saved",
-                        onClose: function() {
-                            $.alert({
-                                title: "With that out of the way, feel free to do whatever you want over here",
-                            });
-                        }
-                    });
-                }
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>A few things to note:<br>The example account's internal date is frozen at May 3, 2021 for consistency, and no modifications to this account are saved<br><br>With that out of the way, feel free to do whatever you want over here"
             });
         },
         saveAndLoadStates: function() {

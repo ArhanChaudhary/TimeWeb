@@ -175,12 +175,6 @@ class VisualAssignment extends Assignment {
         // Passes mouse x and y coords so mouse point can be drawn
         this.draw(raw_x, raw_y);
     }
-    static preventArrowScroll(e) {
-        // Prevent arrow keys from scrolling when clicking the up or down arrows in the graph
-        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-            e.preventDefault();
-        }
-    }
     changeSkewRatio() {
         // Change skew ratio by +- 0.1 and cap it
         const skew_ratio_bound = this.calcSkewRatioBound();
@@ -580,6 +574,7 @@ class VisualAssignment extends Assignment {
         }
     }
     setGraphButtonEventListeners() {
+        // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
                 display_button = this.dom_assignment.find(".display-button"),
@@ -986,10 +981,6 @@ $(".assignment").click(function(e) {
         if (pre_sa.description) {
             priority.positionTagLeft(dom_assignment);
         }
-        // If no graphs are open, allow arrow scroll
-        if ($(".open-assignment").length === 0) {
-            $(document).off("keydown", VisualAssignment.preventArrowScroll);
-        }
         return;
     }
     const sa = new VisualAssignment(dom_assignment);
@@ -999,10 +990,6 @@ $(".assignment").click(function(e) {
         marginBottom: "",
     });
     dom_assignment.css("overflow", "");
-    // Prevents auto scroll if a graph is open
-    if ($(".open-assignment").length === 0) {
-        $(document).keydown(VisualAssignment.preventArrowScroll);
-    }
     assignment_footer.css("display", "block");
     dom_assignment.addClass("open-assignment");
     if (pre_sa.description) {
