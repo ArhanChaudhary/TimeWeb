@@ -582,37 +582,13 @@ utils = {
         },
         graphAlertTutorial: function(days_until_due) {
             $.alert({
-                title: "Welcome to the graph, a visualization of your assignment's entire work schedule",
+                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read TimeWeb's <a href=\"/user-guide#assignment-graph\">user guide for the graph</a> to understand how to use it.<br><br>Once you finish reading that, click OK to disable this popup and then check out the settings to set your preferences",
+                content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment or the example account to see how TimeWeb handles assignments with longer due dates` : '',
+                backgroundDismiss: false,
                 alignTop: true, // alignTop is a custom extension
                 onClose: function() {
-                    $.alert({
-                        title: "The graph splits up your assignment in days over units of work, with day zero being its assignment date and the last day being its due date. The red line is the generated work schedule of this assignment",
-                        content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment to see how TimeWeb handles assignments with longer due dates` : '',
-                        alignTop: true,
-                        onClose: function() {
-                            $.alert({
-                                title: "As you progress through your assignment, you will have to enter your own work inputs to measure how much you've done on a daily basis. This will be represented with a blue line",
-                                content: isExampleAccount ? "" : "This may not yet visible because you haven't entered any work inputs",
-                                alignTop: true,
-                                onClose: function() { 
-                                    $.alert({
-                                        title: "Once you add more assignments, they are automatically prioritized based on their daily estimated completion times and due dates",
-                                        alignTop: true,
-                                        onClose: function() {
-                                            $.alert({
-                                                title: "Now that you have finished reading this, check out the settings to set your preferences",
-                                                alignTop: true,
-                                                onClose: function() {
-                                                    enable_tutorial = false;
-                                                    ajaxUtils.ajaxFinishedTutorial();
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
+                    enable_tutorial = false;
+                    ajaxUtils.ajaxFinishedTutorial();
                 }
             });
         },

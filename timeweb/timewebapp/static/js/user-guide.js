@@ -11,17 +11,14 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     const table_of_contents_major_category_template = $("#table-of-contents-major-category-template").html();
     const table_of_contents_minor_category_template = $("#table-of-contents-minor-category-template").html();
-    $(".major-category").reverse().each(function(index) {
-        index = $(".major-category").length - index;
+    $(".major-category").reverse().each(function() {
         const $major_category = $(this);
-        $major_category.attr("id", `major-${index}`);
 
         const major_category_li = $(table_of_contents_major_category_template);
         major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`).text($major_category.text());
 
-        $major_category.siblings("details").each(function(index) {
+        $major_category.siblings("details").each(function() {
             const $minor_category = $(this).find(".minor-category");
-            $minor_category.attr("id", `${$major_category.attr("id")}-minor-${index+1}`);
 
             const minor_category_li = $(table_of_contents_minor_category_template);
             minor_category_li.find("a").attr("href", `#${$minor_category.attr("id")}`).text($minor_category.text());
@@ -30,9 +27,8 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
     });
 
-    $(".label-question").each(function(index) {
+    $(".label-question").each(function() {
         const $label_question = $(this);
-        $label_question.attr("id", `question-${index+1}`);
 
         const minor_category_li = $(table_of_contents_minor_category_template);
         minor_category_li.find("a").attr("href", `#${$label_question.attr("id")}`).text($label_question.find(".label-title").text());
@@ -40,9 +36,8 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-user-guide-labels").append(minor_category_li);
     });
 
-    $(".label-note").each(function(index) {
+    $(".label-note").each(function() {
         const $label_note = $(this);
-        $label_note.attr("id", `note-${index+1}`);
 
         const minor_category_li = $(table_of_contents_minor_category_template);
         minor_category_li.find("a").attr("href", `#${$label_note.attr("id")}`).text($label_note.find(".label-title").text());

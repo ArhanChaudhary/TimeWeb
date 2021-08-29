@@ -3,14 +3,12 @@
 Assignment graph
     Graph buttons
         (explain all graph buttons) (autotune and dynamic mode isnt perfect) (it isnt meant to be)
-        !autotune disabled at 10000
         !skew ratio isn't always the same distribution in dynamic mode
 Assignment priority
     How prioritized
-        colored automatically; (user doesnt needtodoanything)
         grouped into sections and then prioritized individually; explain status messages
         ?status value can make priority not sorted
-    Priority groups
+    Status messages
         (explain every status message) (difference between finished and completely finished)
 Assignment tags
     (explain what they are and sortable)
@@ -20,13 +18,14 @@ Shortcut wrappers
     ?why does autofill no work done sometimes not work (because they need to do autofill all)
 Google Classroom API
     What is the Google Classroom API?
-        how to enable
+    Enabling gc api
+        you must enable both or nothing will work
         ?why do I ask for permission to view grades
     Adding Google Classroom assignments
         refresh adds them
         ?why does loading take so long (unenroll)
         critieria
-        old assignments are re added
+        old assignments are not re added
 Keybinds
      {% endcomment %}
 {% load static %}
@@ -64,14 +63,14 @@ Keybinds
     <div id="user-guide-container">
         {% comment %} the span groups the major and minor categories together for user-guide.js {% endcomment %}
         <span>
-            <div class="major-category">Introduction</div>
+            <div class="major-category" id="introduction">Introduction</div>
             <details open>
-                <summary class="minor-category">Getting started</summary>
+                <summary class="minor-category" id="getting-started">Getting started</summary>
                 Welcome! TimeWeb's user guide documents all of its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. However, if you do decide to read this, it's recommended to create at least one assignment and take a look at its graph to get a feel for the user interface.
 
                 In this user guide, important notes and FAQs are marked and labeled. FAQ labels are used for questions you may have, and note labels are used for advice and important edge cases. An example of an FAQ label:
 
-                <span class="label-question">
+                <span class="label-question" id="why-doesn't-the-internal-date-change-after-midnight">
                     <span class="label-title">Why doesn't the internal date change after midnight?</span>
                     This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
                 </span>
@@ -79,7 +78,7 @@ Keybinds
 
             </details>
             <details open>
-                <summary class="minor-category">What is TimeWeb and why should I use it?</summary>
+                <summary class="minor-category" id="why-should-i-use-timeweb">What is TimeWeb and why should I use it?</summary>
                 TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take. TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
 
                 A few extra things to help with TimeWeb's credibility:
@@ -91,12 +90,12 @@ Keybinds
                 </ul>
                 The below section has every review and their respective ratings of TimeWeb during its beta phase from an anonymous form.{% endspaceless %}
 
-                If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your home page to look like.
+                If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your homepage to look like.
 
             </details>
             <details>
-                <summary class="minor-category">Every anonymous review during TimeWeb's beta</summary>
-                The below will list every review from TimeWeb's beta testers via its <a href="https://forms.gle/UUCRVYVGgpEyVrjcA">anonymous review form</a>. Take these reviews with a grain of salt, as there was unintentional selection bias and voluntary response bias with these responses.
+                <summary class="minor-category" id="anonymous-beta-reviews">Every anonymous review during TimeWeb's beta</summary>
+                The below will list every review from TimeWeb's beta testers via its <a href="https://forms.gle/UUCRVYVGgpEyVrjcA">anonymous review form</a>. Take these reviews with a grain of salt, as there was unintended selection bias (I was only able to reach people who personally knew me) and voluntary response bias with these responses.
 
                 <span class="minor-minor-category">Anonymous review #1</span>
                 Rating: 5/5
@@ -136,16 +135,16 @@ Keybinds
             </details>
         </span>
         <span>
-            <div class="major-category">Assignment form</div>
+            <div class="major-category" id="assignment-form">Assignment form</div>
             <details open>
-                <summary class="minor-category">What is the assignment form?</summary>
+                <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
                 The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button on an already existing assignment. 
                 
                 The assignment form has 11 inputs in total, 4 of which are optional. Default form input values, which can be set in the settings, are accordingly set every time you make a new assignment, and they can be manually overridden.
                 
             </details>
             <details open>
-                <summary class="minor-category">Standard inputs</summary>
+                <summary class="minor-category" id="standard-assignment-form-inputs">Standard inputs</summary>
                 These inputs in the assignment form are mandatory for every assignment. There are 7 standard inputs:
 
                 <span class="minor-minor-category">Name of this Assignment</span>
@@ -175,7 +174,7 @@ Keybinds
                 
             </details>
             <details open>
-                <summary class="minor-category">Advanced inputs</summary>
+                <summary class="minor-category" id="advanced-assignment-form-inputs">Advanced inputs</summary>
                 These inputs in the assignment form are optional for every assignment, but they further enhance your assignments' work schedules. There are 4 advanced inputs:
 
                 <span class="minor-minor-category">Assignment Description</span>
@@ -192,9 +191,9 @@ Keybinds
             </details>
         </span>
         <span>
-            <div class="major-category">Assignment graph</div>
+            <div class="major-category" id="assignment-graph">Assignment graph</div>
             <details open>
-                <summary class="minor-category">What is the assignment graph?</summary>
+                <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
                 After creating an assignment, click it to open its assignment graph. The assignment graph provides a visualization of how your assignment's work schedule will look like as a line graph. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
 
                 As you progress through your assignment, there needs to be some way to measure your progress so each assignment can be prioritized accordingly. So, you must input the amount of work you complete every day for every assignment. This will be plotted and connected in blue.
@@ -203,7 +202,7 @@ Keybinds
                 
             </details>
             <details open>
-                <summary class="minor-category">Standard controls</summary>
+                <summary class="minor-category" id="standard-assignment-graph-controls">Standard controls</summary>
                 There are 6 standard controls for the assignment graph:
 
                 <span class="minor-minor-category">Delete Work Input</span>
@@ -226,11 +225,11 @@ Keybinds
 
             </details>
             <details open>
-                <summary class="minor-category">Advanced controls</summary>
+                <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
                 Before getting to the advanced controls, you must first understand what the skew ratio is. The skew ratio controls the curvature of the graph and, in turn, your work schedule.
                 
-                A positive skew ratio yields a schedule in which you work more in the beginning and less at the end of an assignment. 
-                A negative skew ratio yields a schedule in which you work less in the beginning and more at the end of an assignment. 
+                A positive skew ratio yields a schedule in which you work more at the beginning and less at the end of an assignment.
+                A negative skew ratio yields a schedule in which you work less at the beginning and more at the end of an assignment.
                 A skew ratio of 0 yields a linear schedule in which you work an equal amount for every day of an assignment.
 
                 There are 3 advanced controls for the assignment graph:
@@ -242,7 +241,7 @@ Keybinds
                 This input allows you to manually enter a numeric skew ratio value. The graph is updated by this value in real time.
 
                 <span class="minor-minor-category">Switch to Fixed/Dynamic mode</span>
-                This button switches the graph to fixed mode or dynamic mode. 
+                This button switches the graph to fixed mode or dynamic mode.
 
                 Fixed mode:
                 The work schedule starts at the date the assignment was assigned and remains static (assuming the skew ratio doesn't change), meaning if you don't finish a day's work, you'll have to make it up on the next day.
@@ -250,43 +249,53 @@ Keybinds
                 Dynamic mode:
                 The work schedule readjusts and the skew ratio autotunes after every work input to adapt to your work schedule, meaning if you don't finish a day's work, the graph will change to fit your work style.
                 
-                It's important to note that skew ratio autotuning in dynamic mode isn't always accurate, as it may not always predict your ideal desired work schedule. Dynamic mode only guides you in general direction of your work style. You are still in control of adjusting the autotuned skew ratio.
+                It's important to note that skew ratio autotuning in dynamic mode isn't always accurate, as it may not always predict your ideal desired work schedule. Dynamic mode only guides you in general direction of your work style, and you are still in control of adjusting the autotuned skew ratio.
                 
-                <span class="label-note">
-                    <span class="label-title">Skew ratio doesn't always have the same distribution in dynamic mode</span>
-                    When submitting and deleting work inputs in dynamic mode, the work distribution may change due to skew ratio autotuning. This isn't a bug and is instead a quirk with dynamic mode.
+                <span class="label-note" id="skew-ratio-doesn't-always-yield-the-same-work-distribution-in-dynamic-mode">
+                    <span class="label-title">Skew ratio doesn't always yield the same work distribution in dynamic mode</span>
+                    After submitting and deleting work inputs in dynamic mode, you may notice that the same skew ratio value may yield different work distributions. This isn't a bug and is instead a quirk with dynamic mode.
                 </span>
             </details>
         </span>
+        <details>
+            <summary class="major-category" id="assignment-priority">Assignment priority</summary>
+            After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for that day compared to every other assignment.
+            
+            Their priority also determines their assignment list position, which represents the order in which you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
+
+            <span class="label-question" id="why-do-some-assignments-with-low-priority-have-a-higher-list-position">
+                <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
+                You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority, meaning that you should complete the low priority assignment first. Although it may seem so at first, this isn't actually a bug.<br>
+                <br>
+                If you look carefully, the assignment with the low priority in this case is actually due tomorrow, while the assignment with the high priority isn't. TimeWeb is able to recognize and make exceptions for cases like these, as, ideally, you should always complete assignments that are due tomorrow first.
+            </span>
+        </details>
         <span>
-            <div class="major-category">Assignment priority</div>
+            <div class="major-category" id="assignment-tags">Assignment tags</div>
+        </span>
+        <span>
+            <div class="major-category" id="assignment-shortcuts">Assignment shortcuts</div>
+        </span>
+        <span>
+            <div class="major-category" id="google-classroom-api">Google Classroom API</div>
             <details open>
-                <summary class="minor-category">What is assignment priority?</summary>
-                After adding multiple assignments, notice that assignments you're supposed to work on automatically have a priority percentage and a color. They both represent how urgent an assignment's work is compared to everything else. Their priority also determines their list position, which represents the order in which you should complete every assignment's work, though you are still free to diverge from this order.
+                <summary class="minor-category" id="what-is-the-google-classroom-api">What is the Google Classroom API?</summary>
+
+                <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
+                    <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
+                    This isn't actually a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom API documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades. If you would like, you can inspect TimeWeb's <a href="https://github.com/ArhanChaudhary/TimeWeb/blob/master/timeweb/timewebapp/views.py">backend source code</a> to see I don't use your grades in any way.
+                </span>
             </details>
-        </span>
-        <span>
-            <div class="major-category">Assignment tags</div>
-        </span>
-        <span>
-            <div class="major-category">Assignment shortcuts</div>
-        </span>
-        <span>
-            <div class="major-category">Google Classroom API</div>
             <details open>
-                <summary class="minor-category">What is the Google Classroom API?</summary>
+                <summary class="minor-category" id="enabling-the-google-classroom-api">Enabling the Google Classroom API</summary>
 
             </details>
             <details open>
-                <summary class="minor-category">Enabling the Google Classroom API</summary>
-
-            </details>
-            <details open>
-                <summary class="minor-category">Adding Google Classroom assignments</summary>
+                <summary class="minor-category" id="adding-google-classroom-assignments">Adding Google Classroom assignments</summary>
             </details>
         </span>
         <span>
-            <div class="major-category">Keybinds</div>
+            <div class="major-category" id="keybinds">Keybinds</div>
         </span>
     </div>
 </div>
