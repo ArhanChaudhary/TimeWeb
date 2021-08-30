@@ -897,34 +897,6 @@ class VisualAssignment extends Assignment {
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
         // END Fixed/dynamic mode button        
     }
-    addGraphInfoButtons() {
-        const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
-                work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
-                fixed_mode_button = this.dom_assignment.find(".fixed-mode-button");
-        skew_ratio_button.info("top", 
-            `The skew ratio controls the curvature of the graph and, in turn, your work schedule
-
-            Hover and click the graph after clicking this button`
-        ).css("margin-right", 1);
-
-        work_input_textbox.info("top",
-            `Enter the number of units done on the graph's displayed date and submit
-            
-            Enter "fin" if you've completed an assignment's work on its displayed date`,"after"
-        ).css({
-            left: "calc(50% + 47px)",
-            top: 3,
-            position: "absolute",
-        });
-
-        fixed_mode_button.info("top",
-            `Fixed mode:
-            The red line always starts at the date this assignment was assigned, meaning if you don't finish a day's work, you'll have to make it up on the next day
-
-            Dynamic mode (default):
-            The red line and skew ratio readjust themselves after every work input to adapt to your work schedule`, "prepend"
-        ).css("left", -3);
-    }
 }
 $(function() {
 $(".assignment").click(function(e) {
@@ -984,10 +956,7 @@ $(".assignment").click(function(e) {
     }
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click
-    if (first_click) {
-        sa.setGraphButtonEventListeners();
-        sa.addGraphInfoButtons();
-    }
+    first_click && sa.setGraphButtonEventListeners();
     sa.resize();
     if (enable_tutorial) {
         $(".assignment").next().remove(); // Remove "Click this assignment"
