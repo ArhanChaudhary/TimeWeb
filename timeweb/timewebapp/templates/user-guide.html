@@ -45,19 +45,8 @@ Keybinds
     </div>
     <div id="table-of-contents-container">
         <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
-        <span class="table-of-contents-header" id="category-important-labels">Important labels</span>
-        <ul>
-            <li>
-                <span>FAQs</span>
-            </li>
-            <ul id="category-user-guide-labels"></ul>
-        </ul>
-        <ul>
-            <li>
-                <span>Notes</span>
-            </li>
-            <ul id="category-user-guide-notes"></ul>
-        </ul>
+        <span class="table-of-contents-header" id="category-important-labels">FAQs</span>
+        <ul id="category-user-guide-labels"></ul>
     </div>
     {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
     <div id="user-guide-container">
@@ -66,15 +55,15 @@ Keybinds
             <div class="major-category" id="introduction">Introduction</div>
             <details open>
                 <summary class="minor-category" id="getting-started">Getting started</summary>
-                Welcome! TimeWeb's official user guide documents its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. If you do decide to read this, it's recommended to create at least one assignment and take a look at its graph to get a feel for TimeWeb's user interface.
+                Welcome! TimeWeb's official user guide documents its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. If you do decide to read this, it's recommended to at least create an assignment and take a look at its graph to get a feel for TimeWeb's user interface.
 
-                In this user guide, important notes and FAQs are marked and labeled. FAQ labels are used for questions you may have, and note labels are used for advice and important edge cases. An example of an FAQ label:
+                In this user guide, FAQs, or frequently asked questions, are marked and labeled as such:
 
                 <span class="label-question" id="why-doesn't-the-internal-date-change-after-midnight">
                     <span class="label-title">Why doesn't the internal date change after midnight?</span>
                     This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
                 </span>
-                The "Table of contents" section to the left shows the complete outline of this user guide, and the "Important labels" section just below that lists every important note and FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
+                The "Table of contents" section to the left shows the complete outline of this user guide, and the "FAQ" section just below that lists every FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
 
             </details>
             <details open>
@@ -87,15 +76,14 @@ Keybinds
                     <li>TimeWeb scored an average of <a href="https://imgur.com/a/1cGhs8W">8.3/10</a> in overall user satisfaction in its incomplete beta</li>
                     <li>TimeWeb has been supported and received well by my school's principal</li>
                     <li>TimeWeb is <a href="https://github.com/ArhanChaudhary/TimeWeb">open source</a></li>
-                </ul>
-                The below section has every review and their respective ratings of TimeWeb during its beta phase from an anonymous form.{% endspaceless %}
+                </ul>If you would like a more direct perspective of TimeWeb, read the below section to see every review and their respective ratings of TimeWeb during its beta phase.{% endspaceless %}
 
                 If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your homepage to look like.
 
             </details>
             <details>
                 <summary class="minor-category" id="anonymous-beta-reviews">Every anonymous review during TimeWeb's beta</summary>
-                The below will list every review from TimeWeb's beta testers via its <a href="https://forms.gle/UUCRVYVGgpEyVrjcA">anonymous review form</a>. Take these reviews with a grain of salt, as there was unintended selection bias (I was only able to reach people who personally knew me) and voluntary response bias with these responses.
+                This section lists every review from TimeWeb's beta testers via its <a href="https://forms.gle/UUCRVYVGgpEyVrjcA">anonymous review form</a>. Take these reviews with a grain of salt, as there was unintended selection bias (I was only able to reach people who personally knew me) and voluntary response bias with these responses.
 
                 <span class="minor-minor-category">Anonymous review #1</span>
                 Rating: 5/5
@@ -159,9 +147,9 @@ Keybinds
                 <span class="minor-minor-category">Name of each Unit of Work</span>
                 This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete X amount of [this input] today." 
 
-                A useful tip is don't choose large divisions of work for this input. For example, pretend you're assigned three worksheets from school, each containing thirty pages. Rather than entering "Worksheet" in this input, it's usually ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed "15 pages," which is nice and clean, instead of "0.5 worksheets," which is an ugly decimal. Note that the latter is still completely valid if you choose to prefer that.
+                Try not to choose large divisions of work for this input. For example, pretend you're assigned three worksheets from school, each containing thirty pages. Rather than entering "Worksheet" for this input, it's more ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed "15 pages," which is nice and clean, instead of "0.5 worksheets," which is an ugly decimal. Note that the latter is still completely valid if you choose to prefer that.
                 
-                If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" in this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
+                If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" for this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
 
                 <span class="minor-minor-category">Total number of Units in this Assignment</span>
                 This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days in which the assignment is due.
@@ -194,7 +182,7 @@ Keybinds
             <div class="major-category" id="assignment-graph">Assignment graph</div>
             <details open>
                 <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
-                After creating an assignment, click it to open its assignment graph. The assignment graph provides a visualization of how your assignment's work schedule will look like as a line graph. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
+                After creating an assignment, click it to open its graph. The assignment line graph provides a visualization of how your assignment's work schedule will look like. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
 
                 As you progress through your assignment, there needs to be some way to measure your progress so each assignment can be prioritized accordingly. So, you must input the amount of work you complete every day for every assignment. This will be plotted and connected in blue.
                 
@@ -251,9 +239,9 @@ Keybinds
                 
                 It's important to note that skew ratio autotuning in dynamic mode isn't always accurate, as it may not always predict your ideal desired work schedule. Dynamic mode only guides you in general direction of your work style, and you are still in control of adjusting the autotuned skew ratio.
                 
-                <span class="label-note" id="skew-ratio-doesn't-always-yield-the-same-work-distribution-in-dynamic-mode">
-                    <span class="label-title">Skew ratio doesn't always yield the same work distribution in dynamic mode</span>
-                    After submitting and deleting work inputs in dynamic mode, you may notice that the same skew ratio value may yield different work distributions. This isn't a bug and is instead a quirk with dynamic mode.
+                <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
+                    <span class="label-title">Why do similar skew ratio values result in different work distributions in dynamic mode?</span>
+                    This will ocassionally occur after submitting and deleting work inputs. This isn't a bug and is instead just how dynamic mode works, so try to re-adjust the skew ratio to its old work distribution if this happens.
                 </span>
             </details>
         </span>
@@ -314,7 +302,7 @@ Keybinds
 </template>
 <template id="label-icon-template">
     <div class="label-icon-container">
-        <img class="label-icon" height="25">
+        <img class="label-icon" height="25" src="/static/images/status-icons/question-mark.png">
     </div>
 </template>
 {% endblock content %}
