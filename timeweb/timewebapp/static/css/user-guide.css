@@ -78,6 +78,8 @@ a:visited {
 }
 #table-of-contents-container a {
     color: black;
+    -webkit-text-decoration-color: rgba(0,0,0,0.4);
+            text-decoration-color: rgba(0,0,0,0.4);
 }
 #user-guide-container {
     padding-left: 100px;
@@ -122,20 +124,17 @@ summary {
 .label-question {
     --label-color: rgb(150, 232, 253);
 }
-.label-note {
-    --label-color: rgb(254, 230, 181);
-}
-.major-category, .minor-category, .label-question, .label-note {
+.major-category, .minor-category, .label-question {
     scroll-margin-top: 50px;
 }
-.label-question, .label-note {
+.label-question {
     display: block;
     position: relative;
     white-space: normal;
     padding-bottom: 12px;
     width: 100%;
 }
-.label-question::before, .label-note::before {
+.label-question::before {
     content: '';
     position: absolute;
     z-index: -1;
