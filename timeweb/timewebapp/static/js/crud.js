@@ -7,7 +7,7 @@ const DEFAULT_FORM_FIELDS = {
     "#id_unit": def_unit_to_minute ? "Minute" : '',
     "#id_y": '',
     "#id_works": '0',
-    "#id_ctime": '',
+    "#id_time_per_unit": '',
     "#id_description": '',
     "#id_funct_round": '',
     "#id_min_work_time": +def_min_work_time||'',
@@ -54,29 +54,29 @@ function replaceUnit() {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
         }
         $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
-        $("label[for='id_ctime']").text(`Estimated number of Minutes to complete each ${singular}`);
+        $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
         $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
         $("label[for='id_funct_round'] .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
     } else {
         $("label[for='id_y']").html("Total number of Units in this Assignment");
         $("label[for='id_works']").onlyText("Total number of Units already Completed");
-        $("label[for='id_ctime']").html("Estimated number of Minutes to complete each Unit");
+        $("label[for='id_time_per_unit']").html("Estimated number of Minutes to complete each Unit");
         $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
         $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
     }
     if (singularToLowerCase in units_of_time) {
-        $("#id_ctime").val(units_of_time[singularToLowerCase]);
-        $("#id_ctime").prop("disabled",true).addClass("disabled-field");
-        $("label[for='id_ctime']").addClass("disabled-field");
+        $("#id_time_per_unit").val(units_of_time[singularToLowerCase]);
+        $("#id_time_per_unit").prop("disabled",true).addClass("disabled-field");
+        $("label[for='id_time_per_unit']").addClass("disabled-field");
         if (def_funct_round_minute && singularToLowerCase === "minute") {
             $("#id_funct_round").val(5);
             $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_funct_round']").addClass("disabled-field");
         }
     } else {
-        old_unit_value in units_of_time && $("#id_ctime").val("");
-        $("#id_ctime").prop("disabled",false).removeClass("disabled-field");
-        $("label[for='id_ctime']").removeClass("disabled-field");   
+        old_unit_value in units_of_time && $("#id_time_per_unit").val("");
+        $("#id_time_per_unit").prop("disabled",false).removeClass("disabled-field");
+        $("label[for='id_time_per_unit']").removeClass("disabled-field");   
     }
     if (def_funct_round_minute && singularToLowerCase !== "minute") {
         old_unit_value in units_of_time && $("#id_funct_round").val("");
@@ -119,10 +119,10 @@ $(window).one("load", function() {
             sa.unit,
             sa.needs_more_info ? '' : sa.y,
             sa.works[0],
-            sa.needs_more_info ? '' : sa.ctime,
+            sa.needs_more_info ? '' : sa.time_per_unit,
             sa.description,
             sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
-            (sa.original_min_work_time*sa.ctime)||'',
+            (sa.original_min_work_time*sa.time_per_unit)||'',
         ];
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         setTimeout(function() {
@@ -133,7 +133,7 @@ $(window).one("load", function() {
             // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_breawk_days.includes(break_day));
             $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
-        $("#id_unit, #id_y, #id_works, #id_ctime").toggleClass("invalid", sa.needs_more_info);
+        $("#id_unit, #id_y, #id_works, #id_time_per_unit").toggleClass("invalid", sa.needs_more_info);
         $("#id_x").toggleClass("invalid", !sa.x);
         // Set button pk so it gets sent on post
         $("#submit-assignment-button").val(sa.id);
@@ -198,7 +198,7 @@ $(window).one("load", function() {
                     break;
                 case "id_y":
                 case "id_works":
-                case "id_ctime":
+                case "id_time_per_unit":
                 case "id_funct_round":
                     message = 'Please enter a value';
                     break;
@@ -221,7 +221,7 @@ $(window).one("load", function() {
         }
         submitted = true;
         // Enable disabled field on submit so it's sent with post
-        $("#id_ctime, #id_funct_round").removeAttr("disabled");
+        $("#id_time_per_unit, #id_funct_round").removeAttr("disabled");
         // JSON fields are picky with their number inputs, convert them to standard form
         $("#id_works").val(+$("#id_works").val());
         $("#submit-assignment-button").text("Submitting...");

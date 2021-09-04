@@ -246,7 +246,7 @@ priority = {
                     } else {
                         status_message += `<br>Complete ${todo} ${pluralize(sa.sa.unit,todo)} Today`;
                     }
-                    total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
+                    total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                 }
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
@@ -256,7 +256,7 @@ priority = {
                     str_daysleft = 'Today';
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
-                    tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.ctime);
+                    tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                     if (![6,7,8].includes(status_value)) {
                         status_value = 5;
                     }
@@ -306,9 +306,9 @@ priority = {
                         }
                     }
                     const how_well_followed_const = 1-sum_diff_red_blue/len_works/sa.sa.y;
-                    status_priority = Math.max(0, how_well_followed_const*todo*sa.sa.ctime/(sa.sa.x-sa.sa.blue_line_start-len_works));
+                    status_priority = Math.max(0, how_well_followed_const*todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works));
                 } else {
-                    status_priority = todo*sa.sa.ctime/(sa.sa.x-sa.sa.blue_line_start-len_works);
+                    status_priority = todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works);
                 }
             }
             let priority_data = [status_value, status_priority, index];
@@ -325,7 +325,7 @@ priority = {
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
-            dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.ctime) : '');
+            dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
         // Updates open graphs
         if (has_autofilled) {
