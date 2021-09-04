@@ -65,7 +65,7 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    ctime = models.DecimalField(
+    time_per_unit = models.DecimalField(
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],

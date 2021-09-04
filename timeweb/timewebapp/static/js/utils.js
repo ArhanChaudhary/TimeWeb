@@ -812,9 +812,9 @@ for (let sa of dat) {
         }
     }
     sa.y = +sa.y;
-    sa.ctime = +sa.ctime;
+    sa.time_per_unit = +sa.time_per_unit;
     sa.funct_round = +sa.funct_round;
-    sa.min_work_time /= sa.ctime; // Converts min_work_time to int if string or null
+    sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
     sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);

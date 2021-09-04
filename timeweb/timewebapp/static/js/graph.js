@@ -446,7 +446,7 @@ class VisualAssignment extends Assignment {
             var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`,
                 label_x_pos = -2;
         } else {
-            var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.ctime)} per ${pluralize(this.sa.unit,1)})`,
+            var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`,
                 label_x_pos = -5;
         }
         if (screen.measureText(text).width > this.height - 50) {

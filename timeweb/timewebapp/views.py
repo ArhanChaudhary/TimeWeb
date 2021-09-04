@@ -63,7 +63,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "works": ["0"],
             "blue_line_start": 0,
             "skew_ratio": "1.0000000000",
-            "ctime": "3.00",
+            "time_per_unit": "3.00",
             "funct_round": "1.00",
             "min_work_time": "60.00",
             "break_days": [],
@@ -294,7 +294,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
             first_work = d(self.form.cleaned_data.get("works"))
-            self.sm.ctime = self.form.cleaned_data.get("ctime")
+            self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
@@ -322,7 +322,7 @@ class TimewebView(LoginRequiredMixin, View):
         if not self.sm.funct_round:
             self.sm.funct_round = 1
         if self.sm.min_work_time != None:
-            self.sm.min_work_time /= self.sm.ctime            
+            self.sm.min_work_time /= self.sm.time_per_unit            
 
         if self.sm.x == None:
             # y - first work = min_work_time_funct_round * x
@@ -392,7 +392,7 @@ class TimewebView(LoginRequiredMixin, View):
                 if self.created_assignment or self.sm.needs_more_info:
                     self.sm.dynamic_start = 0
         if self.sm.min_work_time != None:
-            self.sm.min_work_time *= self.sm.ctime
+            self.sm.min_work_time *= self.sm.time_per_unit
         if self.sm.needs_more_info:
             self.sm.works = [str(first_work)]  
         elif self.created_assignment:
@@ -532,10 +532,10 @@ class TimewebView(LoginRequiredMixin, View):
                     needs_more_info=True,
                     user=user,
 
-                    # y, ctime, works[0], and unit are missing
-                    # y and ctime need to be passed anyways because they have non-null constraints
+                    # y, time_per_unit, works[0], and unit are missing
+                    # y and time_per_unit need to be passed anyways because they have non-null constraints
                     y=1,
-                    ctime=1,
+                    time_per_unit=1,
                 ))
         # .execute() rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute().get('courses', [])

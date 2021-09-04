@@ -25,7 +25,7 @@ class TimewebForm(forms.ModelForm):
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
             'y': forms.NumberInput(attrs={"min":"1"}),
-            'ctime': forms.NumberInput(attrs={"min":"0"}),
+            'time_per_unit': forms.NumberInput(attrs={"min":"0"}),
             'description': forms.Textarea(attrs={"rows": "1"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
@@ -58,11 +58,11 @@ class TimewebForm(forms.ModelForm):
                 'required': _("Please enter a value"),
                 'invalid': _("This field's value is invalid"),
             },
-            'ctime': {
+            'time_per_unit': {
                 'required': _("Please enter a value"),
-                'max_digits': _("This field's value is too long (>%(n)d digits)") % {"n": TimewebModel.ctime.field.max_digits},
-                'max_decimal_places': _("This field's value has too many decimal places (>%(n)d decimal places)") % {"n": TimewebModel.ctime.field.decimal_places},
-                'max_whole_digits': _("This field's value has too many digits before its decimal point (>%(n)d digits)") % {"n": TimewebModel.ctime.field.max_digits - TimewebModel.ctime.field.decimal_places},
+                'max_digits': _("This field's value is too long (>%(n)d digits)") % {"n": TimewebModel.time_per_unit.field.max_digits},
+                'max_decimal_places': _("This field's value has too many decimal places (>%(n)d decimal places)") % {"n": TimewebModel.time_per_unit.field.decimal_places},
+                'max_whole_digits': _("This field's value has too many digits before its decimal point (>%(n)d digits)") % {"n": TimewebModel.time_per_unit.field.max_digits - TimewebModel.time_per_unit.field.decimal_places},
                 'invalid': _("This field's value is invalid"),
             },
             'funct_round': {
