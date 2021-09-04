@@ -332,7 +332,7 @@ priority = {
             if (a[0] < b[0]) return 1;
             if (a[0] > b[0]) return -1;
             // Status priority
-            if (a[0] === 6) {
+            if (Math.round(a[0]) === 6) {
                 // If the assignment is a google classroom assignment, sort from min to max because the status priority is now their first tag
                 if (a[1] < b[1]) return -1;
                 if (a[1] > b[1]) return 1;

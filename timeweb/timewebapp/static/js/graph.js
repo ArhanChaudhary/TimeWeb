@@ -890,12 +890,12 @@ $(function() {
 $(".assignment").click(function(e) {
     if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title")) return;
     const dom_assignment = $(this);
-    const pre_sa = utils.loadAssignmentData(dom_assignment);
+    const sa_sa = utils.loadAssignmentData(dom_assignment);
     let assignment_to_shake;
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
-    if (dom_assignment.hasClass("mark-as-done") && !pre_sa.mark_as_done) {
+    if (dom_assignment.hasClass("mark-as-done") && !sa_sa.mark_as_done) {
         assignment_to_shake = $(".assignment").first().focus();
-    } else if (pre_sa.needs_more_info) {
+    } else if (sa_sa.needs_more_info) {
         assignment_to_shake = dom_assignment;
         dom_assignment.find(".update-button").parents(".button").focus();
     }
@@ -925,7 +925,7 @@ $(".assignment").click(function(e) {
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
-        if (pre_sa.description) {
+        if (sa_sa.description) {
             priority.positionTagLeft(dom_assignment);
         }
         return;
@@ -939,7 +939,7 @@ $(".assignment").click(function(e) {
     dom_assignment.css("overflow", "");
     assignment_footer.css("display", "block");
     dom_assignment.addClass("open-assignment");
-    if (pre_sa.description) {
+    if (sa_sa.description) {
         priority.positionTagLeft(dom_assignment);
     }
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();

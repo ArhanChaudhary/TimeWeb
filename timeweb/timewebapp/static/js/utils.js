@@ -341,7 +341,7 @@ utils = {
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
                         // GC class tags
-                        if (sa.needs_more_info) {
+                        if (sa.needs_more_info || tag_names.includes("Important") || tag_names.includes("Not Important")) {
                             priority.sort();
                         }
                         // Close box and add tags visually
@@ -426,6 +426,7 @@ utils = {
                 const tag_wrapper = $this.parents(".tag-wrapper");
                 if (tag_wrapper.hasClass("tag-is-deleting")) return;
                 tag_wrapper.addClass("keep-delete-open");
+                
                 const sa = utils.loadAssignmentData($this);
                 const data = {
                     csrfmiddlewaretoken: csrf_token,
@@ -437,7 +438,7 @@ utils = {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
                     // GC class tags
-                    if (sa.needs_more_info) {
+                    if (sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
                         priority.sort();
                     }
                     tag_wrapper.addClass("tag-is-deleting");
@@ -500,10 +501,25 @@ utils = {
         },
         setKeybinds: function() {
             $(document).keydown(function(e) {
-                if (e.shiftKey /* shiftKey needed if the user presses caps lock */ && e.key === 'N' && $(document.activeElement).prop("type") !== "text") {
-                    if (!$("#overlay").is(":visible")) {
-                        $("#image-new-container").click();
+                if (e.shiftKey /* shiftKey needed if the user presses caps lock */ && $(document.activeElement).prop("type") !== "text") {
+                    let preventDefault = true;
+                    if (e.key === 'N') {
+                        if (!$("#overlay").is(":visible")) {
+                            $("#image-new-container").click();
+                        }
+                    } else if (e.key === "E" || e.key === "D") {
+                        const assignment_container = $(document.activeElement).parents(".assignment-container");
+                        if (assignment_container.length) {
+                            if (e.key === "E") {
+                                assignment_container.find(".update-button").click();
+                            } else if (e.key === "D") {
+                                assignment_container.find(".delete-button").click();
+                            }
+                        }
+                    } else {
+                        preventDefault = false;
                     }
+                    preventDefault && e.preventDefault(); // Prevent typing the actual letter
                 } else if (e.key === "Tab") {
                     // Prevent tabbing dispositioning screen
                     setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
