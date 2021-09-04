@@ -190,7 +190,7 @@ class VisualAssignment extends Assignment {
             }
         }
         this.setDynamicStartIfInDynamicMode();
-        ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+        ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
         priority.sort({ timeout: true });
         this.draw();
     }
@@ -637,8 +637,8 @@ class VisualAssignment extends Assignment {
                 this.autotuneSkewRatio();
             }
             this.setDynamicStartIfInDynamicMode();
-            ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
-            ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort({ timeout: true });
             this.draw();
         });
@@ -712,8 +712,8 @@ class VisualAssignment extends Assignment {
                 }
                 this.setDynamicStartIfInDynamicMode();
             }
-            ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
-            ajaxUtils.SendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort({ timeout: true });
             this.draw();
         });
@@ -738,7 +738,7 @@ class VisualAssignment extends Assignment {
             }
             this.sa.mark_as_done = !this.sa.mark_as_done;
             ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
-            ajaxUtils.SendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
             priority.sort();
         }).html(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
         // END ignore button
@@ -794,7 +794,7 @@ class VisualAssignment extends Assignment {
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
-            skew_ratio_button.onlyText("(Click again to cancel)");
+            skew_ratio_button.onlyText("Click again to cancel");
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.set_skew_ratio_using_graph = true;
@@ -805,7 +805,7 @@ class VisualAssignment extends Assignment {
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
                 skew_ratio_button.onlyText("Set Skew Ratio using Graph");
-                ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+                ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 if (!this.draw_mouse_point) {
                     this.graph.off("mousemove");
                 }
@@ -859,7 +859,7 @@ class VisualAssignment extends Assignment {
                 // Sets and caps skew ratio
                 // The skew ratio in the code is 1 more than the displayed skew ratio
                 this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, +skew_ratio_textbox.val() + 1, skew_ratio_bound);
-                ajaxUtils.SendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+                ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
             }
             this.setDynamicStartIfInDynamicMode();
             this.draw();
@@ -878,7 +878,7 @@ class VisualAssignment extends Assignment {
         fixed_mode_button.click(() => {
             this.sa.fixed_mode = !this.sa.fixed_mode;
             fixed_mode_button.onlyText(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
-            ajaxUtils.SendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
             if (this.sa.fixed_mode) {
                 this.red_line_start_x = 0;
                 this.red_line_start_y = 0;

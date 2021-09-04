@@ -308,7 +308,6 @@ $(window).one("load", function() {
             'action': 'delete_assignment',
             'assignments': [sa.id], // Primary key value
         }
-        // Send ajax to avoid a page reload
         $.ajax({
             type: "POST",
             data: data,

@@ -360,5 +360,5 @@ Assignment.prototype.autotuneSkewRatio = function() {
 
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor, skew_ratio_bound);
-    ajaxUtils.SendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
+    ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
 }

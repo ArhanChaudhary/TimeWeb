@@ -204,6 +204,7 @@ $.fn.reverse = Array.prototype.reverse;
 $.fn.info = function(facing,text,position) {
     const info_button = $($("#info-button-template").html());
     info_button.find(".info-button-text").addClass(`info-${facing}`).text(text);
+    info_button.click(() => false);
     switch (position) {
         case "prepend":
             return info_button.prependTo(this);

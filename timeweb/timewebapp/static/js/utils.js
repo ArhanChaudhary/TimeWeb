@@ -205,7 +205,7 @@ utils = {
                     if ($(e.target).is("#autofill-selection")) return;
 
                     $.confirm({
-                        title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done until today for ALL assignments with missing work inputs?`,
+                        title: `Are you sure you want to do this?`,
                         content: 'This action is irreversible',
                         buttons: {
                             confirm: {
@@ -489,7 +489,7 @@ utils = {
                     if (sa.needs_more_info) {
                         priority.sort();
                     }
-                    ajaxUtils.SendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
+                    ajaxUtils.sendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
                 }
             });
         },
@@ -623,7 +623,7 @@ utils = {
                 }
                 // Send ajax before close if it's on timeout
                 if (ajaxUtils.attributeData['assignments'].length) {
-                    ajaxUtils.SendAttributeAjax();
+                    ajaxUtils.sendAttributeAjax();
                 }
             });
             if ("advanced_inputs" in sessionStorage) {
@@ -658,7 +658,7 @@ utils = {
         // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
         if (window.in_next_day || isExampleAccount) return;
         const current_time = new Date();
-        if (utils.previous_time.getHours() < utils.after_midnight_hour_to_update && current_time.getHours() > utils.after_midnight_hour_to_update) {
+        if (utils.previous_time.getHours() < utils.after_midnight_hour_to_update && current_time.getHours() >= utils.after_midnight_hour_to_update) {
             window.location.reload();
         }
         utils.previous_time = current_time;
@@ -734,7 +734,7 @@ ajaxUtils = {
             window.location.reload();
         });
     },
-    SendAttributeAjaxWithTimeout: function(key, value, pk) {
+    sendAttributeAjaxWithTimeout: function(key, value, pk) {
         if (ajaxUtils.disable_ajax) return;
         // Add key and values to the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
@@ -745,9 +745,9 @@ ajaxUtils = {
         }
         sa[key] = value;
         clearTimeout(ajaxUtils.ajaxTimeout);
-        ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.SendAttributeAjax, 1000);
+        ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.sendAttributeAjax, 1000);
     },
-    SendAttributeAjax: function() {
+    sendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
                 $.alert({title: "An assignment takes up too much space and can no longer be saved", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs"});
@@ -845,7 +845,7 @@ for (let sa of dat) {
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
     csrf_token = $("form input:first-of-type").val();
-    // Initial ajax data for SendAttributeAjax
+    // Initial ajax data for sendAttributeAjax
     ajaxUtils.attributeData = {
         'csrfmiddlewaretoken': csrf_token,
         'action': 'save_assignment',

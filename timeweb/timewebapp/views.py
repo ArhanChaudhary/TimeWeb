@@ -191,7 +191,7 @@ class TimewebView(LoginRequiredMixin, View):
         
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        if (timezone.localtime(User.objects.get(username=request.user).last_login) - datetime.timedelta(after_midnight_hour_to_update)).day != (timezone.localtime(timezone.now()) - datetime.timedelta(after_midnight_hour_to_update)).day:
+        if (timezone.localtime(User.objects.get(username=request.user).last_login) - datetime.timedelta(hours=after_midnight_hour_to_update)).day != (timezone.localtime(timezone.now()) - datetime.timedelta(hours=after_midnight_hour_to_update)).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False

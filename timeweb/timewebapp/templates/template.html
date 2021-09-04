@@ -23,7 +23,7 @@
             example_assignment_name = "{{ example_assignment_name }}";
             after_midnight_hour_to_update = {{ after_midnight_hour_to_update }};
             max_number_tags = {{ max_number_tags }};
-            creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}{{ creating_gc_assignments_from_frontend|lower }}{% else %}false{% endif %};
+            creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
             editing_example_account = {{ editing_example_account|lower }};
             {% endif %}
         </script>

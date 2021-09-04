@@ -148,8 +148,8 @@ priority = {
                 }
                 if (has_autofilled) {
                     // don't sa.setDynamicStartIfInDynamicMode(); because of the (input_done !== todo) check
-                    ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
-                    ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                    ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
+                    ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
@@ -192,8 +192,8 @@ priority = {
                     }
                     if (has_autofilled) {
                         sa.setDynamicStartIfInDynamicMode();
-                        ajaxUtils.SendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
-                        ajaxUtils.SendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                     }
                 }
@@ -214,7 +214,7 @@ priority = {
                         status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                         status_value = 8;
                     }
-                    if (sa.sa.mark_as_done === true) ajaxUtils.SendAttributeAjaxWithTimeout("mark_as_done", false, sa.sa.id);
+                    sa.sa.mark_as_done === true && ajaxUtils.sendAttributeAjaxWithTimeout("mark_as_done", false, sa.sa.id);
                     sa.sa.mark_as_done = false;
                     dom_status_image.attr({
                         width: 11,
