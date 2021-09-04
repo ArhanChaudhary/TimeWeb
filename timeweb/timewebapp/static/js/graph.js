@@ -1,16 +1,4 @@
-/* 
-This file includes the code for:
-
-Transitioning the opening and closing of assignments
-Drawing the graph
-The graph's buttons and inputs
-
-This only runs on index.html
-*/
-
-//
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-//
 
 // There is a deadlock netween autotuneSkewRatio and setDynamicStartInDynamicMode:
 // When dynamic start is set, skew ratio needs to be re-autotuned

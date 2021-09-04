@@ -1,11 +1,3 @@
-/*
-This file includes the code for:
-
-Prioritizing, swapping, and coloring assignments
-Animating assignments that were just created or edited
-
-This only runs on index.html
-*/
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 priority = {
     sort_timeout_duration: 35,
@@ -257,7 +249,7 @@ priority = {
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
                     tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
-                    if (![6,7,8].includes(status_value)) {
+                    if (![6,7,8].includes(Math.round(status_value))) {
                         status_value = 5;
                     }
                 } else if (due_date_minus_today < 7) {
@@ -268,21 +260,26 @@ priority = {
                     str_daysleft = due_date_minus_today + "d";
                 }
             }
+            if (sa.sa.tags.includes("Important")) {
+                status_value += 0.25;
+            } else if (sa.sa.tags.includes("Not Important")) {
+                status_value -= 0.25;
+            }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            const add_finished_condition = status_value === 1;
-            const add_incomplete_works_condition = status_value === 8;
-            const add_question_mark_condition = [6,7,8].includes(status_value);
+            const add_finished_condition = Math.round(status_value) === 1;
+            const add_incomplete_works_condition = Math.round(status_value) === 8;
+            const add_question_mark_condition = [6,7,8].includes(Math.round(status_value));
             assignment_container.toggleClass("finished", add_finished_condition);
             assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
             assignment_container.toggleClass("question-mark", add_question_mark_condition);
             assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition);
 
             let status_priority;
-            if (status_value === 1) {
+            if (Math.round(status_value) === 1) {
                 status_priority = -index;
-            } else if (status_value === 2) {
+            } else if (Math.round(status_value) === 2) {
                 status_priority = today_minus_ad;
-            } else if (status_value === 6) {
+            } else if (Math.round(status_value) === 6) {
                 // Order assignments that need more info by their tags lexicographically
                 status_priority = (sa.sa.tags[0]||"").toLowerCase();
             } else if (add_question_mark_condition) {
@@ -351,7 +348,8 @@ priority = {
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(ordered_assignments);
         const highest_priority = Math.max(...ordered_assignments.map(function(pd) {
-            if ([4, 5].includes(pd[0]) && !pd[3]) {
+            const status_value = Math.round(pd[0]);
+            if ([4, 5].includes(status_value) && !pd[3]) {
                 return pd[1];
             } else {
                 return -Infinity;
@@ -359,7 +357,8 @@ priority = {
         }));
         const tags_left = $(".tags-left").length;
         const question_mark_exists_excluding_gc = ordered_assignments.some(function(pd) {
-            return [7, 8].includes(pd[0]);
+            const status_value = Math.round(pd[0]);
+            return [7, 8].includes(status_value);
         });
         let prev_assignment_container;
         let prev_tag;
@@ -367,14 +366,15 @@ priority = {
         let already_found_first_finished = false;
         $("#autofill-work-done, #delete-starred-assignments").hide();
         for (let pd of ordered_assignments) {
-            // originally ![6,7,8].includes(pd[0]) && (pd[3] || question_mark_exists_excluding_gc); if pd[3] is true then ![6,7,8].includes(pd[0])
-            const mark_as_done = !!(pd[3] || question_mark_exists_excluding_gc && ![6,7,8].includes(pd[0]));
+            const status_value = Math.round(pd[0]);
+            // originally ![6,7,8].includes(status_value) && (pd[3] || question_mark_exists_excluding_gc); if pd[3] is true then ![6,7,8].includes(status_value)
+            const mark_as_done = !!(pd[3] || question_mark_exists_excluding_gc && ![6,7,8].includes(status_value));
             const dom_assignment = $(".assignment").eq(pd[2]);
             const assignment_container = dom_assignment.parents(".assignment-container");
             let priority_percentage;
-            if ([6,7,8].includes(pd[0])) {
+            if ([6,7,8].includes(status_value)) {
                 priority_percentage = NaN;
-            } else if (mark_as_done || pd[0] === 3 || pd[0] === 1 || pd[0] === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+            } else if (mark_as_done || status_value === 3 || status_value === 1 || status_value === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
                 priority_percentage = 0;
             } else {
                 priority_percentage = Math.max(1, Math.floor(pd[1] / highest_priority * 100 + 1e-10));
@@ -382,7 +382,7 @@ priority = {
                     priority_percentage = 100;
                 }
             }
-            const add_priority_percentage = text_priority && [4, 5].includes(pd[0]) && !mark_as_done;
+            const add_priority_percentage = text_priority && [4, 5].includes(status_value) && !mark_as_done;
             const dom_title = $(".title").eq(pd[2]);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
             if (tags_left) {
@@ -440,12 +440,12 @@ priority = {
                 prev_assignment_container = assignment_container;
             }
 
-            if (pd[0] === 8 && !already_found_first_incomplete_works) {
+            if (status_value === 8 && !already_found_first_incomplete_works) {
                 $("#autofill-work-done").show().insertBefore(dom_assignment);
                 already_found_first_incomplete_works = true;
             }
 
-            if (pd[0] === 1 && !already_found_first_finished) {
+            if (status_value === 1 && !already_found_first_finished) {
                 $("#delete-starred-assignments").show().insertBefore(dom_assignment);
                 already_found_first_finished = true;
             }

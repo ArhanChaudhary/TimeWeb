@@ -118,9 +118,9 @@ $(window).one("load", function() {
             sa.x ? utils.formatting.stringifyDate(x) : '',
             sa.unit,
             sa.needs_more_info ? '' : sa.y,
-            sa.works[0],
             sa.needs_more_info ? '' : sa.time_per_unit,
             sa.description,
+            sa.works[0],
             sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
             (sa.original_min_work_time*sa.time_per_unit)||'',
         ];
@@ -281,8 +281,7 @@ $(window).one("load", function() {
                 if (i === $assignment_container.length - 1) {
                     // Remove from dat
                     dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                    // Although nothing needs to be swapped, priority.sort() still needs to be run
-                    // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
+                    // Although nothing needs to be swapped, priority.sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
                     priority.sort();
                 }
             });

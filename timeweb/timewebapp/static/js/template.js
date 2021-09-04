@@ -1,15 +1,3 @@
-/* 
-This file includes the code for:
-
-Setting up Google Analytics
-Initializing the service worker
-Header responsiveness
-Installing the app on home screen
-Starting animation on index.html
-Other minor utilities
-
-This runs on every template
-*/
 if (!window.gtag) {
     function gtag() {};
 }

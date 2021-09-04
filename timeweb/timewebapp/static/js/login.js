@@ -1,12 +1,3 @@
-/* 
-This file includes the code for:
-
-Preventing form resubmits on refresh
-Styling form fields
-Ensuring the animation only occurs once
-
-This only runs on login.html
-*/
 if (!window.gtag) {
     function gtag() {};
 }

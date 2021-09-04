@@ -52,9 +52,6 @@ class TimewebModel(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(1,_("This field's value can't be less than %(limit_value)s"))],
     )
-    works = models.JSONField(
-        default=empty_list,
-    )
     blue_line_start = models.IntegerField(
         blank=True,
         null=True,
@@ -74,6 +71,9 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
         verbose_name=_('Assignment Description'),
+    )
+    works = models.JSONField(
+        default=empty_list,
     )
     funct_round = models.DecimalField(
         max_digits=15,

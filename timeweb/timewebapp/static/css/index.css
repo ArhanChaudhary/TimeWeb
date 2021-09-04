@@ -403,7 +403,7 @@ header.animate::after {
     position: absolute;
     top: 0;
     right: 0;
-    left: 0;
+    left: 4px;
     transform: translate(-25%, -25%);
     border-radius: 17px;
     border: 17px solid transparent;

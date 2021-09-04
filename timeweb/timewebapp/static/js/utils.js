@@ -404,7 +404,12 @@ utils = {
                 let allTags = [];
                 dat.forEach(sa => allTags.push(...sa.tags));
                 // Remove duplicate tags and sort alphabetically
-                unique_allTags = Array.from(new Set(allTags)).sort();
+                const set_allTags = new Set(allTags);
+                set_allTags.delete("Important");
+                set_allTags.delete("Not Important");
+                unique_allTags = Array.from(set_allTags).sort();
+                unique_allTags.push("Important");
+                unique_allTags.push("Not Important");
                 for (let tag of unique_allTags) {
                     const tag_add_selection_item = $(tag_add_selection_item_template);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
