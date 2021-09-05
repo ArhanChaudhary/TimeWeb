@@ -205,7 +205,7 @@ utils = {
                     if ($(e.target).is("#autofill-selection")) return;
 
                     $.confirm({
-                        title: `Are you sure you want to do this?`,
+                        title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
                         content: 'This action is irreversible',
                         buttons: {
                             confirm: {
