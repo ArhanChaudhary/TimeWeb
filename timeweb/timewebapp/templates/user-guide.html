@@ -1,17 +1,5 @@
 {% extends "template.html" %}
 {% comment %}
-Assignment graph
-    Graph buttons
-        (explain all graph buttons) (autotune and dynamic mode isnt perfect) (it isnt meant to be)
-        !skew ratio isn't always the same distribution in dynamic mode
-Assignment priority
-    How prioritized
-        grouped into sections and then prioritized individually; explain status messages
-        ?status value can make priority not sorted
-    Status messages
-        (explain every status message) (difference between finished and completely finished)
-Assignment tags
-    (explain what they are and sortable)
 Shortcut wrappers
     (explain what they are) (how to use shortcuts)
     !how does delete assignments of class know what to delete (the class name is the first tag)
@@ -154,9 +142,6 @@ Keybinds
                 <span class="minor-minor-category">Total number of Units in this Assignment</span>
                 This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days in which the assignment is due.
 
-                <span class="minor-minor-category">Total number of Units already Completed</span>
-                This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
-
                 <span class="minor-minor-category">Estimated number of Minutes to complete each Unit</span>
                 This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour."
                 
@@ -167,6 +152,9 @@ Keybinds
 
                 <span class="minor-minor-category">Assignment Description</span>
                 This input is the description of the assignment, shown below the assignment name only when the assignment is open.
+
+                <span class="minor-minor-category">Total number of Units already Completed</span>
+                This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
 
                 <span class="minor-minor-category">Number of Units you will Complete at a Time</span>
                 This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in a multiple of 5 pages throughout the entire assignment. You can leave this input empty to disable it.
@@ -255,11 +243,22 @@ Keybinds
                 <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
                 You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority, meaning that you should complete the low priority assignment first. Although it may seem so at first, this isn't actually a bug.<br>
                 <br>
-                If you look carefully, the assignment with the low priority in this case is actually due tomorrow, while the assignment with the high priority isn't. TimeWeb is able to recognize and make exceptions for cases like these, as, ideally, you should always complete assignments that are due tomorrow first.
-            </span>
+                If you look carefully, there's probably a reason why this is the case. The assignment could have the <a href="#important-and-not-important-assignment-tags">"Important" or "Not Important"</a> tags, or the assignment with the low priority is due tomorrow, while the assignment with the high priority isn't. TimeWeb is able to recognize and make exceptions for cases like these, as, ideally, you should always complete assignments that are due tomorrow first.
+            </span>    
         </details>
         <span>
-            <div class="major-category" id="assignment-tags">Assignment tags</div>
+            <div class="major-category" id="google-classroom-api">Assignment tags</div>
+            <details open>
+                <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" tags</summary>
+                Above every assignment's header message, there is a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions. A third exception to this is found in the Google Classroom API section. 
+                
+                Adding the "Important" tag moves the assignment to the highest appropriate list position, while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom. TimeWeb will prioritize "Important" and "Not Important" in the most ideal manner possible.
+            
+            </details>
+            <details open>
+                <summary class="minor-category" id="sorting-assignment-tags">Sorting tags</summary>
+                Tags are only added to the end of an assignment's tag list. So, you can sort the tags in the order you like. You can do this by holding and then dragging the tags around. You must drag the tags horizontally to sort them, as nothing happens by dragging them vertically. Note that you may have to pinch zoom on mobile and then drag the tags around to resort them.
+            </details>
         </span>
         <span>
             <div class="major-category" id="assignment-shortcuts">Assignment shortcuts</div>
