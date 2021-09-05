@@ -30,7 +30,7 @@ img {
 td {
     position: relative;
     text-align: left;
-    width: 350px;
+    width: 250px;
 }
 th {
     text-align: left;
@@ -44,4 +44,9 @@ tr.odd {
 .setting-description {
     font-size: 0.85em;
     opacity: 0.7;
+}
+@media screen and (max-width: 950px) {
+    tr, td {
+        display: block;
+    }
 }
