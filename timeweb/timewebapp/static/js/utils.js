@@ -250,7 +250,7 @@ utils = {
                         return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
                     });
                     $.confirm({
-                        title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"`,
+                        title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's first tag is its class name)`,
                         content: 'This action is irreversible',
                         buttons: {
                             confirm: {

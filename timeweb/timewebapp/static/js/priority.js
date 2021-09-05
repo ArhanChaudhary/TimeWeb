@@ -260,10 +260,12 @@ priority = {
                     str_daysleft = due_date_minus_today + "d";
                 }
             }
-            if (sa.sa.tags.includes("Important")) {
-                status_value += 0.25;
-            } else if (sa.sa.tags.includes("Not Important")) {
-                status_value -= 0.25;
+            if (!sa.sa.needs_more_info) {
+                if (sa.sa.tags.includes("Important")) {
+                    status_value += 0.25;
+                } else if (sa.sa.tags.includes("Not Important")) {
+                    status_value -= 0.25;
+                }
             }
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             const add_finished_condition = Math.round(status_value) === 1;
