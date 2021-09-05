@@ -376,7 +376,7 @@ priority = {
             let priority_percentage;
             if ([6,7,8].includes(status_value)) {
                 priority_percentage = NaN;
-            } else if (mark_as_done || status_value === 3 || status_value === 1 || status_value === 2 /* Last one needed for "This assignment has not yet been assigned" being set to color() values greater than 1 */) {
+            } else if (mark_as_done || [1,2,3].includes(status_value) /* 2 needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
                 priority_percentage = 0;
             } else {
                 priority_percentage = Math.max(1, Math.floor(pd[1] / highest_priority * 100 + 1e-10));
@@ -387,15 +387,19 @@ priority = {
             const add_priority_percentage = text_priority && [4, 5].includes(status_value) && !mark_as_done;
             const dom_title = $(".title").eq(pd[2]);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
-            if (tags_left) {
-                new Promise(function(resolve) {
-                    if (params.first_sort) {
-                        $(window).one("load", () => resolve());
-                    } else {
-                        resolve();
-                    }
-                }).then(() => priority.positionTagLeft(dom_assignment));
-            }
+
+            const dom_tags = dom_assignment.find(".tags");
+            new Promise(function(resolve) {
+                if (params.first_sort) {
+                    $(window).one("load", () => resolve());
+                } else {
+                    resolve();
+                }
+            }).then(() => {
+                dom_tags.removeClass("tags-bottom");
+                tags_left && priority.positionTagLeft(dom_assignment);
+                vertical_tag_position === "Bottom" && dom_tags.addClass("tags-bottom");
+            });
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {

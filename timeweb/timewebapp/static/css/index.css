@@ -343,6 +343,10 @@ header.animate::after {
 .tags-left {
     left: 15px;
 }
+.tags-bottom {
+    top: unset;
+    bottom: 2px;
+}
 .tags-left .tag-add-box {
     left: 23px;
 }

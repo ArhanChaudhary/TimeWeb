@@ -14,10 +14,12 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");
         $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");
         $("#id_background_image").val("");
-        $("#id_tag_position").val("Middle");
+        $("#id_horizontal_tag_position").val("Middle");
+        $("#id_vertical_tag_position").val("Top");
     });
     // verbose name doesnt work on tag position for literally no reason
-    $("label[for=\"id_tag_position\"]").html("Assignment Tag Position");
+    $("label[for=\"id_horizontal_tag_position\"]").html("Horizontal Assignment Tag Position");
+    $("label[for=\"id_horizontal_tag_position\"]").html("Vertical Assignment Tag Position");
     $("#id_dark_mode").click(function(e) {
         e.preventDefault();
         $.alert({title: "Dark mode hasn't yet been implemented"});

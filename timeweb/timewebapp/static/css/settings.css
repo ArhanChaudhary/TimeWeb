@@ -42,11 +42,14 @@ tr.odd {
     background: rgb(238, 238, 238);
 }
 .setting-description {
-    font-size: 0.85em;
+    font-size: 0.8em;
     opacity: 0.7;
 }
 @media screen and (max-width: 950px) {
     tr, td {
         display: block;
+    }
+    td {
+        width: unset;
     }
 }

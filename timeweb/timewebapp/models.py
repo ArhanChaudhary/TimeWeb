@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
@@ -15,12 +15,18 @@ WEEKDAYS = (
     ("6",_("Saturday")),
     ("0",_("Sunday")),
 )
-TAG_POSITIONS = (
+HORIZONTAL_TAG_POSITIONS = (
     ("Left", "Left"),
     ("Middle", "Middle"),
     ("Right", "Right"),
 )
-MAX_TAG_POSITIONS_LENGTH = len(max([i[0] for i in TAG_POSITIONS], key=len))
+MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in HORIZONTAL_TAG_POSITIONS], key=len))
+
+VERTICAL_TAG_POSITIONS = (
+    ("Top", "Top"),
+    ("Bottom", "Bottom"),
+)
+MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in VERTICAL_TAG_POSITIONS], key=len))
 def default_works():
     return 0
 def empty_list():
@@ -183,11 +189,17 @@ class SettingsModel(models.Model):
     )
     
     # Group "Personalize"
-    tag_position = models.CharField(
-        max_length=MAX_TAG_POSITIONS_LENGTH,
-        choices=TAG_POSITIONS,
+    horizontal_tag_position = models.CharField(
+        max_length=MAX_HORIZONTAL_TAG_POSITIONS_LENGTH,
+        choices=HORIZONTAL_TAG_POSITIONS,
         default=_("Middle"),
-        verbose_name=_('Assignment Tag Position'),
+        verbose_name=_('Horizontal Assignment Tag Position'),
+    )
+    vertical_tag_position = models.CharField(
+        max_length=MAX_VERTICAL_TAG_POSITIONS_LENGTH,
+        choices=VERTICAL_TAG_POSITIONS,
+        default=_("Top"),
+        verbose_name=_('Vertical Assignment Tag Position'),
     )
     background_image = models.ImageField(
         upload_to=create_image_path,

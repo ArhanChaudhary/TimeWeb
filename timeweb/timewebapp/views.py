@@ -112,7 +112,8 @@ class SettingsView(LoginRequiredMixin, View):
             'lowest_priority_color': self.settings_model.lowest_priority_color,
             'background_image': self.settings_model.background_image,
             'enable_tutorial': self.settings_model.enable_tutorial,
-            'tag_position': self.settings_model.tag_position,
+            'horizontal_tag_position': self.settings_model.horizontal_tag_position,
+            'vertical_tag_position': self.settings_model.vertical_tag_position,
         }
         self.context['form'] = SettingsForm(initial=initial)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
@@ -159,7 +160,8 @@ class SettingsView(LoginRequiredMixin, View):
         elif self.form.cleaned_data.get("background_image"):
             self.settings_model.background_image = self.form.cleaned_data.get("background_image")
         self.settings_model.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
-        self.settings_model.tag_position = self.form.cleaned_data.get("tag_position")
+        self.settings_model.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
+        self.settings_model.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
@@ -182,7 +184,8 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['background_image'] = self.settings_model.background_image
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
-        self.context['tag_position'] = self.settings_model.tag_position
+            
+        self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
         else:
