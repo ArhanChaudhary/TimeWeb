@@ -292,8 +292,8 @@ utils = {
             },
         },
         addTagHandlers: function() {
-            const tag_add_selection_item_template = $("#tag-add-selection-item-template").html();
-            const tag_template = $("#tag-template").html();
+            const TAG_ADD_SELECTION_ITEM_TEMPLATE = $("#tag-add-selection-item-template").html();
+            const TAG_TEMPLATE = $("#tag-template").html();
             function transitionCloseTagBox($tag_add) {
                 const tag_add_box = $tag_add.find(".tag-add-box");
                 tag_add_box.css({
@@ -348,7 +348,7 @@ utils = {
                         $this.removeClass("open-tag-add-box");
                         transitionCloseTagBox($this);
                         for (let tag_name of tag_names) {
-                            const tag = $(tag_template);
+                            const tag = $(TAG_TEMPLATE);
                             tag.find(".tag-name").text(tag_name);
                             tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
                             tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
@@ -411,7 +411,7 @@ utils = {
                 unique_allTags.push("Important");
                 unique_allTags.push("Not Important");
                 for (let tag of unique_allTags) {
-                    const tag_add_selection_item = $(tag_add_selection_item_template);
+                    const tag_add_selection_item = $(TAG_ADD_SELECTION_ITEM_TEMPLATE);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
                     container_for_tags.append(tag_add_selection_item);
                     tag_add_selection_item.click(function() {

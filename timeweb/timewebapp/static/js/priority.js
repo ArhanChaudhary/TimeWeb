@@ -434,7 +434,7 @@ priority = {
                 assignment_container.addClass("add-line-wrapper");
                 if (current_tag !== prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                     if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
-                    assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-from-class-template").html());
+                    assignment_container.addClass("first-add-line-wrapper").prepend($(DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE));
                 }
                 prev_tag = current_tag;
                 prev_assignment_container = assignment_container;
@@ -515,5 +515,6 @@ priority = {
     }
 }
 document.addEventListener("DOMContentLoaded", function() {
+    DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE = $("#delete-gc-assignments-from-class-template").html();
     priority.sort({ first_sort: true });
 });

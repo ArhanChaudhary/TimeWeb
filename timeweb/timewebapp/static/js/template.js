@@ -22,6 +22,8 @@ window.mobileAndTabletCheck = function() {
 isMobile = mobileAndTabletCheck();
 // Use "document.addEventListener("DOMContentLoaded", function() {" instead of "$(function() {" because "$(function() {" runs after first paint, messing up the initial transition
 document.addEventListener("DOMContentLoaded", function() {
+    CREDITS_TEMPLATE = $("#credits-template").html();
+    INFO_BUTTON_TEMPLATE = $("#info-button-template").html();
     // Position content such that the scrollbar doesn't clip into the header
     if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
         $("main").css({
@@ -174,7 +176,7 @@ $(function() {
         });
     }
     $("#nav-about").click(() => $.alert({title: "This hasn't yet been written"})).css("text-decoration", "line-through");
-    $("#nav-credits").click(() => $.alert({title: $("#credits-template").html()}));
+    $("#nav-credits").click(() => $.alert({title: CREDITS_TEMPLATE}));
 });
 jconfirm.defaults = {
     escapeKey: true,
@@ -190,7 +192,7 @@ jconfirm.defaults = {
 $.fn.reverse = Array.prototype.reverse;
 // Info tooltip
 $.fn.info = function(facing,text,position) {
-    const info_button = $($("#info-button-template").html());
+    const info_button = $(INFO_BUTTON_TEMPLATE);
     info_button.find(".info-button-text").addClass(`info-${facing}`).text(text);
     info_button.click(() => false);
     switch (position) {
