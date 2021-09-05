@@ -5,8 +5,11 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     const table_of_contents_major_category_template = $("#table-of-contents-major-category-template").html();
     const table_of_contents_minor_category_template = $("#table-of-contents-minor-category-template").html();
+
+    const number_major_categories = $(".major-category").length;
     $(".major-category").reverse().each(function() {
         const $major_category = $(this);
+        $major_category.attr("number-major-categories", number_major_categories);
 
         const major_category_li = $(table_of_contents_major_category_template);
         major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`).text($major_category.text());
