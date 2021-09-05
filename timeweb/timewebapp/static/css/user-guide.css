@@ -16,6 +16,10 @@ body {
     overflow-y: scroll;
     overflow-y: overlay;
 }
+#table-of-contents-container > ul, #category-user-guide-labels > li {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 #table-of-contents-container-label {
     display: none;
     bottom: 5px;
@@ -114,12 +118,13 @@ a:visited {
 }
 #table-of-contents-container a {
     color: black;
-    -webkit-text-decoration-color: rgba(0,0,0,0.4);
-            text-decoration-color: rgba(0,0,0,0.4);
+    -webkit-text-decoration-color: rgba(0,0,0,0.3);
+            text-decoration-color: rgba(0,0,0,0.3);
 }
 #user-guide-container {
     padding-left: 100px;
     padding-right: 50px;
+    padding-bottom: 150px;
     flex: 1;
     overflow-x: hidden;
     overflow-y: scroll;
