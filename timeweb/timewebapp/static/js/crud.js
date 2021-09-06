@@ -301,7 +301,7 @@ $(window).one("load", function() {
             success();
             return;
         }
-        const sa = utils.loadAssignmentData(dom_assignment);
+        const sa = utils.loadAssignmentData($button);
         const data = {
             'csrfmiddlewaretoken': csrf_token,
             'action': 'delete_assignment',
@@ -324,8 +324,9 @@ $(window).one("load", function() {
             deleteAssignment($this);
             return;
         }
+        const sa = utils.loadAssignmentData($this);
         $.confirm({
-            title: 'Are you sure you want to delete this assignment?',
+            title: `Are you sure you want to delete assignment "${sa.name}"?`,
             content: 'This action is irreversible',
             buttons: {
                 confirm: {

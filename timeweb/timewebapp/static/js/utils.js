@@ -508,7 +508,8 @@ utils = {
                             $("#image-new-container").click();
                         }
                     } else if (e.key === "E" || e.key === "D") {
-                        const assignment_container = $(document.activeElement).parents(".assignment-container");
+                        let assignment_container = $(document.activeElement).parents(".assignment-container");
+                        if (!assignment_container.length) assignment_container = $(":hover").filter(".assignment-container");
                         if (assignment_container.length) {
                             if (e.key === "E") {
                                 assignment_container.find(".update-button").click();
