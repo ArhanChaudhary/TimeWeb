@@ -511,6 +511,13 @@ priority = {
             });
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
+            if (tomorrow_total === total) {
+                $("#tomorrow-time").html(" (Everything is due Tomorrow)");
+            } else if (tomorrow_total === 0) {
+                $("#tomorrow-time").html(" (Nothing is due Tomorrow)");
+            } else {
+                $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
+            }
         }
         utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
         utils.ui.tickClock();
