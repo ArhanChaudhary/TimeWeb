@@ -75,8 +75,12 @@ priority = {
                     transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
                 });
     },
-
-    positionTagLeft: function(dom_assignment) {
+    positionTags: function(dom_assignment) {
+        dom_assignment.removeClass("tags-bottom");
+        horizontal_tag_position === "Left" && priority.positionTagLeftAndTagBottom(dom_assignment);
+        vertical_tag_position === "Bottom" && dom_assignment.addClass("tags-bottom");
+    },
+    positionTagLeftAndTagBottom: function(dom_assignment) {
         const dom_title = dom_assignment.find(".title");
         const dom_tags = dom_assignment.find(".tags");
         const dom_button = dom_assignment.find(".button");
@@ -138,7 +142,8 @@ priority = {
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
                 dom_title = $(".title").eq(index),
-                dom_completion_time = $(".completion-time").eq(index);
+                dom_completion_time = $(".completion-time").eq(index),
+                dom_tags = $(".tags").eq(index);
             let has_autofilled = false;
             const number_of_forgotten_days = today_minus_ad - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (params.autofill_all_work_done && number_of_forgotten_days > 0) {
@@ -335,6 +340,7 @@ priority = {
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
+            dom_tags.toggleClass("assignment-has-daysleft", vertical_tag_position === "Bottom" && horizontal_tag_position === "Left" && !!str_daysleft ? 14 : 0);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
         // Updates open graphs' today line
@@ -398,18 +404,13 @@ priority = {
             const dom_title = $(".title").eq(pd[2]);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
-            const dom_tags = dom_assignment.find(".tags");
             new Promise(function(resolve) {
                 if (params.first_sort) {
                     $(window).one("load", () => resolve());
                 } else {
                     resolve();
                 }
-            }).then(function() {
-                dom_tags.removeClass("tags-bottom");
-                horizontal_tag_position === "Left" && priority.positionTagLeft(dom_assignment);
-                vertical_tag_position === "Bottom" && dom_tags.addClass("tags-bottom");
-            });
+            }).then(() => priority.positionTags(dom_assignment));
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {

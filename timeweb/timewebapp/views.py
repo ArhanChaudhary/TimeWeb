@@ -510,6 +510,7 @@ class TimewebView(LoginRequiredMixin, View):
                         continue
                 name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length)
                 tags = [course_names[assignment['courseId']]]
+                description = assignment.get('description', None)
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
                 new_gc_assignment_ids.add(assignment_id)
@@ -531,6 +532,7 @@ class TimewebView(LoginRequiredMixin, View):
                     min_work_time=self.settings_model.def_min_work_time,
                     break_days=self.settings_model.def_break_days,
                     dynamic_start=dynamic_start,
+                    description=description,
                     tags=tags,
                     needs_more_info=True,
                     user=user,

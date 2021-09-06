@@ -336,20 +336,34 @@ header.animate::after {
     white-space: nowrap;
     font-size: min(10.25px, 0.87em);
 }
-.tags-right {
+
+.assignment.tags-right .tags {
     right: 2px;
     z-index: 2;
 }
-.tags-left {
+.assignment.tags-left .tags {
     left: 15px;
 }
-.tags-bottom {
+.assignment.tags-bottom .tags {
     top: unset;
     bottom: 2px;
 }
-.tags-left .tag-add-box {
-    left: 23px;
+.assignment.open-assignment.tags-bottom .assignment-header {
+    position: relative;
 }
+.assignment.open-assignment.tags-bottom .tags {
+    top: 100%;
+    bottom: unset;
+    margin-top: -3px;
+}
+.assignment.open-assignment.tags-bottom.tags-left .tags {
+    left: 0;
+    margin-top: unset;
+}
+.assignment.open-assignment.tags-bottom.tags-left .tags.assignment-has-daysleft {
+    margin-top: 14px;
+}
+
 .tag-wrapper {
     position: relative;
     display: inline-block;

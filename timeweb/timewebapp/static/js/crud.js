@@ -17,7 +17,6 @@ const DEFAULT_GC_FORM_FIELDS = {
     "#id_y": '',
     "#id_works": '0',
     "#id_time_per_unit": '',
-    "#id_description": '',
     "#id_funct_round": '',
     "#id_min_work_time": +def_min_work_time||'',
 }

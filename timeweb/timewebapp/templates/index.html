@@ -104,7 +104,7 @@
     </div>
     {% for assignment in assignment_models %}
       <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}"{% if assignment.name == just_created_assignment_name %} id="animate-in"{% elif assignment.name == just_updated_assignment_name %} id="animate-color"{% endif %}>
-        <div class="assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+        <div class="assignment tags-{{ horizontal_tag_position|lower }}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <div class="relative-positioning-wrapper">
               <span class="title">{{ assignment.name }}</span>
@@ -121,7 +121,7 @@
             <div class="right-side-of-header">
               <img class="status-image">
               <div class="align-to-status-message-container">
-                <div class="tags tags-{{ horizontal_tag_position|lower }}">
+                <div class="tags">
                   {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
                   {% spaceless %}
                   <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">

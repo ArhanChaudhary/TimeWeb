@@ -925,9 +925,7 @@ $(".assignment").click(function(e) {
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
-        if (sa_sa.description) {
-            priority.positionTagLeft(dom_assignment);
-        }
+        sa_sa.description && priority.positionTags(dom_assignment);
         return;
     }
     const sa = new VisualAssignment(dom_assignment);
@@ -937,11 +935,9 @@ $(".assignment").click(function(e) {
         marginBottom: "",
     });
     dom_assignment.css("overflow", "");
-    assignment_footer.css("display", "block");
     dom_assignment.addClass("open-assignment");
-    if (sa_sa.description) {
-        priority.positionTagLeft(dom_assignment);
-    }
+    sa_sa.description && priority.positionTags(dom_assignment);
+    assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click
     first_click && sa.setGraphButtonEventListeners();
