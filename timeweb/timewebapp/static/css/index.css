@@ -344,6 +344,9 @@ header.animate::after {
 .assignment.tags-left .tags {
     left: 15px;
 }
+.assignment.tags-left .tag-add-box {
+    left: 23px;
+}
 .assignment.tags-bottom .tags {
     top: unset;
     bottom: 2px;
