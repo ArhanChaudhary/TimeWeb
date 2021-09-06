@@ -12,6 +12,15 @@ const DEFAULT_FORM_FIELDS = {
     "#id_funct_round": '',
     "#id_min_work_time": +def_min_work_time||'',
 }
+const DEFAULT_GC_FORM_FIELDS = {
+    "#id_unit": def_unit_to_minute ? "Minute" : '',
+    "#id_y": '',
+    "#id_works": '0',
+    "#id_time_per_unit": '',
+    "#id_description": '',
+    "#id_funct_round": '',
+    "#id_min_work_time": +def_min_work_time||'',
+}
 function showForm(show_instantly=false) {
     if (show_instantly) {
         $('#overlay').show().children("#form-wrapper").css("top", 15);
@@ -125,16 +134,23 @@ $(window).one("load", function() {
             (sa.original_min_work_time*sa.time_per_unit)||'',
         ];
         form_inputs.each((index, element) => $(element).val(form_data[index]));
-        setTimeout(function() {
-            $("#id_description").trigger("input");
-        }, 0);
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
             // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_breawk_days.includes(break_day));
-            $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
+            $("#id_break_days_"+((break_day+6)%7)).prop("checked", (sa.needs_more_info ? def_break_days : sa.break_days).includes(break_day));
         }
-        $("#id_unit, #id_y, #id_works, #id_time_per_unit").toggleClass("invalid", sa.needs_more_info);
-        $("#id_x").toggleClass("invalid", !sa.x);
+        if (sa.needs_more_info) {
+            for (const field in DEFAULT_GC_FORM_FIELDS) {
+                $(field).val(DEFAULT_GC_FORM_FIELDS[field]);
+            }
+            $("#id_x, #id_unit, #id_y, #id_works, #id_time_per_unit").each(function() {
+                $(this).toggleClass("invalid", sa.needs_more_info && !$(this).val());
+            });
+        }
+        setTimeout(function() {
+            $("#id_description").trigger("input");
+        }, 0);
+
         // Set button pk so it gets sent on post
         $("#submit-assignment-button").val(sa.id);
         showForm();

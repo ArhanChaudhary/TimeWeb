@@ -82,12 +82,24 @@ priority = {
         const dom_button = dom_assignment.find(".button");
         const dom_assignment_footer = dom_assignment.find(".assignment-footer");
         const add_priority_percentage = !!dom_title.attr("data-priority");
+        const add_daysleft = !!dom_title.attr("data-daysleft");
         dom_assignment.css({paddingTop: "", paddingBottom: ""});
         dom_button.css({marginTop: "", marginBottom: ""});
 
         const tag_top = dom_tags.offset().top;
         const tag_height = dom_tags.height();
-        const title_top = dom_title.offset().top + (add_priority_percentage ? -10 : 3);
+
+        let title_top = dom_title.offset().top;
+        if (horizontal_tag_position === "Left") {
+            if (vertical_tag_position === "Bottom") {
+                if (add_daysleft) title_top -= 14;
+            } else if (add_priority_percentage) {
+                title_top -= 10;
+            } else {
+                title_top += 3;
+            }
+        }
+        
         const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
         dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
         dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
@@ -162,7 +174,6 @@ priority = {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = 1;
-                str_daysleft = '';
             } else if (today_minus_ad < 0) {
                 status_image = "no-status-image";
                 status_message = 'This Assignment hasn\'t yet been Assigned';
@@ -357,7 +368,6 @@ priority = {
                 return -Infinity;
             }
         }));
-        const tags_left = $(".tags-left").length;
         const question_mark_exists_excluding_gc = ordered_assignments.some(function(pd) {
             const status_value = Math.round(pd[0]);
             return [7, 8].includes(status_value);
@@ -395,9 +405,9 @@ priority = {
                 } else {
                     resolve();
                 }
-            }).then(() => {
+            }).then(function() {
                 dom_tags.removeClass("tags-bottom");
-                tags_left && priority.positionTagLeft(dom_assignment);
+                horizontal_tag_position === "Left" && priority.positionTagLeft(dom_assignment);
                 vertical_tag_position === "Bottom" && dom_tags.addClass("tags-bottom");
             });
             if (params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
