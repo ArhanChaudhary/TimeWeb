@@ -592,7 +592,12 @@ utils = {
         setAssignmentScaleUtils: function() {
             // width * percent = width+10
             // percent = 1 + 10/width
-            $(window).resize(() => $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`));
+            $(window).resize(function() {
+                $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
+                $(".assignment").each(function() {
+                    priority.positionTags($(this));
+                });
+            });
             $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
         },
         handleTutorialIntroduction: function() {

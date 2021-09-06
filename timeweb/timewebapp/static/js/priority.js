@@ -107,7 +107,8 @@ priority = {
         const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
         dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
         dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
-        dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - 5); // -5 because theres a random gap for some reason
+        dom_assignment_footer.css("top", +dom_assignment.css("padding-bottom").replace("px", "") - +dom_assignment_footer.find(".graph-container").first().css("margin-top").replace("px",""));
+        dom_tags.prop("style").setProperty('--margin-top', +dom_assignment.css("padding-bottom").replace("px", ""));
     },
     sort: function(params={}) {
         clearTimeout(priority.sort_timeout);

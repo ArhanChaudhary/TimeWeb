@@ -338,7 +338,7 @@ header.animate::after {
 }
 
 .assignment.tags-right .tags {
-    right: 2px;
+    right: 17px;
     z-index: 2;
 }
 .assignment.tags-left .tags {
@@ -356,12 +356,16 @@ header.animate::after {
     bottom: unset;
     margin-top: -3px;
 }
+.assignment.open-assignment.tags-bottom.tags-right .tags {
+    right: 2px;
+}
 .assignment.open-assignment.tags-bottom.tags-left .tags {
     left: 0;
     margin-top: unset;
 }
 .assignment.open-assignment.tags-bottom.tags-left .tags.assignment-has-daysleft {
-    margin-top: 14px;
+    margin-top: calc(1px * var(--margin-top));
+    transform: translateY(-100%) translateY(-2px);
 }
 
 .tag-wrapper {
