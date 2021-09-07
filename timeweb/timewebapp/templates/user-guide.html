@@ -27,7 +27,7 @@
             <div class="major-category" id="introduction">Introduction</div>
             <details open>
                 <summary class="minor-category" id="getting-started">Getting started</summary>
-                Welcome! TimeWeb's official user guide documents its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. If you do decide to read this, it's recommended to at least create an assignment and take a look at its graph to get a feel for TimeWeb's user interface.
+                Welcome! TimeWeb's official user guide documents its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. It's recommended to at least create an assignment and take a look at its graph to get a feel for TimeWeb's user interface before reading this guide.
 
                 In this user guide, FAQs, or frequently asked questions, are marked and labeled as such:
 
@@ -175,10 +175,10 @@
                 This button submits the value of the "Enter Units Done" textbox to the graph. Pressing enter on "Enter Units Done" also submits a work input.
 
                 <span class="minor-minor-category">Display in Text</span>
-                This button displays the entire work schedule in text, showing how much work to do every day of the assignment. This hasn't yet been coded in. If someone sees me at school, yell at me to code this in.
+                This button displays the assignment's entire work schedule in text, showing how much work to do for every day. This hasn't yet been coded in. If someone sees me at school, yell at me to code this in.
 
                 <span class="minor-minor-category">Ignore for Today only</span>
-                This button ignores the assignment's work from the total estimated completion time. However, the assignment's position will remain unchanged. This is automatically unignored the day after.
+                This button ignores the assignment's work from the total estimated completion time and makes the assignment translucent. However, the assignment's position will remain unchanged. This is automatically unignored the day after.
 
                 <span class="minor-minor-category">Next Assignment</span>
                 This button closes the current assignment and opens the next assignment.
@@ -188,9 +188,9 @@
                 <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
                 Before getting to the advanced controls, you must first understand what the skew ratio is. The skew ratio controls the curvature of the graph and, in turn, your work schedule.
                 
-                A more positive skew ratio yields a schedule in which you work more at the beginning and less at the end of an assignment.
-                A more negative skew ratio yields a schedule in which you work less at the beginning and more at the end of an assignment.
-                A skew ratio of 0 yields a linear schedule in which you work an equal amount for every day of an assignment.
+                A more positive skew ratio work schedule in which you work more at the beginning and less at the end of an assignment.
+                A more negative skew ratio yields a work schedule in which you work less at the beginning and more at the end of an assignment.
+                A skew ratio of 0 yields a linear work schedule in which you work an equal amount for every day of an assignment.
 
                 There are 3 advanced controls for the assignment graph:
 
@@ -213,7 +213,7 @@
                 
                 <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
                     <span class="label-title">Why do similar skew ratio values result in different work distributions in dynamic mode?</span>
-                    This will ocassionally occur after submitting and deleting work inputs. This isn't a bug and is instead a side effect of how dynamic works. Try to re-adjust the skew ratio to its old work distribution if this happens.
+                    This will ocassionally occur after submitting and deleting work inputs as a side effect of how dynamic works. Try to re-adjust the skew ratio to its old work distribution if this happens.
                 </span>
             </details>
         </span>
@@ -226,7 +226,7 @@
 
             <span class="label-question" id="why-do-some-assignments-with-low-priority-have-a-higher-list-position">
                 <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
-                You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority, meaning that you should complete the low priority assignment first. Although it may seem so at first, this isn't actually a bug.<br>
+                You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority, meaning that you should complete the low priority assignment first. Although it may seem so at first, this isn't actually a bug nor a glitch.<br>
                 <br>
                 If you look carefully, there's probably a reason why this is the case. The assignment could have the <a href="#important-and-not-important-assignment-tags">"Important" or "Not Important"</a> tags, or the assignment with the low priority is due tomorrow, while the assignment with the high priority isn't. TimeWeb is able to recognize and make exceptions for cases like these, as, ideally, you should always complete assignments that are due tomorrow first.
             </span>    
@@ -235,14 +235,14 @@
             <div class="major-category" id="google-classroom-api">Assignment tags</div>
             <details open>
                 <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" tags</summary>
-                Above every assignment's header message, there is a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions.
+                Above every assignment's header message, there's a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions.
                 
                 Adding the "Important" tag moves the assignment to the highest appropriate list position, while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom. TimeWeb will prioritize "Important" and "Not Important" in the most ideal manner possible.
             
             </details>
             <details open>
                 <summary class="minor-category" id="sorting-assignment-tags">Sorting tags</summary>
-                Tags are only added to the end of an assignment's tag list initially. So, you can sort the tags in the order you like. To do this, hold the tags and then drag them around. Note that you may have to pinch zoom on mobile before you can drag the tags around to sort them.
+                Tags are only added to the end of an assignment's tag list initially. So, you can sort the tags in the order you like by holding a tag and then dragging it around horizontally. Note that you may have to pinch zoom on mobile before you can drag the tags around to sort them.
             </details>
         </span>
         <span>
@@ -265,10 +265,10 @@
 
             </details>
             <details open>
-                <summary class="minor-category" id="delete-all-assignments-from-this-class-assignment-shortcut">"Delete all Assignments from Class"</summary>
+                <summary class="minor-category" id="delete-all-assignments-from-this-class-assignment-shortcut">"Delete all Assignments from this Class"</summary>
 
-                <span class="label-question" id="how-does-delete-all-assignments-from-class-know-what-to-delete">
-                    <span class="label-title">How does "Delete all Assignments from Class" know what to delete?</span>
+                <span class="label-question" id="how-does-delete-all-assignments-from-this-class-know-what-to-delete">
+                    <span class="label-title">How does "Delete all Assignments from this Class" know what to delete?</span>
 
                 </span>
             </details>
