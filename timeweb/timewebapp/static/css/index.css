@@ -386,7 +386,7 @@ header.animate::after {
     transition: margin-left 0.75s ease-in-out, opacity 0.7s linear, transform 0.5s linear 0.2s;
 }
 .tag-wrapper.ghost {
-    background: rgb(226, 241, 248);
+    visibility: hidden;
 }
 .tag-delete {
     position: absolute;
