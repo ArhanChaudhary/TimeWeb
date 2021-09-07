@@ -46,7 +46,7 @@
                         {% else %}
                             <td>
                                 {% for error in field.errors %}
-                                    <h3>{{ error|escape }}</h3>
+                                    <h3 class="error-note">{{ error|escape }}</h3>
                                 {% endfor %}
                                 {{ field }}
                             </td>

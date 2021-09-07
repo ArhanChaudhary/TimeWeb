@@ -148,7 +148,7 @@ class SettingsForm(forms.ModelForm):
             "def_unit_to_minute": "Sets the default unit of work to \"Minute\" for every new assignment, meaning it's divided up into units of time. Useful in case you don't know how to divide an assignment into units of work.",
             "def_funct_round_minute": "If your unit of work for any assignment is \"Minute,\" meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes. Unrounded values look ugly (e.g: 17 Minutes, 49 Minutes).",
             "ignore_ends": "Ignores the minimum work time for the first and last working days of EVERY assignment with a minimum work time in exchange for making their work distributions smoother. Recommended to be enabled.",
-            "show_progress_bar": "Displays a progress bar on every assignment's graph that measures how close you are to completing that assignment.",
+            "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
             "dark_mode": "If someone sees me in school yell at me to code this in.",

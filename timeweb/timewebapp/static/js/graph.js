@@ -709,7 +709,7 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Display button
         display_button.click(() => {
-            $.alert({title: "This feature hasn't yet been implemented"});
+            $.alert({title: "This feature hasn't yet been implemented."});
         });
         // END Display button
 

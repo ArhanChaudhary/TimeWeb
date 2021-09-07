@@ -19,14 +19,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     // verbose name doesnt work on tag position for literally no reason
     $("label[for=\"id_horizontal_tag_position\"]").html("Horizontal Assignment Tag Position");
-    $("label[for=\"id_horizontal_tag_position\"]").html("Vertical Assignment Tag Position");
+    $("label[for=\"id_vertical_tag_position\"]").html("Vertical Assignment Tag Position");
     $("#id_dark_mode").click(function(e) {
         e.preventDefault();
-        $.alert({title: "Dark mode hasn't yet been implemented"});
+        $.alert({title: "Dark mode hasn't yet been implemented."});
     });
     $("table input:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor)").each(function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });
+    $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
+    const background_image_link = $("#id_background_image").siblings("a");
+    background_image_link.replaceWith(`<img src=${background_image_link.attr("href")}>`);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
         $("#submit-settings-button").attr("disabled", true);

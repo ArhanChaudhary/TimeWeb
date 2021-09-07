@@ -280,7 +280,8 @@ priority = {
             if (!sa.sa.needs_more_info) {
                 if (sa.sa.tags.includes("Important")) {
                     status_value += 0.25;
-                } else if (sa.sa.tags.includes("Not Important")) {
+                }
+                if (sa.sa.tags.includes("Not Important")) {
                     status_value -= 0.25;
                 }
             }

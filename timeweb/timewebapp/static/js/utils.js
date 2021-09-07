@@ -135,7 +135,7 @@ utils = {
                 }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
-                        $.alert({title: "You can't enable the Google Classroom API on the example account"});
+                        $.alert({title: "You can't enable the Google Classroom API on the example account."});
                         return;
                     }
                     if (creating_gc_assignments_from_frontend) return;
@@ -615,8 +615,8 @@ utils = {
         },
         graphAlertTutorial: function(days_until_due) {
             $.alert({
-                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read TimeWeb's <a href=\"/user-guide#assignment-graph\">user guide for the graph</a> to understand how to use it.<br><br>Once you finish reading that, click OK to disable this popup and then check out the settings to set your preferences",
-                content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment or the example account to see how TimeWeb handles assignments with longer due dates` : '',
+                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read TimeWeb's <a href=\"/user-guide#assignment-graph\">user guide for the graph</a> to understand how to use it.<br><br>Once you're finish reading that, click OK to disable this popup and then check out the settings to set your preferences.",
+                content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment or the example account to see how TimeWeb handles assignments with longer due dates.` : '',
                 backgroundDismiss: false,
                 alignTop: true, // alignTop is a custom extension
                 onClose: function() {
@@ -629,7 +629,7 @@ utils = {
             if (sessionStorage.getItem("already-alerted-example-account")) return;
             sessionStorage.setItem("already-alerted-example-account", true);
             $.alert({
-                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>A few things to note:<br>The example account's internal date is frozen at May 3, 2021 for consistency, and no modifications to this account are saved<br><br>With that out of the way, feel free to do whatever you want over here"
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>A few things to note:<br>The example account's internal date is frozen at May 3, 2021 for consistency, and no modifications to this account are saved<br><br>With that out of the way, feel free to do whatever you want over here."
             });
         },
         saveAndLoadStates: function() {
@@ -710,15 +710,15 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert({title: "Failed to connect", content: "We can't establish a connection with the server. Check your connection and try again"});
+            $.alert({title: "Failed to connect.", content: "We can't establish a connection with the server. Check your connection and try again."});
         } else if (response.status == 404) {
-            $.alert({title: "Not found", content: "Try refreshing or trying again"});
+            $.alert({title: "Not found.", content: "Try refreshing or trying again."});
         } else if (response.status == 500) {
-            $.alert({title: "Internal server error", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this"});
+            $.alert({title: "Internal server error.", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this."});
         } else if (exception === 'timeout') {
-            $.alert({title: "Request timed out", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again"});
+            $.alert({title: "Request timed out.", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again."});
         } else if (exception === 'abort') {
-            $.alert({title: "Request aborted", content: "Try refreshing or try again"});
+            $.alert({title: "Request aborted.", content: "Try refreshing or try again."});
         } else {
             $.alert({title: "<p>Uncaught error while trying to save an assignment:</p>" + response.responseText});
         }
@@ -777,7 +777,7 @@ ajaxUtils = {
     sendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
-                $.alert({title: "An assignment takes up too much space and can no longer be saved", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs"});
+                $.alert({title: "An assignment takes up too much space and can no longer be saved.", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs"});
                 return;
             }
             gtag("event","save_assignment");
