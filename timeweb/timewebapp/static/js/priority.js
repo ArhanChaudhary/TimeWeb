@@ -305,29 +305,12 @@ priority = {
             } else if (add_question_mark_condition) {
                 // Order question mark assignments by their absolute distance to their due date
                 status_priority = -Math.abs(due_date_minus_today);
+            } else if (sa.sa.x-sa.sa.blue_line_start-len_works === 0 || todo < 0 || len_works + sa.sa.blue_line_start > today_minus_ad) {
+                status_priority = 0;
             } else {
-                const original_skew_ratio = sa.sa.skew_ratio;
-                sa.sa.skew_ratio = 1;
-                sa.red_line_start_x = sa.sa.blue_line_start;
-                sa.red_line_start_y = sa.sa.works[0];
-                sa.setParabolaValues();
-                sa.sa.skew_ratio = original_skew_ratio;
-                if (len_works + sa.sa.blue_line_start === sa.sa.x || todo < 0 || len_works + sa.sa.blue_line_start > today_minus_ad) {
-                    status_priority = 0;
-                } else if (len_works && due_date_minus_today !== 1) {
-                    let sum_diff_red_blue = 0;
-                    for (i = 1; i < len_works + 1; i++) { // Start at one because funct(0) - works[0] is always 0
-                        if (!sa.sa.break_days.includes(sa.assign_day_of_week + i - 1)) { // -1 to because of ignore break days if the day before sa.works[i] - sa.funct(i + blue_line_start); is a break day
-                            // No need to worry about sa.funct(i + blue_line_start) being before dynamic_start because red_line_start_x is set to blue_line_start
-                            sum_diff_red_blue += sa.sa.works[i] - sa.funct(i + sa.sa.blue_line_start);
-                        }
-                    }
-                    const how_well_followed_const = 1-sum_diff_red_blue/len_works/sa.sa.y;
-                    status_priority = Math.max(0, how_well_followed_const*todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works));
-                } else {
-                    status_priority = todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works);
-                }
+                status_priority = todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works);
             }
+            
             let priority_data = [status_value, status_priority, index];
             if (sa.sa.mark_as_done && !add_question_mark_condition) {
                 priority_data.push(true);
