@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     gtag("event","settings_view");
+    BACKGROUND_IMAGE_TEMPLATE = $("#background-image-template").html();
     $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
     $("#reset-settings-button").click(function() {
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
     const background_image_link = $("#id_background_image").siblings("a");
-    background_image_link.replaceWith(`<img src=${background_image_link.attr("href")}>`);
+    background_image_link.replaceWith(BACKGROUND_IMAGE_TEMPLATE);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
         $("#submit-settings-button").attr("disabled", true);

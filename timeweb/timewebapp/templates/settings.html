@@ -65,4 +65,7 @@
     <input type="button" value="Reset" id="reset-settings-button">
     <input type="submit" value="Save" id="submit-settings-button">
 </form>
+<template id="background-image-template">
+    <img src="/media/images/{{ user.get_username }}/{{ background_image_name }}">
+</template>
 {% endblock content %}

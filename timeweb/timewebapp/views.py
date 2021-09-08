@@ -116,6 +116,8 @@ class SettingsView(LoginRequiredMixin, View):
             'vertical_tag_position': self.settings_model.vertical_tag_position,
         }
         self.context['form'] = SettingsForm(initial=initial)
+        if self.settings_model.background_image.name:
+            self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return render(request, "settings.html", self.context)
         
@@ -182,6 +184,7 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['settings_model_as_json'] = model_to_dict(self.settings_model)
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['background_image'] = self.settings_model.background_image
+        
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
             
