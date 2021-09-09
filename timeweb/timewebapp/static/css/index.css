@@ -269,7 +269,7 @@ header.animate::after {
 .assignment.open-assignment .description, .assignment.needs-more-info .description {
     display: block;
 }
-.assignment:not(.open-assignment) .title {
+.assignment:not(.open-assignment):not(.needs-more-info) .title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
