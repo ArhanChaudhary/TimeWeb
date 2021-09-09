@@ -646,14 +646,11 @@ class VisualAssignment extends Assignment {
         submit_work_button.click(() => {
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
-            const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             let not_applicable_message;
             if (!work_input_textbox.val()) {
                 not_applicable_message = "Enter a Value";
             } else if (last_work_input >= this.sa.y) {
                 not_applicable_message = "Already Finished";
-            } else if (today_minus_assignment_date < this.sa.blue_line_start) {
-                not_applicable_message = "Not Yet Assigned";
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_textbox.val().trim().toLowerCase();
