@@ -293,6 +293,7 @@ priority = {
             assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
             assignment_container.toggleClass("question-mark", add_question_mark_condition);
             assignment_container.toggleClass("add-line-wrapper", add_finished_condition || add_incomplete_works_condition);
+            dom_assignment.toggleClass("needs-more-info", sa.sa.needs_more_info);
 
             let status_priority;
             if (Math.round(status_value) === 1) {

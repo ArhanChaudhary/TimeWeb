@@ -266,7 +266,7 @@ header.animate::after {
     word-wrap: break-word;
     font-size: 0.7em;
 }
-.assignment.open-assignment .description {
+.assignment.open-assignment .description, .assignment.needs-more-info .description {
     display: block;
 }
 .assignment:not(.open-assignment) .title {
