@@ -103,7 +103,7 @@ class TimewebForm(forms.ModelForm):
             if x <= assignment_date:
                 self.add_error("x",
                     forms.ValidationError(_("The due date can't be %(on_or_before)s the assignment date"),code='invalid',params={
-                        'on_or_before': "on" if x == assignment_date else "before",
+                        'on_or_before': "on" if x == assignment_date else "before"
                     })
                 )
             if x <= timezone.localtime(timezone.now()):

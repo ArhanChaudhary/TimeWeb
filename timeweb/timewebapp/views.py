@@ -478,7 +478,10 @@ class TimewebView(LoginRequiredMixin, View):
         service = build('classroom', 'v1', credentials=credentials)
 
         def add_gc_assignments_from_response(response_id, course_coursework, exception):
-            if not course_coursework or type(exception) is HttpError: # HttpError for permission denied (ex if you're the teacher of a class)
+            if type(exception) is HttpError: # HttpError for permission denied (ex if you're the teacher of a class)
+                logger.warn(exception)
+                return
+            if not course_coursework:
                 return
             course_coursework = course_coursework['courseWork']
             for assignment in course_coursework:
@@ -494,6 +497,7 @@ class TimewebView(LoginRequiredMixin, View):
                 assignment_date = timezone.localtime(assignment_date.replace(tzinfo=datetime.timezone.utc))
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
+                tags = []
                 if x:
                     if "hours" in assignment['dueTime']:
                         assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
@@ -508,11 +512,12 @@ class TimewebView(LoginRequiredMixin, View):
                     # Validation
                     if assignment_date >= x:
                         x = assignment_date + datetime.timedelta(1)
+                        tags.append("Important")
                     if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
                 name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length)
-                tags = [course_names[assignment['courseId']]]
+                tags.insert(0, course_names[assignment['courseId']])
                 description = assignment.get('description', None)
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)

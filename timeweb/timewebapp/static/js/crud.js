@@ -21,6 +21,9 @@ const DEFAULT_GC_FORM_FIELDS = {
     "#id_min_work_time": +def_min_work_time||'',
 }
 function showForm(show_instantly=false) {
+    setTimeout(function() {
+        $("#id_description").trigger("input");
+    }, 0);
     if (show_instantly) {
         $('#overlay').show().children("#form-wrapper").css("top", 15);
     } else {
@@ -146,9 +149,6 @@ $(window).one("load", function() {
                 $(this).toggleClass("invalid", sa.needs_more_info && !$(this).val());
             });
         }
-        setTimeout(function() {
-            $("#id_description").trigger("input");
-        }, 0);
 
         // Set button pk so it gets sent on post
         $("#submit-assignment-button").val(sa.id);

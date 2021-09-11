@@ -82,7 +82,7 @@ utils = {
                 $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
                 $("#break-days-wrapper").addClass("hidden-field");
                 $("#form-wrapper #advanced-inputs").click(function() {
-                    $("#form-wrapper .field-wrapper").last()[0].scrollIntoView({
+                    this.scrollIntoView({
                         behavior: "smooth",
                         block: "start",
                     });

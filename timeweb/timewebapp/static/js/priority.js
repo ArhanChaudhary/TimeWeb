@@ -432,7 +432,7 @@ priority = {
             // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
             const sa = utils.loadAssignmentData(dom_assignment);
 
-            const current_tag = sa.tags[0];
+            const current_tag = ["Not Important", "Important"].includes(sa.tags[0]) ? undefined : sa.tags[0];
             if (sa.needs_more_info && current_tag) {
                 assignment_container.addClass("add-line-wrapper");
                 if (current_tag !== prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
