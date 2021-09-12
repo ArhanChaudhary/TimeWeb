@@ -24,7 +24,7 @@
     <div id="user-guide-container">
         {% comment %} the span groups the major and minor categories together for user-guide.js {% endcomment %}
         <span>
-            <div class="major-category" id="introduction">Introduction</div>
+            <div class="major-category">Introduction</div>
             <details open>
                 <summary class="minor-category" id="getting-started">Getting started</summary>
                 Welcome! TimeWeb's official user guide documents its features, quirks, and methodology. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. It's recommended to at least create an assignment and take a look at its graph to get a feel for TimeWeb's user interface before reading this guide.
@@ -35,7 +35,7 @@
                     <span class="label-title">Why doesn't the internal date change after midnight?</span>
                     This behavior isn't a bug nor a glitch, but is actually intentional. Changing the date at midnight will result in showing the work for the next day despite the current work day not being finished. So, the internal date only changes to the next at the hardcoded value of 4 AM.
                 </span>
-                The "Table of contents" section to the left shows the complete outline of this user guide, and the "FAQ" section just below that lists every FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
+                The "Table of contents" section to the left shows the complete outline of this user guide, and the "FAQs" section just below that lists every FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
 
             </details>
             <details open>
@@ -95,9 +95,10 @@
             </details>
         </span>
         <span>
-            <div class="major-category" id="assignment-form">Assignment form</div>
+            <div class="major-category">Assignment form</div>
             <details open>
                 <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
+                <img src={% static 'images/assignment-form.png' %} width="550">
                 The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button on an already existing assignment. 
                 
                 The assignment form has 11 inputs in total, 5 of which are advanced and optional. Default form input values, which can be set in the settings, are accordingly set every time you make a new assignment, and they can be manually overridden.
@@ -111,10 +112,10 @@
                 This input is simply the name of the assignment and is displayed at the left of the assignment header.
 
                 <span class="minor-minor-category">Date Assigned</span>
-                This input is the date in which the assignment was assigned. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
+                This input is the date the assignment was assigned or the date you'll start working on the assignment. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
 
                 <span class="minor-minor-category">Due Date</span>
-                This input is the date in which the assignment is due. This can't be before the date assigned nor today. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. Note that leaving this empty should be a last resort, as the predicted due date may not always be suitable.
+                This input is the date in which the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
 
                 <span class="minor-minor-category">Name of each Unit of Work</span>
                 This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete X amount of [this input] today." 
@@ -151,9 +152,10 @@
             </details>
         </span>
         <span>
-            <div class="major-category" id="assignment-graph">Assignment graph</div>
+            <div class="major-category">Assignment graph</div>
             <details open>
                 <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
+                <img id="assignment-graph-image">
                 After creating an assignment, click it to open its graph. The assignment line graph provides a visualization of how your assignment's work schedule will look like. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
 
                 As you progress through your assignment, there needs to be some way to measure your progress so each assignment can be prioritized accordingly. So, you must input the amount of work you complete every day for every assignment. This will be plotted and connected in blue.
@@ -190,7 +192,7 @@
                 <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
                 Before getting to the advanced controls, you must first understand what the skew ratio is. The skew ratio controls the curvature of the graph and, in turn, your work schedule.
                 
-                A more positive skew ratio work schedule in which you work more at the beginning and less at the end of an assignment.
+                A more positive skew ratio yields a work schedule in which you work more at the beginning and less at the end of an assignment.
                 A more negative skew ratio yields a work schedule in which you work less at the beginning and more at the end of an assignment.
                 A skew ratio of 0 yields a linear work schedule in which you work an equal amount for every day of an assignment.
 
@@ -215,13 +217,13 @@
                 
                 <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
                     <span class="label-title">Why do similar skew ratio values result in different work distributions in dynamic mode?</span>
-                    This will ocassionally occur after submitting and deleting work inputs as a side effect of how dynamic works. Try to re-adjust the skew ratio to its old work distribution if this happens.
+                    Unfortunately, there is no clear answer. This will ocassionally occur after submitting and deleting work inputs as a side effect of how dynamic works. Try to re-adjust the skew ratio to its old work distribution if this happens.
                 </span>
             </details>
         </span>
 
         <details open>
-            <summary class="major-category" id="assignment-priority">Assignment priority</summary>
+            <summary class="major-category">Assignment priority</summary>
             After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for that day compared to every other assignment.
             
             Their priority also determines their assignment list position, which represents the order in which you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
@@ -234,7 +236,7 @@
             </span>    
         </details>
         <span>
-            <div class="major-category" id="google-classroom-api">Assignment tags</div>
+            <div class="major-category">Assignment tags</div>
             <details open>
                 <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" tags</summary>
                 Above every assignment's header message, there's a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions.
@@ -248,9 +250,10 @@
             </details>
         </span>
         <span>
-            <div class="major-category" id="assignment-shortcuts">Assignment shortcuts</div>
+            <div class="major-category">Assignment shortcuts</div>
             <details open>
                 <summary class="minor-category" id="what-are-assignment-shortcuts">What are assignment shortcuts?</summary>
+                <img src="{% static 'images/assignment-shortcuts.png' %}">
                 Assignment shortcuts allow you to perform actions in bulk and . To use a shortcut, click them on the home page.
             </details>
             <details open>
@@ -274,18 +277,20 @@
                 </span>
             </details>
             <details open>
-                <summary class="minor-category" id="go-to-next-day-assignment-shortcut">Go to Next Day</summary>
-                other header icons
+                <summary class="minor-category" id="header-icons">Header Icons</summary>
+                <img src="{% static 'images/header-icons.png' %}">
+
             </details>
         </span>
         <span>
-            <div class="major-category" id="google-classroom-api">Google Classroom API</div>
+            <div class="major-category">Google Classroom API</div>
             <details open>
                 <summary class="minor-category" id="what-is-the-google-classroom-api">What is the Google Classroom API?</summary>
 
             </details>
             <details open>
                 <summary class="minor-category" id="enabling-the-google-classroom-api">Enabling the Google Classroom API</summary>
+                <img src="{% static 'images/google-classroom-api.png' %}">
                 you must enable both or nothing will work
                 <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
                     <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
@@ -304,7 +309,7 @@
             </details>
         </span>
         <span>
-            <div class="major-category" id="keybinds">Keybinds</div>
+            <div class="major-category">Keybinds</div>
         </span>
         You've reached the end of TimeWeb's user guide! Feel free to <a href="mailto:arhan.ch@gmail.com">contact me</a> if you're still confused about something or you want to suggest adding anything. Have a great day!
     </div>
