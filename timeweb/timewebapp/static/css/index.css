@@ -963,7 +963,7 @@ input[type=number]::-webkit-inner-spin-button {
     position: fixed;
     height: 50px;
     border-radius: 25px;
-    right: 15px;
+    right: 10px;
     bottom: 15px;
     padding: 4px;
     box-sizing: border-box;

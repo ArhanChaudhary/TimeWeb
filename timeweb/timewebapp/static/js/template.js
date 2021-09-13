@@ -33,9 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
             marginTop: 70,
         });
         $(window).one('load', function() {
-            setTimeout(function() {
-                $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
-            }, 0);
+            $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
         });
     // Do starting animation
     } else {
@@ -47,8 +45,8 @@ document.addEventListener("DOMContentLoaded", function() {
         sessionStorage.setItem("animation-ran", true);
         $(window).one('load', function() {
             // Only start loading background image after window.one("load")
+            $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
             setTimeout(function(){
-                $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
                 // This hides the address bar: (not anymore)
                 window.scrollTo(0, 1);
             }, 0);
