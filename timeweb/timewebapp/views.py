@@ -253,15 +253,9 @@ class TimewebView(LoginRequiredMixin, View):
         if self.isExampleAccount and not editing_example_account:
             self.form.add_error("name", forms.ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
-        else:
-            # Ensure that the user's assignment name doesn't match with any other assignment
-            # Can't use unique=True because it doesn't exclude itself if its name doesnt change when edited
-            if self.assignment_models.exclude(pk=self.pk).filter(name=request.POST['name'].strip()).exists():
-                self.form.add_error("name", forms.ValidationError(_('An assignment with this name already exists')))
-                form_is_valid = False
-            if self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-                self.form.add_error("name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
-                form_is_valid = False
+        elif self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
+            self.form.add_error("name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+            form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
 
