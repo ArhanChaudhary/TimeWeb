@@ -324,7 +324,7 @@ class TimewebView(LoginRequiredMixin, View):
         if self.sm.min_work_time != None:
             self.sm.min_work_time /= self.sm.time_per_unit            
 
-        if self.sm.x == None:
+        if self.sm.x == None and self.sm.y:
             # y - first work = min_work_time_funct_round * x
             # x = (y - first_work) / min_work_time_funct_round
             # Solve for first work:

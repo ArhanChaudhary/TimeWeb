@@ -285,10 +285,11 @@ priority = {
                     status_value -= 0.25;
                 }
             }
+            const ignore_tag_status_value = Math.round(status_value);
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            const add_finished_condition = Math.round(status_value) === 1;
-            const add_incomplete_works_condition = Math.round(status_value) === 8;
-            const add_question_mark_condition = [6,7,8].includes(Math.round(status_value));
+            const add_finished_condition = ignore_tag_status_value === 1;
+            const add_incomplete_works_condition = ignore_tag_status_value === 8;
+            const add_question_mark_condition = [6,7,8].includes(ignore_tag_status_value);
             assignment_container.toggleClass("finished", add_finished_condition);
             assignment_container.toggleClass("incomplete-works", add_incomplete_works_condition);
             assignment_container.toggleClass("question-mark", add_question_mark_condition);
@@ -296,11 +297,11 @@ priority = {
             dom_assignment.toggleClass("needs-more-info", sa.sa.needs_more_info);
 
             let status_priority;
-            if (Math.round(status_value) === 1) {
+            if (ignore_tag_status_value === 1) {
                 status_priority = -index;
-            } else if (Math.round(status_value) === 2) {
+            } else if (ignore_tag_status_value === 2) {
                 status_priority = today_minus_ad;
-            } else if (Math.round(status_value) === 6) {
+            } else if (ignore_tag_status_value === 6) {
                 // Order assignments that need more info by their tags lexicographically
                 status_priority = (sa.sa.tags[0]||"").toLowerCase();
             } else if (add_question_mark_condition) {
@@ -333,22 +334,29 @@ priority = {
         $(window).trigger("resize");
         ordered_assignments.sort(function(a, b) {
             // Sort from max to min
-            // Status value
-            if (a[0] < b[0]) return 1;
-            if (a[0] > b[0]) return -1;
-            // Status priority
-            if (Math.round(a[0]) === 6) {
+            const status_value1 = a[0];
+            const status_value2 = b[0];
+            const status_priority1 = a[1];
+            const status_priority2 = b[1];
+            const index1 = a[2];
+            const index2 = b[2];
+            // Max to min
+            if (status_value1 < status_value2) return 1;
+            if (status_value1 > status_value2) return -1;
+
+            const ignore_tag_status_value1 = Math.round(status_value1); // using status_value2 also works
+            if (ignore_tag_status_value1 === 6) {
                 // If the assignment is a google classroom assignment, sort from min to max because the status priority is now their first tag
-                if (a[1] < b[1]) return -1;
-                if (a[1] > b[1]) return 1;
+                if (status_priority1 < status_priority2) return -1;
+                if (status_priority1 > status_priority2) return 1;
             } else {
-                if (a[1] < b[1]) return 1;
-                if (a[1] > b[1]) return -1;
+                if (status_priority1 < status_priority2) return 1;
+                if (status_priority1 > status_priority2) return -1;
             }
             // If the status value and status priority are the same, sort them by their index, which will always be different from each other
             // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
-            if (a[2] < b[2]) return -1;
-            if (a[2] > b[2]) return 1;
+            if (index1 < index2) return -1;
+            if (index1 > index2) return 1;
         });
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(ordered_assignments);

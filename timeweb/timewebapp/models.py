@@ -42,6 +42,7 @@ class TimewebModel(models.Model):
     )
     assignment_date = models.DateTimeField(
         null=True,
+        blank=True,
         verbose_name=_('Date Assigned'),
     )
     x = models.DateTimeField(
@@ -50,10 +51,14 @@ class TimewebModel(models.Model):
         verbose_name=_('Due Date'),
     )
     unit = models.CharField(
+        null=True,
+        blank=True,
         max_length=40,
         verbose_name=_('Name of each Unit of Work'),
     )
     y = models.DecimalField(
+        null=True,
+        blank=True,
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(1,_("This field's value can't be less than %(limit_value)s"))],
@@ -69,6 +74,8 @@ class TimewebModel(models.Model):
         null=True,
     )
     time_per_unit = models.DecimalField(
+        blank=True,
+        null=True,
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
@@ -80,6 +87,7 @@ class TimewebModel(models.Model):
     )
     works = models.JSONField(
         default=empty_list,
+        blank=True,
     )
     funct_round = models.DecimalField(
         max_digits=15,
@@ -117,6 +125,9 @@ class TimewebModel(models.Model):
         blank=True,
     )
     needs_more_info = models.BooleanField(
+        default=False,
+    )
+    is_google_classroom_assignment = models.BooleanField(
         default=False,
     )
     user = models.ForeignKey(
