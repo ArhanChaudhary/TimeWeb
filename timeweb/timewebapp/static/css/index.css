@@ -5,6 +5,7 @@
     top: -10px;
     padding-top: 10px;
     opacity: 0;
+    --scale-percent-y: 1.05;
 }
 main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
@@ -48,7 +49,7 @@ header.animate::after {
     display: inline;
     font-size: 17px;
 }
-#simulated-date {
+#current-date {
     position: relative;
     padding: 0 10px;
     font-size: 17px;
@@ -144,7 +145,7 @@ header.animate::after {
     transition: none;
 }
 .assignment:not(.open-assignment):hover {
-    transform: scale(var(--scale-percent),1.05);
+    transform: scale(var(--scale-percent-x), var(--scale-percent-y));
     border-color: rgba(0,0,0,0.7);
     cursor: pointer;
     box-shadow: 0 0 7px rgb(52,52,52);

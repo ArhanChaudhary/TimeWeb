@@ -2,6 +2,9 @@
 * {
     font-family: "Open Sans", sans-serif;
 }
+html {
+    scroll-behavior: smooth;
+}
 input, textarea {
     -webkit-user-select: text;
     -moz-user-select: text;

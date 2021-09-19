@@ -488,24 +488,12 @@ priority = {
 
         if (question_mark_exists_excluding_gc) {
             $("#current-time, #tomorrow-time, #info").hide();
-            $("#simulated-date").css({
-                marginTop: -23,
-                transform: "translateY(-8px)",
-            });
         } else if (!total) {
             $("#info").show();
-            $("#simulated-date").css({
-                marginTop: "",
-                transform: "",
-            });
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time, #hide-button").hide();
         } else {
             $("#current-time, #tomorrow-time, #hide-button, #info").show();
-            $("#simulated-date").css({
-                marginTop: "",
-                transform: "",
-            });
             $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
             $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
             if (tomorrow_total === total) {

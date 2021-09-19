@@ -655,6 +655,7 @@ class VisualAssignment extends Assignment {
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_textbox.val().trim().toLowerCase();
             switch (input_done) {
+                case "done":
                 case "fin":
                     input_done = Math.max(0, todo);
                     break;

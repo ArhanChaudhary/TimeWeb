@@ -100,9 +100,9 @@ utils = {
                     $(".assignment.open-assignment").click();
                 });
                 if (isExampleAccount) {
-                    $("#simulated-date-text").text("Simulated example account date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long', year: 'numeric'}));
+                    $("#current-date-text").text("Example account simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long', year: 'numeric'}));
                 } else {
-                    $("#simulated-date").hide(); 
+                    $("#current-date-text").text("Current date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                 }
                 $("#next-day").click(function() {
                     in_next_day = true;
@@ -111,8 +111,7 @@ utils = {
                     for (sa of dat) {
                         sa.mark_as_done = false;
                     }
-                    $("#simulated-date").show();
-                    $("#simulated-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                    $("#current-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                     priority.sort();
                 });
                 $("#next-day-icon-label").info("bottom",
@@ -590,15 +589,24 @@ utils = {
             });
         },
         setAssignmentScaleUtils: function() {
-            // width * percent = width+10
-            // percent = 1 + 10/width
+            // width * percentx = width+10
+            // percentx = 1 + 10/width
             $(window).resize(function() {
-                $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
+                $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
                     priority.positionTags($(this));
                 });
             });
-            $("#assignments-container").prop("style").setProperty('--scale-percent',`${1 + 10/$(".assignment").first().width()}`);
+
+            // height * percenty = height+5
+            // percenty = 1 + 5/height
+            $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
+            setTimeout(function() {
+                $(".assignment").each(function() {
+                    if (1 + 10/$(this).height() > 1.05) return;
+                    $(this).prop("style").setProperty('--scale-percent-y',`${1 + 10/$(this).height()}`);
+                });
+            }, 0);
         },
         handleTutorialIntroduction: function() {
             if (enable_tutorial) {
@@ -720,7 +728,7 @@ ajaxUtils = {
         } else if (exception === 'abort') {
             $.alert({title: "Request aborted.", content: "Try refreshing or try again."});
         } else {
-            $.alert({title: "<p>Uncaught error while trying to save an assignment:</p>" + response.responseText});
+            $.alert({title: "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText});
         }
     },
     ajaxFinishedTutorial: function() {
