@@ -31,6 +31,8 @@ def default_works():
     return 0
 def empty_list():
     return []
+def list_with_zero():
+    return ["0"]
 def empty_dict():
     return {}
 def create_image_path(instance, filename):
@@ -86,7 +88,7 @@ class TimewebModel(models.Model):
         verbose_name=_('Assignment Description'),
     )
     works = models.JSONField(
-        default=empty_list,
+        default=list_with_zero,
         blank=True,
     )
     funct_round = models.DecimalField(
@@ -95,6 +97,7 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
         default=1,
         blank=True,
+        null=True,
     )
     min_work_time = models.DecimalField(
         max_digits=15,

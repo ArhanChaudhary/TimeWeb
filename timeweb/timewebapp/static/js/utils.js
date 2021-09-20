@@ -246,7 +246,7 @@ utils = {
                     const assignments_to_delete = $(".assignment-container").filter(function() {
                         const dom_assignment = $(this).children(".assignment");
                         const _sa = utils.loadAssignmentData(dom_assignment);
-                        return _sa.needs_more_info && _sa.tags[0] === sa.tags[0];
+                        return _sa.is_google_classroom_assignment && _sa.tags[0] === sa.tags[0];
                     });
                     $.confirm({
                         title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's first tag is its class name)`,
@@ -340,7 +340,7 @@ utils = {
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
                         // GC class tags
-                        if (sa.needs_more_info || tag_names.includes("Important") || tag_names.includes("Not Important")) {
+                        if (sa.is_google_classroom_assignment || tag_names.includes("Important") || tag_names.includes("Not Important")) {
                             priority.sort();
                         }
                         // Close box and add tags visually
@@ -437,7 +437,7 @@ utils = {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
                     // GC class tags
-                    if (sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
+                    if (sa.is_google_classroom_assignment || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
                         priority.sort();
                     }
                     tag_wrapper.addClass("tag-is-deleting");
@@ -491,9 +491,7 @@ utils = {
                         return $(this).children(".tag-name").text();
                     }).toArray();
                     // GC class tags
-                    if (sa.needs_more_info) {
-                        priority.sort();
-                    }
+                    sa.is_google_classroom_assignment && priority.sort();
                     ajaxUtils.sendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
                 }
             });
@@ -830,13 +828,15 @@ if (isExampleAccount) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
-const max_length_funct_round = dat.length ? dat[0]['funct_round'].split(".")[1].length : undefined;
+const max_length_funct_round = dat[0]['funct_round'] ? dat[0]['funct_round'].split(".")[1].length : undefined;
 for (let sa of dat) {
-    sa.assignment_date = new Date(sa.assignment_date);
-    // Don't really know what to do for assignment dates on different tzs (since they are stored in utc) so i'll just round it to the nearest day
-    // Add half a day and flooring it rounds it
-    sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
-    sa.assignment_date.setHours(0,0,0,0);
+    if (sa.assignment_date) {
+        sa.assignment_date = new Date(sa.assignment_date);
+        // Don't really know what to do for assignment dates on different tzs (since they are stored in utc) so i'll just round it to the nearest day
+        // Add half a day and flooring it rounds it
+        sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
+        sa.assignment_date.setHours(0,0,0,0);
+    }
     if (sa.x) {
         sa.x = new Date(sa.x);
         sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
@@ -846,12 +846,12 @@ for (let sa of dat) {
             sa.assignment_date = new Date(date_now.valueOf());
         }
     }
-    sa.y = +sa.y;
-    sa.time_per_unit = +sa.time_per_unit;
-    sa.funct_round = +sa.funct_round;
-    sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
-    sa.skew_ratio = +sa.skew_ratio;
-    sa.works = sa.works.map(Number);
+    if (sa.y) sa.y = +sa.y;
+    if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;
+    if (sa.funct_round) sa.funct_round = +sa.funct_round;
+    if (sa.min_work_time) sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
+    if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
+    if (sa.works.length) sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 
@@ -861,19 +861,21 @@ for (let sa of dat) {
     // Repopulating the form
     sa.original_funct_round = sa.funct_round;
     sa.original_min_work_time = sa.min_work_time;
-    // Caps and adjusts min_work_time and funct_round; might not be needed but I'll still keep this
+    // Caps and adjusts min_work_time and funct_round; needed in parabola.js i think
     let y1 = sa.y - red_line_start_y;
-    if (sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
-        sa.funct_round = y1;
-    }
-    if (sa.min_work_time > y1) {
-        sa.min_work_time = y1;
-    }
+    if (Number.isFinite(sa.min_work_time) && Number.isFinite(sa.funct_round) && Number.isFinite(y1)) {
+        if (sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
+            sa.funct_round = y1;
+        }
+        if (sa.min_work_time > y1) {
+            sa.min_work_time = y1;
+        }
 
-    // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
-    // Set it to 0 to assume it isn't enabled for calculations in setParabolaValues()
-    if (sa.min_work_time <= sa.funct_round) {
-        sa.min_work_time = 0;
+        // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
+        // Set it to 0 to assume it isn't enabled for calculations in setParabolaValues()
+        if (sa.min_work_time <= sa.funct_round) {
+            sa.min_work_time = 0;
+        }
     }
 };
 // Use DOMContentLoaded because $(function() { fires too slowly

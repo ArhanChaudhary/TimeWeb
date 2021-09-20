@@ -12,14 +12,6 @@ const DEFAULT_FORM_FIELDS = {
     "#id_funct_round": '',
     "#id_min_work_time": +def_min_work_time||'',
 }
-const DEFAULT_GC_FORM_FIELDS = {
-    "#id_unit": def_unit_to_minute ? "Minute" : '',
-    "#id_y": '',
-    "#id_works": '0',
-    "#id_time_per_unit": '',
-    "#id_funct_round": '',
-    "#id_min_work_time": +def_min_work_time||'',
-}
 function showForm(show_instantly=false) {
     setTimeout(function() {
         $("#id_description").trigger("input");
@@ -121,32 +113,32 @@ $(window).one("load", function() {
         $("#submit-assignment-button").html("Edit Assignment");
         // Find which assignment in dat was clicked
         const sa = utils.loadAssignmentData($(this));
-        const x = new Date(sa.assignment_date.valueOf());
-        x.setDate(x.getDate() + sa.x);
+        if (sa.x) {
+            var x = new Date(sa.assignment_date.valueOf());
+            x.setDate(x.getDate() + sa.x);
+        }
         const form_data = [
             sa.name,
-            utils.formatting.stringifyDate(sa.assignment_date),
+            sa.assignment_date ? utils.formatting.stringifyDate(sa.assignment_date) : '',
             sa.x ? utils.formatting.stringifyDate(x) : '',
             sa.unit,
-            sa.needs_more_info ? '' : sa.y,
-            sa.needs_more_info ? '' : sa.time_per_unit,
+            sa.y,
+            sa.time_per_unit,
             sa.description,
             sa.works[0],
-            sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
+            sa.original_funct_round && sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
             (sa.original_min_work_time*sa.time_per_unit)||'',
         ];
         form_inputs.each((index, element) => $(element).val(form_data[index]));
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
-            // Treat this as: $("#id_break_days_"+break_day).prop("checked", def_breawk_days.includes(break_day));
-            $("#id_break_days_"+((break_day+6)%7)).prop("checked", (sa.needs_more_info ? def_break_days : sa.break_days).includes(break_day));
+            // Treat this as: $("#id_break_days_"+break_day).prop("checked", sa.break_days.includes(break_day));
+            $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
         }
         if (sa.needs_more_info) {
-            for (const field in DEFAULT_GC_FORM_FIELDS) {
-                $(field).val(DEFAULT_GC_FORM_FIELDS[field]);
-            }
-            $("#id_x, #id_unit, #id_y, #id_works, #id_time_per_unit").each(function() {
-                $(this).toggleClass("invalid", sa.needs_more_info && !$(this).val());
+            $("#form-wrapper #advanced-inputs").prevAll().each(function() {
+                const input = $(this).children("input");
+                input.toggleClass("invalid", !input.val());
             });
         }
 
@@ -238,7 +230,7 @@ $(window).one("load", function() {
         // Enable disabled field on submit so it's sent with post
         $("#id_time_per_unit, #id_funct_round").removeAttr("disabled");
         // JSON fields are picky with their number inputs, convert them to standard form
-        $("#id_works").val(+$("#id_works").val());
+        $("#id_works").val() && $("#id_works").val(+$("#id_works").val());
         $("#submit-assignment-button").text("Submitting...");
         gtag("event","modify_assignment");
     });
@@ -246,9 +238,11 @@ $(window).one("load", function() {
     $("#form-wrapper .error-note").each(function() {
         $(this).siblings("input, textarea").addClass("invalid");
         // Give the previous field an error if appropriate
-        if (this.id === "error_id_x" && $(this).text().includes("assignment date") || this.id === "error_id_works" && $(this).text().includes("of")) {
-            // Style invalid form for previous cousin
-            $(this).parents(".field-wrapper").prev().children("input, textarea").first().addClass("invalid");
+        if (this.id === "error_id_x" && $(this).text().includes("assignment date")) {
+            $("#id_assignment_date").addClass("invalid");
+        }
+        if (this.id === "error_id_works" && $(this).text().includes("of")) {
+            $("#id_y").addClass("invalid");
         }
     });
     // Delete assignment

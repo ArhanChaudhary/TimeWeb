@@ -11,7 +11,7 @@ from .forms import TimewebForm, SettingsForm
 from django.utils.text import Truncator
 from django import forms
 from django.forms.models import model_to_dict
-from decimal import Decimal as d
+from decimal import Decimal
 from math import ceil, floor
 from django.views.decorators.cache import cache_control
 import datetime
@@ -60,7 +60,6 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "x": date_now + datetime.timedelta(30),
             "unit": "Page",
             "y": "400.00",
-            "works": ["0"],
             "blue_line_start": 0,
             "skew_ratio": "1.0000000000",
             "time_per_unit": "3.00",
@@ -193,7 +192,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
-    def get(self, request, just_created_assignment_name=False, just_updated_assignment_name=False):
+    def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
         
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
@@ -206,10 +205,10 @@ class TimewebView(LoginRequiredMixin, View):
         self.context['form'] = TimewebForm(None)
 
         # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-        if just_created_assignment_name:
-            self.context['just_created_assignment_name'] = just_created_assignment_name
-        elif just_updated_assignment_name:
-            self.context['just_updated_assignment_name'] = just_updated_assignment_name
+        if just_created_assignment_id:
+            self.context['just_created_assignment_id'] = just_created_assignment_id
+        elif just_updated_assignment_id:
+            self.context['just_updated_assignment_id'] = just_updated_assignment_id
             
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return render(request, "index.html", self.context)
@@ -270,7 +269,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.skew_ratio = self.settings_model.def_skew_ratio
             # first_work is works[0]
             # Convert this to a decimal object because it can be a float
-            first_work = d(self.sm.works)
+            first_work = Decimal(self.sm.works)
             # Fill in foreignkey
             self.sm.user = User.objects.get(username=request.user)
         elif self.updated_assignment:
@@ -282,152 +281,155 @@ class TimewebView(LoginRequiredMixin, View):
                 return redirect(request.path_info)
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
-            # Update model values
+
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
-            self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            # self.sm.assignment_date = timezone.make_aware(self.sm.assignment_date) dont include because it's already aware
+            if self.sm.assignment_date:
+                self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.x = self.form.cleaned_data.get("x")
             if self.sm.x:
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
-            # self.sm.x = timezone.make_aware(self.sm.x) dont include because it's already aware
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
-            first_work = d(self.form.cleaned_data.get("works"))
+            first_work = Decimal(self.form.cleaned_data.get("works") or "0")
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
             self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
-        date_now = timezone.localtime(timezone.now())
-        if editing_example_account:
-            # Example account date (for below logic purposes)
-            date_now = timezone.localtime(timezone.make_aware(datetime.datetime(2021, 5, 3)))
-        if date_now.hour < after_midnight_hour_to_update:
-            date_now -= datetime.timedelta(1)
-        date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        if self.created_assignment or self.sm.needs_more_info:
-            self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
-            if self.sm.blue_line_start < 0 or editing_example_account:
-                self.sm.blue_line_start = 0
-            self.sm.dynamic_start = self.sm.blue_line_start
+        if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit:
+            # Works might become an int instead of a list but it doesnt really matter since it isnt being used
+            # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
+            self.sm.works = [str(first_work)]
+            self.sm.needs_more_info = True
         else:
-            self.sm.blue_line_start = old_data.blue_line_start + (old_data.assignment_date-self.sm.assignment_date).days
-            if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or editing_example_account:
-                self.sm.blue_line_start = 0
-            removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
-            if removed_works_start < 0:
-                removed_works_start = 0
-        if not self.sm.funct_round:
-            self.sm.funct_round = 1
-        if self.sm.min_work_time != None:
-            self.sm.min_work_time /= self.sm.time_per_unit            
-
-        if self.sm.x == None and self.sm.y:
-            # y - first work = min_work_time_funct_round * x
-            # x = (y - first_work) / min_work_time_funct_round
-            # Solve for first work:
-            # originally: works = [works[n] - works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
-            # so first work is when n = removed_works_start
-            # first_work = works[removed_works_start] - works[0] + first_work
-            # first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
-            # y - old_data.works[removed_works_start] + old_data.works[0] - first_work
+            date_now = timezone.localtime(timezone.now())
+            if editing_example_account:
+                # Example account date (for below logic purposes)
+                date_now = timezone.localtime(timezone.make_aware(datetime.datetime(2021, 5, 3)))
+            if date_now.hour < after_midnight_hour_to_update:
+                date_now -= datetime.timedelta(1)
+            date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if self.created_assignment or self.sm.needs_more_info:
-                if self.sm.min_work_time:
-                    x_num = (self.sm.y - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
-                else:
-                    x_num = (self.sm.y - first_work)/self.sm.funct_round
-            elif self.updated_assignment:
-                if self.sm.min_work_time:
-                    x_num = (self.sm.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
-                else:
-                    x_num = (self.sm.y - d(old_data.works[removed_works_start]) + d(old_data.works[0]) - first_work)/self.sm.funct_round
-            x_num = ceil(x_num)
-            if self.sm.blue_line_start >= x_num:
-                self.sm.blue_line_start = 0
-                # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
-                # might rewrite
-                if self.created_assignment or self.sm.needs_more_info:
-                    self.sm.dynamic_start = 0
-            if not x_num or len(self.sm.break_days) == 7:
-                x_num = 1
-            elif self.sm.break_days:
-                guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
-                assign_day_of_week = self.sm.assignment_date.weekday()
-                red_line_start_x = self.sm.blue_line_start
-
-                # Terrible implementation of inversing calcModDays
-                xday = assign_day_of_week + red_line_start_x
-                mods = [0]
-                mod_counter = 0
-                for mod_day in range(6):
-                    if (xday + mod_day) % 7 in self.sm.break_days:
-                        mod_counter += 1
-                    mods.append(mod_counter)
-                mods = tuple(mods)
-
-                while 1:
-                    guess_x += 1
-                    if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
-                        x_num = max(1, guess_x)
-                        break
-            # Make sure assignments arent finished by x_num
-            # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
-            if self.sm.assignment_date < date_now:
-                # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
-                # x_num = (date_now - self.sm.assignment_date).days + x_num
-                # x_num += (date_now - self.sm.assignment_date).days
-                x_num += (date_now - self.sm.assignment_date).days
-            try:
-                self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
-            except OverflowError:
-                self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
-                self.sm.x = timezone.make_aware(self.sm.x)
-        else:
-            x_num = (self.sm.x - self.sm.assignment_date).days
-            if self.sm.blue_line_start >= x_num:
-                self.sm.blue_line_start = 0
-                if self.created_assignment or self.sm.needs_more_info:
-                    self.sm.dynamic_start = 0
-        if self.sm.min_work_time != None:
-            self.sm.min_work_time *= self.sm.time_per_unit
-        if self.sm.needs_more_info:
-            self.sm.works = [str(first_work)]  
-        elif self.created_assignment:
-            self.sm.works = [str(self.sm.works)] # Same as str(first_work)
-        elif self.updated_assignment:
-            # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
-            removed_works_end = len(old_data.works) - 1
-            end_of_works = (self.sm.x - old_data.assignment_date).days
-
-            # If the edited due date cuts off some of the work inputs
-            if removed_works_end >= end_of_works:
-                removed_works_end = end_of_works
-                # Remove the work input for the last day if the cut off work input doesn't complete the assignment OR the newly generated work input doesn't complete the assignment
-                if d(old_data.works[removed_works_end]) != self.sm.y or d(old_data.works[removed_works_end]) - d(old_data.works[0]) + first_work < self.sm.y:
-                    removed_works_end -= 1
-            if removed_works_start <= removed_works_end:
-                if self.form.cleaned_data.get("works") != old_data.works[0]: # self.form.cleaned_data.get("works") is str(first_work)
-                    self.sm.works = [str(d(old_data.works[n]) - d(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
+                self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
+                if self.sm.blue_line_start < 0 or editing_example_account:
+                    self.sm.blue_line_start = 0
+                self.sm.dynamic_start = self.sm.blue_line_start
             else:
-                # If the assignment date cuts off every work input
-                self.sm.works = [old_data.works[removed_works_end]]
-            
-            self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
-            if self.sm.dynamic_start < 0:
-                self.sm.dynamic_start = 0
-            elif self.sm.dynamic_start > x_num - 1:
-                self.sm.dynamic_start = x_num - 1
-        self.sm.needs_more_info = False
+                self.sm.blue_line_start = old_data.blue_line_start + (old_data.assignment_date-self.sm.assignment_date).days
+                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or editing_example_account:
+                    self.sm.blue_line_start = 0
+                removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
+                if removed_works_start < 0:
+                    removed_works_start = 0
+            if not self.sm.funct_round:
+                self.sm.funct_round = 1
+            if self.sm.min_work_time != None:
+                self.sm.min_work_time /= self.sm.time_per_unit
+
+            if self.sm.x == None:
+                # y - first work = min_work_time_funct_round * x
+                # x = (y - first_work) / min_work_time_funct_round
+                # Solve for first work:
+                # originally: works = [works[n] - works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                # so first work is when n = removed_works_start
+                # first_work = works[removed_works_start] - works[0] + first_work
+                # first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
+                # y - old_data.works[removed_works_start] + old_data.works[0] - first_work
+                if self.created_assignment or self.sm.needs_more_info:
+                    if self.sm.min_work_time:
+                        x_num = (self.sm.y - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
+                    else:
+                        x_num = (self.sm.y - first_work)/self.sm.funct_round
+                elif self.updated_assignment:
+                    if self.sm.min_work_time:
+                        x_num = (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
+                    else:
+                        x_num = (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/self.sm.funct_round
+                x_num = ceil(x_num)
+                if self.sm.blue_line_start >= x_num:
+                    self.sm.blue_line_start = 0
+                    # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
+                    # might rewrite
+                    if self.created_assignment or self.sm.needs_more_info:
+                        self.sm.dynamic_start = 0
+                if not x_num or len(self.sm.break_days) == 7:
+                    x_num = 1
+                elif self.sm.break_days:
+                    guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
+                    assign_day_of_week = self.sm.assignment_date.weekday()
+                    red_line_start_x = self.sm.blue_line_start
+
+                    # Terrible implementation of inversing calcModDays
+                    xday = assign_day_of_week + red_line_start_x
+                    mods = [0]
+                    mod_counter = 0
+                    for mod_day in range(6):
+                        if (xday + mod_day) % 7 in self.sm.break_days:
+                            mod_counter += 1
+                        mods.append(mod_counter)
+                    mods = tuple(mods)
+
+                    while 1:
+                        guess_x += 1
+                        if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
+                            x_num = max(1, guess_x)
+                            break
+                # Make sure assignments arent finished by x_num
+                # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
+                if self.sm.assignment_date < date_now:
+                    # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
+                    # x_num = (date_now - self.sm.assignment_date).days + x_num
+                    # x_num += (date_now - self.sm.assignment_date).days
+                    x_num += (date_now - self.sm.assignment_date).days
+                try:
+                    self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
+                except OverflowError:
+                    self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
+                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
+                    self.sm.x = timezone.make_aware(self.sm.x)
+            else:
+                x_num = (self.sm.x - self.sm.assignment_date).days
+                if self.sm.blue_line_start >= x_num:
+                    self.sm.blue_line_start = 0
+                    if self.created_assignment or self.sm.needs_more_info:
+                        self.sm.dynamic_start = 0
+            if self.sm.min_work_time != None:
+                self.sm.min_work_time *= self.sm.time_per_unit
+            if self.sm.needs_more_info or self.created_assignment:
+                self.sm.works = [str(first_work)]
+            elif self.updated_assignment:
+                # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
+                removed_works_end = len(old_data.works) - 1
+                end_of_works = (self.sm.x - old_data.assignment_date).days
+
+                # If the edited due date cuts off some of the work inputs
+                if removed_works_end >= end_of_works:
+                    removed_works_end = end_of_works
+                    # Remove the work input for the last day if the cut off work input doesn't complete the assignment OR the newly generated work input doesn't complete the assignment
+                    if Decimal(old_data.works[removed_works_end]) != self.sm.y or Decimal(old_data.works[removed_works_end]) - Decimal(old_data.works[0]) + first_work < self.sm.y:
+                        removed_works_end -= 1
+                if removed_works_start <= removed_works_end:
+                    if str(first_work) != old_data.works[0]:
+                        self.sm.works = [str(Decimal(old_data.works[n]) - Decimal(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
+                else:
+                    # If the assignment date cuts off every work input
+                    self.sm.works = [old_data.works[removed_works_end]]
+                
+                self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
+                if self.sm.dynamic_start < 0:
+                    self.sm.dynamic_start = 0
+                elif self.sm.dynamic_start > x_num - 1:
+                    self.sm.dynamic_start = x_num - 1
+            self.sm.needs_more_info = False
         self.sm.save()
         if self.created_assignment:
             logger.info(f'User \"{request.user}\" added assignment "{self.sm.name}"')
-            return self.get(request, just_created_assignment_name=self.sm.name)
+            return self.get(request, just_created_assignment_id=self.sm.pk)
         elif self.updated_assignment:
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
-            return self.get(request, just_updated_assignment_name=self.sm.name)
+            return self.get(request, just_updated_assignment_id=self.sm.pk)
 
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
@@ -537,12 +539,11 @@ class TimewebView(LoginRequiredMixin, View):
                     description=description,
                     tags=tags,
                     needs_more_info=True,
+                    is_google_classroom_assignment=True,
                     user=user,
 
-                    # y, time_per_unit, works[0], and unit are missing
-                    # y and time_per_unit need to be passed anyways because they have non-null constraints
-                    y=1,
-                    time_per_unit=1,
+                    unit="Minute" if self.settings_model.def_unit_to_minute else None
+                    # y, time_per_unit, and unit are missing
                 ))
         # .execute() rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute().get('courses', [])

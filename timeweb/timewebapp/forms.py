@@ -20,6 +20,7 @@ class TimewebForm(forms.ModelForm):
             'dynamic_start': forms.HiddenInput(),
             'mark_as_done': forms.HiddenInput(),
             'needs_more_info': forms.HiddenInput(),
+            'is_google_classroom_assignment': forms.HiddenInput(),
             'tags': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question"}),

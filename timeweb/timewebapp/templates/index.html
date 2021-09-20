@@ -103,8 +103,8 @@
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}"{% if assignment.name == just_created_assignment_name %} id="animate-in"{% elif assignment.name == just_updated_assignment_name %} id="animate-color"{% endif %}>
-        <div class="assignment tags-{{ horizontal_tag_position|lower }}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+      <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
+        <div class="assignment tags-{{ horizontal_tag_position|lower }}{% if assignment.needs_more_info %} needs-more-info{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <div class="relative-positioning-wrapper">
               <span class="title">{{ assignment.name }}</span>
