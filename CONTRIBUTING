@@ -37,7 +37,7 @@ source timeweb_env/bin/activate
 
 ```
 cd timeweb
-pip install -r requirements.txt
+pip install -r requirements.txt (if you run into a psycopg2 issue: https://github.com/psycopg/psycopg2/issues/1216)
 ```
 
 5. Create the database
