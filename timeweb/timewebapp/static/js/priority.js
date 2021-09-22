@@ -134,7 +134,6 @@ priority = {
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
                 sa.setDynamicStartIfInDynamicMode();
             }
-            debugger;
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
@@ -281,7 +280,8 @@ priority = {
                     str_daysleft = due_date_minus_today + "d";
                 }
             }
-            if (!sa.sa.is_google_classroom_assignment) {
+            // Ignore tags if its a google classroom assignment and it needs more info because
+            if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
                 if (sa.sa.tags.includes("Important")) {
                     status_value += 0.25;
                 }
@@ -444,7 +444,7 @@ priority = {
             const sa = utils.loadAssignmentData(dom_assignment);
 
             const current_tag = ["Not Important", "Important"].includes(sa.tags[0]) ? undefined : sa.tags[0];
-            if (sa.is_google_classroom_assignment && current_tag) {
+            if (sa.is_google_classroom_assignment && sa.needs_more_info && current_tag) {
                 assignment_container.addClass("add-line-wrapper");
                 if (current_tag !== prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                     if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");

@@ -340,7 +340,7 @@ utils = {
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
                         // GC class tags
-                        if (sa.is_google_classroom_assignment || tag_names.includes("Important") || tag_names.includes("Not Important")) {
+                        if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_names.includes("Important") || tag_names.includes("Not Important")) {
                             priority.sort();
                         }
                         // Close box and add tags visually
@@ -437,7 +437,7 @@ utils = {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
                     // GC class tags
-                    if (sa.is_google_classroom_assignment || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
+                    if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
                         priority.sort();
                     }
                     tag_wrapper.addClass("tag-is-deleting");
@@ -491,7 +491,7 @@ utils = {
                         return $(this).children(".tag-name").text();
                     }).toArray();
                     // GC class tags
-                    sa.is_google_classroom_assignment && priority.sort();
+                    sa.is_google_classroom_assignment && sa.needs_more_info && priority.sort();
                     ajaxUtils.sendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
                 }
             });

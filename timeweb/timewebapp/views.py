@@ -1,33 +1,47 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
+
+# Django modules
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
-from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden
+from django.views.decorators.cache import cache_control
+
+# Model modules
+import datetime
+from django.utils import timezone
 from .models import TimewebModel, SettingsModel
-from django.contrib.auth import get_user_model
 from .forms import TimewebForm, SettingsForm
-from django.utils.text import Truncator
-from django import forms
+from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict
+from django.forms import ValidationError
+
+# Formatting modules
+from django.utils.text import Truncator
+import os.path
+
+# JSON modules
+from json import loads as load_json
+
+# Math modules
 from decimal import Decimal
 from math import ceil, floor
-from django.views.decorators.cache import cache_control
-import datetime
-import logging
-import json
-import os
 
+# Google API modules
 from google.cloud import storage
-
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
-from oauthlib.oauth2.rfc6749.errors import InvalidGrantError, MissingCodeError
+from oauthlib.oauth2.rfc6749.errors import OAuth2Error
+
+# Misc
+from logging import getLogger
+from os import environ as set_environment_variable
 from django.conf import settings
+
 User = get_user_model()
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
@@ -35,7 +49,7 @@ GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.r
 GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc-api-credentials.json"
 if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    set_environment_variable['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
     GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
 
@@ -79,7 +93,7 @@ def custom_permission_denied_view(request, exception=None):
     response.status_code = 403
     return response
 
-logger = logging.getLogger('django')
+logger = getLogger('django')
 logger.propagate = False
 def get_default_context():
     return {
@@ -129,7 +143,7 @@ class SettingsView(LoginRequiredMixin, View):
         if not self.form.is_valid():
             form_is_valid = False
         elif self.form.cleaned_data.get("background_image") and self.form.cleaned_data.get("background_image").size > settings.MAX_UPLOAD_SIZE:
-            self.form.add_error("background_image", forms.ValidationError(_('This file is too big (>%(amount)d bytes)') % {'amount': settings.MAX_UPLOAD_SIZE}))
+            self.form.add_error("background_image", ValidationError(_('This file is too big (>%(amount)d bytes)') % {'amount': settings.MAX_UPLOAD_SIZE}))
             form_is_valid = False
         if form_is_valid:
             return self.valid_form(request)
@@ -250,10 +264,10 @@ class TimewebView(LoginRequiredMixin, View):
         # Parts of the form that can only validate in views
         form_is_valid = True
         if self.isExampleAccount and not editing_example_account:
-            self.form.add_error("name", forms.ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
+            self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
         elif self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-            self.form.add_error("name", forms.ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+            self.form.add_error("name", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
             form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
@@ -411,11 +425,10 @@ class TimewebView(LoginRequiredMixin, View):
                     if Decimal(old_data.works[removed_works_end]) != self.sm.y or Decimal(old_data.works[removed_works_end]) - Decimal(old_data.works[0]) + first_work < self.sm.y:
                         removed_works_end -= 1
                 if removed_works_start <= removed_works_end:
-                    if str(first_work) != old_data.works[0]:
-                        self.sm.works = [str(Decimal(old_data.works[n]) - Decimal(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
+                    self.sm.works = [str(Decimal(old_data.works[n]) - Decimal(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
                 else:
-                    # If the assignment date cuts off every work input
-                    self.sm.works = [old_data.works[removed_works_end]]
+                    # If the assignment or due date cuts off every work input
+                    self.sm.works = [str(first_work)]
                 
                 self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
                 if self.sm.dynamic_start < 0:
@@ -451,7 +464,7 @@ class TimewebView(LoginRequiredMixin, View):
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
                 credentials.refresh(Request())
-                self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
+                self.settings_model.oauth_token.update(load_json(credentials.to_json()))
                 self.settings_model.save()
             else:
                 flow = Flow.from_client_secrets_file(
@@ -578,17 +591,12 @@ class TimewebView(LoginRequiredMixin, View):
         request.session["already_created_gc_assignments_from_frontend"] = True
     def deleted_assignment(self, request):
         assignments = request.POST.getlist('assignments[]')
-        for pk in assignments:
-            self.sm = get_object_or_404(TimewebModel, pk=int(pk))
-            if request.user != self.sm.user:
-                logger.warning(f"User \"{request.user}\" can't delete an assignment that isn't their's")
-                return HttpResponseForbidden("The assignment you're trying to delete isn't yours")
-            self.sm.delete()
-            logger.info(f'User \"{request.user}\" deleted assignment "{self.sm.name}"')
+        TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
+        logger.info(f'User \"{request.user}\" deleted {len(assignments)} assignments')
         return HttpResponse(status=204)
         
     def saved_assignment(self, request):
-        assignments = json.loads(request.POST['assignments'])
+        assignments = load_json(request.POST['assignments'])
         for assignment in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
             del assignment['pk'] # Don't loop through the assignment's pk value
@@ -682,14 +690,12 @@ class GCOAuthView(LoginRequiredMixin, View):
         try:
             # turn those parameters into a token
             flow.fetch_token(authorization_response=authorization_response)
-        except InvalidGrantError:
-            # In case users deny a permission
+        except OAuth2Error:
+            # In case users deny a permission or don't input a code in the url or cancel
             return redirect("home")
-        except MissingCodeError:
-            return HttpResponse("Missing code in url")
         credentials = flow.credentials
         # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-        self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
+        self.settings_model.oauth_token.update(load_json(credentials.to_json()))
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
