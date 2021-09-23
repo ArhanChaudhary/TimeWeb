@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const major_category_li = $(table_of_contents_major_category_template);
         major_category_li.find("a").text($major_category.text());
+        $major_category.attr("id") && major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`);
 
         $major_category.siblings("details").each(function() {
             const $minor_category = $(this).find(".minor-category");

@@ -99,9 +99,11 @@
             <details open>
                 <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
                 <img src={% static 'images/assignment-form.png' %} width="550">
-                The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button on an already existing assignment. 
+                The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button next to it. 
                 
-                The assignment form has 11 inputs in total, 5 of which are advanced and optional. Default form input values, which can be set in the settings, are accordingly set every time you make a new assignment, and they can be manually overridden.
+                The assignment form has 11 inputs in total:
+                6 of these inputs are required for a complete assignment. You can still create an assignment without these inputs, but it won't be usable
+                5 of these advanced and optional. Default form input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
                 
             </details>
             <details open>
@@ -117,10 +119,17 @@
                 <span class="minor-minor-category">Due Date</span>
                 This input is the date in which the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
 
-                <span class="minor-minor-category">Name of each Unit of Work</span>
-                This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete X amount of [this input] today." 
+                <span class="label-question" id="why-can't-I-enter-a-due-time">
+                    <span class="label-title">Why can't I enter a due time?</span>
+                    This feature wasn't planned to be implemented with TimeWeb's launch and is currently on my TODO list. This unfortunately means that, as of now, you can't enter a due date that is the same as the assignment date, even if the due date has a later due time.<br>
+                    <br>
+                    A possible workaround to this could be to set the due date to the day after the assignment date and give the assignment the "Important" tag.
+                </span>
 
-                Try not to choose large divisions of work for this input. For example, pretend you're assigned an assignment including three worksheets from school, each containing thirty pages. Rather than entering "Worksheet" for this input, it's usually more ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed "15 pages," which is nice and clean, instead of "0.5 worksheets," which is an ugly decimal. However, the latter is still completely valid if you prefer to input that.
+                <span class="minor-minor-category">Name of each Unit of Work</span>
+                This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete X amount of [this input] today".
+
+                Try not to choose large divisions of work for this input. To demonstrate what I mean by this, pretend you're assigned an assignment with three worksheets, each containing thirty pages of work. Rather than entering "Worksheet" for this input, it's usually more ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed 15 pages, which is nice and clean, instead of 0.5 worksheets, which is an ugly decimal. However, the latter is still completely valid if you prefer to input that.
                 
                 If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" for this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
 
@@ -142,7 +151,7 @@
                 This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
 
                 <span class="minor-minor-category">Number of Units you will Complete at a Time</span>
-                This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in a multiple of 5 pages throughout the entire assignment. You can leave this input empty to disable it.
+                This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in multiples of 5 pages throughout the entire assignment. You can leave this input empty to disable it.
 
                 <span class="minor-minor-category">Minimum Daily Work Time in Minutes</span>
                 This input is the minimum amount of time you will work on of an assignment every day. This doesn't apply for days in which you don't work on the assignment. You can leave this input empty to disable it.
@@ -223,7 +232,7 @@
         </span>
 
         <details open>
-            <summary class="major-category">Assignment priority</summary>
+            <summary class="major-category" id="assignment-priority">Assignment priority</summary>
             After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for that day compared to every other assignment.
             
             Their priority also determines their assignment list position, which represents the order in which you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
@@ -258,11 +267,8 @@
             </details>
             <details open>
                 <summary class="minor-category" id="autofill-work-done-assignment-shortcut">Autofill Work Done</summary>
-
-                <span class="label-question" id="why-doesn't-autofill-no-work-done-always-clear-white-assignments">
-                    <span class="label-title">Why doesn't "Autofill No Work Done" always clear white assignments?</span>
-
-                </span>
+                "since 5" thing vikram was talking about; explain what to do FAQ
+                
             </details>
             <details open>
                 <summary class="minor-category" id="what-are-assignment-shortcuts">Delete all Starred Assignments</summary>
@@ -299,9 +305,10 @@
             </details>
             <details open>
                 <summary class="minor-category" id="adding-google-classroom-assignments">Adding Google Classroom assignments</summary>
-                refresh adds them
-        critieria
-        old assignments are not re added
+                reload to update gc assignments if a new one is posted
+                refresh adds them after you go to home
+                critieria
+                old assignments are not re added
                 <span class="label-question" id="why-does-loading-google-classroom-assignments-take-so-long">
                     <span class="label-title">Why does loading Google Classroom assignments take so long?</span>
 
@@ -309,7 +316,7 @@
             </details>
         </span>
         <span>
-            <div class="major-category">Keybinds</div>
+            <div class="major-category" id="keybinds">Keybinds</div>
         </span>
         You've reached the end of TimeWeb's user guide! Feel free to <a href="mailto:arhan.ch@gmail.com">contact me</a> if you're still confused about something or you want to suggest adding anything. Have a great day!
     </div>
