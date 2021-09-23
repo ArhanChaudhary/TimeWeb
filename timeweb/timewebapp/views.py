@@ -82,6 +82,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             "break_days": [],
             "dynamic_start": 0,
             "mark_as_done": False,
+            "description": "Example assignment description",
             "user": instance,
         })
         SettingsModel.objects.create(user=instance)
@@ -223,11 +224,13 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['just_created_assignment_id'] = just_created_assignment_id
         elif just_updated_assignment_id:
             self.context['just_updated_assignment_id'] = just_updated_assignment_id
-            
+        
+        if request.GET.get("gc-api-init-failed") == "true":
+            self.context["gc_api_init_failed"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return render(request, "index.html", self.context)
 
-    def post(self,request):
+    def post(self, request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
@@ -292,7 +295,7 @@ class TimewebView(LoginRequiredMixin, View):
                 logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you're trying to edit isn't yours")
             if self.isExampleAccount and not editing_example_account:
-                return redirect(request.path_info)
+                return self.get(self.request)
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
 
@@ -692,7 +695,7 @@ class GCOAuthView(LoginRequiredMixin, View):
             flow.fetch_token(authorization_response=authorization_response)
         except OAuth2Error:
             # In case users deny a permission or don't input a code in the url or cancel
-            return redirect("home")
+            return redirect("/?gc-api-init-failed=true")
         credentials = flow.credentials
         # Use .update() (dict method) instead of = so the refresh token isnt overwritten
         self.settings_model.oauth_token.update(load_json(credentials.to_json()))

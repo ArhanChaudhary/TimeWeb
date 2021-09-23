@@ -125,7 +125,7 @@ utils = {
             },
 
             googleClassroomAPI: function() {
-                if (!creating_gc_assignments_from_frontend) {
+                if (!creating_gc_assignments_from_frontend && !gc_api_init_failed) {
                     if (oauth_token.token) {
                         $("#toggle-gc-label").html("Disable Google Classroom API");
                     } else {
@@ -721,8 +721,8 @@ ajaxUtils = {
             $.alert({title: "Not found.", content: "Try refreshing or trying again."});
         } else if (response.status == 500) {
             $.alert({title: "Internal server error.", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this."});
-        } else if (exception === 'timeout') {
-            $.alert({title: "Request timed out.", content: "You're probably seeing this because something took too long while posting to the server. Try refreshing or try again."});
+        } else if (exception === 'timeout' || response.status == 502) {
+            $.alert({title: "Request timed out.", content: "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again."});
         } else if (exception === 'abort') {
             $.alert({title: "Request aborted.", content: "Try refreshing or try again."});
         } else {
