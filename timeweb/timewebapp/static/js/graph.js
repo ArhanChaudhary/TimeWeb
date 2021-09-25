@@ -886,27 +886,41 @@ class VisualAssignment extends Assignment {
         // END Fixed/dynamic mode button        
     }
 }
+function shake_assignment($assignment_to_shake) {
+    $assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
+        $assignment_to_shake.animate({left: 5}, 75, "easeOutCubic", function() {
+            $assignment_to_shake.animate({left: 0}, 75, "easeOutCubic");
+        });
+    });
+}
 $(function() {
 $(".assignment").click(function(e) {
     if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title")) return;
     const dom_assignment = $(this);
     const sa_sa = utils.loadAssignmentData(dom_assignment);
-    let assignment_to_shake;
+    
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
     if (dom_assignment.is(".mark-as-done:not(.open-assignment)") && !sa_sa.mark_as_done) {
-        assignment_to_shake = $(".assignment").first().focus();
+        let assignment_to_shake = $(".assignment").first();
+        new Promise(function(resolve) {
+                setTimeout(function() {
+                    // scrollIntoView sometimes doesn't work without setTimeout
+                    assignment_to_shake[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                    });
+                }, 0);
+                // utils.scroll determines when the page has stopped scrolling and internally resolves the promise
+                $("main").scroll(() => utils.scroll(resolve));
+                utils.scroll(resolve);
+        }).then(() => shake_assignment(assignment_to_shake.focus()));
+        return;
     } else if (sa_sa.needs_more_info) {
-        assignment_to_shake = dom_assignment;
+        shake_assignment(dom_assignment);
         dom_assignment.find(".update-button").parents(".button").focus();
-    }
-    if (assignment_to_shake) {
-        assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
-            assignment_to_shake.animate({left: 5}, 75, "easeOutCubic", function() {
-                assignment_to_shake.animate({left: 0}, 75, "easeOutCubic");
-            });
-        });
         return;
     }
+   
     const first_click = !dom_assignment.hasClass('has-been-clicked');
     dom_assignment.addClass("has-been-clicked");
     const assignment_footer = dom_assignment.find(".assignment-footer");
