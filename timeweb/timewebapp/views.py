@@ -286,7 +286,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.sm.skew_ratio = self.settings_model.def_skew_ratio
             # first_work is works[0]
             # Convert this to a decimal object because it can be a float
-            first_work = Decimal(self.sm.works)
+            first_work = Decimal(str(self.sm.works))
             # Fill in foreignkey
             self.sm.user = User.objects.get(username=request.user)
         elif self.updated_assignment:
@@ -308,7 +308,7 @@ class TimewebView(LoginRequiredMixin, View):
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
-            first_work = Decimal(self.form.cleaned_data.get("works") or "0")
+            first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")

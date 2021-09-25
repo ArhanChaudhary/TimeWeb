@@ -893,7 +893,7 @@ $(".assignment").click(function(e) {
     const sa_sa = utils.loadAssignmentData(dom_assignment);
     let assignment_to_shake;
     // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
-    if (dom_assignment.hasClass("mark-as-done") && !sa_sa.mark_as_done) {
+    if (dom_assignment.is(".mark-as-done:not(.open-assignment)") && !sa_sa.mark_as_done) {
         assignment_to_shake = $(".assignment").first().focus();
     } else if (sa_sa.needs_more_info) {
         assignment_to_shake = dom_assignment;
