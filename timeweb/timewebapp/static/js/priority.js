@@ -347,7 +347,7 @@ priority = {
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
-            dom_tags.toggleClass("assignment-has-daysleft", vertical_tag_position === "Bottom" && horizontal_tag_position === "Left" && !!str_daysleft ? 14 : 0);
+            dom_tags.toggleClass("assignment-has-daysleft", vertical_tag_position === "Bottom" && horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
         // Updates open graphs' today line
