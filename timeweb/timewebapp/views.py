@@ -105,6 +105,9 @@ def get_default_context():
         "editing_example_account": editing_example_account,
         "DEBUG": settings.DEBUG,
     }
+
+def days_between_two_dates(day1, day2):
+    return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 class SettingsView(LoginRequiredMixin, View):
     login_url = '/login/login/?next=/'
 
@@ -329,15 +332,15 @@ class TimewebView(LoginRequiredMixin, View):
                 date_now -= datetime.timedelta(1)
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if self.created_assignment or self.sm.needs_more_info:
-                self.sm.blue_line_start = (date_now-self.sm.assignment_date).days
+                self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
                 if self.sm.blue_line_start < 0 or editing_example_account:
                     self.sm.blue_line_start = 0
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
-                self.sm.blue_line_start = old_data.blue_line_start + (old_data.assignment_date-self.sm.assignment_date).days
+                self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
                 if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or editing_example_account:
                     self.sm.blue_line_start = 0
-                removed_works_start = (self.sm.assignment_date - old_data.assignment_date).days - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
+                removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
                     removed_works_start = 0
             if not self.sm.funct_round:
@@ -399,7 +402,7 @@ class TimewebView(LoginRequiredMixin, View):
                     # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
                     # x_num = (date_now - self.sm.assignment_date).days + x_num
                     # x_num += (date_now - self.sm.assignment_date).days
-                    x_num += (date_now - self.sm.assignment_date).days
+                    x_num += days_between_two_dates(date_now, self.sm.assignment_date)
                 try:
                     self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
                 except OverflowError:
@@ -407,7 +410,7 @@ class TimewebView(LoginRequiredMixin, View):
                     self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
                     self.sm.x = timezone.make_aware(self.sm.x)
             else:
-                x_num = (self.sm.x - self.sm.assignment_date).days
+                x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
                 if self.sm.blue_line_start >= x_num:
                     self.sm.blue_line_start = 0
                     if self.created_assignment or self.sm.needs_more_info:
@@ -419,7 +422,7 @@ class TimewebView(LoginRequiredMixin, View):
             elif self.updated_assignment:
                 # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                 removed_works_end = len(old_data.works) - 1
-                end_of_works = (self.sm.x - old_data.assignment_date).days
+                end_of_works = days_between_two_dates(self.sm.x, old_data.assignment_date)
 
                 # If the edited due date cuts off some of the work inputs
                 if removed_works_end >= end_of_works:
@@ -538,7 +541,7 @@ class TimewebView(LoginRequiredMixin, View):
                     continue
 
                 # Create assignment
-                blue_line_start = (date_now-assignment_date).days
+                blue_line_start = days_between_two_dates(date_now, assignment_date)
                 if blue_line_start < 0:
                     blue_line_start = 0
                 dynamic_start = blue_line_start
