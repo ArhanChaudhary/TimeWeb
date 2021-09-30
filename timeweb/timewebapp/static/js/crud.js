@@ -150,7 +150,7 @@ $(window).one("load", function() {
     $("#id_unit").on('input', replaceUnit);
     $("#id_description").on("input", function() {
         $(this).css("height", "auto"); // Needed for expanding with text
-        $(this).css("height", $(this).prop("scrollHeight") + +$(this).css("padding-top").replace("px", "") + +$(this).css("padding-bottom").replace("px", ""));
+        $(this).css("height", $(this).prop("scrollHeight") + parseFloat($(this).css("padding-top")) + parseFloat($(this).css("padding-bottom")));
     });
     // Add info buttons ($.info defined in template.js)
     $("#id_unit").info('left',
@@ -257,7 +257,7 @@ $(window).one("load", function() {
         dom_assignment.css("opacity", "0");
         const assignment_container = dom_assignment.parents(".assignment-container");
         // Animate height on assignment_container because it doesn't have a transition
-        const boxHeightMinusShortcuts = dom_assignment.outerHeight() + +assignment_container.css("padding-top").replace("px", "") + +assignment_container.css("padding-bottom").replace("px", "");
+        const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
         assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, 750, "easeOutCubic", function() {
             // $("#assignments-container").css("overflow", "");
             // Remove assignment data from dat
@@ -280,7 +280,7 @@ $(window).one("load", function() {
             // Opacity CSS transition
             dom_assignment.css("opacity", "0");
             // Use the height of dom_assignment instead of assignment_container to ignore the height of shortcuts
-            const boxHeightMinusShortcuts = dom_assignment.outerHeight() + +assignment_container.css("padding-top").replace("px", "") + +assignment_container.css("padding-bottom").replace("px", "");
+            const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
             assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, 750, "easeOutCubic", function() {
                 // If a shortcut is in assignment_container, take it out so it doesn't get deleted
                 assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
