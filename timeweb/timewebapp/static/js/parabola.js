@@ -241,7 +241,7 @@ Assignment.prototype.funct = function(x, params={}) {
     }
     // Return untranslated y coordinate
     // No point in untranslating x coordinate
-    return mathUtils.precisionRound(output + this.red_line_start_y, max_length_funct_round);
+    return mathUtils.precisionRound(output + this.red_line_start_y, 10);
 }
 Assignment.prototype.calcModDays = function() {
     // explain this later

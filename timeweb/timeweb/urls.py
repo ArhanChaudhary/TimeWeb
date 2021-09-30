@@ -17,10 +17,7 @@ from django.contrib import admin
 from django.urls import path,include
 
 import os
-try:
-    admin_url = os.environ["ADMINURL"]
-except:
-    admin_url = "admin/"
+admin_url = os.environ.get("ADMINURL", "admin/")
 urlpatterns = [
     path(admin_url, admin.site.urls),
     path('login/', include('django.contrib.auth.urls')),

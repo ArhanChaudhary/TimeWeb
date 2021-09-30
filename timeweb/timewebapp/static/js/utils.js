@@ -828,7 +828,6 @@ if (isExampleAccount) {
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
-const max_length_funct_round = dat[0]['funct_round'] ? dat[0]['funct_round'].split(".")[1].length : undefined;
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
