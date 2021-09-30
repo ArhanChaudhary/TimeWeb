@@ -97,21 +97,29 @@ class VisualAssignment extends Assignment {
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             this.setParabolaValues();
         }
-        if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
-            this.scale = window.devicePixelRatio || 2; // Zoom in/out
+        this.scale = window.devicePixelRatio || 2; // Zoom in/out
+        const assignment_footer = this.dom_assignment.find(".assignment-footer");
+        if (assignment_footer.is(":visible")) {
             this.width = this.fixed_graph.width();
             this.height = this.fixed_graph.height();
-            if (this.width > 500) {
-                VisualAssignment.font_size = 13.9;
-            } else {
-                VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
-            }
-            this.wCon = (this.width - 55) / this.sa.x;
-            this.hCon = (this.height - 55) / this.sa.y;
-            this.graph[0].width = this.width * this.scale;
-            this.graph[0].height = this.height * this.scale;
-            this.fixed_graph[0].width = this.width * this.scale;
-            this.fixed_graph[0].height = this.height * this.scale;
+        } else {
+            assignment_footer.toggle();
+            this.width = this.fixed_graph.width();
+            this.height = this.fixed_graph.height();
+            assignment_footer.toggle();
+        }
+        if (this.width > 500) {
+            VisualAssignment.font_size = 13.9;
+        } else {
+            VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
+        }
+        this.wCon = (this.width - 55) / this.sa.x;
+        this.hCon = (this.height - 55) / this.sa.y;
+        this.graph[0].width = this.width * this.scale;
+        this.graph[0].height = this.height * this.scale;
+        this.fixed_graph[0].width = this.width * this.scale;
+        this.fixed_graph[0].height = this.height * this.scale;
+        if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
             this.drawFixed();
             this.draw();
         }
