@@ -400,18 +400,23 @@ utils = {
                 $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
                 $this.find(".tag-add-selection-item").remove();
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
+                // Push every tag from every assignment
                 let allTags = [];
                 dat.forEach(sa => allTags.push(...sa.tags));
-                // Remove duplicate tags and sort alphabetically
-                const set_allTags = new Set(allTags);
-                set_allTags.delete("Important");
-                set_allTags.delete("Not Important");
-                unique_allTags = []
-                unique_allTags.push("Important");
-                unique_allTags.push("Not Important");
-                unique_allTags.push(...default_dropdown_tags);
-                unique_allTags.push(...Array.from(set_allTags).sort());
-                for (let tag of unique_allTags) {
+                // Remove duplicate tags
+                let unique_allTags = new Set(allTags);
+                // Remove "Important", "Not Important", and default_dropdown_tags
+                unique_allTags.delete("Important");
+                unique_allTags.delete("Not Important");
+                unique_allTags = [...unique_allTags].filter(e => !default_dropdown_tags.includes(e));
+                // Add back in "Important", "Not Important", and default_dropdown_tags
+                const final_allTags = [];
+                final_allTags.push("Important");
+                final_allTags.push("Not Important");
+                final_allTags.push(...default_dropdown_tags);
+                // Add sorted all tags
+                final_allTags.push(...Array.from(unique_allTags).sort());
+                for (let tag of final_allTags) {
                     const tag_add_selection_item = $(TAG_ADD_SELECTION_ITEM_TEMPLATE);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
                     container_for_tags.append(tag_add_selection_item);
@@ -503,9 +508,10 @@ utils = {
                 if (e.shiftKey /* shiftKey needed if the user presses caps lock */ && $(document.activeElement).prop("type") !== "text") {
                     let preventDefault = true;
                     if (e.key === 'N') {
-                        if (!$("#overlay").is(":visible")) {
+                        if ($("#overlay").is(":visible"))
+                            preventDefault = false;
+                        else
                             $("#image-new-container").click();
-                        }
                     } else if (e.key === "E" || e.key === "D") {
                         let assignment_container = $(document.activeElement).parents(".assignment-container");
                         if (!assignment_container.length) assignment_container = $(":hover").filter(".assignment-container");
