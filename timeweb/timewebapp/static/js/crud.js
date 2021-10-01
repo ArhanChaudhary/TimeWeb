@@ -148,10 +148,7 @@ $(window).one("load", function() {
     });
     $("#form-wrapper #cancel-button").click(() => hideForm());
     $("#id_unit").on('input', replaceUnit);
-    $("#id_description").on("input", function() {
-        $(this).css("height", "auto"); // Needed for expanding with text
-        $(this).css("height", $(this).prop("scrollHeight") + parseFloat($(this).css("padding-top")) + parseFloat($(this).css("padding-bottom")));
-    });
+    $("#id_description").expandableTextareaHeight();
     // Add info buttons ($.info defined in template.js)
     $("#id_unit").info('left',
         `This is how your assignment will be split and divided up
@@ -314,14 +311,14 @@ $(window).one("load", function() {
         const data = {
             'csrfmiddlewaretoken': csrf_token,
             'action': 'delete_assignment',
-            'assignments': [sa.id], // Primary key value
+            'assignments': [sa.id],
         }
         $.ajax({
             type: "POST",
             data: data,
             success: success,
             error: function() {
-                // If ajax failed, allow updating or deleting again and dequeue
+                // If ajax failed, allow updating or deleting again
                 dom_assignment.css("pointer-events", "auto");
                 ajaxUtils.error(...arguments);
             }

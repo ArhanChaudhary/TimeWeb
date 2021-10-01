@@ -124,6 +124,7 @@ class SettingsForm(forms.ModelForm):
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
+            'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": "30"}),
             'added_gc_assignment_ids': forms.HiddenInput()
         }
         error_messages = {
@@ -147,7 +148,7 @@ class SettingsForm(forms.ModelForm):
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
-            "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate with a comma (i.e \"Extracurricular\", \"School\", \"Online\")",
+            "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a new line",
             "dark_mode": "If someone sees me in school yell at me to code this in.",
         }
     def __init__(self, *args, **kwargs):

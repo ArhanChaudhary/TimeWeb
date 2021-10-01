@@ -55,3 +55,10 @@ tr.odd {
         width: unset;
     }
 }
+#id_default_dropdown_tags {
+    box-sizing: border-box; 
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    resize: none;
+}

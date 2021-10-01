@@ -206,6 +206,13 @@ $.fn.info = function(facing,text,position) {
             return info_button.appendTo(this);
     }
 }
+$.fn.expandableTextareaHeight = function() {
+    $(this).on("input", function() {
+        $(this).css("height", "auto"); // Needed for expanding with text
+        $(this).css("height", $(this).prop("scrollHeight") + parseFloat($(this).css("padding-top")) + parseFloat($(this).css("padding-bottom")));
+    });
+    return $(this);
+}
 mathUtils = {
     // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
     precisionRound: function(number, precision) {

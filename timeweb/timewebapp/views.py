@@ -143,7 +143,7 @@ class SettingsView(LoginRequiredMixin, View):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
         self.form = SettingsForm(data=request.POST, files=request.FILES)
-        self.checked_background_image_clear = request.POST.get("background_image-clear") or False
+        self.checked_background_image_clear = request.POST.get("background_image-clear")
         form_is_valid = True
         if not self.form.is_valid():
             form_is_valid = False

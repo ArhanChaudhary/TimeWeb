@@ -406,9 +406,11 @@ utils = {
                 const set_allTags = new Set(allTags);
                 set_allTags.delete("Important");
                 set_allTags.delete("Not Important");
-                unique_allTags = Array.from(set_allTags).sort();
+                unique_allTags = []
                 unique_allTags.push("Important");
                 unique_allTags.push("Not Important");
+                unique_allTags.push(...default_dropdown_tags);
+                unique_allTags.push(...Array.from(set_allTags).sort());
                 for (let tag of unique_allTags) {
                     const tag_add_selection_item = $(TAG_ADD_SELECTION_ITEM_TEMPLATE);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);

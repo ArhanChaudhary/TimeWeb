@@ -26,14 +26,38 @@ document.addEventListener("DOMContentLoaded", function() {
         e.preventDefault();
         $.alert({title: "Dark mode hasn't yet been implemented."});
     });
-    $("table input:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor)").each(function() {
+    $("table input:visible:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor)").each(function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });
-    $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
     const background_image_link = $("#id_background_image").siblings("a");
     background_image_link.replaceWith(BACKGROUND_IMAGE_TEMPLATE);
+    JSONToTextarea($("#id_default_dropdown_tags"));
+    $("#id_default_dropdown_tags").expandableTextareaHeight();
+    setTimeout(function() {
+        $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
+        $("#id_default_dropdown_tags").trigger("input");
+    }, 0);
     $("form").submit(function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
+        textareaToJSON($("#id_default_dropdown_tags"));
         $("#submit-settings-button").attr("disabled", true);
     });
 });
+function textareaToJSON($textarea) {
+    let $textareaVal = $textarea.val();
+    if ($textareaVal) {
+        $textareaVal = $textareaVal.split("\n");
+        $textareaVal = [...new Set($textareaVal)];
+        $textareaVal = $textareaVal.sort();
+        $textareaVal = $textareaVal.filter(e => !!e.length).map(e => `"${e}"`).join(",");
+        $textarea.val(`[${$textareaVal}]`);
+    } else {
+        $textarea.val("[]");
+    }
+}
+function JSONToTextarea($textarea) {
+    let $textareaVal = $textarea.val();
+    $textareaVal = $textareaVal.substring(1, $textareaVal.length - 1).replaceAll(" ", "");
+    $textareaVal = $textareaVal.split(",").map(e => e.substring(1, e.length - 1)).join("\n")
+    $textarea.val($textareaVal);
+}
