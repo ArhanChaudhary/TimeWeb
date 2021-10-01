@@ -397,7 +397,7 @@ priority = {
         let already_found_first_incomplete_works = false;
         let already_found_first_finished = false;
         $("#autofill-work-done, #delete-starred-assignments").hide();
-        for (let pd of ordered_assignments) {
+        for (let [index, pd] of ordered_assignments.entries()) {
             const status_value = Math.round(pd[0]);
             // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (pd[3] || question_mark_exists_excluding_gc); if pd[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
             const mark_as_done = !!(pd[3] || question_mark_exists_excluding_gc && status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW);
@@ -430,8 +430,9 @@ priority = {
                     $(window).one('load', function() {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                         // So, scroll to the next assignment instead
-                        let assignment_to_scroll_to = $("#animate-in").next();
-                        if (!assignment_to_scroll_to.length) {
+                        // Scroll to dom_assignment because of its scroll-margin
+                        let assignment_to_scroll_to = $(".assignment").eq(ordered_assignments[index + 1][2]);
+                        if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = dom_assignment;
                         }

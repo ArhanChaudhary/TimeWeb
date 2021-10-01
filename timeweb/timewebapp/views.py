@@ -127,6 +127,7 @@ class SettingsView(LoginRequiredMixin, View):
             'text_priority': self.settings_model.text_priority,
             'highest_priority_color': self.settings_model.highest_priority_color,
             'lowest_priority_color': self.settings_model.lowest_priority_color,
+            'default_dropdown_tags': self.settings_model.default_dropdown_tags,
             'background_image': self.settings_model.background_image,
             'enable_tutorial': self.settings_model.enable_tutorial,
             'horizontal_tag_position': self.settings_model.horizontal_tag_position,
@@ -181,6 +182,7 @@ class SettingsView(LoginRequiredMixin, View):
         self.settings_model.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
         self.settings_model.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
         self.settings_model.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
+        self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")

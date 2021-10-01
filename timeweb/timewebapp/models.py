@@ -203,6 +203,11 @@ class SettingsModel(models.Model):
     )
     
     # Group "Personalize"
+    default_dropdown_tags = models.JSONField(
+        default=empty_list,
+        blank=True,
+        verbose_name=_('Default Dropdown Tags'),
+    )
     horizontal_tag_position = models.CharField(
         max_length=MAX_HORIZONTAL_TAG_POSITIONS_LENGTH,
         choices=HORIZONTAL_TAG_POSITIONS,

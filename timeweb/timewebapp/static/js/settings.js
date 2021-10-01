@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#id_background_image").val("");
         $("#id_horizontal_tag_position").val("Middle");
         $("#id_vertical_tag_position").val("Top");
+        $("#id_default_dropdown_tags").val("");
     });
     // verbose name doesnt work on tag position for literally no reason
     $("label[for=\"id_horizontal_tag_position\"]").html("Horizontal Assignment Tag Position");

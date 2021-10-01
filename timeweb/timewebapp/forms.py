@@ -147,6 +147,7 @@ class SettingsForm(forms.ModelForm):
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
+            "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate with a comma (i.e \"Extracurricular\", \"School\", \"Online\")",
             "dark_mode": "If someone sees me in school yell at me to code this in.",
         }
     def __init__(self, *args, **kwargs):

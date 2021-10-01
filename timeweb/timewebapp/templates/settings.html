@@ -15,7 +15,7 @@
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form.visible_fields %}
-        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "horizontal_tag_position" %}
+        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "default_dropdown_tags" %}
         <fieldset>
             <legend>
                 {% if field.name == "def_break_days" %}
@@ -24,7 +24,7 @@
                     Assignment Graph
                 {% elif field.name == "highest_priority_color" %}
                     Assignment Priority
-                {% elif field.name == "horizontal_tag_position" %}
+                {% elif field.name == "default_dropdown_tags" %}
                     Personalize
                 {% endif %}
             </legend>
