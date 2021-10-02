@@ -304,7 +304,6 @@ utils = {
                         height: "",
                         overflow: "",
                     });
-                    tag_add_box.find(".tag-add-selection-item").remove();
                     tag_add_box.find(".tag-add-button").removeAttr("tabindex");
                     tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
                 });
@@ -614,23 +613,23 @@ utils = {
                 });
             }, 0);
         },
-        handleTutorialIntroduction: function() {
+        insertTutorialMessages: function() {
             if (enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return utils.loadAssignmentData($(this)).name !== example_assignment_name;
+                    return utils.loadAssignmentData($(this)).name !== example_assignment_name && !$(this).parents(".assignment-container").hasClass("question-mark");
                 });
                 if (assignments_excluding_example.length) {
-                    assignments_excluding_example.first().after("<span>Click your assignment to open it<br></span>");
+                    assignments_excluding_example.first().after("<span id=\"tutorial-click-assignment-to-open\">Click your assignment to open it<br></span>");
                 } else {
-                    $("#assignments-header").replaceWith('<div id="introduction-message"><div>Welcome to TimeWeb Beta! Thank you for your interest in using this app.</div><br><div>Create your first school or work assignment to get started</div></div>');
+                    $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container").hide();
                 }
             }
         },
         graphAlertTutorial: function(days_until_due) {
             $.alert({
-                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read TimeWeb's <a href=\"/user-guide#assignment-graph\">user guide for the graph</a> to understand how to use it.<br><br>Once you're finish reading that, click OK to disable this popup and then check out the settings to set your preferences.",
-                content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment or the example account to see how TimeWeb handles assignments with longer due dates.` : '',
+                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it.<br><br>Once you're finished, click OK to disable this popup and then check out the settings to set your preferences.",
+                content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment or the example account on the login page to see how TimeWeb handles longer and more complicated assignments.` : '',
                 backgroundDismiss: false,
                 alignTop: true, // alignTop is a custom extension
                 onClose: function() {
@@ -914,5 +913,5 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();
     utils.ui.saveAndLoadStates();
-    utils.ui.handleTutorialIntroduction();
+    $(window).one("load", utils.ui.insertTutorialMessages);
 });

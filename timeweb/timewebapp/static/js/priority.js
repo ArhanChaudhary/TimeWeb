@@ -431,7 +431,7 @@ priority = {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                         // So, scroll to the next assignment instead
                         // Scroll to dom_assignment because of its scroll-margin
-                        let assignment_to_scroll_to = $(".assignment").eq(ordered_assignments[index + 1][2]);
+                        let assignment_to_scroll_to = $(".assignment").eq(ordered_assignments[index + 1] ? ordered_assignments[index + 1][2] : undefined);
                         if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = dom_assignment;

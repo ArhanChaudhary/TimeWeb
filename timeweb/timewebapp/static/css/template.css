@@ -389,7 +389,8 @@ nav:focus-within #nav-menu::after {
     transform: scale(1.04);
 }
 #break-days-wrapper .break-days-label:active {
-    transform: translateY(1px);
+    margin-top: 1px;
+    margin-bottom: 3px;
 }
 /* open-sans 600 */
 @font-face {

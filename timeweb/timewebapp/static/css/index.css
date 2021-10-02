@@ -29,8 +29,11 @@ header.animate::after {
     transform: translateY(max(-400px, calc(-100% - 20px)));
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
-#introduction-message {
+#tutorial-message {
     padding: 0 10px;
+}
+#tutorial-click-assignment-to-open {
+    background-color: rgb(214, 214, 214);
 }
 #icon-label-container {
     display: flex;
@@ -924,6 +927,7 @@ input[type=number]::-webkit-inner-spin-button {
     padding: 20px 45px;
     font-size: 19px;
     -webkit-appearance: none;
+    background: rgb(238, 238, 238);
     border-radius: 3px;
     border: 1px solid rgb(79, 79, 79);
 }
@@ -932,6 +936,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #submit-assignment-button:active {
     background: rgb(245, 245, 245);
+    transform: translateY(1px);
 }
 #form-wrapper .invalid {
     border: 2px solid rgb(226,30,54);

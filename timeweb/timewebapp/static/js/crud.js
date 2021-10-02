@@ -184,36 +184,8 @@ $(window).one("load", function() {
     // Make this global so it can be used in saveAndLoadStates in utils.js
     form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
     // Sets custom error message
-    form_inputs.on("input invalid",function(e) {
-        let message;
-        if (e.type === "invalid") {
-            switch ($(this).attr("id")) {
-                case "id_name":
-                    message = 'Please enter an assignment name';
-                    break;
-                case "id_ad":
-                    message = 'The assignment date is either out of range or invalid';
-                    break;
-                case "id_x":
-                    message = 'The due date is either out of range or invalid';
-                    break;
-                case "id_unit":
-                    message = 'Please enter a name';
-                    break;
-                case "id_y":
-                case "id_works":
-                case "id_time_per_unit":
-                case "id_funct_round":
-                    message = 'Please enter a value';
-                    break;
-                case "id_min_work_time":
-                    message = 'Please enter a minimum work time';
-                    break;
-            }
-        } else {
-            message = '';
-        }
-        this.setCustomValidity(message);
+    $("#id_name").on("input invalid",function(e) {
+        this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
     });
     // Form submission
     let submitted = false;

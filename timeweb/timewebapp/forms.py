@@ -124,7 +124,7 @@ class SettingsForm(forms.ModelForm):
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
-            'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": "30"}),
+            'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'added_gc_assignment_ids': forms.HiddenInput()
         }
         error_messages = {

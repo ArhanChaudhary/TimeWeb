@@ -7,7 +7,33 @@ input {
 form {
     width: calc(100% - 30px);
     font-size: 17px;
-    transform: translateX(15px);
+    transform: translate(15px, 15px);
+}
+form button {
+    display: block;
+}
+#reset-settings-button, #submit-settings-button {
+    box-sizing: border-box;
+    background: rgb(243, 243, 243);
+    border: 2px solid black;
+    font-size: 20px;
+    border-radius: 4px;
+    margin-top: 5px;
+    width: calc(50% - 10px);
+    height: 50px;
+    margin-bottom: 100px;
+}
+#reset-settings-button:hover, #submit-settings-button:hover {
+    filter: brightness(0.95);
+}
+#reset-settings-button:active, #submit-settings-button:active {
+    transform: translateY(1px);
+}
+#reset-settings-button {
+    margin-right: 10px;
+}
+#submit-settings-button{
+    margin-left: 10px;
 }
 fieldset {
     margin-bottom: 10px;
@@ -58,7 +84,6 @@ tr.odd {
 #id_default_dropdown_tags {
     box-sizing: border-box; 
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
     resize: none;
 }
