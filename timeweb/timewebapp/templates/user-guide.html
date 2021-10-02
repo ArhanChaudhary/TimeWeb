@@ -102,7 +102,7 @@
                 The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button next to it. 
                 
                 The assignment form has 11 inputs in total:
-                6 of these inputs are required for a complete assignment. You can still create an assignment without these inputs, but it won't be usable.
+                6 of these inputs are required for a complete assignment. You can still create an assignment without these inputs as a of reminder system, but its graph won't be usable.
                 5 of these advanced and optional. Default form input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
                 
             </details>
@@ -123,7 +123,7 @@
                     <span class="label-title">Why can't I enter a due time?</span>
                     This feature wasn't planned to be implemented with TimeWeb's launch and is currently on my TODO list. This unfortunately means that, as of now, you can't enter a due date that is the same as the assignment date, even if the due date has a later due time.<br>
                     <br>
-                    A possible workaround to this could be to set the due date to the day after the assignment date and give the assignment the "Important" tag.
+                    One workaround is to round up the due date to the day after the assignment is due. For example, if an assignment is due at October 1, 11:59 PM, enter a due date of October 2, which mostly replicates a due time.
                 </span>
 
                 <span class="minor-minor-category">Name of each Unit of Work</span>
@@ -183,7 +183,7 @@
                 This input is the textbox in which you will enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". If you've completed an assignment's work for that day, enter the keyword "fin". If you haven't completed any of an assignment's work for that day, enter 0.
 
                 <span class="minor-minor-category">Submit Units Done</span>
-                This button submits the value of the "Enter Units Done" textbox to the graph. Pressing enter on "Enter Units Done" also submits a work input.
+                This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
 
                 <span class="minor-minor-category">Display in Text</span>
                 This button displays the assignment's entire work schedule in text, showing how much work to do for every day. This hasn't yet been coded in. If someone sees me at school, yell at me to code this in.
@@ -199,7 +199,7 @@
             </details>
             <details open>
                 <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
-                Before getting to the advanced controls, you must first understand what the skew ratio is. The skew ratio controls the curvature of the graph and, in turn, your work schedule.
+                The advanced controls are completely optional to use and provide a better control of your work distribution. Before getting to the advanced controls, we must first understand what the skew ratio is. The skew ratio controls the curvature of the graph and, in turn, your work schedule.
                 
                 A more positive skew ratio yields a work schedule in which you work more at the beginning and less at the end of an assignment.
                 A more negative skew ratio yields a work schedule in which you work less at the beginning and more at the end of an assignment.
@@ -241,7 +241,7 @@
                 <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
                 You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority, meaning that you should complete the low priority assignment first. Although it may seem so at first, this isn't actually a bug nor a glitch.<br>
                 <br>
-                If you look carefully, there's probably a reason why this is the case. The assignment could have the <a href="#important-and-not-important-assignment-tags">"Important" or "Not Important"</a> tags, or the assignment with the low priority is due tomorrow, while the assignment with the high priority isn't. TimeWeb is able to recognize and make exceptions for cases like these, as, ideally, you should always complete assignments that are due tomorrow first.
+                If you look carefully, there will always be a reason why this is the case. The assignment could have the <a href="#important-and-not-important-assignment-tags">"Important" or "Not Important"</a> tags, or the assignment with the low priority is due tomorrow, while the assignment with the high priority isn't. TimeWeb is able to recognize and make exceptions for cases like these, as, ideally, you should always complete assignments that are due tomorrow first.
             </span>    
         </details>
         <span>
@@ -271,7 +271,7 @@
                 
             </details>
             <details open>
-                <summary class="minor-category" id="what-are-assignment-shortcuts">Delete all Starred Assignments</summary>
+                <summary class="minor-category" id="delete-all-starred-assignments">Delete all Starred Assignments</summary>
 
             </details>
             <details open>
@@ -283,9 +283,9 @@
                 </span>
             </details>
             <details open>
-                <summary class="minor-category" id="header-icons">Header icons</summary>
+                <summary class="minor-category" id="go-to-next-day">Go to Next Day</summary>
                 <img src="{% static 'images/header-icons.png' %}">
-
+                reference header icons
             </details>
         </span>
         <span>
