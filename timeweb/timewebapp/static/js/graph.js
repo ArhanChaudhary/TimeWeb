@@ -700,7 +700,7 @@ class VisualAssignment extends Assignment {
             // Add this check for setDynamicModeIfInDynamicMode
             // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
             // However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
-            // Autotune amd setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
+            // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
             if (input_done !== todo) {
                 for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();

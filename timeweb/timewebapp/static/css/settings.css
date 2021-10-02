@@ -9,7 +9,7 @@ form {
     font-size: 17px;
     transform: translate(15px, 15px);
 }
-form button {
+form select {
     display: block;
 }
 #reset-settings-button, #submit-settings-button {

@@ -3,6 +3,11 @@ from django.utils import timezone
 from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTICAL_TAG_POSITIONS
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
+import datetime
+from django.conf import settings
+
+after_midnight_hour_to_update = settings.after_midnight_hour_to_update
+
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -84,30 +89,24 @@ class TimewebForm(forms.ModelForm):
         assignment_date = cleaned_data.get("assignment_date")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
-        try:
-            if works >= y >= 1:
-                self.add_error("works",
-                    forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
-                        'value': works,
-                        'y': y,
-                        'equal_to_or_greater_than': "equal to" if works == y else "greater than",
-                    })
-                )
-        except:
-            pass
-        try:
-            if x <= assignment_date:
-                self.add_error("x",
-                    forms.ValidationError(_("The due date can't be %(on_or_before)s the assignment date"),code='invalid',params={
-                        'on_or_before': "on" if x == assignment_date else "before"
-                    })
-                )
-            if x <= timezone.localtime(timezone.now()):
-                self.add_error("x",
-                    forms.ValidationError(_("This assignment has already been due"),code='invalid')
-                )
-        except:
-            pass
+        if works != None and y != None and works >= y >= 1:
+            self.add_error("works",
+                forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
+                    'value': works,
+                    'y': y,
+                    'equal_to_or_greater_than': "equal to" if works == y else "greater than",
+                })
+            )
+        if x != None and assignment_date != None and x <= assignment_date:
+            self.add_error("x",
+                forms.ValidationError(_("The due date can't be %(on_or_before)s the assignment date"),code='invalid',params={
+                    'on_or_before': "on" if x == assignment_date else "before"
+                })
+            )
+        if x != None and x <= timezone.localtime(timezone.now()) - datetime.timedelta(hours=after_midnight_hour_to_update):
+            self.add_error("x",
+                forms.ValidationError(_("This assignment has already been due"),code='invalid')
+            )
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):

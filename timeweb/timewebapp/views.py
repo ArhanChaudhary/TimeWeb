@@ -7,6 +7,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.cache import cache_control
+from django.urls import reverse
 
 # Model modules
 import datetime
@@ -22,7 +23,7 @@ from django.utils.text import Truncator
 import os.path
 
 # JSON modules
-from json import loads as load_json
+import json
 
 # Math modules
 from decimal import Decimal
@@ -55,7 +56,7 @@ else:
 
 editing_example_account = False
 
-after_midnight_hour_to_update = 4
+after_midnight_hour_to_update = settings.after_midnight_hour_to_update
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
@@ -213,7 +214,6 @@ class TimewebView(LoginRequiredMixin, View):
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
     def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
-        
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         if (timezone.localtime(User.objects.get(username=request.user).last_login) - datetime.timedelta(hours=after_midnight_hour_to_update)).day != (timezone.localtime(timezone.now()) - datetime.timedelta(hours=after_midnight_hour_to_update)).day:
@@ -429,9 +429,6 @@ class TimewebView(LoginRequiredMixin, View):
                 # If the edited due date cuts off some of the work inputs
                 if removed_works_end >= end_of_works:
                     removed_works_end = end_of_works
-                    # Remove the work input for the last day if the cut off work input doesn't complete the assignment OR the newly generated work input doesn't complete the assignment
-                    if Decimal(old_data.works[removed_works_end]) != self.sm.y or Decimal(old_data.works[removed_works_end]) - Decimal(old_data.works[0]) + first_work < self.sm.y:
-                        removed_works_end -= 1
                 if removed_works_start <= removed_works_end:
                     self.sm.works = [str(Decimal(old_data.works[n]) - Decimal(old_data.works[0]) + first_work) for n in range(removed_works_start,removed_works_end+1)]
                 else:
@@ -472,7 +469,7 @@ class TimewebView(LoginRequiredMixin, View):
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
                 credentials.refresh(Request())
-                self.settings_model.oauth_token.update(load_json(credentials.to_json()))
+                self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
                 self.settings_model.save()
             else:
                 flow = Flow.from_client_secrets_file(
@@ -604,7 +601,7 @@ class TimewebView(LoginRequiredMixin, View):
         return HttpResponse(status=204)
         
     def saved_assignment(self, request):
-        assignments = load_json(request.POST['assignments'])
+        assignments = json.loads(request.POST['assignments'])
         for assignment in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
             del assignment['pk'] # Don't loop through the assignment's pk value
@@ -700,10 +697,10 @@ class GCOAuthView(LoginRequiredMixin, View):
             flow.fetch_token(authorization_response=authorization_response)
         except OAuth2Error:
             # In case users deny a permission or don't input a code in the url or cancel
-            return redirect("/?gc-api-init-failed=true")
+            return redirect(reverse("home") + "?gc-api-init-failed=true")
         credentials = flow.credentials
         # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-        self.settings_model.oauth_token.update(load_json(credentials.to_json()))
+        self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")

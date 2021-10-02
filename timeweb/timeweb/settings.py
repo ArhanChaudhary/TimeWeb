@@ -242,3 +242,6 @@ LOGGING = {
         },
     },
 }
+
+# Views constants
+after_midnight_hour_to_update = 4

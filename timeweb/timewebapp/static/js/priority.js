@@ -172,7 +172,7 @@ priority = {
                     len_works++;
                 }
                 if (has_autofilled) {
-                    // don't sa.setDynamicStartIfInDynamicMode(); because of the (input_done !== todo) check
+                    // don't sa.setDynamicStartIfInDynamicMode() because of the (input_done !== todo) check
                     ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                     ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
@@ -219,9 +219,10 @@ priority = {
                         sa.sa.works.push(last_work_input);
                         len_works++;
                     }
+                    // Remove from if has_autofilled because this may need to run even if nothing autofills
+                    ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.concat(len_works + sa.sa.blue_line_start === sa.sa.x - 1 ? [last_work_input] : []).map(String), sa.sa.id);
                     if (has_autofilled) {
                         sa.setDynamicStartIfInDynamicMode();
-                        ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                     }

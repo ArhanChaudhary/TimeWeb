@@ -857,7 +857,13 @@ for (let sa of dat) {
     if (sa.funct_round) sa.funct_round = +sa.funct_round;
     if (sa.min_work_time) sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
     if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
-    if (sa.works.length) sa.works = sa.works.map(Number);
+    sa.works = sa.works.map(Number);
+    const len_works = sa.works.length - 1;
+    
+    if (![sa.y, sa.blue_line_start, sa.x].includes(undefined) &&
+        len_works + sa.blue_line_start === sa.x && sa.works[len_works] < sa.y) {
+        sa.works.pop();
+    }
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 
@@ -869,19 +875,17 @@ for (let sa of dat) {
     sa.original_min_work_time = sa.min_work_time;
     // Caps and adjusts min_work_time and funct_round; needed in parabola.js i think
     let y1 = sa.y - red_line_start_y;
-    if (Number.isFinite(sa.min_work_time) && Number.isFinite(sa.funct_round) && Number.isFinite(y1)) {
-        if (sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
-            sa.funct_round = y1;
-        }
-        if (sa.min_work_time > y1) {
-            sa.min_work_time = y1;
-        }
+    if (Number.isFinite(sa.funct_round) && Number.isFinite(y1) && sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
+        sa.funct_round = y1;
+    }
+    if (Number.isFinite(sa.min_work_time) && Number.isFinite(y1) && sa.min_work_time > y1) {
+        sa.min_work_time = y1;
+    }
 
-        // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
-        // Set it to 0 to assume it isn't enabled for calculations in setParabolaValues()
-        if (sa.min_work_time <= sa.funct_round) {
-            sa.min_work_time = 0;
-        }
+    // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
+    // Set it to 0 to assume it isn't enabled for calculations in setParabolaValues()
+    if (Number.isFinite(sa.min_work_time) && Number.isFinite(sa.funct_round) && sa.min_work_time <= sa.funct_round) {
+        sa.min_work_time = 0;
     }
 };
 // Use DOMContentLoaded because $(function() { fires too slowly

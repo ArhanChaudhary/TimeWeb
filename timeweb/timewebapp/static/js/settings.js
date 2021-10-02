@@ -51,10 +51,13 @@ document.addEventListener("DOMContentLoaded", function() {
         $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
+    let alreadyHasSubmitted = false;
     $("form").submit(function() {
+        if (alreadyHasSubmitted) return;
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
-        $("#submit-settings-button").attr("disabled", true);
+        $("#submit-settings-button").val("Submitting...");
+        alreadyHasSubmitted = true;
     });
 });
 function textareaToJSON($textarea) {
@@ -63,7 +66,7 @@ function textareaToJSON($textarea) {
         $textareaVal = $textareaVal.split("\n");
         $textareaVal = [...new Set($textareaVal)];
         $textareaVal = $textareaVal.sort();
-        $textareaVal = $textareaVal.filter(e => !!e.length).map(e => `"${e}"`).join(",");
+        $textareaVal = $textareaVal.filter(e => !!e.length).map(e => JSON.stringify(e)).join(",");
         $textarea.val(`[${$textareaVal}]`);
     } else {
         $textarea.val("[]");
@@ -72,6 +75,6 @@ function textareaToJSON($textarea) {
 function JSONToTextarea($textarea) {
     let $textareaVal = $textarea.val();
     $textareaVal = $textareaVal.substring(1, $textareaVal.length - 1).replaceAll(" ", "");
-    $textareaVal = $textareaVal.split(",").map(e => e.substring(1, e.length - 1)).join("\n")
+    $textareaVal = $textareaVal.split(",").map(e => JSON.parse(e)).join("\n")
     $textarea.val($textareaVal);
 }
