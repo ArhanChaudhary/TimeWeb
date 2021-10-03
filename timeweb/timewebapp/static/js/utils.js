@@ -115,7 +115,7 @@ utils = {
                     priority.sort();
                 });
                 $("#next-day-icon-label").info("bottom",
-                    `Simulates the next day for ALL assignments
+                    `Simulates every assignments' work on the next day
                     
                     All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
                 );
@@ -295,15 +295,18 @@ utils = {
             const TAG_TEMPLATE = $("#tag-template").html();
             function transitionCloseTagBox($tag_add) {
                 const tag_add_box = $tag_add.find(".tag-add-box");
+
                 tag_add_box.css({
                     height: "unset",
                     overflow: "visible",
                 });
+
                 tag_add_box.one("transitionend", function() {
                     tag_add_box.css({
                         height: "",
                         overflow: "",
                     });
+                    tag_add_box.find(".tag-add-selection-item").remove();
                     tag_add_box.find(".tag-add-button").removeAttr("tabindex");
                     tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
                 });
@@ -397,7 +400,6 @@ utils = {
                 $this.addClass("open-tag-add-box");
                 $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
                 $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
-                $this.find(".tag-add-selection-item").remove();
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
                 // Push every tag from every assignment
                 let allTags = [];
@@ -479,7 +481,11 @@ utils = {
                 const $this = $(this);
                 setTimeout(function() {
                     // const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
-                    if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this)) return;
+
+                    // If the user unfocuses the closed tag modal which they previously clicked to close, this will run and add the transitionend event in transitionCloseTagBox to the already closed tag-add-box, which is unwanted and causes bugs
+                    // I can't just do !$(e.target).is($this) because the tag modal may already be open without the user already previously clicking .tag-add to close it, and the transitionend event is needed in this case
+                    // So, only return when the tag modal is closed by adding || $this.find(".tag-add-box").css("height") === 0
+                    if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this) || parseInt($this.find(".tag-add-box").css("height")) === 0) return;
                     $this.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
                 }, 0);
@@ -616,13 +622,21 @@ utils = {
         insertTutorialMessages: function() {
             if (enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return utils.loadAssignmentData($(this)).name !== example_assignment_name && !$(this).parents(".assignment-container").hasClass("question-mark");
+                    return utils.loadAssignmentData($(this)).name !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
-                    assignments_excluding_example.first().after("<span id=\"tutorial-click-assignment-to-open\">Click your assignment to open it<br></span>");
+                    const available_assignments = $(".assignment:not(.question-mark)");
+                    let first_available_assignment;
+                    if (available_assignments.length) {
+                        first_available_assignment = available_assignments.first()
+                    } else {
+                        first_available_assignment = $(".assignment").first();
+                    }
+                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\">Click your assignment to open it<br></span>");
                 } else {
                     $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container").hide();
+                    $("#current-date").hide();
                 }
             }
         },

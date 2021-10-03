@@ -6,8 +6,6 @@ from colorfield.widgets import ColorWidget
 import datetime
 from django.conf import settings
 
-after_midnight_hour_to_update = settings.after_midnight_hour_to_update
-
 class DateInput(forms.DateInput):
     input_type = 'date'
 
@@ -103,7 +101,7 @@ class TimewebForm(forms.ModelForm):
                     'on_or_before': "on" if x == assignment_date else "before"
                 })
             )
-        if x != None and x <= timezone.localtime(timezone.now()) - datetime.timedelta(hours=after_midnight_hour_to_update):
+        if x != None and x <= timezone.localtime(timezone.now()) - datetime.timedelta(hours=settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE):
             self.add_error("x",
                 forms.ValidationError(_("This assignment has already been due"),code='invalid')
             )
@@ -148,7 +146,6 @@ class SettingsForm(forms.ModelForm):
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a new line",
-            "dark_mode": "If someone sees me in school yell at me to code this in.",
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

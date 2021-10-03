@@ -39,9 +39,11 @@ header.animate::after {
     display: flex;
     align-items: center;
     margin-left: auto;
+    background: rgb(214, 214, 214);
 }
 #assignments-header {
     position: relative;
+    z-index: 1001;
     padding: 0 10px;
     margin-bottom: 4px;
     display: flex;
@@ -91,10 +93,9 @@ header.animate::after {
 #assignments-header #icon-label-container img ~ div {
     position: absolute;
     order: 1;
-    z-index: 1000;
     padding-right: 5px;
     padding-left: 5px;
-    right: 225px;
+    right: 230px;
     bottom: 5px;
     background: rgb(214, 214, 214);
     visibility: hidden;
@@ -174,8 +175,9 @@ header.animate::after {
     box-shadow: 0 0 7px rgb(52,52,52);
     opacity: 1;
 }
-#delete-starred-assignments, #autofill-work-done,.delete-gc-assignments-from-class {
+.shortcut {
     position: relative;
+    z-index: 1000;
     margin-bottom: 15px;
     margin-top: -7px;
 }
@@ -477,6 +479,7 @@ header.animate::after {
 }
 .tag-add-box::after {
     border-color: transparent transparent rgb(220,220,220) transparent !important;
+    pointer-events: none;
     bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
 }
 .tag-add.open-tag-add-box .tag-add-box {
@@ -643,7 +646,7 @@ header.animate::after {
 .button + .button {
     margin-right: -7px;
 }
-.button:focus, .button:hover  {
+.button:focus, .button:hover {
     outline: 0;
     background-color: rgb(173, 216, 230);
     z-index: 1;
@@ -1025,4 +1028,27 @@ input[type=number]::-webkit-inner-spin-button {
 .assignment-container.difference-blend-mode::after {
     mix-blend-mode: difference;
     border-color: white !important;
+}
+
+#dark-mode #assignments-container > *:not(.assignment-container),
+
+#dark-mode .shortcut,
+
+.assignment-container::before,
+.assignment-container::after,
+
+/* Need these annoying rules instead of just doing "#dark-mode .assignment-header *" because it messes up positioning */
+.assignment-container.invert-text-color .assignment-header > *:not(.right-side-of-header),
+.assignment-container.invert-text-color .assignment-header > .right-side-of-header > *:not(.align-to-status-message-container),
+.assignment-container.invert-text-color .assignment-header > .right-side-of-header > .align-to-status-message-container > *:not(.tags),
+#dark-mode .tags,
+
+.assignment-container:not(.invert-text-color) .advanced-buttons, /* Undo filter already applied by #dark-mode .assignment-footer */
+#dark-mode .assignment-footer,
+
+#dark-mode #assignments-container .info-button {
+    filter: invert(1);
+}
+#dark-mode body {
+    background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
 }

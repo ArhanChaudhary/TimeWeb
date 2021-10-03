@@ -16,9 +16,22 @@ const NO_WORKING_DAYS = 8;
 const INCOMPLETE_WORKS = 9;
 priority = {
     sort_timeout_duration: 35,
-    percentageToColor: function(p) {
-        if (isNaN(p)) return "white";
-        return `rgb(${lowest_priority_color.r+(highest_priority_color.r - lowest_priority_color.r)*p},${lowest_priority_color.g+(highest_priority_color.g - lowest_priority_color.g)*p},${lowest_priority_color.b+(highest_priority_color.b - lowest_priority_color.b)*p})`;
+    percentageToColor: function(p, $assignment_container) {
+        const a = $("html").is("#dark-mode") ? 0.75 : 1;
+        if (isNaN(p)) {
+            var r = 255;
+            var g = 255;
+            var b = 255;
+        } else {
+            var r = lowest_priority_color.r + (highest_priority_color.r - lowest_priority_color.r) * p;
+            var g = lowest_priority_color.g + (highest_priority_color.g - lowest_priority_color.g) * p;
+            var b = lowest_priority_color.b + (highest_priority_color.b - lowest_priority_color.b) * p;
+        }
+        r *= a;
+        g *= a;
+        b *= a;
+        $assignment_container.toggleClass("invert-text-color", (r + g + b) / 3 <= 255 / 2);
+        return `rgb(${r},${g},${b})`;
     },
     // Handles coloring and animating assignments that were just created or edited
     colorOrTransitionAssignment: function(dom_assignment, priority_percentage, is_element_submitted, color_instantly, mark_as_done) {
@@ -36,7 +49,7 @@ priority = {
             if (color_instantly) {
                 dom_assignment.addClass("transition-instantly");
             }
-            dom_assignment.css("background", priority.percentageToColor(priority_percentage));
+            dom_assignment.css("background", priority.percentageToColor(priority_percentage, dom_assignment.parents(".assignment-container")));
             dom_assignment.toggleClass("mark-as-done", mark_as_done);
             if (color_instantly) {
                 dom_assignment[0].offsetHeight;
@@ -543,6 +556,7 @@ priority = {
     }
 }
 document.addEventListener("DOMContentLoaded", function() {
+    
     DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE = $("#delete-gc-assignments-from-class-template").html();
     priority.sort({ first_sort: true });
 });

@@ -56,7 +56,6 @@ else:
 
 editing_example_account = False
 
-after_midnight_hour_to_update = settings.after_midnight_hour_to_update
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
@@ -100,7 +99,7 @@ logger.propagate = False
 def get_default_context():
     return {
         "example_account_name": example_account_name,
-        "after_midnight_hour_to_update": after_midnight_hour_to_update,
+        "after_midnight_hour_to_update": settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE,
         "example_assignment_name": example_assignment_name,
         "max_number_tags": MAX_NUMBER_TAGS,
         "editing_example_account": editing_example_account,
@@ -109,7 +108,17 @@ def get_default_context():
 
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
-class SettingsView(LoginRequiredMixin, View):
+
+class TimewebGenericView(View):
+    def render_with_dynamic_context(self, request, file, context):
+        if not hasattr(self, "settings_model"):
+            self.settings_model = SettingsModel.objects.filter(user__username=request.user)
+            if not self.settings_model.exists():
+                return render(request, file, context)
+            self.settings_model = self.settings_model.first()
+        context['dark_mode'] = self.settings_model.dark_mode
+        return render(request, file, context)
+class SettingsView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
 
     def __init__(self):
@@ -133,12 +142,13 @@ class SettingsView(LoginRequiredMixin, View):
             'enable_tutorial': self.settings_model.enable_tutorial,
             'horizontal_tag_position': self.settings_model.horizontal_tag_position,
             'vertical_tag_position': self.settings_model.vertical_tag_position,
+            'dark_mode': self.settings_model.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
-        return render(request, "settings.html", self.context)
+        return self.render_with_dynamic_context(request, "settings.html", self.context)
         
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
@@ -184,15 +194,16 @@ class SettingsView(LoginRequiredMixin, View):
         self.settings_model.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
         self.settings_model.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
         self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
+        self.settings_model.dark_mode = self.form.cleaned_data.get("dark_mode")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
     
     def invalid_form(self, request):
         self.context['form'] = self.form
-        return render(request, "settings.html", self.context)
+        return self.render_with_dynamic_context(request, "settings.html", self.context)
 
-class TimewebView(LoginRequiredMixin, View):
+class TimewebView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
 
     def __init__(self):
@@ -216,7 +227,7 @@ class TimewebView(LoginRequiredMixin, View):
     def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        if (timezone.localtime(User.objects.get(username=request.user).last_login) - datetime.timedelta(hours=after_midnight_hour_to_update)).day != (timezone.localtime(timezone.now()) - datetime.timedelta(hours=after_midnight_hour_to_update)).day:
+        if (timezone.localtime(User.objects.get(username=request.user).last_login) - datetime.timedelta(hours=settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE)).day != (timezone.localtime(timezone.now()) - datetime.timedelta(hours=settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE)).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
@@ -233,7 +244,7 @@ class TimewebView(LoginRequiredMixin, View):
         if request.GET.get("gc-api-init-failed") == "true":
             self.context["gc_api_init_failed"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
-        return render(request, "index.html", self.context)
+        return self.render_with_dynamic_context(request, "index.html", self.context)
 
     def post(self, request):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
@@ -330,7 +341,7 @@ class TimewebView(LoginRequiredMixin, View):
             if editing_example_account:
                 # Example account date (for below logic purposes)
                 date_now = timezone.localtime(timezone.make_aware(datetime.datetime(2021, 5, 3)))
-            if date_now.hour < after_midnight_hour_to_update:
+            if date_now.hour < settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE:
                 date_now -= datetime.timedelta(1)
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if self.created_assignment or self.sm.needs_more_info:
@@ -458,7 +469,7 @@ class TimewebView(LoginRequiredMixin, View):
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form
         self.add_user_models_to_context(request)
-        return render(request, "index.html", self.context)
+        return self.render_with_dynamic_context(request, "index.html", self.context)
  
     def create_gc_assignments(self, request):
         # The file token.json stores the user's access and refresh tokens, and is
@@ -486,7 +497,7 @@ class TimewebView(LoginRequiredMixin, View):
                 return authorization_url
 
         date_now = timezone.localtime(timezone.now())
-        if date_now.hour < after_midnight_hour_to_update:
+        if date_now.hour < settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE:
             date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         service = build('classroom', 'v1', credentials=credentials)
@@ -675,7 +686,7 @@ class TimewebView(LoginRequiredMixin, View):
     #     logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
     #     return HttpResponse(status=204)
 
-class GCOAuthView(LoginRequiredMixin, View):
+class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
     def get(self, request):
         self.isExampleAccount = request.user.username == example_account_name
@@ -761,7 +772,7 @@ class GCOAuthView(LoginRequiredMixin, View):
         #     except HttpError:
         #         pass
 
-class ImagesView(LoginRequiredMixin, View):
+class ImagesView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
 
     def __init__(self):
@@ -780,25 +791,25 @@ class ImagesView(LoginRequiredMixin, View):
         else:
             return HttpResponse(status=204)
 
-class UserguideView(View):
+class UserguideView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request):
-        return render(request, "user-guide.html", self.context)
+        return self.render_with_dynamic_context(request, "user-guide.html", self.context)
 
-class ChangelogView(View):
+class ChangelogView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request):
-        return render(request, "changelog.html", self.context)
+        return self.render_with_dynamic_context(request, "changelog.html", self.context)
 
-class rickView(View):
+class rickView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request, _):
         return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
 
-class stackpileView(View):
+class stackpileView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request):

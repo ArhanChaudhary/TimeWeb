@@ -36,10 +36,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // verbose name doesnt work on tag position for literally no reason
     $("label[for=\"id_horizontal_tag_position\"]").html("Horizontal Assignment Tag Position");
     $("label[for=\"id_vertical_tag_position\"]").html("Vertical Assignment Tag Position");
-    $("#id_dark_mode").click(function(e) {
-        e.preventDefault();
-        $.alert({title: "Dark mode hasn't yet been implemented."});
-    });
     $("table input:visible:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor)").each(function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });
@@ -75,6 +71,7 @@ function textareaToJSON($textarea) {
 function JSONToTextarea($textarea) {
     let $textareaVal = $textarea.val();
     $textareaVal = $textareaVal.substring(1, $textareaVal.length - 1).replaceAll(" ", "");
-    $textareaVal = $textareaVal.split(",").map(e => JSON.parse(e)).join("\n")
+    if ($textareaVal)
+        $textareaVal = $textareaVal.split(",").map(e => JSON.parse(e)).join("\n")
     $textarea.val($textareaVal);
 }

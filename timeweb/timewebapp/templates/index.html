@@ -85,7 +85,7 @@
     <div id="current-date">
       <span id="current-date-text"{% if background_image %} class="grey-highlight"{% endif %}></span>
     </div>
-    <div id="autofill-work-done">
+    <div id="autofill-work-done" class="shortcut">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
@@ -97,13 +97,14 @@
         Work Done
       </span>
     </div>
-    <div id="delete-starred-assignments">
+    <div id="delete-starred-assignments" class="shortcut">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
+      {% comment %} Add invert-text-color in dark mode to initially make the text white for #animate-in or #animate-color assignments. Without this, the text goes from black to white and looks bad {% endcomment %}
+      <div class="assignment-container{% if background_image %} difference-blend-mode{% endif %}{% if dark_mode %} invert-text-color{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
         <div class="assignment tags-{{ horizontal_tag_position|lower }}{% if assignment.needs_more_info %} needs-more-info{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <div class="relative-positioning-wrapper">
@@ -198,7 +199,7 @@
     {% endfor %}
   </div>
   <template id="delete-gc-assignments-from-class-template">
-    <div class="delete-gc-assignments-from-class">
+    <div class="delete-gc-assignments-from-class" class="shortcut">
       <div class="shortcut-line-left{% if background_image %} difference-blend-mode{% endif %}"></div>
       <div class="shortcut-line-right{% if background_image %} difference-blend-mode{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">Delete all Assignments from this Class</span>

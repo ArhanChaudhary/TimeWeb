@@ -244,4 +244,4 @@ LOGGING = {
 }
 
 # Views constants
-after_midnight_hour_to_update = 4
+AFTER_MIDNIGHT_HOUR_TO_UPDATE = 4

@@ -236,12 +236,12 @@ class VisualAssignment extends Assignment {
                 bar_move_left = this.width - 8;
             }
             // bar move left
-            screen.fillStyle = "rgb(55,55,55)";
+            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(200,200,200)" : "rgb(55,55,55)";
             screen.fillRect(this.width-155-bar_move_left, this.height-121,148,50);
-            screen.fillStyle = "lime";
+            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(255,0,255)" : "rgb(0,255,0)";
             screen.fillRect(this.width-153-bar_move_left, this.height-119,144,46);
 
-            screen.fillStyle = "rgb(0,128,0)";
+            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(255,127,255)" : "rgb(0,128,0)";
             const slash_x = this.width - 142 - bar_move_left;
             screen.beginPath();
             screen.moveTo(slash_x,this.height-119);
@@ -298,7 +298,7 @@ class VisualAssignment extends Assignment {
         let circle_x,
             circle_y,
             line_end = this.sa.x + Math.ceil(1 / this.wCon);
-        screen.strokeStyle = "rgb(233,68,46)"; // red
+        screen.strokeStyle = $("html").is("#dark-mode") ? "rgb(22,187,209)" : "rgb(233,68,46)"; // red
         screen.lineWidth = radius;
         screen.beginPath();
         for (let point = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point < line_end; point += Math.ceil(1 / this.wCon)) {
@@ -317,7 +317,7 @@ class VisualAssignment extends Assignment {
         if (len_works + Math.ceil(1 / this.wCon) < line_end) {
             line_end = len_works + Math.ceil(1 / this.wCon);
         }
-        screen.strokeStyle = "rgb(1,147,255)"; // blue
+        screen.strokeStyle = $("html").is("#dark-mode") ? "rgb(254,108,0)" : "rgb(1,147,255)"; // blue
         screen.lineWidth = radius;
         for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
             circle_x = (point + this.sa.blue_line_start) * this.wCon + 50;
@@ -353,8 +353,8 @@ class VisualAssignment extends Assignment {
             }
             screen.fillStyle = "black";
             screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x}) `, this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50);
-            screen.fillStyle = "lime";
-            screen.strokeStyle = "lime";
+            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(255,0,255)" : "rgb(0,255,0)";
+            screen.strokeStyle = screen.fillStyle;
             screen.beginPath();
             screen.arc(this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50, radius, 0, 2 * Math.PI);
             screen.stroke();
