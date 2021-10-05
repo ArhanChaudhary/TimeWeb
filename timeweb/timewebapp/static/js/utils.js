@@ -625,18 +625,17 @@ utils = {
                     return utils.loadAssignmentData($(this)).name !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
-                    const available_assignments = $(".assignment:not(.question-mark)");
+                    const available_assignments = $(".assignment-container:not(.question-mark)");
                     let first_available_assignment;
                     if (available_assignments.length) {
-                        first_available_assignment = available_assignments.first()
+                        first_available_assignment = available_assignments.first().children(".assignment");
                     } else {
                         first_available_assignment = $(".assignment").first();
                     }
-                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\">Click your assignment to open it<br></span>");
+                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\">Click your assignment to open it<br></span>")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
                 } else {
                     $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
-                    $(".assignment-container").hide();
-                    $("#current-date").hide();
+                    $(".assignment-container, #current-date").hide();
                 }
             }
         },

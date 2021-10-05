@@ -70,8 +70,8 @@ function textareaToJSON($textarea) {
 }
 function JSONToTextarea($textarea) {
     let $textareaVal = $textarea.val();
-    $textareaVal = $textareaVal.substring(1, $textareaVal.length - 1).replaceAll(" ", "");
+    $textareaVal = $textareaVal.substring(1, $textareaVal.length - 1);
     if ($textareaVal)
-        $textareaVal = $textareaVal.split(",").map(e => JSON.parse(e)).join("\n")
+        $textareaVal = $textareaVal.split(", ").map(e => JSON.parse(e)).join("\n")
     $textarea.val($textareaVal);
 }

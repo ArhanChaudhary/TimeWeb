@@ -1032,10 +1032,7 @@ input[type=number]::-webkit-inner-spin-button {
 
 #dark-mode #assignments-container > *:not(.assignment-container),
 
-#dark-mode .shortcut,
-
-.assignment-container::before,
-.assignment-container::after,
+#dark-mode .shortcut-text,
 
 /* Need these annoying rules instead of just doing "#dark-mode .assignment-header *" because it messes up positioning */
 .assignment-container.invert-text-color .assignment-header > *:not(.right-side-of-header),
