@@ -27,10 +27,10 @@ priority = {
             var g = lowest_priority_color.g + (highest_priority_color.g - lowest_priority_color.g) * p;
             var b = lowest_priority_color.b + (highest_priority_color.b - lowest_priority_color.b) * p;
         }
+        $assignment_container.toggleClass("invert-text-color", (r + g + b) / 3 <= 255 / 2);
         r *= a;
         g *= a;
         b *= a;
-        $assignment_container.toggleClass("invert-text-color", (r + g + b) / 3 <= 255 / 2);
         return `rgb(${r},${g},${b})`;
     },
     // Handles coloring and animating assignments that were just created or edited
