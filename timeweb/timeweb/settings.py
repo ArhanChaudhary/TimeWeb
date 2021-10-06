@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
+PROXY = 0
+
 # SECURITY WARNING: don't run with debug turned on in production!
 try:
     DEBUG = os.environ['DEBUG'] == "True"
@@ -133,8 +135,7 @@ if os.getenv('GAE_APPLICATION', None):
         }
     }
 else:
-    proxy = 0
-    if proxy:
+    if PROXY:
         # If running locally and connecting to server database, connect via the proxy.
         #
         #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
