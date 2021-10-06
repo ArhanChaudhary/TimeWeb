@@ -334,7 +334,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
-            self.sm.mark_as_done = self.form.cleaned_data.get("mark_as_done")
         if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
