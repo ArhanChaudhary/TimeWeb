@@ -357,8 +357,10 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
     // This way ensures the autotune becomes more effective as more data points are made available for the regression
     
-    // A slight problem with this is
-    let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+    // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
+    // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
+    // There is no easy solution to this. The best way I thought to resolve this is to manually remove 0.1 from the autotune factor and cap it at 0
+    let autotune_factor = Math.max(0, works_without_break_days.length / x1_from_blue_line_start - 0.1);
     
     this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     const skew_ratio_bound = this.calcSkewRatioBound();
