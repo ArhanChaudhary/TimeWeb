@@ -344,6 +344,9 @@ Assignment.prototype.autotuneSkewRatio = function() {
         y2 -= y1_from_blue_line_start - y1;
         const parabola = this.calcAandBfromOriginAndTwoPoints([x2, y2], [x1, y1]);
         autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+
+        // Zero division somewhere
+        if (!Number.isFinite(autotuned_skew_ratio)) return;
     } else {
         // A parabola cannot be defined by two or less points; instead connect a line
         autotuned_skew_ratio = 1;
@@ -353,12 +356,12 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
     // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
     // This way ensures the autotune becomes more effective as more data points are made available for the regression
+    
+    // A slight problem with this is
     let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
-
-    // Zero division somewhere
-    if (!Number.isFinite(autotuned_skew_ratio)) return;
-
+    
+    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     const skew_ratio_bound = this.calcSkewRatioBound();
-    this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor, skew_ratio_bound);
+    this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
     ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
 }

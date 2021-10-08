@@ -160,7 +160,13 @@ priority = {
             if (params.first_sort) {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
+                for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                    sa.setDynamicStartIfInDynamicMode();
+                    sa.autotuneSkewRatio();
+                }
                 sa.setDynamicStartIfInDynamicMode();
+                ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
             }
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
@@ -239,8 +245,13 @@ priority = {
                     // Remove from if has_autofilled because this may need to run even if nothing autofills
                     ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.concat(reached_end_of_assignment ? [last_work_input] : []).map(String), sa.sa.id);
                     if (has_autofilled) {
+                        for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                            sa.setDynamicStartIfInDynamicMode();
+                            sa.autotuneSkewRatio();
+                        }
                         sa.setDynamicStartIfInDynamicMode();
                         ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                     }
                 }
