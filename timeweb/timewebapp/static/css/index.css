@@ -1034,13 +1034,13 @@ input[type=number]::-webkit-inner-spin-button {
 
 #dark-mode .shortcut-text,
 
-/* Need these annoying rules instead of just doing "#dark-mode .assignment-header *" because it messes up positioning */
+/* Need these annoying rules instead of just doing ".assignment-container.invert-text-color .assignment-header *" because it messes up positioning */
 .assignment-container.invert-text-color .assignment-header > *:not(.right-side-of-header),
 .assignment-container.invert-text-color .assignment-header > .right-side-of-header > *:not(.align-to-status-message-container),
 .assignment-container.invert-text-color .assignment-header > .right-side-of-header > .align-to-status-message-container > *:not(.tags),
 #dark-mode .tags,
 
-.assignment-container:not(.invert-text-color) .advanced-buttons, /* Undo filter already applied by #dark-mode .assignment-footer */
+#dark-mode .assignment-container:not(.invert-text-color) .advanced-buttons, /* Undo filter already applied by #dark-mode .assignment-footer */
 #dark-mode .assignment-footer,
 
 #dark-mode #assignments-container .info-button {

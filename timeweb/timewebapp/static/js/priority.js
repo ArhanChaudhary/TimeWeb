@@ -226,14 +226,18 @@ priority = {
                 status_value = NOT_YET_ASSIGNED;
             } else {
                 if (params.autofill_no_work_done && number_of_forgotten_days > 0) {
+                    let reached_end_of_assignment = false;
                     for (let i = 0; i < number_of_forgotten_days; i++) {
-                        if (len_works + sa.sa.blue_line_start === sa.sa.x - 1) break;
+                        if (len_works + sa.sa.blue_line_start === sa.sa.x - 1) {
+                            reached_end_of_assignment = true;
+                            break;
+                        }
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
                     }
                     // Remove from if has_autofilled because this may need to run even if nothing autofills
-                    ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.concat(len_works + sa.sa.blue_line_start === sa.sa.x - 1 ? [last_work_input] : []).map(String), sa.sa.id);
+                    ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.concat(reached_end_of_assignment ? [last_work_input] : []).map(String), sa.sa.id);
                     if (has_autofilled) {
                         sa.setDynamicStartIfInDynamicMode();
                         ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
