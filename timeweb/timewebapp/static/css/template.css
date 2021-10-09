@@ -236,20 +236,14 @@ rect {
 #nav-menu svg {
     display: block;
 }
-#menu:hover ~ nav, 
 #menu:focus ~ nav, 
-nav:hover,
 nav:focus-within {
     transform: translateX(calc(-100% - 3px));
 }
-#menu:hover ~ nav #nav-items::after, 
-nav:hover #nav-items::after, 
 #menu:focus ~ nav #nav-items::after,
 nav:focus-within #nav-items::after {
     opacity: 1;
 }
-#menu:hover ~ nav #nav-menu::after, 
-nav:hover #nav-menu::after, 
 #menu:focus ~ nav #nav-menu::after,
 nav:focus-within #nav-menu::after {    
     opacity: 1;
