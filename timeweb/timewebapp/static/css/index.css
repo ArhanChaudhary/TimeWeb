@@ -1040,7 +1040,9 @@ input[type=number]::-webkit-inner-spin-button {
 .assignment-container.invert-text-color .assignment-header > .right-side-of-header > .align-to-status-message-container > *:not(.tags),
 #dark-mode .tags,
 
-#dark-mode .assignment-container:not(.invert-text-color) .advanced-buttons, /* Undo filter already applied by #dark-mode .assignment-footer */
+/* Undo filter already applied by #dark-mode .assignment-footer */
+#dark-mode .assignment-container:not(.invert-text-color) .advanced-buttons,
+html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
 #dark-mode .assignment-footer,
 
 #dark-mode #assignments-container .info-button {

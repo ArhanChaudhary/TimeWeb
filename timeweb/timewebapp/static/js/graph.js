@@ -124,7 +124,7 @@ class VisualAssignment extends Assignment {
             this.draw();
         }
     }
-    mousemove(e) {
+    mousemove(e, iteration_number=1) {
         const raw_x = e.pageX - this.fixed_graph.offset().left;
         const raw_y = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
@@ -169,9 +169,15 @@ class VisualAssignment extends Assignment {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
             this.setDynamicStartIfInDynamicMode();
+            if (iteration_number === AUTOTUNE_ITERATIONS) {
+                this.draw(raw_x, raw_y);
+            } else {
+                this.mousemove(e, iteration_number + 1);
+            }
+        } else {
+            // Passes mouse x and y coords so mouse point can be drawn
+            this.draw(raw_x, raw_y);
         }
-        // Passes mouse x and y coords so mouse point can be drawn
-        this.draw(raw_x, raw_y);
     }
     changeSkewRatio() {
         // Change skew ratio by +- 0.1 and cap it

@@ -160,13 +160,11 @@ priority = {
             if (params.first_sort) {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
-                for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
-                    sa.setDynamicStartIfInDynamicMode();
-                    sa.autotuneSkewRatio();
-                }
+
+                // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                const old_dynamic_start = sa.sa.dynamic_start;
                 sa.setDynamicStartIfInDynamicMode();
-                ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                old_dynamic_start !== sa.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
             }
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
