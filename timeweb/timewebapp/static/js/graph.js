@@ -734,15 +734,15 @@ class VisualAssignment extends Assignment {
                 ignore_assignment_button.html("Not Applicable");
                 clearTimeout(not_applicable_timeout_ignore_assignment_button);
                 not_applicable_timeout_ignore_assignment_button = setTimeout(function() {
-                    ignore_assignment_button.html("Ignore for Today only");
+                    ignore_assignment_button.html("Simulate No Work Done");
                 }, 1000);
                 return;
             }
             this.sa.mark_as_done = !this.sa.mark_as_done;
-            ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
+            ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Stop Simulating No Work Done" : "Simulate No Work Done");
             ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
             priority.sort();
-        }).html(this.sa.mark_as_done ? "Unignore for Today" : "Ignore for Today only");
+        }).html(this.sa.mark_as_done ? "Stop Simulating No Work Done" : "Simulate No Work Done");
         // END ignore button
 
         // BEGIN Next assignment button
