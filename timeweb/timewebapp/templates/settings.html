@@ -15,14 +15,14 @@
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form.visible_fields %}
-        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "default_dropdown_tags" %}
+        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "reverse_sorting" or field.name == "default_dropdown_tags" %}
         <fieldset>
             <legend>
                 {% if field.name == "def_break_days" %}
                     Assignment Form
                 {% elif field.name == "def_skew_ratio" %}
                     Assignment Graph
-                {% elif field.name == "highest_priority_color" %}
+                {% elif field.name == "reverse_sorting" %}
                     Assignment Priority
                 {% elif field.name == "default_dropdown_tags" %}
                     Personalize
@@ -63,8 +63,10 @@
         {{ hidden }}
     {% endfor %}
     {% spaceless %}
-    <input type="button" value="Reset" id="reset-settings-button">
-    <input type="submit" value="Save" id="submit-settings-button">
+    <div class="button-container">
+        <input type="button" value="Reset" id="reset-settings-button">
+        <input type="submit" value="Save" id="submit-settings-button">
+    </div>
     {% endspaceless %}
 </form>
 <template id="background-image-template">

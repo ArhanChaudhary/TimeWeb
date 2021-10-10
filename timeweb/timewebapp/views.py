@@ -133,6 +133,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_funct_round_minute': self.settings_model.def_funct_round_minute,
             'ignore_ends': self.settings_model.ignore_ends,
             'show_progress_bar': self.settings_model.show_progress_bar,
+            'reverse_sorting': self.settings_model.reverse_sorting,
             'color_priority': self.settings_model.color_priority,
             'text_priority': self.settings_model.text_priority,
             'highest_priority_color': self.settings_model.highest_priority_color,
@@ -182,6 +183,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                     model.save()
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         self.settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
+        self.settings_model.reverse_sorting = self.form.cleaned_data.get("reverse_sorting")
         self.settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         self.settings_model.text_priority = self.form.cleaned_data.get("text_priority")
         self.settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")

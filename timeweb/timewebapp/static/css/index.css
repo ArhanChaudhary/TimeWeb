@@ -180,13 +180,13 @@ header.animate::after {
     z-index: 1000;
     margin-bottom: 15px;
     margin-top: -7px;
+    cursor: pointer;
 }
 .shortcut-text {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     margin-top: -10px;
-    cursor: pointer;
 }
 /* Info buttons */
 .shortcut-text:hover {

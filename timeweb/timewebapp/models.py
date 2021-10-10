@@ -185,6 +185,10 @@ class SettingsModel(models.Model):
     )
 
     # Group "Assignment Priority"
+    reverse_sorting = models.BooleanField(
+        default=False,
+        verbose_name=_('Sort Assignments in Reverse'),
+    )
     highest_priority_color = ColorField(
         default="#e25b50",
         verbose_name=_('Highest Priority Color'),

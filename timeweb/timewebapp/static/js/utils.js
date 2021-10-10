@@ -239,8 +239,10 @@ utils = {
             },
 
             deleteAssignmentsFromClass: function() {
-                $(".delete-gc-assignments-from-class").click(function() {
-                    const $this = $(this);
+                $(document).click(function(e) {
+                    let $this = $(e.target);
+                    if (!$this.hasClass("delete-gc-assignments-from-class")) $this = $(e.target).parents(".delete-gc-assignments-from-class");
+                    if (!$this.length) return;
                     const dom_assignment = $this.siblings(".assignment");
                     const sa = utils.loadAssignmentData(dom_assignment);
                     const assignments_to_delete = $(".assignment-container").filter(function() {
@@ -833,7 +835,7 @@ ajaxUtils = {
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
-({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags } = JSON.parse(document.getElementById("settings-model").textContent));
+({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date();
 if (date_now.getHours() < utils.after_midnight_hour_to_update) {
@@ -919,6 +921,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.headerIcons();
     utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
+    utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();
     if (isExampleAccount) {
         utils.ui.exampleAccountAlertTutorial();

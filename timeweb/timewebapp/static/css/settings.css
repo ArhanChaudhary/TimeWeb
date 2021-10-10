@@ -12,6 +12,12 @@ form {
 form select {
     display: block;
 }
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding: 0;
+}
 #reset-settings-button, #submit-settings-button {
     box-sizing: border-box;
     background: rgb(243, 243, 243);
@@ -19,7 +25,7 @@ form select {
     font-size: 20px;
     border-radius: 4px;
     margin-top: 5px;
-    width: calc(50% - 10px);
+    width: min(600px, calc(50% - 10px));
     height: 50px;
     margin-bottom: 100px;
 }
