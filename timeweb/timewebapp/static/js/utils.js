@@ -234,7 +234,7 @@ utils = {
                             message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for";
                             break;
                     }
-                    $("#autofill-work-done .shortcut-text").info("bottom", message, "append").css({marginLeft: -2, left: 1, bottom: 1});
+                    $("#autofill-work-done .shortcut-text").info("bottom", message, "append").css({marginLeft: -2, marginRight: 2, left: 1, bottom: 1});
                 }
             },
 

@@ -72,7 +72,7 @@ header.animate::after {
 #tomorrow-time {
     white-space: nowrap;
 }
-#assignments-header img {
+#assignments-header img:not(:first-of-type) {
     position: relative;
     z-index: 1;
     cursor: pointer;
@@ -95,7 +95,7 @@ header.animate::after {
     order: 1;
     padding-right: 5px;
     padding-left: 5px;
-    right: 230px;
+    right: 225px;
     bottom: 5px;
     background: rgb(214, 214, 214);
     visibility: hidden;
@@ -177,7 +177,7 @@ header.animate::after {
 }
 .shortcut {
     position: relative;
-    z-index: 1000;
+    /* z-index: 1000; might be needed? */
     margin-bottom: 15px;
     margin-top: -7px;
     cursor: pointer;
@@ -1030,8 +1030,10 @@ input[type=number]::-webkit-inner-spin-button {
     border-color: white !important;
 }
 
-#dark-mode #assignments-container > *:not(.assignment-container),
+#dark-mode #assignments-container > *:not(.assignment-container):not(#assignments-header),
+#dark-mode #assignments-container > *:not(.assignment-container):not(#assignments-header) > *:not(.icon-label-container),
 
+#dark-mode .shortcut .info-button,
 #dark-mode .shortcut-text,
 
 /* Need these annoying rules instead of just doing ".assignment-container.invert-text-color .assignment-header *" because it messes up positioning */
@@ -1045,8 +1047,19 @@ input[type=number]::-webkit-inner-spin-button {
 html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
 #dark-mode .assignment-footer,
 
-#dark-mode #assignments-container .info-button {
+#dark-mode #assignments-container .info-button-text {
     filter: invert(1);
+}
+#dark-mode #overlay {
+    filter: brightness(0.85);
+    background-color: rgba(0,0,0,0.55);
+}
+#dark-mode .shortcut-line-left:not(.difference-blend-mode),
+#dark-mode .shortcut-line-right:not(.difference-blend-mode),
+#dark-mode .shortcut-line-left:not(.difference-blend-mode)::after,
+#dark-mode .assignment-container:not(.difference-blend-mode)::after,
+#dark-mode .assignment-container:not(.difference-blend-mode)::before {
+    border-color: white !important;
 }
 #dark-mode body {
     background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
