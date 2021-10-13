@@ -411,14 +411,20 @@ utils = {
                 // Remove "Important", "Not Important", and default_dropdown_tags
                 unique_allTags.delete("Important");
                 unique_allTags.delete("Not Important");
-                unique_allTags = [...unique_allTags].filter(e => !default_dropdown_tags.includes(e));
+                unique_allTags = Array.from(unique_allTags).filter(e => !default_dropdown_tags.includes(e));
                 // Add back in "Important", "Not Important", and default_dropdown_tags
                 const final_allTags = [];
                 final_allTags.push("Important");
                 final_allTags.push("Not Important");
                 final_allTags.push(...default_dropdown_tags);
                 // Add sorted all tags
-                final_allTags.push(...Array.from(unique_allTags).sort());
+                final_allTags.push(...unique_allTags.sort());
+
+                // The tag add box can be reopened while the transitionend from the transitionCloseTagBox function hasn't yet fired, causing all the tags to disppear
+                // Trigger the transitionend if this is the case, and since transitionCloseTagAddBox uses .one, it will be disabled after
+                const tag_add_box = $this.find(".tag-add-box");
+                tag_add_box.trigger("transitionend");
+
                 for (let tag of final_allTags) {
                     const tag_add_selection_item = $(TAG_ADD_SELECTION_ITEM_TEMPLATE);
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
@@ -428,6 +434,7 @@ utils = {
                         $(this).toggleClass("checked");
                     });
                 }
+                
             }
             $(".tag-delete").click(tagDelete);
             function tagDelete() {
@@ -496,11 +503,17 @@ utils = {
                 animation: 150,
                 ghostClass: "ghost",
                 direction: "horizontal",
+                onMove: function(e) {
+                    // If the tag is dragged while it's being deleted, it won't be deleted by the above code but it will instead be re-added in its final styles back into .tag-sortable-container
+                    // Prevent that from happening
+                    return !$(e.dragged).hasClass("tag-is-deleting");
+                },
                 onEnd: function() {
                     const $this = $(this.el);
                     const sa = utils.loadAssignmentData($this);
                     sa.tags = $this.find(".tag-wrapper").filter(function() {
-                        return !$(this).hasClass("tag-is-deleting");
+                        // Also remove z-index if it wasnt reset back to none from dragging the tag around
+                        return !$(this).css("z-index","").hasClass("tag-is-deleting");
                     }).map(function() {
                         return $(this).children(".tag-name").text();
                     }).toArray();

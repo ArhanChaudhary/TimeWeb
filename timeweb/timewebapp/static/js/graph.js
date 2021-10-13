@@ -658,7 +658,6 @@ class VisualAssignment extends Assignment {
         // END Work input textbox
 
         // BEGIN Submit work button
-        let not_applicable_timeout_submit_work_button;
         submit_work_button.click(() => {
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
@@ -689,11 +688,7 @@ class VisualAssignment extends Assignment {
                 not_applicable_message = "Last work input must finish this assignment";
             }
             if (not_applicable_message) {
-                submit_work_button.html(not_applicable_message);
-                clearTimeout(not_applicable_timeout_submit_work_button);
-                not_applicable_timeout_submit_work_button = setTimeout(function() {
-                    submit_work_button.html("Submit Work Input");
-                }, 1000);
+                $.alert({title: not_applicable_message});
                 return;
             }
             if (input_done + last_work_input < 0) {
@@ -734,15 +729,15 @@ class VisualAssignment extends Assignment {
                 ignore_assignment_button.html("Not Applicable");
                 clearTimeout(not_applicable_timeout_ignore_assignment_button);
                 not_applicable_timeout_ignore_assignment_button = setTimeout(function() {
-                    ignore_assignment_button.html("Simulate No Work Done");
+                    ignore_assignment_button.html("Ignore for Today Only");
                 }, 1000);
                 return;
             }
             this.sa.mark_as_done = !this.sa.mark_as_done;
-            ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Stop Simulating No Work Done" : "Simulate No Work Done");
+            ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today Only" : "Ignore for Today Only");
             ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
             priority.sort();
-        }).html(this.sa.mark_as_done ? "Stop Simulating No Work Done" : "Simulate No Work Done");
+        }).html(this.sa.mark_as_done ? "Unignore for Today Only" : "Ignore for Today Only");
         // END ignore button
 
         // BEGIN Next assignment button

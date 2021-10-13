@@ -94,8 +94,9 @@ header.animate::after {
     position: absolute;
     order: 1;
     padding-right: 5px;
-    padding-left: 5px;
+    padding-left: 20px;
     right: 225px;
+    text-align: right;
     bottom: 5px;
     background: rgb(214, 214, 214);
     visibility: hidden;
@@ -1031,10 +1032,14 @@ input[type=number]::-webkit-inner-spin-button {
 }
 
 #dark-mode #assignments-container > *:not(.assignment-container):not(#assignments-header),
-#dark-mode #assignments-container > *:not(.assignment-container):not(#assignments-header) > *:not(.icon-label-container),
+#dark-mode #assignments-container > #assignments-header > *:not(#icon-label-container),
+
+#dark-mode #assignments-header #icon-label-container img ~ div,
+
+#dark-mode .shortcut-text,
 
 #dark-mode .shortcut .info-button,
-#dark-mode .shortcut-text,
+#dark-mode #assignments-header #icon-label-container img ~ div > .info-button,
 
 /* Need these annoying rules instead of just doing ".assignment-container.invert-text-color .assignment-header *" because it messes up positioning */
 .assignment-container.invert-text-color .assignment-header > *:not(.right-side-of-header),
@@ -1047,7 +1052,7 @@ input[type=number]::-webkit-inner-spin-button {
 html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
 #dark-mode .assignment-footer,
 
-#dark-mode #assignments-container .info-button-text {
+#dark-mode #assignments-container .info-button-text:not(.tag-add-box) {
     filter: invert(1);
 }
 #dark-mode #overlay {
