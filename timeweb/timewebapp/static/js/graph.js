@@ -669,15 +669,25 @@ class VisualAssignment extends Assignment {
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_textbox.val().trim().toLowerCase();
-            switch (input_done) {
-                case "done":
-                case "fin":
-                    input_done = Math.max(0, todo);
-                    break;
-                default: {
-                    input_done = +input_done;
-                    if (isNaN(input_done)) {
-                        not_applicable_message = "Invalid Number";
+            if (input_done.startsWith("since")) {
+                input_done = +input_done.replace("since", "").trim();
+                if (isNaN(input_done)) {
+                    not_applicable_message = "Invalid Format";
+                }
+                const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+                this.sa.works.push(...new Array(today_minus_assignment_date - (this.sa.blue_line_start + len_works) - 1).fill(last_work_input));
+                len_works = this.sa.works.length - 1;
+            } else {
+                switch (input_done) {
+                    case "done":
+                    case "fin":
+                        input_done = Math.max(0, todo);
+                        break;
+                    default: {
+                        input_done = +input_done;
+                        if (isNaN(input_done)) {
+                            not_applicable_message = "Invalid Number";
+                        }
                     }
                 }
             }
