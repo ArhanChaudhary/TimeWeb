@@ -102,7 +102,7 @@
                 The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button next to it. 
                 
                 The assignment form has 11 inputs in total:
-                6 of these inputs are required for a complete assignment. You can still create an assignment without these inputs as a of reminder system, but its graph won't be usable.
+                6 of these inputs are required for a complete assignment. You can still create an assignment without these inputs as a sort of reminder system, but its graph won't be usable.
                 5 of these advanced and optional. Default form input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
                 
             </details>
@@ -180,7 +180,7 @@
                 This button deletes the most recent work input from your graph.
 
                 <span class="minor-minor-category">Enter Units Done</span>
-                This input is the textbox in which you will enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". If you've completed an assignment's work for that day, enter the keyword "fin". If you haven't completed any of an assignment's work for that day, enter 0.
+                This input is the textbox in which you will enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". If you've completed an assignment's work for any day, enter the keyword "fin". If you haven't completed any of an assignment's work for any day, enter 0.
 
                 <span class="minor-minor-category">Submit Units Done</span>
                 This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -191,7 +191,7 @@
                 <span class="minor-minor-category">Ignore for Today only</span>
                 This button ignores the assignment's work from the total estimated completion time and makes the assignment translucent. However, the assignment's position will remain unchanged. This is automatically unignored the day after.
             
-                Use this when you're not sure whether or not you'll complete an assignment's work for that day and enter 0 units done instead when you are sure you won't complete any of the assignment's work.
+                Use this when you're not sure whether or not you'll complete an assignment's work for any day and enter 0 units done instead when you are sure you won't complete any of the assignment's work.
 
                 <span class="minor-minor-category">Next Assignment</span>
                 This button closes the current assignment and opens the next assignment.
@@ -233,7 +233,7 @@
 
         <details open>
             <summary class="major-category" id="assignment-priority">Assignment priority</summary>
-            After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for that day compared to every other assignment.
+            After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.
             
             Their priority also determines their assignment list position, which represents the order in which you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
 
@@ -255,7 +255,7 @@
             </details>
             <details open>
                 <summary class="minor-category" id="sorting-assignment-tags">Sorting tags</summary>
-                Tags are only added to the end of an assignment's tag list initially. So, you can sort the tags in the order you like by holding a tag and then dragging it around horizontally. Note that you may have to pinch zoom on mobile before you can drag the tags around to sort them.
+                Tags are only added to the end of an assignment's tag list initially. So, you can sort the tags in the order you like by holding on a tag and then dragging it around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around to sort them.
             </details>
         </span>
         <span>
@@ -263,12 +263,17 @@
             <details open>
                 <summary class="minor-category" id="what-are-assignment-shortcuts">What are assignment shortcuts?</summary>
                 <img src="{% static 'images/assignment-shortcuts.png' %}">
-                Assignment shortcuts allow you to perform actions in bulk and . To use a shortcut, click them on the home page.
+                Assignment shortcuts simplify performing complex actions on many assignments at once. To use a shortcut, all you have to do is click on them.
             </details>
             <details open>
                 <summary class="minor-category" id="autofill-work-done-assignment-shortcut">Autofill Work Done</summary>
-                "since 5" thing vikram was talking about; explain what to do FAQ
+                Every day, you have to enter a work input for every assignment so it can be prioritized accordingly. If you don't enter your past work (for example if you didn't enter how much work you did yesterday), the assignment displays a question mark, as it doesn't know how to prioritize the assignment because it doesn't know where your progress is currently at.
                 
+                Suppose you haven't yet entered work inputs for many assignments at once. Without this shortcut, you would have to open every assignment, manually enter how many units of work you completed, and then close it, which takes time. This shortcut allows you to automatically autofill no work done or all work done for each of these assignments.
+
+                Another use of this shortcut is when you don't remember how much work you've done every day since your last work input, but you know how much work you've done right now. For example, pretend your assignment is reading a book, and you entered 10 pages as your last work input. However, that work input was 10 days ago, and you don't remember how much you've read since 
+
+                Lastly, explain work buffering and why autofill no work done doesnt work for assignments due today
             </details>
             <details open>
                 <summary class="minor-category" id="delete-all-starred-assignments">Delete all Starred Assignments</summary>
