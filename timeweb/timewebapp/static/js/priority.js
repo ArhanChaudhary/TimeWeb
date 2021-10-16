@@ -192,6 +192,7 @@ priority = {
             if (!sa.sa.needs_more_info && params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 for (let i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
+                    // Don't use "sa.sa.soft" logic because this will always complete the assignment if the due date already passed
                     if (len_works + sa.sa.blue_line_start === sa.sa.x) break; // Don't autofill past completion
                     has_autofilled = true;
                     last_work_input += Math.max(0, todo);
@@ -245,7 +246,7 @@ priority = {
                 if (params.autofill_no_work_done && number_of_forgotten_days > 0) {
                     let reached_end_of_assignment = false;
                     for (let i = 0; i < number_of_forgotten_days; i++) {
-                        if (len_works + sa.sa.blue_line_start === sa.sa.x - 1) {
+                        if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x - 1) {
                             reached_end_of_assignment = true;
                             break;
                         }
@@ -253,7 +254,25 @@ priority = {
                         sa.sa.works.push(last_work_input);
                         len_works++;
                     }
-                    // Remove from if has_autofilled because this may need to run even if nothing autofills
+                    /**
+                     * 
+                     * t x   r
+                     * 1 5 > 5
+                     * 2 5 > 5
+                     * 3 5 > 5
+                     * 4 5 > 5
+                     * 5 5 > 6
+                     * 6 6 > 7
+                     * 7 7 > 8
+                     * 10 7 > 11
+                     */
+                    if (sa.sa.soft && today_minus_ad >= sa.sa.x) {
+                        sa.sa.x = today_minus_ad + 1;
+                        const due_date = new Date(sa.sa.assignment_date.valueOf());
+                        due_date.setDate(due_date.getDate() + sa.sa.x);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, sa.sa.id);
+                    }
+                    // Remove from "if has_autofilled" because this may need to run even if nothing autofills
                     ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.concat(reached_end_of_assignment ? [last_work_input] : []).map(String), sa.sa.id);
                     if (has_autofilled) {
                         for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {

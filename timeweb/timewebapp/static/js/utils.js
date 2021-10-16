@@ -25,8 +25,13 @@ utils = {
                 g: parseInt(result[2], 16),
                 b: parseInt(result[3], 16),
             }
+        },
+        // https://stackoverflow.com/questions/201724/easy-way-to-turn-javascript-array-into-comma-separated-list
+        arrayToEnglish: function(array) {
+            return array
+                .join(", ")
+                .replace(/, ((?:.(?!, ))+)$/, `${array.length >= 3 ? "," : ""} and $1`);
         }
-          
     },
     ui: {
         tickClock: function() {
@@ -690,7 +695,7 @@ utils = {
                     sessionStorage.setItem("advanced_inputs", true);
                 }
                 // Send ajax before close if it's on timeout
-                if (ajaxUtils.attributeData['assignments'].length) {
+                if (ajaxUtils.attributeData.assignments.length) {
                     ajaxUtils.sendAttributeAjax();
                 }
             });
@@ -802,16 +807,46 @@ ajaxUtils = {
             window.location.reload();
         });
     },
+    notice_assignments: [],
     sendAttributeAjaxWithTimeout: function(key, value, pk) {
-        if (ajaxUtils.disable_ajax) return;
+
         // Add key and values to the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-        let sa = ajaxUtils.attributeData['assignments'].find(iter_sa => iter_sa.pk === pk);
+        let sa = ajaxUtils.attributeData.assignments.find(iter_sa => iter_sa.pk === pk);
         if (!sa) {
             sa = {pk: pk};
-            ajaxUtils.attributeData['assignments'].push(sa);
+            ajaxUtils.attributeData.assignments.push(sa);
         }
         sa[key] = value;
+
+
+        // Add data before checking disable_ajax so ajaxUtils.attributeData.assignments below is updated
+        for (const assignment of ajaxUtils.attributeData.assignments) {
+            if (!("x" in assignment)) continue;
+            const sa = dat.find(sa => sa.id === assignment.pk);
+            ajaxUtils.notice_assignments.push(`"${sa.name}"`);
+        }
+        setTimeout(function() {
+            if (ajaxUtils.notice_assignments.length) {
+                $.alert({
+                    title: ajaxUtils.notice_assignments.length === 1 
+                    ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled`
+                    : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates are enabled.`,
+                    conent: "This only occurs when you an assignment's due date passes, but the assignment still isn't complete.",
+                });
+                ajaxUtils.notice_assignments = [];
+            }
+        }, 0);
+
+        if (ajaxUtils.disable_ajax) {
+            // Reset data
+            ajaxUtils.attributeData = {
+                'csrfmiddlewaretoken': csrf_token,
+                'action': 'save_assignment',
+                'assignments': [],
+            }
+            return;
+        }
         clearTimeout(ajaxUtils.ajaxTimeout);
         ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.sendAttributeAjax, 1000);
     },
@@ -828,7 +863,7 @@ ajaxUtils = {
         // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
         // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
         // Plus, a pointless ajax of this sort won't happen frequently and will have a minimal impact on the server's performance
-        ajaxUtils.attributeData['assignments'] = JSON.stringify(ajaxUtils.attributeData['assignments']);
+        ajaxUtils.attributeData.assignments = JSON.stringify(ajaxUtils.attributeData.assignments);
         $.ajax({
             type: "POST",
             data: ajaxUtils.attributeData,
@@ -873,6 +908,7 @@ for (let sa of dat) {
     }
     if (sa.x) {
         sa.x = new Date(sa.x);
+        // floor(date + 0.5) is the same as round(date)
         sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
         sa.x.setHours(0,0,0,0);
         sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);

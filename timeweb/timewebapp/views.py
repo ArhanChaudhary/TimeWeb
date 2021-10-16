@@ -328,6 +328,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.x = self.form.cleaned_data.get("x")
             if self.sm.x:
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
+            self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
@@ -633,9 +634,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     log_message = f'User \"{request.user}\" marked or unmarked assignment "{self.sm.name}" as completed'
                 elif key == 'tags':
                     log_message = f'User \"{request.user}\" reordered tags for assignment "{self.sm.name}"'
+                elif key == "x":
+                    log_message = f'User \"{request.user}\" changed the date for assignment "{self.sm.name}"'
                 if request.user != self.sm.user:
                     logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
                     return HttpResponseForbidden("This assignment isn't yours")
+                if key == "x":
+                    # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
+                    value = datetime.datetime.fromtimestamp(value, datetime.timezone.utc)
                 setattr(self.sm, key, value)
                 logger.info(log_message)
             try:

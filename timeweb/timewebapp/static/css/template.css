@@ -16,6 +16,9 @@ input, textarea {
     /* Firefox */
     filter: none;
 }
+input[type="checkbox"] {
+    -webkit-appearance: auto;
+}
 header {
     width: 100%;
     background: rgb(13,26,38);

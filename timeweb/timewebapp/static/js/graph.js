@@ -128,7 +128,7 @@ class VisualAssignment extends Assignment {
         const raw_x = e.pageX - this.fixed_graph.offset().left;
         const raw_y = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
-        if (this.set_skew_ratio_using_graph) {
+        if (this.set_skew_ratio_using_graph && iteration_number !== AUTOTUNE_ITERATIONS + 1) {
             let x1 = this.sa.x - this.red_line_start_x;
             let y1 = this.sa.y - this.red_line_start_y;
             if (this.sa.break_days.length) {
@@ -169,11 +169,7 @@ class VisualAssignment extends Assignment {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
             this.setDynamicStartIfInDynamicMode();
-            if (iteration_number === AUTOTUNE_ITERATIONS) {
-                this.draw(raw_x, raw_y);
-            } else {
-                this.mousemove(e, iteration_number + 1);
-            }
+            this.mousemove(e, iteration_number + 1);
         } else {
             // Passes mouse x and y coords so mouse point can be drawn
             this.draw(raw_x, raw_y);
@@ -649,12 +645,7 @@ class VisualAssignment extends Assignment {
         // END Delete work input button
 
         // BEGIN Work input textbox
-        work_input_textbox.keydown(e => {
-            if (e.key === "Enter") {
-               submit_work_button.click();
-               work_input_textbox.val('');
-            }
-        });
+        work_input_textbox.keydown(e => {e.key === "Enter" && submit_work_button.click()});
         // END Work input textbox
 
         // BEGIN Submit work button
@@ -675,7 +666,9 @@ class VisualAssignment extends Assignment {
                     not_applicable_message = "Invalid Format";
                 }
                 const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-                this.sa.works.push(...new Array(today_minus_assignment_date - (this.sa.blue_line_start + len_works) - 1).fill(last_work_input));
+                const array_length = today_minus_assignment_date - (this.sa.blue_line_start + len_works) - 1;
+                if (array_length < 0) return;
+                this.sa.works.push(...new Array(array_length).fill(last_work_input));
                 len_works = this.sa.works.length - 1;
             } else {
                 switch (input_done) {
@@ -695,7 +688,14 @@ class VisualAssignment extends Assignment {
                 todo = 0;
             }
             if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y) {
-                not_applicable_message = "Last work input must finish this assignment";
+                if (this.sa.soft) {
+                    this.sa.x++;
+                    const due_date = new Date(this.sa.assignment_date.valueOf());
+                    due_date.setDate(due_date.getDate() + this.sa.x);
+                    ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
+                } else {
+                    not_applicable_message = "Last work input must finish this assignment";
+                }
             }
             if (not_applicable_message) {
                 $.alert({title: not_applicable_message});

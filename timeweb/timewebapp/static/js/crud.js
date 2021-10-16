@@ -4,6 +4,7 @@ const DEFAULT_FORM_FIELDS = {
     "#id_name": '',
     "#id_assignment_date": utils.formatting.stringifyDate(date_now),
     "#id_x": '',
+    "#id_soft": false,
     "#id_unit": def_unit_to_minute ? "Minute" : '',
     "#id_y": '',
     "#id_works": '0',
@@ -21,7 +22,8 @@ function showForm(show_instantly=false) {
     } else {
         $("#overlay").fadeIn(FORM_ANIMATION_DURATION).children("#form-wrapper").animate({top: 15}, FORM_ANIMATION_DURATION);
         if (!isMobile) {
-            form_inputs.first().focus();
+            for (var first_form_field in DEFAULT_FORM_FIELDS) break;
+            $(first_form_field).first().focus();
         } else {
             $(document.activeElement).blur();
         }
@@ -93,7 +95,10 @@ $(window).one("load", function() {
     // Create and show a new form when user clicks new assignment
     $("#image-new-container").click(function() {
         for (const field in DEFAULT_FORM_FIELDS) {
-            $(field).val(DEFAULT_FORM_FIELDS[field]);
+            if ($(field).attr("type") === "checkbox")
+                $(field).prop("checked", DEFAULT_FORM_FIELDS[field]);
+            else
+                $(field).val(DEFAULT_FORM_FIELDS[field]);
         }
         for (let break_day of Array(7).keys()) {
             // (break_days+6)%7) is for ordering I think
@@ -117,19 +122,25 @@ $(window).one("load", function() {
             var x = new Date(sa.assignment_date.valueOf());
             x.setDate(x.getDate() + sa.x);
         }
-        const form_data = [
-            sa.name,
-            sa.assignment_date ? utils.formatting.stringifyDate(sa.assignment_date) : '',
-            sa.x ? utils.formatting.stringifyDate(x) : '',
-            sa.unit,
-            sa.y,
-            sa.time_per_unit,
-            sa.description,
-            sa.works[0],
-            sa.original_funct_round && sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
-            (sa.original_min_work_time*sa.time_per_unit)||'',
-        ];
-        form_inputs.each((index, element) => $(element).val(form_data[index]));
+        const ASSIGNMENT_FORM_FIELDS = {
+            "#id_name": sa.name,
+            "#id_assignment_date": sa.assignment_date ? utils.formatting.stringifyDate(sa.assignment_date) : '',
+            "#id_x": sa.x ? utils.formatting.stringifyDate(x) : '',
+            "#id_soft": sa.soft,
+            "#id_unit": sa.unit,
+            "#id_y": sa.y,
+            "#id_time_per_unit": sa.time_per_unit,
+            "#id_description": sa.description,
+            "#id_works": sa.works[0],
+            "#id_funct_round": sa.original_funct_round && sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
+            "#id_min_work_time": (sa.original_min_work_time*sa.time_per_unit)||'',
+        }
+        for (const field in ASSIGNMENT_FORM_FIELDS) {
+            if ($(field).attr("type") === "checkbox")
+                $(field).prop("checked", ASSIGNMENT_FORM_FIELDS[field]);
+            else
+                $(field).val(ASSIGNMENT_FORM_FIELDS[field]);
+        }
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
             // Treat this as: $("#id_break_days_"+break_day).prop("checked", sa.break_days.includes(break_day));
@@ -180,9 +191,6 @@ $(window).one("load", function() {
         left: -15,
         bottom: 18,
     });
-    // All form inputs, can't use "#form-wrapper input:visible" because form is initially hidden
-    // Make this global so it can be used in saveAndLoadStates in utils.js
-    form_inputs = $("#form-wrapper input:not([type='hidden']):not([name='break_days']), #form-wrapper textarea");
     // Sets custom error message
     $("#id_name").on("input invalid",function(e) {
         this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');

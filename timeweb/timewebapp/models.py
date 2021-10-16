@@ -52,6 +52,9 @@ class TimewebModel(models.Model):
         blank=True,
         verbose_name=_('Due Date'),
     )
+    soft = models.BooleanField(
+        default=False,
+    )
     unit = models.CharField(
         null=True,
         blank=True,
