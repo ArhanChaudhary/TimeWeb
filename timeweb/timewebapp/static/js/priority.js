@@ -223,7 +223,12 @@ priority = {
                     width: 11,
                     height: 18,
                 }).css("margin-left", 2);
-            } else if (last_work_input >= sa.sa.y || sa.sa.x <= today_minus_ad) {
+            // (sa.sa.x <= today_minus_ad && !sa.sa.soft)
+            // This marks the assignment as completed if its due date passes
+            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
+            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
+            // Instead, give it a question mark so it can be appropriately handled
+            } else if (last_work_input >= sa.sa.y || (sa.sa.x <= today_minus_ad && !sa.sa.soft)) {
                 status_image = "completely-finished";
                 status_message = 'You\'re Completely Finished with this Assignment';
                 dom_status_image.attr({

@@ -758,7 +758,7 @@ ajaxUtils = {
         if (response.status == 0) {
             $.alert({title: "Failed to connect.", content: "We can't establish a connection with the server. Check your connection and try again."});
         } else if (response.status == 404) {
-            $.alert({title: "Not found.", content: "Try refreshing or trying again."});
+            $.alert({title: "Not found.", content: "Refresh or try again."});
         } else if (response.status == 500) {
             $.alert({title: "Internal server error.", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this."});
         } else if (exception === 'timeout' || response.status == 502) {
@@ -830,8 +830,8 @@ ajaxUtils = {
             if (ajaxUtils.notice_assignments.length) {
                 $.alert({
                     title: ajaxUtils.notice_assignments.length === 1 
-                    ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled`
-                    : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates are enabled.`,
+                    ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled.`
+                    : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates enabled.`,
                     conent: "This only occurs when you an assignment's due date passes, but the assignment still isn't complete.",
                 });
                 ajaxUtils.notice_assignments = [];
@@ -853,7 +853,7 @@ ajaxUtils = {
     sendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
-                $.alert({title: "An assignment takes up too much space and can no longer be saved.", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs"});
+                $.alert({title: "An assignment takes up too much space and can no longer be saved.", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs."});
                 return;
             }
             gtag("event","save_assignment");
