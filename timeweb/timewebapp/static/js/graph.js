@@ -762,12 +762,12 @@ class VisualAssignment extends Assignment {
                 }, 1000);
                 return;
             }
-            if (!next_assignment.hasClass("open-assignment")) {  
+            this.dom_assignment.click();
+            if (!next_assignment.hasClass("open-assignment")) {
                 this.dom_assignment[0].scrollIntoView({
                     behavior: 'smooth',
                     block: 'start',
                 });
-                this.dom_assignment.click();
                 next_assignment.click();
             }
         });
