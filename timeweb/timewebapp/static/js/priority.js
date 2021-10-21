@@ -223,7 +223,7 @@ priority = {
                     width: 11,
                     height: 18,
                 }).css("margin-left", 2);
-            } else if (last_work_input >= sa.sa.y) {
+            } else if (last_work_input >= sa.sa.y || sa.sa.x <= today_minus_ad) {
                 status_image = "completely-finished";
                 status_message = 'You\'re Completely Finished with this Assignment';
                 dom_status_image.attr({
