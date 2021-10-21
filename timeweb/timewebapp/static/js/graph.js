@@ -914,7 +914,12 @@ function shake_assignment($assignment_to_shake) {
 }
 $(function() {
 $(".assignment").click(function(e) {
-    if (!$(e.target).is(".status-message, .right-side-of-header, .align-to-status-message-container, .assignment, .assignment-header, .status-image, .arrow-container, polygon, .title")) return;
+    const target = $(e.target);
+    const targetInHeader = !!target.parents(".assignment-header").length || target.is(".assignment-header, .assignment");
+    const targetInTags = !!target.parents(".tags").length || target.is(".tags");
+    const targetInButton = !!target.parents(".button").length || target.is(".button");
+    const dontFire = targetInTags || targetInButton;
+    if (!(targetInHeader && !dontFire)) return;
     const dom_assignment = $(this);
     const sa_sa = utils.loadAssignmentData(dom_assignment);
     
