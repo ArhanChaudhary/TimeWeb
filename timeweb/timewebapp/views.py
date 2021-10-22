@@ -815,14 +815,20 @@ class ChangelogView(TimewebGenericView):
     def get(self, request):
         return self.render_with_dynamic_context(request, "changelog.html", self.context)
 
-class rickView(TimewebGenericView):
+class RickView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request, _):
         return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
 
-class stackpileView(TimewebGenericView):
+class StackpileView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request):
         return redirect("https://stackpile.me")
+
+class SpookyView(TimewebGenericView):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request):
+        return self.render_with_dynamic_context(request, "spooky.html", self.context)

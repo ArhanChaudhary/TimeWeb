@@ -31,8 +31,9 @@ urlpatterns = [
     path('mstile-150x150.png', RedirectView.as_view(url='/static/images/icons/mstile-150x150.png')),
     path('safari-pinned-tab.svg', RedirectView.as_view(url='/static/images/icons/safari-pinned-tab.svg')),
 
-    path('stackpile', views.stackpileView.as_view(),name='stackpile'),
-    re_path(r"^(wp|wordpress)", views.rickView.as_view()),
+    path('stackpile', views.StackpileView.as_view(), name='stackpile'),
+    path('spooky', views.SpookyView.as_view(), name="spooky"),
+    re_path(r"^(wp|wordpress)", views.RickView.as_view()),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static
