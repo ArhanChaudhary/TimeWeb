@@ -206,10 +206,15 @@ $.fn.info = function(facing,text,position) {
             return info_button.appendTo(this);
     }
 }
-$.fn.hasOverflown = function(){
+$.fn.hasOverflown = function() {
     const e = this[0];
     if (!e) return false;
     return e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth;
+}
+$.fn.isFullyScrolled = function() {
+    const e = this[0];
+    debugger;
+    return e.scrollTop + e.clientHeight >= e.scrollHeight;
 }
 $.fn.expandableTextareaHeight = function() {
     $(this).on("input", function() {

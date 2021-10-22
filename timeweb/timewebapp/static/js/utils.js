@@ -82,15 +82,23 @@ utils = {
                     $(".advanced-buttons").toggle();
                 });
                 $(".second-advanced-button").toggle();
-                $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hidden in graph.js
+                $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hiddenzAz in graph.js
                 // Advanced inputs for form
                 $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
                 $("#break-days-wrapper").addClass("hidden-field");
                 $("#form-wrapper #advanced-inputs").click(function() {
-                    this.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                    });
+                    if ($(this).parents("#fields-wrapper").isFullyScrolled()) {
+                        this.scrollIntoView({
+                            behavior: "smooth",
+                            block: "end",
+                        });
+                    } else {
+                        this.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                    }
+                    
                 });
             },
 
