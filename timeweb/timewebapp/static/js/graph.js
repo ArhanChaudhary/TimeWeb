@@ -976,6 +976,7 @@ $(".assignment").click(function(e) {
     dom_assignment.css("overflow", "");
     dom_assignment.addClass("open-assignment");
     priority.positionTags(dom_assignment);
+    utils.ui.displayTruncateWarning(dom_assignment);
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click

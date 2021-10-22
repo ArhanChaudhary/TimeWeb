@@ -619,6 +619,10 @@ utils = {
                 }
             });
         },
+        displayTruncateWarning: function($assignment) {
+            const relative_positioning_wrapper = $assignment.find(".relative-positioning-wrapper");
+            relative_positioning_wrapper.toggleClass("display-truncate-warning", relative_positioning_wrapper.find(".description").hasOverflown());
+        },
         setAssignmentScaleUtils: function() {
             // width * percentx = width+10
             // percentx = 1 + 10/width
@@ -627,8 +631,7 @@ utils = {
                 $(".assignment").each(function() {
                     const $this = $(this);
                     priority.positionTags($this);
-                    const relative_positioning_wrapper = $this.find(".relative-positioning-wrapper");
-                    relative_positioning_wrapper.toggleClass("display-truncate-warning", $this.hasClass("needs-more-info") && relative_positioning_wrapper.find(".description").hasOverflown());
+                    utils.ui.displayTruncateWarning($this);
                 });
             });
 

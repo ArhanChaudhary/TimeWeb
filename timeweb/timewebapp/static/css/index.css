@@ -279,16 +279,14 @@ header.animate::after {
 }
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description, .assignment.needs-more-info .description {
-    display: block;
-}
-.assignment.assignment.needs-more-info .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 6;
     overflow: hidden;
 }
-.relative-positioning-wrapper.display-truncate-warning::after {
-    content: "[Remaining description truncated]";
+.assignment.open-assignment .relative-positioning-wrapper.display-truncate-warning::after,
+.assignment.needs-more-info .relative-positioning-wrapper.display-truncate-warning::after {
+    content: "[Description shortened]";
     opacity: var(--description-opacity);
     font-size: var(--description-font-size);
     margin-top: 1em;
