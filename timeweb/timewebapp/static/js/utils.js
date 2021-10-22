@@ -104,11 +104,7 @@ utils = {
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
-                if (isExampleAccount) {
-                    $("#current-date-text").text("Example account simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long', year: 'numeric'}));
-                } else {
-                    $("#current-date-text").text("Current date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                }
+                $("#current-date-text").text("Current date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                 $("#next-day").click(function() {
                     in_next_day = true;
                     ajaxUtils.disable_ajax = true;
@@ -681,7 +677,7 @@ utils = {
             if (sessionStorage.getItem("already-alerted-example-account")) return;
             sessionStorage.setItem("already-alerted-example-account", true);
             $.alert({
-                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>A few things to note:<br>The example account's internal date is frozen at May 3, 2021 for consistency, and no modifications to this account are saved<br><br>With that out of the way, feel free to do whatever you want over here."
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like. Feel free to do whatever you want over here, as no modifications are saved."
             });
         },
         saveAndLoadStates: function() {
@@ -892,7 +888,8 @@ if ( window.history.replaceState ) {
 ({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting } = JSON.parse(document.getElementById("settings-model").textContent));
 def_break_days = def_break_days.map(Number);
 date_now = new Date();
-if (date_now.getHours() < utils.after_midnight_hour_to_update) {
+// Don't account for midnight on the example account because it wont make sense
+if (date_now.getHours() < utils.after_midnight_hour_to_update && !isExampleAccount) {
     date_now.setDate(date_now.getDate() - 1);
 }
 date_now = new Date(date_now.toDateString());
@@ -900,7 +897,7 @@ highest_priority_color = utils.formatting.hexToRGB(highest_priority_color);
 lowest_priority_color = utils.formatting.hexToRGB(lowest_priority_color);
 if (isExampleAccount) {
     window.gtag = function(){};
-    date_now = new Date(2021, 4, 3);
+    x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));    
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
@@ -920,6 +917,9 @@ for (let sa of dat) {
         sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
         if (sa.name === example_assignment_name) {
             sa.assignment_date = new Date(date_now.valueOf());
+        }
+        if (isExampleAccount) {
+            sa.assignment_date.setDate(sa.assignment_date.getDate() + x_transform);
         }
     }
     if (sa.y) sa.y = +sa.y;
@@ -956,6 +956,10 @@ for (let sa of dat) {
     // Set it to 0 to assume it isn't enabled for calculations in setParabolaValues()
     if (Number.isFinite(sa.min_work_time) && Number.isFinite(sa.funct_round) && sa.min_work_time <= sa.funct_round) {
         sa.min_work_time = 0;
+    }
+
+    if (isExampleAccount) {
+        sa.break_days = sa.break_days.map(break_day => (break_day + x_transform) % 7);
     }
 };
 // Use DOMContentLoaded because $(function() { fires too slowly
