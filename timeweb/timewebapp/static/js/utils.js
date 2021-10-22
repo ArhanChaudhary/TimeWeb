@@ -625,7 +625,10 @@ utils = {
             $(window).resize(function() {
                 $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
-                    priority.positionTags($(this));
+                    const $this = $(this);
+                    priority.positionTags($this);
+                    const relative_positioning_wrapper = $this.find(".relative-positioning-wrapper");
+                    relative_positioning_wrapper.toggleClass("display-truncate-warning", $this.hasClass("needs-more-info") && relative_positioning_wrapper.find(".description").hasOverflown());
                 });
             });
 

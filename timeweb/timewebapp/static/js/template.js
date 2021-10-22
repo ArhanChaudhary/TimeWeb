@@ -206,6 +206,11 @@ $.fn.info = function(facing,text,position) {
             return info_button.appendTo(this);
     }
 }
+$.fn.hasOverflown = function(){
+    const e = this[0];
+    if (!e) return false;
+    return e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth;
+}
 $.fn.expandableTextareaHeight = function() {
     $(this).on("input", function() {
         $(this).css("height", "auto"); // Needed for expanding with text

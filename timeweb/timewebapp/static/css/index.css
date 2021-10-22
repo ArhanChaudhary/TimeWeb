@@ -262,19 +262,38 @@ header.animate::after {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
     flex-direction: column; /* put description below name */
     position: relative;
+    --description-opacity: 0.6;
+    --description-font-size: 0.7em;
+    --left-side-of-header-width: calc(20px + 13vw);
 }
 .description {
+    position: relative;
     display: none;
-    opacity: 0.6;
+    opacity: var(--description-opacity);
     white-space: pre-wrap;
     transform: translateY(-2px);
-    min-width: calc(20px + 13vw);
-    max-width: calc(20px + 13vw);
+    min-width: var(--left-side-of-header-width);
+    max-width: var(--left-side-of-header-width);
     word-wrap: break-word;
-    font-size: 0.7em;
+    font-size: var(--description-font-size);
 }
+/* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description, .assignment.needs-more-info .description {
     display: block;
+}
+.assignment.assignment.needs-more-info .description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+    overflow: hidden;
+}
+.relative-positioning-wrapper.display-truncate-warning::after {
+    content: "[Remaining description truncated]";
+    opacity: var(--description-opacity);
+    font-size: var(--description-font-size);
+    margin-top: 1em;
+    margin-bottom: 2px;
+    max-width: var(--left-side-of-header-width);
 }
 .assignment:not(.open-assignment):not(.needs-more-info) .title {
     display: -webkit-box;
@@ -283,9 +302,9 @@ header.animate::after {
     overflow: hidden;
 }
 .title {
-    min-width: calc(20px + 13vw);
-    max-width: calc(20px + 13vw);
-    font-size: min(16.76px,calc(11px + 0.4vw));
+    min-width: var(--left-side-of-header-width);
+    max-width: var(--left-side-of-header-width);
+    font-size: min(16.76px, calc(11px + 0.4vw));
     overflow-wrap: break-word;
 }
 /* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
