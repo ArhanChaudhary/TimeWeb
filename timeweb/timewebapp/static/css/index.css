@@ -321,7 +321,7 @@ header.animate::after {
     margin-top: -12px;
 }
 .title[data-priority]::before {
-    content: attr(data-priority) !important;
+    content: "Priority: " attr(data-priority) "%" !important;
     position: absolute;
     font-size: 0.7em;
     margin-top: -12px;
