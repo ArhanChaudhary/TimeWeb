@@ -32,14 +32,10 @@ header.animate::after {
 #tutorial-message {
     padding: 0 10px;
 }
-#tutorial-click-assignment-to-open {
-    background-color: rgb(214, 214, 214);
-}
 #icon-label-container {
     display: flex;
     align-items: center;
     margin-left: auto;
-    background: rgb(214, 214, 214);
 }
 #assignments-header {
     position: relative;
@@ -53,6 +49,9 @@ header.animate::after {
 #info {
     display: inline;
     font-size: 17px;
+}
+#info.dim {
+    opacity: 0;
 }
 #current-date {
     position: relative;
@@ -75,8 +74,10 @@ header.animate::after {
 #assignments-header img:not(:first-of-type) {
     position: relative;
     z-index: 1;
-    cursor: pointer;
     margin-left: 14px;
+}
+#assignments-header img {
+    cursor: pointer;
 }
 #close-assignments {
     order: 2;
@@ -98,8 +99,7 @@ header.animate::after {
     right: 225px;
     text-align: right;
     bottom: 5px;
-    background: rgb(214, 214, 214);
-    visibility: hidden;
+    display: none;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
@@ -109,13 +109,13 @@ header.animate::after {
 #assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label,
 #assignments-header img#settings:focus ~ div#settings-icon-label {
-    visibility: visible;
+    display: block;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
 #assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
 #assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
 #assignments-header img#settings:hover ~ div:not(#settings-icon-label) {
-    visibility: hidden !important;
+    display: none !important;
 }
 .assignment-container {
     transition: transform 2s ease-in-out;
@@ -238,6 +238,8 @@ header.animate::after {
 .assignment-container.add-line-wrapper::before {
     content: '';
     position: absolute;
+    /* Put the before wrapper in front of the after wrapper, which are both visible with grey-highlight */
+    z-index: 1;
     height: 100%;
     left: 3px;
     bottom: -1px;
@@ -1031,22 +1033,18 @@ input[type=number]::-webkit-inner-spin-button {
     width: 333px;
 }
 
-.grey-highlight {
-    background-color: rgb(214, 214, 214);
+#dark-mode #assignments-header img,
+.grey-highlight:not(.assignment-container),
+.grey-highlight.assignment-container::after,
+.grey-highlight.assignment-container::before {
+    --filter-drop-shadow: 0.5px;
+    filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
 }
-:not(.assignment-container).difference-blend-mode {
-    mix-blend-mode: difference;
-    color: white;
-}
-.shortcut-line-right.difference-blend-mode, .shortcut-line-left.difference-blend-mode,
-.shortcut-line-left.difference-blend-mode::after {
-    border-color: white !important;
-}
-.assignment-container.difference-blend-mode::before,
-.assignment-container.difference-blend-mode::after {
-    mix-blend-mode: difference;
-    border-color: white !important;
-}
+
+#dark-mode .assignment-container::after,
+#dark-mode .assignment-container::before,
+#dark-mode .shortcut-line-right,
+#dark-mode .shortcut-line-left,
 
 #dark-mode #assignments-container > *:not(.assignment-container):not(#assignments-header),
 #dark-mode #assignments-container > #assignments-header > *:not(#icon-label-container),
@@ -1069,19 +1067,15 @@ input[type=number]::-webkit-inner-spin-button {
 html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
 #dark-mode .assignment-footer,
 
-#dark-mode #assignments-container .info-button-text:not(.tag-add-box) {
-    filter: invert(1);
+#dark-mode #assignments-container .info-button-text:not(.tag-add-box),
+
+#dark-mode #tutorial-click-assignment-to-open {
+    --filter-invert: 1;
+    filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
 }
 #dark-mode #overlay {
     filter: brightness(0.85);
     background-color: rgba(0,0,0,0.55);
-}
-#dark-mode .shortcut-line-left:not(.difference-blend-mode),
-#dark-mode .shortcut-line-right:not(.difference-blend-mode),
-#dark-mode .shortcut-line-left:not(.difference-blend-mode)::after,
-#dark-mode .assignment-container:not(.difference-blend-mode)::after,
-#dark-mode .assignment-container:not(.difference-blend-mode)::before {
-    border-color: white !important;
 }
 #dark-mode body {
     background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);

@@ -301,6 +301,16 @@ utils = {
                 });
             },
         },
+        dimAssignmentsHeaderInfoOnIconHover: function() {
+            $("#assignments-header #icon-label-container img").on("mouseover mouseout", function(e) {
+                const info = $(e.target).parents("#icon-label-container").siblings("#info");
+                const visible_icon_label = $(e.target).siblings("div:visible");
+                if (e.type === "mouseover")
+                    info.toggleClass("dim", collision(info, visible_icon_label));
+                else
+                    info.removeClass("dim");
+            });
+        },
         addTagHandlers: function() {
             const TAG_ADD_SELECTION_ITEM_TEMPLATE = $("#tag-add-selection-item-template").html();
             const TAG_TEMPLATE = $("#tag-template").html();
@@ -662,7 +672,7 @@ utils = {
                     } else {
                         first_available_assignment = $(".assignment").first();
                     }
-                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\">Click your assignment to open it<br></span>")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
                 } else {
                     $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container, #current-date").hide();
@@ -996,6 +1006,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (isMobile) {
         utils.ui.scaleGoogleClassroomAPIIconOnMobile();
     }
+    utils.ui.dimAssignmentsHeaderInfoOnIconHover();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();
