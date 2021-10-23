@@ -101,10 +101,6 @@ class TimewebForm(forms.ModelForm):
                     'on_or_before': "on" if x == assignment_date else "before"
                 })
             )
-        if x != None and x <= timezone.localtime(timezone.now()) - datetime.timedelta(hours=settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE):
-            self.add_error("x",
-                forms.ValidationError(_("This assignment has already been due"),code='invalid')
-            )
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):

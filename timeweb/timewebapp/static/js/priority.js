@@ -476,7 +476,7 @@ priority = {
             }
             const add_priority_percentage = text_priority && X_AND_CHECK_MARK_CUTOFF < status_value && status_value < QUESTION_MARK_AND_X_CUTOFF && !mark_as_done;
             const dom_title = $(".title").eq(pd[2]);
-            dom_title.attr("data-priority", add_priority_percentage ? priority_percentage : "");
+            dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
             new Promise(function(resolve) {
                 if (params.first_sort) {
