@@ -146,7 +146,7 @@ class SettingsForm(forms.ModelForm):
             "reverse_sorting": "Sorts assignments in reverse order. Useful if you like completing easier assignments first and harder assignments last. Note that some assignments may still be placed in higher list positions, and this isn't a true reverse.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
-            "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a new line.",
+            "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

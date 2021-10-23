@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function textareaToJSON($textarea) {
     let $textareaVal = $textarea.val();
     if ($textareaVal) {
-        $textareaVal = $textareaVal.split("\n");
+        $textareaVal = $textareaVal.split(/\n|,/).map(e => e.trim());
         $textareaVal = [...new Set($textareaVal)];
         $textareaVal = $textareaVal.sort();
         $textareaVal = $textareaVal.filter(e => !!e.length).map(e => JSON.stringify(e)).join(",");
