@@ -230,7 +230,10 @@ priority = {
             // Instead, give it a question mark so it can be appropriately handled
             } else if (last_work_input >= sa.sa.y || (sa.sa.x <= today_minus_ad && !sa.sa.soft)) {
                 status_image = "completely-finished";
-                status_message = 'You\'re Completely Finished with this Assignment';
+                if (last_work_input >= sa.sa.y)
+                    status_message = 'You\'re Completely Finished with this Assignment';
+                else
+                    status_message = 'This Assignment\'s Due Date has Passed';
                 dom_status_image.attr({
                     width: 16,
                     height: 16,
