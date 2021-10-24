@@ -136,6 +136,9 @@ class TimewebModel(models.Model):
     is_google_classroom_assignment = models.BooleanField(
         default=False,
     )
+    has_alerted_due_date_passed_notice = models.BooleanField(
+        default=False,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

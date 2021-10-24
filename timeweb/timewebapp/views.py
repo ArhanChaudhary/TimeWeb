@@ -625,17 +625,19 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             del assignment['pk'] # Don't loop through the assignment's pk value
             for key, value in assignment.items():
                 if key == "skew_ratio":
-                    log_message = f'User \"{request.user}\" saved skew ratio for assignment "{self.sm.name}"'             
+                    log_message = f'User \"{request.user}\" saved their skew ratio for assignment "{self.sm.name}"'             
                 elif key == 'fixed_mode':
-                    log_message = f'User \"{request.user}\" saved fixed mode for assignment "{self.sm.name}"'
+                    log_message = f'User \"{request.user}\" saved their fixed mode or dynamic mode for assignment "{self.sm.name}"'
                 elif key == 'works' or key == 'dynamic_start':
-                    log_message = f'User \"{request.user}\" modified works for assignment "{self.sm.name}"'
+                    log_message = f'User \"{request.user}\" modified their work inputs for assignment "{self.sm.name}"'
                 elif key == 'mark_as_done':
-                    log_message = f'User \"{request.user}\" marked or unmarked assignment "{self.sm.name}" as completed'
+                    log_message = f'User \"{request.user}\" ignored or unignored assignment "{self.sm.name}"'
                 elif key == 'tags':
-                    log_message = f'User \"{request.user}\" reordered tags for assignment "{self.sm.name}"'
+                    log_message = f'User \"{request.user}\" reordered their tags for assignment "{self.sm.name}"'
                 elif key == "x":
-                    log_message = f'User \"{request.user}\" changed the date for assignment "{self.sm.name}"'
+                    log_message = f'User \"{request.user}\" changed the due date for assignment "{self.sm.name}"'
+                elif key == "has_alerted_due_date_passed_notice":
+                    log_message = f'User \"{request.user}\" changed the has alerted due date passed notice for assignment "{self.sm.name}"'
                 if request.user != self.sm.user:
                     logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
                     return HttpResponseForbidden("This assignment isn't yours")

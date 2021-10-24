@@ -219,10 +219,16 @@ class Priority {
             // Instead, give it a question mark so it can be appropriately handled
             } else if (last_work_input >= sa.sa.y || (sa.sa.x <= today_minus_ad && !sa.sa.soft)) {
                 status_image = "completely-finished";
-                if (last_work_input >= sa.sa.y)
+                if (last_work_input >= sa.sa.y) {
                     status_message = 'You\'re Completely Finished with this Assignment';
-                else
+                } else {
+                    if (!sa.sa.has_alerted_due_date_passed_notice) {
+                        that.due_date_passed_notices.push(`"${sa.sa.name}"`);
+                        sa.sa.has_alerted_due_date_passed_notice = true;
+                        ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
+                    }
                     status_message = 'This Assignment\'s Due Date has Passed';
+                }
                 dom_status_image.attr({
                     width: 16,
                     height: 16,
@@ -524,7 +530,17 @@ class Priority {
         that.priority_data_list = [];
         that.total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
+        that.due_date_passed_notices = [];
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
+        if (that.due_date_passed_notices.length === 1) {
+            $.alert({
+                title: `Notice: The assignment ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} has been marked as completely finished because its due date has passed.`,
+            });
+        } else if (that.due_date_passed_notices.length > 1) {
+            $.alert({
+                title: `Notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} have been marked as completely finished because their due dates have passed.`
+            });
+        }
         // Updates open graphs' today line and other graph text
         $(window).trigger("resize");
         that.priority_data_list.sort(that.assignmentSortingComparator);
@@ -584,7 +600,7 @@ class Priority {
                         let assignment_to_scroll_to = $(".assignment").eq(that.priority_data_list[index + 1] ? that.priority_data_list[index + 1][2] : undefined);
                         if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
-                            assignment_to_scroll_to = that.dom_assignment;
+                            assignment_to_scroll_to = dom_assignment;
                         }
                         setTimeout(function() {
                             // scrollIntoView sometimes doesn't work without setTimeout
