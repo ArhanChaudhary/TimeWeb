@@ -74,13 +74,13 @@ class Priority {
         // Selection sort
         for (let [index, sa] of priority_data_list.entries()) {
             // index represents the selected assignment's final position
-            // sa[2] represents the selected assignment's current position
-            if (index !== sa[2]) {
+            // sa.index represents the selected assignment's current position
+            if (index !== sa.index) {
                 // Swap them in the dom
-                that.domSwapAssignments(index, sa[2]);
+                that.domSwapAssignments(index, sa.index);
                 // Swap them in priority_data_list
-                priority_data_list.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
-                sa[2] = index; // Adjust index of current swapped assignment
+                priority_data_list.find(sa => sa.index === index).index = sa.index; // Adjust index of assignment that used to be there 
+                sa.index = index; // Adjust index of current swapped assignment
             }
         }
     }
@@ -391,9 +391,9 @@ class Priority {
                 status_priority = todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works);
             }
             
-            let priority_data = [status_value, status_priority, index];
+            let priority_data = {status_value, status_priority, index};
             if (sa.sa.mark_as_done && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
-                priority_data.push(true);
+                priority_data.mark_as_done = true;
             }
             that.priority_data_list.push(priority_data);
 
@@ -411,43 +411,35 @@ class Priority {
         });
     }
     assignmentSortingComparator(a, b) {
-        // Sort from max to min
-        const status_value1 = a[0];
-        const status_value2 = b[0];
-        const status_priority1 = a[1];
-        const status_priority2 = b[1];
-        const index1 = a[2];
-        const index2 = b[2];
         // Max to min
-        if (status_value1 < status_value2) return 1;
-        if (status_value1 > status_value2) return -1;
+        if (a.status_value < b.status_value) return 1;
+        if (a.status_value > b.status_value) return -1;
 
-        const ignore_tag_status_value1 = Math.round(status_value1); // using status_value2 also works
-        if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value1) 
-        || reverse_sorting && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value1)) {
+        const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
+        if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
+        || reverse_sorting && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
-            if (status_priority1 < status_priority2) return -1;
-            if (status_priority1 > status_priority2) return 1;
+            if (a.status_priority < b.status_priority) return -1;
+            if (a.status_priority > b.status_priority) return 1;
         } else {
-            if (status_priority1 < status_priority2) return 1;
-            if (status_priority1 > status_priority2) return -1;
+            if (a.status_priority < b.status_priority) return 1;
+            if (a.status_priority > b.status_priority) return -1;
         }
         // If the status value and status priority are the same, sort them by their index, which will always be different from each other
         // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
-        if (index1 < index2) return -1;
-        if (index1 > index2) return 1;
+        if (a.index < b.index) return -1;
+        if (a.index > b.index) return 1;
     }
     priorityDataToPriorityPercentage(priority_data) {
         var that = this;
-        const status_value = priority_data[0];
-        const status_priority = priority_data[1];
+        const ignore_tag_status_value = Math.round(priority_data.status_value);
 
-        if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value)) {
+        if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
             var priority_percentage = NaN;
-        } else if (that.mark_as_done || [FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value) /* NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
+        } else if (that.mark_as_done || [FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(ignore_tag_status_value) /* NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
             var priority_percentage = 0;
         } else {
-            var priority_percentage = Math.max(1, Math.floor(status_priority / that.highest_priority * 100 + 1e-10));
+            var priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
             if (!Number.isFinite(priority_percentage)) {
                 priority_percentage = 100;
             }
@@ -465,7 +457,7 @@ class Priority {
         // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
         const sa = utils.loadAssignmentData(dom_assignment);
 
-        const ignore_tag_status_value = Math.round(that.priority_data[0]);
+        const ignore_tag_status_value = Math.round(that.priority_data.status_value);
 
         if (!["Not Important", "Important"].includes(sa.tags[0]))
             var current_tag = sa.tags[0];
@@ -547,16 +539,16 @@ class Priority {
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
-            const status_value = Math.round(priority_data[0]);
-            if ([UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value) && !priority_data[3]) {
-                return priority_data[1];
+            const ignore_tag_status_value = Math.round(priority_data.status_value);
+            if ([UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done) {
+                return priority_data.status_priority;
             } else {
                 return -Infinity;
             }
         }));
         that.question_mark_exists_excluding_gc = that.priority_data_list.some(function(priority_data) {
-            const status_value = Math.round(priority_data[0]);
-            return [NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value);
+            const ignore_tag_status_value = Math.round(priority_data.status_value);
+            return [NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(ignore_tag_status_value);
         });
         that.prev_assignment_container = undefined;
         that.prev_tag = undefined;
@@ -567,21 +559,21 @@ class Priority {
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             that.priority_data = priority_data;
-            const status_value = Math.round(that.priority_data[0]);
-            // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data[3] || that.question_mark_exists_excluding_gc); if that.priority_data[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
-            const mark_as_done = !!(that.priority_data[3] || that.question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value));
+            const ignore_tag_status_value = Math.round(that.priority_data.status_value);
+            // originally ignore_tag_status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc); if that.priority_data.mark_as_done is true then ignore_tag_status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
+            const mark_as_done = !!(that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(ignore_tag_status_value));
             that.mark_as_done = mark_as_done;
-            const dom_assignment = $(".assignment").eq(that.priority_data[2]); // Need to define this so the resolved promise can access it
+            const dom_assignment = $(".assignment").eq(that.priority_data.index); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
             const assignment_container = that.dom_assignment.parents(".assignment-container");            
 
             let priority_percentage = that.priorityDataToPriorityPercentage(that.priority_data);
             that.priority_percentage = priority_percentage;
-            const add_priority_percentage = text_priority && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value) && !that.mark_as_done;
-            const dom_title = $(".title").eq(that.priority_data[2]);
+            const add_priority_percentage = text_priority && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !that.mark_as_done;
+            const dom_title = $(".title").eq(that.priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${that.priority_percentage}%` : "");
 
-            const first_sort = this.params.first_sort;
+            const first_sort = that.params.first_sort;
             new Promise(function(resolve) {
                 if (that.params.first_sort) {
                     $(window).one("load", resolve);
@@ -597,7 +589,7 @@ class Priority {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                         // So, scroll to the next assignment instead
                         // Scroll to dom_assignment because of its scroll-margin
-                        let assignment_to_scroll_to = $(".assignment").eq(that.priority_data_list[index + 1] ? that.priority_data_list[index + 1][2] : undefined);
+                        let assignment_to_scroll_to = $(".assignment").eq(that.priority_data_list[index + 1] ? that.priority_data_list[index + 1].index : undefined);
                         if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = dom_assignment;
