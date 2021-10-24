@@ -16,6 +16,7 @@ class Priority {
         var that = this;
         that.sort_timeout_duration = 35;
         that.dark_mode_alpha = 0.75;
+        that.animate_in_start_margin = 20;
     }
     
     percentageToColor(priority_percentage) {
@@ -482,6 +483,32 @@ class Priority {
             that.already_found_first_finished = true;
         }
     }
+    updateInfoHeader() {
+        var that = this;
+        if (that.question_mark_exists_excluding_gc) {
+            $("#current-time, #tomorrow-time, #info").hide();
+        } else if (!that.total_completion_time) {
+            $("#info").show();
+            $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
+            $("#current-time, #tomorrow-time, #hide-button").hide();
+        } else {
+            $("#current-time, #tomorrow-time, #hide-button, #info").show();
+            $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
+            $("#tomorrow-time").html(` (${that.tomorrow_total_completion_time === that.total_completion_time ? "All" : utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
+            if (that.tomorrow_total_completion_time === that.total_completion_time) {
+                $("#tomorrow-time").html(" (Everything is due Tomorrow)");
+            } else if (that.tomorrow_total_completion_time === 0) {
+                $("#tomorrow-time").html(" (Nothing is due Tomorrow)");
+            } else {
+                $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
+            }
+        }
+        utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
+        utils.ui.tickClock();
+        if (that.params.first_sort) {
+            setInterval(utils.ui.tickClock, 1000);
+        }
+    }
     sort(params={}) {
         var that = this;
         that.params = params;
@@ -511,7 +538,7 @@ class Priority {
                 return -Infinity;
             }
         }));
-        const question_mark_exists_excluding_gc = that.priority_data_list.some(function(priority_data) {
+        that.question_mark_exists_excluding_gc = that.priority_data_list.some(function(priority_data) {
             const status_value = Math.round(priority_data[0]);
             return [NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value);
         });
@@ -525,8 +552,8 @@ class Priority {
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             that.priority_data = priority_data;
             const status_value = Math.round(that.priority_data[0]);
-            // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data[3] || question_mark_exists_excluding_gc); if that.priority_data[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
-            const mark_as_done = !!(that.priority_data[3] || question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value));
+            // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data[3] || that.question_mark_exists_excluding_gc); if that.priority_data[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
+            const mark_as_done = !!(that.priority_data[3] || that.question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value));
             that.mark_as_done = mark_as_done;
             const dom_assignment = $(".assignment").eq(that.priority_data[2]); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
@@ -612,9 +639,9 @@ class Priority {
             // Load the fonts first or height() may return the wrong values
             document.fonts.ready.then(function() {
                 $("#animate-in").css({
-                    top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + 20, // Move to below the last assignment and add a 20px margin
+                    top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + that.animate_in_start_margin, // Moves animate in a bit below the last assignment to give it more breathing room
                     opacity: "0",
-                    marginBottom: -($("#animate-in").height()+10), // +10 deals with margins
+                    marginBottom: -$("#animate-in").outerHeight(),
                 });
             });
         }
@@ -624,29 +651,7 @@ class Priority {
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
 
-        if (question_mark_exists_excluding_gc) {
-            $("#current-time, #tomorrow-time, #info").hide();
-        } else if (!that.total_completion_time) {
-            $("#info").show();
-            $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
-            $("#current-time, #tomorrow-time, #hide-button").hide();
-        } else {
-            $("#current-time, #tomorrow-time, #hide-button, #info").show();
-            $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
-            $("#tomorrow-time").html(` (${that.tomorrow_total_completion_time === that.total_completion_time ? "All" : utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
-            if (that.tomorrow_total_completion_time === that.total_completion_time) {
-                $("#tomorrow-time").html(" (Everything is due Tomorrow)");
-            } else if (that.tomorrow_total_completion_time === 0) {
-                $("#tomorrow-time").html(" (Nothing is due Tomorrow)");
-            } else {
-                $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
-            }
-        }
-        utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
-        utils.ui.tickClock();
-        if (that.params.first_sort) {
-            setInterval(utils.ui.tickClock, 1000);
-        }
+        that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
     }
 }
