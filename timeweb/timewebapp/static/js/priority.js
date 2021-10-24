@@ -33,10 +33,10 @@ class Priority {
         return {r, g, b};
     }
     // Handles coloring and animating assignments that were just created or edited
-    colorOrTransitionAssignment(dom_assignment) {
+    colorOrAnimateInAssignment(dom_assignment) {
         var that = this;
         if ($("#animate-in").length && that.is_element_submitted) {
-            // If a new assignment was created and the assignment that colorOrTransitionAssignment() was called on is the assignment that was created, animate it easing in
+            // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
             dom_assignment.parents(".assignment-container").animate({
                 top: "0", 
@@ -149,22 +149,7 @@ class Priority {
         dom_assignment_footer.css("top", parseFloat(dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
         dom_tags.prop("style").setProperty('--margin-top', parseFloat(dom_assignment.css("padding-bottom")));
     }
-    sort(params={}) {
-        var that = this;
-        that.params = params;
-        clearTimeout(that.sort_timeout);
-        if (that.params.timeout) {
-            that.sort_timeout = setTimeout(() => that.sortWithoutTimeout(), that.sort_timeout_duration);
-        } else {
-            that.sortWithoutTimeout();
-        }
-    }
-    sortWithoutTimeout() {
-        let ordered_assignments = [],
-            total = 0,
-            tomorrow_total = 0;
-        $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
-        $(".delete-gc-assignments-from-class").remove();
+    updateAssignmentHeaders() {
         var that = this;
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
@@ -347,7 +332,7 @@ class Priority {
                     } else {
                         status_message += `<br>Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
                     }
-                    total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                    that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                 }
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
@@ -357,7 +342,7 @@ class Priority {
                     str_daysleft = 'Today';
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
-                    tomorrow_total += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                    that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                     if ([UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value)) {
                         status_value = UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
@@ -405,7 +390,7 @@ class Priority {
             if (sa.sa.mark_as_done && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
                 priority_data.push(true);
             }
-            ordered_assignments.push(priority_data);
+            that.ordered_assignments.push(priority_data);
 
             if (status_image === "no-status-image") {
                 // https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
@@ -418,38 +403,57 @@ class Priority {
             dom_tags.toggleClass("assignment-has-daysleft", vertical_tag_position === "Bottom" && horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
+    }
+    sort(params={}) {
+        var that = this;
+        that.params = params;
+        clearTimeout(that.sort_timeout);
+        if (that.params.timeout) {
+            that.sort_timeout = setTimeout(that.sortWithoutTimeout, that.sort_timeout_duration);
+        } else {
+            that.sortWithoutTimeout();
+        }
+    }
+    assignmentSortingComparator(a, b) {
+        // Sort from max to min
+        const status_value1 = a[0];
+        const status_value2 = b[0];
+        const status_priority1 = a[1];
+        const status_priority2 = b[1];
+        const index1 = a[2];
+        const index2 = b[2];
+        // Max to min
+        if (status_value1 < status_value2) return 1;
+        if (status_value1 > status_value2) return -1;
+
+        const ignore_tag_status_value1 = Math.round(status_value1); // using status_value2 also works
+        if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value1) 
+        || reverse_sorting && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value1)) {
+            // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
+            if (status_priority1 < status_priority2) return -1;
+            if (status_priority1 > status_priority2) return 1;
+        } else {
+            if (status_priority1 < status_priority2) return 1;
+            if (status_priority1 > status_priority2) return -1;
+        }
+        // If the status value and status priority are the same, sort them by their index, which will always be different from each other
+        // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
+        if (index1 < index2) return -1;
+        if (index1 > index2) return 1;
+    }
+    sortWithoutTimeout() {
+        var that = this;
+        that.ordered_assignments = [];
+        that.total_completion_time = 0;
+        that.tomorrow_total_completion_time = 0;
+        $(".delete-gc-assignments-from-class").remove();
+        that.updateAssignmentHeaderMessagesAnd();
         // Updates open graphs' today line
         $(window).trigger("resize");
-        ordered_assignments.sort(function(a, b) {
-            // Sort from max to min
-            const status_value1 = a[0];
-            const status_value2 = b[0];
-            const status_priority1 = a[1];
-            const status_priority2 = b[1];
-            const index1 = a[2];
-            const index2 = b[2];
-            // Max to min
-            if (status_value1 < status_value2) return 1;
-            if (status_value1 > status_value2) return -1;
-
-            const ignore_tag_status_value1 = Math.round(status_value1); // using status_value2 also works
-            if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value1) 
-            || reverse_sorting && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value1)) {
-                // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
-                if (status_priority1 < status_priority2) return -1;
-                if (status_priority1 > status_priority2) return 1;
-            } else {
-                if (status_priority1 < status_priority2) return 1;
-                if (status_priority1 > status_priority2) return -1;
-            }
-            // If the status value and status priority are the same, sort them by their index, which will always be different from each other
-            // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
-            if (index1 < index2) return -1;
-            if (index1 > index2) return 1;
-        });
+        that.ordered_assignments.sort(that.assignmentSortingComparator);
         // Source code lurkers, uncomment this for some fun
-        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(ordered_assignments);
-        const highest_priority = Math.max(...ordered_assignments.map(function(pd) {
+        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.ordered_assignments);
+        const highest_priority = Math.max(...that.ordered_assignments.map(function(pd) {
             const status_value = Math.round(pd[0]);
             if ([UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value) && !pd[3]) {
                 return pd[1];
@@ -457,7 +461,7 @@ class Priority {
                 return -Infinity;
             }
         }));
-        const question_mark_exists_excluding_gc = ordered_assignments.some(function(pd) {
+        const question_mark_exists_excluding_gc = that.ordered_assignments.some(function(pd) {
             const status_value = Math.round(pd[0]);
             return [NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value);
         });
@@ -466,12 +470,12 @@ class Priority {
         let already_found_first_incomplete_works = false;
         let already_found_first_finished = false;
         $("#autofill-work-done, #delete-starred-assignments").hide();
-        for (let [index, pd] of ordered_assignments.entries()) {
+        for (let [index, pd] of that.ordered_assignments.entries()) {
             const status_value = Math.round(pd[0]);
             // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (pd[3] || question_mark_exists_excluding_gc); if pd[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
             const mark_as_done = !!(pd[3] || question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value));
             that.mark_as_done = mark_as_done;
-            const dom_assignment = $(".assignment").eq(pd[2]); // Need to define this so z
+            const dom_assignment = $(".assignment").eq(pd[2]); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
             const assignment_container = that.dom_assignment.parents(".assignment-container");
             let priority_percentage;
@@ -493,7 +497,7 @@ class Priority {
             const first_sort = this.params.first_sort;
             new Promise(function(resolve) {
                 if (that.params.first_sort) {
-                    $(window).one("load", () => resolve());
+                    $(window).one("load", resolve);
                 } else {
                     resolve();
                 }
@@ -506,7 +510,7 @@ class Priority {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                         // So, scroll to the next assignment instead
                         // Scroll to dom_assignment because of its scroll-margin
-                        let assignment_to_scroll_to = $(".assignment").eq(ordered_assignments[index + 1] ? ordered_assignments[index + 1][2] : undefined);
+                        let assignment_to_scroll_to = $(".assignment").eq(that.ordered_assignments[index + 1] ? that.ordered_assignments[index + 1][2] : undefined);
                         if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = that.dom_assignment;
@@ -527,18 +531,18 @@ class Priority {
                     that.priority_percentage = priority_percentage;
                     that.params.first_sort = first_sort;
                     that.mark_as_done = mark_as_done;
-                    that.colorOrTransitionAssignment(dom_assignment);
+                    that.colorOrAnimateInAssignment(dom_assignment);
                 });
             } else {
                 that.is_element_submitted = false;
-                that.colorOrTransitionAssignment(dom_assignment);
+                that.colorOrAnimateInAssignment(dom_assignment);
             }
 
             // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
             // Uses the same below logic for delete starred assignments and autoill work done
 
             // This has to be looped before they are sorted so setInitialTopOffsets is accurate
-            // This means we can't loop through ".assignment-container" because it's currently unsorted, so we instead have to loop through ordered_assignments
+            // This means we can't loop through ".assignment-container" because it's currently unsorted, so we instead have to loop through that.ordered_assignments
             // The current looped assignment's tag is compared with the previous looped assignment's tag
             // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
             const sa = utils.loadAssignmentData(that.dom_assignment);
@@ -568,7 +572,7 @@ class Priority {
             prev_assignment_container.addClass("last-add-line-wrapper");
         }
         if (!that.params.first_sort) that.setInitialTopOffsets($(".assignment-container"));
-        that.domSortAssignments(ordered_assignments);
+        that.domSortAssignments(that.ordered_assignments);
         const number_of_assignments = $(".assignment").length;
         $(".assignment-container").each(function(index) {
             const assignment_container = $(this);
@@ -595,6 +599,7 @@ class Priority {
             });
         }
         // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
+        $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         $(".finished").first().addClass("first-add-line-wrapper");
         $(".finished").last().addClass("last-add-line-wrapper");
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
@@ -602,20 +607,20 @@ class Priority {
 
         if (question_mark_exists_excluding_gc) {
             $("#current-time, #tomorrow-time, #info").hide();
-        } else if (!total) {
+        } else if (!that.total_completion_time) {
             $("#info").show();
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time, #hide-button").hide();
         } else {
             $("#current-time, #tomorrow-time, #hide-button, #info").show();
-            $("#estimated-total-time").html(utils.formatting.formatMinutes(total)).attr("data-minutes", total);
-            $("#tomorrow-time").html(` (${tomorrow_total === total ? "All" : utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
-            if (tomorrow_total === total) {
+            $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
+            $("#tomorrow-time").html(` (${that.tomorrow_total_completion_time === that.total_completion_time ? "All" : utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
+            if (that.tomorrow_total_completion_time === that.total_completion_time) {
                 $("#tomorrow-time").html(" (Everything is due Tomorrow)");
-            } else if (tomorrow_total === 0) {
+            } else if (that.tomorrow_total_completion_time === 0) {
                 $("#tomorrow-time").html(" (Nothing is due Tomorrow)");
             } else {
-                $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(tomorrow_total)} due Tomorrow)`);
+                $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
             }
         }
         utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
