@@ -63,24 +63,22 @@ class Priority {
             }
         }
     }
-    setInitialTopOffsets($assignment_container) {
+    setInitialAssignmentTopOffset($assignment_container) {
         var that = this;
-        $assignment_container.each(function() {
-            $(this).attr("data-initial-top-offset", $(this).offset().top);
-        });
+        $assignment_container.attr("data-initial-top-offset", $assignment_container.offset().top);
     }
 
-    domSortAssignments(ordered_assignments) {
+    domSortAssignments(priority_data_list) {
         var that = this;
         // Selection sort
-        for (let [index, sa] of ordered_assignments.entries()) {
+        for (let [index, sa] of priority_data_list.entries()) {
             // index represents the selected assignment's final position
             // sa[2] represents the selected assignment's current position
             if (index !== sa[2]) {
                 // Swap them in the dom
                 that.domSwapAssignments(index, sa[2]);
-                // Swap them in ordered_assignments
-                ordered_assignments.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
+                // Swap them in priority_data_list
+                priority_data_list.find(sa => sa[2] === index)[2] = sa[2]; // Adjust index of assignment that used to be there 
                 sa[2] = index; // Adjust index of current swapped assignment
             }
         }
@@ -149,7 +147,7 @@ class Priority {
         dom_assignment_footer.css("top", parseFloat(dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
         dom_tags.prop("style").setProperty('--margin-top', parseFloat(dom_assignment.css("padding-bottom")));
     }
-    updateAssignmentHeaders() {
+    updateAssignmentHeaderMessagesAndSetPriorityData() {
         var that = this;
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
@@ -390,12 +388,13 @@ class Priority {
             if (sa.sa.mark_as_done && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
                 priority_data.push(true);
             }
-            that.ordered_assignments.push(priority_data);
+            that.priority_data_list.push(priority_data);
 
             if (status_image === "no-status-image") {
-                // https://stackoverflow.com/questions/5775469/whats-the-valid-way-to-include-an-image-with-no-src
-                dom_status_image.attr("src", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=");
+                dom_status_image.hide();
+                dom_status_image.removeAttr("src");
             } else {
+                dom_status_image.show();
                 dom_status_image.attr("src", `/static/images/status-icons/${status_image}.png`);
             }
             dom_status_message.html(status_message);
@@ -403,16 +402,6 @@ class Priority {
             dom_tags.toggleClass("assignment-has-daysleft", vertical_tag_position === "Bottom" && horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
-    }
-    sort(params={}) {
-        var that = this;
-        that.params = params;
-        clearTimeout(that.sort_timeout);
-        if (that.params.timeout) {
-            that.sort_timeout = setTimeout(that.sortWithoutTimeout, that.sort_timeout_duration);
-        } else {
-            that.sortWithoutTimeout();
-        }
     }
     assignmentSortingComparator(a, b) {
         // Sort from max to min
@@ -441,57 +430,112 @@ class Priority {
         if (index1 < index2) return -1;
         if (index1 > index2) return 1;
     }
+    priorityDataToPriorityPercentage(priority_data) {
+        var that = this;
+        const status_value = priority_data[0];
+        const status_priority = priority_data[1];
+
+        if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value)) {
+            var priority_percentage = NaN;
+        } else if (that.mark_as_done || [FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value) /* NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
+            var priority_percentage = 0;
+        } else {
+            var priority_percentage = Math.max(1, Math.floor(status_priority / that.highest_priority * 100 + 1e-10));
+            if (!Number.isFinite(priority_percentage)) {
+                priority_percentage = 100;
+            }
+        }
+        return priority_percentage;
+    }
+    addAssignmentShortcut(dom_assignment) {
+        var that = this;
+        // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
+        // Uses the same below logic for delete starred assignments and autoill work done
+
+        // This has to be looped before they are sorted so setInitialAssignmentTopOffset is accurate
+        // This means we can't loop through ".assignment-container" because it's currently unsorted, so we instead have to loop through that.priority_data_list
+        // The current looped assignment's tag is compared with the previous looped assignment's tag
+        // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
+        const sa = utils.loadAssignmentData(dom_assignment);
+
+        const ignore_tag_status_value = Math.round(that.priority_data[0]);
+
+        if (!["Not Important", "Important"].includes(sa.tags[0]))
+            var current_tag = sa.tags[0];
+        if (sa.is_google_classroom_assignment && sa.needs_more_info && current_tag) {
+            const assignment_container = that.dom_assignment.parents(".assignment-container");
+            assignment_container.addClass("add-line-wrapper");
+            if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
+                if (that.prev_assignment_container) that.prev_assignment_container.addClass("last-add-line-wrapper");
+                assignment_container.addClass("first-add-line-wrapper").prepend($(DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE));
+            }
+            that.prev_tag = current_tag;
+            that.prev_assignment_container = assignment_container;
+        }
+
+        if (ignore_tag_status_value === INCOMPLETE_WORKS && !that.already_found_first_incomplete_works) {
+            $("#autofill-work-done").show().insertBefore(dom_assignment);
+            that.already_found_first_incomplete_works = true;
+        }
+        if (ignore_tag_status_value === COMPLETELY_FINISHED && !that.already_found_first_finished) {
+            $("#delete-starred-assignments").show().insertBefore(dom_assignment);
+            that.already_found_first_finished = true;
+        }
+    }
+    sort(params={}) {
+        var that = this;
+        that.params = params;
+        clearTimeout(that.sort_timeout);
+        if (that.params.timeout) {
+            that.sort_timeout = setTimeout(that.sortWithoutTimeout, that.sort_timeout_duration);
+        } else {
+            that.sortWithoutTimeout();
+        }
+    }
     sortWithoutTimeout() {
         var that = this;
-        that.ordered_assignments = [];
+        that.priority_data_list = [];
         that.total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
-        $(".delete-gc-assignments-from-class").remove();
-        that.updateAssignmentHeaderMessagesAnd();
-        // Updates open graphs' today line
+        that.updateAssignmentHeaderMessagesAndSetPriorityData();
+        // Updates open graphs' today line and other graph text
         $(window).trigger("resize");
-        that.ordered_assignments.sort(that.assignmentSortingComparator);
+        that.priority_data_list.sort(that.assignmentSortingComparator);
         // Source code lurkers, uncomment this for some fun
-        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.ordered_assignments);
-        const highest_priority = Math.max(...that.ordered_assignments.map(function(pd) {
-            const status_value = Math.round(pd[0]);
-            if ([UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value) && !pd[3]) {
-                return pd[1];
+        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
+        that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
+            const status_value = Math.round(priority_data[0]);
+            if ([UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value) && !priority_data[3]) {
+                return priority_data[1];
             } else {
                 return -Infinity;
             }
         }));
-        const question_mark_exists_excluding_gc = that.ordered_assignments.some(function(pd) {
-            const status_value = Math.round(pd[0]);
+        const question_mark_exists_excluding_gc = that.priority_data_list.some(function(priority_data) {
+            const status_value = Math.round(priority_data[0]);
             return [NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value);
         });
-        let prev_assignment_container;
-        let prev_tag;
-        let already_found_first_incomplete_works = false;
-        let already_found_first_finished = false;
+        that.prev_assignment_container = undefined;
+        that.prev_tag = undefined;
+        that.already_found_first_incomplete_works = false;
+        that.already_found_first_finished = false;
         $("#autofill-work-done, #delete-starred-assignments").hide();
-        for (let [index, pd] of that.ordered_assignments.entries()) {
-            const status_value = Math.round(pd[0]);
-            // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (pd[3] || question_mark_exists_excluding_gc); if pd[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
-            const mark_as_done = !!(pd[3] || question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value));
+        $(".delete-gc-assignments-from-class").remove();
+        $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
+        for (let [index, priority_data] of that.priority_data_list.entries()) {
+            that.priority_data = priority_data;
+            const status_value = Math.round(that.priority_data[0]);
+            // originally status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data[3] || question_mark_exists_excluding_gc); if that.priority_data[3] is true then status_value <= UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
+            const mark_as_done = !!(that.priority_data[3] || question_mark_exists_excluding_gc && [UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, UNFINISHED_FOR_TODAY, FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value));
             that.mark_as_done = mark_as_done;
-            const dom_assignment = $(".assignment").eq(pd[2]); // Need to define this so the resolved promise can access it
+            const dom_assignment = $(".assignment").eq(that.priority_data[2]); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
-            const assignment_container = that.dom_assignment.parents(".assignment-container");
-            let priority_percentage;
-            if ([NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, NO_WORKING_DAYS, INCOMPLETE_WORKS].includes(status_value)) {
-                priority_percentage = NaN;
-            } else if (that.mark_as_done || [FINISHED_FOR_TODAY, NOT_YET_ASSIGNED, COMPLETELY_FINISHED].includes(status_value) /* NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
-                priority_percentage = 0;
-            } else {
-                priority_percentage = Math.max(1, Math.floor(pd[1] / highest_priority * 100 + 1e-10));
-                if (!Number.isFinite(priority_percentage)) {
-                    priority_percentage = 100;
-                }
-            }
+            const assignment_container = that.dom_assignment.parents(".assignment-container");            
+
+            let priority_percentage = that.priorityDataToPriorityPercentage(that.priority_data);
             that.priority_percentage = priority_percentage;
             const add_priority_percentage = text_priority && [UNFINISHED_FOR_TODAY, UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value) && !that.mark_as_done;
-            const dom_title = $(".title").eq(pd[2]);
+            const dom_title = $(".title").eq(that.priority_data[2]);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${that.priority_percentage}%` : "");
 
             const first_sort = this.params.first_sort;
@@ -510,7 +554,7 @@ class Priority {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                         // So, scroll to the next assignment instead
                         // Scroll to dom_assignment because of its scroll-margin
-                        let assignment_to_scroll_to = $(".assignment").eq(that.ordered_assignments[index + 1] ? that.ordered_assignments[index + 1][2] : undefined);
+                        let assignment_to_scroll_to = $(".assignment").eq(that.priority_data_list[index + 1] ? that.priority_data_list[index + 1][2] : undefined);
                         if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = that.dom_assignment;
@@ -537,42 +581,18 @@ class Priority {
                 that.is_element_submitted = false;
                 that.colorOrAnimateInAssignment(dom_assignment);
             }
-
-            // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
-            // Uses the same below logic for delete starred assignments and autoill work done
-
-            // This has to be looped before they are sorted so setInitialTopOffsets is accurate
-            // This means we can't loop through ".assignment-container" because it's currently unsorted, so we instead have to loop through that.ordered_assignments
-            // The current looped assignment's tag is compared with the previous looped assignment's tag
-            // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
-            const sa = utils.loadAssignmentData(that.dom_assignment);
-
-            const current_tag = ["Not Important", "Important"].includes(sa.tags[0]) ? undefined : sa.tags[0];
-            if (sa.is_google_classroom_assignment && sa.needs_more_info && current_tag) {
-                assignment_container.addClass("add-line-wrapper");
-                if (current_tag !== prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
-                    if (prev_assignment_container) prev_assignment_container.addClass("last-add-line-wrapper");
-                    assignment_container.addClass("first-add-line-wrapper").prepend($(DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE));
-                }
-                prev_tag = current_tag;
-                prev_assignment_container = assignment_container;
-            }
-
-            if (status_value === INCOMPLETE_WORKS && !already_found_first_incomplete_works) {
-                $("#autofill-work-done").show().insertBefore(that.dom_assignment);
-                already_found_first_incomplete_works = true;
-            }
-
-            if (status_value === COMPLETELY_FINISHED && !already_found_first_finished) {
-                $("#delete-starred-assignments").show().insertBefore(that.dom_assignment);
-                already_found_first_finished = true;
-            }
+            that.addAssignmentShortcut(that.dom_assignment);
         }
-        if (prev_assignment_container) {
-            prev_assignment_container.addClass("last-add-line-wrapper");
+        // End part of addAssignmentShortcut
+        if (that.prev_assignment_container) {
+            that.prev_assignment_container.addClass("last-add-line-wrapper");
         }
-        if (!that.params.first_sort) that.setInitialTopOffsets($(".assignment-container"));
-        that.domSortAssignments(that.ordered_assignments);
+        if (!that.params.first_sort) {
+            $(".assignment-container").each(function() {
+                that.setInitialAssignmentTopOffset($(this));
+            });
+        }
+        that.domSortAssignments(that.priority_data_list);
         const number_of_assignments = $(".assignment").length;
         $(".assignment-container").each(function(index) {
             const assignment_container = $(this);
@@ -599,7 +619,6 @@ class Priority {
             });
         }
         // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
-        $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         $(".finished").first().addClass("first-add-line-wrapper");
         $(".finished").last().addClass("last-add-line-wrapper");
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
