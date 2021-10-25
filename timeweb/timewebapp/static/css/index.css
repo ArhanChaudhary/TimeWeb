@@ -1073,6 +1073,10 @@ html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
     --filter-invert: 1;
     filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
 }
+/* Fix double invert */
+#dark-mode #next-day-icon-label .grey-highlight {
+    --filter-invert: 0;
+}
 #dark-mode #overlay {
     filter: brightness(0.85);
     background-color: rgba(0,0,0,0.55);
