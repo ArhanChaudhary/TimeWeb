@@ -299,6 +299,23 @@ utils = {
                         }
                     });
                 });
+                $(".assignment-container").click(function(e) {
+                    const assignment_container = $(this);
+                    const dom_assignment = assignment_container.children(".assignment");
+                    const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left;
+                    const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") && e.offsetX <= 27 && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top; // 27 is the width plus the left of last-line-wrapper::after
+                    if (!dom_assignment.is(":hover") && (hovering_line_wrapper || hovering_last_line_wrapper)) {
+                        assignment_container.prevAll(".assignment-container").addBack().reverse() // addBack reveres query for some reason
+                            .each(function() {
+                                const shortcut = $(this).children(".shortcut");
+                                if (!!shortcut.length) {
+                                    shortcut.click();
+                                    return false;
+                                }
+                            });
+                            
+                    }
+                });
             },
         },
         dimAssignmentsHeaderInfoOnIconHover: function() {

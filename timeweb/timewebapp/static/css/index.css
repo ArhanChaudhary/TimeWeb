@@ -251,10 +251,15 @@ header.animate::after {
 .assignment-container.last-add-line-wrapper::after {
     content: '';
     position: absolute;
+    /* Change in deleteAssignmentsFromClass if the width or left properties change */
     width: 22px;
     left: 5px;
     bottom: -1px;
     border-bottom: 2px solid black;
+}
+.assignment-container::before,
+.assignment-container::after {
+    cursor: pointer;
 }
 .assignment-header {
     display: flex;
