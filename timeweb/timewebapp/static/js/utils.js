@@ -186,7 +186,7 @@ utils = {
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
-                                        transitionDeleteAssignments($(".finished"), assignment_ids_to_delete);
+                                        crud.transitionDeleteAssignments($(".finished"), assignment_ids_to_delete);
                                     }
                                     if (ajaxUtils.disable_ajax) {
                                         success();
@@ -278,7 +278,7 @@ utils = {
                                     }
                                     const success = function() {
                                         $this.off("click");
-                                        transitionDeleteAssignments(assignments_to_delete, assignment_ids_to_delete);
+                                        crud.transitionDeleteAssignments(assignments_to_delete, assignment_ids_to_delete);
                                     }
                 
                                     if (ajaxUtils.disable_ajax) {
@@ -569,7 +569,7 @@ utils = {
                     // Prevent tabbing dispositioning screen
                     setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
                 } else if (e.key === "Escape") {
-                    hideForm();
+                    crud.hideForm();
                 } else if (e.key === "ArrowDown") {
                     if (e.shiftKey) {
                         // If there is an open assignment in view, select that one and 

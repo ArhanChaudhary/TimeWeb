@@ -231,7 +231,6 @@ $.fn.hasOverflown = function() {
 }
 $.fn.isFullyScrolled = function() {
     const e = this[0];
-    debugger;
     return e.scrollTop + e.clientHeight >= e.scrollHeight;
 }
 $.fn.expandableTextareaHeight = function() {
@@ -241,6 +240,13 @@ $.fn.expandableTextareaHeight = function() {
     });
     return $(this);
 }
+// Only change text
+$.fn.onlyText = function(text) {
+    $(this).contents().filter(function() {
+        return this.nodeType === Node.TEXT_NODE;
+    }).first()[0].nodeValue = text;
+    return $(this);
+};
 mathUtils = {
     // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
     precisionRound: function(number, precision) {
