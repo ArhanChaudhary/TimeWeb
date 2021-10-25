@@ -512,7 +512,7 @@ class Priority {
         that.params = params;
         clearTimeout(that.sort_timeout);
         if (that.params.timeout) {
-            that.sort_timeout = setTimeout(that.sortWithoutTimeout, that.SORT_TIMEOUT_DURATION);
+            that.sort_timeout = setTimeout(() => that.sortWithoutTimeout(), that.SORT_TIMEOUT_DURATION);
         } else {
             that.sortWithoutTimeout();
         }
@@ -523,7 +523,11 @@ class Priority {
         that.total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
         that.due_date_passed_notices = [];
-        that.updateAssignmentHeaderMessagesAndSetPriorityData();
+        try{
+            that.updateAssignmentHeaderMessagesAndSetPriorityData();
+        }catch(e){
+            debugger;
+        }
         if (that.due_date_passed_notices.length === 1) {
             $.alert({
                 title: `Notice: The assignment ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} has been marked as completely finished because its due date has passed.`,
