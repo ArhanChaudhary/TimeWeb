@@ -523,11 +523,7 @@ class Priority {
         that.total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
         that.due_date_passed_notices = [];
-        try{
-            that.updateAssignmentHeaderMessagesAndSetPriorityData();
-        }catch(e){
-            debugger;
-        }
+        that.updateAssignmentHeaderMessagesAndSetPriorityData();
         if (that.due_date_passed_notices.length === 1) {
             $.alert({
                 title: `Notice: The assignment ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} has been marked as completely finished because its due date has passed.`,
