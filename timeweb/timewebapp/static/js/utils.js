@@ -303,7 +303,9 @@ utils = {
                     const assignment_container = $(this);
                     const dom_assignment = assignment_container.children(".assignment");
                     const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left;
-                    const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") && e.offsetX <= 27 && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top; // 27 is the width plus the left of last-line-wrapper::after
+                    const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") 
+                        && e.offsetX <= parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-left")) + parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-width"))
+                        && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top;
                     if (!dom_assignment.is(":hover") && (hovering_line_wrapper || hovering_last_line_wrapper)) {
                         assignment_container.prevAll(".assignment-container").addBack().reverse() // addBack reveres query for some reason
                             .each(function() {
