@@ -249,8 +249,9 @@ header.animate::after {
     height: calc(100% - 20px);
 }
 .assignment-container {
-    --last-line-wrapper-left: 5px;
-    --last-line-wrapper-width: 22px;
+    /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after */
+    --last-line-wrapper-left: 4px;
+    --last-line-wrapper-width: 23px;
 }
 .assignment-container.last-add-line-wrapper::after {
     content: '';
