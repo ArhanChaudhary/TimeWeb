@@ -704,8 +704,8 @@ class VisualAssignment extends Assignment {
             if (input_done + last_work_input < 0) {
                 input_done = -last_work_input;
             }
-            this.sa.works.push(input_done + last_work_input);
-            last_work_input += input_done;
+            last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
+            this.sa.works.push(last_work_input);
             len_works++;
             
             // Add this check for setDynamicModeIfInDynamicMode

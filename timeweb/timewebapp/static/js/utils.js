@@ -773,7 +773,8 @@ utils = {
         }
         utils.previous_time = current_time;
     },
-    loadAssignmentData: function($element_with_id_attribute) {
+    loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
+        if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
         return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
     },
     // Resolves a promise function when automatic scrolling ends
@@ -844,12 +845,12 @@ ajaxUtils = {
             window.location.reload();
         });
     },
-    notice_assignments: [],
+    notice_assignments: new Set(),
     sendAttributeAjaxWithTimeout: function(key, value, pk) {
 
         // Add key and values to the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-        let sa = ajaxUtils.attributeData.assignments.find(iter_sa => iter_sa.pk === pk);
+        let sa = ajaxUtils.attributeData.assignments.find(sa => sa.pk === pk);
         if (!sa) {
             sa = {pk: pk};
             ajaxUtils.attributeData.assignments.push(sa);
@@ -860,18 +861,19 @@ ajaxUtils = {
         // Add data before checking disable_ajax so ajaxUtils.attributeData.assignments below is updated
         for (const assignment of ajaxUtils.attributeData.assignments) {
             if (!("x" in assignment)) continue;
-            const sa = dat.find(sa => sa.id === assignment.pk);
-            ajaxUtils.notice_assignments.push(`"${sa.name}"`);
+            ajaxUtils.notice_assignments.add(assignment.pk);
         }
         setTimeout(function() {
-            if (ajaxUtils.notice_assignments.length) {
+            if (ajaxUtils.notice_assignments.size) {
+                ajaxUtils.notice_assignments = [...ajaxUtils.notice_assignments];
+                ajaxUtils.notice_assignments = ajaxUtils.notice_assignments.map(sa => `"${utils.loadAssignmentData(sa, true).name}"`);
                 $.alert({
                     title: ajaxUtils.notice_assignments.length === 1 
                     ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled.`
                     : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates enabled.`,
                     conent: "This only occurs when you an assignment's due date passes, but the assignment still isn't complete.",
                 });
-                ajaxUtils.notice_assignments = [];
+                ajaxUtils.notice_assignments = new Set();
             }
         }, 0);
 

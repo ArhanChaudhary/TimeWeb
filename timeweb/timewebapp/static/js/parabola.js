@@ -117,7 +117,7 @@ Assignment.prototype.setParabolaValues = function() {
         // To fix this, add Math.max(0, ...)
         
         // I've gone through every other binary search used in the cuttoff and this one is the only one that seems to have this issue
-        if (output <= Math.max(this.red_line_start_y, this.sa.y - this.min_work_time_funct_round)) {
+        if (output <= mathUtils.precisionRound(Math.max(this.red_line_start_y, this.sa.y - this.min_work_time_funct_round), 10)) {
             left = mid + 1;
         } else {
             right = mid;
@@ -179,7 +179,7 @@ Assignment.prototype.setParabolaValues = function() {
         const mid = left + Math.floor((right - left) / 2);
 
         output = this.funct(mid, {translateX: false});
-        if (output < this.min_work_time_funct_round + this.red_line_start_y) {
+        if (output < mathUtils.precisionRound(this.min_work_time_funct_round + this.red_line_start_y, 10)) {
             left = mid + 1;
         } else {
             right = mid;
