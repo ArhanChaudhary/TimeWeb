@@ -36,15 +36,10 @@ Assignment.prototype.setParabolaValues = function() {
         const mods = this.calcModDays();
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
     }
-    if (this.sa.skew_ratio === 1) {
-        // Needed for roundoff errors
-        this.a = 0;
-        this.b = y1 / x1;
-    } else {
-        const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
-        this.a = parabola.a;
-        this.b = parabola.b;
-    }
+    
+    const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
+    this.a = parabola.a;
+    this.b = parabola.b;
 
     if (!Number.isFinite(this.a)) {
         // If there was a zero division somewhere, where x2 === 1 or something else happened, make a line with the slope of y1
@@ -259,12 +254,14 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
     // Connect (0,0), (point_1[0], point_1[1]), and (point_2[0], point_2[1])
     const x1 = point_1[0];
     const y1 = point_1[1];
+    // Needed for roundoff errors
+    if (this.sa.skew_ratio === 1) return {a: 0, b: y1 / x1};
     const x2 = point_2[0];
     const y2 = point_2[1];
     // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
     const a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
     const b = (y1 - x1 * x1 * a) / x1;
-    return {a: a, b: b};
+    return {a, b};
 }
 Assignment.prototype.autotuneSkewRatio = function() {
     if (this.sa.fixed_mode) return;
