@@ -108,7 +108,7 @@
             </header>
             <main>
                 {% if background_image %}
-                <img id="background-image" ignored-window-onload-src="/media/images/{{ user.get_username }}/{{ background_image_name }}" width="{{background_image.width}}" height="{{background_image.height}}" draggable="false">
+                <img id="background-image" src="/media/images/{{ user.get_username }}/{{ background_image_name }}" width="{{background_image.width}}" height="{{background_image.height}}" draggable="false">
                 {% endif %}
                 {% block content %}{% endblock content %}
                 <template id="info-button-template">
