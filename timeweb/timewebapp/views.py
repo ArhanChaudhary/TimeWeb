@@ -550,7 +550,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
-                name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length)
+                name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length).strip()
                 tags.insert(0, course_names[assignment['courseId']])
                 description = assignment.get('description', None)
 

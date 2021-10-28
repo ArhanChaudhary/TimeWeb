@@ -391,16 +391,15 @@ class Priority {
             } else if (ignore_tag_status_value === that.NOT_YET_ASSIGNED) {
                 status_priority = today_minus_ad;
             } else if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
-                // Order assignments that need more info by their tags lexicographically
-                status_priority = (first_tag||sa.sa.name).toLowerCase();
+                status_priority = NaN;
             } else if ([that.FINISHED_FOR_TODAY, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, that.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
                 // Order question mark and check mark assignments by their absolute distance to their due date
                 status_priority = -Math.abs(due_date_minus_today);
             } else {
                 status_priority = todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works);
             }
-            
-            let priority_data = {status_value, status_priority, index};
+
+            let priority_data = {status_value, status_priority, first_tag, name: sa.sa.name, index};
             if (sa.sa.mark_as_done && [that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.FINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
                 priority_data.mark_as_done = true;
             }
@@ -435,7 +434,13 @@ class Priority {
             if (a.status_priority < b.status_priority) return 1;
             if (a.status_priority > b.status_priority) return -1;
         }
-        // If the status value and status priority are the same, sort them by their index, which will always be different from each other
+        if (a.first_tag < b.first_tag) return -1;
+        if (a.first_tag > b.first_tag) return 1;
+
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+
+        // If everything is the same, sort them by their index, which will always be different from each other
         // Sort from min to max otherwise they will infinitly swap with each other every time they are resorted
         if (a.index < b.index) return -1;
         if (a.index > b.index) return 1;
