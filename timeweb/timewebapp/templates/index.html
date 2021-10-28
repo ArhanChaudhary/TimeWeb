@@ -30,7 +30,7 @@
         <div id="fields-wrapper">
           {% csrf_token %}
           {% for field in form.visible_fields %}
-            <div class="field-wrapper">
+            <div class="field-wrapper{% if field.name == "soft" %} id-soft-field-wrapper{% endif %}">
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Break Days</label>
                 <div id="break-days-wrapper">
@@ -75,7 +75,9 @@
         <img id="close-assignments"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close-all-assignments.png' %}">
         <img id="open-assignments"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Open all Assignments" height="32" src="{% static 'images/open-all-assignments.png' %}">
         <img id="next-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
-        <img id="settings"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
+        <a href="settings">
+          <img id="settings"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
+        </a>
         <div id="settings-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Settings</div>
         <div id="next-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
         <div id="open-assignments-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Open all Assignments</div>
@@ -104,9 +106,8 @@
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">Delete all Starred Assignments</span>
     </div>
     {% for assignment in assignment_models %}
-      {% comment %} Add invert-text-color in dark mode to initially make the text white for #animate-in or #animate-color assignments. Without this, the text goes from black to white and looks bad {% endcomment %}
       {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
-      <div class="assignment-container{% if background_image %} grey-highlight{% endif %}{% if dark_mode %} invert-text-color{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
+      <div class="assignment-container{% if background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
         <div class="assignment tags-{{ horizontal_tag_position|lower }}{% if assignment.needs_more_info %} needs-more-info{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <div class="relative-positioning-wrapper">

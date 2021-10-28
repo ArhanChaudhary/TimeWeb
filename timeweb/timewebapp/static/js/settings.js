@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_background_image").val("");
                         $("#id_horizontal_tag_position").val("Middle");
                         $("#id_vertical_tag_position").val("Top");
-                        $("#id_default_dropdown_tags").val("");
+                        $("#id_default_dropdown_tags").val("").trigger("input");
                     }
                 },
                 cancel: function() {
@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
         $("#submit-settings-button").val("Submitting...");
+        $("main > *").fadeOut();
         alreadyHasSubmitted = true;
     });
 });

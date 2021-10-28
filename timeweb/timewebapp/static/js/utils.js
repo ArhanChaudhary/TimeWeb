@@ -93,12 +93,11 @@ utils = {
                             block: "end",
                         });
                     } else {
-                        this.scrollIntoView({
+                        $("#fields-wrapper > :last-child")[0].scrollIntoView({
                             behavior: "smooth",
                             block: "start",
                         });
-                    }
-                    
+                    }                    
                 });
             },
 
@@ -128,8 +127,8 @@ utils = {
                     
                     All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
                 );
-                $("#settings").click(function() {
-                    window.location.href = "/settings";
+                $("a[href=\"settings\"]").click(function() {
+                    $("main > *").fadeOut();
                 });
             },
 
@@ -323,7 +322,7 @@ utils = {
         dimAssignmentsHeaderInfoOnIconHover: function() {
             $("#assignments-header #icon-label-container img").on("mouseover mouseout", function(e) {
                 const info = $(e.target).parents("#icon-label-container").siblings("#info");
-                const visible_icon_label = $(e.target).siblings("div:visible");
+                const visible_icon_label = $(e.target).parents("#icon-label-container").children("div:visible");
                 if (e.type === "mouseover")
                     info.toggleClass("dim", collision(info, visible_icon_label));
                 else

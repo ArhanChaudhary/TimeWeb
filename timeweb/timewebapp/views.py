@@ -40,7 +40,7 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
 # Misc
 from logging import getLogger
-from os import environ as set_environment_variable
+from os import environ as os_environ
 from django.conf import settings
 
 User = get_user_model()
@@ -50,9 +50,11 @@ GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.r
 GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc-api-credentials.json"
 if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
-    set_environment_variable['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os_environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
     GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
+# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 editing_example_account = False
 

@@ -14,7 +14,7 @@ class TimewebForm(forms.ModelForm):
         model = TimewebModel
         fields = "__all__"
         widgets = {
-            'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
+            'namef': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'assignment_date': DateInput(),
             'x': DateInput(),
             'blue_line_start': forms.HiddenInput(),
@@ -33,6 +33,7 @@ class TimewebForm(forms.ModelForm):
             'description': forms.Textarea(attrs={"rows": "1"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
+            'has_alerted_due_date_passed_notice': forms.HiddenInput(),
         }
         error_messages = {
             'name': {
@@ -139,7 +140,7 @@ class SettingsForm(forms.ModelForm):
             "def_funct_round_minute": "If your unit of work for any assignment is \"Minute,\" meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes. Unrounded values look ugly (e.g: 17 Minutes, 49 Minutes).",
             "ignore_ends": "Ignores the minimum work time for the first and last working days of EVERY assignment with a minimum work time in exchange for making their work distributions smoother. Recommended to be enabled.",
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
-            "reverse_sorting": "Sorts assignments in reverse order. Useful if you like completing easier assignments first and harder assignments last. Note that some assignments may still be placed in higher list positions, and this isn't a true reverse.",
+            "reverse_sorting": "Sorts assignments in reverse order. Useful if you like completing easier assignments first and harder assignments last. Note that this isn't a true reverse. Some assignments may be still be placed at higher list positions due to other factors, such as them being due tomorrow.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",

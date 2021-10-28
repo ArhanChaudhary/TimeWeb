@@ -194,6 +194,7 @@ class Priority {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
+            let alert_due_date_passed_cond;
             let str_daysleft, status_value, status_message, status_image;
             if (sa.sa.needs_more_info) {
                 status_image = 'question-mark';
@@ -221,6 +222,7 @@ class Priority {
                 if (last_work_input >= sa.sa.y) {
                     status_message = 'You\'re Completely Finished with this Assignment';
                 } else {
+                    alert_due_date_passed_cond = true;
                     if (!sa.sa.has_alerted_due_date_passed_notice) {
                         that.due_date_passed_notices.push(`"${sa.sa.name}"`);
                         sa.sa.has_alerted_due_date_passed_notice = true;
@@ -245,6 +247,14 @@ class Priority {
                 }
                 status_value = that.NOT_YET_ASSIGNED;
             } else {
+                // if (alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice)
+                // The above code alerts the notice and ajaxs the due date passed notice as true
+                // if !alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice)
+                // The following code ajaxs the due date passed notice as false
+                if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
+                    sa.sa.has_alerted_due_date_passed_notice = false;
+                    ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
+                }
                 if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
                     let reached_end_of_assignment = false;
                     for (let i = 0; i < number_of_forgotten_days; i++) {

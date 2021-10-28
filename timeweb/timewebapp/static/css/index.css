@@ -71,7 +71,7 @@ header.animate::after {
 #tomorrow-time {
     white-space: nowrap;
 }
-#assignments-header img:not(:first-of-type) {
+#assignments-header img:not(:first-of-type), #assignments-header a img {
     position: relative;
     z-index: 1;
     margin-left: 14px;
@@ -89,6 +89,10 @@ header.animate::after {
     order: 4;
 }
 #settings {
+    /* Remove weird extra space */
+    display: block;
+}
+a[href="settings"] {
     order: 5;
 }
 #assignments-header #icon-label-container img ~ div {
@@ -104,17 +108,17 @@ header.animate::after {
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
 #assignments-header img#next-day:hover ~ div#next-day-icon-label,
-#assignments-header img#settings:hover ~ div#settings-icon-label,
+#assignments-header a[href="settings"]:hover ~ div#settings-icon-label,
 #assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label,
-#assignments-header img#settings:focus ~ div#settings-icon-label {
+#assignments-header a[href="settings"]:focus ~ div#settings-icon-label {
     display: block;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
 #assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
 #assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
-#assignments-header img#settings:hover ~ div:not(#settings-icon-label) {
+#assignments-header a[href="settings"]:hover ~ div:not(#settings-icon-label) {
     display: none !important;
 }
 .assignment-container {
@@ -890,6 +894,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper #fields-wrapper {
     overflow-y: scroll;
     overflow-y: overlay;
+    --soft-label-width: 56px;
 }
 #form-wrapper .field-wrapper {
     margin-top: 10px;
@@ -912,8 +917,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input, #form-wrapper textarea {
     box-sizing: border-box; 
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 10px;
     width: calc(100% - 20px);
     border: 1px solid black;
     border-radius: 3px;
@@ -921,6 +925,28 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input[type="date"] {
     /* IOS */
     min-width: calc(100% - 30px);
+}
+#form-wrapper .field-wrapper.id-soft-field-wrapper {
+    position: absolute;
+    transform: translateY(-33px);
+    right: 15px;
+}
+#form-wrapper #id_soft {
+    width: unset;
+    display: inline;
+    margin-left: 0;
+}
+#form-wrapper label[for='id_soft'] {
+    display: inline;
+    margin: unset;
+}
+#form-wrapper #id_x {
+    min-width: calc(100% - 30px - var(--soft-label-width));
+    width: calc(100% - 20px - var(--soft-label-width));
+}
+#form-wrapper .field-wrapper label[for='id_x']::after {
+    right: calc(var(--soft-label-width) - 10px);
+    /* scrolling doesnt work lol */
 }
 #form-wrapper #advanced-inputs {
     border-bottom: 1px solid;
