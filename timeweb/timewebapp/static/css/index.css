@@ -1072,7 +1072,7 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight:not(.assignment-container),
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
-    --filter-drop-shadow: 0.5px;
+    --filter-drop-shadow: 0.35px;
     filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
 }
 

@@ -212,7 +212,7 @@ Assignment.prototype.setParabolaValues = function() {
         }
     }
 }
-Assignment.prototype.funct = function(x, params={}) {
+Assignment.prototype.funct = function(x, params={translateX: true}) {
     if (params.translateX !== false) {
         // Translate x coordinate
         x -= this.red_line_start_x;

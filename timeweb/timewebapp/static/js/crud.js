@@ -35,7 +35,7 @@ class Crud {
             $("#form-wrapper #advanced-inputs").click();
         }
     }
-    showForm(params={}) {
+    showForm(params={show_instantly: false}) {
         var that = this;
         setTimeout(function() {
             $("#id_description").trigger("input");
@@ -55,7 +55,7 @@ class Crud {
         that.old_unit_value = undefined;
         that.replaceUnit();
     }
-    hideForm(params={}) {
+    hideForm(params={hide_instantly: false}) {
         var that = this;
         if (params.hide_instantly) {
             $("#overlay").hide().children("#form-wrapper");
