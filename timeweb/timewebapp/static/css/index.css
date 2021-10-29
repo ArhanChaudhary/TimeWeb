@@ -102,7 +102,6 @@ a[href="settings"] {
     padding-left: 20px;
     right: 225px;
     text-align: right;
-    bottom: 5px;
     display: none;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
@@ -1073,7 +1072,11 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
     --filter-drop-shadow: 0.35px;
+    font-size: 20px !important;
     filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
+}
+.grey-highlight.shortcut-text {
+    font-size: unset !important;
 }
 
 #dark-mode .assignment-container::after,
