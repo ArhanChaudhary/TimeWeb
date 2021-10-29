@@ -143,7 +143,7 @@ Assignment.prototype.setParabolaValues = function() {
 
         const upper_return_y_cutoff = this.return_y_cutoff;
         const upper_output_diff = this.sa.y - output;
-        if (this.min_work_time_funct_round > (upper_output_diff + lower_output_diff) / 2) {
+        if (this.min_work_time_funct_round >= (upper_output_diff + lower_output_diff) / 2) {
             this.return_y_cutoff = lower_return_y_cutoff;
         } else {
             this.return_y_cutoff = upper_return_y_cutoff;
@@ -205,7 +205,7 @@ Assignment.prototype.setParabolaValues = function() {
         const lower_return_0_cutoff = this.return_0_cutoff;
         const lower_output_diff = output - this.red_line_start_y;
         // Pick whichever cutoff its output diff is closest to
-        if (this.min_work_time_funct_round > (lower_output_diff + upper_output_diff) / 2) {
+        if (this.min_work_time_funct_round >= (lower_output_diff + upper_output_diff) / 2) {
             this.return_0_cutoff = upper_return_0_cutoff;
         } else {
             this.return_0_cutoff = lower_return_0_cutoff;
