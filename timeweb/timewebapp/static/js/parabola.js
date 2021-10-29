@@ -143,6 +143,11 @@ Assignment.prototype.setParabolaValues = function() {
 
         const upper_return_y_cutoff = this.return_y_cutoff;
         const upper_output_diff = this.sa.y - output;
+        /**
+         * Round cutoff down instead of up because it on average made more sense.
+         * For example, 45 as the lower diff and 15 as the upper diff used to choose the upper diff using >
+         * Now, >= chooses the lower diff because it seems to just be a better choice in general. 
+         */
         if (this.min_work_time_funct_round >= (upper_output_diff + lower_output_diff) / 2) {
             this.return_y_cutoff = lower_return_y_cutoff;
         } else {
@@ -205,6 +210,12 @@ Assignment.prototype.setParabolaValues = function() {
         const lower_return_0_cutoff = this.return_0_cutoff;
         const lower_output_diff = output - this.red_line_start_y;
         // Pick whichever cutoff its output diff is closest to
+
+        /**
+         * Round cutoff down instead of up because it on average made more sense.
+         * For example, 45 as the lower diff and 15 as the upper diff used to choose the upper diff using >
+         * Now, >= chooses the lower diff because it seems to just be a better choice in general. 
+         */
         if (this.min_work_time_funct_round >= (lower_output_diff + upper_output_diff) / 2) {
             this.return_0_cutoff = upper_return_0_cutoff;
         } else {
