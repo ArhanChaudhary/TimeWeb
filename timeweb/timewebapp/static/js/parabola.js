@@ -225,28 +225,30 @@ Assignment.prototype.setParabolaValues = function() {
 }
 Assignment.prototype.funct = function(x, params={translateX: true}) {
     if (params.translateX !== false) {
-        // Translate x coordinate
+        // Translate x coordinate and break days
         x -= this.red_line_start_x;
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x -= Math.floor(x / 7) * this.sa.break_days.length + mods[x % 7];
         }
+        // Return at cutoffs
         if (x >= this.return_y_cutoff) return this.sa.y;
         if (x <= this.return_0_cutoff) return this.red_line_start_y;
     }
     if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (x < this.cutoff_to_use_round))) {
-        // Get translated y coordinate
+        // Get untranslated y coordinate for min_work_time_funct_round
         var output = this.min_work_time_funct_round * Math.round(x * (this.a * x + this.b) / this.min_work_time_funct_round);
+        // Translate the cutoff transition value
         if (this.a < 0) {
             output += this.cutoff_transition_value;
         } else {
             output -= this.cutoff_transition_value;
         }
     } else {
+        // Get raw untranslated y coordinate
         var output = this.sa.funct_round * Math.round(x * (this.a * x + this.b) / this.sa.funct_round);
     }
-    // Return untranslated y coordinate
-    // No point in untranslating x coordinate
+    // Return translated y coordinate
     return mathUtils.precisionRound(output + this.red_line_start_y, 10);
 }
 Assignment.prototype.calcModDays = function() {
@@ -359,19 +361,17 @@ Assignment.prototype.autotuneSkewRatio = function() {
         // A parabola cannot be defined by two or less points; instead connect a line
         autotuned_skew_ratio = 1;
     }
-    
     // Finally, we need to set an autotune factor
     // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
     // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
     // This way ensures the autotune becomes more effective as more data points are made available for the regression
     let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
 
-    // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
-    // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
-    // So, to solve this issue, curve the autotune lower with a lower number of remaining working days in the assignment
-    autotune_factor *= Math.min(1, (x1_from_blue_line_start - (works_without_break_days.length - 1)) / 15);
+    // Way too much to say about this, will explain later
+    autotune_factor = 1 - Math/pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
 
-    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+    // Autotune in the reverse direction
+    this.sa.skew_ratio += ((2 - autotuned_skew_ratio) - this.sa.skew_ratio) * autotune_factor;
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
     ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
