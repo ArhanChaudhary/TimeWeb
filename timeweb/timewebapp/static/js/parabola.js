@@ -368,7 +368,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
     let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
 
     // Way too much to say about this, will explain later
-    autotune_factor = 1 - Math/pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
 
     // Autotune in the reverse direction
     this.sa.skew_ratio += ((2 - autotuned_skew_ratio) - this.sa.skew_ratio) * autotune_factor;
