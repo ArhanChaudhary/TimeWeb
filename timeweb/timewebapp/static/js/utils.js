@@ -113,12 +113,17 @@ utils = {
                 });
                 $("#current-date-text").text("Current date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                 $("#next-day").click(function() {
-                    in_next_day = true;
+                    utils.in_next_day = true;
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
                     for (let sa of dat) {
                         sa.mark_as_done = false;
                     }
+                    // Hide current time without using display none, as that can be affected by .toggle
+                    $("#current-time").css({
+                        position: "absolute",
+                        top: -9999,
+                    })
                     $("#current-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                     priority.sort();
                 });
@@ -768,7 +773,7 @@ utils = {
     reloadAfterMidnightHourToUpdate: function() {
         // Don't reload in the next day to preserve changes made in the simulation
         // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
-        if (window.in_next_day || isExampleAccount) return;
+        if (utils.in_next_day || isExampleAccount) return;
         const current_time = new Date();
         if (utils.previous_time.getHours() < utils.after_midnight_hour_to_update && current_time.getHours() >= utils.after_midnight_hour_to_update) {
             window.location.reload();
