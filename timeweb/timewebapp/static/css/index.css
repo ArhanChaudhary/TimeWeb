@@ -893,7 +893,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper #fields-wrapper {
     overflow-y: scroll;
     overflow-y: overlay;
-    --soft-label-width: 56px;
+    --soft-label-width: 78px;
 }
 #form-wrapper .field-wrapper {
     margin-top: 10px;
@@ -933,6 +933,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper #id_soft {
     width: unset;
     display: inline;
+    margin-right: 3px;
     margin-left: 0;
 }
 #form-wrapper label[for='id_soft'] {

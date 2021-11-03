@@ -261,6 +261,11 @@ class Crud {
             left: -15,
             bottom: 18,
         });
+        $("#id_soft").info('left',
+            `This makes this assignment's due date soft, which increments it if you haven't finished the assignment by then`,
+        "after").css({
+            marginRight: 9,
+        })
     }
     styleErorrs() {
         var that = this;

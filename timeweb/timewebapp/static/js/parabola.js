@@ -347,6 +347,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
             const mods = this.calcModDays();
             x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7]; // Handles break days, explained later
         }
+
         // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
         // y1_from_blue_line_start - y1 simplifies to red_line_start_y - works[0]
         // Translate the point to the scope of x1
@@ -357,6 +358,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
 
         // Zero division somewhere
         if (!Number.isFinite(autotuned_skew_ratio)) return;
+        
     } else {
         // A parabola cannot be defined by two or less points; instead connect a line
         autotuned_skew_ratio = 1;
@@ -370,8 +372,14 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // Way too much to say about this, will explain later
     autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
 
+    // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
+    // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
+    // So, put a higher weight on a linear skew ratio as there are less days in the assignment
+    autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+
     // Autotune in the reverse direction
     this.sa.skew_ratio += ((2 - autotuned_skew_ratio) - this.sa.skew_ratio) * autotune_factor;
+    // this.sa.skew_ratio = autotuned_skew_ratio;
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
     ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
