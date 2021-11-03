@@ -18,8 +18,8 @@ class Assignment {
         }
     }
     calcSkewRatioBound() {
-        let x1 = this.sa.x - this.red_line_start_x;
-        let y1 = this.sa.y - this.red_line_start_y;
+        let x1 = this.sa.x;
+        let y1 = this.sa.y;
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];

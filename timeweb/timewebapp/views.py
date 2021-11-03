@@ -135,6 +135,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_funct_round_minute': self.settings_model.def_funct_round_minute,
             'ignore_ends': self.settings_model.ignore_ends,
             'show_progress_bar': self.settings_model.show_progress_bar,
+            'assignment_spacing': self.settings_model.assignment_spacing,
             'reverse_sorting': self.settings_model.reverse_sorting,
             'color_priority': self.settings_model.color_priority,
             'text_priority': self.settings_model.text_priority,
@@ -185,6 +186,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                     model.save()
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         self.settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
+        self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
         self.settings_model.reverse_sorting = self.form.cleaned_data.get("reverse_sorting")
         self.settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         self.settings_model.text_priority = self.form.cleaned_data.get("text_priority")
@@ -223,6 +225,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
             
+        self.context['assignment_spacing'] = self.settings_model.assignment_spacing
+
         self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token

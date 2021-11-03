@@ -7,6 +7,12 @@
     opacity: 0;
     --scale-percent-y: 1.05;
 }
+#assignments-container.comfy {
+    --vertical-assignment-padding: 25px;
+}
+#assignments-container.compact {
+    --vertical-assignment-padding: 15px;
+}
 main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
 }
@@ -137,7 +143,7 @@ a[href="settings"] {
     background: white; /* Set white so it doesnt transition background initially if added by priority.js */
     /*  background: rgb(226,91,80);
     background: rgb(132,200,65); */
-    padding: 15px;
+    padding: var(--vertical-assignment-padding) 15px;
     border: 2px solid rgb(80,80,80);
     border-radius: 5px;
     position: relative;
@@ -669,7 +675,8 @@ a[href="settings"] {
     align-items: center;
     align-self: normal;
     justify-content: center;
-    margin: -15px 0;
+    /* negate the variable pixel value */
+    margin: calc(-1 * var(--vertical-assignment-padding)) 0;
     margin-right: -4px;
     min-width: 40px;
     cursor: pointer;
@@ -691,7 +698,7 @@ a[href="settings"] {
 }
 .assignment-footer {
     position: relative;
-    top: 10px;
+    top: calc(var(--vertical-assignment-padding) - 5px); /* -5px because display inline block is stupid */
     display: none;
     /* firefox acts weirdly without this */
     width: 100%;
@@ -1072,7 +1079,7 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight:not(.assignment-container),
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
-    --filter-drop-shadow: 0.35px;
+    --filter-drop-shadow: 1px;
     font-size: 20px !important;
     filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
 }

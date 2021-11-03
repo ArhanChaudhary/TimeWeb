@@ -298,6 +298,7 @@ utils = {
                         }
                     });
                 });
+                // Click on after and before pseudo-elements
                 $(".assignment-container").click(function(e) {
                     const assignment_container = $(this);
                     const dom_assignment = assignment_container.children(".assignment");
@@ -310,7 +311,7 @@ utils = {
                             .each(function() {
                                 const shortcut = $(this).children(".shortcut");
                                 if (!!shortcut.length) {
-                                    shortcut.click();
+                                    shortcut.is(":visible") && shortcut.click();
                                     return false;
                                 }
                             });

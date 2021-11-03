@@ -27,6 +27,12 @@ VERTICAL_TAG_POSITIONS = (
     ("Bottom", "Bottom"),
 )
 MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in VERTICAL_TAG_POSITIONS], key=len))
+
+ASSIGNMENT_SPACINGS = (
+    ("Comfy", "Comfy"),
+    ("Compact", "Compact"),
+)
+MAX_ASSIGNMENT_SPACINGS_LENGTH = len(max([i[0] for i in ASSIGNMENT_SPACINGS], key=len))
 def default_works():
     return 0
 def empty_list():
@@ -213,6 +219,12 @@ class SettingsModel(models.Model):
     )
     
     # Group "Personalize"
+    assignment_spacing = models.CharField(
+        max_length=MAX_ASSIGNMENT_SPACINGS_LENGTH,
+        choices=ASSIGNMENT_SPACINGS,
+        default=("Comfy"),
+        verbose_name=_('Assignment Spacing'),
+    )
     default_dropdown_tags = models.JSONField(
         default=empty_list,
         blank=True,

@@ -15,7 +15,7 @@
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form.visible_fields %}
-        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "reverse_sorting" or field.name == "default_dropdown_tags" %}
+        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "reverse_sorting" or field.name == "assignment_spacing" %}
         <fieldset>
             <legend>
                 {% if field.name == "def_break_days" %}
@@ -24,7 +24,7 @@
                     Assignment Graph
                 {% elif field.name == "reverse_sorting" %}
                     Assignment Priority
-                {% elif field.name == "default_dropdown_tags" %}
+                {% elif field.name == "assignment_spacing" %}
                     Personalize
                 {% endif %}
             </legend>
