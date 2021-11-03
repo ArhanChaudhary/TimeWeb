@@ -536,27 +536,32 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
                 tags = []
+                description = ""
                 if x:
                     if "hours" in assignment['dueTime']:
                         assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                     if "minutes" in assignment['dueTime']:
                         assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
                     x = timezone.localtime(datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=datetime.timezone.utc))
-                    if x.hour == 11 and x.minute == 59:
+                    due_hour = x.hour
+                    due_minute = x.minute
+                    if due_hour == 11 and due_minute == 59:
                         x += datetime.timedelta(minutes=1)
                     else:
+
                         x = x.replace(hour=0, minute=0, second=0, microsecond=0)
                     
                     # Validation
                     if assignment_date >= x:
                         x = assignment_date + datetime.timedelta(1)
                         tags.append("Important")
+                        description += f"Due at {due_hour % 13 + 1}:{due_minute} {'A' if due_hour < 12 else 'P'}M today\n"
                     if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
                 name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length).strip()
                 tags.insert(0, course_names[assignment['courseId']])
-                description = assignment.get('description', None)
+                description += assignment.get('description', "")
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
                 new_gc_assignment_ids.add(assignment_id)
