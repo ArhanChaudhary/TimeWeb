@@ -162,7 +162,7 @@ Assignment.prototype.setParabolaValues = function() {
         var y_value_to_cutoff = this.min_work_time_funct_round - this.sa.funct_round / 2;
     }
 
-    if (y_value_to_cutoff < y1 && this.sa.y > this.red_line_start_y && (this.a || this.b)) {
+    if (mathUtils.precisionRound(y_value_to_cutoff - y1, 10) < 0 && this.sa.y > this.red_line_start_y && (this.a || this.b)) {
         if (this.a) {
             this.return_0_cutoff = (Math.sqrt(this.b * this.b + 4 * this.a * y_value_to_cutoff) - this.b) / this.a / 2;
         } else {
@@ -198,7 +198,7 @@ Assignment.prototype.setParabolaValues = function() {
             const mid = left + Math.floor((right - left) / 2);
 
             output = this.funct(mid, {translateX: false});
-            if (output <= this.red_line_start_y) {
+            if (mathUtils.precisionRound(output - this.red_line_start_y, 10) <= 0) {
                 left = mid + 1;
             } else {
                 right = mid;
