@@ -990,7 +990,9 @@ for (let sa of dat) {
     if (sa.y) sa.y = +sa.y;
     if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;
     if (sa.funct_round) sa.funct_round = +sa.funct_round;
-    if (sa.min_work_time) sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
+    // If sa.time_per_unit is undefined, don't translate the minimum work time and display the raw value in update assignment in crud.js
+    // The || 1 might cause issues if sa.time_per_unit is 0, but this won't happen
+    if (sa.min_work_time) sa.min_work_time /= (sa.time_per_unit || 1); // Converts min_work_time to int if string or null
     if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
     const len_works = sa.works.length - 1;
