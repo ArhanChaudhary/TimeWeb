@@ -358,6 +358,7 @@ utils = {
             }
             // might be easier to attach the click to $(document) but will do later
             $(".tag-add").click(tagAddClick);
+            let tag_names = new Set();
             function tagAddClick(e) {
                 const $this = $(this);
                 // Close add tag box if "Add Tag" is clicked again
@@ -369,25 +370,42 @@ utils = {
                 // Plus button was clicked
                 if ($(e.target).is(".tag-add-button, .tag-add-plus")) {
                     const sa = utils.loadAssignmentData($this);
-                    let tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
+
+                    const checked_tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
                         return $(this).text();
                     }).toArray();
+                    // Push all checked tag names not already in tag_names to tag_names
+                    checked_tag_names.forEach(tag_names.add, tag_names);
+                    
                     const inputted_tag_name = $this.find(".tag-add-input").val().trim();
-                    if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.includes(inputted_tag_name)) {
-                        tag_names.push(inputted_tag_name);
+                    if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.has(inputted_tag_name)) {
+                        tag_names.add(inputted_tag_name);
                     }
-                    if (!tag_names.length) return;
-                    tag_names = tag_names.filter(tag_name => !sa.tags.includes(tag_name));
-                    if (sa.tags.length + tag_names.length > max_number_tags) {
+                    // Nothing is checked or inputted
+                    if (!tag_names.size) {
+                        if (utils.ui.close_on_success) {
+                            utils.ui.close_on_success = false;
+                            $this.find(".tag-add-input").blur();
+                        }
+                        return;
+                    }
+                    tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
+
+                    if (sa.tags.length + tag_names.size > max_number_tags) {
                         $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
                         $(this).find(".tag-add-input").val("Too Many Tags!");
+                        tag_names = new Set();
                         return;
                     }
                     const success = function() {
+                        if (utils.ui.close_on_success) {
+                            utils.ui.close_on_success = false;
+                            $this.find(".tag-add-input").blur();
+                        }
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
                         // GC class tags
-                        if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_names.includes("Important") || tag_names.includes("Not Important")) {
+                        if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
                             priority.sort();
                         }
                         // Close box and add tags visually
@@ -419,25 +437,28 @@ utils = {
                                 tag.prev().css("z-index", "");
                             });
                         }
+                        tag_names = new Set();
                     }
                     
                     // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
-                    if (ajaxUtils.disable_ajax || !tag_names.length) {
+                    if (ajaxUtils.disable_ajax || !tag_names.size) {
                         success();
                         return;
                     }
                     const data = {
                         csrfmiddlewaretoken: csrf_token,
                         pk: sa.id,
-                        tag_names: tag_names,
+                        tag_names: [...tag_names],
                         action: "tag_add",
                     }
+                    setTimeout(function() {
                     $.ajax({
                         type: "POST",
                         data: data,
                         success: success,
                         error: ajaxUtils.error,
                     });
+                    }, 2000);
                     return;
                 }
                 // Tag add textbox was selected or tags were selected
@@ -652,8 +673,8 @@ utils = {
             });
             $(".tag-add-input").keydown(function(e) {
                 if (e.key === "Enter") {
-                    // blur so it hides the tag add box
-                    $(this).blur().parents(".tags").find(".tag-add-button").click();
+                    utils.ui.close_on_success = true;
+                    $(this).parents(".tags").find(".tag-add-button").click();
                 }
             });
         },

@@ -1080,9 +1080,13 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight:not(.assignment-container),
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
-    --filter-drop-shadow: 1px;
+    --filter-drop-shadow-blur: 1px;
+    --filter-drop-shadow-color: white;
     font-size: 20px !important;
-    filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
+    filter: drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent)) 
+            invert(var(--filter-invert, 0));
 }
 .grey-highlight.shortcut-text {
     font-size: unset !important;
@@ -1118,7 +1122,10 @@ html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
 
 #dark-mode #tutorial-click-assignment-to-open {
     --filter-invert: 1;
-    filter: drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) drop-shadow(0 0 var(--filter-drop-shadow, 0) white) invert(var(--filter-invert, 0));
+    filter: drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent)) 
+            invert(var(--filter-invert, 0));
 }
 /* Fix double invert */
 #dark-mode #next-day-icon-label .grey-highlight {
