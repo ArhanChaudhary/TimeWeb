@@ -4,7 +4,7 @@
 // When dynamic start is set, skew ratio needs to be re-autotuned
 // But when skew ratio is re-autotuned, it may mess up dynamic start
 // This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
-const AUTOTUNE_ITERATIONS = 3;
+const AUTOTUNE_ITERATIONS = 4;
 
 class Assignment {
     constructor(dom_assignment) {
