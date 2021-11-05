@@ -847,6 +847,18 @@ ajaxUtils = {
             error: ajaxUtils.error,
         });
     },
+    ajaxSeenLatestChangelog: function() {
+        if (ajaxUtils.disable_ajax) return;
+        const data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'seen_latest_changelog',
+        }
+        $.ajax({
+            type: "POST",
+            data: data,
+            error: ajaxUtils.error,
+        });
+    },
     createGCAssignments: function() {
         if (ajaxUtils.disable_ajax || !creating_gc_assignments_from_frontend) return;
         const data = {
@@ -950,7 +962,24 @@ ajaxUtils = {
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
-({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting } = JSON.parse(document.getElementById("settings-model").textContent));
+({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting, seen_latest_changelog } = JSON.parse(document.getElementById("settings-model").textContent));
+if (!seen_latest_changelog) {
+    latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
+    setTimeout(function() {
+        const jconfirm = $.alert({
+            title: `A new update is here! You can also view this on TimeWeb's <a href="changelog">changelog.</a><br><br>${latest_changelog.version}`,
+            content: latest_changelog.updates,
+            onClose: function() {
+                seen_latest_changelog = true;
+                ajaxUtils.ajaxSeenLatestChangelog();
+            }
+        });
+        setTimeout(function() {
+            jconfirm.$content.css("opacity", "0.85");
+            jconfirm.$titleContainer.css("padding-bottom", "5px");
+        }, 0);
+    }, 500);
+}
 def_break_days = def_break_days.map(Number);
 date_now = new Date();
 // Don't account for midnight on the example account because it wont make sense

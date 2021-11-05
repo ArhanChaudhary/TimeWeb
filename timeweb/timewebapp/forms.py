@@ -119,7 +119,8 @@ class SettingsForm(forms.ModelForm):
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
-            'added_gc_assignment_ids': forms.HiddenInput()
+            'added_gc_assignment_ids': forms.HiddenInput(),
+            'seen_latest_changelog': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {

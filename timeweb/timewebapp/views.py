@@ -9,6 +9,10 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.cache import cache_control
 from django.urls import reverse
 
+# Automatically creates settings model and example assignment when user is created
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 # Model modules
 import datetime
 from django.utils import timezone
@@ -42,6 +46,7 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from logging import getLogger
 from os import environ as os_environ
 from django.conf import settings
+from .changelogs import CHANGELOGS
 
 User = get_user_model()
 
@@ -62,9 +67,7 @@ example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_TAGS = 10
-# Automatically creates settings model and example assignment when user is created
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
@@ -219,15 +222,17 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models'] = self.assignment_models
         self.context['assignment_models_as_json'] = list(self.assignment_models.values())
         self.context['settings_model_as_json'] = model_to_dict(self.settings_model)
+
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['background_image'] = self.settings_model.background_image
-        
         if self.settings_model.background_image.name:
             self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
-            
         self.context['assignment_spacing'] = self.settings_model.assignment_spacing
-
         self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
+        self.context['seen_latest_changelog'] = self.settings_model.seen_latest_changelog
+
+        self.context['latest_changelog'] = CHANGELOGS[0]
+
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
         else:
@@ -272,6 +277,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             return self.saved_assignment(request)
         elif action == 'finished_tutorial':
             return self.finished_tutorial(request)
+        elif action == 'seen_latest_changelog':
+            return self.seen_latest_changelog(request)
         elif action == 'create_gc_assignments':
             if 'token' in self.settings_model.oauth_token:
                 redirect_url_if_creds_invalid = self.create_gc_assignments(request)
@@ -669,6 +676,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         logger.info(f"User \"{request.user}\" finished their tutorial")
         return HttpResponse(status=204)
     
+    def seen_latest_changelog(self, request):
+        self.settings_model.seen_latest_changelog = True
+        self.settings_model.save()
+        logger.info(f"User \"{request.user}\" saved seeing their changelog")
+        return HttpResponse(status=204)
+
     def tag_add_or_delete(self, request, action):
         self.pk = request.POST['pk']
         self.sm = get_object_or_404(TimewebModel, pk=self.pk)
@@ -826,6 +839,7 @@ class ChangelogView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request):
+        self.context['changelogs'] = CHANGELOGS
         return self.render_with_dynamic_context(request, "changelog.html", self.context)
 
 class RickView(TimewebGenericView):
