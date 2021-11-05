@@ -165,7 +165,8 @@ class Priority {
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
-            let today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
+            // || date_now for displaying daysleft for needs more info if the due date exists but the assignment date doesn't
+            let today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date || date_now);
             let todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
@@ -195,7 +196,7 @@ class Priority {
                 }
             }
             let alert_due_date_passed_cond;
-            let str_daysleft, status_value, status_message, status_image;
+            let str_daysleft, status_value, status_message, status_image, due_date_minus_today;
             if (sa.sa.needs_more_info) {
                 status_image = 'question-mark';
                 if (sa.sa.is_google_classroom_assignment) {
@@ -212,6 +213,27 @@ class Priority {
                     width: 11,
                     height: 18,
                 }).css("margin-left", 2);
+
+                // Copy paste of some below code
+                if (Number.isFinite(sa.sa.x)) {
+                    due_date_minus_today = sa.sa.x - today_minus_ad;
+                    if (due_date_minus_today < -1) {
+                        str_daysleft = -due_date_minus_today + "d Ago";
+                    } else if (due_date_minus_today === -1) {
+                        str_daysleft = 'Yesterday';
+                    } else if (due_date_minus_today === 0) {
+                        str_daysleft = 'Today';
+                    } else if (due_date_minus_today === 1) {
+                        str_daysleft = 'Tomorrow';
+                    } else if (due_date_minus_today < 7) {
+                        const due_date = new Date((sa.sa.assignment_date || date_now).valueOf());
+                        due_date.setDate(due_date.getDate() + sa.sa.x);
+                        str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                    } else {
+                        str_daysleft = due_date_minus_today + "d";
+                    }
+                }
+
             // (sa.sa.x <= today_minus_ad && !sa.sa.soft)
             // This marks the assignment as completed if its due date passes
             // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
@@ -302,7 +324,7 @@ class Priority {
                     const mods = sa.calcModDays();
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
                 }
-                var due_date_minus_today = sa.sa.x - today_minus_ad;
+                due_date_minus_today = sa.sa.x - today_minus_ad;
                 const todo_is_completed = todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start;
                 const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_ad) % 7) && due_date_minus_today !== 1;
                 if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
@@ -400,7 +422,14 @@ class Priority {
                 status_priority = todo*sa.sa.time_per_unit/(sa.sa.x-sa.sa.blue_line_start-len_works);
             }
 
-            let priority_data = {status_value, status_priority, first_tag, name: sa.sa.name, index};
+            let priority_data = {
+                status_value, 
+                status_priority, 
+                first_tag, 
+                name: sa.sa.name, 
+                index, 
+                mark_as_done: false,
+            };
             if (sa.sa.mark_as_done && [that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.FINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
                 priority_data.mark_as_done = true;
             }

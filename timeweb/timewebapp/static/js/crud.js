@@ -142,14 +142,14 @@ class Crud {
             $("#submit-assignment-button").html("Edit Assignment");
             // Find which assignment in dat was clicked
             const sa = utils.loadAssignmentData($(this));
-            if (sa.x) {
-                var x = new Date(sa.assignment_date.valueOf());
+            if (Number.isFinite(sa.x)) {
+                var x = new Date((sa.assignment_date || date_now).valueOf());
                 x.setDate(x.getDate() + sa.x);
             }
             const ASSIGNMENT_FORM_FIELDS = {
                 "#id_name": sa.name,
                 "#id_assignment_date": sa.assignment_date ? utils.formatting.stringifyDate(sa.assignment_date) : '',
-                "#id_x": sa.x ? utils.formatting.stringifyDate(x) : '',
+                "#id_x": Number.isFinite(sa.x) ? utils.formatting.stringifyDate(x) : '',
                 "#id_soft": sa.soft,
                 "#id_unit": sa.unit,
                 "#id_y": sa.y,
@@ -281,6 +281,9 @@ class Crud {
                 $("#id_y").addClass("invalid");
             }
         });
+        if ($("#id_x.invalid").length) {
+            $(".field-wrapper.id-soft-field-wrapper").css("margin-top", -9);
+        }
     }
     // Delete assignment
     transitionDeleteAssignment(dom_assignment) {

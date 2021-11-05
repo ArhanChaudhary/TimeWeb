@@ -1003,12 +1003,14 @@ for (let sa of dat) {
         sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
         sa.assignment_date.setHours(0,0,0,0);
     }
+    // Don't do Number.isFinite(x) because this is the raw value
     if (sa.x) {
         sa.x = new Date(sa.x);
         // floor(date + 0.5) is the same as round(date)
         sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
         sa.x.setHours(0,0,0,0);
-        sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
+        // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
+        sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date || date_now);
         if (sa.name === example_assignment_name) {
             sa.assignment_date = new Date(date_now.valueOf());
         }
