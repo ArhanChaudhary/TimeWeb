@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");
                         $("#id_background_image").val("");
                         $("#id_horizontal_tag_position").val("Middle");
+                        $("#id_assignment_spacing").val("Comfy");
                         $("#id_vertical_tag_position").val("Top");
                         $("#id_default_dropdown_tags").val("").trigger("input");
                     }
