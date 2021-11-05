@@ -25,7 +25,7 @@
                 {% elif field.name == "reverse_sorting" %}
                     Assignment Priority
                 {% elif field.name == "assignment_spacing" %}
-                    Personalize
+                    Assignment Header
                 {% endif %}
             </legend>
             {% endif %}
@@ -54,7 +54,7 @@
                     </tr>
                 </tbody>
             </table>
-        {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "enable_tutorial" %}
+        {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "vertical_tag_position" %}
         </fieldset>
         {% endif %}
     {% endfor %}

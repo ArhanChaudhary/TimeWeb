@@ -218,7 +218,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Show Priority Text'),
     )
     
-    # Group "Personalize"
+    # Group "Assignment Header"
     assignment_spacing = models.CharField(
         max_length=MAX_ASSIGNMENT_SPACINGS_LENGTH,
         choices=ASSIGNMENT_SPACINGS,
