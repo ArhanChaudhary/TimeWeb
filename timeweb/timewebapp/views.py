@@ -39,6 +39,8 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+
+# Google API exceptions
 from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
@@ -499,6 +501,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # If there are no valid credentials available, let the user log in.
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
+                # Errors can happen in refresh because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
                 credentials.refresh(Request())
                 self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
                 self.settings_model.save()

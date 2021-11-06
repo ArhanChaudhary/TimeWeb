@@ -111,6 +111,16 @@
                 <img id="background-image" src="/media/images/{{ user.get_username }}/{{ background_image_name }}" width="{{background_image.width}}" height="{{background_image.height}}" draggable="false">
                 {% endif %}
                 {% block content %}{% endblock content %}
+                <div id="loading-container">
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                    <div class="loading-circle"></div>
+                </div>
                 <template id="info-button-template">
                     <div class="info-button" tabindex="-1">
                         i<span class="info-button-text"></span>

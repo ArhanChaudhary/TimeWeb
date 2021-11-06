@@ -83,6 +83,81 @@ main {
     -o-object-fit: cover;
        object-fit: cover;
 }
+#loading-container {
+    display: none;
+    --circle-count: 8;
+}
+.loading-circle {
+    position: absolute;
+    --radius: 75;
+    --s: 40px;
+    width: var(--s);
+    height: var(--s);
+    background: gray;
+    border-radius: 50%;
+    transform: translate(calc(var(--x) * var(--radius) * 1px), calc(var(--y) * var(--radius) * 1px));
+    -webkit-animation: animateLoading 1s cubic-bezier(0.71, 0, 0.6, 0.79) calc(1s * (var(--circle-number) - var(--circle-count)) / var(--circle-count)) infinite;
+            animation: animateLoading 1s cubic-bezier(0.71, 0, 0.6, 0.79) calc(1s * (var(--circle-number) - var(--circle-count)) / var(--circle-count)) infinite;
+}
+.loading-circle:nth-child(1) {
+    --circle-number: 1;
+    --x: 0;
+    --y: 1;
+}
+.loading-circle:nth-child(2) {
+    --circle-number: 2;
+    --x: 0.7071;
+    --y: 0.7071;
+}
+.loading-circle:nth-child(3) {
+    --circle-number: 3;
+    --x: 1;
+    --y: 0;
+}
+.loading-circle:nth-child(4) {
+    --circle-number: 4;
+    --x: 0.7071;
+    --y: -0.7071;
+}
+.loading-circle:nth-child(5) {
+    --circle-number: 5;
+    --x: 0;
+    --y: -1;
+}
+.loading-circle:nth-child(6) {
+    --circle-number: 6;
+    --x: -0.7071;
+    --y: -0.7071;
+}
+.loading-circle:nth-child(7) {
+    --circle-number: 7;
+    --x: -1;
+    --y: 0;
+}
+.loading-circle:nth-child(8) {
+    --circle-number: 8;
+    --x: -0.7071;
+    --y: 0.7071;
+}
+@-webkit-keyframes animateLoading {
+    from {
+        background: gray;
+    }
+    to {
+        background: inherit;
+    }
+}
+@keyframes animateLoading {
+    from {
+        background: gray;
+    }
+    to {
+        background: inherit;
+    }
+}
+#dark-mode #loading-container {
+    filter: invert(1);
+}
 #logo-container {
     display: inline-block;
     position: relative;
@@ -94,7 +169,8 @@ main {
 }
 body {
     margin: 0;
-    background: radial-gradient(circle, rgb(245,245,245) 0, rgb(192,192,192) 100%);
+    --body-background: radial-gradient(circle, rgb(245,245,245) 0, rgb(192,192,192) 100%);
+    background: var(--body-background);
 }
 #site {
     position: relative;

@@ -132,9 +132,6 @@ utils = {
                     
                     All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
                 );
-                $("a[href=\"settings\"]").click(function() {
-                    $("main > *").fadeOut();
-                });
             },
 
             googleClassroomAPI: function() {
@@ -303,11 +300,12 @@ utils = {
                         }
                     });
                 });
-                // Click on after and before pseudo-elements
+                // Expand shortcut hitbox by also simulating clicking on after and before pseudo-elements
                 $(".assignment-container").click(function(e) {
                     const assignment_container = $(this);
                     const dom_assignment = assignment_container.children(".assignment");
-                    const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left;
+                    const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left
+                        || dom_assignment.offset().top - assignment_container.offset().top >= e.offsetY;
                     const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") 
                         && e.offsetX <= parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-left")) + parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-width"))
                         && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top;
@@ -451,14 +449,12 @@ utils = {
                         tag_names: [...tag_names],
                         action: "tag_add",
                     }
-                    setTimeout(function() {
                     $.ajax({
                         type: "POST",
                         data: data,
                         success: success,
                         error: ajaxUtils.error,
                     });
-                    }, 2000);
                     return;
                 }
                 // Tag add textbox was selected or tags were selected
@@ -826,7 +822,7 @@ ajaxUtils = {
         } else if (response.status == 404) {
             $.alert({title: "Not found.", content: "Refresh or try again."});
         } else if (response.status == 500) {
-            $.alert({title: "Internal server error.", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this."});
+            $.alert({title: "Internal server error.", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this, and try to provide context on how the issue happened."});
         } else if (exception === 'timeout' || response.status == 502) {
             $.alert({title: "Request timed out.", content: "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again."});
         } else if (exception === 'abort') {

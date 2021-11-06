@@ -180,6 +180,16 @@ $(function() {
     $("#nav-about").click(() => $.alert({title: "This hasn't yet been written."})).css("text-decoration", "line-through");
     $("#nav-credits").click(() => $.alert({title: CREDITS_TEMPLATE}));
 });
+window.onbeforeunload = function() {
+    $("main > *").hide();
+    $("main").css({
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    });
+    $("#loading-container").css("display", "contents");
+};
+
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
 function collision($div1, $div2) {
     var x1 = $div1.offset().left;
