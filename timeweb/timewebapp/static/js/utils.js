@@ -218,7 +218,7 @@ utils = {
 
                     $.confirm({
                         title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
-                        content: 'This action is irreversible',
+                        content: 'This action is irreversible.',
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -303,12 +303,14 @@ utils = {
                         }
                     });
                 });
+            },
+            expandShortcutHitboxes: function() {
                 // Expand shortcut hitbox by also simulating clicking on after and before pseudo-elements
                 $(".assignment-container").click(function(e) {
                     const assignment_container = $(this);
                     const dom_assignment = assignment_container.children(".assignment");
                     const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left
-                        || dom_assignment.offset().top - assignment_container.offset().top >= e.offsetY;
+                                                || e.offsetY <= dom_assignment.offset().top - assignment_container.offset().top;
                     const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") 
                         && e.offsetX <= parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-left")) + parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-width"))
                         && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top;
@@ -317,7 +319,8 @@ utils = {
                             .each(function() {
                                 const shortcut = $(this).children(".shortcut");
                                 if (!!shortcut.length) {
-                                    shortcut.is(":visible") && shortcut.click();
+                                    // Don't click when invisible or when alreay hovered (to prevent double clicking)
+                                    shortcut.is(":visible") && !shortcut.is(":hover") && shortcut.click();
                                     return false;
                                 }
                             });
@@ -910,7 +913,7 @@ ajaxUtils = {
                     title: ajaxUtils.notice_assignments.length === 1 
                     ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled.`
                     : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates enabled.`,
-                    conent: "This only occurs when you an assignment's due date passes, but the assignment still isn't complete.",
+                    content: "This only occurs when an assignment's due date passes, but the assignment still isn't complete. If you don't want this to happen, disable soft due dates in the edit assignment form.",
                 });
                 ajaxUtils.notice_assignments = new Set();
             }
@@ -1077,6 +1080,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();
+    utils.ui.setClickHandlers.expandShortcutHitboxes();
     if (isExampleAccount) {
         utils.ui.exampleAccountAlertTutorial();
     }
