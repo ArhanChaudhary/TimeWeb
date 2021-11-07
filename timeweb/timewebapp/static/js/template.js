@@ -172,15 +172,21 @@ $(function() {
                 });
             } else {
                 if (isMobile) {
-                    $.alert({title: "Please use the Safari browser:<br>Click the share icon on your screen (up arrow in a square) and scroll to \"Add to Home Screen\"."});
+                    $.alert({
+                        title: "Please use the Safari browser:<br>Click the share icon on your screen (up arrow in a square) and scroll to \"Add to Home Screen\".",
+                    });
                 } else {
-                    $.alert({title: "Progressive web apps are not supported on your web browser. Please use Google Chrome or Microsoft Edge (ignore this if you already have TimeWeb installed)."});
+                    $.alert({
+                        title: "Progressive web apps are not supported on your web browser. Please use Google Chrome or Microsoft Edge (ignore this if you already have TimeWeb installed).",
+                    });
                 }
             }
         });
     }
     $("#nav-about").click(() => $.alert({title: "This hasn't yet been written."})).css("text-decoration", "line-through");
-    $("#nav-credits").click(() => $.alert({title: CREDITS_TEMPLATE}));
+    $("#nav-credits").click(() => $.alert({
+        title: CREDITS_TEMPLATE,
+    }));
 });
 window.onbeforeunload = function() {
     $("main > *").hide();

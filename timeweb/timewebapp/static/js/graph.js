@@ -573,6 +573,12 @@ class VisualAssignment extends Assignment {
             screen.rotate(-Math.PI / 2);
         }
     }
+    static assignmentGraphOnScreen($dom_assignment) {
+        const fixed_graph = $dom_assignment.find(".fixed-graph");
+        const rect = fixed_graph[0].getBoundingClientRect();
+        // Makes sure graph is on screen
+        return rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight;
+    }
     setGraphButtonEventListeners() {
         // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
@@ -594,9 +600,7 @@ class VisualAssignment extends Assignment {
         $(document).keydown(e => {
             // fixed_graph.is(":visible") to make sure it doesnt change when the assignment is closed
             if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.fixed_graph.is(":visible")) {
-                const rect = this.fixed_graph[0].getBoundingClientRect();
-                // Makes sure graph is on screen
-                if (rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight && !fired) {
+                if (VisualAssignment.assignmentGraphOnScreen(this.dom_assignment) && !fired) {
                     // "fired" makes .keydown fire only when a key is pressed, not repeatedly
                     fired = true;
                     this.pressed_arrow_key = e.key;

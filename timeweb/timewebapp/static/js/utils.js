@@ -824,17 +824,34 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         if (response.status == 0) {
-            $.alert({title: "Failed to connect.", content: "We can't establish a connection with the server. Check your connection and try again."});
+            $.alert({
+                title: "Failed to connect.", 
+                content: "We can't establish a connection with the server. Check your connection and try again.",
+            });
         } else if (response.status == 404) {
-            $.alert({title: "Not found.", content: "Refresh or try again."});
+            $.alert({
+                title: "Not found.",
+                content: "Refresh or try again.",
+            });
         } else if (response.status == 500) {
-            $.alert({title: "Internal server error.", content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this, and try to provide context on how the issue happened."});
+            $.alert({
+                title: "Internal server error.",
+                content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this, and try to provide context on how the issue happened.",
+            });
         } else if (exception === 'timeout' || response.status == 502) {
-            $.alert({title: "Request timed out.", content: "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again."});
+            $.alert({
+                title: "Request timed out.",
+                content: "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.",
+            });
         } else if (exception === 'abort') {
-            $.alert({title: "Request aborted.", content: "Try refreshing or try again."});
+            $.alert({
+                title: "Request aborted.",
+                content: "Try refreshing or try again.",
+            });
         } else {
-            $.alert({title: "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText});
+            $.alert({
+                title: "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText,
+            });
         }
     },
     ajaxFinishedTutorial: function() {
@@ -914,6 +931,7 @@ ajaxUtils = {
                     ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled.`
                     : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates enabled.`,
                     content: "This only occurs when an assignment's due date passes, but the assignment still isn't complete. If you don't want this to happen, disable soft due dates in the edit assignment form.",
+                    backgroundDismiss: false,
                 });
                 ajaxUtils.notice_assignments = new Set();
             }
@@ -937,6 +955,7 @@ ajaxUtils = {
                 $.alert({
                     title: "An assignment takes up too much space and can no longer be saved.",
                     content: "An assignment has too many work inputs. Try changing its assignment date to today to lessen its work inputs.",
+                    backgroundDismiss: false,
                 });
                 return;
             }
@@ -974,6 +993,7 @@ if (!seen_latest_changelog) {
         const jconfirm = $.alert({
             title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version}`,
             content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"changelog\">changelog.</a>",
+            backgroundDismiss: false,
             onClose: function() {
                 seen_latest_changelog = true;
                 ajaxUtils.ajaxSeenLatestChangelog();
@@ -981,7 +1001,7 @@ if (!seen_latest_changelog) {
         });
         setTimeout(function() {
             jconfirm.$content.css("opacity", "0.85");
-            jconfirm.$titleContainer.css("padding-bottom", "5px");
+            jconfirm.$titleContainer.css("padding-bottom", 5);
         }, 0);
     }, 500);
 }
