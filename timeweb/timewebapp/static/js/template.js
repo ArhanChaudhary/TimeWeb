@@ -195,6 +195,7 @@ window.onbeforeunload = function() {
         justifyContent: "center",
         alignItems: "center",
     });
+    $("#background-image").show();
     $("#loading-container").css("display", "contents");
 };
 
