@@ -22,9 +22,9 @@ class Priority {
         var that = this;
         const percentage_as_decimal = priority_percentage / 100;
         if (isNaN(percentage_as_decimal)) {
-            var r = 255;
-            var g = 255;
-            var b = 255;
+            var r = 999;
+            var g = 999;
+            var b = 999;
         } else {
             var r = lowest_priority_color.r + (highest_priority_color.r - lowest_priority_color.r) * percentage_as_decimal;
             var g = lowest_priority_color.g + (highest_priority_color.g - lowest_priority_color.g) * percentage_as_decimal;
