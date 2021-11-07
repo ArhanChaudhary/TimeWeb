@@ -192,7 +192,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
     show_progress_bar = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_('Show Graph Progress Bar'),
     )
 
