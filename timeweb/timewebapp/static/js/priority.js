@@ -570,13 +570,13 @@ class Priority {
         if (that.due_date_passed_notices.length === 1) {
             $.alert({
                 title: `Notice: The assignment ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} has been marked as completely finished because its due date has passed.`,
-                content: "You can also enable soft due dates in the assignment form if you want them to automatically increment if you don't finish the assignment by then.",
+                content: "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.",
                 backgroundDismiss: false,
             });
         } else if (that.due_date_passed_notices.length > 1) {
             $.alert({
                 title: `Notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} have been marked as completely finished because their due dates have passed.`,
-                content: "You can also enable soft due dates in the assignment form if you want them to automatically increment if you don't finish the assignment by then.",
+                content: "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.",
                 backgroundDismiss: false,
             });
         }
