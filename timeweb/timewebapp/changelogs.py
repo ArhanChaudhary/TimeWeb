@@ -1,6 +1,30 @@
 # Could probably make this a json but multi line strings are not allowed
 CHANGELOGS = [
 {
+    "version": "v1.5.1 (11/7/2021):",
+    "updates": '''<ul>
+                    <li>Added soft due dates</li>
+                    <li>Added "since" keyword to the work input</li>
+                    <li>Added changelog alert updates</li>
+                    <li>Added "assignment spacing" setting</li>
+                    <li>Improved priority algorithm</li>
+                    <li>Improved dynamic mode algorithm</li>
+                    <li>Improved example account</li>
+                    <li>Improved dark mode</li>
+                    <li>Increased work input validation flexibility</li>
+                    <li>Dozens of minor UI improvements</li>
+                    <li>Minor bug fixes</li>
+                    <ul>
+                        <li>Fixed "Next Assignment" button sometimes not working</li>
+                        <li>Fixed rare Google Classroom API errors</li>
+                        <li>Fixed skew ratio not capping properly</li>
+                        <li>Fixed submitting duplicate assignment tags</li>
+                        <li>Fixed default minimum work time not showing up for Google Classroom assignments</li>
+                        <li>Fixed incorrect Google Classroom assignment creation validation</li>
+                    </ul>
+                </ul>''',
+},
+{
     "version": "v1.5.0 (10/12/2021):",
     "updates": '''<ul>
                     <li>Major UI improvements</li>
