@@ -232,7 +232,7 @@ class VisualAssignment extends Assignment {
             move_info_down = 0;
             let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
                 bar_move_left = should_be_done_x - this.width + 17;
-            if (bar_move_left < 0 || this.sa.x <= today_minus_assignment_date || last_work_input >= this.sa.y) {
+            if (bar_move_left < 0 || this.dom_assignment.hasClass("completely-finished")) {
                 bar_move_left = 0
             } else if (should_be_done_x > this.width - 8) {
                 bar_move_left = this.width - 8;
@@ -394,7 +394,7 @@ class VisualAssignment extends Assignment {
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
         center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
-        if (last_work_input < this.sa.y) {
+        if (!this.dom_assignment.hasClass("completely-finished")) {
             if (goal_for_this_day < last_work_input || this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 goal_for_this_day = last_work_input;
             }
@@ -652,9 +652,11 @@ class VisualAssignment extends Assignment {
         submit_work_button.click(() => {
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
-            let not_applicable_message;
+            let not_applicable_message_title;
+            let not_applicable_message_description;
             if (!work_input_textbox.val()) {
-                not_applicable_message = "Enter a Value";
+                not_applicable_message_title = "Enter a Value.";
+                not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"user-guide#standard-assignment-graph-controls\">user guide</a>) into the textbox to submit a work input."
             } else if (last_work_input >= this.sa.y) {
                 not_applicable_message = "Already Finished";
             }
@@ -663,7 +665,8 @@ class VisualAssignment extends Assignment {
             if (input_done.startsWith("since")) {
                 input_done = +input_done.replace("since", "").trim();
                 if (isNaN(input_done)) {
-                    not_applicable_message = "Invalid Format";
+                    not_applicable_message_title = "Invalid \"since\" format.";
+                    not_applicable_message_description = "Please use the \"since\" keyword with the format: \"since [number]\".";
                 }
                 const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
                 const array_length = today_minus_assignment_date - (this.sa.blue_line_start + len_works) - 1;
@@ -679,7 +682,8 @@ class VisualAssignment extends Assignment {
                     default: {
                         input_done = +input_done;
                         if (isNaN(input_done)) {
-                            not_applicable_message = "Invalid Number";
+                            not_applicable_message_title = "Invalid Number.";
+                            not_applicable_message_description = "Please enter a valid number into the textbox to submit a work input."
                         }
                     }
                 }
@@ -687,18 +691,23 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 todo = 0;
             }
-            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y) {
-                if (this.sa.soft) {
-                    this.sa.x++;
-                    const due_date = new Date(this.sa.assignment_date.valueOf());
-                    due_date.setDate(due_date.getDate() + this.sa.x);
-                    ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
-                } else {
-                    not_applicable_message = "Last work input must finish this assignment";
-                }
+            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y
+                && this.sa.soft) {
+                this.sa.x++;
+                const due_date = new Date(this.sa.assignment_date.valueOf());
+                due_date.setDate(due_date.getDate() + this.sa.x);
+                ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
             }
-            if (not_applicable_message) {
-                $.alert({title: not_applicable_message});
+            if (len_works + this.sa.blue_line_start === this.sa.x) {
+                not_applicable_message_title = "End of Assignment.";
+                not_applicable_message_description = "You've reached the end of this assignment, and there are no more work inputs to submit.";
+            }
+            if (not_applicable_message_title) {
+                $.alert({
+                    title: not_applicable_message_title,
+                    content: not_applicable_message_description,
+                    onDestroy: () => work_input_textbox.focus(),
+                });
                 return;
             }
             if (input_done + last_work_input < 0) {
@@ -728,7 +737,10 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Display button
         display_button.click(() => {
-            $.alert({title: "This feature hasn't yet been implemented."});
+            $.alert({
+                title: "This feature hasn't yet been implemented.",
+                content: "If you see me at school, yell at me to code this in.",
+            });
         });
         // END Display button
 

@@ -278,10 +278,8 @@ class Priority {
                     ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
                 }
                 if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
-                    let reached_end_of_assignment = false;
                     for (let i = 0; i < number_of_forgotten_days; i++) {
-                        if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x - 1) {
-                            reached_end_of_assignment = true;
+                        if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
                             break;
                         }
                         has_autofilled = true;
@@ -306,8 +304,6 @@ class Priority {
                         due_date.setDate(due_date.getDate() + sa.sa.x);
                         ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, sa.sa.id);
                     }
-                    // Remove from "if has_autofilled" because this may need to run even if nothing autofills
-                    ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.concat(reached_end_of_assignment ? [last_work_input] : []).map(String), sa.sa.id);
                     if (has_autofilled) {
                         for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
                             sa.setDynamicStartIfInDynamicMode();
@@ -316,6 +312,7 @@ class Priority {
                         sa.setDynamicStartIfInDynamicMode();
                         ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
                         ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                     }
                 }
@@ -327,7 +324,8 @@ class Priority {
                 due_date_minus_today = sa.sa.x - today_minus_ad;
                 const todo_is_completed = todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start;
                 const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_ad) % 7) && due_date_minus_today !== 1;
-                if (today_minus_ad > len_works + sa.sa.blue_line_start || !x1) {
+                // Don't mark as no working days when the end of the assignment has been reached
+                if (today_minus_ad > len_works + sa.sa.blue_line_start || (!x1 && len_works + sa.sa.blue_line_start !== sa.sa.x)) {
                     status_image = 'question-mark';
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s break days';
@@ -379,7 +377,7 @@ class Priority {
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
                     that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
-                    if ([that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.FINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(status_value)) {
+                    if ([that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(status_value)) {
                         status_value = that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
                 } else if (due_date_minus_today < 7) {

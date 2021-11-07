@@ -144,7 +144,10 @@ utils = {
                 }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
-                        $.alert({title: "You can't enable the Google Classroom API on the example account."});
+                        $.alert({
+                            title: "You can't enable the Google Classroom API on the example account.",
+                            content: "Please create your own account and try again.",
+                        });
                         return;
                     }
                     if (creating_gc_assignments_from_frontend) return;
@@ -928,7 +931,10 @@ ajaxUtils = {
     sendAttributeAjax: function() {
         const success = function(responseText) {
             if (responseText === "RequestDataTooBig") {
-                $.alert({title: "An assignment takes up too much space and can no longer be saved.", content: "An assignment has too many work inputs. Try changing its assignment date to today to reset its work inputs."});
+                $.alert({
+                    title: "An assignment takes up too much space and can no longer be saved.",
+                    content: "An assignment has too many work inputs. Try changing its assignment date to today to lessen its work inputs.",
+                });
                 return;
             }
             gtag("event","save_assignment");
@@ -963,7 +969,7 @@ if (!seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
         const jconfirm = $.alert({
-            title: `A new update is here! You can also view this on TimeWeb's <a href="changelog">changelog.</a><br><br>${latest_changelog.version}`,
+            title: `Hey there! A new update is here :D!<br>${latest_changelog.version}<br>This can also be viewed on TimeWeb's <a href="changelog">changelog.</a>`,
             content: latest_changelog.updates,
             onClose: function() {
                 seen_latest_changelog = true;
@@ -1022,12 +1028,7 @@ for (let sa of dat) {
     if (sa.min_work_time) sa.min_work_time /= (sa.time_per_unit || 1); // Converts min_work_time to int if string or null
     if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
-    const len_works = sa.works.length - 1;
-    
-    if (![sa.y, sa.blue_line_start, sa.x].includes(undefined) &&
-        len_works + sa.blue_line_start === sa.x && sa.works[len_works] < sa.y) {
-        sa.works.pop();
-    }
+
     sa.break_days = sa.break_days.map(Number);
     sa.tags = sa.tags || [];
 

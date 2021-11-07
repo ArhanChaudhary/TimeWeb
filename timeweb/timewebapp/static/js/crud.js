@@ -84,13 +84,13 @@ class Crud {
             $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
             $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
             $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
-            $("label[for='id_funct_round'] .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
+            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         } else {
             $("label[for='id_y']").html("Total number of Units in this Assignment");
             $("label[for='id_works']").onlyText("Total number of Units already Completed");
             $("label[for='id_time_per_unit']").html("Estimated number of Minutes to complete each Unit");
             $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
-            $("label[for='id_funct_round'] .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
+            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
         }
         if (singularToLowerCase in that.UNITS_OF_TIME) {
             $("#id_time_per_unit").val(that.UNITS_OF_TIME[singularToLowerCase]);
@@ -263,7 +263,7 @@ class Crud {
             bottom: 18,
         });
         $("#id_soft").info('left',
-            `This makes this assignment's due date soft, which increments it if you haven't finished the assignment by then`,
+            `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
         "after").css({
             marginRight: 9,
         })
