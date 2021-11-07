@@ -189,6 +189,7 @@ $(function() {
     }));
 });
 window.onbeforeunload = function() {
+    if (window.disable_loading) return;
     $("main > *").hide();
     $("main").css({
         display: "flex",

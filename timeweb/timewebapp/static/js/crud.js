@@ -217,6 +217,7 @@ class Crud {
 
         let submitted = false;
         $("#form-wrapper form").submit(function(e) {
+            disable_loading = true;
             // Prevent submit button spam clicking
             if (submitted) {
                 e.preventDefault();
