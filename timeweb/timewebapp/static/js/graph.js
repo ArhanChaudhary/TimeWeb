@@ -198,8 +198,8 @@ class VisualAssignment extends Assignment {
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-        // && raw_x && raw_y is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
-        if (this.draw_mouse_point && raw_x && raw_y) {
+        // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
+        if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             // -50.1 and -48.7 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
             var mouse_x = Math.round((raw_x - 50.1) / this.wCon),
                 mouse_y = (this.height - raw_y - 48.7) / this.hCon;
@@ -337,7 +337,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.textAlign = "start";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
-        if (this.draw_mouse_point && raw_x && raw_y) {
+        if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             let funct_mouse_x;
             if (mouse_y) {
                 funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];

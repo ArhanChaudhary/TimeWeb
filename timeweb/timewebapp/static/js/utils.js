@@ -969,8 +969,8 @@ if (!seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
         const jconfirm = $.alert({
-            title: `Hey there! A new update is here :D!<br>${latest_changelog.version}<br>This can also be viewed on TimeWeb's <a href="changelog">changelog.</a>`,
-            content: latest_changelog.updates,
+            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version}`,
+            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"changelog\">changelog.</a>",
             onClose: function() {
                 seen_latest_changelog = true;
                 ajaxUtils.ajaxSeenLatestChangelog();
