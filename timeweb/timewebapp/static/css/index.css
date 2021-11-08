@@ -405,6 +405,8 @@ a[href="settings"] {
 }
 .assignment.open-assignment.tags-bottom.tags-right .tags {
     right: 2px;
+    /* Dirty hardcoded fix to position tags with different assignment paddings */
+    top: calc(100% + var(--vertical-assignment-padding) - 15px);
 }
 .assignment.open-assignment.tags-bottom.tags-left .tags {
     left: 0;

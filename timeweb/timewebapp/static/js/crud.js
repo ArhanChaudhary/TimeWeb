@@ -112,6 +112,7 @@ class Crud {
             $("label[for='id_funct_round']").removeClass("disabled-field");
         }
         that.old_unit_value = singularToLowerCase;
+        // +1 to show the line under "Advanced Inputs"
         $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseInt($("#advanced-inputs").css("margin-top")) + 1 + $("#fields-wrapper").scrollTop());
     }
     setCrudHandlers() {
