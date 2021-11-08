@@ -112,7 +112,7 @@ class Crud {
             $("label[for='id_funct_round']").removeClass("disabled-field");
         }
         that.old_unit_value = singularToLowerCase;
-        $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#fields-wrapper").scrollTop());
+        $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseInt($("#advanced-inputs").css("margin-top")) + 1 + $("#fields-wrapper").scrollTop());
     }
     setCrudHandlers() {
         var that = this;
