@@ -1044,7 +1044,7 @@ for (let sa of dat) {
         }
     }
     // Repopulating the form
-    sa.original_min_work_time = sa.min_work_time;
+    sa.original_min_work_time = +sa.min_work_time;
 
     if (sa.y) sa.y = +sa.y;
     if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;

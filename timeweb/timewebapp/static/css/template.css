@@ -377,7 +377,7 @@ nav:focus-within #nav-menu::after {
     padding: 0 !important;
     color: black;
     font-size: 13px;
-    line-height: 13px;
+    line-height: 14px;
     font-style: normal;
     white-space: pre-line;
     opacity: 0;

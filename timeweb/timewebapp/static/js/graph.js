@@ -662,7 +662,8 @@ class VisualAssignment extends Assignment {
                 not_applicable_message_title = "Enter a Value.";
                 not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"user-guide#standard-assignment-graph-controls\">user guide</a>) into the textbox to submit a work input."
             } else if (last_work_input >= this.sa.y) {
-                not_applicable_message = "Already Finished";
+                not_applicable_message_title = "Already Finished.";
+                not_applicable_message_description = "You've already finished this assignment, so you can't enter any more work inputs.";
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_textbox.val().trim().toLowerCase();
@@ -714,7 +715,10 @@ class VisualAssignment extends Assignment {
                 });
                 return;
             }
-            if (input_done + last_work_input < 0) {
+            // Cap at y and 0
+            if (input_done + last_work_input > this.sa.y) {
+                input_done = this.sa.y - last_work_input;
+            } else if (input_done + last_work_input < 0) {
                 input_done = -last_work_input;
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
