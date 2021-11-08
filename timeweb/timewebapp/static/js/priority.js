@@ -410,7 +410,10 @@ class Priority {
                 status_priority = -index;
             } else if (ignore_tag_status_value === that.NOT_YET_ASSIGNED) {
                 status_priority = today_minus_ad;
-            } else if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
+            } else if ([that.FINISHED_FOR_TODAY, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
+                // Include that.FINISHED_FOR_TODAY
+                // If you're submitting work inpuuts for a check marked assignments ahead of time, it might swap with other check marked assignments, if this wasn't here and it went to the end of the if chain, which would make no sense
+
                 // Don't use NaN because NaN === NaN is false for calculations used later
                 status_priority = undefined;
             } else if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, that.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
