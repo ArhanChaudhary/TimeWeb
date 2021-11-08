@@ -1043,24 +1043,23 @@ for (let sa of dat) {
             sa.assignment_date.setDate(sa.assignment_date.getDate() + x_transform);
         }
     }
+    // Repopulating the form
+    sa.original_min_work_time = sa.min_work_time;
+
     if (sa.y) sa.y = +sa.y;
     if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;
     if (sa.funct_round) sa.funct_round = +sa.funct_round;
-    // If sa.time_per_unit is undefined, don't translate the minimum work time and display the raw value in update assignment in crud.js
-    // The || 1 might cause issues if sa.time_per_unit is 0, but this won't happen
-    if (sa.min_work_time) sa.min_work_time /= (sa.time_per_unit || 1); // Converts min_work_time to int if string or null
+    if (sa.min_work_time) sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
     if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
-
     sa.break_days = sa.break_days.map(Number);
-    sa.tags = sa.tags || [];
+    if (!sa.tags) sa.tags = [];
 
     const red_line_start_x = sa.fixed_mode ? 0 : sa.dynamic_start; // X-coordinate of the start of the red line
     const red_line_start_y = sa.fixed_mode ? 0 : sa.works[red_line_start_x - sa.blue_line_start]; // Y-coordinate of the start of the red line
 
-    // Repopulating the form
-    sa.original_funct_round = sa.funct_round;
-    sa.original_min_work_time = sa.min_work_time;
+   
+    
     // Caps and adjusts min_work_time and funct_round; needed in parabola.js i think
     let y1 = sa.y - red_line_start_y;
     if (Number.isFinite(sa.funct_round) && Number.isFinite(y1) && sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN

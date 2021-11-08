@@ -380,6 +380,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if not self.sm.funct_round:
                 self.sm.funct_round = 1
             if self.sm.min_work_time != None:
+                original_min_work_time = self.sm.min_work_time
                 self.sm.min_work_time /= self.sm.time_per_unit
 
             if self.sm.x == None:
@@ -450,7 +451,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     if self.created_assignment or self.sm.needs_more_info:
                         self.sm.dynamic_start = 0
             if self.sm.min_work_time != None:
-                self.sm.min_work_time *= self.sm.time_per_unit
+                self.sm.min_work_time = original_min_work_time
             if self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:

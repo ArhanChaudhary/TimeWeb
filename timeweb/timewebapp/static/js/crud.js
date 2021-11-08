@@ -157,9 +157,9 @@ class Crud {
                 "#id_time_per_unit": sa.time_per_unit,
                 "#id_description": sa.description,
                 "#id_works": sa.works[0],
-                "#id_funct_round": sa.original_funct_round && sa.original_funct_round-1 ? +sa.original_funct_round : '', // Displays nothing if it is 1
+                "#id_funct_round": sa.funct_round-1 ? sa.funct_round : '', // Displays nothing if it is 1 or null
                 // The || 1 might cause issues if sa.time_per_unit is 0, but this won't happen
-                "#id_min_work_time": (sa.original_min_work_time * (sa.time_per_unit || 1))||'',
+                "#id_min_work_time": sa.original_min_work_time||'',
             }
             for (const field in ASSIGNMENT_FORM_FIELDS) {
                 if ($(field).attr("type") === "checkbox")
