@@ -166,7 +166,7 @@ class Priority {
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
             // || date_now for displaying daysleft for needs more info if the due date exists but the assignment date doesn't
-            let today_minus_ad = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date || date_now);
+            let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date || date_now);
             let todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
@@ -177,7 +177,7 @@ class Priority {
             let has_autofilled = false;
             let first_tag = sa.sa.tags[0];
             if (["Important","Not Important"].includes(first_tag)) first_tag = undefined;
-            const number_of_forgotten_days = today_minus_ad - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
+            const number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (!sa.sa.needs_more_info && that.params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 for (let i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
@@ -216,7 +216,7 @@ class Priority {
 
                 // Copy paste of some below code
                 if (Number.isFinite(sa.sa.x)) {
-                    due_date_minus_today = sa.sa.x - today_minus_ad;
+                    due_date_minus_today = sa.sa.x - today_minus_assignment_date;
                     if (due_date_minus_today < -1) {
                         str_daysleft = -due_date_minus_today + "d Ago";
                     } else if (due_date_minus_today === -1) {
@@ -234,12 +234,12 @@ class Priority {
                     }
                 }
 
-            // (sa.sa.x <= today_minus_ad && !sa.sa.soft)
+            // (sa.sa.x <= today_minus_assignment_date && !sa.sa.soft)
             // This marks the assignment as completed if its due date passes
             // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
             // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
             // Instead, give it a question mark so it can be appropriately handled
-            } else if (last_work_input >= sa.sa.y || (sa.sa.x <= today_minus_ad && !sa.sa.soft)) {
+            } else if (last_work_input >= sa.sa.y || (sa.sa.x <= today_minus_assignment_date && !sa.sa.soft)) {
                 status_image = "completely-finished";
                 if (last_work_input >= sa.sa.y) {
                     status_message = 'You\'re Completely Finished with this Assignment';
@@ -257,15 +257,15 @@ class Priority {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = that.COMPLETELY_FINISHED;
-            } else if (today_minus_ad < 0) {
+            } else if (today_minus_assignment_date < 0) {
                 status_image = "no-status-image";
                 status_message = 'This Assignment hasn\'t yet been Assigned';
-                if (today_minus_ad === -1) {
+                if (today_minus_assignment_date === -1) {
                     str_daysleft = 'Assigned Tomorrow';
-                } else if (today_minus_ad > -7) {
+                } else if (today_minus_assignment_date > -7) {
                     str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
                 } else {
-                    str_daysleft = `Assigned in ${-today_minus_ad}d`;
+                    str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
                 }
                 status_value = that.NOT_YET_ASSIGNED;
             } else {
@@ -298,8 +298,8 @@ class Priority {
                      * 7 7 > 8
                      * 10 7 > 11
                      */
-                    if (sa.sa.soft && today_minus_ad >= sa.sa.x) {
-                        sa.sa.x = today_minus_ad + 1;
+                    if (sa.sa.soft && today_minus_assignment_date >= sa.sa.x) {
+                        sa.sa.x = today_minus_assignment_date + 1;
                         const due_date = new Date(sa.sa.assignment_date.valueOf());
                         due_date.setDate(due_date.getDate() + sa.sa.x);
                         ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, sa.sa.id);
@@ -321,11 +321,11 @@ class Priority {
                     const mods = sa.calcModDays();
                     x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
                 }
-                due_date_minus_today = sa.sa.x - today_minus_ad;
-                const todo_is_completed = todo <= 0 || today_minus_ad < len_works + sa.sa.blue_line_start;
-                const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_ad) % 7) && due_date_minus_today !== 1;
+                due_date_minus_today = sa.sa.x - today_minus_assignment_date;
+                const todo_is_completed = todo <= 0 || today_minus_assignment_date < len_works + sa.sa.blue_line_start;
+                const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7) && due_date_minus_today !== 1;
                 // Don't mark as no working days when the end of the assignment has been reached
-                if (today_minus_ad > len_works + sa.sa.blue_line_start || (!x1 && len_works + sa.sa.blue_line_start !== sa.sa.x)) {
+                if (today_minus_assignment_date > len_works + sa.sa.blue_line_start || (!x1 && len_works + sa.sa.blue_line_start !== sa.sa.x)) {
                     status_image = 'question-mark';
                     if (!x1) {
                         status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s break days';
@@ -409,7 +409,7 @@ class Priority {
             if (ignore_tag_status_value === that.COMPLETELY_FINISHED) {
                 status_priority = -index;
             } else if (ignore_tag_status_value === that.NOT_YET_ASSIGNED) {
-                status_priority = today_minus_ad;
+                status_priority = today_minus_assignment_date;
             } else if ([that.FINISHED_FOR_TODAY, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
                 // Include that.FINISHED_FOR_TODAY
                 // If you're submitting work inpuuts for a check marked assignments ahead of time, it might swap with other check marked assignments, if this wasn't here and it went to the end of the if chain, which would make no sense
