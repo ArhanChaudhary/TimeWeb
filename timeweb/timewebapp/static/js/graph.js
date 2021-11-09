@@ -588,13 +588,11 @@ class VisualAssignment extends Assignment {
         // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
-                display_button = this.dom_assignment.find(".display-button"),
                 skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 submit_work_button = this.dom_assignment.find(".submit-work-button"),
                 ignore_assignment_button = this.dom_assignment.find(".mark-as-finished-button"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
-                delete_work_input_button = this.dom_assignment.find(".delete-work-input-button"),
-                next_assignment_button = this.dom_assignment.find(".next-assignment-button");
+                delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
@@ -744,18 +742,15 @@ class VisualAssignment extends Assignment {
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort({ timeout: true });
+            // Put this after priority.sort because that triggers a resize, which messes up drawFixed()
+            setTimeout(function() {
+                if (close_graph_after_work_input) {
+                    this.dom_assignment.click();
+                }
+            }.bind(this), 400);
             this.draw();
         });
         // END Submit work button
-
-        // BEGIN Display button
-        display_button.click(() => {
-            $.alert({
-                title: "This feature hasn't yet been implemented.",
-                content: "If you see me at school, yell at me to code this in.",
-            });
-        });
-        // END Display button
 
         // BEGIN ignore button
         let not_applicable_timeout_ignore_assignment_button;
@@ -774,29 +769,6 @@ class VisualAssignment extends Assignment {
             priority.sort();
         }).html(this.sa.mark_as_done ? "Unignore for Today Only" : "Ignore for Today Only");
         // END ignore button
-
-        // BEGIN Next assignment button
-        let not_applicable_timeout_next_assignment_button;
-        next_assignment_button.click(() => {
-            const next_assignment = this.dom_assignment.parents(".assignment-container").next().children(".assignment");
-            if (!next_assignment.length) {
-                next_assignment_button.html("No More Assignments");
-                clearTimeout(not_applicable_timeout_next_assignment_button);
-                not_applicable_timeout_next_assignment_button = setTimeout(function() {
-                    next_assignment_button.html("Next Assignment");
-                }, 1000);
-                return;
-            }
-            this.dom_assignment.click();
-            if (!next_assignment.hasClass("open-assignment")) {
-                this.dom_assignment[0].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                });
-                next_assignment.click();
-            }
-        });
-        // END Next assignment button
 
         // BEGIN Set skew ratio using graph button
         let original_skew_ratio;

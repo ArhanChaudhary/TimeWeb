@@ -191,6 +191,10 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
+    close_graph_after_work_input = models.BooleanField(
+        default=False,
+        verbose_name=_('Close Graph After Submitting Work Input'),
+    )
     show_progress_bar = models.BooleanField(
         default=True,
         verbose_name=_('Show Graph Progress Bar'),
