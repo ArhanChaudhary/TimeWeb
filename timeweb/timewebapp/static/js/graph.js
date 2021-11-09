@@ -674,7 +674,7 @@ class VisualAssignment extends Assignment {
                 input_done = +input_done.replace("since", "").trim();
                 if (isNaN(input_done)) {
                     not_applicable_message_title = "Invalid \"since\" format.";
-                    not_applicable_message_description = "Please use the \"since\" keyword with the format: \"since [number]\".";
+                    not_applicable_message_description = "Please use the \"since\" keyword with the format: \"since [number]\", with [number] being your work input.";
                 }
                 const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
                 const array_length = today_minus_assignment_date - (this.sa.blue_line_start + len_works) - 1;

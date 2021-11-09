@@ -8,9 +8,7 @@
 {% block js %}
 {{ assignment_models_as_json|json_script:"assignment-models" }}
 {{ settings_model_as_json|json_script:"settings-model" }}
-{% if not seen_latest_changelog %}
-  {{ latest_changelog|json_script:"latest-changelog" }}
-{% endif %}
+{{ latest_changelog|json_script:"latest-changelog" }}
 <script src="{% static 'vendor/pluralize.js' %}"></script>
 <script src="{% static 'vendor/jquery.easing.min.js' %}"></script>
 <script src="{% static 'vendor/Sortable.min.js' %}"></script>

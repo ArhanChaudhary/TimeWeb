@@ -173,11 +173,13 @@ $(function() {
             } else {
                 if (isMobile) {
                     $.alert({
-                        title: "Please use the Safari browser:<br>Click the share icon on your screen (up arrow in a square) and scroll to \"Add to Home Screen\".",
+                        title: "Please use Safari to install TimeWeb on your home screen.",
+                        content: "Once you're there, click the share icon on your screen (the up arrow in a square icon) and scroll to \"Add to Home Screen\".",
                     });
                 } else {
                     $.alert({
-                        title: "Progressive web apps are not supported on your web browser. Please use Google Chrome or Microsoft Edge (ignore this if you already have TimeWeb installed).",
+                        title: "Progressive web apps are not supported on your web browser.",
+                        content: "Please use Google Chrome or Microsoft Edge. Ignore this if you already have TimeWeb installed.",
                     });
                 }
             }
