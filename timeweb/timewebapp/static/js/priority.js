@@ -553,7 +553,7 @@ class Priority {
             setInterval(utils.ui.tickClock, 1000);
         }
     }
-    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false}) {
+    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false, triggerResize: true}) {
         var that = this;
         that.params = params;
         clearTimeout(that.sort_timeout);
@@ -584,7 +584,7 @@ class Priority {
             });
         }
         // Updates open graphs' today line and other graph text
-        $(window).trigger("resize");
+        that.params.triggerResize && $(window).trigger("resize");
         that.priority_data_list.sort((a,b) => that.assignmentSortingComparator(a,b));
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);

@@ -728,8 +728,8 @@ utils = {
         },
         graphAlertTutorial: function(days_until_due) {
             $.alert({
-                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it.<br><br>Once you're finished, click OK to disable this popup and then check out the settings to set your preferences.",
-                content: days_until_due <= 2 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out the example assignment or the example account on the login page to see how TimeWeb handles longer and more complicated assignments.` : '',
+                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences. Click OK to prevent this popup from showing again."),
+                content: days_until_due <= 3 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out your example assignment or the example account on the login page to see how TimeWeb handles longer and more complicated assignments.` : '',
                 backgroundDismiss: false,
                 alignTop: true, // alignTop is a custom extension
                 onClose: function() {
@@ -742,7 +742,8 @@ utils = {
             if (sessionStorage.getItem("already-alerted-example-account")) return;
             sessionStorage.setItem("already-alerted-example-account", true);
             $.alert({
-                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like. Feel free to do whatever you want over here, as no modifications are saved."
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>Feel free to do whatever you want over here. No modifications to this account are saved.",
+                backgroundDismiss: false,
             });
         },
         saveAndLoadStates: function() {

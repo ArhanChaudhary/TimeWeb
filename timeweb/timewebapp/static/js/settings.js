@@ -41,14 +41,21 @@ document.addEventListener("DOMContentLoaded", function() {
     $("table input:visible:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor)").each(function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });
+
     const background_image_link = $("#id_background_image").siblings("a");
     background_image_link.replaceWith(BACKGROUND_IMAGE_TEMPLATE);
+
     JSONToTextarea($("#id_default_dropdown_tags"));
     $("#id_default_dropdown_tags").expandableTextareaHeight();
     setTimeout(function() {
         $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
+
+    $("form legend").click(function() {
+        $(this).parents("fieldset").toggleClass("closed");
+    });
+
     let alreadyHasSubmitted = false;
     $("form").submit(function() {
         if (alreadyHasSubmitted) return;

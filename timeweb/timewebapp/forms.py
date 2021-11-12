@@ -145,7 +145,7 @@ class SettingsForm(forms.ModelForm):
             "assignment_spacing": "Controls the height of every assignment.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
-            "close_graph_after_work_input": "Automatically closes the assignment graph after submitting a work input for today.",
+            "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
         }
     def __init__(self, *args, **kwargs):

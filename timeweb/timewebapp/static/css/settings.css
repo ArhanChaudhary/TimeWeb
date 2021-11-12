@@ -35,11 +35,24 @@ form select {
 #reset-settings-button {
     margin-right: 10px;
 }
-#submit-settings-button{
+#submit-settings-button {
     margin-left: 10px;
 }
-fieldset {
+form fieldset {
+    overflow: hidden;
     margin-bottom: 10px;
+    padding-bottom: 5px;
+}
+form fieldset.closed {
+    height: 0;
+}
+form fieldset.closed legend {
+    list-style-type: disclosure-closed;
+}
+form legend {
+    display: list-item;
+    cursor: pointer;
+    list-style: inside disclosure-open;
 }
 table {
     width: 100%;

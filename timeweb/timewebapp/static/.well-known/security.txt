@@ -1,4 +1,0 @@
-Contact: mailto:arhan.ch@gmail.com
-Expires: 2023-07-27T07:00:00.000Z
-Preferred-Languages: en
-Canonical: https://timeweb.io/.well-known/security.txt

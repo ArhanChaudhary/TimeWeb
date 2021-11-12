@@ -15,7 +15,7 @@
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form.visible_fields %}
-        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "reverse_sorting" or field.name == "assignment_spacing" %}
+        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "reverse_sorting" or field.name == "assignment_spacing" or field.name == "background_image" %}
         <fieldset>
             <legend>
                 {% if field.name == "def_break_days" %}
@@ -26,6 +26,8 @@
                     Assignment Priority
                 {% elif field.name == "assignment_spacing" %}
                     Assignment Header
+                {% elif field.name == "background_image" %}
+                    Personalize
                 {% endif %}
             </legend>
             {% endif %}
@@ -54,7 +56,7 @@
                     </tr>
                 </tbody>
             </table>
-        {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "vertical_tag_position" %}
+        {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "vertical_tag_position" or field.name == "enable_tutorial" %}
         </fieldset>
         {% endif %}
     {% endfor %}
@@ -70,6 +72,6 @@
     {% endspaceless %}
 </form>
 <template id="background-image-template">
-    <img src="/media/images/{{ user.get_username }}/{{ background_image_name }}">
+    <img src="media/images/{{ user.get_username }}/{{ background_image_name }}">
 </template>
 {% endblock content %}

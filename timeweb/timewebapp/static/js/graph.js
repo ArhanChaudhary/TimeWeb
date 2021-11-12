@@ -741,13 +741,11 @@ class VisualAssignment extends Assignment {
             }
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
-            priority.sort({ timeout: true });
-            // Put this after priority.sort because that triggers a resize, which messes up drawFixed()
-            setTimeout(function() {
-                if (close_graph_after_work_input) {
-                    this.dom_assignment.click();
-                }
-            }.bind(this), 400);
+            priority.sort({ timeout: true, triggerResize: !close_graph_after_work_input });
+            const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+            if (close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
+                this.dom_assignment.click();
+            }
             this.draw();
         });
         // END Submit work button
@@ -984,7 +982,7 @@ $(".assignment").click(function(e) {
         setTimeout(function() {
             const days_until_due = sa.sa.x-sa.sa.blue_line_start;
             utils.ui.graphAlertTutorial(days_until_due);
-        }, 200);
+        }, 1000);
     }
 });
 });

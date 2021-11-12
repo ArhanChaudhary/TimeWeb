@@ -246,6 +246,8 @@ class SettingsModel(models.Model):
         default=_("Top"),
         verbose_name=_('Vertical Assignment Tag Position'),
     )
+
+    # Group "Personalize"
     background_image = models.ImageField(
         upload_to=create_image_path,
         null=True,
@@ -256,13 +258,12 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Dark Mode'),
     )
-    
-    # No group
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Enable Tutorial'),
     )
 
+    # Hidden
     oauth_token = models.JSONField(
         default=empty_dict,
         blank=True,
