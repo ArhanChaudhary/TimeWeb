@@ -962,6 +962,7 @@ $(".assignment").click(function(e) {
         priority.positionTags(dom_assignment);
         return;
     }
+    
     const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
     assignment_footer.stop().css({
