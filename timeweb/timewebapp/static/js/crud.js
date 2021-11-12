@@ -297,7 +297,10 @@ class Crud {
         // NOTE: removed because of bugginess and just looking bad overall
 
         // Opacity CSS transition
-        dom_assignment.css("opacity", "0");
+        dom_assignment.css({
+            opacity: "0",
+            zIndex: dom_assignment.css("z-index")-2,
+        });
         const assignment_container = dom_assignment.parents(".assignment-container");
         // Animate height on assignment_container because it doesn't have a transition
         const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
