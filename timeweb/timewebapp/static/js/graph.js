@@ -374,7 +374,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.font = '13.75px Open Sans';
         screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-        screen.fillText(`Skew Ratio: ${rounded_skew_ratio} (${rounded_skew_ratio ? "Parabolic" : "Linear"})`, this.width-2, this.height-138+move_info_down);
+        screen.fillText(`Skew Ratio: ${rounded_skew_ratio || "Linear"}`, this.width-2, this.height-138+move_info_down);
 
         const daysleft = this.sa.x - today_minus_assignment_date;
         let strdaysleft = '';
@@ -701,7 +701,20 @@ class VisualAssignment extends Assignment {
             }
             if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y
                 && this.sa.soft) {
-                this.sa.x++;
+                const original_red_line_start_x = this.red_line_start_x;
+                this.red_line_start_x = len_works+1+this.sa.blue_line_start;
+                while (true) {
+                    this.sa.x++;
+                    // Number of days between end of blue line and due date
+                    let x1 = this.sa.x - this.red_line_start_x;
+                    if (this.sa.break_days.length) {
+                        const mods = this.calcModDays();
+                        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+                    }
+                    // Add due days until there is a working day
+                    if (x1) break;
+                }
+                this.red_line_start_x = original_red_line_start_x;
                 const due_date = new Date(this.sa.assignment_date.valueOf());
                 due_date.setDate(due_date.getDate() + this.sa.x);
                 ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
@@ -741,10 +754,13 @@ class VisualAssignment extends Assignment {
             }
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
-            priority.sort({ timeout: true, triggerResize: !close_graph_after_work_input });
+            
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             if (close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
+                priority.sort({ timeout: true, triggerResize: false });
                 this.dom_assignment.click();
+            } else {
+                priority.sort({ timeout: true, triggerResize: true });
             }
             this.draw();
         });
