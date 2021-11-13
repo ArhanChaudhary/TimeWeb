@@ -1,7 +1,7 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 class Priority {
     constructor() {
-        var that = this;
+        const that = this;
         that.SORT_TIMEOUT_DURATION = 35;
         that.DARK_MODE_ALPHA = 0.75;
         that.ANIMATE_IN_START_MARGIN = 20;
@@ -19,7 +19,7 @@ class Priority {
     }
     
     percentageToColor(priority_percentage) {
-        var that = this;
+        const that = this;
         const percentage_as_decimal = priority_percentage / 100;
         if (isNaN(percentage_as_decimal)) {
             var r = 255;
@@ -34,7 +34,7 @@ class Priority {
     }
     // Handles coloring and animating assignments that were just created or edited
     colorOrAnimateInAssignment(dom_assignment) {
-        var that = this;
+        const that = this;
         if ($("#animate-in").length && that.is_element_submitted) {
             // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
@@ -64,12 +64,12 @@ class Priority {
         }
     }
     setInitialAssignmentTopOffset($assignment_container) {
-        var that = this;
+        const that = this;
         $assignment_container.attr("data-initial-top-offset", $assignment_container.offset().top);
     }
 
     domSortAssignments(priority_data_list) {
-        var that = this;
+        const that = this;
         // Selection sort
         for (let [index, sa] of priority_data_list.entries()) {
             // index represents the selected assignment's final position
@@ -111,13 +111,13 @@ class Priority {
     }        
 
     positionTags(dom_assignment) {
-        var that = this;
+        const that = this;
         dom_assignment.removeClass("tags-bottom");
         horizontal_tag_position === "Left" && that.positionTagLeftAndTagBottom(dom_assignment);
         vertical_tag_position === "Bottom" && dom_assignment.addClass("tags-bottom");
     }
     positionTagLeftAndTagBottom(dom_assignment) {
-        var that = this;
+        const that = this;
         const dom_title = dom_assignment.find(".title");
         const dom_tags = dom_assignment.find(".tags");
         const dom_button = dom_assignment.find(".button");
@@ -148,7 +148,7 @@ class Priority {
         dom_tags.prop("style").setProperty('--margin-top', parseFloat(dom_assignment.css("padding-bottom")));
     }
     updateAssignmentHeaderMessagesAndSetPriorityData() {
-        var that = this;
+        const that = this;
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
@@ -450,7 +450,7 @@ class Priority {
         });
     }
     assignmentSortingComparator(a, b) {
-        var that = this;
+        const that = this;
         // Max to min
         if (a.status_value < b.status_value) return 1;
         if (a.status_value > b.status_value) return -1;
@@ -477,7 +477,7 @@ class Priority {
         if (a.index > b.index) return 1;
     }
     priorityDataToPriorityPercentage(priority_data) {
-        var that = this;
+        const that = this;
         const ignore_tag_status_value = Math.round(priority_data.status_value);
 
         if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, that.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
@@ -493,7 +493,7 @@ class Priority {
         return priority_percentage;
     }
     addAssignmentShortcut(dom_assignment) {
-        var that = this;
+        const that = this;
         // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
         // Uses the same below logic for delete starred assignments and autoill work done
 
@@ -528,7 +528,7 @@ class Priority {
         }
     }
     updateInfoHeader() {
-        var that = this;
+        const that = this;
         if (that.question_mark_exists_excluding_gc) {
             $("#current-time, #tomorrow-time, #info").hide();
         } else if (!that.total_completion_time) {
@@ -554,7 +554,7 @@ class Priority {
         }
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false, triggerResize: true}) {
-        var that = this;
+        const that = this;
         that.params = params;
         clearTimeout(that.sort_timeout);
         if (that.params.timeout) {
@@ -564,7 +564,7 @@ class Priority {
         }
     }
     sortWithoutTimeout() {
-        var that = this;
+        const that = this;
         that.priority_data_list = [];
         that.total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;

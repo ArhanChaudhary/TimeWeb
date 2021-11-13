@@ -29,3 +29,19 @@ self.addEventListener("fetch", event => {
             })
     )
 });
+
+// Uncomment once server worker notification API support is added
+// // https://css-tricks.com/creating-scheduled-push-notifications/
+// self.addEventListener('notificationclick', event => {
+//     if (event.action === 'close') { 
+//         event.notification.close();
+//     } else {
+//         event.waitUntil(self.clients.matchAll().then(clients => {
+//             if (clients.length){ // check if at least one tab is already open
+//                 clients[0].focus();
+//             } else {
+//                 self.clients.openWindow('/');
+//             }
+//         }));
+//     }
+// });

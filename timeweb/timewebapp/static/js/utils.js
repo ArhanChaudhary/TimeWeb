@@ -728,11 +728,67 @@ utils = {
         },
         graphAlertTutorial: function(days_until_due) {
             $.alert({
-                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences. Click OK to prevent this popup from showing again."),
+                title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
                 content: days_until_due <= 3 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out your example assignment or the example account on the login page to see how TimeWeb handles longer and more complicated assignments.` : '',
                 backgroundDismiss: false,
                 alignTop: true, // alignTop is a custom extension
                 onClose: function() {
+                // Service worker push notifs API hasn't yet been implemented :-(
+                // Code once it is implemented:
+
+                //     $.alert({
+                //         title: "Would you like to allow TimeWeb to send notifications?",
+                //         content: "You will be notified of your total estimated completion time daily. If you accidentally click no, you can come back to this popup by re-enabling the tutorial in the settings.",
+                //         backgroundDismiss: false,
+                //         alignTop: true, // alignTop is a custom extension
+                //         buttons: {
+                //             // https://css-tricks.com/creating-scheduled-push-notifications/
+                //             yes: {
+                //                 action: async function() {
+                //                     const reg = await navigator.serviceWorker.getRegistration();
+                //                     Notification.requestPermission().then(permission => {
+                //                         if (permission === 'granted') {
+                //                             reg.showNotification(
+                //                                 'Demo Push Notification',
+                //                                 {
+                //                                     tag: timestamp, // a unique ID
+                //                                     body: 'Hello World', // content of the push notification
+                //                                     data: {
+                //                                         url: window.location.href, // pass the current url to the notification
+                //                                     },
+                //                                     badge: "images/icon-192x192.png",
+                //                                     icon: "images/icon-192x192.png",
+                //                                     actions: [
+                //                                         {
+                //                                             action: 'open',
+                //                                             title: 'Open app',
+                //                                         },
+                //                                         {
+                //                                             action: 'close',
+                //                                             title: 'Close notification',
+                //                                         }
+                //                                     ]
+                //                                 }
+                //                             );
+                //                         }
+                //                     });
+                //                 }
+                //             },
+                //             no: {
+                //                 action: async function() {
+                //                     const reg = await navigator.serviceWorker.getRegistration();
+                //                     const notifications = await reg.getNotifications({
+                //                         includeTriggered: true
+                //                     });
+                //                     notifications.forEach(notification => notification.close());
+                //                 }
+                //             }
+                //         },
+                //         onClose: function() {
+                //             enable_tutorial = false;
+                //             ajaxUtils.ajaxFinishedTutorial();
+                //         },
+                //     });
                     enable_tutorial = false;
                     ajaxUtils.ajaxFinishedTutorial();
                 }

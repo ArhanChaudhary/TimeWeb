@@ -147,6 +147,7 @@ class SettingsForm(forms.ModelForm):
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
+            "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
