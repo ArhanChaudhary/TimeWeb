@@ -31,7 +31,7 @@
         <div id="fields-wrapper">
           {% csrf_token %}
           {% for field in form.visible_fields %}
-            <div class="field-wrapper{% if field.name == "soft" %} id-soft-field-wrapper{% endif %}">
+            <div class="field-wrapper{% if field.name == "soft" %} id-soft-field-wrapper{% elif field.name == "due_time" %} id-due-time-field-wrapper{% endif %}">
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Break Days</label>
                 <div id="break-days-wrapper">

@@ -345,6 +345,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.x = self.form.cleaned_data.get("x")
             if self.sm.x:
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
+            self.sm.due_time = self.form.cleaned_data.get("due_time")
             self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
@@ -448,6 +449,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.x = timezone.make_aware(self.sm.x)
             else:
                 x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
+                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
+                    x_num += 1
                 if self.sm.blue_line_start >= x_num:
                     self.sm.blue_line_start = 0
                     if self.created_assignment or self.sm.needs_more_info:
@@ -549,36 +552,29 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
                 tags = []
-                description = ""
-                original_x = None
                 if x:
                     if "hours" in assignment['dueTime']:
                         assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                     if "minutes" in assignment['dueTime']:
                         assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
                     x = timezone.localtime(datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=datetime.timezone.utc))
-                    original_x = x
-                    if original_x < date_now:
+                    if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
 
-                    if x.hour == 11 and x.minute == 59:
-                        x += datetime.timedelta(minutes=1)
-                    else:
-                        x = x.replace(hour=0, minute=0, second=0, microsecond=0)
+                    due_time = datetime.time(x.hour, x.minute)
+                    x = x.replace(hour=0, minute=0, second=0, microsecond=0)
                         
                     if assignment_date > x:
                         self.gc_skipped_assignment += 1
                         continue
                     if date_now == x:
                         tags.append("Important")
-
+                else:
+                    due_time = None
                 name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length).strip()
                 tags.insert(0, course_names[assignment['courseId']])
-                if original_x:
-                    # https://stackoverflow.com/questions/904928/python-strftime-date-without-leading-0
-                    description += f'Due at {datetime.datetime.strptime(f"{original_x.hour}:{original_x.minute}", "%H:%M").strftime("X%I:%M %p").replace("X0", "X").replace("X", "")} {original_x.month}/{original_x.day}\n'
-                description += assignment.get('description', "")
+                description = assignment.get('description', "")
 
                 # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
                 new_gc_assignment_ids.add(assignment_id)
@@ -595,6 +591,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     name=name,
                     assignment_date=assignment_date,
                     x=x,
+                    due_time=due_time,
                     blue_line_start=blue_line_start,
                     skew_ratio=self.settings_model.def_skew_ratio,
                     min_work_time=self.settings_model.def_min_work_time,

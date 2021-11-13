@@ -1,13 +1,14 @@
 from django import forms
-from django.utils import timezone
 from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTICAL_TAG_POSITIONS
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 import datetime
-from django.conf import settings
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+class TimeInput(forms.TimeInput):
+    input_type = 'time'
 
 class TimewebForm(forms.ModelForm):
     class Meta:
@@ -17,6 +18,7 @@ class TimewebForm(forms.ModelForm):
             'namef': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'assignment_date': DateInput(),
             'x': DateInput(),
+            'due_time': TimeInput(),
             'blue_line_start': forms.HiddenInput(),
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
@@ -85,6 +87,7 @@ class TimewebForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         x = cleaned_data.get("x")
+        due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
         assignment_date = cleaned_data.get("assignment_date")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
@@ -96,10 +99,12 @@ class TimewebForm(forms.ModelForm):
                     'equal_to_or_greater_than': "equal to" if works == y else "greater than",
                 })
             )
-        if x != None and assignment_date != None and x <= assignment_date:
+        if x != None:
+            complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
+        if x != None and assignment_date != None and complete_due_date <= assignment_date:
             self.add_error("x",
                 forms.ValidationError(_("The due date can't be %(on_or_before)s the assignment date"),code='invalid',params={
-                    'on_or_before': "on" if x == assignment_date else "before"
+                    'on_or_before': "on" if complete_due_date == assignment_date else "before"
                 })
             )
         return cleaned_data

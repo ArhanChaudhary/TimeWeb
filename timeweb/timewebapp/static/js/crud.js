@@ -6,6 +6,7 @@ class Crud {
             "#id_name": '',
             "#id_assignment_date": utils.formatting.stringifyDate(date_now),
             "#id_x": '',
+            '#id_due_time': '00:00',
             "#id_soft": false,
             "#id_unit": def_unit_to_minute ? "Minute" : '',
             "#id_y": '',
@@ -151,6 +152,7 @@ class Crud {
                 "#id_name": sa.name,
                 "#id_assignment_date": sa.assignment_date ? utils.formatting.stringifyDate(sa.assignment_date) : '',
                 "#id_x": Number.isFinite(sa.x) ? utils.formatting.stringifyDate(x) : '',
+                "#id_due_time": sa.due_time,
                 "#id_soft": sa.soft,
                 "#id_unit": sa.unit,
                 "#id_y": sa.y,
@@ -284,7 +286,7 @@ class Crud {
             }
         });
         if ($("#id_x.invalid").length) {
-            $(".field-wrapper.id-soft-field-wrapper").css("margin-top", -9);
+            $(".field-wrapper.id-soft-field-wrapper, .field-wrapper.id-due-time-field-wrapper").css("margin-top", -9);
         }
     }
     // Delete assignment

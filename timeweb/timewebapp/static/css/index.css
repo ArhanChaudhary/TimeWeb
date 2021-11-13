@@ -940,6 +940,15 @@ input[type=number]::-webkit-inner-spin-button {
     transform: translateY(-33px);
     right: 10px;
 }
+#form-wrapper .field-wrapper.id-due-time-field-wrapper {
+    position: absolute;
+    transform: translate(127px, -33px);
+}
+#form-wrapper #id_due_time {
+    border: none;
+    width: unset;
+    background-color: unset;
+}
 #form-wrapper #id_soft {
     width: unset;
     display: inline;
