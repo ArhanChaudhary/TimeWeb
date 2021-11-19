@@ -112,6 +112,7 @@ class TimewebModel(models.Model):
         default=1,
         blank=True,
         null=True,
+        verbose_name=_('Step Size'),
     )
     min_work_time = models.DecimalField(
         max_digits=15,

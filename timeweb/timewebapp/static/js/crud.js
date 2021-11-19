@@ -13,7 +13,7 @@ class Crud {
             "#id_works": '0',
             "#id_time_per_unit": '',
             "#id_description": '',
-            "#id_funct_round": '',
+            "#id_funct_round": '1',
             "#id_min_work_time": +def_min_work_time||'',
         }
         that.FORM_POSITION_TOP = 15;
@@ -87,14 +87,12 @@ class Crud {
             }
             $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
             $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
-            $("label[for='id_funct_round']").onlyText(`Number of ${plural} you will Complete at a Time`);
-            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
+            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         } else {
             $("label[for='id_y']").html("Total number of Units in this Assignment");
             $("label[for='id_works']").onlyText("Total number of Units already Completed");
             $("label[for='id_time_per_unit']").html("Estimated number of Minutes to complete each Unit");
-            $("label[for='id_funct_round']").onlyText("Number of Units you will Complete at a Time");
-            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text("e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
+            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text("This is the number of units of work you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
         }
         if (singularToLowerCase in that.UNITS_OF_TIME) {
             $("#id_time_per_unit").val(that.UNITS_OF_TIME[singularToLowerCase]);
@@ -167,7 +165,7 @@ class Crud {
                 "#id_time_per_unit": sa.time_per_unit,
                 "#id_description": sa.description,
                 "#id_works": sa.works[0],
-                "#id_funct_round": sa.funct_round-1 ? sa.funct_round : '', // Displays nothing if it is 1 or null
+                "#id_funct_round": sa.funct_round,
                 "#id_min_work_time": sa.original_min_work_time||'',
             }
             for (const field in ASSIGNMENT_FORM_FIELDS) {
@@ -300,9 +298,7 @@ class Crud {
             }
         });
         if ($("#id_x.invalid").length) {
-            $(".field-wrapper").filter(function() {
-                return !!$(this).attr("id");
-            }).css("margin-top", -9);
+            $(".field-wrapper#id-soft-field-wrapper, .field-wrapper#id-due_time-field-wrapper").css("margin-top", -9);
         }
     }
     // Delete assignment
