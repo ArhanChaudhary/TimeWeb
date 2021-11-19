@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_show_progress_bar").prop("checked", true);
                         $("#id_color_priority").prop("checked", true);
                         $("#id_text_priority").prop("checked", true);
+                        $("#id_one_graph_at_a_time").prop("checked", false);
                         $("#id_close_graph_after_work_input").prop("checked", false);
                         $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");
                         $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");

@@ -959,6 +959,7 @@ function shake_assignment($assignment_to_shake) {
         });
     });
 }
+let already_ran_tutorial = false;
 $(function() {
 $(".assignment").click(function(e) {
     const target = $(e.target);
@@ -1014,6 +1015,7 @@ $(".assignment").click(function(e) {
         priority.positionTags(dom_assignment);
         return;
     }
+    one_graph_at_a_time && $("#close-assignments").click();
     
     const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
@@ -1030,7 +1032,8 @@ $(".assignment").click(function(e) {
     // Sets event handlers only on the assignment's first click
     first_click && sa.setGraphButtonEventListeners();
     sa.resize();
-    if (enable_tutorial) {
+    if (enable_tutorial && !already_ran_tutorial) {
+        already_ran_tutorial = true;
         $(".assignment").next().remove(); // Remove "Click this assignment"
         setTimeout(function() {
             const days_until_due = Math.floor(sa.sa.complete_x) - sa.sa.blue_line_start;

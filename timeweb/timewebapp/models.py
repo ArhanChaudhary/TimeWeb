@@ -198,6 +198,10 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
+    one_graph_at_a_time = models.BooleanField(
+        default=False,
+        verbose_name=_('Allow only One Open Graph at a Time'),
+    )
     close_graph_after_work_input = models.BooleanField(
         default=False,
         verbose_name=_('Close Graph After Submitting Work Input'),

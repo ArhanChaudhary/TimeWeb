@@ -1046,7 +1046,7 @@ ajaxUtils = {
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
-({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting, seen_latest_changelog, close_graph_after_work_input } = JSON.parse(document.getElementById("settings-model").textContent));
+({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting, seen_latest_changelog, close_graph_after_work_input, one_graph_at_a_time } = JSON.parse(document.getElementById("settings-model").textContent));
 if (!seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
