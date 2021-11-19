@@ -18,11 +18,11 @@ class Assignment {
         }
     }
     calcSkewRatioBound() {
-        let x1 = this.sa.x;
+        let x1 = this.sa.complete_x;
         let y1 = this.sa.y;
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
-            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+            x1 -= Math.floor(this.sa.x / 7) * this.sa.break_days.length + mods[this.sa.x % 7];
         }
         if (!y1) return 0;
         /*
@@ -70,6 +70,27 @@ class Assignment {
         this.sa.dynamic_start = this.red_line_start_x;
         this.setParabolaValues();
     }
+    // make sure to properly set red_line_start_x before running this function
+    incrementDueDate() {
+        this.sa.due_time = {hours: 0, minutes: 0};
+        while (true) {
+            this.sa.x++;
+            // Number of days between end of blue line and due date
+            let x1 = this.sa.x - this.red_line_start_x;
+            if (this.sa.break_days.length) {
+                const mods = this.calcModDays();
+                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+            }
+            // Add due days until there is a working day
+            if (x1) break;
+        }
+        this.sa.complete_x = this.sa.x;
+        ajaxUtils.sendAttributeAjaxWithTimeout("due_time", this.sa.due_time, this.sa.id);
+
+        const due_date = new Date(this.sa.assignment_date.valueOf());
+        due_date.setDate(due_date.getDate() + this.sa.x);
+        ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
+    }
 }
 class VisualAssignment extends Assignment {
     constructor(dom_assignment) {
@@ -79,9 +100,12 @@ class VisualAssignment extends Assignment {
         this.fixed_graph = dom_assignment.find(".fixed-graph");
         this.set_skew_ratio_using_graph = false;
         this.draw_mouse_point = true;
-        this.due_date = new Date(this.sa.assignment_date.valueOf());
-        this.due_date.setDate(this.due_date.getDate() + this.sa.x);
-        if (this.sa.assignment_date.getFullYear() === this.due_date.getFullYear()) {
+        this.complete_due_date = new Date(this.sa.assignment_date.valueOf());
+        this.complete_due_date.setDate(this.complete_due_date.getDate() + Math.floor(this.sa.complete_x));
+        if (this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+            this.complete_due_date.setMinutes(this.complete_due_date.getMinutes() + this.sa.due_time.hours * 60 + this.sa.due_time.minutes);
+        }
+        if (this.sa.assignment_date.getFullYear() === this.complete_due_date.getFullYear()) {
             this.date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {month: 'long', day: 'numeric'};
         } else {
@@ -113,7 +137,7 @@ class VisualAssignment extends Assignment {
         } else {
             VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
         }
-        this.wCon = (this.width - 55) / this.sa.x;
+        this.wCon = (this.width - 55) / this.sa.complete_x;
         this.hCon = (this.height - 55) / this.sa.y;
         this.graph[0].width = this.width * this.scale;
         this.graph[0].height = this.height * this.scale;
@@ -129,11 +153,11 @@ class VisualAssignment extends Assignment {
         const raw_y = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
         if (this.set_skew_ratio_using_graph && iteration_number !== AUTOTUNE_ITERATIONS + 1) {
-            let x1 = this.sa.x - this.red_line_start_x;
+            let x1 = this.sa.complete_x - this.red_line_start_x;
             let y1 = this.sa.y - this.red_line_start_y;
             if (this.sa.break_days.length) {
                 const mods = this.calcModDays();
-                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+                x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
             }
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
@@ -201,15 +225,18 @@ class VisualAssignment extends Assignment {
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             // -50.1 and -48.7 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-            var mouse_x = Math.round((raw_x - 50.1) / this.wCon),
+            var mouse_x = (raw_x - 50.1) / this.wCon,
                 mouse_y = (this.height - raw_y - 48.7) / this.hCon;
-            if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start)) {
-                mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
-            } else if (mouse_x > this.sa.x) {
+            if (mouse_x >= (Math.round(mouse_x) + this.sa.complete_x) / 2)
                 mouse_x = this.sa.x;
-            }
+            else
+                mouse_x = Math.round(mouse_x);
+            if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start))
+                mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
+            else if (mouse_x > this.sa.x)
+                mouse_x = this.sa.x;
             if (this.sa.blue_line_start <= mouse_x && mouse_x <= len_works + this.sa.blue_line_start) {
-                if (mouse_x < this.red_line_start_x) {
+                if (Math.ceil(mouse_x) < this.red_line_start_x) {
                     mouse_y = true;
                 } else {
                     mouse_y = Math.abs(mouse_y - this.funct(mouse_x)) > Math.abs(mouse_y - this.sa.works[mouse_x - this.sa.blue_line_start]);
@@ -217,11 +244,14 @@ class VisualAssignment extends Assignment {
             } else {
                 mouse_y = false;
             }
-            if (!this.set_skew_ratio_using_graph && this.last_mouse_x === mouse_x && this.last_mouse_y === mouse_y) return;
+            if (!this.set_skew_ratio_using_graph && this.last_mouse_x === mouse_x && this.last_mouse_y === mouse_y) {
+                return;
+            }
             this.last_mouse_x = mouse_x;
             this.last_mouse_y = mouse_y;
         }
         // draw() always runs setParabolaValues but I'll leave it like this because it'll require a lot of maintence
+        
         this.setParabolaValues();
         const screen = this.graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
@@ -273,7 +303,9 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
-            if (this.sa.x > today_minus_assignment_date && last_work_input < this.sa.y) {
+            if (this.dom_assignment.hasClass("completely-finished")) {
+                screen.fillText("Completed!", this.width-81-bar_move_left, this.height-68);
+            } else {
                 screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, this.width-81, this.height-68);
                 const done_x = this.width-153+last_work_input/this.sa.y*144-bar_move_left;
                 screen.fillStyle = "white";
@@ -290,8 +322,6 @@ class VisualAssignment extends Assignment {
                     screen.fillStyle = "rgb(55,55,55)";
                     screen.fillRect(should_be_done_x, this.height-119, 2, 46);
                 }
-            } else {
-                screen.fillText("Completed!", this.width-81-bar_move_left, this.height-68);
             }
         } else {
             move_info_down = 72;
@@ -304,7 +334,7 @@ class VisualAssignment extends Assignment {
         }
         let circle_x,
             circle_y,
-            line_end = this.sa.x + Math.ceil(1 / this.wCon);
+            line_end = this.sa.complete_x + Math.ceil(1 / this.wCon);
         screen.strokeStyle = $("html").is("#dark-mode") ? "rgb(22,187,209)" : "rgb(233,68,46)"; // red
         screen.lineWidth = radius;
         screen.beginPath();
@@ -321,18 +351,15 @@ class VisualAssignment extends Assignment {
         screen.stroke();
         screen.beginPath();
         radius *= 0.75;
-        if (len_works + Math.ceil(1 / this.wCon) < line_end) {
+        if (line_end > len_works + Math.ceil(1 / this.wCon)) {
             line_end = len_works + Math.ceil(1 / this.wCon);
         }
         screen.strokeStyle = $("html").is("#dark-mode") ? "rgb(254,108,0)" : "rgb(1,147,255)"; // blue
         screen.lineWidth = radius;
         for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
-            circle_x = (point + this.sa.blue_line_start) * this.wCon + 50;
-            if (point > len_works) {
-                circle_y = this.height - this.sa.works[len_works] * this.hCon - 50;
-            } else {
-                circle_y = this.height - this.sa.works[point] * this.hCon - 50;
-            }
+            circle_x = (Math.min(this.sa.complete_x, point) + this.sa.blue_line_start) * this.wCon + 50;
+            circle_y = this.height - this.sa.works[Math.min(len_works, point)] * this.hCon - 50;
+            
             screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
             screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
             screen.moveTo(circle_x, circle_y);
@@ -349,9 +376,17 @@ class VisualAssignment extends Assignment {
             } else {
                 funct_mouse_x = this.funct(mouse_x);
             }
-            let str_mouse_x = new Date(this.sa.assignment_date);
-            str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
-            str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
+            let str_mouse_x;
+            if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+                str_mouse_x = new Date(this.complete_due_date.valueOf());
+                str_mouse_x = str_mouse_x.toLocaleDateString("en-US", {...this.date_string_options_no_weekday, hour: "numeric", minute: "numeric"});
+                // mouse_x as a variable isnt needed anymore. Set it to complete_x if at x to position the point
+                mouse_x = this.sa.complete_x;
+            } else {
+                str_mouse_x = new Date(this.sa.assignment_date.valueOf());
+                str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
+                str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
+            }
             if (this.wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`).width > this.width - 5) {
                 screen.textAlign = "end";
             }
@@ -376,8 +411,8 @@ class VisualAssignment extends Assignment {
         screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
         screen.fillText(`Skew Ratio: ${rounded_skew_ratio || "Linear"}`, this.width-2, this.height-138+move_info_down);
 
-        const daysleft = this.sa.x - today_minus_assignment_date;
-        let strdaysleft = '';
+        const daysleft = Math.floor(this.sa.complete_x) - today_minus_assignment_date;
+        let strdaysleft;
         if (daysleft < -1) {
             strdaysleft = ` (${-daysleft} Days Ago)`;
         } else {
@@ -391,6 +426,8 @@ class VisualAssignment extends Assignment {
                 case 1:
                     strdaysleft = " (Tomorrow)";
                     break;
+                default:
+                    strdaysleft = '';
             }
         }
         screen.textAlign = "center";
@@ -398,15 +435,26 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
-        center(`Due Date: ${this.due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
+        if (this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+            center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", {...this.date_string_options, hour: "numeric", minute: "numeric"})}${strdaysleft}`, 1);
+        } else {
+            center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
+        }
         if (!this.dom_assignment.hasClass("completely-finished")) {
             if (goal_for_this_day < last_work_input || this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 goal_for_this_day = last_work_input;
             }
-            let displayed_day = new Date(this.sa.assignment_date.valueOf());
-            displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
+            let displayed_day;
+            let str_day;
+            if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+                displayed_day = new Date(this.complete_due_date.valueOf());
+                str_day = displayed_day.toLocaleDateString("en-US", {...this.date_string_options, hour: "numeric", minute: "numeric"});
+            } else {
+                displayed_day = new Date(this.sa.assignment_date.valueOf());
+                displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
+                str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
+            }
             const distance_today_from_displayed_day = today_minus_assignment_date - this.sa.blue_line_start - len_works;
-            let str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
             switch (distance_today_from_displayed_day) {
                 case -1:
                     str_day += ' (Tomorrow)';
@@ -462,14 +510,14 @@ class VisualAssignment extends Assignment {
 
         screen.font = '13.75px Open Sans';
         screen.textBaseline = "top";
-        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.x))) * Math.ceil(this.sa.x.toString()[0] / Math.ceil((this.width - 100) / 100));
-        if (this.sa.x >= 10) {
+        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - 100) / 100));
+        if (this.sa.complete_x >= 10) {
             gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
             gradient.addColorStop(0, "gainsboro");
             gradient.addColorStop(1, "silver");
             const small_x_axis_scale = x_axis_scale / 5,
-                label_index = screen.measureText(Math.floor(this.sa.x)).width * 1.25 < small_x_axis_scale * this.wCon;
-            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.x / small_x_axis_scale); smaller_index++) {
+                label_index = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.25 < small_x_axis_scale * this.wCon;
+            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.complete_x / small_x_axis_scale); smaller_index++) {
                 if (smaller_index % 5) {
                     const displayed_number = smaller_index * small_x_axis_scale;
                     screen.fillStyle = gradient; // Line color
@@ -549,7 +597,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.textAlign = "center";
         screen.font = '16.5px Open Sans';
-        for (let bigger_index = Math.ceil(this.sa.x - this.sa.x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
+        for (let bigger_index = Math.ceil(this.sa.complete_x - this.sa.complete_x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
             screen.fillStyle = "rgb(205,205,205)";
             screen.fillRect(bigger_index * this.wCon + 47.5, 0, 5, this.height - 50);
             screen.fillStyle = "black";
@@ -562,10 +610,10 @@ class VisualAssignment extends Assignment {
         }
         screen.fillText(0, 55.5, this.height - 38.5);
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);;
-        if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.x) {
-            let today_x = today_minus_assignment_date*this.wCon+47.5;
+        if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.complete_x) {
+            let today_x = today_minus_assignment_date * this.wCon + 47.5;
             screen.fillStyle = "rgb(150,150,150)";
-            screen.fillRect(today_x, 0, 5, this.height-50);
+            screen.fillRect(today_x, 0, 5, this.height - 50);
             screen.fillStyle = "black";
             screen.rotate(Math.PI / 2);
             screen.textAlign = "center";
@@ -574,7 +622,7 @@ class VisualAssignment extends Assignment {
             if (today_x > this.width - 12.5) {
                 today_x = this.width - 12.5;
             }
-            screen.fillText("Today Line", (this.height-50)/2, -today_x-2.5);
+            screen.fillText("Today Line", (this.height - 50)/2, -today_x - 2.5);
             screen.rotate(-Math.PI / 2);
         }
     }
@@ -696,30 +744,19 @@ class VisualAssignment extends Assignment {
                     }
                 }
             }
-            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
+            // Prematurely increment for calculations
+            len_works++;
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
                 todo = 0;
             }
-            if (len_works + this.sa.blue_line_start === this.sa.x - 1 && input_done + last_work_input < this.sa.y
+            if (len_works + this.sa.blue_line_start === this.sa.x && input_done + last_work_input < this.sa.y
                 && this.sa.soft) {
                 const original_red_line_start_x = this.red_line_start_x;
-                this.red_line_start_x = len_works+1+this.sa.blue_line_start;
-                while (true) {
-                    this.sa.x++;
-                    // Number of days between end of blue line and due date
-                    let x1 = this.sa.x - this.red_line_start_x;
-                    if (this.sa.break_days.length) {
-                        const mods = this.calcModDays();
-                        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
-                    }
-                    // Add due days until there is a working day
-                    if (x1) break;
-                }
+                this.red_line_start_x = len_works + this.sa.blue_line_start;
+                this.incrementDueDate();
                 this.red_line_start_x = original_red_line_start_x;
-                const due_date = new Date(this.sa.assignment_date.valueOf());
-                due_date.setDate(due_date.getDate() + this.sa.x);
-                ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
             }
-            if (len_works + this.sa.blue_line_start === this.sa.x) {
+            if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
                 not_applicable_message_title = "End of Assignment.";
                 not_applicable_message_description = "You've reached the end of this assignment, and there are no more work inputs to submit.";
             }
@@ -739,7 +776,6 @@ class VisualAssignment extends Assignment {
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
             this.sa.works.push(last_work_input);
-            len_works++;
             
             // Add this check for setDynamicModeIfInDynamicMode
             // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
@@ -997,7 +1033,7 @@ $(".assignment").click(function(e) {
     if (enable_tutorial) {
         $(".assignment").next().remove(); // Remove "Click this assignment"
         setTimeout(function() {
-            const days_until_due = sa.sa.x-sa.sa.blue_line_start;
+            const days_until_due = Math.floor(sa.sa.complete_x) - sa.sa.blue_line_start;
             utils.ui.graphAlertTutorial(days_until_due);
         }, 1000);
     }

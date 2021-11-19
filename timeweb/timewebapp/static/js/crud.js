@@ -1,6 +1,6 @@
 class Crud {
     constructor() {
-        var that = this;
+        const that = this;
         that.FORM_ANIMATION_DURATION = 300;
         that.DEFAULT_FORM_FIELDS = {
             "#id_name": '',
@@ -21,7 +21,7 @@ class Crud {
         that.DELETE_ASSIGNMENT_TRANSITION_DURATION = 750;
     }
     init() {
-        var that = this;
+        const that = this;
         that.setCrudHandlers();
         that.addInfoButtons();
         that.styleErorrs();
@@ -37,9 +37,10 @@ class Crud {
         }
     }
     showForm(params={show_instantly: false}) {
-        var that = this;
+        const that = this;
         setTimeout(function() {
             $("#id_description").trigger("input");
+            $("#id_x").trigger("keydown");
         }, 0);
         if (params.show_instantly) {
             $('#overlay').show().children("#form-wrapper").css("top", that.FORM_POSITION_TOP);
@@ -57,7 +58,7 @@ class Crud {
         that.replaceUnit();
     }
     hideForm(params={hide_instantly: false}) {
-        var that = this;
+        const that = this;
         if (params.hide_instantly) {
             $("#overlay").hide().children("#form-wrapper");
             $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
@@ -68,10 +69,12 @@ class Crud {
                 $(".error-note").remove();
             }).children("#form-wrapper").animate({top: 0}, that.FORM_ANIMATION_DURATION);
         }
+        // Fallback if "overlay" doesn't exist
+        $("main").css("overflow-y", "");
         $("main").css("overflow-y", "overlay");
     }
     replaceUnit() {
-        var that = this;
+        const that = this;
         const val = $("#id_unit").val().trim();
         const plural = pluralize(val),
             singular = pluralize(val, 1),
@@ -117,7 +120,7 @@ class Crud {
         $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseInt($("#advanced-inputs").css("margin-top")) + 1 + $("#fields-wrapper").scrollTop());
     }
     setCrudHandlers() {
-        var that = this;
+        const that = this;
         // Create and show a new form when user clicks new assignment
         $("#image-new-container").click(function() {
             for (const field in that.DEFAULT_FORM_FIELDS) {
@@ -144,15 +147,20 @@ class Crud {
             $("#submit-assignment-button").html("Edit Assignment");
             // Find which assignment in dat was clicked
             const sa = utils.loadAssignmentData($(this));
-            if (Number.isFinite(sa.x)) {
-                var x = new Date((sa.assignment_date || date_now).valueOf());
-                x.setDate(x.getDate() + sa.x);
-            }
             const ASSIGNMENT_FORM_FIELDS = {
                 "#id_name": sa.name,
-                "#id_assignment_date": sa.assignment_date ? utils.formatting.stringifyDate(sa.assignment_date) : '',
-                "#id_x": Number.isFinite(sa.x) ? utils.formatting.stringifyDate(x) : '',
-                "#id_due_time": sa.due_time,
+                "#id_assignment_date": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
+                "#id_x": (function() {
+                    const due_date = new Date(sa.assignment_date.valueOf());
+                    due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));
+                    return utils.formatting.stringifyDate(due_date);
+                })(),
+                "#id_due_time": (function() {
+                    if (!sa.due_time) return "";
+                    const hour = (sa.due_time.hours < 10 ? "0" : "") + sa.due_time.hours;
+                    const minute = (sa.due_time.minutes < 10 ? "0" : "") + sa.due_time.minutes;
+                    return `${hour}:${minute}`;
+                })(),
                 "#id_soft": sa.soft,
                 "#id_unit": sa.unit,
                 "#id_y": sa.y,
@@ -160,7 +168,6 @@ class Crud {
                 "#id_description": sa.description,
                 "#id_works": sa.works[0],
                 "#id_funct_round": sa.funct_round-1 ? sa.funct_round : '', // Displays nothing if it is 1 or null
-                // The || 1 might cause issues if sa.time_per_unit is 0, but this won't happen
                 "#id_min_work_time": sa.original_min_work_time||'',
             }
             for (const field in ASSIGNMENT_FORM_FIELDS) {
@@ -212,6 +219,13 @@ class Crud {
         // Arrow function to preserve this
         $("#form-wrapper #cancel-button").click(() => that.hideForm());
         $("#id_unit").on('input', () => that.replaceUnit());
+        $("#id_x").on("keydown", function() {
+            setTimeout(() => {
+                $(this).css({width: "unset", minWidth: "unset"});
+                $(".field-wrapper#id-due_time-field-wrapper").prop("style").setProperty("--right-translate", $(this).width());
+                $(this).css({width: "", minWidth: ""});
+            }, 0);
+        });
         $("#id_description").expandableTextareaHeight();
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
@@ -273,7 +287,7 @@ class Crud {
         })
     }
     styleErorrs() {
-        var that = this;
+        const that = this;
         // Style errors if form is invalid
         $("#form-wrapper .error-note").each(function() {
             $(this).siblings("input, textarea").addClass("invalid");
@@ -286,12 +300,14 @@ class Crud {
             }
         });
         if ($("#id_x.invalid").length) {
-            $(".field-wrapper.id-soft-field-wrapper, .field-wrapper.id-due-time-field-wrapper").css("margin-top", -9);
+            $(".field-wrapper").filter(function() {
+                return !!$(this).attr("id");
+            }).css("margin-top", -9);
         }
     }
     // Delete assignment
     transitionDeleteAssignment(dom_assignment) {
-        var that = this;
+        const that = this;
         const sa = utils.loadAssignmentData(dom_assignment);
 
         // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
@@ -321,7 +337,7 @@ class Crud {
         gtag("event","delete_assignment");
     }
     transitionDeleteAssignments($assignment_container, assignment_ids_to_delete) {
-        var that = this;
+        const that = this;
         $assignment_container.each(function(i) {
             gtag("event","delete_assignment");
             const assignment_container = $(this);
@@ -346,7 +362,7 @@ class Crud {
         }); 
     }
     deleteAssignment($button) {
-        var that = this;
+        const that = this;
         // Unfocus to prevent pressing enter to click again
         $button.blur();
         const dom_assignment = $button.parents(".assignment");
@@ -378,7 +394,7 @@ class Crud {
         });
     }
     invalidOnlyInAdvanced() {
-        var that = this;
+        const that = this;
         return !!$("#form-wrapper .error-note").first().parents(".field-wrapper").prevAll().filter(function() {
             return $(this).is("#form-wrapper #advanced-inputs");
         }).length;

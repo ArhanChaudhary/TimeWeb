@@ -275,8 +275,9 @@ mathUtils = {
         const factor = Math.pow(10, precision);
         return Math.round(number * factor) / factor;
     },
-    daysBetweenTwoDates: function(larger_date, smaller_date) {
-        return Math.round((larger_date - smaller_date) / 86400000); // Round for DST
+    daysBetweenTwoDates: function(larger_date, smaller_date, params={round: true}) {
+        const diff = (larger_date - smaller_date) / 86400000;
+        return params.round ? Math.round(diff) : diff; // Round for DST
     },
     clamp: function(low, value, high) {
         return Math.min(Math.max(value, low), high)

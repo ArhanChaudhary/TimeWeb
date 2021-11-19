@@ -52,7 +52,7 @@ header::after {
 }
 #image-new-container img {
     float: left;
-    transform: scale(0.75);
+    transform: scale(0.8);
 }
 #new-assignment-text {
     margin-left: 4px;

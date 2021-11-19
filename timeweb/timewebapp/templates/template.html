@@ -21,7 +21,6 @@
             example_account_name = "{{ example_account_name }}";
             example_assignment_name = "{{ example_assignment_name }}";
             {% comment %} make these dont crash in case these arent passed into context {% endcomment %}
-            after_midnight_hour_to_update = +"{{ after_midnight_hour_to_update }}";
             max_number_tags = +"{{ max_number_tags }}";
 
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
@@ -31,7 +30,7 @@
         <title>TimeWeb</title>
         {% progressive_web_app_meta %}
         <meta name="title" content="TimeWeb">
-        <meta name="description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
+        <meta name="description" content="TimeWeb — An online time management app that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
 
         <meta name="twitter:card" content="summary">
         <meta name="twitter:site" content="@TimeWebOfficial">
@@ -39,7 +38,7 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://timeweb.io/">
         <meta property="og:title" content="Introducing TimeWeb!">
-        <meta property="og:description" content="TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
+        <meta property="og:description" content="TimeWeb — An online time management app that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
         <meta property="og:image" content="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}{% static 'images/icons/icon-512x512.png' %}">
 
         <meta name="author" content="Arhan Chaudhary">
@@ -141,7 +140,7 @@
                     <ul>
                         <li>Charles P. for designing TimeWeb's <a href="/favicon.ico">favicon</a></li>
                         <li><a href="https://github.com/RedBlueBird" target="_blank">Jeffrey Zhang</a> for the <a href="https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">skew ratio autotuning algorithm</a></li>
-                        <li>Stanley Ho for frequently suggesting many features and giving user interface advice</li>
+                        <li>Stanley Ho and Kevin Chu for frequently suggesting many features and giving user interface advice</li>
                     </ul>
                     <!--
                     completely-finished.png: ascii character

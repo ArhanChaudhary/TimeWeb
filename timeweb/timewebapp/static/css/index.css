@@ -935,14 +935,15 @@ input[type=number]::-webkit-inner-spin-button {
     /* IOS */
     min-width: calc(100% - 30px);
 }
-#form-wrapper .field-wrapper.id-soft-field-wrapper {
+#form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
     transform: translateY(-33px);
     right: 10px;
 }
-#form-wrapper .field-wrapper.id-due-time-field-wrapper {
+#form-wrapper .field-wrapper#id-due_time-field-wrapper {
     position: absolute;
-    transform: translate(127px, -33px);
+    margin-left: 10px;
+    transform: translate(calc(var(--right-translate, 0) * 1px), -33px);
 }
 #form-wrapper #id_due_time {
     border: none;
@@ -965,7 +966,6 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper .field-wrapper label[for='id_x']::after {
     right: calc(var(--soft-label-width) - 10px);
-    /* scrolling doesnt work lol */
 }
 #form-wrapper #advanced-inputs {
     border-bottom: 1px solid;

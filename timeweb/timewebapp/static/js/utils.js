@@ -4,6 +4,7 @@ utils = {
         // Reverses utils.formatting.parseDate
         // Converts Date objects to YYYY-MM-DD
         stringifyDate: function(date) {
+            if (!date instanceof Date) return "";
             return [
                 ('000' + date.getFullYear()).slice(-4),
                 ('0' + (date.getMonth() + 1)).slice(-2),
@@ -721,7 +722,7 @@ utils = {
                     }
                     first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
                 } else {
-                    $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
+                    $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time management app that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container, #current-date").hide();
                 }
             }
@@ -848,17 +849,19 @@ utils = {
             $("#toggle-gc-container").addClass("scale-on-mobile");
         }
     },
-    after_midnight_hour_to_update: after_midnight_hour_to_update,
-    previous_time: new Date(),
-    reloadAfterMidnightHourToUpdate: function() {
-        // Don't reload in the next day to preserve changes made in the simulation
-        // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
-        if (utils.in_next_day || isExampleAccount) return;
-        const current_time = new Date();
-        if (utils.previous_time.getHours() < utils.after_midnight_hour_to_update && current_time.getHours() >= utils.after_midnight_hour_to_update) {
-            window.location.reload();
+    reloadAtMidnight: function() {
+        // Reloads the page after midnight hour to update the graph
+        const now = new Date();
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const reload_time = midnight.getTime() + 1000 * 60 * 60 * 24;
+        if (now.getTime() < reload_time) {
+            setTimeout(function() {
+                // Don't reload in the next day to preserve changes made in the simulation
+                // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
+                if (utils.in_next_day || isExampleAccount) return;
+                window.location.reload();
+            }, reload_time - now.getTime());
         }
-        utils.previous_time = current_time;
     },
     loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
         if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
@@ -1064,16 +1067,13 @@ if (!seen_latest_changelog) {
 }
 def_break_days = def_break_days.map(Number);
 date_now = new Date();
-// Don't account for midnight on the example account because it wont make sense
-if (date_now.getHours() < utils.after_midnight_hour_to_update && !isExampleAccount) {
-    date_now.setDate(date_now.getDate() - 1);
-}
+original_date_now = new Date(date_now.valueOf());
 date_now = new Date(date_now.toDateString());
 highest_priority_color = utils.formatting.hexToRGB(highest_priority_color);
 lowest_priority_color = utils.formatting.hexToRGB(lowest_priority_color);
 if (isExampleAccount) {
     window.gtag = function(){};
-    x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));    
+    x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
 }
 // Load in assignment data
 dat = JSON.parse(document.getElementById("assignment-models").textContent);
@@ -1084,20 +1084,52 @@ for (let sa of dat) {
         // Add half a day and flooring it rounds it
         sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
         sa.assignment_date.setHours(0,0,0,0);
+    } else {
+        sa.assignment_date = new Date(date_now.valueOf());
+        sa.fake_assignment_date = true;
+    }
+
+    if (sa.due_time) {
+        sa.due_time = sa.due_time.split(":");
+        sa.due_time = {
+            hours: +sa.due_time[0],
+            minutes: +sa.due_time[1],
+        }
     }
     // Don't do Number.isFinite(x) because this is the raw value
     if (sa.x) {
         sa.x = new Date(sa.x);
         // floor(date + 0.5) is the same as round(date)
-        sa.x = new Date(sa.x.valueOf() + 12*60*60*1000);
-        sa.x.setHours(0,0,0,0);
-        // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
-        sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date || date_now);
+        sa.x.setHours(sa.x.getHours() + 24/2);
+        sa.x.setHours(0, 0, 0, 0);
+        
+        if (sa.due_time) {
+            let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hours, sa.due_time.minutes);
+            $(window).one("load", function() {
+                setTimeout(function() {
+                    priority.sort();
+                // Hardcoded delay if setTimeout isn't accurate
+                }, complete_due_date - original_date_now + 5000);
+            });
+            // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
+            sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
+            sa.complete_x = mathUtils.daysBetweenTwoDates(complete_due_date, sa.assignment_date, {round: false});
+        } else {
+            // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
+            sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
+            sa.complete_x = sa.x;
+        }
+        
+
+        if (sa.due_time && (sa.due_time.hours || sa.due_time.minutes)) {
+            sa.x++;
+        }
         if (sa.name === example_assignment_name) {
-            sa.assignment_date = new Date(date_now.valueOf());
+            sa.fake_assignment_date = false;
         }
         if (isExampleAccount) {
             sa.assignment_date.setDate(sa.assignment_date.getDate() + x_transform);
+            sa.fake_assignment_date = false; // probably isnt needed but ill keep this here anyways
         }
     }
     // Repopulating the form
@@ -1146,9 +1178,8 @@ document.addEventListener("DOMContentLoaded", function() {
         'action': 'save_assignment',
         'assignments': [],
     },
-    utils.reloadAfterMidnightHourToUpdate();
+    utils.reloadAtMidnight();
     if (oauth_token.token) ajaxUtils.createGCAssignments();
-    setInterval(utils.reloadAfterMidnightHourToUpdate, 1000*60);
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();

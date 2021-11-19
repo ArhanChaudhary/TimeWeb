@@ -30,13 +30,12 @@ Assignment.prototype.setParabolaValues = function() {
     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
     */
     // Define (x1, y1) and translate both variables to (0,0)
-    let x1 = this.sa.x - this.red_line_start_x,
+    let x1 = this.sa.complete_x - this.red_line_start_x,
         y1 = this.sa.y - this.red_line_start_y;
     if (this.sa.break_days.length) {
         const mods = this.calcModDays();
-        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+        x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
     }
-    
     const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
     this.a = parabola.a;
     this.b = parabola.b;
@@ -291,11 +290,11 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // red_line_start_x needs to be set for calcModDays; also set red_line_start_y for consistency
     this.red_line_start_x = this.sa.blue_line_start;
     this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-    let x1_from_blue_line_start = this.sa.x - this.red_line_start_x;
+    let x1_from_blue_line_start = this.sa.complete_x - this.red_line_start_x;
     let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
     if (this.sa.break_days.length) {
         const mods = this.calcModDays();
-        x1_from_blue_line_start -= Math.floor(x1_from_blue_line_start / 7) * this.sa.break_days.length + mods[x1_from_blue_line_start % 7]; // Handles break days, explained later
+        x1_from_blue_line_start -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
     }
     // Roundoff errors
     if (x1_from_blue_line_start > 10000) return;
@@ -305,11 +304,16 @@ Assignment.prototype.autotuneSkewRatio = function() {
 
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for this algorithm!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3
-    const x_matrix = works_without_break_days.map((work_input, work_input_index) => [work_input_index, Math.pow(work_input_index, 2)]);
+    const x_matrix = works_without_break_days.map((work_input, work_input_index) => 
+        [
+            Math.min(work_input_index, x1_from_blue_line_start), 
+            Math.pow(Math.min(work_input_index, x1_from_blue_line_start), 2)
+        ]
+    );
     const y_matrix = works_without_break_days.map(work_input => work_input - this.sa.works[0]);
 
     // Add the last point if it wasn't already added (to ensure the next statement doesn't yield a false positive)
-    if (len_works_without_break_days !== x1_from_blue_line_start) {
+    if (len_works_without_break_days !== Math.ceil(x1_from_blue_line_start)) {
         x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
         y_matrix.push(y1_from_blue_line_start);
     }
@@ -341,11 +345,11 @@ Assignment.prototype.autotuneSkewRatio = function() {
         // Change the scope of the skew ratio to x1
         this.red_line_start_x = original_red_line_start_x;
         this.red_line_start_y = original_red_line_start_y;
-        let x1 = this.sa.x - this.red_line_start_x;
+        let x1 = this.sa.complete_x - this.red_line_start_x;
         let y1 = this.sa.y - this.red_line_start_y;
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
-            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7]; // Handles break days, explained later
+            x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) & 7]; // Handles break days, explained later
         }
 
         // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
@@ -367,7 +371,9 @@ Assignment.prototype.autotuneSkewRatio = function() {
     // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
     // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
     // This way ensures the autotune becomes more effective as more data points are made available for the regression
-    let autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+
+    // Math.min(..., 1) to make sure the autotune factor is never greater than 1 (this can happen with due times)
+    let autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
 
     // Way too much to say about this, will explain later
     autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
