@@ -153,6 +153,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'enable_tutorial': self.settings_model.enable_tutorial,
             'horizontal_tag_position': self.settings_model.horizontal_tag_position,
             'vertical_tag_position': self.settings_model.vertical_tag_position,
+            'restore_gc_assignments': False,
             'dark_mode': self.settings_model.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
@@ -209,6 +210,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
         self.settings_model.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
         self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
+        if self.form.cleaned_data.get("restore_gc_assignments"):
+            self.settings_model.added_gc_assignment_ids = []
         self.settings_model.dark_mode = self.form.cleaned_data.get("dark_mode")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
