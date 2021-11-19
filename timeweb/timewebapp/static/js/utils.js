@@ -1092,8 +1092,8 @@ for (let sa of dat) {
     if (sa.due_time) {
         sa.due_time = sa.due_time.split(":");
         sa.due_time = {
-            hours: +sa.due_time[0],
-            minutes: +sa.due_time[1],
+            hour: +sa.due_time[0],
+            minute: +sa.due_time[1],
         }
     }
     // Don't do Number.isFinite(x) because this is the raw value
@@ -1104,7 +1104,7 @@ for (let sa of dat) {
         sa.x.setHours(0, 0, 0, 0);
         
         if (sa.due_time) {
-            let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hours, sa.due_time.minutes);
+            let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
             $(window).one("load", function() {
                 setTimeout(function() {
                     priority.sort();
@@ -1121,7 +1121,7 @@ for (let sa of dat) {
         }
         
 
-        if (sa.due_time && (sa.due_time.hours || sa.due_time.minutes)) {
+        if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
             sa.x++;
         }
         if (sa.name === example_assignment_name) {

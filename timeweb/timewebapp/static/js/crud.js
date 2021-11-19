@@ -155,8 +155,8 @@ class Crud {
                 })(),
                 "#id_due_time": (function() {
                     if (!sa.due_time) return "";
-                    const hour = (sa.due_time.hours < 10 ? "0" : "") + sa.due_time.hours;
-                    const minute = (sa.due_time.minutes < 10 ? "0" : "") + sa.due_time.minutes;
+                    const hour = (sa.due_time.hour < 10 ? "0" : "") + sa.due_time.hour;
+                    const minute = (sa.due_time.minute < 10 ? "0" : "") + sa.due_time.minute;
                     return `${hour}:${minute}`;
                 })(),
                 "#id_soft": sa.soft,

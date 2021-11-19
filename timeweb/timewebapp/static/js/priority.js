@@ -241,8 +241,8 @@ class Priority {
             } else {
                 let complete_due_date = new Date(sa.sa.assignment_date.valueOf());
                 complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
-                if (sa.sa.due_time && (sa.sa.due_time.hours || sa.sa.due_time.minutes)) {
-                    complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hours * 60 + sa.sa.due_time.minutes);
+                if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
+                    complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
                 }
                 
                 let complete_date_now = new Date(date_now.valueOf());

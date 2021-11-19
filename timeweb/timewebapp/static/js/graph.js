@@ -72,7 +72,7 @@ class Assignment {
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
-        this.sa.due_time = {hours: 0, minutes: 0};
+        this.sa.due_time = {hour: 0, minute: 0};
         while (true) {
             this.sa.x++;
             // Number of days between end of blue line and due date
@@ -102,8 +102,8 @@ class VisualAssignment extends Assignment {
         this.draw_mouse_point = true;
         this.complete_due_date = new Date(this.sa.assignment_date.valueOf());
         this.complete_due_date.setDate(this.complete_due_date.getDate() + Math.floor(this.sa.complete_x));
-        if (this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
-            this.complete_due_date.setMinutes(this.complete_due_date.getMinutes() + this.sa.due_time.hours * 60 + this.sa.due_time.minutes);
+        if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
+            this.complete_due_date.setMinutes(this.complete_due_date.getMinutes() + this.sa.due_time.hour * 60 + this.sa.due_time.minute);
         }
         if (this.sa.assignment_date.getFullYear() === this.complete_due_date.getFullYear()) {
             this.date_string_options = {month: 'long', day: 'numeric', weekday: 'long'};
@@ -377,7 +377,7 @@ class VisualAssignment extends Assignment {
                 funct_mouse_x = this.funct(mouse_x);
             }
             let str_mouse_x;
-            if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+            if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 str_mouse_x = new Date(this.complete_due_date.valueOf());
                 str_mouse_x = str_mouse_x.toLocaleDateString("en-US", {...this.date_string_options_no_weekday, hour: "numeric", minute: "numeric"});
                 // mouse_x as a variable isnt needed anymore. Set it to complete_x if at x to position the point
@@ -435,7 +435,7 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
-        if (this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+        if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
             center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", {...this.date_string_options, hour: "numeric", minute: "numeric"})}${strdaysleft}`, 1);
         } else {
             center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
@@ -446,7 +446,7 @@ class VisualAssignment extends Assignment {
             }
             let displayed_day;
             let str_day;
-            if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hours || this.sa.due_time.minutes)) {
+            if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 displayed_day = new Date(this.complete_due_date.valueOf());
                 str_day = displayed_day.toLocaleDateString("en-US", {...this.date_string_options, hour: "numeric", minute: "numeric"});
             } else {
