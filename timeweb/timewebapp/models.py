@@ -172,6 +172,7 @@ class SettingsModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("The default minimum work time must be positive"))],
+        default=15,
         blank=True,
         null=True,
         verbose_name=_('Default Minimum Daily Work Time in Minutes'),
