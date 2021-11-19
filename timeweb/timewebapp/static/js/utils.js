@@ -137,7 +137,7 @@ utils = {
 
             googleClassroomAPI: function() {
                 if (!creating_gc_assignments_from_frontend && !gc_api_init_failed) {
-                    if (oauth_token.token) {
+                    if (SETTINGS.oauth_token.token) {
                         $("#toggle-gc-label").html("Disable Google Classroom API");
                     } else {
                         $("#toggle-gc-label").html("Enable Google Classroom API");
@@ -478,12 +478,12 @@ utils = {
                 // Remove "Important", "Not Important", and default_dropdown_tags
                 unique_allTags.delete("Important");
                 unique_allTags.delete("Not Important");
-                unique_allTags = Array.from(unique_allTags).filter(e => !default_dropdown_tags.includes(e));
+                unique_allTags = Array.from(unique_allTags).filter(e => !SETTINGS.default_dropdown_tags.includes(e));
                 // Add back in "Important", "Not Important", and default_dropdown_tags
                 const final_allTags = [];
                 final_allTags.push("Important");
                 final_allTags.push("Not Important");
-                final_allTags.push(...default_dropdown_tags);
+                final_allTags.push(...SETTINGS.default_dropdown_tags);
                 // Add sorted all tags
                 final_allTags.push(...unique_allTags.sort());
 
@@ -708,7 +708,7 @@ utils = {
             }, 0);
         },
         insertTutorialMessages: function() {
-            if (enable_tutorial) {
+            if (SETTINGS.enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
                     return utils.loadAssignmentData($(this)).name !== example_assignment_name;
                 });
@@ -786,11 +786,11 @@ utils = {
                 //             }
                 //         },
                 //         onClose: function() {
-                //             enable_tutorial = false;
+                //             SETTINGS.enable_tutorial = false;
                 //             ajaxUtils.ajaxFinishedTutorial();
                 //         },
                 //     });
-                    enable_tutorial = false;
+                    SETTINGS.enable_tutorial = false;
                     ajaxUtils.ajaxFinishedTutorial();
                 }
             });
@@ -806,7 +806,7 @@ utils = {
         saveAndLoadStates: function() {
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
             $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
-                if (!enable_tutorial) {
+                if (!SETTINGS.enable_tutorial) {
                     // Save current open assignments
                     sessionStorage.setItem("open_assignments", JSON.stringify(
                         $(".assignment.open-assignment").map(function() {
@@ -952,7 +952,7 @@ ajaxUtils = {
             if (authentication_url === "No new gc assignments were added") {
                 $("#toggle-gc-label").html("");
                 $("#toggle-gc-container").removeClass("open");
-                if (oauth_token.token) {
+                if (SETTINGS.oauth_token.token) {
                     $("#toggle-gc-label").html("Disable Google Classroom API");
                 } else {
                     $("#toggle-gc-label").html("Enable Google Classroom API");
@@ -1046,8 +1046,8 @@ ajaxUtils = {
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
-({ def_min_work_time, def_skew_ratio, def_break_days, def_unit_to_minute, def_funct_round_minute, ignore_ends, show_progress_bar, color_priority, text_priority, enable_tutorial, date_now, highest_priority_color, lowest_priority_color, oauth_token, horizontal_tag_position, vertical_tag_position, default_dropdown_tags, reverse_sorting, seen_latest_changelog, close_graph_after_work_input, one_graph_at_a_time } = JSON.parse(document.getElementById("settings-model").textContent));
-if (!seen_latest_changelog) {
+const SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+if (!SETTINGS.seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
         const jconfirm = $.alert({
@@ -1055,7 +1055,7 @@ if (!seen_latest_changelog) {
             content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"changelog\">changelog.</a>",
             backgroundDismiss: false,
             onClose: function() {
-                seen_latest_changelog = true;
+                SETTINGS.seen_latest_changelog = true;
                 ajaxUtils.ajaxSeenLatestChangelog();
             }
         });
@@ -1065,12 +1065,12 @@ if (!seen_latest_changelog) {
         }, 0);
     }, 500);
 }
-def_break_days = def_break_days.map(Number);
+SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
 date_now = new Date();
 original_date_now = new Date(date_now.valueOf());
 date_now = new Date(date_now.toDateString());
-highest_priority_color = utils.formatting.hexToRGB(highest_priority_color);
-lowest_priority_color = utils.formatting.hexToRGB(lowest_priority_color);
+SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
+SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
     window.gtag = function(){};
     x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
@@ -1179,7 +1179,7 @@ document.addEventListener("DOMContentLoaded", function() {
         'assignments': [],
     },
     utils.reloadAtMidnight();
-    if (oauth_token.token) ajaxUtils.createGCAssignments();
+    if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();

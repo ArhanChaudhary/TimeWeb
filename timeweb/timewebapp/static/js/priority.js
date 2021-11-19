@@ -26,9 +26,9 @@ class Priority {
             var g = 255;
             var b = 255;
         } else {
-            var r = lowest_priority_color.r + (highest_priority_color.r - lowest_priority_color.r) * percentage_as_decimal;
-            var g = lowest_priority_color.g + (highest_priority_color.g - lowest_priority_color.g) * percentage_as_decimal;
-            var b = lowest_priority_color.b + (highest_priority_color.b - lowest_priority_color.b) * percentage_as_decimal;
+            var r = SETTINGS.lowest_priority_color.r + (SETTINGS.highest_priority_color.r - SETTINGS.lowest_priority_color.r) * percentage_as_decimal;
+            var g = SETTINGS.lowest_priority_color.g + (SETTINGS.highest_priority_color.g - SETTINGS.lowest_priority_color.g) * percentage_as_decimal;
+            var b = SETTINGS.lowest_priority_color.b + (SETTINGS.highest_priority_color.b - SETTINGS.lowest_priority_color.b) * percentage_as_decimal;
         }
         return {r, g, b};
     }
@@ -45,7 +45,7 @@ class Priority {
             }, 1500, "easeOutCubic");
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-        if (color_priority) {
+        if (SETTINGS.color_priority) {
             if (that.params.first_sort) {
                 dom_assignment.addClass("transition-instantly");
             }
@@ -113,8 +113,8 @@ class Priority {
     positionTags(dom_assignment) {
         const that = this;
         dom_assignment.removeClass("tags-bottom");
-        horizontal_tag_position === "Left" && that.positionTagLeftAndTagBottom(dom_assignment);
-        vertical_tag_position === "Bottom" && dom_assignment.addClass("tags-bottom");
+        SETTINGS.horizontal_tag_position === "Left" && that.positionTagLeftAndTagBottom(dom_assignment);
+        SETTINGS.vertical_tag_position === "Bottom" && dom_assignment.addClass("tags-bottom");
     }
     positionTagLeftAndTagBottom(dom_assignment) {
         const that = this;
@@ -131,8 +131,8 @@ class Priority {
         const tag_height = dom_tags.height();
 
         let title_top = dom_title.offset().top;
-        if (horizontal_tag_position === "Left") {
-            if (vertical_tag_position === "Bottom") {
+        if (SETTINGS.horizontal_tag_position === "Left") {
+            if (SETTINGS.vertical_tag_position === "Bottom") {
                 if (add_daysleft) title_top -= 14;
             } else if (add_priority_percentage) {
                 title_top -= 10;
@@ -458,7 +458,7 @@ class Priority {
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
-            dom_tags.toggleClass("assignment-has-daysleft", vertical_tag_position === "Bottom" && horizontal_tag_position === "Left" && !!str_daysleft);
+            dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
     }
@@ -470,7 +470,7 @@ class Priority {
 
         const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
         if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
-        || reverse_sorting && [that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
+        || SETTINGS.reverse_sorting && [that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
@@ -632,7 +632,7 @@ class Priority {
 
             let priority_percentage = that.priorityDataToPriorityPercentage(that.priority_data);
             that.priority_percentage = priority_percentage;
-            const add_priority_percentage = text_priority && [that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !that.mark_as_done;
+            const add_priority_percentage = SETTINGS.text_priority && [that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !that.mark_as_done;
             const dom_title = $(".title").eq(that.priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${that.priority_percentage}%` : "");
 

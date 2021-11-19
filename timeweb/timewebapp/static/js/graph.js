@@ -263,7 +263,7 @@ class VisualAssignment extends Assignment {
         } else {
             goal_for_this_day = this.sa.works[today_minus_assignment_date - this.sa.blue_line_start + 1];
         }
-        if (show_progress_bar) {
+        if (SETTINGS.show_progress_bar) {
             move_info_down = 0;
             let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
                 bar_move_left = should_be_done_x - this.width + 17;
@@ -792,7 +792,7 @@ class VisualAssignment extends Assignment {
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-            if (close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
+            if (SETTINGS.close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
                 priority.sort({ timeout: true, triggerResize: false });
                 this.dom_assignment.click();
             } else {
@@ -1015,7 +1015,7 @@ $(".assignment").click(function(e) {
         priority.positionTags(dom_assignment);
         return;
     }
-    one_graph_at_a_time && $("#close-assignments").click();
+    SETTINGS.one_graph_at_a_time && $("#close-assignments").click();
     
     const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
@@ -1032,7 +1032,7 @@ $(".assignment").click(function(e) {
     // Sets event handlers only on the assignment's first click
     first_click && sa.setGraphButtonEventListeners();
     sa.resize();
-    if (enable_tutorial && !already_ran_tutorial) {
+    if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
         already_ran_tutorial = true;
         $(".assignment").next().remove(); // Remove "Click this assignment"
         setTimeout(function() {

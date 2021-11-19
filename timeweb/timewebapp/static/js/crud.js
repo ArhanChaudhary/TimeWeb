@@ -8,13 +8,13 @@ class Crud {
             "#id_x": '',
             '#id_due_time': '00:00',
             "#id_soft": false,
-            "#id_unit": def_unit_to_minute ? "Minute" : '',
+            "#id_unit": SETTINGS.def_unit_to_minute ? "Minute" : '',
             "#id_y": '',
             "#id_works": '0',
             "#id_time_per_unit": '',
             "#id_description": '',
             "#id_funct_round": '1',
-            "#id_min_work_time": +def_min_work_time||'',
+            "#id_min_work_time": +SETTINGS.def_min_work_time||'',
         }
         that.FORM_POSITION_TOP = 15;
         that.UNITS_OF_TIME = {"minute": 1, "hour": 60};
@@ -98,7 +98,7 @@ class Crud {
             $("#id_time_per_unit").val(that.UNITS_OF_TIME[singularToLowerCase]);
             $("#id_time_per_unit").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_time_per_unit']").addClass("disabled-field");
-            if (def_funct_round_minute && singularToLowerCase === "minute") {
+            if (SETTINGS.def_funct_round_minute && singularToLowerCase === "minute") {
                 $("#id_funct_round").val(5);
                 $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
                 $("label[for='id_funct_round']").addClass("disabled-field");
@@ -108,7 +108,7 @@ class Crud {
             $("#id_time_per_unit").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_time_per_unit']").removeClass("disabled-field");   
         }
-        if (def_funct_round_minute && singularToLowerCase !== "minute") {
+        if (SETTINGS.def_funct_round_minute && singularToLowerCase !== "minute") {
             that.old_unit_value in that.UNITS_OF_TIME && $("#id_funct_round").val("");
             $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_funct_round']").removeClass("disabled-field");
@@ -129,8 +129,8 @@ class Crud {
             }
             for (let break_day of Array(7).keys()) {
                 // (break_days+6)%7) is for ordering I think
-                // Treat this as: $("#id_break_days_"+break_days).prop("checked", def_break_days.includes(break_days));
-                $("#id_break_days_"+((break_day+6)%7)).prop("checked", def_break_days.includes(break_day));
+                // Treat this as: $("#id_break_days_"+break_days).prop("checked", SETTINGS.def_break_days.includes(break_days));
+                $("#id_break_days_"+((break_day+6)%7)).prop("checked", SETTINGS.def_break_days.includes(break_day));
             }
             // Set form text
             $("#new-title").html("New Assignment");
