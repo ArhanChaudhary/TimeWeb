@@ -93,6 +93,17 @@ class Assignment {
     }
 }
 class VisualAssignment extends Assignment {
+    static CLOSE_ASSIGNMENT_TRANSITION_DURATION = 750
+    static MOUSE_POSITION_TRANSFORM = {x: 0.1, y: -1.3} // Adjusts the mouse position by a few pixels to make it visually more accurate
+    static RED_LINE_COLOR = {r: 233, g: 68, b: 46}
+    static BLUE_LINE_COLOR = {r: 1, g: 147, b: 255}
+    static DRAW_POINT_COLOR = {r: 0, g: 255, b: 0}
+    static SKEW_RATIO_ROUND_PRECISION = 3
+    static SKEW_RATIO_SNAP_DIFF = 0.05
+    static ARROW_KEYDOWN_THRESHOLD = 500
+    static ARROW_KEYDOWN_INTERVAL = 13
+    static BUTTON_ERROR_DISPLAY_TIME = 1000
+
     constructor(dom_assignment) {
         super(dom_assignment);
         this.dom_assignment = dom_assignment;
@@ -127,11 +138,12 @@ class VisualAssignment extends Assignment {
             this.width = this.fixed_graph.width();
             this.height = this.fixed_graph.height();
         } else {
-            assignment_footer.toggle();
+            assignment_footer.show();
             this.width = this.fixed_graph.width();
             this.height = this.fixed_graph.height();
-            assignment_footer.toggle();
+            assignment_footer.hide();
         }
+        //hard
         if (this.width > 500) {
             VisualAssignment.font_size = 13.9;
         } else {
@@ -161,8 +173,8 @@ class VisualAssignment extends Assignment {
             }
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
-            let x2 = (raw_x - 50.1) / this.wCon - this.red_line_start_x;
-            let y2 = (this.height - raw_y - 48.7) / this.hCon - this.red_line_start_y;
+            let x2 = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon - this.red_line_start_x;
+            let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y;
             // Handles break days
             if (this.sa.break_days.length) {
                 const floorx2 = Math.floor(x2);
@@ -183,7 +195,7 @@ class VisualAssignment extends Assignment {
                 
                 // Redefine skew ratio
                 this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, (this.a + this.b) * x1 / y1, skew_ratio_bound);
-                if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < 0.05) {
+                if (Math.abs(Math.round(this.sa.skew_ratio) - this.sa.skew_ratio) < VisualAssignment.SKEW_RATIO_SNAP_DIFF) {
                     // Snap skew ratio to whole numbers
                     this.sa.skew_ratio = Math.round(this.sa.skew_ratio);
                 }
@@ -218,15 +230,15 @@ class VisualAssignment extends Assignment {
         priority.sort({ timeout: true });
         this.draw();
     }
+    //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
-            // -50.1 and -48.7 were used instead of -50 because I experimented those to be the optimal positions of the graph coordinates
-            var mouse_x = (raw_x - 50.1) / this.wCon,
-                mouse_y = (this.height - raw_y - 48.7) / this.hCon;
+            var mouse_x = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
+                mouse_y = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon;
             if (mouse_x >= (Math.round(mouse_x) + this.sa.complete_x) / 2)
                 mouse_x = this.sa.x;
             else
@@ -335,7 +347,19 @@ class VisualAssignment extends Assignment {
         let circle_x,
             circle_y,
             line_end = this.sa.complete_x + Math.ceil(1 / this.wCon);
-        screen.strokeStyle = $("html").is("#dark-mode") ? "rgb(22,187,209)" : "rgb(233,68,46)"; // red
+        if ($("html").is("#dark-mode")) {
+            screen.strokeStyle = `rgb(
+                ${255 - VisualAssignment.RED_LINE_COLOR.r},
+                ${255 - VisualAssignment.RED_LINE_COLOR.g},
+                ${255 - VisualAssignment.RED_LINE_COLOR.b}
+            )`.replace(/\s+/g, '');
+        } else {
+            screen.strokeStyle = `rgb(
+                ${VisualAssignment.RED_LINE_COLOR.r},
+                ${VisualAssignment.RED_LINE_COLOR.g},
+                ${VisualAssignment.RED_LINE_COLOR.b}
+            )`.replace(/\s+/g, '');
+        }
         screen.lineWidth = radius;
         screen.beginPath();
         for (let point = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point < line_end; point += Math.ceil(1 / this.wCon)) {
@@ -351,10 +375,20 @@ class VisualAssignment extends Assignment {
         screen.stroke();
         screen.beginPath();
         radius *= 0.75;
-        if (line_end > len_works + Math.ceil(1 / this.wCon)) {
-            line_end = len_works + Math.ceil(1 / this.wCon);
+        line_end = Math.min(line_end, len_works + Math.ceil(1 / this.wCon));
+        if ($("html").is("#dark-mode")) {
+            screen.strokeStyle = `rgb(
+                ${255 - VisualAssignment.BLUE_LINE_COLOR.r},
+                ${255 - VisualAssignment.BLUE_LINE_COLOR.g},
+                ${255 - VisualAssignment.BLUE_LINE_COLOR.b}
+            )`.replace(/\s+/g, '');
+        } else {
+            screen.strokeStyle = `rgb(
+                ${VisualAssignment.BLUE_LINE_COLOR.r},
+                ${VisualAssignment.BLUE_LINE_COLOR.g},
+                ${VisualAssignment.BLUE_LINE_COLOR.b}
+            )`.replace(/\s+/g, '');
         }
-        screen.strokeStyle = $("html").is("#dark-mode") ? "rgb(254,108,0)" : "rgb(1,147,255)"; // blue
         screen.lineWidth = radius;
         for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
             circle_x = (Math.min(this.sa.complete_x, point) + this.sa.blue_line_start) * this.wCon + 50;
@@ -395,7 +429,19 @@ class VisualAssignment extends Assignment {
             }
             screen.fillStyle = "black";
             screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x}) `, this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50);
-            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(255,0,255)" : "rgb(0,255,0)";
+            if ($("html").is("#dark-mode")) {
+                screen.fillStyle = `rgb(
+                    ${255 - VisualAssignment.DRAW_POINT_COLOR.r},
+                    ${255 - VisualAssignment.DRAW_POINT_COLOR.g},
+                    ${255 - VisualAssignment.DRAW_POINT_COLOR.b}
+                )`.replace(/\s+/g, '');
+            } else {
+                screen.fillStyle = `rgb(
+                    ${VisualAssignment.DRAW_POINT_COLOR.r},
+                    ${VisualAssignment.DRAW_POINT_COLOR.g},
+                    ${VisualAssignment.DRAW_POINT_COLOR.b}
+                )`.replace(/\s+/g, '');
+            }
             screen.strokeStyle = screen.fillStyle;
             screen.beginPath();
             screen.arc(this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50, radius, 0, 2 * Math.PI);
@@ -403,7 +449,7 @@ class VisualAssignment extends Assignment {
             screen.fill();
             screen.fillStyle = "black";
         }
-        const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, 3);
+        const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";
         screen.fillStyle = "black";
         screen.textBaseline = "top";
@@ -472,6 +518,7 @@ class VisualAssignment extends Assignment {
         }
         screen.scale(1 / this.scale, 1 / this.scale);
     }
+    //hard (the entire function)
     drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
@@ -658,8 +705,8 @@ class VisualAssignment extends Assignment {
                     this.changeSkewRatio();
                     graphtimeout = setTimeout(function() {
                         clearInterval(graphinterval);
-                        graphinterval = setInterval(this.changeSkewRatio.bind(this), 13);
-                    }.bind(this), 500);
+                        graphinterval = setInterval(this.changeSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
+                    }.bind(this), VisualAssignment.ARROW_KEYDOWN_THRESHOLD);
                 }
             }
         }).keyup(e => {
@@ -682,7 +729,7 @@ class VisualAssignment extends Assignment {
                 clearTimeout(not_applicable_timeout_delete_work_input_button);
                 not_applicable_timeout_delete_work_input_button = setTimeout(function() {
                     delete_work_input_button.html("Delete Work Input");
-                }, 1000);
+                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             this.sa.works.pop();
@@ -793,10 +840,10 @@ class VisualAssignment extends Assignment {
             
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             if (SETTINGS.close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
-                priority.sort({ timeout: true, triggerResize: false });
+                priority.sort({ timeout: true, delayResize: false });
                 this.dom_assignment.click();
             } else {
-                priority.sort({ timeout: true, triggerResize: true });
+                priority.sort({ timeout: true, delayResize: true });
             }
             this.draw();
         });
@@ -810,7 +857,7 @@ class VisualAssignment extends Assignment {
                 clearTimeout(not_applicable_timeout_ignore_assignment_button);
                 not_applicable_timeout_ignore_assignment_button = setTimeout(function() {
                     ignore_assignment_button.html("Ignore for Today Only");
-                }, 1000);
+                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             this.sa.mark_as_done = !this.sa.mark_as_done;
@@ -844,7 +891,7 @@ class VisualAssignment extends Assignment {
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
                     skew_ratio_button.onlyText("Set Skew Ratio using Graph");
-                }, 1000);
+                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
@@ -906,7 +953,7 @@ class VisualAssignment extends Assignment {
                 clearTimeout(not_applicable_timeout_skew_ratio_textbox);
                 not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
                     skew_ratio_textbox.attr("placeholder", "Enter Skew Ratio");
-                }, 1000);
+                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             if (skew_ratio_textbox.val()) {
@@ -951,13 +998,13 @@ class VisualAssignment extends Assignment {
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
         // END Fixed/dynamic mode button        
     }
-}
-function shake_assignment($assignment_to_shake) {
-    $assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
-        $assignment_to_shake.animate({left: 5}, 75, "easeOutCubic", function() {
-            $assignment_to_shake.animate({left: 0}, 75, "easeOutCubic");
+    static shake_assignment($assignment_to_shake) {
+        $assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
+            $assignment_to_shake.animate({left: 5}, 75, "easeOutCubic", function() {
+                $assignment_to_shake.animate({left: 0}, 75, "easeOutCubic");
+            });
         });
-    });
+    }
 }
 let already_ran_tutorial = false;
 $(function() {
@@ -985,10 +1032,10 @@ $(".assignment").click(function(e) {
                 // utils.scroll determines when the page has stopped scrolling and internally resolves the promise
                 $("main").scroll(() => utils.scroll(resolve));
                 utils.scroll(resolve);
-        }).then(() => shake_assignment(assignment_to_shake.focus()));
+        }).then(() => VisualAssignment.shake_assignment(assignment_to_shake.focus()));
         return;
     } else if (sa_sa.needs_more_info) {
-        shake_assignment(dom_assignment);
+        VisualAssignment.shake_assignment(dom_assignment);
         dom_assignment.find(".update-button").parents(".button").focus();
         return;
     }
@@ -1000,8 +1047,8 @@ $(".assignment").click(function(e) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         assignment_footer.animate({
-            marginBottom: -(assignment_footer.height() + 5)
-        }, 750, "easeOutCubic", function() {
+            marginBottom: -(assignment_footer.height() + parseInt(dom_assignment.find(".graph-container").css("margin-top")))
+        }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");
             assignment_footer.css({
@@ -1038,7 +1085,7 @@ $(".assignment").click(function(e) {
         setTimeout(function() {
             const days_until_due = Math.floor(sa.sa.complete_x) - sa.sa.blue_line_start;
             utils.ui.graphAlertTutorial(days_until_due);
-        }, 1000);
+        }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
     }
 });
 });

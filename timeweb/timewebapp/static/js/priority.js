@@ -1,22 +1,21 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 class Priority {
-    constructor() {
-        const that = this;
-        that.SORT_TIMEOUT_DURATION = 35;
-        that.DARK_MODE_ALPHA = 0.75;
-        that.ANIMATE_IN_START_MARGIN = 20;
+    static ANIMATE_IN_DURATION = 1500;
+    static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => 1.75 + Math.abs(transform_value) / 2000;
+    static SORT_TIMEOUT_DURATION = 35;
+    static DARK_MODE_ALPHA = 0.75;
+    static ANIMATE_IN_START_MARGIN = 20; // Moves animate in a bit below the last assignment to give it more breathing room
 
-        that.INCOMPLETE_WORKS = 10;
-        that.NO_WORKING_DAYS = 9;
-        that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT = 8;
-        that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG = 7;
-        that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT = 6;
-        that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW = 5;
-        that.UNFINISHED_FOR_TODAY = 4;
-        that.FINISHED_FOR_TODAY = 3;
-        that.NOT_YET_ASSIGNED = 2;
-        that.COMPLETELY_FINISHED = 1;
-    }
+    static INCOMPLETE_WORKS = 10;
+    static NO_WORKING_DAYS = 9;
+    static NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT = 8;
+    static NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG = 7;
+    static NEEDS_MORE_INFO_AND_GC_ASSIGNMENT = 6;
+    static UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW = 5;
+    static UNFINISHED_FOR_TODAY = 4;
+    static FINISHED_FOR_TODAY = 3;
+    static NOT_YET_ASSIGNED = 2;
+    static COMPLETELY_FINISHED = 1;
     
     percentageToColor(priority_percentage) {
         const that = this;
@@ -42,7 +41,7 @@ class Priority {
                 top: "0", 
                 opacity: "1", 
                 marginBottom: "0",
-            }, 1500, "easeOutCubic");
+            }, Priority.ANIMATE_IN_DURATION, "easeOutCubic");
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
         if (SETTINGS.color_priority) {
@@ -50,7 +49,7 @@ class Priority {
                 dom_assignment.addClass("transition-instantly");
             }
             const background_color = that.percentageToColor(that.priority_percentage);
-            const a = $("html").is("#dark-mode") ? that.DARK_MODE_ALPHA : 1;
+            const a = $("html").is("#dark-mode") ? Priority.DARK_MODE_ALPHA : 1;
             dom_assignment.parents(".assignment-container").toggleClass("invert-text-color", (background_color.r + background_color.g + background_color.b) / 3 <= 255 / 2);
             background_color.r = Math.round(background_color.r * a);
             background_color.g = Math.round(background_color.g * a);
@@ -106,7 +105,7 @@ class Priority {
         assignment_container.removeClass("transform-instantly")
                 .css({
                     transform: "",
-                    transitionDuration: `${1.75 + Math.abs(transform_value)/2000}s`, // Delays longer transforms
+                    transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
                 });
     }        
 
@@ -132,6 +131,7 @@ class Priority {
 
         let title_top = dom_title.offset().top;
         if (SETTINGS.horizontal_tag_position === "Left") {
+            //hard
             if (SETTINGS.vertical_tag_position === "Bottom") {
                 if (add_daysleft) title_top -= 14;
             } else if (add_priority_percentage) {
@@ -166,7 +166,7 @@ class Priority {
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
-            let todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
+            let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
             const assignment_container = $(".assignment-container").eq(index),
                 dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
@@ -201,13 +201,14 @@ class Priority {
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
                     if (first_tag)
-                        status_value = that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG;
+                        status_value = Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG;
                     else
-                        status_value = that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
+                        status_value = Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
                 } else {
                     status_message = "This Assignment needs more Info!<br>Please Edit this Assignment";
-                    status_value = that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
+                    status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
                 }
+                //hard
                 dom_status_image.attr({
                     width: 11,
                     height: 18,
@@ -261,11 +262,12 @@ class Priority {
                         }
                         status_message = 'This Assignment\'s Due Date has Passed';
                     }
+                    //hard
                     dom_status_image.attr({
                         width: 16,
                         height: 16,
                     }).css("margin-left", -3);
-                    status_value = that.COMPLETELY_FINISHED;
+                    status_value = Priority.COMPLETELY_FINISHED;
                 } else if (today_minus_assignment_date < 0) {
                     status_image = "no-status-image";
                     status_message = 'This Assignment hasn\'t yet been Assigned';
@@ -276,7 +278,7 @@ class Priority {
                     } else {
                         str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
                     }
-                    status_value = that.NOT_YET_ASSIGNED;
+                    status_value = Priority.NOT_YET_ASSIGNED;
                 } else {
                     // if (alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice)
                     // The above code alerts the notice and ajaxs the due date passed notice as true
@@ -339,13 +341,14 @@ class Priority {
                         status_image = 'question-mark';
                         if (!x1) {
                             status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Break Days';
-                            status_value = that.NO_WORKING_DAYS;
+                            status_value = Priority.NO_WORKING_DAYS;
                         } else {
                             status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
-                            status_value = that.INCOMPLETE_WORKS;
+                            status_value = Priority.INCOMPLETE_WORKS;
                         }
                         sa.sa.mark_as_done && ajaxUtils.sendAttributeAjaxWithTimeout("mark_as_done", false, sa.sa.id);
                         sa.sa.mark_as_done = false;
+                        //hard
                         dom_status_image.attr({
                             width: 11,
                             height: 18,
@@ -357,16 +360,18 @@ class Priority {
                         } else {
                             status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
                         }
+                        //hard
                         dom_status_image.attr({
                             width: 15,
                             height: 15,
                         }).css("margin-left", -2);
-                        status_value = that.FINISHED_FOR_TODAY;
+                        status_value = Priority.FINISHED_FOR_TODAY;
                     } else {
-                        status_value = that.UNFINISHED_FOR_TODAY;
+                        status_value = Priority.UNFINISHED_FOR_TODAY;
                         display_format_minutes = true;
                         status_image = 'unfinished';
                         status_message = "This Assignment's Daily Work is Unfinished";
+                        //hard
                         dom_status_image.attr({
                             width: 15,
                             height: 15,
@@ -384,14 +389,14 @@ class Priority {
                         str_daysleft = 'Yesterday';
                     } else if (due_date_minus_today === 0) {
                         str_daysleft = 'Today';
-                        if ([that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.COMPLETELY_FINISHED].includes(status_value)) {
-                            status_value = that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                        if ([Priority.UNFINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHED].includes(status_value)) {
+                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                         }
                     } else if (due_date_minus_today === 1) {
                         str_daysleft = 'Tomorrow';
                         that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
-                        if ([that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.COMPLETELY_FINISHED].includes(status_value)) {
-                            status_value = that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                        if ([Priority.UNFINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHED].includes(status_value)) {
+                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                         }
                     } else if (due_date_minus_today < 7) {
                         const due_date = new Date(sa.sa.assignment_date.valueOf());
@@ -403,7 +408,7 @@ class Priority {
                 }
             }
             // Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
-            // Not needed anymore because of that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
+            // Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
             // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
                 if (sa.sa.tags.includes("Important")) {
                     status_value += 0.25;
@@ -414,19 +419,19 @@ class Priority {
             // }
             const ignore_tag_status_value = Math.round(status_value);
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            assignment_container.toggleClass("finished", ignore_tag_status_value === that.COMPLETELY_FINISHED);
-            assignment_container.toggleClass("incomplete-works", ignore_tag_status_value === that.INCOMPLETE_WORKS);
-            assignment_container.toggleClass("question-mark", [that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, that.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
-            assignment_container.toggleClass("add-line-wrapper", ignore_tag_status_value === that.COMPLETELY_FINISHED || ignore_tag_status_value === that.INCOMPLETE_WORKS);
+            assignment_container.toggleClass("finished", ignore_tag_status_value === Priority.COMPLETELY_FINISHED);
+            assignment_container.toggleClass("incomplete-works", ignore_tag_status_value === Priority.INCOMPLETE_WORKS);
+            assignment_container.toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
+            assignment_container.toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
 
             let status_priority;
-            if (ignore_tag_status_value === that.COMPLETELY_FINISHED) {
+            if (ignore_tag_status_value === Priority.COMPLETELY_FINISHED) {
                 status_priority = -index;
-            } else if (ignore_tag_status_value === that.NOT_YET_ASSIGNED) {
+            } else if (ignore_tag_status_value === Priority.NOT_YET_ASSIGNED) {
                 status_priority = today_minus_assignment_date;
-            } else if ([that.FINISHED_FOR_TODAY, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
-                // Include that.FINISHED_FOR_TODAY
-                // If you're submitting work inpuuts for a check marked assignments ahead of time, it might swap with other check marked assignments, if this wasn't here and it went to the end of the if chain, which would make no sense
+            } else if ([Priority.FINISHED_FOR_TODAY, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
+                // Include Priority.FINISHED_FOR_TODAY
+                // If you're submitting work inputs for a check marked assignments ahead of time, it might swap with other check marked assignments, if this wasn't here and it went to the end of the if chain, which would make no sense
 
                 // Don't use NaN because NaN === NaN is false for calculations used later
                 status_priority = undefined;
@@ -444,7 +449,7 @@ class Priority {
                 index,
                 mark_as_done: false,
             };
-            if (sa.sa.mark_as_done && [that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.FINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
+            if (sa.sa.mark_as_done && [Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY, Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
                 priority_data.mark_as_done = true;
             }
             that.priority_data_list.push(priority_data);
@@ -469,8 +474,8 @@ class Priority {
         if (a.status_value > b.status_value) return -1;
 
         const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
-        if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
-        || SETTINGS.reverse_sorting && [that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
+        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
+        || SETTINGS.reverse_sorting && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
@@ -493,9 +498,9 @@ class Priority {
         const that = this;
         const ignore_tag_status_value = Math.round(priority_data.status_value);
 
-        if ([that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, that.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, that.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, that.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
+        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
             var priority_percentage = NaN;
-        } else if (that.mark_as_done || [that.FINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(ignore_tag_status_value) /* that.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
+        } else if (that.mark_as_done || [Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value) /* Priority.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
             var priority_percentage = 0;
         } else {
             var priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
@@ -531,11 +536,11 @@ class Priority {
             that.prev_assignment_container = assignment_container;
         }
 
-        if (ignore_tag_status_value === that.INCOMPLETE_WORKS && !that.already_found_first_incomplete_works) {
+        if (ignore_tag_status_value === Priority.INCOMPLETE_WORKS && !that.already_found_first_incomplete_works) {
             $("#autofill-work-done").show().insertBefore(dom_assignment);
             that.already_found_first_incomplete_works = true;
         }
-        if (ignore_tag_status_value === that.COMPLETELY_FINISHED && !that.already_found_first_finished) {
+        if (ignore_tag_status_value === Priority.COMPLETELY_FINISHED && !that.already_found_first_finished) {
             $("#delete-starred-assignments").show().insertBefore(dom_assignment);
             that.already_found_first_finished = true;
         }
@@ -571,7 +576,7 @@ class Priority {
         that.params = params;
         clearTimeout(that.sort_timeout);
         if (that.params.timeout) {
-            that.sort_timeout = setTimeout(() => that.sortWithoutTimeout(), that.SORT_TIMEOUT_DURATION);
+            that.sort_timeout = setTimeout(() => that.sortWithoutTimeout(), Priority.SORT_TIMEOUT_DURATION);
         } else {
             that.sortWithoutTimeout();
         }
@@ -597,13 +602,15 @@ class Priority {
             });
         }
         // Updates open graphs' today line and other graph text
-        that.params.triggerResize && $(window).trigger("resize");
+        setTimeout(() => {
+            $(window).trigger("resize");
+        }, that.params.triggerResize ? VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION : 0);
         that.priority_data_list.sort((a,b) => that.assignmentSortingComparator(a,b));
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
             const ignore_tag_status_value = Math.round(priority_data.status_value);
-            if ([that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done) {
+            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done) {
                 return priority_data.status_priority;
             } else {
                 return -Infinity;
@@ -611,7 +618,7 @@ class Priority {
         }));
         that.question_mark_exists_excluding_gc = that.priority_data_list.some(function(priority_data) {
             const ignore_tag_status_value = Math.round(priority_data.status_value);
-            return [that.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value);
+            return [Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value);
         });
         that.prev_assignment_container = undefined;
         that.prev_tag = undefined;
@@ -623,8 +630,8 @@ class Priority {
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             that.priority_data = priority_data;
             const ignore_tag_status_value = Math.round(that.priority_data.status_value);
-            // originally ignore_tag_status_value <= that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc); if that.priority_data.mark_as_done is true then ignore_tag_status_value <= that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
-            const mark_as_done = !!(that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc && [that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, that.UNFINISHED_FOR_TODAY, that.FINISHED_FOR_TODAY, that.NOT_YET_ASSIGNED, that.COMPLETELY_FINISHED].includes(ignore_tag_status_value));
+            // originally ignore_tag_status_value <= Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc); if that.priority_data.mark_as_done is true then ignore_tag_status_value <= Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
+            const mark_as_done = !!(that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc && [Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY, Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value));
             that.mark_as_done = mark_as_done;
             const dom_assignment = $(".assignment").eq(that.priority_data.index); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
@@ -632,7 +639,7 @@ class Priority {
 
             let priority_percentage = that.priorityDataToPriorityPercentage(that.priority_data);
             that.priority_percentage = priority_percentage;
-            const add_priority_percentage = SETTINGS.text_priority && [that.UNFINISHED_FOR_TODAY, that.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !that.mark_as_done;
+            const add_priority_percentage = SETTINGS.text_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !that.mark_as_done;
             const dom_title = $(".title").eq(that.priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${that.priority_percentage}%` : "");
 
@@ -710,7 +717,7 @@ class Priority {
             // Load the fonts first or height() may return the wrong values
             document.fonts.ready.then(function() {
                 $("#animate-in").css({
-                    top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + that.ANIMATE_IN_START_MARGIN, // Moves animate in a bit below the last assignment to give it more breathing room
+                    top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + Priority.ANIMATE_IN_START_MARGIN,
                     opacity: "0",
                     marginBottom: -$("#animate-in").outerHeight(),
                 });

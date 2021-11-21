@@ -275,6 +275,9 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
     const b = (y1 - x1 * x1 * a) / x1;
     return {a, b};
 }
+Assignment.MAX_WORK_INPUTS_AUTOTUNE = 10000;
+Assignment.THIRD_POINT_STEP = 0.01;
+Assignment.MATRIX_ENDS_WEIGHT = 100000;
 Assignment.prototype.autotuneSkewRatio = function() {
     if (this.sa.fixed_mode) return;
     const works_without_break_days = this.sa.works.filter(function(work_input, work_input_index) {
@@ -297,7 +300,7 @@ Assignment.prototype.autotuneSkewRatio = function() {
         x1_from_blue_line_start -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
     }
     // Roundoff errors
-    if (x1_from_blue_line_start > 10000) return;
+    if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE) return;
     // The first part calculates the a and b values for the least squares curve from works_without_break_days using WLS quadratic regression
     // Using WLS, we can put a lot of weight on (0,0) and (x1_from_blue_line_start, y1_from_blue_line_start) to ensure the curve is valid by passing through these two points
     // NOTE: don't worry about the fact that a large weight doesn't cause the parabola to exactly pass through these points. The a and b values are converted to valid skew ratio values
@@ -321,8 +324,8 @@ Assignment.prototype.autotuneSkewRatio = function() {
     let autotuned_skew_ratio;
     if (y_matrix.length >= 3) {
         const transposed = math.clone(x_matrix);
-        transposed[transposed.length-1][0] *= 1e5;
-        transposed[transposed.length-1][1] *= 1e5;
+        transposed[transposed.length-1][0] *= Assignment.MATRIX_ENDS_WEIGHT;
+        transposed[transposed.length-1][1] *= Assignment.MATRIX_ENDS_WEIGHT;
 
         const X = math.matrix(x_matrix);
         const Y = math.matrix(y_matrix);
@@ -336,10 +339,9 @@ Assignment.prototype.autotuneSkewRatio = function() {
         // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
         // For instance, low skew ratios never allow users to do work because the start keeps changing
         // Instead, we need to do this a different way
-        // We take the point of x1_from_blue_line_start and subtract it by a small value, in this case 0.01
+        // We take the point of x1_from_blue_line_start and subtract it by a small value, in this case third_point_step
         // Then, once the scope of the skew ratio changes to x1, connect (0,0), the point, and (x1, y1) to get the autotuned skew ratio
-        const third_point_step = 0.01;
-        let x2 = x1_from_blue_line_start - third_point_step;
+        let x2 = x1_from_blue_line_start - Assignment.THIRD_POINT_STEP;
         let y2 = x2 * (a * x2 + b);
 
         // Change the scope of the skew ratio to x1

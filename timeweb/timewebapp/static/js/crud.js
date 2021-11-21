@@ -1,30 +1,28 @@
 class Crud {
-    constructor() {
-        const that = this;
-        that.FORM_ANIMATION_DURATION = 300;
-        that.DEFAULT_FORM_FIELDS = {
-            "#id_name": '',
-            "#id_assignment_date": utils.formatting.stringifyDate(date_now),
-            "#id_x": '',
-            '#id_due_time': '00:00',
-            "#id_soft": false,
-            "#id_unit": SETTINGS.def_unit_to_minute ? "Minute" : '',
-            "#id_y": '',
-            "#id_works": '0',
-            "#id_time_per_unit": '',
-            "#id_description": '',
-            "#id_funct_round": '1',
-            "#id_min_work_time": +SETTINGS.def_min_work_time||'',
-        }
-        that.FORM_POSITION_TOP = 15;
-        that.UNITS_OF_TIME = {"minute": 1, "hour": 60};
-        that.DELETE_ASSIGNMENT_TRANSITION_DURATION = 750;
+    static FORM_ANIMATION_DURATION = 300
+    static DEFAULT_FORM_FIELDS = {
+        "#id_name": '',
+        "#id_assignment_date": utils.formatting.stringifyDate(date_now),
+        "#id_x": '',
+        '#id_due_time': '00:00',
+        "#id_soft": false,
+        "#id_unit": SETTINGS.def_unit_to_minute ? "Minute" : '',
+        "#id_y": '',
+        "#id_works": '0',
+        "#id_time_per_unit": '',
+        "#id_description": '',
+        "#id_funct_round": '1',
+        "#id_min_work_time": +SETTINGS.def_min_work_time||'',
     }
+    static FORM_POSITION_TOP = 15
+    static UNITS_OF_TIME = {"minute": 1, "hour": 60}
+    static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750
+
     init() {
         const that = this;
         that.setCrudHandlers();
         that.addInfoButtons();
-        that.styleErorrs();
+        setTimeout(() => that.styleErorrs());
 
         if ($(".error-note").length) {
             that.showForm({ show_instantly: true })
@@ -43,12 +41,11 @@ class Crud {
             $("#id_x").trigger("keydown");
         }, 0);
         if (params.show_instantly) {
-            $('#overlay').show().children("#form-wrapper").css("top", that.FORM_POSITION_TOP);
+            $('#overlay').show().children("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
         } else {
-            $("#overlay").fadeIn(that.FORM_ANIMATION_DURATION).children("#form-wrapper").animate({top: that.FORM_POSITION_TOP}, that.FORM_ANIMATION_DURATION);
+            $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).children("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
             if (!isMobile) {
-                for (var first_form_field in that.DEFAULT_FORM_FIELDS) break;
-                $(first_form_field).first().focus();
+                $("form input:visible").first().focus();
             } else {
                 $(document.activeElement).blur();
             }
@@ -63,11 +60,11 @@ class Crud {
             $("#overlay").hide().children("#form-wrapper");
             $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
         } else {
-            $("#overlay").fadeOut(that.FORM_ANIMATION_DURATION, function() {
+            $("#overlay").fadeOut(Crud.FORM_ANIMATION_DURATION, function() {
                 // Remove all error notes when form is exited
                 $(".invalid").removeClass("invalid");
                 $(".error-note").remove();
-            }).children("#form-wrapper").animate({top: 0}, that.FORM_ANIMATION_DURATION);
+            }).children("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
         // Fallback if "overlay" doesn't exist
         $("main").css("overflow-y", "");
@@ -80,7 +77,7 @@ class Crud {
             singular = pluralize(val, 1),
             singularToLowerCase = singular.toLowerCase();
         if (val) {
-            if (singularToLowerCase in that.UNITS_OF_TIME) {
+            if (singularToLowerCase in Crud.UNITS_OF_TIME) {
                 $("label[for='id_y']").text(`Estimate how many ${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} this assignment will Take to Complete`);
             } else {
                 $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
@@ -94,8 +91,8 @@ class Crud {
             $("label[for='id_time_per_unit']").html("Estimated number of Minutes to complete each Unit");
             $("label[for='id_funct_round'] ~ .info-button .info-button-text").text("This is the number of units of work you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
         }
-        if (singularToLowerCase in that.UNITS_OF_TIME) {
-            $("#id_time_per_unit").val(that.UNITS_OF_TIME[singularToLowerCase]);
+        if (singularToLowerCase in Crud.UNITS_OF_TIME) {
+            $("#id_time_per_unit").val(Crud.UNITS_OF_TIME[singularToLowerCase]);
             $("#id_time_per_unit").prop("disabled",true).addClass("disabled-field");
             $("label[for='id_time_per_unit']").addClass("disabled-field");
             if (SETTINGS.def_funct_round_minute && singularToLowerCase === "minute") {
@@ -104,12 +101,12 @@ class Crud {
                 $("label[for='id_funct_round']").addClass("disabled-field");
             }
         } else {
-            that.old_unit_value in that.UNITS_OF_TIME && $("#id_time_per_unit").val("");
+            that.old_unit_value in Crud.UNITS_OF_TIME && $("#id_time_per_unit").val("");
             $("#id_time_per_unit").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_time_per_unit']").removeClass("disabled-field");   
         }
         if (SETTINGS.def_funct_round_minute && singularToLowerCase !== "minute") {
-            that.old_unit_value in that.UNITS_OF_TIME && $("#id_funct_round").val("");
+            that.old_unit_value in Crud.UNITS_OF_TIME && $("#id_funct_round").val("");
             $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_funct_round']").removeClass("disabled-field");
         }
@@ -121,11 +118,11 @@ class Crud {
         const that = this;
         // Create and show a new form when user clicks new assignment
         $("#image-new-container").click(function() {
-            for (const field in that.DEFAULT_FORM_FIELDS) {
+            for (const field in Crud.DEFAULT_FORM_FIELDS) {
                 if ($(field).attr("type") === "checkbox")
-                    $(field).prop("checked", that.DEFAULT_FORM_FIELDS[field]);
+                    $(field).prop("checked", Crud.DEFAULT_FORM_FIELDS[field]);
                 else
-                    $(field).val(that.DEFAULT_FORM_FIELDS[field]);
+                    $(field).val(Crud.DEFAULT_FORM_FIELDS[field]);
             }
             for (let break_day of Array(7).keys()) {
                 // (break_days+6)%7) is for ordering I think
@@ -298,7 +295,10 @@ class Crud {
             }
         });
         if ($("#id_x.invalid").length) {
-            $(".field-wrapper#id-soft-field-wrapper, .field-wrapper#id-due_time-field-wrapper").css("margin-top", -9);
+            $(".field-wrapper#id-soft-field-wrapper, .field-wrapper#id-due_time-field-wrapper").each(function() {
+                // Subtract one more px for minor positioning issues
+                $(this).css("margin-top", `-=${$("#error_id_x").height()+1}`);
+            });
         }
     }
     // Delete assignment
@@ -318,7 +318,7 @@ class Crud {
         const assignment_container = dom_assignment.parents(".assignment-container");
         // Animate height on assignment_container because it doesn't have a transition
         const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
-        assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, that.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
+        assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             // $("#assignments-container").css("overflow", "");
             // Remove assignment data from dat
             dat = dat.filter(_sa => sa.id !== _sa.id);
@@ -342,7 +342,7 @@ class Crud {
             dom_assignment.css("opacity", "0");
             // Use the height of dom_assignment instead of assignment_container to ignore the height of shortcuts
             const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
-            assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, that.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
+            assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
                 // If a shortcut is in assignment_container, take it out so it doesn't get deleted
                 assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
                 // Remove assignment from DOM
