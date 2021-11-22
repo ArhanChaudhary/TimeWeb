@@ -805,7 +805,8 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
                 todo = 0;
             }
-            if (len_works + this.sa.blue_line_start === this.sa.x && input_done + last_work_input < this.sa.y
+            // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
+            if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done + last_work_input < this.sa.y
                 && this.sa.soft) {
                 const original_red_line_start_x = this.red_line_start_x;
                 this.red_line_start_x = len_works + this.sa.blue_line_start;
@@ -848,11 +849,12 @@ class VisualAssignment extends Assignment {
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+            // Delay resize because the graphs don't draw while the assignment is clsoing
             if (SETTINGS.close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
-                priority.sort({ timeout: true, delayResize: false });
+                priority.sort({ timeout: true, delayResize: true });
                 this.dom_assignment.click();
             } else {
-                priority.sort({ timeout: true, delayResize: true });
+                priority.sort({ timeout: true, delayResize: false });
             }
             this.draw();
         });

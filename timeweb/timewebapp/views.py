@@ -106,7 +106,6 @@ logger.propagate = False
 def get_default_context():
     return {
         "example_account_name": example_account_name,
-        "after_midnight_hour_to_update": settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE,
         "example_assignment_name": example_assignment_name,
         "max_number_tags": MAX_NUMBER_TAGS,
         "editing_example_account": editing_example_account,
@@ -250,7 +249,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         
-        if (timezone.localtime(User.objects.get(username=request.user).last_login) - datetime.timedelta(hours=settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE)).day != (timezone.localtime(timezone.now()) - datetime.timedelta(hours=settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE)).day:
+        if (timezone.localtime(User.objects.get(username=request.user).last_login)).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
@@ -370,8 +369,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if editing_example_account:
                 # Example account date (for below logic purposes)
                 date_now = timezone.localtime(timezone.make_aware(datetime.datetime(2021, 5, 3)))
-            if date_now.hour < settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE:
-                date_now -= datetime.timedelta(1)
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if self.created_assignment or self.sm.needs_more_info:
                 self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
@@ -452,6 +449,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
                     self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
                     self.sm.x = timezone.make_aware(self.sm.x)
+                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
+                    x_num += 1
             else:
                 x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
                 if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
@@ -467,7 +466,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             elif self.updated_assignment:
                 # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                 removed_works_end = len(old_data.works) - 1
-                end_of_works = days_between_two_dates(self.sm.x, old_data.assignment_date) - self.sm.blue_line_start
+                old_x_num = days_between_two_dates(self.sm.x, old_data.assignment_date)
+                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
+                    old_x_num += 1
+                end_of_works = old_x_num - self.sm.blue_line_start
 
                 # If the edited due date cuts off some of the work inputs
                 if removed_works_end > end_of_works:
@@ -531,8 +533,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 return authorization_url
 
         date_now = timezone.localtime(timezone.now())
-        if date_now.hour < settings.AFTER_MIDNIGHT_HOUR_TO_UPDATE:
-            date_now -= datetime.timedelta(1)
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         service = build('classroom', 'v1', credentials=credentials)
 

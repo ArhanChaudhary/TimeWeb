@@ -240,6 +240,3 @@ LOGGING = {
         },
     },
 }
-
-# Views constants
-AFTER_MIDNIGHT_HOUR_TO_UPDATE = 4
