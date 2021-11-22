@@ -73,23 +73,32 @@ class Assignment {
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
         this.sa.due_time = {hour: 0, minute: 0};
-        while (true) {
+        do {
             this.sa.x++;
-            // Number of days between end of blue line and due date
-            let x1 = this.sa.x - this.red_line_start_x;
-            if (this.sa.break_days.length) {
-                const mods = this.calcModDays();
-                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
-            }
-            // Add due days until there is a working day
-            if (x1) break;
-        }
+        } while (this.getWorkingDaysRemaining({ reference: "blue line end" }) === 0);
         this.sa.complete_x = this.sa.x;
         ajaxUtils.sendAttributeAjaxWithTimeout("due_time", this.sa.due_time, this.sa.id);
 
         const due_date = new Date(this.sa.assignment_date.valueOf());
         due_date.setDate(due_date.getDate() + this.sa.x);
         ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
+    }
+    getWorkingDaysRemaining(params={reference: null}) {
+        const original_red_line_start_x = this.red_line_start_x;
+        if (params.reference === "today") {
+            let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+            this.red_line_start_x = today_minus_assignment_date;
+        } else if (params.reference === "blue line end") {
+            let len_works = this.sa.works.length - 1;
+            this.red_line_start_x = this.sa.blue_line_start + len_works;
+        }
+        let x1 = this.sa.x - this.red_line_start_x;
+        if (this.sa.break_days.length) {
+            const mods = this.calcModDays();
+            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+        }
+        this.red_line_start_x = original_red_line_start_x;
+        return x1;
     }
 }
 class VisualAssignment extends Assignment {
@@ -881,12 +890,7 @@ class VisualAssignment extends Assignment {
                 // No need to ajax since skew ratio is the same
                 return;
             }
-            let x1 = this.sa.x - this.red_line_start_x;
-            if (this.sa.break_days.length) {
-                const mods = this.calcModDays();
-                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
-            }
-            if (x1 <= 1) {
+            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1) {
                 skew_ratio_button.onlyText("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
@@ -942,13 +946,7 @@ class VisualAssignment extends Assignment {
                 min: -max_textbox_value,
                 max: max_textbox_value,
             });
-
-            let x1 = this.sa.x - this.red_line_start_x;
-            if (this.sa.break_days.length) {
-                const mods = this.calcModDays();
-                x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
-            }
-            if (x1 <= 1) {
+            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1) {
                 skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_textbox);
                 not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {

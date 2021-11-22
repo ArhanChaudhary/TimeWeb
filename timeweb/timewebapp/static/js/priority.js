@@ -325,29 +325,22 @@ class Priority {
                             todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                         }
                     }
-                    if (sa.sa.name === "English Worksheet Packet") {
-                        debugger;
-                    }
-                    let x1 = sa.sa.x - sa.red_line_start_x;
-                    if (sa.sa.break_days.length) {
-                        const mods = sa.calcModDays();
-                        x1 -= Math.floor(x1 / 7) * sa.sa.break_days.length + mods[x1 % 7];
-                    }
                     due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                     const todo_is_completed = todo <= 0 || today_minus_assignment_date < len_works + sa.sa.blue_line_start;
                     const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
                     // Don't mark as no working days when the end of the assignment has been reached
-
+                    const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now;
                     // use complete_due_date <= complete_date_now instead of (complete_due_date <= complete_date_now && sa.sa.soft)
                     // if the conjugate is true, (complete_due_date <= complete_date_now && !sa.sa.soft), the assignment will be marked as due date passed
-                    if (today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now || (!x1 && len_works + sa.sa.blue_line_start !== sa.sa.x)) {
+                    const no_working_days = sa.getWorkingDaysRemaining({ reference: "today" }) === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
+                    if (incomplete_past_inputs || no_working_days) {
                         status_image = 'question-mark';
-                        if (!x1) {
-                            status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Break Days';
-                            status_value = Priority.NO_WORKING_DAYS;
-                        } else {
+                        if (incomplete_past_inputs) {
                             status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                             status_value = Priority.INCOMPLETE_WORKS;
+                        } else {
+                            status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Break Days';
+                            status_value = Priority.NO_WORKING_DAYS;
                         }
                         if (sa.sa.mark_as_done) {
                             sa.sa.mark_as_done = false;
