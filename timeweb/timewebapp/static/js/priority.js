@@ -325,6 +325,9 @@ class Priority {
                             todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                         }
                     }
+                    if (sa.sa.name === "English Worksheet Packet") {
+                        debugger;
+                    }
                     let x1 = sa.sa.x - sa.red_line_start_x;
                     if (sa.sa.break_days.length) {
                         const mods = sa.calcModDays();
@@ -346,8 +349,10 @@ class Priority {
                             status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                             status_value = Priority.INCOMPLETE_WORKS;
                         }
-                        sa.sa.mark_as_done && ajaxUtils.sendAttributeAjaxWithTimeout("mark_as_done", false, sa.sa.id);
-                        sa.sa.mark_as_done = false;
+                        if (sa.sa.mark_as_done) {
+                            sa.sa.mark_as_done = false;
+                            ajaxUtils.sendAttributeAjaxWithTimeout("mark_as_done", sa.sa.mark_as_done, sa.sa.id);
+                        }
                         //hard
                         dom_status_image.attr({
                             width: 11,
@@ -616,10 +621,6 @@ class Priority {
                 return -Infinity;
             }
         }));
-        that.question_mark_exists_excluding_gc = that.priority_data_list.some(function(priority_data) {
-            const ignore_tag_status_value = Math.round(priority_data.status_value);
-            return [Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value);
-        });
         that.prev_assignment_container = undefined;
         that.prev_tag = undefined;
         that.already_found_first_incomplete_works = false;
@@ -630,8 +631,8 @@ class Priority {
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             that.priority_data = priority_data;
             const ignore_tag_status_value = Math.round(that.priority_data.status_value);
-            // originally ignore_tag_status_value <= Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW && (that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc); if that.priority_data.mark_as_done is true then ignore_tag_status_value <= Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
-            const mark_as_done = !!(that.priority_data.mark_as_done || that.question_mark_exists_excluding_gc && [Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY, Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value));
+
+            const mark_as_done = that.priority_data.mark_as_done;
             that.mark_as_done = mark_as_done;
             const dom_assignment = $(".assignment").eq(that.priority_data.index); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
