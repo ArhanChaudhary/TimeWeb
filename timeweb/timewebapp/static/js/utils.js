@@ -214,12 +214,12 @@ utils = {
             },
 
             autofillWorkDone: function() {
+                let message;
                 $("#autofill-work-done").click(function(e) {
                     if ($(e.target).is("#autofill-selection")) return;
-
                     $.confirm({
                         title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
-                        content: 'This action is irreversible.',
+                        content: "This action is irreversible.",
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -235,17 +235,31 @@ utils = {
                         }
                     });                    
                 });
+                let in_select = false;
                 replaceAutofillInfo();
-                $("#autofill-selection").on("change", replaceAutofillInfo);
+                $("#autofill-selection").on("change", function() {
+                    if (in_select) {
+                        replaceAutofillInfo();
+                        $("#autofill-work-done").click();
+                        in_select = false;
+                    }
+                // This setup runs the prompt after selecting the same option in the select because mouseover is the only event fired
+                }).on("mouseover", function() {
+                    if (in_select) {
+                        $(this).trigger("change");
+                        in_select = false;
+                    }
+                }).on("click", function() {
+                    in_select = !in_select;
+                });
                 function replaceAutofillInfo() {
                     $("#autofill-work-done .shortcut-text").find(".info-button").remove();
-                    let message;
                     switch ($("#autofill-selection").val()) {
                         case "No":
-                            message = "Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for";
+                            message = "Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for.\n\nClick the text or line wrapper to perform this action.";
                             break;
                         case "All":
-                            message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for";
+                            message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for.\n\nClick the text or line wrapper to perform this action.";
                             break;
                     }
                     $("#autofill-work-done .shortcut-text").info("bottom", message, "append").css({marginLeft: -2, marginRight: 2, left: 1, bottom: 1});
@@ -266,7 +280,7 @@ utils = {
                     });
                     $.confirm({
                         title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's first tag is its class name)`,
-                        content: 'This action is irreversible',
+                        content: 'This action is irreversible.',
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],

@@ -196,7 +196,7 @@ class Crud {
             const sa = utils.loadAssignmentData($this);
             $.confirm({
                 title: `Are you sure you want to delete assignment "${sa.name}"?`,
-                content: 'This action is irreversible',
+                content: 'This action is irreversible.',
                 buttons: {
                     confirm: {
                         keys: ['Enter'],
