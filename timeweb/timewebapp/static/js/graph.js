@@ -1081,7 +1081,7 @@ $(".assignment").click(function(e) {
     sa.resize();
     if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
         already_ran_tutorial = true;
-        $(".assignment").next().remove(); // Remove "Click this assignment"
+        $("#tutorial-click-assignment-to-open").remove();
         setTimeout(function() {
             const days_until_due = Math.floor(sa.sa.complete_x) - sa.sa.blue_line_start;
             utils.ui.graphAlertTutorial(days_until_due);

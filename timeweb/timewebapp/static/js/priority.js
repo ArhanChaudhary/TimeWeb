@@ -419,7 +419,7 @@ class Priority {
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", ignore_tag_status_value === Priority.COMPLETELY_FINISHED);
             assignment_container.toggleClass("incomplete-works", ignore_tag_status_value === Priority.INCOMPLETE_WORKS);
-            assignment_container.toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, that.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
+            assignment_container.toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
             assignment_container.toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
 
             let status_priority;
@@ -723,8 +723,12 @@ class Priority {
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
 
+        $("#tutorial-click-assignment-to-open").remove();
+        utils.ui.insertTutorialMessages();
+
         that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
+        
     }
 }
 document.addEventListener("DOMContentLoaded", function() {

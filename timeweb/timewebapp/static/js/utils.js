@@ -865,6 +865,11 @@ utils = {
                     ajaxUtils.sendAttributeAjax();
                 }
             });
+
+
+
+
+
             if ("advanced_inputs" in sessionStorage) {
                 $("#form-wrapper #advanced-inputs").click();
                 sessionStorage.removeItem("advanced_inputs");
@@ -872,7 +877,7 @@ utils = {
             // Ensure fonts load for the graph
             document.fonts.ready.then(function() {
                 // Reopen closed assignments
-                if ("open_assignments" in sessionStorage) {
+                if ("open_assignments" in sessionStorage && !SETTINGS.enable_tutorial) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
                     $(".assignment").filter(function() {
                         return open_assignments.includes($(this).attr("data-assignment-id"));
@@ -1240,5 +1245,4 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();
     utils.ui.saveAndLoadStates();
-    $(window).one("load", utils.ui.insertTutorialMessages);
 });
