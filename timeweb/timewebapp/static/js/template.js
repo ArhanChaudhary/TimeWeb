@@ -71,6 +71,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const target = $(e.target).attr("target") || '_self';
         window.open(href, target);
     });
+    // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
+    $(document.body).on("focus", function() {
+        $("main").focus();
+    })
 });
 $(function() {
     // Click element when enter is pressed

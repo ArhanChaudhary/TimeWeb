@@ -15,7 +15,7 @@ class Crud {
         "#id_min_work_time": +SETTINGS.def_min_work_time||'',
     }
     static FORM_POSITION_TOP = 15
-    static UNITS_OF_TIME = {"minute": 1, "hour": 60}
+    static UNITS_OF_TIME = {minute: 1, hour: 60}
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750
 
     init() {

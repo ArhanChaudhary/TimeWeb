@@ -333,7 +333,7 @@ utils = {
                         assignment_container.prevAll(".assignment-container").addBack().reverse() // addBack reveres query for some reason
                             .each(function() {
                                 const shortcut = $(this).children(".shortcut");
-                                if (!!shortcut.length) {
+                                if (shortcut.length) {
                                     // Don't click when invisible or when alreay hovered (to prevent double clicking)
                                     shortcut.is(":visible") && !shortcut.is(":hover") && shortcut.click();
                                     return false;
@@ -606,86 +606,113 @@ utils = {
         },
         setKeybinds: function() {
             $(document).keydown(function(e) {
-                if (e.shiftKey /* shiftKey needed if the user presses caps lock */ && $(document.activeElement).prop("type") !== "text") {
-                    let preventDefault = true;
-                    if (e.key === 'N') {
-                        if ($("#overlay").is(":visible"))
-                            preventDefault = false;
-                        else
-                            $("#image-new-container").click();
-                    } else if (e.key === "E" || e.key === "D") {
-                        let assignment_container = $(document.activeElement).parents(".assignment-container");
-                        if (!assignment_container.length) assignment_container = $(":hover").filter(".assignment-container");
-                        if (assignment_container.length) {
-                            if (e.key === "E") {
-                                assignment_container.find(".update-button").click();
-                            } else if (e.key === "D") {
-                                assignment_container.find(".delete-button").click();
+                switch (e.key) {
+                    case "n":
+                    case "e":
+                    case "d":
+                    case "i":
+                    case "Backspace":
+                    case "s":
+                        if ($(document.activeElement).prop("type") !== "text")
+                            switch (e.key) {
+                                case "n":
+                                    !$("#overlay").is(":visible") && $("#image-new-container").click();
+                                    break;
+                                case "e":
+                                case "d":
+                                case "i":
+                                case "Backspace":
+                                case "s":
+                                    let assignment_container = $(document.activeElement).parents(".assignment-container");
+                                    if (!assignment_container.length) assignment_container = $(":hover").filter(".assignment-container");
+                                    if (assignment_container.length)
+                                        switch (e.key) {
+                                            case "e":
+                                                assignment_container.find(".update-button").focus().click();
+                                                break;
+                                            case "d":
+                                                assignment_container.find(".delete-button").focus().click();
+                                                break;
+                                            case "i":
+                                                assignment_container.find(".mark-as-finished-button").focus().click();
+                                                break;
+                                            case "Backspace":
+                                                assignment_container.find(".delete-work-input-button").focus().click();
+                                                break;
+                                            case "s":
+                                                if (!assignment_container.find(".skew-ratio-button").is(":visible")) {
+                                                    assignment_container.find(".first-advanced-buttons").focus().click();
+                                                }
+                                                assignment_container.find(".skew-ratio-button").focus().click();
+                                                break;
+                                        }
+                                    break;
                             }
-                        }
-                    } else {
-                        preventDefault = false;
-                    }
-                    preventDefault && e.preventDefault(); // Prevent typing the actual letter
-                } else if (e.key === "Tab") {
-                    // Prevent tabbing dispositioning screen
-                    setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
-                } else if (e.key === "Escape") {
-                    crud.hideForm();
-                } else if (e.key === "ArrowDown") {
-                    if (e.shiftKey) {
-                        // If there is an open assignment in view, select that one and 
-                        const first_open_assignment = $(".assignment.open-assignment").first();
-                        if (first_open_assignment.length) {
-                            var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
-                            first_open_assignment[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start',
-                            });
-                        } else {
-                            var assignment_to_be_opened = $(".assignment").first();
-                            assignment_to_be_opened[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start',
-                            });
-                        }
-                        first_open_assignment.click();
-                        if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                            assignment_to_be_opened.click();
-                        }
-                    } else if ($(".open-assignment").length !== 0) {
-                        // Prevent arrow scroll
-                        e.preventDefault();
-                    }
-                } else if (e.key === "ArrowUp") {
-                    if (e.shiftKey) {
-                        // If there is an open assignment in view, select that one and 
-                        const last_open_assignment = $(".assignment.open-assignment").last();
-                        if (last_open_assignment.length) {
-                            var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
-                            if (assignment_to_be_opened.length) {
-                                assignment_to_be_opened[0].scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'start',
-                                });
+                        break;
+
+                    case "Tab":
+                        // Prevent tabbing dispositioning screen
+                        setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
+                        break;
+                    case "Escape":
+                        crud.hideForm();
+                        break;
+                    case "ArrowDown":
+                    case "ArrowUp":
+                        const open_assignmens_on_screen = $(".open-assignment").filter(function() {
+                            return VisualAssignment.assignmentGraphOnScreen($(this));
+                        });
+                        if (e.shiftKey) {
+                            if (e.key === "ArrowDown") {
+                                // If there is an open assignment in view, select that one and 
+                                const first_open_assignment = $(".assignment.open-assignment").first();
+                                if (first_open_assignment.length) {
+                                    var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
+                                    first_open_assignment[0].scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'start',
+                                    });
+                                } else {
+                                    var assignment_to_be_opened = $(".assignment").first();
+                                    assignment_to_be_opened[0].scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'start',
+                                    });
+                                }
+                                first_open_assignment.click();
+                                if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                                    assignment_to_be_opened.click();
+                                }
+                            } else if (e.key === "ArrowUp") {
+                                // If there is an open assignment in view, select that one and 
+                                const last_open_assignment = $(".assignment.open-assignment").last();
+                                if (last_open_assignment.length) {
+                                    var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
+                                    if (assignment_to_be_opened.length) {
+                                        assignment_to_be_opened[0].scrollIntoView({
+                                            behavior: 'smooth',
+                                            block: 'start',
+                                        });
+                                    }
+                                } else {
+                                    var assignment_to_be_opened = $(".assignment").last();
+                                }
+                                last_open_assignment.click();
+                                if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                                    assignment_to_be_opened.click();
+                                }
+                                if (!last_open_assignment.length) {
+                                    assignment_to_be_opened[0].scrollIntoView({
+                                        behavior: 'smooth',
+                                        block: 'end',
+                                    });        
+                                }
                             }
-                        } else {
-                            var assignment_to_be_opened = $(".assignment").last();
+                        } else if (open_assignmens_on_screen.length !== 0) {
+                            // Prevent arrow scroll
+                            e.preventDefault();
                         }
-                        last_open_assignment.click();
-                        if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                            assignment_to_be_opened.click();
-                        }
-                        if (!last_open_assignment.length) {
-                            assignment_to_be_opened[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'end',
-                            });        
-                        }
-                    } else if ($(".open-assignment").length !== 0) {
-                        // Prevent arrow scroll
-                        e.preventDefault();
-                    }
+                        break;
                 }
             });
             $(".tag-add-input").keydown(function(e) {
