@@ -797,7 +797,8 @@ a[href="settings"] {
 }
 /* 2nd row */
 .skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
-    margin: 7px 0;
+    margin-top: 12px;
+    margin-bottom: 7px;
 }
 .work-input-textbox {
     width: 111px;

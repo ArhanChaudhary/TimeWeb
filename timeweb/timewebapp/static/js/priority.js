@@ -38,8 +38,8 @@ class Priority {
             // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
             dom_assignment.parents(".assignment-container").animate({
-                top: "0", 
-                opacity: "1", 
+                top: "0",
+                opacity: "1",
                 marginBottom: "0",
             }, Priority.ANIMATE_IN_DURATION, "easeOutCubic");
         }
@@ -342,10 +342,6 @@ class Priority {
                             status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Break Days';
                             status_value = Priority.NO_WORKING_DAYS;
                         }
-                        if (sa.sa.mark_as_done) {
-                            sa.sa.mark_as_done = false;
-                            ajaxUtils.sendAttributeAjaxWithTimeout("mark_as_done", sa.sa.mark_as_done, sa.sa.id);
-                        }
                         //hard
                         dom_status_image.attr({
                             width: 11,
@@ -445,11 +441,9 @@ class Priority {
                 first_tag,
                 name: sa.sa.name,
                 index,
-                mark_as_done: false,
+                // Not actually used for sorting, used for priority stuff later on
+                mark_as_done: sa.sa.mark_as_done,
             };
-            if (sa.sa.mark_as_done && [Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY, Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value)) {
-                priority_data.mark_as_done = true;
-            }
             that.priority_data_list.push(priority_data);
 
             if (status_image === "no-status-image") {
@@ -498,7 +492,7 @@ class Priority {
 
         if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
             var priority_percentage = NaN;
-        } else if (that.mark_as_done || [Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value) /* Priority.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
+        } else if (priority_data.mark_as_done || [Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value) /* Priority.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
             var priority_percentage = 0;
         } else {
             var priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
@@ -603,7 +597,7 @@ class Priority {
         setTimeout(() => {
             $(window).trigger("resize");
         }, that.params.delayResize ? VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION : 0);
-        that.priority_data_list.sort((a,b) => that.assignmentSortingComparator(a,b));
+        that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // Source code lurkers, uncomment this for some fun
         // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
@@ -627,8 +621,10 @@ class Priority {
 
             const mark_as_done = that.priority_data.mark_as_done;
             that.mark_as_done = mark_as_done;
+
             const dom_assignment = $(".assignment").eq(that.priority_data.index); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
+
             const assignment_container = that.dom_assignment.parents(".assignment-container");            
 
             let priority_percentage = that.priorityDataToPriorityPercentage(that.priority_data);

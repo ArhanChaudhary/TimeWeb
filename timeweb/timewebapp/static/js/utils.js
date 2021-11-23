@@ -48,6 +48,19 @@ utils = {
             }
         },
         setClickHandlers: {
+            markAsDoneButtons: function() {
+                $(".mark-as-done-button").parent().click(function() {
+                    const sa = utils.loadAssignmentData($(this));
+                    sa.mark_as_done = !sa.mark_as_done;
+                    ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
+                    if (sa.mark_as_done)
+                        $(this).children("img").attr("src", "static/images/show.png");
+                    else
+                        $(this).children("img").attr("src", "static/images/hide.png");
+                    priority.sort();
+                });
+            },
+
             toggleEstimatedCompletionTime: function() {
                 // Hide and show estimated completion time
                 $("#hide-button").click(function() {
@@ -319,6 +332,7 @@ utils = {
                     });
                 });
             },
+
             expandShortcutHitboxes: function() {
                 // Expand shortcut hitbox by also simulating clicking on after and before pseudo-elements
                 $(".assignment-container").click(function(e) {
@@ -634,7 +648,7 @@ utils = {
                                                 assignment_container.find(".delete-button").focus().click();
                                                 break;
                                             case "i":
-                                                assignment_container.find(".mark-as-finished-button").focus().click();
+                                                assignment_container.find(".mark-as-done-button").focus().click();
                                                 break;
                                             case "Backspace":
                                                 assignment_container.find(".delete-work-input-button").focus().click();
@@ -1232,6 +1246,7 @@ document.addEventListener("DOMContentLoaded", function() {
     },
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
+    utils.ui.setClickHandlers.markAsDoneButtons();
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();

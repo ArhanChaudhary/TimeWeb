@@ -694,7 +694,6 @@ class VisualAssignment extends Assignment {
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
                 skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 submit_work_button = this.dom_assignment.find(".submit-work-button"),
-                ignore_assignment_button = this.dom_assignment.find(".mark-as-finished-button"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
@@ -859,24 +858,6 @@ class VisualAssignment extends Assignment {
             this.draw();
         });
         // END Submit work button
-
-        // BEGIN ignore button
-        let not_applicable_timeout_ignore_assignment_button;
-        ignore_assignment_button.click(() => {
-            if (this.dom_assignment.parents(".assignment-container").hasClass("question-mark")) {
-                ignore_assignment_button.html("Not Applicable");
-                clearTimeout(not_applicable_timeout_ignore_assignment_button);
-                not_applicable_timeout_ignore_assignment_button = setTimeout(function() {
-                    ignore_assignment_button.html("Ignore for Today Only");
-                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
-                return;
-            }
-            this.sa.mark_as_done = !this.sa.mark_as_done;
-            ignore_assignment_button.onlyText(this.sa.mark_as_done ? "Unignore for Today Only" : "Ignore for Today Only");
-            ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
-            priority.sort();
-        }).html(this.sa.mark_as_done ? "Unignore for Today Only" : "Ignore for Today Only");
-        // END ignore button
 
         // BEGIN Set skew ratio using graph button
         let original_skew_ratio;
