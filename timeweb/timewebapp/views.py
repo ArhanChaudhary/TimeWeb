@@ -135,6 +135,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_min_work_time': self.settings_model.def_min_work_time,
             'def_skew_ratio': self.settings_model.def_skew_ratio,
             'def_break_days': self.settings_model.def_break_days,
+            'def_due_time': self.settings_model.def_due_time,
             'def_unit_to_minute': self.settings_model.def_unit_to_minute,
             'def_funct_round_minute': self.settings_model.def_funct_round_minute,
             'ignore_ends': self.settings_model.ignore_ends,
@@ -183,6 +184,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
         self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         self.settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
+        self.settings_model.def_due_time = self.form.cleaned_data.get("def_due_time")
         self.settings_model.def_unit_to_minute = self.form.cleaned_data.get("def_unit_to_minute")
         self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes

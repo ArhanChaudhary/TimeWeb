@@ -117,12 +117,13 @@ class SettingsForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "user": forms.HiddenInput(),
-            'def_min_work_time': forms.NumberInput(attrs={"min":"0"}),
+            'def_min_work_time': forms.NumberInput(attrs={"min": "0"}),
+            'def_due_time': forms.TimeInput(attrs={"type": "time"}),
             'date_now': forms.HiddenInput(),
             'oauth_token': forms.HiddenInput(),
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
-            'def_skew_ratio': forms.NumberInput(attrs={"step":"0.1"}),
+            'def_skew_ratio': forms.NumberInput(attrs={"step": "0.1"}),
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'added_gc_assignment_ids': forms.HiddenInput(),
             'seen_latest_changelog': forms.HiddenInput(),

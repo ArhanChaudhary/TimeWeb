@@ -4,7 +4,7 @@ class Crud {
         "#id_name": '',
         "#id_assignment_date": utils.formatting.stringifyDate(date_now),
         "#id_x": '',
-        '#id_due_time': '00:00',
+        '#id_due_time': SETTINGS.def_due_time.slice(0, -3),
         "#id_soft": false,
         "#id_unit": SETTINGS.def_unit_to_minute ? "Minute" : '',
         "#id_y": '',

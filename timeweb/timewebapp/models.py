@@ -5,6 +5,7 @@ from multiselectfield import MultiSelectField
 from django.conf import settings
 from colorfield.fields import ColorField
 from decimal import Decimal
+import datetime
 
 WEEKDAYS = (
     ("1",_("Monday")),
@@ -41,6 +42,8 @@ def list_with_zero():
     return ["0"]
 def empty_dict():
     return {}
+def get_midnight_time():
+    return datetime.time(0, 0, 0)
 def create_image_path(instance, filename):
     return f"images/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
@@ -177,6 +180,10 @@ class SettingsModel(models.Model):
         blank=True,
         null=True,
         verbose_name=_('Default Minimum Daily Work Time in Minutes'),
+    )
+    def_due_time = models.TimeField(
+        default=get_midnight_time,
+        verbose_name=_('Default Due Time'),
     )
     def_unit_to_minute = models.BooleanField(
         default=False,
