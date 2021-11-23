@@ -933,30 +933,36 @@ ajaxUtils = {
             $.alert({
                 title: "Failed to connect.", 
                 content: "We can't establish a connection with the server. Check your connection and try again.",
+                backgroundDismiss: false,
             });
         } else if (response.status == 404) {
             $.alert({
                 title: "Not found.",
                 content: "Refresh or try again.",
+                backgroundDismiss: false,
             });
         } else if (response.status == 500) {
             $.alert({
                 title: "Internal server error.",
                 content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this, and try to provide context on how the issue happened.",
+                backgroundDismiss: false,
             });
         } else if (exception === 'timeout' || response.status == 502) {
             $.alert({
                 title: "Request timed out.",
                 content: "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.",
+                backgroundDismiss: false,
             });
         } else if (exception === 'abort') {
             $.alert({
                 title: "Request aborted.",
                 content: "Try refreshing or try again.",
+                backgroundDismiss: false,
             });
         } else {
             $.alert({
                 title: "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText,
+                backgroundDismiss: false,
             });
         }
     },

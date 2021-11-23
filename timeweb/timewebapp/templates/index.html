@@ -161,6 +161,9 @@
               <span class="completion-time"></span>
             </div>
             <div class="button" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+              <img class="mark-as-finished-button" width="22" height="22" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
+            </div>
+            <div class="button" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <img class="update-button" width="22" height="22" src="{% static 'images/edit.png' %}" alt="delete" draggable="false"/>
             </div>
             <div class="button" data-assignment-id="{{ assignment.pk }}" tabindex="0">
@@ -176,10 +179,6 @@
               <button class="delete-work-input-button">Delete Work Input</button>
               <input class="work-input-textbox" placeholder="Enter Units Done"/>
               <button class="submit-work-button">Submit Work Input</button>
-              <br>
-              <button class="display-button">Display in Text</button>
-              <button class="mark-as-finished-button"></button>
-              <button class="next-assignment-button">Next Assignment</button>
               <br>
               <div class="advanced-buttons first-advanced-buttons" tabindex="0">
                 Advanced Controls

@@ -772,12 +772,12 @@ a[href="settings"] {
     box-shadow: none;
 }
 /* 1st column */
-.delete-work-input-button, .display-button, .skew-ratio-button {
+.delete-work-input-button, .skew-ratio-button {
     position: absolute;
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .mark-as-finished-button, .skew-ratio-textbox, .advanced-buttons  {
+.work-input-textbox, .skew-ratio-textbox, .advanced-buttons  {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -787,16 +787,16 @@ a[href="settings"] {
     width: 127px;
     font-size: 12px;
 }
-.second-advanced-button {
+.first-advanced-buttons {
     margin-top: 7px;
 }
 /* 3rd column */
-.submit-work-button, .next-assignment-button, .fixed-mode-button {
+.submit-work-button, .fixed-mode-button {
     position: absolute;
     right: 0;
 }
 /* 2nd row */
-.display-button, .mark-as-finished-button, .next-assignment-button {
+.skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
     margin: 7px 0;
 }
 .work-input-textbox {
