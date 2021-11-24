@@ -1115,8 +1115,8 @@ input[type=number]::-webkit-inner-spin-button {
 #dark-mode .shortcut-line-right,
 #dark-mode .shortcut-line-left,
 
-#dark-mode #assignments-container > *:not(.assignment-container):not(#assignments-header),
-#dark-mode #assignments-container > #assignments-header > *:not(#icon-label-container),
+#dark-mode #assignments-container > :not(.assignment-container):not(#assignments-header),
+#dark-mode #assignments-container > #assignments-header > :not(#icon-label-container),
 
 #dark-mode #assignments-header #icon-label-container img ~ div,
 
@@ -1126,9 +1126,11 @@ input[type=number]::-webkit-inner-spin-button {
 #dark-mode #assignments-header #icon-label-container img ~ div > .info-button,
 
 /* Need these annoying rules instead of just doing ".assignment-container.invert-text-color .assignment-header *" because it messes up positioning */
-.assignment-container.invert-text-color .assignment-header > *:not(.right-side-of-header),
-.assignment-container.invert-text-color .assignment-header > .right-side-of-header > *:not(.align-to-status-message-container),
-.assignment-container.invert-text-color .assignment-header > .right-side-of-header > .align-to-status-message-container > *:not(.tags),
+.assignment-container.invert-text-color .assignment-header > :not(.right-side-of-header):not(.button),
+.assignment-container.invert-text-color .assignment-header > .button > *,
+.assignment-container.invert-text-color .assignment-header > .right-side-of-header > :not(.align-to-status-message-container),
+.assignment-container.invert-text-color .assignment-header > .right-side-of-header > .align-to-status-message-container > :not(.tags),
+
 #dark-mode .tags,
 
 /* Undo filter already applied by #dark-mode .assignment-footer */
@@ -1150,7 +1152,7 @@ html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
     --filter-invert: 0;
 }
 #dark-mode #overlay {
-    filter: brightness(0.85);
+    filter: brightness(0.75);
     background-color: rgba(0,0,0,0.55);
 }
 #dark-mode body {
