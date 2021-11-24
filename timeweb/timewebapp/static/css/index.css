@@ -1154,5 +1154,5 @@ html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
     background-color: rgba(0,0,0,0.55);
 }
 #dark-mode body {
-    background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
+    --body-background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
 }

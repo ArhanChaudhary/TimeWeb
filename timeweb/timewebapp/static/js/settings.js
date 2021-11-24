@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let alreadyHasSubmitted = false;
     $("form").submit(function() {
         if (alreadyHasSubmitted) return;
-        $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()+1, 10));
+        $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
         $("#submit-settings-button").val("Submitting...");
         alreadyHasSubmitted = true;

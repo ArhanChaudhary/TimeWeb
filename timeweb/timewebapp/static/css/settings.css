@@ -1,5 +1,5 @@
 body {
-    background: rgb(218, 218, 218);
+    --body-background: rgb(218, 218, 218);
 }
 form {
     width: calc(100% - 30px);
@@ -59,10 +59,14 @@ table {
     -webkit-border-horizontal-spacing: 5px;
     -webkit-border-vertical-spacing: 5px;
 }
-img {
+td img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
     box-sizing: border-box;
-    width: 100%;
-    padding: 0 10px;
+    width: min(100%, 500px);
+    box-shadow: 0 0 3px 1px gray;
 }
 .hitbox-label {
     position: absolute;
@@ -75,6 +79,9 @@ td {
     position: relative;
     text-align: left;
     width: 250px;
+}
+input[type="file"] {
+    width: 100%;
 }
 th {
     text-align: left;
@@ -102,4 +109,14 @@ tr.odd {
     display: block;
     width: 100%;
     resize: none;
+}
+#dark-mode body {
+    --body-background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
+}
+#dark-mode #break-days-wrapper,
+#dark-mode main,
+#dark-mode .jscolor,
+#dark-mode td img,
+#dark-mode input[type="checkbox"] {
+    filter: invert(1);
 }
