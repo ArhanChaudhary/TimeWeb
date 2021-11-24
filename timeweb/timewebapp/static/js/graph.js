@@ -496,9 +496,6 @@ class VisualAssignment extends Assignment {
             center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
         }
         if (!this.dom_assignment.hasClass("completely-finished")) {
-            if (goal_for_this_day < last_work_input || this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
-                goal_for_this_day = last_work_input;
-            }
             let displayed_day;
             let str_day;
             if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
@@ -522,8 +519,16 @@ class VisualAssignment extends Assignment {
                     break;
             }
             str_day += ':';
-            center(str_day, 3);
-            center(`Goal for ${displayed_day.valueOf() === date_now.valueOf() ? "Today" : "this Day"}: ${goal_for_this_day}/${this.sa.y} ${pluralize(this.sa.unit)}`, 4);
+
+            let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
+            if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
+                todo = 0;
+            }
+
+            if (displayed_day.valueOf() !== date_now.valueOf()) {
+                center(str_day, 3);
+                center(`${pluralize(this.sa.unit, 2)} to Complete for this Day: ${todo}`, 4);
+            }
         }
         screen.scale(1 / this.scale, 1 / this.scale);
     }

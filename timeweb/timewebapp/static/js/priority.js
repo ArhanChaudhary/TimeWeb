@@ -383,13 +383,13 @@ class Priority {
                         str_daysleft = 'Yesterday';
                     } else if (due_date_minus_today === 0) {
                         str_daysleft = 'Today';
-                        if ([Priority.UNFINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHED].includes(status_value)) {
+                        if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                         }
                     } else if (due_date_minus_today === 1) {
                         str_daysleft = 'Tomorrow';
                         that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
-                        if ([Priority.UNFINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHED].includes(status_value)) {
+                        if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                         }
                     } else if (due_date_minus_today < 7) {
