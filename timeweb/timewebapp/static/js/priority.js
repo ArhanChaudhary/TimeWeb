@@ -539,16 +539,15 @@ class Priority {
     }
     updateInfoHeader() {
         const that = this;
-        if (that.question_mark_exists_excluding_gc) {
-            $("#current-time, #tomorrow-time, #info").hide();
-        } else if (!that.total_completion_time) {
-            $("#info").show();
+        if (!that.total_completion_time) {
+
+            $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
             $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
             $("#current-time, #tomorrow-time, #hide-button").hide();
         } else {
-            $("#current-time, #tomorrow-time, #hide-button, #info").show();
+            $("#hide-button").html() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
+            $("#current-time, #tomorrow-time, #hide-button").show();
             $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
-            $("#tomorrow-time").html(` (${that.tomorrow_total_completion_time === that.total_completion_time ? "All" : utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
             if (that.tomorrow_total_completion_time === that.total_completion_time) {
                 $("#tomorrow-time").html(" (Everything is due Tomorrow)");
             } else if (that.tomorrow_total_completion_time === 0) {

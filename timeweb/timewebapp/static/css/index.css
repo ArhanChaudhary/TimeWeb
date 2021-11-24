@@ -77,6 +77,12 @@ header.animate::after {
 #tomorrow-time {
     white-space: nowrap;
 }
+.hide-info {
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    position: absolute;
+}
 #assignments-header img:not(:first-of-type), #assignments-header a img {
     position: relative;
     z-index: 1;

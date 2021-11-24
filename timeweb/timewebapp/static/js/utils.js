@@ -66,21 +66,11 @@ utils = {
                 $("#hide-button").click(function() {
                     if ($(this).html() === "Hide") {
                         $(this).html("Show");
-                        $("#estimated-total-time, #current-time, #tomorrow-time").css({
-                            height: 0,
-                            width: 0,
-                            overflow: "hidden",
-                            position: "absolute",
-                        });
+                        $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
                         localStorage.setItem("hide-button", true);
                     } else {
                         $(this).html("Hide");
-                        $("#estimated-total-time, #current-time, #tomorrow-time").css({
-                            height: "",
-                            width: "",
-                            overflow: "",
-                            position: "",
-                        });
+                        $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
                         localStorage.removeItem("hide-button");
                     }
                 });
