@@ -961,10 +961,15 @@ ajaxUtils = {
                 ok: {
 
                 },
+                reload: {
+                    action: function() {
+                        window.location.reload();
+                    },
+                },
                 "try again": {
                     action: () => {
                         $.ajax(this);
-                    }
+                    },
                 },
             },
         });
