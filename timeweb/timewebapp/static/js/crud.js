@@ -17,6 +17,7 @@ class Crud {
     static FORM_POSITION_TOP = 15
     static UNITS_OF_TIME = {minute: 1, hour: 60}
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750
+    static STEP_SIZE_AUTO_LOWER_ROUND = 0.05;
 
     init() {
         const that = this;
@@ -106,7 +107,7 @@ class Crud {
             $("label[for='id_time_per_unit']").removeClass("disabled-field");   
         }
         if (SETTINGS.def_funct_round_minute && singularToLowerCase !== "minute") {
-            that.old_unit_value in Crud.UNITS_OF_TIME && $("#id_funct_round").val("");
+            that.old_unit_value in Crud.UNITS_OF_TIME && $("#id_funct_round").val("1");
             $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
             $("label[for='id_funct_round']").removeClass("disabled-field");
         }
@@ -225,6 +226,44 @@ class Crud {
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
             this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
+        });
+        let alert_already_shown = false;
+        $("#id_min_work_time, #id_time_per_unit").on("focusout", () => {
+            
+            if (!(
+                // Criteria for doing this alert
+
+                +$("#id_y").val() === 1 &&
+                // <= 1 to alert again if it aleady alerted, meaning funct_round will be set to some number less than 1
+                +$("#id_funct_round").val() <= 1 &&
+                // + to make sure it isnt empty nor 0, as funct_round is then set to 0 or NaN
+                +$("#id_min_work_time").val() &&
+                +$("#id_time_per_unit").val() &&
+                // Make sure the new funct_round value is less than 1
+                +$("#id_time_per_unit").val() > +$("#id_min_work_time").val() &&
+                !alert_already_shown
+            )) return;
+            // funct_round * time_per_unit * y = min_work_time
+            // funct_round * time_per_unit = min_work_time
+            // funct_round = min_work_time / time_per_unit
+            $("#id_funct_round").val(
+                Math.max(Crud.STEP_SIZE_AUTO_LOWER_ROUND, // Don't want this to round to 0
+                    mathUtils.precisionRound(
+                        Crud.STEP_SIZE_AUTO_LOWER_ROUND * Math.round(
+                            $("#id_min_work_time").val() / $("#id_time_per_unit").val()
+                            / Crud.STEP_SIZE_AUTO_LOWER_ROUND
+                        )
+                    , 10)
+                )
+            );
+
+            $.alert({
+                title: `Your step size has been automatically lowered from 1 to ${$("#id_funct_round").val()}`,
+                content: "This is to prevent you from unnecessarily working longer than your minimum work time to ensure a smoother work schedule. The step size can be edited and overridden in the advanced inputs.",
+                onClose: function() {
+                    alert_already_shown = false;
+                }
+            })
         });
 
         let submitted = false;
