@@ -1,6 +1,29 @@
 # Could probably make this a json but multi line strings are not allowed
 CHANGELOGS = [
 {
+    "version": "v1.5.2 (11/24/2021):",
+    "updates": '''<ul>
+                    <li>Redesigned the assignment graph layout</li>
+                    <li>Renamed "Skew Ratio" to "Curvature"</li>
+                    <li>Added due times</li>
+                    <li>Added "Close Graph After Submitting Work Input" setting</li>
+                    <li>Added "Allow Only one open Graph at a Time" setting</li>
+                    <li>Added "Default Due Time" setting</li>
+                    <li>Added "Restore Deleted Google Classroom" option to the settings</li>
+                    <li>Removed being unable to open other assignments if other assignments are more urgent</li>
+                    <li>Finished adding all the keybinds</li>
+                    <li>Increased zoom on mobile</li>
+                    <li>Dozens of minor UI improvements</li>
+                    <li>Minor bug fixes</li>
+                    <ul>
+                        <li>Fixed soft due date incompatibility with break days</li>
+                        <li>Fixed scrolling on Firefox not working</li>
+                        <li>Fixed assignments not being marked as no more working days</li>
+                        <li>Fixed default skew ratio not properly saving</li>
+                    </ul>
+                </ul>''',
+},
+{
     "version": "v1.5.1 (11/7/2021):",
     "updates": '''<ul>
                     <li>Added soft due dates</li>
