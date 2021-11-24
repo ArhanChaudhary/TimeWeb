@@ -464,7 +464,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.font = '13.75px Open Sans';
         screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-        screen.fillText(`Skew Ratio: ${rounded_skew_ratio || "Linear"}`, this.width-2, this.height-138+move_info_down);
+        screen.fillText(`Curvature: ${rounded_skew_ratio || "Linear"}`, this.width-2, this.height-138+move_info_down);
 
         const daysleft = Math.floor(this.sa.complete_x) - today_minus_assignment_date;
         let strdaysleft;
@@ -869,7 +869,7 @@ class VisualAssignment extends Assignment {
         let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
-                skew_ratio_button.onlyText("Set Skew Ratio using Graph");
+                skew_ratio_button.onlyText("Set Curvature of the Graph");
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
@@ -882,12 +882,12 @@ class VisualAssignment extends Assignment {
                 skew_ratio_button.onlyText("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
-                    skew_ratio_button.onlyText("Set Skew Ratio using Graph");
+                    skew_ratio_button.onlyText("Set Curvature of the Graph");
                 }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
-            skew_ratio_button.onlyText("Click again to cancel");
+            skew_ratio_button.onlyText("Hover the graph. Click again to cancel");
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.set_skew_ratio_using_graph = true;
@@ -897,7 +897,7 @@ class VisualAssignment extends Assignment {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.onlyText("Set Skew Ratio using Graph");
+                skew_ratio_button.onlyText("Set Curvature of the Graph");
                 ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 if (!this.draw_mouse_point) {
                     this.graph.off("mousemove");
@@ -938,7 +938,7 @@ class VisualAssignment extends Assignment {
                 skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_textbox);
                 not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
-                    skew_ratio_textbox.attr("placeholder", "Enter Skew Ratio");
+                    skew_ratio_textbox.attr("placeholder", "Enter Curvature");
                 }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }

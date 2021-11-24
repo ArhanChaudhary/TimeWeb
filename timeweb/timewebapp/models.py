@@ -199,7 +199,7 @@ class SettingsModel(models.Model):
         max_digits=17,
         decimal_places=10,
         default=1,
-        verbose_name=_('Default Skew Ratio'),
+        verbose_name=_('Default Curvature'),
     )
     ignore_ends = models.BooleanField(
         default=False,
