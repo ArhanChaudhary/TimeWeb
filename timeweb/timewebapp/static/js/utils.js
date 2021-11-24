@@ -933,42 +933,41 @@ isExampleAccount = username === example_account_name || editing_example_account;
 ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
+        let title;
+        let content;
         if (response.status == 0) {
-            $.alert({
-                title: "Failed to connect.", 
-                content: "We can't establish a connection with the server. Check your connection and try again.",
-                backgroundDismiss: false,
-            });
+            title = "Failed to connect.";
+            content = "We can't establish a connection with the server. Check your connection and try again.";
         } else if (response.status == 404) {
-            $.alert({
-                title: "Not found.",
-                content: "Refresh or try again.",
-                backgroundDismiss: false,
-            });
+            title = "Not found.";
+            content = "Refresh or try again.";
         } else if (response.status == 500) {
-            $.alert({
-                title: "Internal server error.",
-                content: "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this, and try to provide context on how the issue happened.",
-                backgroundDismiss: false,
-            });
+            title = "Internal server error.";
+            content = "Please <a target='_blank' href='mailto:arhan.ch@gmail.com'>contact me</a> if you see this, and try to provide context on how the issue happened.";
         } else if (exception === 'timeout' || response.status == 502) {
-            $.alert({
-                title: "Request timed out.",
-                content: "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.",
-                backgroundDismiss: false,
-            });
+            title = "Request timed out.";
+            content = "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.";
         } else if (exception === 'abort') {
-            $.alert({
-                title: "Request aborted.",
-                content: "Try refreshing or try again.",
-                backgroundDismiss: false,
-            });
+            title = "Request aborted.";
+            content = "Try refreshing or try again.";
         } else {
-            $.alert({
-                title: "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText,
-                backgroundDismiss: false,
-            });
+            title = "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText;
         }
+        $.alert({
+            title: title,
+            content: content,
+            backgroundDismiss: false,
+            buttons: {
+                ok: {
+
+                },
+                "try again": {
+                    action: () => {
+                        $.ajax(this);
+                    }
+                },
+            },
+        });
     },
     ajaxFinishedTutorial: function() {
         if (ajaxUtils.disable_ajax) return;
