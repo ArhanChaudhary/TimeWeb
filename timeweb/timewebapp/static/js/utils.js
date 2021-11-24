@@ -120,9 +120,10 @@ utils = {
                     utils.in_next_day = true;
                     ajaxUtils.disable_ajax = true;
                     date_now.setDate(date_now.getDate() + 1);
-                    for (let sa of dat) {
-                        sa.mark_as_done = false;
-                    }
+                    // mark as done is unmarked in the next day
+                    $(".assignment.mark-as-done").each(function() {
+                        $(this).find(".mark-as-done-button").click();
+                    });
                     // Hide current time without using display none, as that can be affected by .toggle
                     $("#current-time").css({
                         position: "absolute",

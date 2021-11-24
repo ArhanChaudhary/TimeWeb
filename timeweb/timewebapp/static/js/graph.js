@@ -495,7 +495,7 @@ class VisualAssignment extends Assignment {
         } else {
             center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
         }
-        if (!this.dom_assignment.hasClass("completely-finished")) {
+        if (!this.dom_assignment.parents(".assignment-container").hasClass("finished")) {
             let displayed_day;
             let str_day;
             if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
