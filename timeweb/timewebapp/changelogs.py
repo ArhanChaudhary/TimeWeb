@@ -20,6 +20,8 @@ CHANGELOGS = [
                         <li>Fixed scrolling on Firefox not working</li>
                         <li>Fixed assignments not being marked as no more working days</li>
                         <li>Fixed default skew ratio not properly saving</li>
+                        <li>Fixed NaN curvature</li>
+                        <li>Fixed unbounded curvature</li>
                     </ul>
                 </ul>''',
 },
