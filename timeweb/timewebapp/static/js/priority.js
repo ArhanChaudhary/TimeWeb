@@ -152,6 +152,16 @@ class Priority {
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
+
+            const skew_ratio_bound = sa.calcSkewRatioBound();
+            if (sa.sa.skew_ratio > skew_ratio_bound) {
+                sa.sa.skew_ratio = skew_ratio_bound;
+                ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+            } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
+                sa.sa.skew_ratio = 2 - skew_ratio_bound;
+                ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+            }
+
             sa.setParabolaValues();
             if (that.params.first_sort) {
                 // Fix dynamic start if y or anything else was changed
@@ -162,6 +172,7 @@ class Priority {
                 sa.setDynamicStartIfInDynamicMode();
                 old_dynamic_start !== sa.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
             }
+            
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
