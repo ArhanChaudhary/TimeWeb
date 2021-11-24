@@ -1,5 +1,5 @@
 body {
-    background: white;
+    --body-background: white;
 }
 #flex-container {
     height: calc(100vh - 70px);
@@ -251,4 +251,13 @@ details > img {
 	font-weight: 700;
     src: local(''),
          url('../fonts/roboto-slab-v7-bold.woff2') format('woff2');
+}
+
+#dark-mode body {
+    --body-background: black;
+}
+#dark-mode main,
+#dark-mode #user-guide-container a,
+#dark-mode main img:not(.label-icon) {
+    filter: invert(1);
 }
