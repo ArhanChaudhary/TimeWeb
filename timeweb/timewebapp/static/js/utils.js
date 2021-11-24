@@ -27,11 +27,8 @@ utils = {
                 b: parseInt(result[3], 16),
             }
         },
-        // https://stackoverflow.com/questions/201724/easy-way-to-turn-javascript-array-into-comma-separated-list
         arrayToEnglish: function(array) {
-            return array
-                .join(", ")
-                .replace(/, ((?:.(?!, ))+)$/, `${array.length >= 3 ? "," : ""} and $1`);
+            return `<ol><li>${array.join("</li><li>")}</li></ol>`;
         }
     },
     ui: {
@@ -1046,10 +1043,10 @@ ajaxUtils = {
         setTimeout(function() {
             if (ajaxUtils.notice_assignments.size) {
                 ajaxUtils.notice_assignments = [...ajaxUtils.notice_assignments];
-                ajaxUtils.notice_assignments = ajaxUtils.notice_assignments.map(sa => `"${utils.loadAssignmentData(sa, true).name}"`);
+                ajaxUtils.notice_assignments = ajaxUtils.notice_assignments.map(sa => utils.loadAssignmentData(sa, true).name);
                 $.alert({
                     title: ajaxUtils.notice_assignments.length === 1 
-                    ? `Notice: the assignment ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} has had its due date incremented because it has soft due dates enabled.`
+                    ? `Notice: the assignment "${ajaxUtils.notice_assignments[0]}" has had its due date incremented because it has soft due dates enabled.`
                     : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates enabled.`,
                     content: "This only occurs when an assignment's due date passes, but the assignment still isn't complete. If you don't want this to happen, disable soft due dates in the edit assignment form.",
                     backgroundDismiss: false,

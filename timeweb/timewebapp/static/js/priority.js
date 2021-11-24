@@ -256,7 +256,7 @@ class Priority {
                     } else {
                         alert_due_date_passed_cond = true;
                         if (!sa.sa.has_alerted_due_date_passed_notice) {
-                            that.due_date_passed_notices.push(`"${sa.sa.name}"`);
+                            that.due_date_passed_notices.push(sa.sa.name);
                             sa.sa.has_alerted_due_date_passed_notice = true;
                             ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
                         }
@@ -581,13 +581,13 @@ class Priority {
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         if (that.due_date_passed_notices.length === 1) {
             $.alert({
-                title: `Important notice: The assignment: ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} has been marked as completely finished because its due date has passed.`,
+                title: `Important notice: The assignment "${that.due_date_passed_notices[0]}" has been marked as completely finished because its due date has passed.`,
                 content: "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.",
                 backgroundDismiss: false,
             });
         } else if (that.due_date_passed_notices.length > 1) {
             $.alert({
-                title: `Important notice: The assignments: ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} have been marked as completely finished because their due dates have passed.`,
+                title: `Important notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} have been marked as completely finished because their due dates have passed.`,
                 content: "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.",
                 backgroundDismiss: false,
             });
