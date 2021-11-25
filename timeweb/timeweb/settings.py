@@ -75,6 +75,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django.contrib.sites',
+
     'timewebapp',
     'multiselectfield',
     'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
@@ -118,7 +121,7 @@ TEMPLATES = [
     },
 ]
 
-SITE_ID = 2
+SITE_ID = 3
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
@@ -264,3 +267,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+SOCIALACCOUNT_AUTO_SIGNUP = False # Always prompt for username
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False

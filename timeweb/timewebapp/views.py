@@ -125,7 +125,6 @@ class TimewebGenericView(View):
         context['dark_mode'] = self.settings_model.dark_mode
         return render(request, file, context)
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
-    login_url = '/login/login/?next=/'
 
     def __init__(self):
         self.context = get_default_context()
@@ -223,7 +222,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         return self.render_with_dynamic_context(request, "settings.html", self.context)
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
-    login_url = '/login/login/?next=/'
+
 
     def __init__(self):
         self.context = get_default_context()
@@ -726,7 +725,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     #     return HttpResponse(status=204)
 
 class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
-    login_url = '/login/login/?next=/'
+
     def get(self, request):
         self.isExampleAccount = request.user.username == example_account_name
         if self.isExampleAccount: return redirect("home")
@@ -812,7 +811,6 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         pass
 
 class ImagesView(LoginRequiredMixin, TimewebGenericView):
-    login_url = '/login/login/?next=/'
 
     def __init__(self):
         self.context = get_default_context()
