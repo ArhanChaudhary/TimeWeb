@@ -53,46 +53,6 @@
                 If you would like, take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your homepage to look like.
 
             </details>
-            <details>
-                <summary class="minor-category" id="anonymous-beta-reviews">Every anonymous review during TimeWeb's beta</summary>
-                This section lists every review from TimeWeb's beta testers via its <a href="https://forms.gle/UUCRVYVGgpEyVrjcA">anonymous review form</a>. Take these reviews with a grain of salt, as there was unintended selection bias (I was only able to reach people who personally knew me) and voluntary response bias with these responses.
-
-                <span class="minor-minor-category">Anonymous review #1</span>
-                Rating: 5/5
-                Review: The creator of the TimeWeb is a really nice guy. You hang out with him in discord and you will realize he is really passionate about web development and willingly to put as much effort as it takes to improve the user experience even if only a bit.
-
-                <span class="minor-minor-category">Anonymous review #2</span>
-                Rating: 4/5
-                Review: I haven't used it in a bit. It wasn't the easiest to use but it was very feature heavy so you could do a lot with it. It's like iPhone vs Android. iPhone is really intuitive and easy to use. Android let's you do so much more but its not as easy.
-
-                <span class="minor-minor-category">Anonymous review #3</span>
-                Rating: 4/5
-                Review: More colors can be used and maybe more user friendly otherwise really effective and efficient.
-
-                <span class="minor-minor-category">Anonymous review #4</span>
-                Rating: 5/5
-                Review: It works well enough.
-
-                <span class="minor-minor-category">Anonymous review #5</span>
-                Rating: 5/5
-                Review: TimeWeb is a great way to get organized. As a junior in a very demanding high school, being on top of your work is critical. I was never great at using my planner and even when I did write down my homework, I could not tackle it efficiently. TimeWeb fixes all of this because it is easy to input my work and it is easy to understand all the different features it has to offer. It sorts, prioritizes, and graphs all my homework. The graph offers an easy to understand trend of how you should approach your work, and the sorting system is the best you can get. But the one thing that makes TimeWeb great is the fact that you have so many ways to control and change a range from the big and important info to the miniscule details. By using TimeWeb you never need to worry about stressing over assignments, procrastinating, and missing deadlines.   
-
-                <span class="minor-minor-category">Anonymous review #6</span>
-                Rating: 4/5
-                Review: It's useful for planning out long-term assignments and has good QOL features like custom break days and even Google Classroom integration.
-
-                <span class="minor-minor-category">Anonymous review #7</span>
-                Rating: 4/5
-                Review: No review provided
-                
-                <span class="minor-minor-category">Anonymous review #8</span>
-                Rating: 4/5
-                Review: Timeweb is a great tool when utilized correctly. At first it takes time to get used to due to the inputs. It can get a bit tedious when transferring homework to Timeweb. Due to this, it should only be used for bigger pieces of work that take multiple days instead of one day. Once it becomes a part of your routine, it still is tedious but you start to notice the benefits of using Timeweb.
-
-                <span class="minor-minor-category">Anonymous review #9</span>
-                Rating: 5/5
-                Review: No review provided
-            </details>
         </span>
         <span>
             <div class="major-category">Assignment form</div>
@@ -101,9 +61,9 @@
                 <img src={% static 'images/assignment-form.png' %} width="550">
                 The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking the edit button next to it. 
                 
-                The assignment form has 11 inputs in total:
+                The assignment form has 12 inputs in total:
                 6 of these inputs are required for a complete assignment. You can still create an assignment without these inputs as a sort of reminder system, but its graph won't be usable.
-                5 of these advanced and optional. Default form input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
+                6 of these advanced and optional. Default form input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
                 
             </details>
             <details open>
@@ -111,13 +71,13 @@
                 These inputs in the assignment form are mandatory for every assignment. There are 6 standard inputs:
 
                 <span class="minor-minor-category">Name of this Assignment</span>
-                This input is simply the name of the assignment and is displayed at the left of the assignment header.
+                Simply the name of the assignment. is displayed at the left of the assignment header.
 
                 <span class="minor-minor-category">Date Assigned</span>
                 This input is the date the assignment was assigned or the date you'll start working on the assignment. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
 
                 <span class="minor-minor-category">Due Date</span>
-                This input is the date in which the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
+                This input is the date the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
 
                 <span class="label-question" id="why-can't-I-enter-a-due-time">
                     <span class="label-title">Why can't I enter a due time?</span>
@@ -134,7 +94,7 @@
                 If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" for this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
 
                 <span class="minor-minor-category">Total number of Units in this Assignment</span>
-                This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days in which the assignment is due.
+                This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days the assignment is due.
 
                 <span class="minor-minor-category">Estimated number of Minutes to complete each Unit</span>
                 This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour".
@@ -144,8 +104,11 @@
                 <summary class="minor-category" id="advanced-assignment-form-inputs">Advanced inputs</summary>
                 These inputs in the assignment form are optional for every assignment, but they further enhance your assignments' work schedules. There are 5 advanced inputs:
 
+                <span class="minor-minor-category">Soft</span>
+                This option enables soft due dates. Soft due dates are automatically incremented if you haven't finished the assignment by then.
+
                 <span class="minor-minor-category">Assignment Description</span>
-                This input is the description of the assignment, shown below the assignment name only when the assignment is open.
+                This input is the description of the assignment, shown below the assignment name when the assignment is open or when the assignment needs more info.
 
                 <span class="minor-minor-category">Total number of Units already Completed</span>
                 This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
@@ -154,10 +117,10 @@
                 This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in multiples of 5 pages throughout the entire assignment. You can leave this input empty to disable it.
 
                 <span class="minor-minor-category">Minimum Daily Work Time in Minutes</span>
-                This input is the minimum amount of time you will work on of an assignment every day. This doesn't apply for days in which you don't work on the assignment. You can leave this input empty to disable it.
+                This input is the minimum amount of time you will work on of an assignment every day. This doesn't apply for the days you don't work on the assignment. You can leave this input empty to disable it.
 
                 <span class="minor-minor-category">Break Days</span>
-                This input is the days of the week in which you won't work on the assignment. Green days represent days in which you will work, and red days represent days in which you won't work.
+                This input is the days of the week you won't work on the assignment. Green days represent the days you will work, while red days represent the days you won't work.
             </details>
         </span>
         <span>
@@ -177,10 +140,10 @@
                 There are 6 standard controls for the assignment graph:
 
                 <span class="minor-minor-category">Delete Work Input</span>
-                This button deletes the most recent work input from your graph.
+                This button deletes the most recent work input from the graph.
 
                 <span class="minor-minor-category">Enter Units Done</span>
-                This input is the textbox in which you will enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". If you've completed an assignment's work for any day, enter the keyword "fin". If you haven't completed any of an assignment's work for any day, enter 0.
+                This input is the textbox used to enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". If you've completed an assignment's work for any day, enter the keyword "fin". If you haven't completed any of an assignment's work for any day, enter 0.
 
                 <span class="minor-minor-category">Submit Units Done</span>
                 This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -235,7 +198,7 @@
             <summary class="major-category" id="assignment-priority">Assignment priority</summary>
             After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.
             
-            Their priority also determines their assignment list position, which represents the order in which you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
+            Their priority also determines their assignment list position, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
 
             <span class="label-question" id="why-do-some-assignments-with-low-priority-have-a-higher-list-position">
                 <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
