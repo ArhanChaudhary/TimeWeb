@@ -614,7 +614,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # y, time_per_unit, and unit are missing
                 ))
         # .execute() rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list().execute().get('courses', [])
+        courses = []
         coursework_lazy = service.courses().courseWork()
         batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
 
@@ -745,9 +745,17 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         try:
             # turn those parameters into a token
             flow.fetch_token(authorization_response=authorization_response)
-        except OAuth2Error:
-            # In case users deny a permission or don't input a code in the url or cancel
-            return redirect(reverse("home") + "?gc-api-init-failed=true")
+            # Ensure the user enabled both scopes
+            service = build('classroom', 'v1', credentials=flow.credentials)
+            service.courses().list().execute()
+            service.courses().courseWork().list(courseId="easter egg!").execute()
+        except (HttpError, OAuth2Error) as e:
+            # If the error is an OAuth2Error, the init failed
+            # If the error is an HttpError and the access code is 403, the init failed
+            # If the error is an HttpError and the access code is 404, the init succeeded, as the course work execute line provides a dunder id so it can execute
+            if not e is HttpError or e.resp.status == 403:
+                # In case users deny a permission or don't input a code in the url or cancel
+                return redirect(reverse("home") + "?gc-api-init-failed=true")
         credentials = flow.credentials
         # Use .update() (dict method) instead of = so the refresh token isnt overwritten
         self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
