@@ -147,14 +147,20 @@
                 This button deletes the most recent work input from the graph.
 
                 <span class="minor-minor-category">Enter Units Done</span>
-                This input is the textbox used to enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". 
+                This input is the textbox used to enter an assignment's daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done".
                 
                 For any day, if you've completed an assignment's work, enter the keywords "done" or "fin".
 
                 If you haven't completed any of an assignment's work, enter "0" instead.
 
-                If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since then, enter "since 5".
+                If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since your last input, enter "since 5".
 
+                <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
+                    <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
+                    This happens because you've already worked for today. By entering no work done, you're communicating that you've done nothing and you're not going to work any more for the rest of the day. 
+
+                    This feature isn't exclusive to inputting no work done only; this occurs when you input less work than how much you're supposed to do for today.
+                </span>
                 <span class="minor-minor-category">Submit Units Done</span>
                 This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
 
@@ -194,6 +200,20 @@
         <span>
             <div class="major-category">Assignment header</div>
             <details open>
+                <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
+                <img src="{% static 'images/assignment-header.png' %}">
+                The assignment header contains a brief, daily summary of the assignment and its work for today.
+
+                Above an assignment's name is its priority percentage relative to the other assignments.
+                Below an assignment's name is the days left until it is due.
+                Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".
+
+                At the center of an assignment is its header message. The message displayed will reflect the current status of the assignment. For instance, if you need to work on assignment for today, the header message will display how much you need to work for today according to the assignment graph.
+
+                At the right of the assignment header is the assignment's estimated completion time along with its hide, edit, and delete buttons.
+
+            </details>
+            <details open>
                 <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
                 After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.
                 
@@ -210,7 +230,7 @@
                 </span>
 
                 <span class="minor-minor-category">An advanced example</span>
-                To demonstrate, let's go through the methodology of ordering every assignment in this example. I have manually labeled each assignment in the image with a number:
+                To demonstrate, let's go through the methodology of ordering every assignment in an example. I have manually labeled each assignment in the image with a number:
 
                 <img src="{% static 'images/advanced-priority-example.png' %}">
 
@@ -253,7 +273,7 @@
             </details>
             <details open>
                 <summary class="minor-category" id="sorting-assignment-tags">Sorting assignment tags</summary>
-                Tags are only added to the end of an assignment's tag list initially. So, you can sort the tags in the order you like by holding on a tag and then dragging it around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around to sort them.
+                Tags are initially added to the end of an assignment's tag list. So, you can sort the tags in the order you like by clicking or holding on a tag and then dragging it around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around.
 
             </details>
         </span>
@@ -263,6 +283,7 @@
                 <summary class="minor-category" id="what-are-assignment-shortcuts">What are assignment shortcuts?</summary>
                 <img src="{% static 'images/assignment-shortcuts.png' %}">
                 Assignment shortcuts simplify performing complex actions on many assignments at once. To use a shortcut, all you have to do is click on them.
+
             </details>
             <details open>
                 <summary class="minor-category" id="autofill-work-done-assignment-shortcut">Autofill Work Done</summary>

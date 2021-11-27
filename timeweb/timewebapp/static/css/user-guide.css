@@ -51,7 +51,7 @@ body {
     z-index: 2;
     background-color: rgb(237, 237, 237);
 }
-@media screen and (max-width: 950px) {
+@media screen and (max-width: 1200px) {
     #table-of-contents-container {
         position: absolute;
         z-index: 2;
