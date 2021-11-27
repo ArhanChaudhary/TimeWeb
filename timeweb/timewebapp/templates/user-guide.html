@@ -12,7 +12,7 @@
 
 {% block content %}
 <div id="flex-container">
-    <div id="table-of-contents-container-label">
+    <div id="table-of-contents-container-label" tabindex="0">
         <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
     </div>
     <div id="table-of-contents-container">
@@ -159,7 +159,7 @@
                     <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
                     This happens because you've already worked for today. By entering no work done, you're communicating that you've done nothing and you're not going to work any more for the rest of the day. 
 
-                    This feature isn't exclusive to inputting no work done only; this occurs when you input less work than how much you're supposed to do for today.
+                    This feature isn't exclusive to inputting no work done only; this occurs when you input less work than the assignment's daily work.
                 </span>
                 <span class="minor-minor-category">Submit Units Done</span>
                 This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -176,7 +176,7 @@
                 There are 3 advanced controls for the assignment graph:
 
                 <span class="minor-minor-category">Set Curvature of the Graph</span>
-                This button allows you to be able to hover over the graph to manually set your curvature. Click the graph to save, and click this button again to cancel. 
+                This button allows you to be able to hover over the graph to manually set your curvature. Click the graph to save, and click this button again to cancel.
 
                 <span class="minor-minor-category">Enter Curvature</span>
                 This input allows you to manually enter a numeric curvature value. The graph is updated by this value in real time.
@@ -191,8 +191,8 @@
                 The work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden.
                 
                 <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
-                    <span class="label-title">Why do similar skew ratio values result in different work distributions in dynamic mode?</span>
-                    Unfortunately, this a side effect of dynamic mode's implementation, ocassionally occuring after submitting and deleting work inputs. Try to re-adjust the skew ratio to its old work distribution if this happens.
+                    <span class="label-title">Why do similar curvature values result in different work distributions in dynamic mode?</span>
+                    Unfortunately, this a side effect of dynamic mode's implementation, ocassionally occuring after submitting and deleting work inputs. Try to re-adjust the curvature to its old work distribution if this happens.
                 </span>
             </details>
         </span>
@@ -282,7 +282,7 @@
             <details open>
                 <summary class="minor-category" id="what-are-assignment-shortcuts">What are assignment shortcuts?</summary>
                 <img src="{% static 'images/assignment-shortcuts.png' %}">
-                Assignment shortcuts simplify performing complex actions on many assignments at once. To use a shortcut, all you have to do is click on them.
+                Assignment shortcuts simplify performing complex actions on many assignments at once.
 
             </details>
             <details open>
@@ -294,16 +294,22 @@
             </details>
             <details open>
                 <summary class="minor-category" id="delete-all-starred-assignments">Delete all Starred Assignments</summary>
+                If you have many starred assignments, you can delete them all at once with this shortcut.
 
             </details>
             <details open>
                 <summary class="minor-category" id="delete-all-assignments-from-this-class-assignment-shortcut">Delete all Assignments from this Class</summary>
+                The Google Classroom integration automatically converts Google Classroom assignments into TimeWeb assignments. If you don't want to use TimeWeb for the assignments from a particular class, you can delete all of them at once with this shortcut.
+
+                A Google Classroom assignment's first tag, which is automatically set to the Google Classroom class name, determines which class it belongs to. So, you can delete or replace a Google Classroom assignment's first tag if you don't want the assignment to be deleted with this shortcut.
 
             </details>
             <details open>
                 <summary class="minor-category" id="go-to-next-day">Go to Next Day</summary>
                 <img src="{% static 'images/header-icons.png' %}">
-                reference header icons
+                The header icons, from left to right, are: "Close All Assignments", "Open All Assignments", "Go To Next Day", and "Settings". The "Go to Next Day" shortcut simulates your work for tomorrow. In this state, none of the changes you make are saved, so you're free to experiment and make whatever changes you want.
+                
+                To get back to your original state, simply reload the page. Note that adding or editing assignments reload the page and get you back to your original state whether or not you were in the simulation.
 
             </details>
         </span>
