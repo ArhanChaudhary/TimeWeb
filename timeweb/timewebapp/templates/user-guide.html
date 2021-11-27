@@ -27,14 +27,16 @@
             <div class="major-category">Introduction</div>
             <details open>
                 <summary class="minor-category" id="getting-started">Getting started</summary>
-                Welcome! TimeWeb's official user guide is a full documentation of all of its features and their usage. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. It's recommended to at least create an assignment and take a look at its assignment graph to get a feel for TimeWeb's user interface before reading this guide.
+                Welcome! TimeWeb's official user guide is a full documentation of all of its features and their usage cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. It's recommended to at least create an assignment and take a look at its assignment graph to get a feel for TimeWeb's user interface before reading this guide.
 
                 The "Table of contents" section to the left shows the complete outline of this user guide, and the "FAQs" section just below that lists every FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
 
             </details>
             <details open>
                 <summary class="minor-category" id="what-is-timeweb">What is TimeWeb?</summary>
-                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take. TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
+                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take.
+                
+                TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
 
                 A few extra things to help with TimeWeb's credibility:
                 {% spaceless %}
@@ -116,7 +118,7 @@
                 You can leave this input empty to disable it.
 
                 <span class="minor-minor-category">Minimum Daily Work Time in Minutes</span>
-                This input is the minimum amount of time you will work on of an assignment every day. This only applies to days when you DO work on the assignment; this doesn't apply to days when you don't work.
+                This input is the minimum amount of time you will work on of an assignment every day. This only applies to days when you DO work on the assignment and doesn't apply to days when you don't work.
                 
                 You can leave this input empty to disable it.
 
@@ -147,7 +149,11 @@
                 <span class="minor-minor-category">Enter Units Done</span>
                 This input is the textbox used to enter your daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done". 
                 
-                For any day, if you've completed an assignment's work, enter the keywords "done" or "fin". If you haven't completed any of an assignment's work, enter "0" instead. If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since then, enter "since 5".
+                For any day, if you've completed an assignment's work, enter the keywords "done" or "fin".
+
+                If you haven't completed any of an assignment's work, enter "0" instead.
+
+                If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since then, enter "since 5".
 
                 <span class="minor-minor-category">Submit Units Done</span>
                 This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -203,7 +209,8 @@
                     Check out the advanced example below for a better understanding of this functionality.
                 </span>
 
-                To demonstrate, let's break down the priority of each assignment in an advanced example. I have manually labeled each assignment in the image with a number:
+                <span class="minor-minor-category">An advanced example</span>
+                To demonstrate, let's go through the methodology of ordering every assignment in this example. I have manually labeled each assignment in the image with a number:
 
                 <img src="{% static 'images/advanced-priority-example.png' %}">
 
@@ -212,18 +219,18 @@
 
                 Assignment #1 has the "Important" tag, so it is placed as the first assignment.
 
-                Assignment #2 also has the "Important" tag, but it has a lower priority than assignment #1, so it is placed as the second assignment.
+                Assignment #2 also has the "Important" tag, but it has a lower priority than #1, so it is placed as the second assignment.
                 
                 Assignment #3 does not have the "Important" tag, so it is placed as the third assignment.
 
-                Assignment #4 also does not have the "Important" tag, but it has a lower priority than assignment #3, so it is placed as the fourth assignment.
+                Assignment #4 also does not have the "Important" tag, but it has a lower priority than #3, so it is placed as the fourth assignment.
 
-                Assignment #5 has the "Not Imoprtant" tag, so it is placed as the fifth assignment.
+                Assignment #5 has the "Not Important" tag, so it is placed as the fifth assignment.
 
-                Assignment #6 also has the "Not Imoprtant" tag, but it has a lower priority than assignment #5, so it is placed as the sixth assignment.
+                Assignment #6 also has the "Not Important" tag, but it has a lower priority than #5, so it is placed as the sixth assignment.
 
 
-                At this point, you may be wondering why assignment #7 and assignment #8 are placed at the bottom. This is because assignments #1 - #6 are all due tomorrow, as indicated below their name. They are placed at the very top of the assignment list, as, logically, assignments due tomorrow are more urgent than assignments due later.
+                At this point, you may be wondering why assignment #7 and assignment #8 are placed at the bottom. This is because assignments #1 through assignment #6 are all due tomorrow, as indicated below their name. They are placed at the very top of the assignment list, as, logically, assignments due tomorrow are more urgent than assignments due later.
 
             </details>
             <details open>
@@ -276,6 +283,7 @@
                 <summary class="minor-category" id="go-to-next-day">Go to Next Day</summary>
                 <img src="{% static 'images/header-icons.png' %}">
                 reference header icons
+
             </details>
         </span>
         <span>
@@ -290,7 +298,9 @@
                 you must enable both or nothing will work
                 <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
                     <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
-                    This isn't actually a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades. If you would like, you can inspect TimeWeb's <a href="https://github.com/ArhanChaudhary/TimeWeb/blob/master/timeweb/timewebapp/views.py">backend source code</a> to see I don't use your grades in any way.
+                    This isn't actually a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades.<br>
+                    <br>
+                    If you would like, you can inspect TimeWeb's <a href="https://github.com/ArhanChaudhary/TimeWeb/blob/master/timeweb/timewebapp/views.py">backend source code</a> to see I don't use your grades in any way.
                 </span>
             </details>
             <details open>
