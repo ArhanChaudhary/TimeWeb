@@ -572,7 +572,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     due_time = datetime.time(x.hour, x.minute)
                     x = x.replace(hour=0, minute=0, second=0, microsecond=0)
                         
-                    if assignment_date > x:
+                    if assignment_date >= x:
                         self.gc_skipped_assignment += 1
                         continue
                     if date_now == x:
