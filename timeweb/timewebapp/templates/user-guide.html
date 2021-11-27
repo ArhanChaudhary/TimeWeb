@@ -325,7 +325,7 @@
                 <img src="{% static 'images/google-classroom-integration.png' %}">
                 
                 To enable the Google Classroom integration, you must first click the Google Classroom icon at the bottom right of the home page. This will bring up Google's authentication service. You MUST enable both permissions to proceed with enabling the Google Classroom integration. After authenticating, you may have to log in one more time, and after that you're completely done.
-                
+
                 <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
                     <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
                     This isn't actually a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades.<br>
@@ -351,9 +351,35 @@
                 </span>
             </details>
         </span>
-        <span>
-            <div class="major-category" id="keybinds">Keybinds</div>
-        </span>
+        <details open>
+            <summary class="major-category" id="keybinds">Keybinds</summary>
+            Keybinds allow you to perform actions with a single keystroke.
+
+            <button>n</button> : Open the new assignment form
+
+            <button>Escape</button> : Close the new assignment form
+            
+            <button>Arrow up/down</button> : Change the curvature by +-0.1 if an open graph is on screen
+
+            <button>Shift + Arrow up/down</button> : Open and go to next/previous assignment
+            
+            <button>Shift + Click delete assignment</button> : Delete assignment without confirmation prompt
+
+
+            Hover over or focus on any element in an assignment to select it as the target of the below keybinds:
+
+            <button>e</button> : Open the edit assignment form
+
+            <button>d</button> : Open the delete assignment confirmation prompt
+
+            <button>i</button> : Hide an assignment for today (clicks the eye icon)
+
+            <button>Backspace</button> : Delete the most recent work input (ASSIGNMENT MUST BE OPEN)
+
+            <button>s</button> : Enable "Set Curvature of the Graph" (ASSIGNMENT MUST BE OPEN)
+            
+        </details>
+        <hr>
         You've reached the end of TimeWeb's user guide! Feel free to <a href="mailto:arhan.ch@gmail.com">contact me</a> to suggest adding anything or if you're still confused about anything. Have a great day!
     </div>
 </div>
