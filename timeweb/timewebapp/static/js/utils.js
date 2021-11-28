@@ -329,7 +329,7 @@ utils = {
                     const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left
                                                 || e.offsetY <= dom_assignment.offset().top - assignment_container.offset().top;
                     const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") 
-                        && e.offsetX <= parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-left")) + parseInt(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-width"))
+                        && e.offsetX <= parseFloat(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-left")) + parseFloat(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-width"))
                         && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top;
                     if (!dom_assignment.is(":hover") && (hovering_line_wrapper || hovering_last_line_wrapper)) {
                         assignment_container.prevAll(".assignment-container").addBack().reverse() // addBack reveres query for some reason
@@ -577,7 +577,7 @@ utils = {
                     // If the user unfocuses the closed tag modal which they previously clicked to close, this will run and add the transitionend event in transitionCloseTagBox to the already closed tag-add-box, which is unwanted and causes bugs
                     // I can't just do !$(e.target).is($this) because the tag modal may already be open without the user already previously clicking .tag-add to close it, and the transitionend event is needed in this case
                     // So, only return when the tag modal is closed by adding || $this.find(".tag-add-box").css("height") === 0
-                    if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this) || parseInt($this.find(".tag-add-box").css("height")) === 0) return;
+                    if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this) || parseFloat($this.find(".tag-add-box").css("height")) === 0) return;
                     $this.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
                 }, 0);

@@ -1034,7 +1034,7 @@ $(".assignment").click(function(e) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         assignment_footer.animate({
-            marginBottom: -(assignment_footer.height() + parseInt(dom_assignment.find(".graph-container").css("margin-top")))
+            marginBottom: -(assignment_footer.height() + parseFloat(dom_assignment.find(".graph-container").css("margin-top")))
         }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");
