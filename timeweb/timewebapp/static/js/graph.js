@@ -400,7 +400,7 @@ class VisualAssignment extends Assignment {
         }
         screen.lineWidth = radius;
         for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
-            circle_x = (Math.min(this.sa.complete_x, point) + this.sa.blue_line_start) * this.wCon + 50;
+            circle_x = Math.min(this.sa.complete_x, point + this.sa.blue_line_start) * this.wCon + 50;
             circle_y = this.height - this.sa.works[Math.min(len_works, point)] * this.hCon - 50;
             
             screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
