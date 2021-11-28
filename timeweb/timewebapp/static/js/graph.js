@@ -890,6 +890,7 @@ class VisualAssignment extends Assignment {
             skew_ratio_button.onlyText("Hover the graph. Click again to cancel");
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
+            this.graph.trigger("mousemove");
             this.set_skew_ratio_using_graph = true;
         });
         this.graph.click(e => {
