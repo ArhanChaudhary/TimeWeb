@@ -16,8 +16,11 @@
 .major-category::after {
     counter-increment: major-category-counter -1;
 }
+#table-of-contents-container, #table-of-contents-container-label {
+    width: 225px;
+}
 /* Make sure to change user-guide.css and others if this media query is modified */
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 825px) {
     #table-of-contents-container {
         position: absolute;
         z-index: 2;
