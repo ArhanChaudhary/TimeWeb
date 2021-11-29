@@ -1,6 +1,3 @@
-#dark-mode body {
-    --body-background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
-}
 #dark-mode main {
     filter: invert(1);
 }
