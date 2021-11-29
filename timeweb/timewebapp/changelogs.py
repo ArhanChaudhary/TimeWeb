@@ -1,7 +1,7 @@
 # Could probably make this a json but multi line strings are not allowed
 CHANGELOGS = [
 {
-    "version": "v1.5.2 (11/24/2021)",
+    "version": "v1.5.2-beta (11/24/2021)",
     "updates": '''<ul>
                     <li>Redesigned the assignment graph layout</li>
                     <li>Renamed "Skew Ratio" to "Curvature"</li>
@@ -26,7 +26,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.5.1 (11/7/2021)",
+    "version": "v1.5.1-beta (11/7/2021)",
     "updates": '''<ul>
                     <li>Added soft due dates</li>
                     <li>Added "since" keyword to the work input</li>
@@ -50,7 +50,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.5.0 (10/12/2021)",
+    "version": "v1.5.0-beta (10/12/2021)",
     "updates": '''<ul>
                     <li>Major UI improvements</li>
                     <li>Added the ability to enter assignment fields later</li>
@@ -75,7 +75,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.4.4 (8/12/2021)",
+    "version": "v1.4.4-beta (8/12/2021)",
     "updates": '''<ul>
                     <li>Updated policies</li>
                     <li>Improved "ignore minimum work time ends" functionality</li>
@@ -98,7 +98,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.4.3 (7/27/2021)",
+    "version": "v1.4.3-beta (7/27/2021)",
     "updates": '''<ul>
                     <li>Improved the assignment form UI</li>
                     <li>Restyled alerts</li>
@@ -116,7 +116,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.4.2 (7/19/2021)",
+    "version": "v1.4.2-beta (7/19/2021)",
     "updates": '''<ul>
                     <li>Improved Google Classroom API loading speeds</li>
                     <li>Added "delete assignments from class" shortcut</li>
@@ -132,7 +132,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.4.1 (7/12/2021)",
+    "version": "v1.4.1-beta (7/12/2021)",
     "updates": '''<ul>
                     <li>Improved Google Classroom API loading speeds</li>
                     <li>Clamped long assignment names</li>
@@ -150,7 +150,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.4.0 (7/8/2021)",
+    "version": "v1.4.0-beta (7/8/2021)",
     "updates": '''<ul>
                     <li>Implemented Google Classroom API</li>
                     <li>Replaced "Advanced" with icons</li>
@@ -159,7 +159,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.3.3 (7/1/2021)",
+    "version": "v1.3.3-beta (7/1/2021)",
     "updates": '''<ul>
                     <li>Made tags draggable to allow resorting</li>
                     <li>Synced the example account's assignments' dates with today</li>
@@ -176,7 +176,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.3.2 (6/28/2021)",
+    "version": "v1.3.2-beta (6/28/2021)",
     "updates": '''<ul>
                     <li>Made info buttons hoverable</li>
                     <li>Changed assignment header button icons</li>
@@ -192,7 +192,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.3.1 (6/26/2021)",
+    "version": "v1.3.1-beta (6/26/2021)",
     "updates": '''<ul>
                     <li>Completely rewrote a large portion of code</li>
                     <li>Added shortcut line wrappers around their assignments</li>
@@ -207,13 +207,13 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.3.0 (6/23/2021)",
+    "version": "v1.3.0-beta (6/23/2021)",
     "updates": '''<ul>
                     <li>Added assignment tags</li>
                 </ul>''',
 },
 {
-    "version": "v1.2.2 (6/16/2021)",
+    "version": "v1.2.2-beta (6/16/2021)",
     "updates": '''<ul>
                     <li>Added custom background images</li>
                     <li>Removed delete assignment queue</li>
@@ -226,7 +226,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.2.1 (6/7/2021)",
+    "version": "v1.2.1-beta (6/7/2021)",
     "updates": '''<ul>
                     <li>Reworked the assignment sorting algorithm</li>
                     <li>Removed "in progress"</li>
@@ -242,7 +242,7 @@ CHANGELOGS = [
                 </ul>'''
 },
 {
-    "version": "v1.2.0 (5/29/2021)",
+    "version": "v1.2.0-beta (5/29/2021)",
     "updates": '''<ul>
                     <li>Slightly adjusted favicon</li>
                     <li>Added full device support for favicons and PWAs</li>
@@ -260,7 +260,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.11 (5/22/2021)",
+    "version": "v1.1.11-beta (5/22/2021)",
     "updates": '''<ul>
                     <li>Added highest and lowest custom priority colors in the settings</li>
                     <li>Added a reset button to the settings</li>
@@ -278,7 +278,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.10 (5/20/2021)",
+    "version": "v1.1.10-beta (5/20/2021)",
     "updates": '''<ul>
                     <li>Implemented a system to ensure users fully complete their assignments, even if their due dates pass</li>
                     <li>Removed skew ratio sort timeout</li>
@@ -290,7 +290,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.9 (5/19/2021)",
+    "version": "v1.1.9-beta (5/19/2021)",
     "updates": '''<ul>
                     <li>Rewrote tutorial alert text</li>
                     <li>Minor bug fixes</li>
@@ -305,7 +305,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.8 (5/18/2021)",
+    "version": "v1.1.8-beta (5/18/2021)",
     "updates": '''<ul>
                     <li>Added a label for advanced buttons on the graph footer</li>
                     <li>Rearranged graph footer buttons</li>
@@ -320,7 +320,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.7 (5/17/2021)",
+    "version": "v1.1.7-beta (5/17/2021)",
     "updates": '''<ul>
                     <li>Added example account to login page</li>
                     <li>Removed unnecessary graph text</li>
@@ -333,14 +333,14 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.6 (5/13/2021)",
+    "version": "v1.1.6-beta (5/13/2021)",
     "updates": '''<ul>
                     <li>Added status icon images</li>
                     <li>Repositioned status icons</li>
                 </ul>''',
 },
 {
-    "version": "v1.1.5 (5/13/2021)",
+    "version": "v1.1.5-beta (5/13/2021)",
     "updates": '''<ul>
                     <li>Changed edit icon</li>
                     <li>Changed delete icon</li>
@@ -352,7 +352,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.4 (5/12/2021)",
+    "version": "v1.1.4-beta (5/12/2021)",
     "updates": '''<ul>
                     <li>Enabling round to multiples of 5 minutes automatically changes every assignment appropriately</li>
                     <li>Increased sort timeout to avoid assignments resorting too fast</li>
@@ -366,7 +366,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.3 (5/11/2021)",
+    "version": "v1.1.3-beta (5/11/2021)",
     "updates": '''<ul>
                     <li>Added "Go to Next Day" in advanced</li>
                     <li>Added shift + click delete icon keybind to skip the prompt for deleting an assignment</li>
@@ -377,7 +377,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.2 (5/11/2021)",
+    "version": "v1.1.2-beta (5/11/2021)",
     "updates": '''<ul>
                     <li>Made assignments unclickable if an assignment without past work inputs or no working days is present to force users to resolve the issue</li>
                     <li>Minor bug fixes</li>
@@ -388,7 +388,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.1 (5/10/2021)",
+    "version": "v1.1.1-beta (5/10/2021)",
     "updates": '''<ul>
                     <li>Marked all other assignments as completed when an assignment without past work inputs is present to urge users to enter their progress</li>
                     <li>Marked all other assignments as completed when an assignment with no working days is present to urge users to re-enter its break days</li>
@@ -405,7 +405,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.1.0 (5/8/2021)",
+    "version": "v1.1.0-beta (5/8/2021)",
     "updates": '''<ul>
                     <li>Added "mark assignment as completed" button below the graph</li>
                     <li>Improved Form UI</li>
@@ -417,7 +417,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.0.3 (5/7/2021)",
+    "version": "v1.0.3-beta (5/7/2021)",
     "updates": '''<ul>
                     <li>Removed excessive caching</li>
                     <li>Minor bug fixes</li>
@@ -431,7 +431,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.0.2 (5/6/2021)",
+    "version": "v1.0.2-beta (5/6/2021)",
     "updates": '''<ul>
                     <li>Allowed assignments to be open during swaps</li>
                     <li>Minor bug fixes</li>
@@ -443,7 +443,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.0.1 (5/3/2021)",
+    "version": "v1.0.1-beta (5/3/2021)",
     "updates": '''<ul>
                     <li>Updated scroller image</li>
                     <li>Colored assignments without past work inputs white</li>
@@ -457,7 +457,7 @@ CHANGELOGS = [
                 </ul>''',
 },
 {
-    "version": "v1.0.0 (5/3/2021)",
+    "version": "v1.0.0-beta (5/3/2021)",
     "updates": '''<ul>
                     <li>Official beta release! :D</li>
                 </ul>''',
