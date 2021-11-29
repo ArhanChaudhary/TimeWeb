@@ -139,15 +139,15 @@ utils = {
             googleClassroomAPI: function() {
                 if (!creating_gc_assignments_from_frontend && !gc_api_init_failed) {
                     if (SETTINGS.oauth_token.token) {
-                        $("#toggle-gc-label").html("Disable Google Classroom API");
+                        $("#toggle-gc-label").html("Disable Google Classroom integration");
                     } else {
-                        $("#toggle-gc-label").html("Enable Google Classroom API");
+                        $("#toggle-gc-label").html("Enable Google Classroom integration");
                     }
                 }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
                         $.alert({
-                            title: "You can't enable the Google Classroom API on the example account.",
+                            title: "You can't enable the Google Classroom integration on the example account.",
                             content: "Please create your own account and try again.",
                         });
                         return;
@@ -162,7 +162,7 @@ utils = {
                         data: {csrfmiddlewaretoken: csrf_token},
                         success: function(authentication_url) {
                             if (authentication_url === "Disabled gc api") {
-                                $("#toggle-gc-label").html("Enable Google Classroom API");
+                                $("#toggle-gc-label").html("Enable Google Classroom integration");
                                 $this.removeClass("clicked");
                             } else {
                                 window.location.href = authentication_url;
@@ -1011,9 +1011,9 @@ ajaxUtils = {
                 $("#toggle-gc-label").html("");
                 $("#toggle-gc-container").removeClass("open");
                 if (SETTINGS.oauth_token.token) {
-                    $("#toggle-gc-label").html("Disable Google Classroom API");
+                    $("#toggle-gc-label").html("Disable Google Classroom integration");
                 } else {
-                    $("#toggle-gc-label").html("Enable Google Classroom API");
+                    $("#toggle-gc-label").html("Enable Google Classroom integration");
                 }
                 creating_gc_assignments_from_frontend = false;
                 return;

@@ -753,7 +753,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
             # If the error is an OAuth2Error, the init failed
             # If the error is an HttpError and the access code is 403, the init failed
             # If the error is an HttpError and the access code is 404, the init succeeded, as the course work execute line provides a dunder id so it can execute
-            if not e is HttpError or e.resp.status == 403:
+            if not isinstance(e, HttpError) or e.resp.status == 403:
                 # In case users deny a permission or don't input a code in the url or cancel
                 return redirect(reverse("home") + "?gc-api-init-failed=true")
         credentials = flow.credentials

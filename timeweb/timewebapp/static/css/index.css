@@ -1088,7 +1088,7 @@ input[type=number]::-webkit-inner-spin-button {
     transition: width 0.7s cubic-bezier(0, 0, 0.5, 1), opacity 0.3s linear 0.35s, transform 0.25s linear 0.35s;
 }
 #toggle-gc-container:hover #toggle-gc-label {
-    width: 245px;
+    width: 304px;
 }
 #toggle-gc-container.open #toggle-gc-label {
     width: 333px;
