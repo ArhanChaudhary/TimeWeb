@@ -1,3 +1,9 @@
+#doc-container span > ul {
+    -webkit-margin-before: 1em;
+            margin-block-start: 1em;
+    -webkit-margin-after: 1em;
+            margin-block-end: 1em;
+}
 /* Make sure to change user-guide.css and others if this media query is modified */
 @media screen and (max-width: 900px) {
     #table-of-contents-container {
