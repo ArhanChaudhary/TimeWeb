@@ -189,7 +189,6 @@ $(function() {
             }
         });
     }
-    $("#nav-about").click(() => $.alert({title: "This hasn't yet been written."})).css("text-decoration", "line-through");
     $("#nav-credits").click(() => $.alert({
         title: CREDITS_TEMPLATE,
     }));

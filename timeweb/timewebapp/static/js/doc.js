@@ -23,6 +23,12 @@ document.addEventListener("DOMContentLoaded", function() {
             major_category_li.find("ul").append(minor_category_li);
         });
         $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
+
+        $major_category.prop("style").setProperty("--shadow-color", rgbToHex(
+            Math.round(200 - 255 / number_major_categories), 
+            Math.round(200 - 255 / number_major_categories), 
+            Math.round(200 - 255 / number_major_categories),
+        ));
     });
 
     $(".label-question").each(function() {
@@ -31,6 +37,10 @@ document.addEventListener("DOMContentLoaded", function() {
         const minor_category_li = $(TABLE_OF_CONTENTS_MINOR_CATEGORY_TEMPLATE);
         minor_category_li.find("a").attr("href", `#${$label_question.attr("id")}`).text($label_question.find(".label-title").text());
 
-        $("#table-of-contents-container #category-user-guide-labels").append(minor_category_li);
+        $("#table-of-contents-container #category-doc-labels").append(minor_category_li);
     });
 });
+// https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}

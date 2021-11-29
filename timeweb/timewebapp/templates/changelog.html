@@ -1,18 +1,21 @@
-{% extends "template.html" %}
+{% extends "doc-template.html" %}
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/logged_out.css' %}">
+{% block doc_css %}
 <link rel="stylesheet" href="{% static 'css/changelog.css' %}">
-{% endblock css %}
+{% endblock doc_css %}
 
-{% block content %}
-<div id="changelog-container">
+{% block doc_js %}
+<script src="{% static 'js/changelog.js' %}"></script>
+{% endblock doc_js %}
+
+{% block doc_content %}
 {% autoescape off %}
 {% for changelog in changelogs %}
-    {{ changelog.version }}
+<span>
+    <div class="major-category" id="{{ changelog.version }}">{{ changelog.version }}</div>
     {{ changelog.updates }}
+</span>
 {% endfor %}
 {% endautoescape %}
-</div>
-{% endblock content %}
+{% endblock doc_content %}

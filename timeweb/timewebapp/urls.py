@@ -7,6 +7,7 @@ from django.conf import settings
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
     path('settings', views.SettingsView.as_view(),name='settings'),
+    path('blog', views.BlogView.as_view(),name='blog'),
     path('user-guide', views.UserguideView.as_view(), name='user-guide'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
     path('credits', RedirectView.as_view(url='/static/credits.html'), name='credits'),

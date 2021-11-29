@@ -1,404 +1,370 @@
-{% extends "template.html" %}
+{% extends "doc-template.html" %}
 
 {% load static %}
 
-{% block css %}
+{% block doc_css %}
 <link rel="stylesheet" href="{% static 'css/user-guide.css' %}">
-{% endblock css %}
+{% endblock %}
 
-{% block js %}
-<script src="{% static 'js/user-guide.js' %}"></script>
-{% endblock js %}
+{% block doc_content %}
+{% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
+{% comment %} the span groups the major and minor categories together for user-guide.js {% endcomment %}
+<span>
+    <div class="major-category">Introduction</div>
+    <details open>
+        <summary class="minor-category" id="getting-started">Getting started</summary>
+        Welcome! TimeWeb's official user guide is a full documentation of all of its features and their usage cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. It's recommended to create at least one assignment and take a look at its assignment graph to get a feel for TimeWeb's user interface before reading this guide.
 
-{% block content %}
-<div id="flex-container">
-    <div id="table-of-contents-container-label" tabindex="0">
-        <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
-    </div>
-    <div id="table-of-contents-container">
-        <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
-        <span class="table-of-contents-header" id="category-important-labels">FAQs</span>
-        <ul id="category-user-guide-labels"></ul>
-    </div>
-    {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
-    <div id="user-guide-container">
-        {% comment %} the span groups the major and minor categories together for user-guide.js {% endcomment %}
-        <span>
-            <div class="major-category">Introduction</div>
-            <details open>
-                <summary class="minor-category" id="getting-started">Getting started</summary>
-                Welcome! TimeWeb's official user guide is a full documentation of all of its features and their usage cases. Reading this isn't required, but doing so will clear up confusion you may have and greatly help with your user experience. It's recommended to create at least one assignment and take a look at its assignment graph to get a feel for TimeWeb's user interface before reading this guide.
+        The "Table of contents" section to the left shows the complete outline of this user guide, and the "FAQs" section just below that lists every FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
 
-                The "Table of contents" section to the left shows the complete outline of this user guide, and the "FAQs" section just below that lists every FAQ in this guide. If you came here because you're confused about something specific, there's a good chance you'll find your answer in either of those sections.
+    </details>
+    <details open>
+        <summary class="minor-category" id="what-is-timeweb">What is TimeWeb?</summary>
+        TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take.
+        
+        TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
 
-            </details>
-            <details open>
-                <summary class="minor-category" id="what-is-timeweb">What is TimeWeb?</summary>
-                TimeWeb is a free, online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Unlike an ordinary planner, each of your assignments' work is split up and graphed over the days until they are due. Then, they are automatically prioritized so you will always know which assignment to do, when to do it, and how long it will take.
-                
-                TimeWeb's main focus is on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters that can be configured for you and your work style.
+        A few extra things to help with TimeWeb's credibility:
+        {% spaceless %}
+        <ul>
+            <li>TimeWeb has been useful to a dozen of its beta testers</li>
+            <li>TimeWeb has been supported and received well by my school's principal</li>
+            <li>TimeWeb is <a href="https://github.com/ArhanChaudhary/TimeWeb">open source</a></li>
+        </ul>{% endspaceless %}
+        Take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your homepage to look like.
 
-                A few extra things to help with TimeWeb's credibility:
-                {% spaceless %}
-                <ul>
-                    <li>TimeWeb has been useful to a dozen of its beta testers</li>
-                    <li>TimeWeb has been supported and received well by my school's principal</li>
-                    <li>TimeWeb is <a href="https://github.com/ArhanChaudhary/TimeWeb">open source</a></li>
-                </ul>{% endspaceless %}
-                Take a look at TimeWeb's <a href="https://youtu.be/[link]">YouTube demo</a> to get an idea of what you should expect your homepage to look like.
+    </details>
+</span>
+<span>
+    <div class="major-category">Assignment form</div>
+    <details open>
+        <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
+        <img src={% static 'images/assignment-form.png' %} width="550">
+        The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking its edit button.
+        
+        The assignment form has 12 inputs in total:
 
-            </details>
+        6 of these inputs are required for a complete assignment.
+
+        6 of these advanced and optional. Default input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
+        
+    </details>
+    <details open>
+        <summary class="minor-category" id="needs-more-info">"Needs more Info"</summary>
+        You can still create an assignment without the required inputs, but its graph won't be usable and it will be marked as "needs more info". You will need to edit the assignment and re-enter its required inputs to make it a complete assignment.
+        
+        One use of this feature is for assignments you don't want to have a graph for. The "needs more info" functionality acts as a sort of reminder system in this case.
+        
+        If you don't have time to enter a complete assignment, another use of this feature is to remind yourself to enter the required inputs later.
+        
+    </details>
+    <details open>
+        <summary class="minor-category" id="standard-assignment-form-inputs">Standard inputs</summary>
+        These inputs in the assignment form are mandatory for every assignment. There are 6 standard inputs:
+
+        <span class="minor-minor-category">Name of this Assignment</span>
+        Simply the name of the assignment. is displayed at the left of the assignment header.
+
+        <span class="minor-minor-category">Date Assigned</span>
+        This input is the date the assignment was assigned or the date you'll start working on the assignment. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
+
+        <span class="minor-minor-category">Due Date</span>
+        This input is the date the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
+
+        <span class="minor-minor-category">Name of each Unit of Work</span>
+        This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete [some number] amount of [this input] today".
+
+        Try not to choose large divisions of work for this input. To demonstrate what I mean by this, pretend you're assigned an assignment with three worksheets, each containing thirty pages of work. Rather than entering "Worksheet" for this input, it's usually more ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed 15 pages, which is nice and clean, instead of 0.5 worksheets, which is an ugly decimal. However, the latter is still completely valid if you prefer to input that.
+        
+        If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" for this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
+
+        <span class="minor-minor-category">Total number of Units in this Assignment</span>
+        This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days the assignment is due.
+
+        <span class="minor-minor-category">Estimated number of Minutes to complete each Unit</span>
+        This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour".
+        
+    </details>
+    <details open>
+        <summary class="minor-category" id="advanced-assignment-form-inputs">Advanced inputs</summary>
+        These inputs in the assignment form are optional for every assignment, but they further enhance your assignments' work schedules. There are 6 advanced inputs:
+
+        <span class="minor-minor-category">Soft</span>
+        This option enables soft due dates. Soft due dates are automatically incremented if you haven't finished the assignment by then.
+
+        <span class="minor-minor-category">Assignment Description</span>
+        This input is the description of the assignment, shown below the assignment name when the assignment is open or when the assignment needs more info.
+
+        <span class="minor-minor-category">Total number of Units already Completed</span>
+        This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
+
+        <span class="minor-minor-category">Step Size</span>
+        This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in multiples of 5 pages throughout the entire assignment.
+        
+        You can leave this input empty to disable it.
+
+        <span class="minor-minor-category">Minimum Daily Work Time in Minutes</span>
+        This input is the minimum amount of time you will work on of an assignment every day. This only applies to days when you DO work on the assignment and doesn't apply to days when you don't work.
+        
+        You can leave this input empty to disable it.
+
+        <span class="minor-minor-category">Break Days</span>
+        This input is the days of the week you won't work on the assignment. Green days represent the days you will work, while red days represent the days you won't work.
+
+    </details>
+</span>
+<span>
+    <div class="major-category">Assignment graph</div>
+    <details open>
+        <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
+        <img id="assignment-graph-image">
+        After creating an assignment, click it to open its graph. The assignment line graph provides a visualization of how your assignment's work schedule will look like. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
+
+        As you progress through your assignment, there needs to be some way to measure your progress so each assignment can be prioritized accordingly. So, you must input the amount of work you complete every day for every assignment. This will be plotted and connected in blue.
+        
+        The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure your graph is tuned for you and your work style.
+        
+    </details>
+    <details open>
+        <summary class="minor-category" id="standard-assignment-graph-controls">Standard controls</summary>
+        There are 3 standard controls for the assignment graph:
+
+        <span class="minor-minor-category">Delete Work Input</span>
+        This button deletes the most recent work input from the graph.
+
+        <span class="minor-minor-category">Enter Units Done</span>
+        This input is the textbox used to enter an assignment's daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done".
+        
+        For any day, if you've completed an assignment's work, enter the keywords "done" or "fin".
+
+        If you haven't completed any of an assignment's work, enter "0" instead.
+
+        If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since your last input, enter "since 5".
+
+        <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
+            <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
+            This happens because you've already worked for today. By entering no work done, you're communicating that you've done nothing and you're not going to work any more for the rest of the day. 
+
+            This feature isn't exclusive to inputting no work done only; this occurs when you input less work than the assignment's daily work.
         </span>
-        <span>
-            <div class="major-category">Assignment form</div>
-            <details open>
-                <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
-                <img src={% static 'images/assignment-form.png' %} width="550">
-                The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking its edit button.
-                
-                The assignment form has 12 inputs in total:
+        <span class="minor-minor-category">Submit Units Done</span>
+        This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
 
-                6 of these inputs are required for a complete assignment.
+    </details>
+    <details open>
+        <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
+        The advanced controls are completely optional to use and provide a better control of your work distribution. Before getting to the advanced controls, we must first understand what the curvature is. The curvature controls the curvature of the graph and, in turn, your work schedule.
+        
+        A more positive curvature yields a work schedule in which you work more at the beginning and less at the end of an assignment.
+        A more negative curvature yields a work schedule in which you work less at the beginning and more at the end of an assignment.
+        A curvature of 0, or linear, yields a work schedule in which you work an equal amount for every day of an assignment.
 
-                6 of these advanced and optional. Default input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
-                
-            </details>
-            <details open>
-                <summary class="minor-category" id="needs-more-info">"Needs more Info"</summary>
-                You can still create an assignment without the required inputs, but its graph won't be usable and it will be marked as "needs more info". You will need to edit the assignment and re-enter its required inputs to make it a complete assignment.
-                
-                One use of this feature is for assignments you don't want to have a graph for. The "needs more info" functionality acts as a sort of reminder system in this case.
-                
-                If you don't have time to enter a complete assignment, another use of this feature is to remind yourself to enter the required inputs later.
-                
-            </details>
-            <details open>
-                <summary class="minor-category" id="standard-assignment-form-inputs">Standard inputs</summary>
-                These inputs in the assignment form are mandatory for every assignment. There are 6 standard inputs:
+        There are 3 advanced controls for the assignment graph:
 
-                <span class="minor-minor-category">Name of this Assignment</span>
-                Simply the name of the assignment. is displayed at the left of the assignment header.
+        <span class="minor-minor-category">Set Curvature of the Graph</span>
+        This button allows you to be able to hover over the graph to manually set your curvature. Click the graph to save, and click this button again to cancel.
 
-                <span class="minor-minor-category">Date Assigned</span>
-                This input is the date the assignment was assigned or the date you'll start working on the assignment. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
+        <span class="minor-minor-category">Enter Curvature</span>
+        This input allows you to manually enter a numeric curvature value. The graph is updated by this value in real time.
 
-                <span class="minor-minor-category">Due Date</span>
-                This input is the date the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
+        <span class="minor-minor-category">Switch to Fixed/Dynamic mode</span>
+        This button switches the graph to fixed mode or dynamic mode.
 
-                <span class="minor-minor-category">Name of each Unit of Work</span>
-                This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete [some number] amount of [this input] today".
+        Fixed mode:
+        The work schedule isn't affected by work inputs throughout the entire assignment. If you don't finish a day's work, you'll have to make it up on the next day.
 
-                Try not to choose large divisions of work for this input. To demonstrate what I mean by this, pretend you're assigned an assignment with three worksheets, each containing thirty pages of work. Rather than entering "Worksheet" for this input, it's usually more ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed 15 pages, which is nice and clean, instead of 0.5 worksheets, which is an ugly decimal. However, the latter is still completely valid if you prefer to input that.
-                
-                If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" for this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.
-
-                <span class="minor-minor-category">Total number of Units in this Assignment</span>
-                This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days the assignment is due.
-
-                <span class="minor-minor-category">Estimated number of Minutes to complete each Unit</span>
-                This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour".
-                
-            </details>
-            <details open>
-                <summary class="minor-category" id="advanced-assignment-form-inputs">Advanced inputs</summary>
-                These inputs in the assignment form are optional for every assignment, but they further enhance your assignments' work schedules. There are 6 advanced inputs:
-
-                <span class="minor-minor-category">Soft</span>
-                This option enables soft due dates. Soft due dates are automatically incremented if you haven't finished the assignment by then.
-
-                <span class="minor-minor-category">Assignment Description</span>
-                This input is the description of the assignment, shown below the assignment name when the assignment is open or when the assignment needs more info.
-
-                <span class="minor-minor-category">Total number of Units already Completed</span>
-                This input is the number of units of work you've already completed in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
-
-                <span class="minor-minor-category">Step Size</span>
-                This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if the assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in multiples of 5 pages throughout the entire assignment.
-                
-                You can leave this input empty to disable it.
-
-                <span class="minor-minor-category">Minimum Daily Work Time in Minutes</span>
-                This input is the minimum amount of time you will work on of an assignment every day. This only applies to days when you DO work on the assignment and doesn't apply to days when you don't work.
-                
-                You can leave this input empty to disable it.
-
-                <span class="minor-minor-category">Break Days</span>
-                This input is the days of the week you won't work on the assignment. Green days represent the days you will work, while red days represent the days you won't work.
-
-            </details>
+        Dynamic mode:
+        The work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden.
+        
+        <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
+            <span class="label-title">Why do similar curvature values result in different work distributions in dynamic mode?</span>
+            Unfortunately, this a side effect of dynamic mode's implementation, ocassionally occuring after submitting and deleting work inputs. Try to re-adjust the curvature to its old work distribution if this happens.
         </span>
-        <span>
-            <div class="major-category">Assignment graph</div>
-            <details open>
-                <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
-                <img id="assignment-graph-image">
-                After creating an assignment, click it to open its graph. The assignment line graph provides a visualization of how your assignment's work schedule will look like. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
+    </details>
+</span>
 
-                As you progress through your assignment, there needs to be some way to measure your progress so each assignment can be prioritized accordingly. So, you must input the amount of work you complete every day for every assignment. This will be plotted and connected in blue.
-                
-                The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure your graph is tuned for you and your work style.
-                
-            </details>
-            <details open>
-                <summary class="minor-category" id="standard-assignment-graph-controls">Standard controls</summary>
-                There are 3 standard controls for the assignment graph:
+<span>
+    <div class="major-category">Assignment header</div>
+    <details open>
+        <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
+        <img src="{% static 'images/assignment-header.png' %}">
+        The assignment header contains a brief, daily summary of the assignment and its work for today.
 
-                <span class="minor-minor-category">Delete Work Input</span>
-                This button deletes the most recent work input from the graph.
+        Above an assignment's name is its priority percentage relative to the other assignments.
+        Below an assignment's name is the days left until it is due.
+        Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".
 
-                <span class="minor-minor-category">Enter Units Done</span>
-                This input is the textbox used to enter an assignment's daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done".
-                
-                For any day, if you've completed an assignment's work, enter the keywords "done" or "fin".
+        At the center of an assignment is its header message. The message displayed will reflect the current status of the assignment. For instance, if you need to work on assignment for today, the header message will display how much you need to work for today according to the assignment graph.
 
-                If you haven't completed any of an assignment's work, enter "0" instead.
+        At the right of the assignment header is the assignment's estimated completion time along with its hide, edit, and delete buttons.
 
-                If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since your last input, enter "since 5".
+    </details>
+    <details open>
+        <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
+        After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.
+        
 
-                <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
-                    <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
-                    This happens because you've already worked for today. By entering no work done, you're communicating that you've done nothing and you're not going to work any more for the rest of the day. 
+        Their priority is also a factor in determining their assignment list positions, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
 
-                    This feature isn't exclusive to inputting no work done only; this occurs when you input less work than the assignment's daily work.
-                </span>
-                <span class="minor-minor-category">Submit Units Done</span>
-                This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
-
-            </details>
-            <details open>
-                <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
-                The advanced controls are completely optional to use and provide a better control of your work distribution. Before getting to the advanced controls, we must first understand what the curvature is. The curvature controls the curvature of the graph and, in turn, your work schedule.
-                
-                A more positive curvature yields a work schedule in which you work more at the beginning and less at the end of an assignment.
-                A more negative curvature yields a work schedule in which you work less at the beginning and more at the end of an assignment.
-                A curvature of 0, or linear, yields a work schedule in which you work an equal amount for every day of an assignment.
-
-                There are 3 advanced controls for the assignment graph:
-
-                <span class="minor-minor-category">Set Curvature of the Graph</span>
-                This button allows you to be able to hover over the graph to manually set your curvature. Click the graph to save, and click this button again to cancel.
-
-                <span class="minor-minor-category">Enter Curvature</span>
-                This input allows you to manually enter a numeric curvature value. The graph is updated by this value in real time.
-
-                <span class="minor-minor-category">Switch to Fixed/Dynamic mode</span>
-                This button switches the graph to fixed mode or dynamic mode.
-
-                Fixed mode:
-                The work schedule isn't affected by work inputs throughout the entire assignment. If you don't finish a day's work, you'll have to make it up on the next day.
-
-                Dynamic mode:
-                The work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden.
-                
-                <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
-                    <span class="label-title">Why do similar curvature values result in different work distributions in dynamic mode?</span>
-                    Unfortunately, this a side effect of dynamic mode's implementation, ocassionally occuring after submitting and deleting work inputs. Try to re-adjust the curvature to its old work distribution if this happens.
-                </span>
-            </details>
+        <span class="label-question" id="why-do-some-assignments-with-low-priority-have-a-higher-list-position">
+            <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
+            You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority. As mentioned right above, the order you should complete your assignments in isn't determined by their priority, but rather their position in the assignment list. Although it may seem so at first, this isn't actually a bug nor a glitch.<br>
+            <br>
+            If you look carefully, there will always be a reason why this is the case; other external factors may make an assignment more urgent than others. For instance, the assignment could be due tomorrow.<br>
+            <br>
+            Check out the advanced example below for a better understanding of this functionality.
         </span>
 
-        <span>
-            <div class="major-category">Assignment header</div>
-            <details open>
-                <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
-                <img src="{% static 'images/assignment-header.png' %}">
-                The assignment header contains a brief, daily summary of the assignment and its work for today.
+        <span class="minor-minor-category">An advanced example</span>
+        To demonstrate, let's go through the methodology of ordering every assignment in an example. I have manually labeled each assignment in the image with a number:
 
-                Above an assignment's name is its priority percentage relative to the other assignments.
-                Below an assignment's name is the days left until it is due.
-                Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".
+        <img src="{% static 'images/advanced-priority-example.png' %}">
 
-                At the center of an assignment is its header message. The message displayed will reflect the current status of the assignment. For instance, if you need to work on assignment for today, the header message will display how much you need to work for today according to the assignment graph.
-
-                At the right of the assignment header is the assignment's estimated completion time along with its hide, edit, and delete buttons.
-
-            </details>
-            <details open>
-                <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
-                After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.
-                
-
-                Their priority is also a factor in determining their assignment list positions, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.
-
-                <span class="label-question" id="why-do-some-assignments-with-low-priority-have-a-higher-list-position">
-                    <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
-                    You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority. As mentioned right above, the order you should complete your assignments in isn't determined by their priority, but rather their position in the assignment list. Although it may seem so at first, this isn't actually a bug nor a glitch.<br>
-                    <br>
-                    If you look carefully, there will always be a reason why this is the case; other external factors may make an assignment more urgent than others. For instance, the assignment could be due tomorrow.<br>
-                    <br>
-                    Check out the advanced example below for a better understanding of this functionality.
-                </span>
-
-                <span class="minor-minor-category">An advanced example</span>
-                To demonstrate, let's go through the methodology of ordering every assignment in an example. I have manually labeled each assignment in the image with a number:
-
-                <img src="{% static 'images/advanced-priority-example.png' %}">
-
-                At a first glance, it may seem like the assignments are randomly prioritized. However, this is not the case: the assignments are actually optimally ordered.
+        At a first glance, it may seem like the assignments are randomly prioritized. However, this is not the case: the assignments are actually optimally ordered.
 
 
-                Assignment #1 has the "Important" tag, so it is placed as the first assignment.
+        Assignment #1 has the "Important" tag, so it is placed as the first assignment.
 
-                Assignment #2 also has the "Important" tag, but it has a lower priority than #1, so it is placed as the second assignment.
-                
-                Assignment #3 does not have the "Important" tag, so it is placed as the third assignment.
+        Assignment #2 also has the "Important" tag, but it has a lower priority than #1, so it is placed as the second assignment.
+        
+        Assignment #3 does not have the "Important" tag, so it is placed as the third assignment.
 
-                Assignment #4 also does not have the "Important" tag, but it has a lower priority than #3, so it is placed as the fourth assignment.
+        Assignment #4 also does not have the "Important" tag, but it has a lower priority than #3, so it is placed as the fourth assignment.
 
-                Assignment #5 has the "Not Important" tag, so it is placed as the fifth assignment.
+        Assignment #5 has the "Not Important" tag, so it is placed as the fifth assignment.
 
-                Assignment #6 also has the "Not Important" tag, but it has a lower priority than #5, so it is placed as the sixth assignment.
+        Assignment #6 also has the "Not Important" tag, but it has a lower priority than #5, so it is placed as the sixth assignment.
 
 
-                At this point, you may be wondering why assignment #7 and assignment #8 are placed at the bottom. This is because assignments #1 through assignment #6 are all due tomorrow, as indicated below their name. They are placed at the very top of the assignment list, as, logically, assignments due tomorrow are more urgent than assignments due later.
+        At this point, you may be wondering why assignment #7 and assignment #8 are placed at the bottom. This is because assignments #1 through assignment #6 are all due tomorrow, as indicated below their name. They are placed at the very top of the assignment list, as, logically, assignments due tomorrow are more urgent than assignments due later.
 
-            </details>
-            <details open>
-                <summary class="minor-category" id="hide-assignment">Hide assignment</summary>
-                <img src="{% static 'images/hide-assignment.png' %}">
-                
-                This button ignores the assignment's work from the total estimated completion time and removes the assignment's priority. The assignment also becomes translucent as a visual indicator of this action. However, the assignment's position will remain unchanged. The assignment is automatically un-hidden day after.
-            
-                Use this if you want to temporarily ignore an assignment's work from the total estimated completion time, to see how the esimated completion time or other assignments' priorities will change.
+    </details>
+    <details open>
+        <summary class="minor-category" id="hide-assignment">Hide assignment</summary>
+        <img src="{% static 'images/hide-assignment.png' %}">
+        
+        This button ignores the assignment's work from the total estimated completion time and removes the assignment's priority. The assignment also becomes translucent as a visual indicator of this action. However, the assignment's position will remain unchanged. The assignment is automatically un-hidden day after.
+    
+        Use this if you want to temporarily ignore an assignment's work from the total estimated completion time, to see how the esimated completion time or other assignments' priorities will change.
 
-                You can also use this when you're not sure whether or not you'll complete an assignment's work for any day. Enter 0 units done instead when you are sure you won't complete any of the assignment's work.
+        You can also use this when you're not sure whether or not you'll complete an assignment's work for any day. Enter 0 units done instead when you are sure you won't complete any of the assignment's work.
 
-            </details>
-            <details open>
-                <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" assignment tags</summary>
-                Above every assignment's header message, there's a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions.
-                
-                Adding the "Important" tag moves the assignment to the highest appropriate list position, while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom, as more urgent assignments may come first or less urgent assignments may come last.
-            
-            </details>
-            <details open>
-                <summary class="minor-category" id="sorting-assignment-tags">Sorting assignment tags</summary>
-                Tags are initially added to the end of an assignment's tag list. So, you can sort the tags in the order you like by clicking or holding on a tag and then dragging it around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around.
+    </details>
+    <details open>
+        <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" assignment tags</summary>
+        Above every assignment's header message, there's a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions.
+        
+        Adding the "Important" tag moves the assignment to the highest appropriate list position, while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom, as more urgent assignments may come first or less urgent assignments may come last.
+    
+    </details>
+    <details open>
+        <summary class="minor-category" id="sorting-assignment-tags">Sorting assignment tags</summary>
+        Tags are initially added to the end of an assignment's tag list. So, you can sort the tags in the order you like by clicking or holding on a tag and then dragging it around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around.
 
-            </details>
+    </details>
+</span>
+<span>
+    <div class="major-category">Assignment shortcuts</div>
+    <details open>
+        <summary class="minor-category" id="what-are-assignment-shortcuts">What are assignment shortcuts?</summary>
+        <img src="{% static 'images/assignment-shortcuts.png' %}">
+        Assignment shortcuts simplify performing complex actions on many assignments at once.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="autofill-work-done-assignment-shortcut">Autofill Work Done</summary>
+        Every day, you have to enter a work input for every assignment so it can be prioritized accordingly. If you don't enter your past work inputs, the assignment displays a question mark. The assignment doesn't know how to prioritize itself because it doesn't know where your progress is currently at.
+        
+        Suppose you haven't yet entered past work inputs for many assignments at once. Without this shortcut, you would have to open every assignment, manually enter how many units of work you completed, and then close it, which takes time. This shortcut allows you to automatically autofill no work done or all work done for each of these assignments.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="delete-all-starred-assignments">Delete all Starred Assignments</summary>
+        If you have many completely finished assignments, you can delete them all at once with this shortcut, as shown in the image above.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="delete-all-assignments-from-this-class-assignment-shortcut">Delete all Assignments from this Class</summary>
+        The Google Classroom integration automatically converts Google Classroom assignments into TimeWeb assignments. If you don't want to use TimeWeb for the assignments from a particular class, you can delete all of them at once with this shortcut.
+
+        A Google Classroom assignment's first tag, which is automatically set to the Google Classroom class name, determines which class it belongs to. So, you can delete or replace a Google Classroom assignment's first tag if you don't want the assignment to be deleted with this shortcut.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="go-to-next-day">Go to Next Day</summary>
+        <img src="{% static 'images/header-icons.png' %}">
+        The header icons, from left to right, are: "Close All Assignments", "Open All Assignments", "Go To Next Day", and "Settings". The "Go to Next Day" shortcut simulates your work for tomorrow. In this state, none of the changes you make are saved, so you're free to experiment and make whatever changes you want.
+        
+        To get back to your original state, simply reload the page. Note that adding or editing assignments reload the page and get you back to your original state whether or not you were in the simulation.
+
+    </details>
+</span>
+<span>
+    <div class="major-category">Google Classroom integration</div>
+    <details open>
+        <summary class="minor-category" id="what-is-the-google-classroom-integration">What is the Google Classroom integration?</summary>
+        The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authentication, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not modify Google Classroom assignments in any way.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="enabling-the-google-classroom-integration">Enabling the Google Classroom integration</summary>
+        <img src="{% static 'images/google-classroom-integration.png' %}">
+        
+        To enable the Google Classroom integration, you must first click the Google Classroom icon at the bottom right of the home page. This will bring up Google's authentication service. You MUST enable both permissions to proceed with enabling the Google Classroom integration. After authenticating, you may have to log in one more time, and after that you're completely done.
+
+        <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
+            <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
+            This isn't actually a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades.<br>
+            <br>
+            If you would like, you can inspect TimeWeb's <a href="https://github.com/ArhanChaudhary/TimeWeb/blob/master/timeweb/timewebapp/views.py">backend source code</a> to see I don't use your grades in any way.
         </span>
-        <span>
-            <div class="major-category">Assignment shortcuts</div>
-            <details open>
-                <summary class="minor-category" id="what-are-assignment-shortcuts">What are assignment shortcuts?</summary>
-                <img src="{% static 'images/assignment-shortcuts.png' %}">
-                Assignment shortcuts simplify performing complex actions on many assignments at once.
+    </details>
+    <details open>
+        <summary class="minor-category" id="adding-google-classroom-assignments">Adding Google Classroom assignments</summary>
+        Google classroom assignments are added right after viewing the home page. If a Google Classroom assignment meets the following criteria, the page will be refreshed with the added assignment:
 
-            </details>
-            <details open>
-                <summary class="minor-category" id="autofill-work-done-assignment-shortcut">Autofill Work Done</summary>
-                Every day, you have to enter a work input for every assignment so it can be prioritized accordingly. If you don't enter your past work inputs, the assignment displays a question mark. The assignment doesn't know how to prioritize itself because it doesn't know where your progress is currently at.
-                
-                Suppose you haven't yet entered past work inputs for many assignments at once. Without this shortcut, you would have to open every assignment, manually enter how many units of work you completed, and then close it, which takes time. This shortcut allows you to automatically autofill no work done or all work done for each of these assignments.
+        {% spaceless %}<ul>
+            <li>You must be a student of the assignment's class</li>
+            <li>The assignment's class can't be archived</li>
+            <li>The assignment can't have already been added in the past (this can be bypassed in the settings)</li>
+            <li>The assignment can't have already been due</li>
+            <li>The assignment has to be assigned before its due date</li>
+        </ul>{% endspaceless %}
 
-            </details>
-            <details open>
-                <summary class="minor-category" id="delete-all-starred-assignments">Delete all Starred Assignments</summary>
-                If you have many completely finished assignments, you can delete them all at once with this shortcut, as shown in the image above.
-
-            </details>
-            <details open>
-                <summary class="minor-category" id="delete-all-assignments-from-this-class-assignment-shortcut">Delete all Assignments from this Class</summary>
-                The Google Classroom integration automatically converts Google Classroom assignments into TimeWeb assignments. If you don't want to use TimeWeb for the assignments from a particular class, you can delete all of them at once with this shortcut.
-
-                A Google Classroom assignment's first tag, which is automatically set to the Google Classroom class name, determines which class it belongs to. So, you can delete or replace a Google Classroom assignment's first tag if you don't want the assignment to be deleted with this shortcut.
-
-            </details>
-            <details open>
-                <summary class="minor-category" id="go-to-next-day">Go to Next Day</summary>
-                <img src="{% static 'images/header-icons.png' %}">
-                The header icons, from left to right, are: "Close All Assignments", "Open All Assignments", "Go To Next Day", and "Settings". The "Go to Next Day" shortcut simulates your work for tomorrow. In this state, none of the changes you make are saved, so you're free to experiment and make whatever changes you want.
-                
-                To get back to your original state, simply reload the page. Note that adding or editing assignments reload the page and get you back to your original state whether or not you were in the simulation.
-
-            </details>
+        <span class="label-question" id="why-does-loading-google-classroom-assignments-take-so-long">
+            <span class="label-title">Why does loading Google Classroom assignments take so long?</span>
+            It can take up to a dozen seconds to finish loading Google Classroom assignments due to the large number of Google Classroom assignments in the classes you are enrolled in. Unenroll from unneeded or old Google Classroom classes to speed up loading times.
         </span>
-        <span>
-            <div class="major-category">Google Classroom integration</div>
-            <details open>
-                <summary class="minor-category" id="what-is-the-google-classroom-integration">What is the Google Classroom integration?</summary>
-                The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authentication, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not modify Google Classroom assignments in any way.
+    </details>
+</span>
+<details open>
+    <summary class="major-category" id="keybinds">Keybinds</summary>
+    Keybinds allow you to perform actions with a single keystroke.
 
-            </details>
-            <details open>
-                <summary class="minor-category" id="enabling-the-google-classroom-integration">Enabling the Google Classroom integration</summary>
-                <img src="{% static 'images/google-classroom-integration.png' %}">
-                
-                To enable the Google Classroom integration, you must first click the Google Classroom icon at the bottom right of the home page. This will bring up Google's authentication service. You MUST enable both permissions to proceed with enabling the Google Classroom integration. After authenticating, you may have to log in one more time, and after that you're completely done.
+    <button>n</button> : Open the new assignment form
 
-                <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
-                    <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
-                    This isn't actually a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades.<br>
-                    <br>
-                    If you would like, you can inspect TimeWeb's <a href="https://github.com/ArhanChaudhary/TimeWeb/blob/master/timeweb/timewebapp/views.py">backend source code</a> to see I don't use your grades in any way.
-                </span>
-            </details>
-            <details open>
-                <summary class="minor-category" id="adding-google-classroom-assignments">Adding Google Classroom assignments</summary>
-                Google classroom assignments are added right after viewing the home page. If a Google Classroom assignment meets the following criteria, the page will be refreshed with the added assignment:
+    <button>Escape</button> : Close the new assignment form
+    
+    <button>Arrow up/down</button> : Change the curvature by +-0.1 if an open graph is on screen
 
-                {% spaceless %}<ul>
-                    <li>You must be a student of the assignment's class</li>
-                    <li>The assignment's class can't be archived</li>
-                    <li>The assignment can't have already been added in the past (this can be bypassed in the settings)</li>
-                    <li>The assignment can't have already been due</li>
-                    <li>The assignment has to be assigned before its due date</li>
-                </ul>{% endspaceless %}
-
-                <span class="label-question" id="why-does-loading-google-classroom-assignments-take-so-long">
-                    <span class="label-title">Why does loading Google Classroom assignments take so long?</span>
-                    It can take up to a dozen seconds to finish loading Google Classroom assignments due to the large number of Google Classroom assignments in the classes you are enrolled in. Unenroll from unneeded or old Google Classroom classes to speed up loading times.
-                </span>
-            </details>
-        </span>
-        <details open>
-            <summary class="major-category" id="keybinds">Keybinds</summary>
-            Keybinds allow you to perform actions with a single keystroke.
-
-            <button>n</button> : Open the new assignment form
-
-            <button>Escape</button> : Close the new assignment form
-            
-            <button>Arrow up/down</button> : Change the curvature by +-0.1 if an open graph is on screen
-
-            <button>Shift + Arrow up/down</button> : Open and go to next/previous assignment
-            
-            <button>Shift + Click delete assignment</button> : Delete assignment without confirmation prompt
+    <button>Shift + Arrow up/down</button> : Open and go to next/previous assignment
+    
+    <button>Shift + Click delete assignment</button> : Delete assignment without confirmation prompt
 
 
-            Hover over or focus on any element in an assignment to select it as the target of the below keybinds:
+    Hover over or focus on any element in an assignment to select it as the target of the below keybinds:
 
-            <button>e</button> : Open the edit assignment form
+    <button>e</button> : Open the edit assignment form
 
-            <button>d</button> : Open the delete assignment confirmation prompt
+    <button>d</button> : Open the delete assignment confirmation prompt
 
-            <button>i</button> : Hide an assignment for today (clicks the eye icon)
+    <button>i</button> : Hide an assignment for today (clicks the eye icon)
 
-            <button>Backspace</button> : Delete the most recent work input (ASSIGNMENT MUST BE OPEN)
+    <button>Backspace</button> : Delete the most recent work input (ASSIGNMENT MUST BE OPEN)
 
-            <button>s</button> : Enable "Set Curvature of the Graph" (ASSIGNMENT MUST BE OPEN)
-            
-        </details>
-        <hr>
-        You've reached the end of TimeWeb's user guide! Feel free to <a href="mailto:arhan.ch@gmail.com">contact me</a> to suggest adding anything or if you're still confused about anything. Have a great day!
-    </div>
-</div>
-<template id="table-of-contents-major-category-template">
-    <ul>
-        <li>
-            <a></a>
-        </li>
-        <ul></ul>
-    </ul>
-</template>
-<template id="table-of-contents-minor-category-template">
-    <li>
-        <a></a>
-    </li>
-</template>
-<template id="label-icon-template">
-    <div class="label-icon-container">
-        <img class="label-icon" height="25" src="{% static 'images/status-icons/question-mark.png' %}">
-    </div>
-</template>
-{% endblock content %}
+    <button>s</button> : Enable "Set Curvature of the Graph" (ASSIGNMENT MUST BE OPEN)
+    
+</details>
+<hr>
+You've reached the end of TimeWeb's user guide! Feel free to <a href="mailto:arhan.ch@gmail.com">contact me</a> to suggest adding anything or if you're still confused about anything. Have a great day!
+{% endblock doc_content %}

@@ -4,3 +4,31 @@
 #dark-mode main {
     filter: invert(1);
 }
+#doc-container {
+    white-space: normal;
+}
+#doc-container span > ul {
+    -webkit-margin-before: 1em;
+            margin-block-start: 1em;
+    -webkit-margin-after: 1em;
+            margin-block-end: 1em;
+}
+.major-category::after {
+    counter-increment: major-category-counter -1;
+}
+/* Make sure to change user-guide.css and others if this media query is modified */
+@media screen and (max-width: 900px) {
+    #table-of-contents-container {
+        position: absolute;
+        z-index: 2;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-out;
+    }
+    #table-of-contents-container-label {
+        display: block;
+        position: absolute;
+        transform: translateX(-100%);
+        -webkit-animation: slideLabelIn 0.35s ease-out 0.2s 1 forwards;
+                animation: slideLabelIn 0.35s ease-out 0.2s 1 forwards;
+    }
+}

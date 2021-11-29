@@ -838,10 +838,18 @@ class ImagesView(LoginRequiredMixin, TimewebGenericView):
         else:
             return HttpResponse(status=204)
 
+class BlogView(TimewebGenericView):
+    def __init__(self):
+        self.context = get_default_context()
+
+    def get(self, request):
+        return self.render_with_dynamic_context(request, "blog.html", self.context)
+
 class UserguideView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self, request):
+        self.context['add_faq'] = True
         return self.render_with_dynamic_context(request, "user-guide.html", self.context)
 
 class ChangelogView(TimewebGenericView):
