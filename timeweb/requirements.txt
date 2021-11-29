@@ -38,12 +38,15 @@ pyasn1-modules==0.2.8
 pycparser==2.20
 PyJWT==2.3.0
 pyparsing==2.4.7
+python-http-client==3.3.3
 python3-openid==3.2.0
 pytz==2021.1
 requests==2.26.0
 requests-oauthlib==1.3.0
 rsa==4.7.2
+sendgrid==6.9.1
 six==1.16.0
 sqlparse==0.4.2
+starkbank-ecdsa==2.0.3
 uritemplate==3.0.1
 urllib3==1.26.6

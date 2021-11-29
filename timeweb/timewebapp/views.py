@@ -1,4 +1,6 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
+from allauth.account.adapter import DefaultAccountAdapter
+DefaultAccountAdapter.clean_username.__defaults__ = (True,)
 
 # Django modules
 from django.shortcuts import render, get_object_or_404, redirect
@@ -65,7 +67,7 @@ os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 editing_example_account = False
 
-example_account_name = "Example"
+example_account_email = "placeholder@gmail.com"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_TAGS = 10
@@ -105,7 +107,7 @@ logger = getLogger('django')
 logger.propagate = False
 def get_default_context():
     return {
-        "example_account_name": example_account_name,
+        "example_account_email": example_account_email,
         "example_assignment_name": example_assignment_name,
         "max_number_tags": MAX_NUMBER_TAGS,
         "editing_example_account": editing_example_account,
@@ -118,7 +120,7 @@ def days_between_two_dates(day1, day2):
 class TimewebGenericView(View):
     def render_with_dynamic_context(self, request, file, context):
         if not hasattr(self, "settings_model"):
-            self.settings_model = SettingsModel.objects.filter(user__username=request.user)
+            self.settings_model = SettingsModel.objects.filter(user__email=request.user.email)
             if not self.settings_model.exists():
                 return render(request, file, context)
             self.settings_model = self.settings_model.first()
@@ -129,7 +131,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self,request):
-        self.settings_model = SettingsModel.objects.get(user__username=request.user)
+        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
         initial = {
             'def_min_work_time': self.settings_model.def_min_work_time,
             'def_skew_ratio': self.settings_model.def_skew_ratio,
@@ -162,8 +164,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         return self.render_with_dynamic_context(request, "settings.html", self.context)
         
     def post(self, request):
-        self.settings_model = SettingsModel.objects.get(user__username=request.user)
-        self.isExampleAccount = request.user.username == example_account_name
+        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.isExampleAccount = request.user.email == example_account_email
         self.form = SettingsForm(data=request.POST, files=request.FILES)
         self.checked_background_image_clear = request.POST.get("background_image-clear")
         form_is_valid = True
@@ -188,7 +190,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
         if self.settings_model.def_funct_round_minute:
-            for model in TimewebModel.objects.filter(user__username=request.user):
+            for model in TimewebModel.objects.filter(user__email=request.user.email):
                 if model.unit in ('minute', 'Minute', 'minutes', 'Minutes') and model.funct_round != 5:
                     model.funct_round = 5
                     model.save()
@@ -247,15 +249,15 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
     def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
-        self.settings_model = SettingsModel.objects.get(user__username=request.user)
-        self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
+        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.assignment_models = TimewebModel.objects.filter(user__email=request.user.email)
         
-        if (timezone.localtime(User.objects.get(username=request.user).last_login)).day != timezone.localtime(timezone.now()).day:
+        if (timezone.localtime(User.objects.get(email=request.user.email).last_login)).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
             TimewebModel.objects.bulk_update(self.assignment_models, ['mark_as_done'])
-        self.user_model = User.objects.get(username=request.user)
+        self.user_model = User.objects.get(email=request.user.email)
         self.user_model.last_login = timezone.now()
         self.user_model.save()
         self.add_user_models_to_context(request)
@@ -273,9 +275,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         return self.render_with_dynamic_context(request, "index.html", self.context)
 
     def post(self, request):
-        self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
-        self.settings_model = SettingsModel.objects.get(user__username=request.user)
-        self.isExampleAccount = request.user.username == example_account_name
+        self.assignment_models = TimewebModel.objects.filter(user__email=request.user.email)
+        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.isExampleAccount = request.user.email == example_account_email
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
         if self.isExampleAccount and not editing_example_account: return HttpResponse(status=204)
@@ -332,7 +334,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # Convert this to a decimal object because it can be a float
             first_work = Decimal(str(self.sm.works))
             # Fill in foreignkey
-            self.sm.user = User.objects.get(username=request.user)
+            self.sm.user = User.objects.get(email=request.user.email)
         elif self.updated_assignment:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
@@ -592,7 +594,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if blue_line_start < 0:
                     blue_line_start = 0
                 dynamic_start = blue_line_start
-                user = User.objects.get(username=request.user)
+                user = User.objects.get(email=request.user.email)
                 gc_models_to_create.append(TimewebModel(
                     name=name,
                     assignment_date=assignment_date,
@@ -727,9 +729,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
-        self.isExampleAccount = request.user.username == example_account_name
+        self.isExampleAccount = request.user.email == example_account_email
         if self.isExampleAccount: return redirect("home")
-        self.settings_model = SettingsModel.objects.get(user__username=request.user)
+        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
         # Callback URI
         state = request.GET.get('state', None)
 
@@ -754,8 +756,8 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
     def post(self, request):
-        self.settings_model = SettingsModel.objects.get(user__username=request.user)
-        self.isExampleAccount = request.user.username == example_account_name
+        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.isExampleAccount = request.user.email == example_account_email
         if self.isExampleAccount: return HttpResponse(status=204)
         # self.settings_model.oauth_token stores the user's access and refresh tokens
         if 'token' in self.settings_model.oauth_token:
@@ -817,12 +819,12 @@ class ImagesView(LoginRequiredMixin, TimewebGenericView):
 
     # GS_CACHE_CONTROL in settings.py is supposed to set a cache but it doesnt for some reason
     @cache_control(public=True, max_age=604800)
-    def get(self, request, imageUser, imageName):
-        if request.user.username != imageUser:
+    def get(self, request, imageEmail, imageName):
+        if request.user.email != imageEmail:
             return HttpResponseForbidden("You do not have access to this media")
         client = storage.Client()
         bucket = client.bucket("timeweb-308201.appspot.com")
-        blob = bucket.get_blob(f"images/{imageUser}/{imageName}")
+        blob = bucket.get_blob(f"images/{imageEmail}/{imageName}")
         if blob:
             return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
         else:

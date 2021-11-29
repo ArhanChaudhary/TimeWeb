@@ -927,7 +927,7 @@ utils = {
     },
 }
 
-isExampleAccount = username === example_account_name || editing_example_account;
+isExampleAccount = username === example_account_email || editing_example_account;
 ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {

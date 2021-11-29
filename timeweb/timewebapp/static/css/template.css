@@ -241,18 +241,20 @@ body {
     transform: translateX(-50%);
     position: absolute;
 }
-#account-dropdown * {
+#account-dropdown *:hover {
+    background: rgb(73, 86, 98);
+}
+#account-dropdown button {
     display: block;
     text-align: center;
     padding: 6px;
     font-size: 15px;
-}
-#account-dropdown *:hover {
-    background: rgb(73, 86, 98);
-}
-#account-dropdown a {
-    color: white;
-    text-decoration: none;
+    width: 100%;
+    background: none;
+	color: inherit;
+	border: none;
+	cursor: pointer;
+	outline: inherit;
 }
 #menu {
     float: right;

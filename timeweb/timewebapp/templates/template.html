@@ -18,7 +18,7 @@
 
             gtag('config', 'G-3K1HRD42V7');
             username = "{{ user.get_username }}";
-            example_account_name = "{{ example_account_name }}";
+            example_account_email = "{{ example_account_email }}";
             example_assignment_name = "{{ example_assignment_name }}";
             {% comment %} make these dont crash in case these arent passed into context {% endcomment %}
             max_number_tags = +"{{ max_number_tags }}";
@@ -74,9 +74,15 @@
                     <div id="user-greeting">
                         <span id="welcome">Welcome, </span>
                         <div tabindex="1" id="username">
-                            {{ user.get_username }}
+                            {{ user.username }}
                             <div id="account-dropdown">
-                                <a href="{% url "account_logout" %}?next={{request.path}}">Log out</a>
+                                <form method="post" action="{% url 'account_logout' %}">
+                                    {% csrf_token %}
+                                    {% if redirect_field_value %}
+                                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                                    {% endif %}
+                                    <button type="submit">Log out</button>
+                                </form>
                             </div>
                         </div>
                     </div>
