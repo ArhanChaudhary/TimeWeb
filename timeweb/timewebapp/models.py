@@ -63,7 +63,7 @@ def empty_dict():
 def get_midnight_time():
     return datetime.time(0, 0, 0)
 def create_image_path(instance, filename):
-    return f"images/{instance.user.email}/{filename}"
+    return f"images/{instance.user.id}/{filename}"
 class TimewebModel(models.Model):
     name = models.CharField(
         max_length=200,

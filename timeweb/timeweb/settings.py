@@ -121,7 +121,7 @@ TEMPLATES = [
     },
 ]
 
-SITE_ID = 7
+SITE_ID = 8
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'

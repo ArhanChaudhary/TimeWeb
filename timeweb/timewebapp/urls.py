@@ -3,6 +3,7 @@ from . import views
 from django.views.generic import RedirectView
 from django.http import HttpResponse
 from django.conf import settings
+from allauth.account.urls import urlpatterns as allauth_urls
 
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
@@ -43,3 +44,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
     urlpatterns.append(path('media/images/<str:imageUser>/<str:imageName>', views.ImagesView.as_view(), name='images'))
+
+allauth_urls += [
+    path('username/reset', views.UsernameResetView.as_view(), name='reset_username'),
+]

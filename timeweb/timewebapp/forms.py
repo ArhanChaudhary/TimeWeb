@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTICAL_TAG_POSITIONS
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
@@ -157,6 +158,21 @@ class SettingsForm(forms.ModelForm):
             "restore_gc_assignments": "Google Classroom assignments are normally added only once. Enabling this adds every Google Classroom assignment again in case you want them back.",
             "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
+class UsernameResetForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ("username", )
+        widgets = {
+            "username": forms.TextInput(attrs={"placeholder": "Username"}),
+        }
+        help_texts = {
+            "username": "Enter your new username:",
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""

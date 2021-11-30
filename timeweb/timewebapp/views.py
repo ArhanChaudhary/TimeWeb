@@ -19,7 +19,7 @@ from django.dispatch import receiver
 import datetime
 from django.utils import timezone
 from .models import TimewebModel, SettingsModel
-from .forms import TimewebForm, SettingsForm
+from .forms import TimewebForm, SettingsForm, UsernameResetForm
 from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict
 from django.forms import ValidationError
@@ -120,7 +120,7 @@ def days_between_two_dates(day1, day2):
 class TimewebGenericView(View):
     def render_with_dynamic_context(self, request, file, context):
         if not hasattr(self, "settings_model"):
-            self.settings_model = SettingsModel.objects.filter(user__email=request.user.email)
+            self.settings_model = SettingsModel.objects.filter(user=request.user)
             if not self.settings_model.exists():
                 return render(request, file, context)
             self.settings_model = self.settings_model.first()
@@ -131,7 +131,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
     def get(self,request):
-        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.settings_model = SettingsModel.objects.get(user=request.user)
         initial = {
             'def_min_work_time': self.settings_model.def_min_work_time,
             'def_skew_ratio': self.settings_model.def_skew_ratio,
@@ -164,7 +164,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         return self.render_with_dynamic_context(request, "settings.html", self.context)
         
     def post(self, request):
-        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.settings_model = SettingsModel.objects.get(user=request.user)
         self.isExampleAccount = request.user.email == example_account_email
         self.form = SettingsForm(data=request.POST, files=request.FILES)
         self.checked_background_image_clear = request.POST.get("background_image-clear")
@@ -190,7 +190,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
         if self.settings_model.def_funct_round_minute:
-            for model in TimewebModel.objects.filter(user__email=request.user.email):
+            for model in TimewebModel.objects.filter(user=request.user):
                 if model.unit in ('minute', 'Minute', 'minutes', 'Minutes') and model.funct_round != 5:
                     model.funct_round = 5
                     model.save()
@@ -249,8 +249,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
     def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
-        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
-        self.assignment_models = TimewebModel.objects.filter(user__email=request.user.email)
+        self.settings_model = SettingsModel.objects.get(user=request.user)
+        self.assignment_models = TimewebModel.objects.filter(user=request.user)
         
         if (timezone.localtime(User.objects.get(email=request.user.email).last_login)).day != timezone.localtime(timezone.now()).day:
             for assignment in self.assignment_models:
@@ -275,8 +275,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         return self.render_with_dynamic_context(request, "index.html", self.context)
 
     def post(self, request):
-        self.assignment_models = TimewebModel.objects.filter(user__email=request.user.email)
-        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.assignment_models = TimewebModel.objects.filter(user=request.user)
+        self.settings_model = SettingsModel.objects.get(user=request.user)
         self.isExampleAccount = request.user.email == example_account_email
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
@@ -731,7 +731,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
     def get(self, request):
         self.isExampleAccount = request.user.email == example_account_email
         if self.isExampleAccount: return redirect("home")
-        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.settings_model = SettingsModel.objects.get(user=request.user)
         # Callback URI
         state = request.GET.get('state', None)
 
@@ -756,7 +756,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
     def post(self, request):
-        self.settings_model = SettingsModel.objects.get(user__email=request.user.email)
+        self.settings_model = SettingsModel.objects.get(user=request.user)
         self.isExampleAccount = request.user.email == example_account_email
         if self.isExampleAccount: return HttpResponse(status=204)
         # self.settings_model.oauth_token stores the user's access and refresh tokens
@@ -819,16 +819,49 @@ class ImagesView(LoginRequiredMixin, TimewebGenericView):
 
     # GS_CACHE_CONTROL in settings.py is supposed to set a cache but it doesnt for some reason
     @cache_control(public=True, max_age=604800)
-    def get(self, request, imageEmail, imageName):
-        if request.user.email != imageEmail:
+    def get(self, request, id_, imageName):
+        if request.user.id != id_:
             return HttpResponseForbidden("You do not have access to this media")
         client = storage.Client()
         bucket = client.bucket("timeweb-308201.appspot.com")
-        blob = bucket.get_blob(f"images/{imageEmail}/{imageName}")
+        blob = bucket.get_blob(f"images/{id_}/{imageName}")
         if blob:
             return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
         else:
             return HttpResponse(status=204)
+
+class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
+    def __init__(self):
+        self.context = get_default_context()
+
+    def get(self, request):
+        initial = {
+            "username": request.user.username,
+        }
+        self.context['form'] = UsernameResetForm(initial=initial)
+        return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
+
+    def post(self, request):
+        self.isExampleAccount = request.user.email == example_account_email
+        self.form = UsernameResetForm(data=request.POST)
+        if self.form.is_valid():
+            return self.valid_form(request)
+        else:
+            return self.invalid_form(request)
+            
+    
+    def valid_form(self, request):
+        if self.isExampleAccount: return redirect("home")
+        self.user_model = User.objects.get(email=request.user.email)
+        self.user_model.username = self.form.cleaned_data.get('username')
+        self.user_model.save()
+        logger.info(f'User \"{request.user}\" updated their username')
+        return redirect("home")
+    
+    def invalid_form(self, request):
+        self.context['form'] = self.form
+        return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
+
 
 class UserguideView(TimewebGenericView):
     def __init__(self):
