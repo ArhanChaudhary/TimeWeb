@@ -1,15 +1,13 @@
 {% extends "account/base.html" %}
 
-{% load i18n %}
-
-{% block head_title %}{% trans "Change Username" %}{% endblock %}
+{% block head_title %}Change Username{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Change Username" %}</h1>
+    <h1>Change Username</h1>
 
     <form method="POST" action="{% url 'reset_username' %}" class="username_change">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" name="action">{% trans "Change Username" %}</button>
+        <button type="submit" name="action">Change Username</button>
     </form>
 {% endblock %}
