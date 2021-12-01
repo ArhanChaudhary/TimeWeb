@@ -1,22 +1,26 @@
 $(function() {
     // Style form if invalid
     if ($("#error-message").length) {
-        $("#id_username, #id_password").css("box-shadow", "inset 0 0 3px 1px red");
-        $("#example-message").css("margin-top", -153);
+        $("#id_login, #id_password").css("box-shadow", "inset 0 0 3px 1px red");
     }
     // Reset storages from index.js
     sessionStorage.removeItem("open_assignments");
     localStorage.removeItem("scroll");
-    $("#id_username").attr("placeholder", "Username");
-    $("#id_password").attr("placeholder", "Password");
 
     $("#example-message").click(function() {
-        $("#id_username").val("Example");
+        $("#id_login").val("timeweb@example.com");
         $("#id_password").val("exampleaccount");
         $("#submit-button").click();
     });
-
+    let clicked = false;
     $(".socialaccount-button").click(function() {
+        if (clicked) return;
+        clicked = true;
         $(this).find("a").click();
+    });
+
+    $(".password-image").click(function() {
+        $(".password-image").toggle();
+        $("#id_password").attr("type") === "text" ? $("#id_password").attr("type", "password") : $("#id_password").attr("type", "text");
     });
 });

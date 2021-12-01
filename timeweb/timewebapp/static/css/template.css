@@ -245,8 +245,8 @@ body {
     background: rgb(73, 86, 98);
 }
 #account-dropdown #div-seperator {
-    width: calc(100% - 5px);
-    margin: 3px auto;
+    width: 100%;
+    margin: 4px auto;
     height: 1px;
     background: rgb(101, 101, 101);
 }

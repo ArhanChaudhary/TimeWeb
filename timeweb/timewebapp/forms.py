@@ -4,6 +4,7 @@ from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTI
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 import datetime
+from allauth.account.forms import LoginForm
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -175,4 +176,22 @@ class UsernameResetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
+class LabeledSignupForm(LoginForm):
+
+    def __init__(self, *args, **kwargs):
+        super(LabeledSignupForm, self).__init__(*args, **kwargs)
+
+        self.fields['login'] = forms.EmailField(
+            label=_("E-mail address"),
+            required=True,
+            widget=forms.TextInput(
+                attrs={
+                    "type": "email",
+                    "autocomplete": "email",
+                }
+            ),
+        )
+        self.fields['password'].widget.attrs["placeholder"] = ""
         self.label_suffix = ""

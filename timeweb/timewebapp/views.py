@@ -68,7 +68,7 @@ os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 editing_example_account = False
 
-example_account_email = "placeholder@gmail.com"
+example_account_email = "timeweb@example.com"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_TAGS = 10

@@ -1,14 +1,21 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
+p {
+    -webkit-margin-after: 0;
+            margin-block-end: 0;
+    -webkit-margin-before: 0;
+            margin-block-start: 0;
+}
 #accounts-container {
     position: relative;
-    width: clamp(290px, calc(80vw - 160px), 600px);
-    height: clamp(440px, calc(100vh - 310px), 800px);
+    width: clamp(290px, calc(100vw - 100px), 600px);
+    height: 510px;
     border-radius: 25px;
     background: inherit;
     -webkit-backdrop-filter: blur(2px);
             backdrop-filter: blur(2px);
     box-sizing: border-box;
     padding: 40px;
+    padding-top: 65px;
 }
 #accounts-container::before {
     content: '';
@@ -29,7 +36,7 @@
     left: 90px;
     right: 90px;
     bottom: 90px;
-    box-shadow: 0 0 50px 75px white;
+    box-shadow: 0 0 60px 80px white;
     background: white;
     border-radius: 25px;
     z-index: -1;
@@ -54,6 +61,16 @@
         background-image: url(/static/images/narrow-scroller.png);
     }
 }
+hr {
+    margin-top: 20px;
+}
+.hr-interrupt {
+    position: absolute;
+    left: 50%;
+    padding: 0 5px;
+    transform: translate(-50%, -100%);
+    background-color: white;
+}
 #submit-button {
     width: 100%;
     background: rgb(0, 150, 255);
@@ -61,16 +78,16 @@
     color: white;
     border: none;
     padding: 5px 0;
-    margin-top: 15px;
+    margin-top: 30px;
     cursor: pointer;
     font: inherit;
 }
 #submit-button:focus, #submit-button:hover {
-    background: rgba(0, 150, 255, 0.75);
+    background: rgba(0, 150, 255, 0.9);
     outline: 0;
 }
 #submit-button:active {
-    background: rgba(0, 150, 255, 0.9);
+    transform: translateY(2px);
 }
 @-webkit-keyframes slide {
     from {
@@ -87,12 +104,4 @@
     to {
         transform: none;
     }
-}
-/* VarelaRound-Regular */
-@font-face {
-    font-family: 'Varela';
-    font-style: normal;
-    font-weight: 800;
-    src: local(''),
-         url('../fonts/VarelaRound-Regular.ttf') format('truetype');
 }

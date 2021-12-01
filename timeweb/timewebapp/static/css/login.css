@@ -1,32 +1,44 @@
 label {
     display: block;
 }
+form {
+    margin-top: 15px;
+}
 #id_login {
-    margin-bottom: 5px;
+    margin-bottom: 2em;
 }
 #id_password {
-    margin-bottom: 35px;
+    margin-bottom: 5px;
 }
 #id_login, #id_password {
     width: 100%;
+    margin-top: 5px;
     box-sizing: border-box;
-    border-color: transparent;
-    box-shadow: inset 0 0 3px 1px;
+    border: none;
+    box-shadow: inset 0 0 2px 1px;
     background: white;
     height: 36px;
-    font-size: 20px;
+    border-radius: 4px;
     padding-left: 15px;
 }
 #id_login:focus, #id_password:focus {
     box-shadow: inset 0 0 0 2px rgb(94, 94, 255);
     outline: 0;
 }
-
+.password-image {
+    position: absolute;
+    right: 0;
+    transform: translate(-50px, -33px);
+    cursor: pointer;
+}
+.hide-password-image {
+    display: none;
+}
 .socialaccount-button {
     padding: 10px 0;
     position: relative;
     background: rgb(238, 245, 255);
-    width: 100%;
+    width: calc(100% - 2px);
     box-sizing: unset;
     height: 30px;
     cursor: pointer;
@@ -36,12 +48,16 @@ label {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.5s cubic-bezier(.5,-3,.5,4);
+    transition: all 0.5s cubic-bezier(.5,-3,.5,4), margin 0s;
 }
 .socialaccount-button:hover {
     transform: scale(1.05, 1.02);
     box-shadow: 0 0 4px 1px rgba(13, 106, 255, 0.5);
     background: white;
+}
+.socialaccount-button:active {
+    margin-top: 2px;
+    margin-bottom: -2px;
 }
 .socialaccount-image {
     height: calc(100% - 8px);
@@ -61,14 +77,10 @@ label {
     color: rgb(226,30,54);
 }
 #example-message {
-    color: -webkit-link;
+    color: rgb(61, 123, 248);
+    float: right;
     cursor: pointer;
     text-decoration: underline;
-    width: 100%;
-    position: absolute;
-    font-size: 10px;
-    margin-top: -60px;
-    text-align: center;
 }
 #beta-message {
     position: absolute;
@@ -77,5 +89,9 @@ label {
     text-align: center;
 }
 #forgor-password {
-    color: rgb(72, 141, 251);
+    float: left;
+    color: rgb(61, 123, 248);
+}
+#sign-up {
+    color: rgb(61, 123, 248);
 }

@@ -8,22 +8,29 @@
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock accounts_css %}
 
+{% block accounts_js %}
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock accounts_js %}
+
 {% block accounts_content %}
 {% get_providers as socialaccount_providers %}
 
-{% comment %} <a href="{{ signup_url }}">sign up</a> {% endcomment %}
-
 {% include "socialaccount/snippets/provider_list.html" with process="login" %}
 {% include "socialaccount/snippets/login_extra.html" %}
-
+<hr>
+<span class="hr-interrupt">Or</span>
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
   {{ form.as_p }}
+  <img src="{% static 'images/hide.png' %}" class="password-image show-password-image" height="20">
+  <img src="{% static 'images/show.png' %}" class="password-image hide-password-image" height="20">
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
   <a href="{% url 'account_reset_password' %}" id="forgor-password">Forgot Password?</a>
+  <span id="example-message">Example Account</span>
   <button id="submit-button" type="submit">Log In</button>
 </form>
-
+<hr>
+Don't have an account? <a href="{{ signup_url }}" id="sign-up">Sign Up</a>
 {% endblock %}
