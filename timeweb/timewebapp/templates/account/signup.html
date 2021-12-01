@@ -5,7 +5,7 @@
 {% block accounts_content %}
 <h1>Sign Up</h1>
 
-<p>Already have an account? Then please <a href="{{ login_url }}">sign in</a>.</p>
+<p>Already have an account? Then please <a href="{{ login_url }}">log in</a>.</p>
 
 <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}

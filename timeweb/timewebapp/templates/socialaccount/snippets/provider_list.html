@@ -1,20 +1,26 @@
 {% load socialaccount %}
-
+{% load static %}
 {% get_providers as socialaccount_providers %}
 
 {% for provider in socialaccount_providers %}
 {% if provider.id == "openid" %}
 {% for brand in provider.get_brands %}
-<li>
-  <a title="{{brand.name}}" 
-     class="socialaccount_provider {{provider.id}} {{brand.id}}" 
-     href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
-     >{{brand.name}}</a>
-</li>
+
+<button class="socialaccount-button">
+  <img src="{% static 'images/'|add:provider.id|add:'.png' %}">
+  <a title="{{brand.name}}"
+      class="socialaccount_provider"{% comment %} {{provider.id}} {{brand.id}}" {% endcomment %}
+      href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
+      >Continue with {{brand.name}}</a>
+</button>
+
 {% endfor %}
 {% endif %}
-<li>
-  <a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
-     href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{{provider.name}}</a>
-</li>
+
+<button class="socialaccount-button">
+  <img class="socialaccount-image" src="{% static 'images/'|add:provider.id|add:'.png' %}">
+  <a title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
+      href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">Continue with {{provider.name}}</a>
+</button>
+
 {% endfor %}

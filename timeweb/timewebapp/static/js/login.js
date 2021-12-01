@@ -16,4 +16,7 @@ $(function() {
         $("#submit-button").click();
     });
 
+    $(".socialaccount-button").click(function() {
+        $(this).find("a").click();
+    });
 });

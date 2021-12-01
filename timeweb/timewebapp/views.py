@@ -62,6 +62,7 @@ if settings.DEBUG:
     os_environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
     GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
+    
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
@@ -119,13 +120,16 @@ def days_between_two_dates(day1, day2):
 
 class TimewebGenericView(View):
     def render_with_dynamic_context(self, request, file, context):
+
         if not hasattr(self, "settings_model"):
             self.settings_model = SettingsModel.objects.filter(user=request.user)
             if not self.settings_model.exists():
                 return render(request, file, context)
             self.settings_model = self.settings_model.first()
+
         context['dark_mode'] = self.settings_model.dark_mode
         return render(request, file, context)
+
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
 
     def __init__(self):
@@ -225,7 +229,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
-
     def __init__(self):
         self.context = get_default_context()
 
@@ -248,6 +251,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
+
     def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
@@ -281,6 +285,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
         if self.isExampleAccount and not editing_example_account: return HttpResponse(status=204)
+
         action = request.POST['action']
         if action == 'delete_assignment':
             return self.deleted_assignment(request)
@@ -298,6 +303,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif action == "tag_add" or action == "tag_delete":
             return self.tag_add_or_delete(request, action)
         return HttpResponse(status=204)
+
     def assignment_form_submitted(self, request):
         # The frontend adds the assignment's pk as the "value" attribute to the submit button
         self.pk = request.POST['submit-button']
@@ -325,6 +331,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             return self.valid_form(request)
         else:
             return self.invalid_form(request)
+
     def valid_form(self, request):
         if self.created_assignment:
             self.sm = self.form.save(commit=False)
@@ -755,6 +762,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.save()
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
+
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.isExampleAccount = request.user.email == example_account_email

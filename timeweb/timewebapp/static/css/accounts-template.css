@@ -1,14 +1,14 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
 #accounts-container {
     position: relative;
-    width: clamp(290px, calc(100vw - 160px), 400px);
-    height: clamp(440px, calc(100vh - 310px), 500px);
+    width: clamp(290px, calc(80vw - 160px), 600px);
+    height: clamp(440px, calc(100vh - 310px), 800px);
     border-radius: 25px;
     background: inherit;
     -webkit-backdrop-filter: blur(2px);
             backdrop-filter: blur(2px);
     box-sizing: border-box;
-    padding: 0 40px;
+    padding: 40px;
 }
 #accounts-container::before {
     content: '';
@@ -44,8 +44,8 @@
     background-size: 100%;
     z-index: -2;
     top: 10px; /* Override flexbox */
-    -webkit-animation: slide 100s linear infinite;
-            animation: slide 100s linear infinite;
+    /* -webkit-animation: slide 100s linear infinite;
+            animation: slide 100s linear infinite; */
     -webkit-animation-fill-mode: forwards;
             animation-fill-mode: forwards;
 }
@@ -60,8 +60,10 @@
     border-radius: 4px;
     color: white;
     border: none;
-    height: 25px;
+    padding: 5px 0;
+    margin-top: 15px;
     cursor: pointer;
+    font: inherit;
 }
 #submit-button:focus, #submit-button:hover {
     background: rgba(0, 150, 255, 0.75);

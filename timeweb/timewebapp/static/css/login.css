@@ -1,66 +1,15 @@
-/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
-#first-smallvw, #second-smallvw {
-    position: absolute;
-    display: none;
-}
-#first-smallvw {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 154px;
-    margin: 0 30px;
-}
-#second-smallvw {
-    text-align: center;
-    bottom: 60px;
-}
-#image {
-    left: 30px;
-    margin: -10px;
-    position: absolute;
-    height: 2452px;
-    width: calc(100% - 40px);
-    background-image: url(/static/images/wide-scroller.png);
-    background-size: 100%;
-    z-index: -2;
-    top: 10px; /* Override flexbox */
-    -webkit-animation: slide 100s linear infinite;
-            animation: slide 100s linear infinite;
-    -webkit-animation-fill-mode: forwards;
-            animation-fill-mode: forwards;
-}
-@media screen and (max-width: 790px) {
-    #login span {
-        display: none;
-    }
-    #first-smallvw, #second-smallvw {
-        display: flex !important;
-    }
-    #image {
-        background-image: url(/static/images/narrow-scroller.png);
-    }
-}
-#login span {
-    font-size: 40px;
-    font-family: 'Varela';
-}
 label {
     display: block;
-    text-align: center;
 }
-#id_username {
+#id_login {
     margin-bottom: 5px;
 }
 #id_password {
     margin-bottom: 35px;
 }
-#id_username, #id_password {
+#id_login, #id_password {
     width: 100%;
     box-sizing: border-box;
-    border-radius: 20px;
     border-color: transparent;
     box-shadow: inset 0 0 3px 1px;
     background: white;
@@ -68,9 +17,39 @@ label {
     font-size: 20px;
     padding-left: 15px;
 }
-#id_username:focus, #id_password:focus {
-    box-shadow: inset 0 0 0 2px rgb(0,95,204);
+#id_login:focus, #id_password:focus {
+    box-shadow: inset 0 0 0 2px rgb(94, 94, 255);
     outline: 0;
+}
+
+.socialaccount-button {
+    padding: 10px 0;
+    position: relative;
+    background: rgb(238, 245, 255);
+    width: 100%;
+    box-sizing: unset;
+    height: 30px;
+    cursor: pointer;
+
+    border: 1px solid rgb(13, 106, 255);
+    box-shadow: 0 0 3px 1px rgba(13, 106, 255, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s cubic-bezier(.5,-3,.5,4);
+}
+.socialaccount-button:hover {
+    transform: scale(1.05, 1.02);
+    box-shadow: 0 0 4px 1px rgba(13, 106, 255, 0.5);
+    background: white;
+}
+.socialaccount-image {
+    height: calc(100% - 8px);
+    margin-right: 8px;
+}
+.socialaccount_provider {
+    color: rgb(13, 106, 255);
+    text-decoration: none;
 }
 #error-message {
     text-align: center;
@@ -97,85 +76,6 @@ label {
     font-size: 10px;
     text-align: center;
 }
-#beta-message a:visited {
-    text-decoration: none;
-    color: blue;
-}
-#discord-promo {
-    position: absolute;
-    right: 12px;
-    bottom: 5px;
-    display: flex;
-    font-size: 13px;
-    align-items: center;
-    text-decoration: none;
-    color: black;
-}
-#discord-image {
-    margin-left: 4px;
-}
-#submit-button {
-    width: 100%;
-    background: rgb(0, 150, 255);
-    border-radius: 4px;
-    color: white;
-    border: none;
-    height: 25px;
-    cursor: pointer;
-}
-#submit-button:focus, #submit-button:hover {
-    background: rgba(0, 150, 255, 0.75);
-    outline: 0;
-}
-#submit-button:active {
-    background: rgba(0, 150, 255, 0.9);
-}
-#form-wrapper {
-    margin-left: 15px;
-    width: 300px;
-    position: relative;
-}
-@-webkit-keyframes slide {
-    from {
-        transform: translateY(-100%) translateY(100vh);
-    }
-    to {
-        transform: none;
-    }
-}
-@keyframes slide {
-    from {
-        transform: translateY(-100%) translateY(100vh);
-    }
-    to {
-        transform: none;
-    }
-}
-@-webkit-keyframes scale {
-    from {
-        transform: scale(0.85);
-        opacity: 0;
-    }
-    to {
-        transform: none;
-        opacity: 1;
-    }
-}
-@keyframes scale {
-    from {
-        transform: scale(0.85);
-        opacity: 0;
-    }
-    to {
-        transform: none;
-        opacity: 1;
-    }
-}
-/* VarelaRound-Regular */
-@font-face {
-    font-family: 'Varela';
-    font-style: normal;
-    font-weight: 800;
-    src: local(''),
-         url('../fonts/VarelaRound-Regular.ttf') format('truetype');
+#forgor-password {
+    color: rgb(72, 141, 251);
 }
