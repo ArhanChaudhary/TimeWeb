@@ -1,0 +1,96 @@
+/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
+#accounts-container {
+    position: relative;
+    width: clamp(290px, calc(100vw - 160px), 400px);
+    height: clamp(440px, calc(100vh - 310px), 500px);
+    border-radius: 25px;
+    background: inherit;
+    -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(2px);
+    box-sizing: border-box;
+    padding: 0 40px;
+}
+#accounts-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: inset 0 0 200px white, 0 0 3px 1px black;
+    z-index: -1;
+    background: inherit;
+    border-radius: 20px;
+}
+#accounts-container::after {
+    content: '';
+    position: absolute;
+    top: 90px;
+    left: 90px;
+    right: 90px;
+    bottom: 90px;
+    box-shadow: 0 0 50px 75px white;
+    background: white;
+    border-radius: 25px;
+    z-index: -1;
+}
+#image {
+    left: 30px;
+    margin: -10px;
+    position: absolute;
+    height: 2452px;
+    width: calc(100% - 40px);
+    background-image: url(/static/images/wide-scroller.png);
+    background-size: 100%;
+    z-index: -2;
+    top: 10px; /* Override flexbox */
+    -webkit-animation: slide 100s linear infinite;
+            animation: slide 100s linear infinite;
+    -webkit-animation-fill-mode: forwards;
+            animation-fill-mode: forwards;
+}
+@media screen and (max-width: 790px) {
+    #image {
+        background-image: url(/static/images/narrow-scroller.png);
+    }
+}
+#submit-button {
+    width: 100%;
+    background: rgb(0, 150, 255);
+    border-radius: 4px;
+    color: white;
+    border: none;
+    height: 25px;
+    cursor: pointer;
+}
+#submit-button:focus, #submit-button:hover {
+    background: rgba(0, 150, 255, 0.75);
+    outline: 0;
+}
+#submit-button:active {
+    background: rgba(0, 150, 255, 0.9);
+}
+@-webkit-keyframes slide {
+    from {
+        transform: translateY(-100%) translateY(100vh);
+    }
+    to {
+        transform: none;
+    }
+}
+@keyframes slide {
+    from {
+        transform: translateY(-100%) translateY(100vh);
+    }
+    to {
+        transform: none;
+    }
+}
+/* VarelaRound-Regular */
+@font-face {
+    font-family: 'Varela';
+    font-style: normal;
+    font-weight: 800;
+    src: local(''),
+         url('../fonts/VarelaRound-Regular.ttf') format('truetype');
+}

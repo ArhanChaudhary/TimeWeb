@@ -78,11 +78,12 @@
                             <div id="account-dropdown">
                                 <form method="post" action="{% url 'account_logout' %}">
                                     {% csrf_token %}
-                                    {% if redirect_field_value %}
-                                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-                                    {% endif %}
                                     <button type="submit">Log out</button>
                                 </form>
+                                <div id="div-seperator"></div>
+                                <a href="{% url 'account_email' %}">Change<br>E-mail</a>
+                                <a href="{% url 'account_logout' %}">Change Username</a>
+                                <a href="{% url 'account_reset_password' %}">Reset Password</a>
                             </div>
                         </div>
                     </div>

@@ -1,8 +1,8 @@
-{% extends "account/base.html" %}
+{% extends "account/accounts-template.html" %}
 
 {% block head_title %}E-mail Addresses{% endblock %}
 
-{% block content %}
+{% block accounts_content %}
     <h1>E-mail Addresses</h1>
 {% if user.emailaddress_set.all %}
 <p>The following e-mail addresses are associated with your account:</p>
