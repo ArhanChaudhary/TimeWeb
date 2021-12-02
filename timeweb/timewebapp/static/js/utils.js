@@ -1217,6 +1217,7 @@ for (let sa of dat) {
             sa.x++;
         }
         if (sa.name === example_assignment_name) {
+            sa.assignment_date = new Date(date_now.valueOf());
             sa.fake_assignment_date = false;
         }
         if (isExampleAccount) {
