@@ -2,7 +2,7 @@
 #accounts-container {
     position: relative;
     width: clamp(290px, calc(100vw - 100px), 600px);
-    min-height: 510px;
+    min-height: 520px;
     border-radius: 25px;
     background: inherit;
     -webkit-backdrop-filter: blur(2px);
