@@ -889,9 +889,6 @@ utils = {
                 }
             });
         },
-        scaleGoogleClassroomAPIIconOnMobile: function() {
-            $("#toggle-gc-container").addClass("scale-on-mobile");
-        }
     },
     reloadAtMidnight: function() {
         // Reloads the page after midnight hour to update the graph
@@ -1284,9 +1281,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.expandShortcutHitboxes();
     if (isExampleAccount) {
         utils.ui.exampleAccountAlertTutorial();
-    }
-    if (isMobile) {
-        utils.ui.scaleGoogleClassroomAPIIconOnMobile();
     }
     utils.ui.dimAssignmentsHeaderInfoOnIconHover();
     utils.ui.addTagHandlers();

@@ -1063,12 +1063,6 @@ input[type=number]::-webkit-inner-spin-button {
     z-index: 1000;
     box-shadow: 0 0 5px 1px black;
 }
-#toggle-gc-container.scale-on-mobile {
-    right: 17px;
-    bottom: 25px;
-    transform: scale(1.25);
-    transform-origin: right;
-}
 #toggle-gc-label {
     width: 0;
     overflow: hidden;
