@@ -1,14 +1,8 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
-p {
-    -webkit-margin-after: 0;
-            margin-block-end: 0;
-    -webkit-margin-before: 0;
-            margin-block-start: 0;
-}
 #accounts-container {
     position: relative;
     width: clamp(290px, calc(100vw - 100px), 600px);
-    height: 510px;
+    min-height: 510px;
     border-radius: 25px;
     background: inherit;
     -webkit-backdrop-filter: blur(2px);
@@ -51,8 +45,8 @@ p {
     background-size: 100%;
     z-index: -2;
     top: 10px; /* Override flexbox */
-    /* -webkit-animation: slide 100s linear infinite;
-            animation: slide 100s linear infinite; */
+    -webkit-animation: slide 100s linear infinite;
+            animation: slide 100s linear infinite;
     -webkit-animation-fill-mode: forwards;
             animation-fill-mode: forwards;
 }
@@ -63,12 +57,13 @@ p {
 }
 hr {
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 .hr-interrupt {
     position: absolute;
     left: 50%;
     padding: 0 5px;
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, -150%);
     background-color: white;
 }
 #submit-button {
@@ -87,7 +82,7 @@ hr {
     outline: 0;
 }
 #submit-button:active {
-    transform: translateY(2px);
+    transform: translateY(1px);
 }
 @-webkit-keyframes slide {
     from {

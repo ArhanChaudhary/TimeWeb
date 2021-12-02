@@ -21,14 +21,31 @@
 <span class="hr-interrupt">Or</span>
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
-  {{ form.as_p }}
+  
+  {% comment %} This also displays non field errors {% endcomment %}
+  {% for key, field in form.errors.items %}
+    {% for error in field %}
+      <div class="error-note">
+        <span>{{ error|escape }}</span>
+      </div>
+    {% endfor %}
+  {% endfor %}
+  {% for field in form %}
+    <span>
+      <label for="{{ field.auto_id }}">{{ field.label }}</label>
+      {{ field }}
+    </span>
+  {% endfor %}
+
   <img src="{% static 'images/hide.png' %}" class="password-image show-password-image" height="20">
   <img src="{% static 'images/show.png' %}" class="password-image hide-password-image" height="20">
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <a href="{% url 'account_reset_password' %}" id="forgor-password">Forgot Password?</a>
-  <span id="example-message">Example Account</span>
+  <span id="under-password">
+    <a href="{% url 'account_reset_password' %}" id="forgor-password">Forgot Password?</a>
+    <span id="example-message">Example {{ site.name }} Account</span>
+  </span>
   <button id="submit-button" type="submit">Log In</button>
 </form>
 <hr>

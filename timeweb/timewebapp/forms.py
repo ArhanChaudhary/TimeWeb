@@ -180,6 +180,13 @@ class UsernameResetForm(forms.ModelForm):
 
 class LabeledSignupForm(LoginForm):
 
+    error_messages = {
+        "account_inactive": _("This account is currently disabled, please contact the administrator"),
+        "email_password_mismatch": _(
+            "Your e-mail address or password is incorrect"
+        ),
+    }
+
     def __init__(self, *args, **kwargs):
         super(LabeledSignupForm, self).__init__(*args, **kwargs)
 

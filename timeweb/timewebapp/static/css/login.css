@@ -1,9 +1,6 @@
 label {
     display: block;
 }
-form {
-    margin-top: 15px;
-}
 #id_login {
     margin-bottom: 2em;
 }
@@ -25,10 +22,14 @@ form {
     box-shadow: inset 0 0 0 2px rgb(94, 94, 255);
     outline: 0;
 }
+#under-password {
+    white-space: nowrap;
+    overflow: hidden;
+}
 .password-image {
     position: absolute;
     right: 0;
-    transform: translate(-50px, -33px);
+    transform: translate(-50px, 13px);
     cursor: pointer;
 }
 .hide-password-image {
@@ -48,7 +49,7 @@ form {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.5s cubic-bezier(.5,-3,.5,4), margin 0s;
+    transition: all 0.5s cubic-bezier(.5,-1,.5,2), margin 0s;
 }
 .socialaccount-button:hover {
     transform: scale(1.05, 1.02);
@@ -56,8 +57,8 @@ form {
     background: white;
 }
 .socialaccount-button:active {
-    margin-top: 2px;
-    margin-bottom: -2px;
+    margin-top: 1px;
+    margin-bottom: -1px;
 }
 .socialaccount-image {
     height: calc(100% - 8px);
@@ -67,18 +68,31 @@ form {
     color: rgb(13, 106, 255);
     text-decoration: none;
 }
-#error-message {
-    text-align: center;
-    position: absolute;
-    margin-top: -35px;
-    font-size: 9.75px;
-    text-align: center;
+.error-note {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    padding: 25px 10px;
     width: 100%;
-    color: rgb(226,30,54);
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    height: 30px;
+
+    background: rgba(255, 68, 12, 0.05);
+    color: rgb(255, 68, 12);
+    border: 1px solid rgb(255, 68, 12);
+}
+form span:first-of-type label {
+    /* gap showing up for no reason >:( */
+    margin-top: -5px;
+}
+#under-password {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
 }
 #example-message {
     color: rgb(61, 123, 248);
-    float: right;
     cursor: pointer;
     text-decoration: underline;
 }
@@ -89,8 +103,8 @@ form {
     text-align: center;
 }
 #forgor-password {
-    float: left;
     color: rgb(61, 123, 248);
+    margin-right: 10px;
 }
 #sign-up {
     color: rgb(61, 123, 248);
