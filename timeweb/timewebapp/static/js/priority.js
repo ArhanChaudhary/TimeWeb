@@ -50,7 +50,15 @@ class Priority {
             }
             const background_color = that.percentageToColor(that.priority_percentage);
             const a = $("html").is("#dark-mode") ? Priority.DARK_MODE_ALPHA : 1;
-            dom_assignment.parents(".assignment-container").toggleClass("invert-text-color", (background_color.r + background_color.g + background_color.b) / 3 <= 255 / 2);
+            dom_assignment.parents(".assignment-container").toggleClass("invert-text-color",
+                // https://awik.io/determine-color-bright-dark-using-javascript/
+                Math.sqrt(
+                    0.299 * (background_color.r * background_color.r) +
+                    0.587 * (background_color.g * background_color.g) +
+                    0.114 * (background_color.b * background_color.b)
+                ) <= 127.5
+            );
+
             background_color.r = Math.round(background_color.r * a);
             background_color.g = Math.round(background_color.g * a);
             background_color.b = Math.round(background_color.b * a);
