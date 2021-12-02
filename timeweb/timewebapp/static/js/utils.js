@@ -165,7 +165,7 @@ utils = {
                                 $("#toggle-gc-label").html("Enable Google Classroom integration");
                                 $this.removeClass("clicked");
                             } else {
-                                window.location.href = authentication_url;
+                                utils.reloadWhenAppropriate({ href: authentication_url });
                             }
                         },
                     });
@@ -868,10 +868,6 @@ utils = {
                 }
             });
 
-
-
-
-
             if ("advanced_inputs" in sessionStorage) {
                 $("#form-wrapper #advanced-inputs").click();
                 sessionStorage.removeItem("advanced_inputs");
@@ -907,7 +903,7 @@ utils = {
                 // Don't reload in the next day to preserve changes made in the simulation
                 // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
                 if (utils.in_next_day || isExampleAccount) return;
-                window.location.reload();
+                utils.reloadWhenAppropriate();
             }, reload_time - now.getTime());
         }
     },
@@ -924,6 +920,23 @@ utils = {
             $("main").off('scroll');
             resolver();
         }, 200);
+    },
+    reloadResolver: null,
+    reloadWhenAppropriate: function(params={href: null}) {
+        new Promise(function(resolve) {
+            if ($(".jconfirm").length) {
+                utils.reloadResolver = resolve;
+            } else {
+                resolve();
+            }
+        }).then(function() {
+            if (params.href) {
+                window.location.href = params.href;
+            } else {
+                window.location.reload();
+            }
+        });
+
     },
 }
 
@@ -961,7 +974,7 @@ ajaxUtils = {
                 },
                 reload: {
                     action: function() {
-                        window.location.reload();
+                        utils.reloadWhenAppropriate();
                     },
                 },
                 "try again": {
@@ -1018,8 +1031,11 @@ ajaxUtils = {
                 creating_gc_assignments_from_frontend = false;
                 return;
             }
-            if (authentication_url) window.location.href = authentication_url; // Invalid creds
-            window.location.reload();
+            if (authentication_url) {
+                utils.reloadWhenAppropriate({href: authentication_url}); // Invalid creds
+            } else {
+                utils.reloadWhenAppropriate();
+            }
         });
     },
     notice_assignments: new Set(),
