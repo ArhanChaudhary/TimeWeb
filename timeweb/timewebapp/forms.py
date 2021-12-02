@@ -145,6 +145,7 @@ class SettingsForm(forms.ModelForm):
         help_texts = {
             "def_unit_to_minute": "Sets the default unit of work to \"Minute\" for every new assignment, meaning it's divided up into units of time. Useful in case you don't know how to divide an assignment into units of work.",
             "def_funct_round_minute": "If your unit of work for any assignment is \"Minute,\" meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes. Unrounded values look ugly (e.g: 17 Minutes, 49 Minutes).",
+            "def_skew_ratio": "Set this value to 0 to make it linear.",
             "ignore_ends": "Ignores the minimum work time for the first and last working days of EVERY assignment with a minimum work time in exchange for making their work distributions smoother. Recommended to be enabled.",
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
             "reverse_sorting": "Sorts assignments in reverse order. Useful if you like completing easier assignments first and harder assignments last. Note that this isn't a true reverse. Some assignments may be still be placed at higher list positions due to other factors, such as them being due tomorrow.",
