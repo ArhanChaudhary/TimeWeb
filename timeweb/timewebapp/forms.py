@@ -155,7 +155,7 @@ class SettingsForm(forms.ModelForm):
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
             "restore_gc_assignments": "Google Classroom assignments are normally added only once. Enabling this adds every Google Classroom assignment again in case you want them back.",
-            "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
+            # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
