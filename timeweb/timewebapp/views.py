@@ -876,3 +876,9 @@ class SpookyView(TimewebGenericView):
         self.context = get_default_context()
     def get(self, request):
         return self.render_with_dynamic_context(request, "spooky.html", self.context)
+    
+class SusView(TimewebGenericView):
+    def __init__(self):
+        self.context = get_default_context()
+    def get(self, request):
+        return self.render_with_dynamic_context(request, "sus.html", self.context)
