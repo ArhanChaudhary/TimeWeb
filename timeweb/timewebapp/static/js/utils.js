@@ -1046,6 +1046,9 @@ ajaxUtils = {
                                 utils.reloadWhenAppropriate({href: authentication_url});
                             }
                         },
+                        onClose: function() {
+                            $("#toggle-gc-container").removeClass("open");
+                        },
                     }
                 });
             } else {
