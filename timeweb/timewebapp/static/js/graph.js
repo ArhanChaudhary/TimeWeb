@@ -490,11 +490,6 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
-        if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
-            center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", {...this.date_string_options, hour: "numeric", minute: "numeric"})}${strdaysleft}`, 1);
-        } else {
-            center(`Due Date: ${this.complete_due_date.toLocaleDateString("en-US", this.date_string_options)}${strdaysleft}`, 1);
-        }
         if (!this.dom_assignment.parents(".assignment-container").hasClass("finished")) {
             let displayed_day;
             let str_day;
@@ -526,8 +521,8 @@ class VisualAssignment extends Assignment {
             }
 
             if (displayed_day.valueOf() !== date_now.valueOf()) {
-                center(str_day, 3);
-                center(`${pluralize(this.sa.unit, 2)} to Complete for this Day: ${todo}`, 4);
+                center(str_day, 1);
+                center(`${pluralize(this.sa.unit, 2)} to Complete for this Day: ${todo}`, 2);
             }
         }
         screen.scale(1 / this.scale, 1 / this.scale);
