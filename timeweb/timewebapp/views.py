@@ -489,6 +489,16 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 elif self.sm.dynamic_start > x_num - 1:
                     self.sm.dynamic_start = x_num - 1
             self.sm.needs_more_info = False
+        # Reset skew ratio if the red line x axis (x - (blue_line_start + leN_works)) or y axis (y - red_line_start_y)
+        # dynamic_start, blue_line_start (both from red_line_start_y), x, works, or y needs to be different
+        if (self.updated_assignment and (
+                old_data.x != self.sm.x or 
+                old_data.y != self.sm.y or 
+                old_data.works != self.sm.works or
+                old_data.blue_line_start != self.sm.blue_line_start or 
+                old_data.dynamic_start != self.sm.dynamic_start
+        )):
+            self.sm.skew_ratio = self.settings_model.def_skew_ratio
         self.sm.save()
         if self.created_assignment:
             logger.info(f'User \"{request.user}\" added assignment "{self.sm.name}"')
