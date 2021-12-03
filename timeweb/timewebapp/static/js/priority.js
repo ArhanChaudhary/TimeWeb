@@ -161,13 +161,15 @@ class Priority {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
 
+            // Remember: protect ajaxs with !sa.sa.needs_more_info
+
             const skew_ratio_bound = sa.calcSkewRatioBound();
             if (sa.sa.skew_ratio > skew_ratio_bound) {
                 sa.sa.skew_ratio = skew_ratio_bound;
-                ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
             } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
                 sa.sa.skew_ratio = 2 - skew_ratio_bound;
-                ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
             }
 
             sa.setParabolaValues();
@@ -178,7 +180,8 @@ class Priority {
                 // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
                 const old_dynamic_start = sa.sa.dynamic_start;
                 sa.setDynamicStartIfInDynamicMode();
-                old_dynamic_start !== sa.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                // !sa.sa.needs_more_info probably isn't needed but just in case as a safety mechanism
+                !sa.sa.needs_more_info && old_dynamic_start !== sa.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
             }
             
             let display_format_minutes = false;
