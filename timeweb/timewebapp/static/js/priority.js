@@ -730,9 +730,12 @@ class Priority {
             // Set initial transition values for "#animate-in"
             // Needs to be after domswap or else "top" bugs out 
             
+            // First paint is before the fonts load; #animate-in is shown
+            $("#animate-in").hide();
             // Load the fonts first or height() may return the wrong values
             document.fonts.ready.then(function() {
                 $("#animate-in").css({
+                    display: "",
                     top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + Priority.ANIMATE_IN_START_MARGIN,
                     opacity: "0",
                     marginBottom: -$("#animate-in").outerHeight(),
