@@ -28,7 +28,7 @@ utils = {
             }
         },
         arrayToEnglish: function(array) {
-            return `<ol><li>${array.join("</li><li>")}</li></ol>`;
+            return `<ul><li>${array.join("</li><li>")}</li></ul>`;
         }
     },
     ui: {
