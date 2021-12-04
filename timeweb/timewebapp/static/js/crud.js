@@ -53,7 +53,11 @@ class Crud {
         }
         $("main").css("overflow-y", "hidden");
         that.old_unit_value = undefined;
-        that.replaceUnit();
+        that.replaceUnit();    
+        
+        if (that.invalidOnlyInAdvanced()) {
+            $("#form-wrapper #advanced-inputs").click();
+        }
     }
     hideForm(params={hide_instantly: false}) {
         const that = this;
@@ -431,7 +435,7 @@ class Crud {
     }
     invalidOnlyInAdvanced() {
         const that = this;
-        return !!$("#form-wrapper .error-note").first().parents(".field-wrapper").prevAll().filter(function() {
+        return !!$("#form-wrapper .invalid").first().parents(".field-wrapper").prevAll().filter(function() {
             return $(this).is("#form-wrapper #advanced-inputs");
         }).length;
     }
