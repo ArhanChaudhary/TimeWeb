@@ -743,12 +743,15 @@ utils = {
             // height * percenty = height+5
             // percenty = 1 + 5/height
             $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
-            setTimeout(function() {
-                $(".assignment").each(function() {
-                    if (1 + 10/$(this).height() > 1.05) return;
-                    $(this).prop("style").setProperty('--scale-percent-y',`${1 + 10/$(this).height()}`);
-                });
-            }, 0);
+            // #animate-in is initially display: hidden in priority.js, delay adding the scale
+            document.fonts.ready.then(function() {
+                setTimeout(function() {
+                    $(".assignment").each(function() {
+                        if (1 + 10/$(this).height() > 1.05) return;
+                        $(this).prop("style").setProperty('--scale-percent-y',`${1 + 10/$(this).height()}`);
+                    });
+                }, 0);
+            });
         },
         insertTutorialMessages: function() {
             if (SETTINGS.enable_tutorial) {
