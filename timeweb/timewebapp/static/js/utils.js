@@ -615,7 +615,7 @@ utils = {
                     case "i":
                     case "Backspace":
                     case "s":
-                        if ($(document.activeElement).prop("type") !== "text")
+                        if (!["text", "number"].includes($(document.activeElement).prop("type")))
                             switch (e.key) {
                                 case "n":
                                     !$("#overlay").is(":visible") && $("#image-new-container").click();
