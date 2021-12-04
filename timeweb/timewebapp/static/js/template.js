@@ -222,7 +222,25 @@ function collision($div1, $div2) {
 
     if (b1 < y2 || y1 > b2 || r1 < x2 || x1 > r2) return false;
     return true;
-  }
+}
+
+reloadResolver = null;
+function reloadWhenAppropriate(params={href: null}) {
+    new Promise(function(resolve) {
+        if ($(".jconfirm").length) {
+            reloadResolver = resolve;
+        } else {
+            resolve();
+        }
+    }).then(function() {
+        if (params.href) {
+            window.location.href = params.href;
+        } else {
+            window.location.reload();
+        }
+    });
+}
+
 jconfirm.defaults = {
     escapeKey: true,
     backgroundDismiss: true,

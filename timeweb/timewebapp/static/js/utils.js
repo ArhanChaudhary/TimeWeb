@@ -165,7 +165,7 @@ utils = {
                                 $("#toggle-gc-label").html("Enable Google Classroom integration");
                                 $this.removeClass("clicked");
                             } else {
-                                utils.reloadWhenAppropriate({ href: authentication_url });
+                                reloadWhenAppropriate({ href: authentication_url });
                             }
                         },
                     });
@@ -902,7 +902,7 @@ utils = {
                 // Don't reload in the next day to preserve changes made in the simulation
                 // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
                 if (utils.in_next_day || isExampleAccount) return;
-                utils.reloadWhenAppropriate();
+                reloadWhenAppropriate();
             }, reload_time - now.getTime());
         }
     },
@@ -919,23 +919,6 @@ utils = {
             $("main").off('scroll');
             resolver();
         }, 200);
-    },
-    reloadResolver: null,
-    reloadWhenAppropriate: function(params={href: null}) {
-        new Promise(function(resolve) {
-            if ($(".jconfirm").length) {
-                utils.reloadResolver = resolve;
-            } else {
-                resolve();
-            }
-        }).then(function() {
-            if (params.href) {
-                window.location.href = params.href;
-            } else {
-                window.location.reload();
-            }
-        });
-
     },
 }
 
@@ -973,7 +956,7 @@ ajaxUtils = {
                 },
                 reload: {
                     action: function() {
-                        utils.reloadWhenAppropriate();
+                        reloadWhenAppropriate();
                     },
                 },
                 "try again": {
@@ -1042,7 +1025,7 @@ ajaxUtils = {
                         },
                         authenticate: {
                             action: function() {
-                                utils.reloadWhenAppropriate({href: authentication_url});
+                                reloadWhenAppropriate({href: authentication_url});
                             }
                         },
                         onClose: function() {
@@ -1051,7 +1034,7 @@ ajaxUtils = {
                     }
                 });
             } else {
-                utils.reloadWhenAppropriate();
+                reloadWhenAppropriate();
             }
         });
     },
