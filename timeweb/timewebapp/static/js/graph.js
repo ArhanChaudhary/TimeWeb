@@ -471,13 +471,6 @@ class VisualAssignment extends Assignment {
             screen.fill();
             screen.fillStyle = "black";
         }
-        // const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
-        // screen.textAlign = "end";
-        // screen.fillStyle = "black";
-        // screen.textBaseline = "top";
-        // screen.font = '13.75px Open Sans';
-        // screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-        // screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
         
         const daysleft = Math.floor(this.sa.complete_x) - today_minus_assignment_date;
         let strdaysleft;
@@ -846,17 +839,18 @@ class VisualAssignment extends Assignment {
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
             this.sa.works.push(last_work_input);
             
-            // Add this check for setDynamicModeIfInDynamicMode
-            // Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
-            // However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
+            // +Add this check for setDynamicModeIfInDynamicMode
+            // -Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
+            // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
             // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
-            if (input_done !== todo) {
+            // -However, this isn't really that much of a problem; I can just call this a "feature" of dynamic mode in that it tries to make stuff linear
+            // if (input_done !== todo) {
                 for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatio();
                 }
                 this.setDynamicStartIfInDynamicMode();
-            }
+            // }
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
