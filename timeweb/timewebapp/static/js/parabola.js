@@ -268,13 +268,17 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
     // Connect (0,0), (point_1[0], point_1[1]), and (point_2[0], point_2[1])
     const x1 = point_1[0];
     const y1 = point_1[1];
-    // Needed for roundoff errors
-    if (this.sa.skew_ratio === 1) return {a: 0, b: y1 / x1};
     const x2 = point_2[0];
     const y2 = point_2[1];
     // http://stackoverflow.com/questions/717762/how-to-calculate-the-vertex-of-a-parabola-given-three-points
     const a = (x2 * y1 - x1 * y2) / ((x1 - x2) * x1 * x2);
     const b = (y1 - x1 * x1 * a) / x1;
+
+    // I need to check if all three points are colinear to avoid roundoff errors
+    // if (this.sa.skew_ratio === 1) return {a: 0, b: y1 / x1}; won't work because the use of this.sa.skew_ratio might cause it to unexpectedly return that
+    // Instead, determine if the slopes between [0, 0] and [x1, y1] and [x1, y1] and [x2, y2] are the same
+    if (mathUtils.precisionRound(y1/x1 - (y2-y1)/(x2-x1), 10) === 0)
+        return {a: 0, b: y1 / x1};
     return {a, b};
 }
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 10000;

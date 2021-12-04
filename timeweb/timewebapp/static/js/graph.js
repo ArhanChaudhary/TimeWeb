@@ -30,7 +30,7 @@ class Assignment {
         skew_ratio = this.funct(1) * x1 / y1;
         skew_ratio = (y1+min_work_time_funct_round) * x1 / y1;
         */
-        const skew_ratio_bound = mathUtils.precisionRound((y1 + this.min_work_time_funct_round) * x1 / y1, 1);
+        const skew_ratio_bound = mathUtils.precisionRound((y1 + this.min_work_time_funct_round) * x1 / y1, 10);
         return skew_ratio_bound;
     }
     setDynamicStartIfInDynamicMode() {
@@ -112,6 +112,7 @@ class VisualAssignment extends Assignment {
     static ARROW_KEYDOWN_THRESHOLD = 500
     static ARROW_KEYDOWN_INTERVAL = 13
     static BUTTON_ERROR_DISPLAY_TIME = 1000
+    static TOTAL_ARROW_SKEW_RATIO_STEPS = 100
 
     constructor(dom_assignment) {
         super(dom_assignment);
@@ -220,20 +221,75 @@ class VisualAssignment extends Assignment {
             this.draw(raw_x, raw_y);
         }
     }
-    changeSkewRatio() {
-        // Change skew ratio by +- 0.1 and cap it
-        const skew_ratio_bound = this.calcSkewRatioBound();
-        if (this.pressed_arrow_key === "ArrowDown") {
-            this.sa.skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 0.1, 1);
-            if (this.sa.skew_ratio < 2 - skew_ratio_bound) {
-                this.sa.skew_ratio = skew_ratio_bound;
-            }
-        } else {
-            this.sa.skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio + 0.1, 1);
-            if (this.sa.skew_ratio > skew_ratio_bound) {
-                this.sa.skew_ratio = 2 - skew_ratio_bound;
-            }
+    arrowSkewRatio() {
+        /**
+         * Line: y = ax + b
+         * y1 = y - this.red_line_start_y
+         * x1 = (complete_x - this.red_line_start_x)
+         * y = x(y1/x1)
+         * inverse:
+         * y = y1-x(y1/x1)
+         * inverse it:
+         * 
+         * Parabola: y = ax^2 + bx
+         * y = ax^2 + bx
+         * 
+         * Solve for x:
+         * y1-x(y1/x1) = ax^2 + bx
+         * 0 = ax^2 + xb - x(y1)/(x1) - y1
+         * 0 = ax^2 + (y1/x1 - b)x - y1
+         * a = a
+         * b = b + y1/x1
+         * c = -y1
+         * result = (-b +- Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+         * result = (-(y1/x1 - b) +- Math.sqrt(Math.pow(y1/x1 - b, 2) - (4 * a * -y1))) / (2 * a);
+         * by playing with this https://www.desmos.com/calculator/urjcy3zcua we can see to always use plus
+         */
+        let x1 = this.sa.complete_x - this.red_line_start_x;
+        let y1 = this.sa.y - this.red_line_start_y;
+        if (this.sa.break_days.length) {
+            const mods = this.calcModDays();
+            x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
         }
+
+        let a = this.a;
+        let b = this.b + y1/x1;
+        let c = -y1;
+        if (a)
+            var intersection_x = (-b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+        else
+            // y = y1 - x(y1/x1)
+            // y = (y1/x1)x
+            // (y1/x1)x = y1 - x(y1/x1)
+            // 2 x y1 = y1 x1
+            // 2 x = x1
+            // x = x1 / 2
+            var intersection_x = x1 / 2;
+
+        let x_step = x1 / VisualAssignment.TOTAL_ARROW_SKEW_RATIO_STEPS;
+        intersection_x = x_step * Math.round(intersection_x / x_step);
+        if (this.pressed_arrow_key === "ArrowUp")
+            var next_intersection_x = intersection_x - x_step;
+        else if (this.pressed_arrow_key === "ArrowDown")
+            var next_intersection_x = intersection_x + x_step;
+        else return // safety
+        
+        // plug in next_intersection_x as x into y = y1 - x(y1/x1)
+        let next_intersection = [next_intersection_x, y1 - next_intersection_x * y1/x1];
+        let parabola = this.calcAandBfromOriginAndTwoPoints(next_intersection, [x1, y1]);
+
+        const original_skew_ratio = this.sa.skew_ratio;
+        this.sa.skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+
+        const skew_ratio_bound = this.calcSkewRatioBound();
+        // use original_skew_ratio to allow one more arrow before bound so the parabols completely flattens
+        // add && or else holding down will cause themselves to trigger each other in an infinite loop
+        if (original_skew_ratio >= skew_ratio_bound && this.pressed_arrow_key === "ArrowUp") {
+            this.sa.skew_ratio = 2 - skew_ratio_bound;
+        } else if (original_skew_ratio <= 2 - skew_ratio_bound && this.pressed_arrow_key === "ArrowDown") {
+            this.sa.skew_ratio = skew_ratio_bound;
+        }
+
         this.setDynamicStartIfInDynamicMode();
         ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
         priority.sort({ timeout: true });
@@ -472,25 +528,6 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
         }
         
-        const daysleft = Math.floor(this.sa.complete_x) - today_minus_assignment_date;
-        let strdaysleft;
-        if (daysleft < -1) {
-            strdaysleft = ` (${-daysleft} Days Ago)`;
-        } else {
-            switch (daysleft) {
-                case -1:
-                    strdaysleft = " (Yesterday)";
-                    break
-                case 0:
-                    strdaysleft = " (Today)";
-                    break;
-                case 1:
-                    strdaysleft = " (Tomorrow)";
-                    break;
-                default:
-                    strdaysleft = '';
-            }
-        }
         screen.textAlign = "center";
         screen.textBaseline = "bottom";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
@@ -716,10 +753,10 @@ class VisualAssignment extends Assignment {
                     // "fired" makes .keydown fire only when a key is pressed, not repeatedly
                     fired = true;
                     this.pressed_arrow_key = e.key;
-                    this.changeSkewRatio();
+                    this.arrowSkewRatio();
                     graphtimeout = setTimeout(function() {
                         clearInterval(graphinterval);
-                        graphinterval = setInterval(this.changeSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
+                        graphinterval = setInterval(this.arrowSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
                     }.bind(this), VisualAssignment.ARROW_KEYDOWN_THRESHOLD);
                 }
             }
