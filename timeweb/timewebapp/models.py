@@ -112,7 +112,6 @@ class TimewebModel(models.Model):
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
-        default=1,
         blank=True,
         null=True,
         verbose_name=_('Step Size'),

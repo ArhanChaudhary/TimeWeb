@@ -113,7 +113,7 @@ class Crud {
         }
         that.old_unit_value = singularToLowerCase;
         // +1 to show the line under "Advanced Inputs"
-        $("#fields-wrapper").css("height", $("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseFloat($("#advanced-inputs").css("margin-top")) + 1 + $("#fields-wrapper").scrollTop());
+        $("#fields-wrapper").css("height", Math.ceil($("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseFloat($("#advanced-inputs").css("margin-top")) + 1 + $("#fields-wrapper").scrollTop()));
     }
     setCrudHandlers() {
         const that = this;
@@ -178,7 +178,7 @@ class Crud {
                 $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
             }
             if (sa.needs_more_info) {
-                $("#form-wrapper #advanced-inputs").prevAll().each(function() {
+                $.merge($("#form-wrapper #advanced-inputs").prevAll(), $("#form-wrapper #id-funct_round-field-wrapper")).each(function() {
                     const input = $(this).children("input");
                     input.toggleClass("invalid", !input.val());
                 });
@@ -243,6 +243,7 @@ class Crud {
                 +$("#id_time_per_unit").val() > +$("#id_min_work_time").val() &&
                 !alert_already_shown
             )) return;
+            const original_funct_round = +$("#id_funct_round").val();
             // funct_round * time_per_unit * y = min_work_time
             // funct_round * time_per_unit = min_work_time
             // funct_round = min_work_time / time_per_unit
@@ -258,10 +259,10 @@ class Crud {
             );
 
             $.alert({
-                title: `Your step size has been automatically lowered from 1 to ${$("#id_funct_round").val()}`,
+                title: `Your step size has been automatically changed from ${original_funct_round} to ${$("#id_funct_round").val()}`,
                 content: "This is to prevent you from unnecessarily working longer than your minimum work time to ensure a smoother work schedule. The step size can be edited and overridden in the advanced inputs.",
                 onClose: function() {
-                    alert_already_shown = false;
+                    alert_already_shown = true;
                 }
             })
         });
