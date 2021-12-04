@@ -425,8 +425,9 @@ utils = {
                         }
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
-                        // GC class tags
-                        if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+                        // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
+                        // "important" and "not important" because they were designed to affect priority
+                        if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
                             priority.sort();
                         }
                         // Close box and add tags visually

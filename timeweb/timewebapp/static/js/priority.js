@@ -428,8 +428,8 @@ class Priority {
                     }
                 }
             }
-            // Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
-            // Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
+            // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
+            // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
             // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
                 if (sa.sa.tags.includes("Important")) {
                     status_value += 0.25;
