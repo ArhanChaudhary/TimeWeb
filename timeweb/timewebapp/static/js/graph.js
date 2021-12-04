@@ -468,8 +468,8 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.font = '13.75px Open Sans';
         screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-        screen.fillText(`Curvature: ${rounded_skew_ratio || "Linear"}`, this.width-2, this.height-138+move_info_down);
-
+        screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
+        
         const daysleft = Math.floor(this.sa.complete_x) - today_minus_assignment_date;
         let strdaysleft;
         if (daysleft < -1) {
@@ -748,7 +748,7 @@ class VisualAssignment extends Assignment {
             len_works--;
             for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
                 this.setDynamicStartIfInDynamicMode();
-                this.autotuneSkewRatio();
+                this.autotuneSkewRatio({ inverse: false });
             }
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);

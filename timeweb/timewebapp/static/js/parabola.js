@@ -278,7 +278,7 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 10000;
 Assignment.THIRD_POINT_STEP = 0.01;
 Assignment.MATRIX_ENDS_WEIGHT = 100000;
-Assignment.prototype.autotuneSkewRatio = function() {
+Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     if (this.sa.fixed_mode) return;
     const works_without_break_days = this.sa.works.filter(function(work_input, work_input_index) {
         // If break days are enabled, filter out work inputs that are on break days
@@ -369,24 +369,32 @@ Assignment.prototype.autotuneSkewRatio = function() {
         // A parabola cannot be defined by two or less points; instead connect a line
         autotuned_skew_ratio = 1;
     }
-    // Finally, we need to set an autotune factor
-    // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
-    // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
-    // This way ensures the autotune becomes more effective as more data points are made available for the regression
+    if (params.inverse) {
+        // Finally, we need to set an autotune factor
+        // This is because if a user enters no work done as their first work input, the regression will calculate an extremely downward curve with a low skew ratio, which is not ideal
+        // So, only change the original skew ratio by (works_without_break_days.length / x1_from_blue_line_start)%
+        // This way ensures the autotune becomes more effective as more data points are made available for the regression
 
-    // Math.min(..., 1) to make sure the autotune factor is never greater than 1 (this can happen with due times)
-    let autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        // Math.min(..., 1) to make sure the autotune factor is never greater than 1 (this can happen with due times)
+        var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
 
-    // Way too much to say about this, will explain later
-    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
+        // Way too much to say about this, will explain later
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
 
-    // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
-    // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
-    // So, put a higher weight on a linear skew ratio as there are less days in the assignment
-    autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+        // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
+        // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
+        // So, put a higher weight on a linear skew ratio as there are less days in the assignment
+        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
 
-    // Autotune in the reverse direction
-    this.sa.skew_ratio += ((2 - autotuned_skew_ratio) - this.sa.skew_ratio) * autotune_factor;
+        // Autotune in the inverse direction
+        autotuned_skew_ratio = 2 - autotuned_skew_ratio;
+    } else {
+        // TODO: improve non inverse algorithm; this one currently works but not as well as I want
+        var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
+        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+    }
+    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     // this.sa.skew_ratio = autotuned_skew_ratio;
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
