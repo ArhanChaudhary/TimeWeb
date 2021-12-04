@@ -129,6 +129,7 @@ class TimewebModel(models.Model):
         choices=WEEKDAYS,
         blank=True,
         null=True,
+        verbose_name=_('Working Days'),
     )
     fixed_mode = models.BooleanField(
         default=False,
