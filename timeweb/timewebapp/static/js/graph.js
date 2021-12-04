@@ -528,7 +528,7 @@ class VisualAssignment extends Assignment {
             }
             str_day += ':';
 
-            let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
+            let todo = mathUtils.precisionRound(this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input, 10);
             if (todo < 0 || this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
                 todo = 0;
             }
