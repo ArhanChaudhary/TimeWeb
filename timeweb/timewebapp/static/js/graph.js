@@ -351,12 +351,21 @@ class VisualAssignment extends Assignment {
         } else {
             move_info_down = 72;
         }
+        
+        const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
+        screen.textAlign = "end";
+        screen.fillStyle = "black";
+        screen.textBaseline = "top";
+        screen.font = '13.75px Open Sans';
+        screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
+        screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
         let radius = this.wCon / 3;
         if (radius > 3) {
             radius = 3;
         } else if (radius < 2) {
             radius = 2;
         }
+
         let circle_x,
             circle_y,
             line_end = this.sa.complete_x + Math.ceil(1 / this.wCon);
@@ -462,13 +471,13 @@ class VisualAssignment extends Assignment {
             screen.fill();
             screen.fillStyle = "black";
         }
-        const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
-        screen.textAlign = "end";
-        screen.fillStyle = "black";
-        screen.textBaseline = "top";
-        screen.font = '13.75px Open Sans';
-        screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-        screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
+        // const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
+        // screen.textAlign = "end";
+        // screen.fillStyle = "black";
+        // screen.textBaseline = "top";
+        // screen.font = '13.75px Open Sans';
+        // screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
+        // screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
         
         const daysleft = Math.floor(this.sa.complete_x) - today_minus_assignment_date;
         let strdaysleft;
