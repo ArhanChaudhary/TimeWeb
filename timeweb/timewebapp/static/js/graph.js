@@ -803,6 +803,7 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Submit work button
         submit_work_button.click(() => {
+            const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
             let not_applicable_message_title;
@@ -874,6 +875,9 @@ class VisualAssignment extends Assignment {
                 input_done = -last_work_input;
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
+            // len_works-1 to undo the ++ earlier
+            if (SETTINGS.use_in_progress && today_minus_assignment_date < (len_works-1) + this.sa.blue_line_start)
+                this.sa.works.pop();
             this.sa.works.push(last_work_input);
             
             // +Add this check for setDynamicModeIfInDynamicMode
@@ -891,7 +895,6 @@ class VisualAssignment extends Assignment {
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
-            const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             // Delay resize because the graphs don't draw while the assignment is clsoing
             if (SETTINGS.close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
                 priority.sort({ timeout: true, delayResize: true });

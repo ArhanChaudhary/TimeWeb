@@ -16,9 +16,12 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#break-days-wrapper input").prop("checked", false);
                         $("#id_def_funct_round_minute").prop("checked", false);
                         $("#id_ignore_ends").prop("checked", false);
+                        $("#id_def_unit_to_minute").prop("checked", false);
+                        $("#id_def_due_time").val("00:00");
                         $("#id_show_progress_bar").prop("checked", true);
                         $("#id_color_priority").prop("checked", true);
                         $("#id_text_priority").prop("checked", true);
+                        $("#id_use_in_progress").prop("checked", false);
                         $("#id_one_graph_at_a_time").prop("checked", false);
                         $("#id_close_graph_after_work_input").prop("checked", false);
                         $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");

@@ -144,6 +144,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'reverse_sorting': self.settings_model.reverse_sorting,
             'color_priority': self.settings_model.color_priority,
             'text_priority': self.settings_model.text_priority,
+            'use_in_progress': self.settings_model.use_in_progress,
             'one_graph_at_a_time': self.settings_model.one_graph_at_a_time,
             'close_graph_after_work_input': self.settings_model.close_graph_after_work_input,
             'highest_priority_color': self.settings_model.highest_priority_color,
@@ -199,6 +200,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.reverse_sorting = self.form.cleaned_data.get("reverse_sorting")
         self.settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         self.settings_model.text_priority = self.form.cleaned_data.get("text_priority")
+        self.settings_model.use_in_progress = self.form.cleaned_data.get("use_in_progress")
         self.settings_model.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
         self.settings_model.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")
         self.settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")

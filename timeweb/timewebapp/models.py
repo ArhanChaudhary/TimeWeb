@@ -205,6 +205,10 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
+    use_in_progress = models.BooleanField(
+        default=False,
+        verbose_name=_('Enter Work inputs In-Place after Today'),
+    )
     one_graph_at_a_time = models.BooleanField(
         default=False,
         verbose_name=_('Allow Only one open Graph at a Time'),
