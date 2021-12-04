@@ -28,6 +28,8 @@ Assignment.prototype.setParabolaValues = function() {
     If set skew ratio is enabled, the third point is (x2,y2). skew_ratio will also be redefined
     If set skew ratio isn't enabled, the third point is now (1,y1/x1 * skew_ratio)
     Here, a straight line is connected from (0,0) and (x1,y1) and then the output of f(1) of that straight line is multiplied by the skew ratio to get the y-coordinate of the first point
+
+    This is the only way I could think of storing a third point in a similar manner, as any other form will make the default curvature inconsistent
     */
     // Define (x1, y1) and translate both variables to (0,0)
     let x1 = this.sa.complete_x - this.red_line_start_x,
