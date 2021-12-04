@@ -96,12 +96,6 @@ form span:first-of-type label {
     cursor: pointer;
     text-decoration: underline;
 }
-#beta-message {
-    position: absolute;
-    text-decoration: none;
-    font-size: 10px;
-    text-align: center;
-}
 #forgor-password {
     color: rgb(61, 123, 248);
     margin-right: 10px;
