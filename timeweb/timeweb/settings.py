@@ -55,7 +55,7 @@ except KeyError:
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 if DEBUG:
-    ALLOWED_HOSTS = ['localhost']
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 else:
     ALLOWED_HOSTS = ['timeweb.io', 'timeweb-308201.wl.r.appspot.com', 'www.timeweb.io', 'www.timeweb-308201.wl.r.appspot.com']
 # Application definition
