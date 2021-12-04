@@ -625,8 +625,8 @@ utils = {
                                 case "i":
                                 case "Backspace":
                                 case "s":
-                                    let assignment_container = $(document.activeElement).parents(".assignment-container");
-                                    if (!assignment_container.length) assignment_container = $(":hover").filter(".assignment-container");
+                                    let assignment_container = $(":hover").filter(".assignment-container");
+                                    if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                                     if (assignment_container.length)
                                         switch (e.key) {
                                             case "e":
