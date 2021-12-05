@@ -818,17 +818,25 @@ class VisualAssignment extends Assignment {
             }
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_textbox.val().trim().toLowerCase();
+            let bypass_in_progress = false;
             if (input_done.startsWith("since")) {
                 input_done = +input_done.replace("since", "").trim();
                 if (isNaN(input_done)) {
                     not_applicable_message_title = "Invalid \"since\" format.";
-                    not_applicable_message_description = "Please use the \"since\" keyword with the format: \"since [number]\", with [number] being your work input.";
+                    not_applicable_message_description = "Please use the \"since\" keyword with the format: \"since [some number]\", with [some number] being your work input.";
                 }
                 const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
                 const array_length = today_minus_assignment_date - (this.sa.blue_line_start + len_works) - 1;
                 if (array_length < 0) return;
                 this.sa.works.push(...new Array(array_length).fill(last_work_input));
                 len_works = this.sa.works.length - 1;
+            } else if (input_done.startsWith("tom")) {
+                input_done = +input_done.replace("tom", "").trim();
+                if (isNaN(input_done)) {
+                    not_applicable_message_title = "Invalid \"tom\" format.";
+                    not_applicable_message_description = "Please use the \"tom\" keyword with the format: \"tom [some number]\", with [some number] being your work input.";
+                }
+                bypass_in_progress = true;
             } else {
                 switch (input_done) {
                     case "done":
