@@ -799,7 +799,12 @@ class VisualAssignment extends Assignment {
         // END Delete work input button
 
         // BEGIN Work input textbox
-        work_input_textbox.keydown(e => {e.key === "Enter" && submit_work_button.click()});
+        work_input_textbox.keydown(e => {
+            if (e.key === "Enter") {
+                submit_work_button.click();
+                work_input_textbox.val("");
+            }
+        });
         // END Work input textbox
 
         // BEGIN Submit work button
