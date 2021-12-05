@@ -23,13 +23,10 @@ except KeyError:
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-if DEBUG:
-    CSP_CONNECT_SRC = ("'self'", 'https://accounts.google.com')
-    CSP_SCRIPT_SRC = ("'self'", )
-else:
-    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://accounts.google.com', "https://storage.googleapis.com")
-    CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com") # Needs to be set so nonce can be added
-    CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com")
+
+CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://accounts.google.com', "https://storage.googleapis.com")
+CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com") # Needs to be set so nonce can be added
+CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com")
 CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
