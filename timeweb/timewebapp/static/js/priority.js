@@ -481,7 +481,7 @@ class Priority {
                 dom_status_image.attr("src", `https://storage.googleapis.com/twstatic/images/status-icons/${status_image}.png`);
             }
             dom_status_message.html(status_message);
-            dom_title.attr("data-daysleft", str_daysleft);
+            dom_title.attr("data-daysleft", str_daysleft||"");
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
