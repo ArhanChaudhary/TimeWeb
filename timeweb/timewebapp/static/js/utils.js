@@ -51,9 +51,9 @@ utils = {
                     sa.mark_as_done = !sa.mark_as_done;
                     ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
                     if (sa.mark_as_done)
-                        $(this).children("img").attr("src", "static/images/show.png");
+                        $(this).children("img").attr("src", "https://storage.googleapis.com/twstatic/images/show.png");
                     else
-                        $(this).children("img").attr("src", "static/images/hide.png");
+                        $(this).children("img").attr("src", "https://storage.googleapis.com/twstatic/images/hide.png");
                     priority.sort();
                 });
             },
