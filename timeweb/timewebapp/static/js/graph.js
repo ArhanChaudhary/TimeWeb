@@ -592,20 +592,21 @@ class VisualAssignment extends Assignment {
         screen.fillText("Days", (this.width - 50) / 2 + 50, this.height - 5);
 
         // y axis label
-        screen.rotate(Math.PI / 2);
+        screen.rotate(-Math.PI / 2);
         if (this.unit_is_of_time) {
             const plural = pluralize(this.sa.unit);
             var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`,
-                label_x_pos = -2;
+                label_x_pos = -3;
         } else {
             var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`,
-                label_x_pos = -5;
+                label_x_pos = 0;
         }
         if (screen.measureText(text).width > this.height - 50) {
             text = pluralize(this.sa.unit);
         }
-        screen.fillText(text, (this.height - 50) / 2, label_x_pos);
-        screen.rotate(-Math.PI / 2);
+        screen.textBaseline = "hanging";
+        screen.fillText(text, -(this.height - 50) / 2, label_x_pos);
+        screen.rotate(Math.PI / 2);
 
         screen.font = '13.75px Open Sans';
         screen.textBaseline = "top";
