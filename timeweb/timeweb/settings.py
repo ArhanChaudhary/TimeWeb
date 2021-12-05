@@ -27,13 +27,13 @@ if DEBUG:
     CSP_CONNECT_SRC = ("'self'", 'https://accounts.google.com')
     CSP_SCRIPT_SRC = ("'self'", )
 else:
-    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://accounts.google.com')
-    CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com') # Needs to be set so nonce can be added
-    CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com')
+    CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://accounts.google.com', "https://storage.googleapis.com")
+    CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com") # Needs to be set so nonce can be added
+    CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com")
 CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
-CSP_IMG_SRC = ("'self'", "data:")
+CSP_IMG_SRC = ("'self'", "data:", "https://storage.googleapis.com")
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'timewebapp/static/js' if DEBUG else 'static/js', 'serviceworker.js')
 PWA_APP_DEBUG_MODE = False
@@ -197,10 +197,12 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-if not DEBUG:
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+else:
     DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    GS_BUCKET_NAME = 'timeweb-308201.appspot.com'
+    STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    GS_BUCKET_NAME = 'twstatic'
 
     GS_PROJECT_ID = 'timeweb-308201'
     from google.oauth2 import service_account

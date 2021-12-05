@@ -837,12 +837,12 @@ class ImagesView(LoginRequiredMixin, TimewebGenericView):
 
     # GS_CACHE_CONTROL in settings.py is supposed to set a cache but it doesnt for some reason
     @cache_control(public=True, max_age=604800)
-    def get(self, request, imageUser, imageName):
-        if request.user.username != imageUser:
+    def get(self, request, imageUserId, imageName):
+        if request.user.id != imageUserId:
             return HttpResponseForbidden("You do not have access to this media")
         client = storage.Client()
         bucket = client.bucket("timeweb-308201.appspot.com")
-        blob = bucket.get_blob(f"images/{imageUser}/{imageName}")
+        blob = bucket.get_blob(f"backgrounds/{imageUserId}/{imageName}")
         if blob:
             return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
         else:

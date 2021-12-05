@@ -45,7 +45,7 @@ def empty_dict():
 def get_midnight_time():
     return datetime.time(0, 0, 0)
 def create_image_path(instance, filename):
-    return f"images/{instance.user.username}/{filename}"
+    return f"backgrounds/{instance.user.username}/{filename}"
 class TimewebModel(models.Model):
     name = models.CharField(
         max_length=200,
