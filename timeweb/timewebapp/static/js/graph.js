@@ -854,18 +854,20 @@ class VisualAssignment extends Assignment {
             }
             // Prematurely increment for calculations
             len_works++;
-            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
-                todo = 0;
+            if (!not_applicable_message_title) {
+                if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
+                    todo = 0;
+                }
+                // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
+                if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done + last_work_input < this.sa.y
+                    && this.sa.soft) {
+                    const original_red_line_start_x = this.red_line_start_x;
+                    this.red_line_start_x = len_works + this.sa.blue_line_start;
+                    this.incrementDueDate();
+                    this.red_line_start_x = original_red_line_start_x;
+                }
             }
-            // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
-            if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done + last_work_input < this.sa.y
-                && this.sa.soft) {
-                const original_red_line_start_x = this.red_line_start_x;
-                this.red_line_start_x = len_works + this.sa.blue_line_start;
-                this.incrementDueDate();
-                this.red_line_start_x = original_red_line_start_x;
-            }
-            if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
+            if ((len_works-1) + this.sa.blue_line_start === this.sa.x) {
                 not_applicable_message_title = "End of Assignment.";
                 not_applicable_message_description = "You've reached the end of this assignment, and there are no more work inputs to submit.";
             }
