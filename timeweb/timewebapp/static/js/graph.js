@@ -887,8 +887,17 @@ class VisualAssignment extends Assignment {
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
             // len_works-1 to undo the ++ earlier
-            if (SETTINGS.use_in_progress && today_minus_assignment_date < (len_works-1) + this.sa.blue_line_start)
+            if (SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === (len_works-1) + this.sa.blue_line_start) {
                 this.sa.works.pop();
+
+                // Attempts to undo the last work input to ensure the autotune isn't double dipped
+                // Note that the invsering of the autotune algorithm is still not perfect, but usable
+                for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                    this.setDynamicStartIfInDynamicMode();
+                    this.autotuneSkewRatio({ inverse: false });
+                }
+                this.setDynamicStartIfInDynamicMode();
+            }
             this.sa.works.push(last_work_input);
             
             // +Add this check for setDynamicModeIfInDynamicMode
@@ -896,6 +905,9 @@ class VisualAssignment extends Assignment {
             // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
             // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
             // -However, this isn't really that much of a problem; I can just call this a "feature" of dynamic mode in that it tries to make stuff linear. Disabling this makes dynamic mode completely deterministic in its red line start
+
+            // Remember to add this check to the above autotune if I decide to add this back
+
             // if (input_done !== todo) {
                 for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
@@ -903,6 +915,7 @@ class VisualAssignment extends Assignment {
                 }
                 this.setDynamicStartIfInDynamicMode();
             // }
+
             ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
