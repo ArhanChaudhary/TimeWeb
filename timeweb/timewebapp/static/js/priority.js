@@ -138,6 +138,7 @@ class Priority {
         const dom_button = dom_assignment.find(".button");
         const dom_assignment_footer = dom_assignment.find(".assignment-footer");
         const add_priority_percentage = !!dom_title.attr("data-priority");
+        // Even though this is always true, it'll add this here for compatibility
         const add_daysleft = !!dom_title.attr("data-daysleft");
         dom_assignment.css({paddingTop: "", paddingBottom: ""});
         dom_button.css({marginTop: "", marginBottom: ""});
@@ -281,13 +282,6 @@ class Priority {
                 } else if (today_minus_assignment_date < 0) {
                     status_image = "no-status-image";
                     status_message = 'This Assignment hasn\'t yet been Assigned';
-                    if (today_minus_assignment_date === -1) {
-                        str_daysleft = 'Assigned Tomorrow';
-                    } else if (today_minus_assignment_date > -7) {
-                        str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
-                    } else {
-                        str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
-                    }
                     status_value = Priority.NOT_YET_ASSIGNED;
                 } else {
                     // if (alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice)
@@ -404,7 +398,15 @@ class Priority {
                 }
             }
             let str_daysleft;
-            if (Number.isFinite(sa.sa.x) && status_value !== Priority.NOT_YET_ASSIGNED) {
+            if (status_value === Priority.NOT_YET_ASSIGNED) {
+                if (today_minus_assignment_date === -1) {
+                    str_daysleft = 'Assigned Tomorrow';
+                } else if (today_minus_assignment_date > -7) {
+                    str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                } else {
+                    str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
+                }
+            } else if (Number.isFinite(sa.sa.x)) {
                 due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
@@ -477,6 +479,7 @@ class Priority {
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
+            // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
