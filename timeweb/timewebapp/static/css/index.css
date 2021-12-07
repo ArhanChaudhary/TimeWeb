@@ -133,6 +133,7 @@ a[href="settings"] {
     display: none !important;
 }
 .assignment-container {
+    /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
     position: relative;
     padding: 5px 10px;
@@ -156,7 +157,7 @@ a[href="settings"] {
     width: 100%; /* Needed for when it becomes position: absolute during deletion */
     box-sizing: border-box;
     scroll-margin: 20px;
-    transition: all .2s ease-in-out, opacity .375s ease-in-out, background 2s, left 0s, padding 0s;
+    transition: all .2s ease-in-out, opacity .375s ease-in-out, background calc(2s * var(--animation-speed)), left 0s, padding 0s;
 }
 .assignment.mark-as-done {
     opacity: 0.6;
@@ -435,7 +436,9 @@ a[href="settings"] {
     margin-right: 3px;
     background: linear-gradient(135deg, rgb(255,255,255) 0%, rgb(222,222,222) 100%);
     transform-origin: right;
-    transition: margin-left 0.75s ease-in-out, opacity 0.7s linear, transform 0.5s linear 0.2s;
+    transition: margin-left calc(0.75s * var(--animation-speed)) ease-in-out,
+                opacity calc(0.7s * var(--animation-speed)) linear,
+                transform calc(0.5s * var(--animation-speed)) linear calc(0.2s * var(--animation-speed));
 }
 .tag-wrapper.ghost {
     visibility: hidden;
@@ -450,7 +453,7 @@ a[href="settings"] {
     background-color: black;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.1s linear;
+    transition: opacity calc(0.1s * var(--animation-speed)) linear;
 }
 /* Don't do :hover::after because the ::after doesnt then become pointless */
 .tag-delete::after {
@@ -473,7 +476,7 @@ a[href="settings"] {
     background-color: rgb(231, 231, 231);
     border: 1px dashed rgb(24, 24, 24);
     cursor: pointer;
-    transition: width 0.25s ease-out;
+    transition: width calc(0.25s * var(--animation-speed)) ease-out;
 }
 .tag-add::after {
     content: '';
@@ -487,7 +490,7 @@ a[href="settings"] {
 }
 .tag-add-text {
     opacity: 0;
-    transition: opacity 0.2s linear;
+    transition: opacity calc(0.2s * var(--animation-speed)) linear;
     text-align: right;
     direction: rtl;
     margin-right: 4px;
@@ -500,7 +503,7 @@ a[href="settings"] {
 .tag-name {
     position: relative;
     z-index: 1;
-    transition: margin-right 0.15s ease-in-out;
+    transition: margin-right calc(0.15s * var(--animation-speed)) ease-in-out;
 }
 .tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
     margin-right: 9px;
@@ -521,7 +524,8 @@ a[href="settings"] {
     background: white !important;
     transform-origin: top;
     transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
-    transition: transform 0.15s cubic-bezier(0.31, 1.15, 0.5, 1.2), opacity 0.1s ease-out;
+    transition: transform calc(0.15s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
+                opacity calc(0.1s * var(--animation-speed)) ease-out;
 }
 .tag-add-box::after {
     border-color: transparent transparent rgb(220,220,220) transparent !important;
@@ -1065,7 +1069,7 @@ input[type=number]::-webkit-inner-spin-button {
     text-align: left;
     white-space: nowrap;
     transform: translateX(30px);
-    transition: width 0.7s cubic-bezier(0, 0, 0.5, 1);
+    transition: width calc(0.7s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1);
 }
 #toggle-gc-container img {
     position: relative;
@@ -1073,7 +1077,9 @@ input[type=number]::-webkit-inner-spin-button {
 #toggle-gc-container:hover #toggle-gc-label, #toggle-gc-container.open #toggle-gc-label {
     opacity: 1;
     transform: translateX(10px);
-    transition: width 0.7s cubic-bezier(0, 0, 0.5, 1), opacity 0.3s linear 0.35s, transform 0.25s linear 0.35s;
+    transition: width calc(0.7s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1),
+                opacity calc(0.3s * var(--animation-speed)) linear calc(0.35s * var(--animation-speed)),
+                transform calc(0.25s * var(--animation-speed)) linear calc(0.35s * var(--animation-speed));
 }
 #toggle-gc-container:hover #toggle-gc-label {
     width: 304px;

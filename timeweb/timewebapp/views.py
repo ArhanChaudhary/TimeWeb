@@ -141,6 +141,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'ignore_ends': self.settings_model.ignore_ends,
             'show_progress_bar': self.settings_model.show_progress_bar,
             'assignment_spacing': self.settings_model.assignment_spacing,
+            'animation_speed': self.settings_model.animation_speed,
             'reverse_sorting': self.settings_model.reverse_sorting,
             'color_priority': self.settings_model.color_priority,
             'text_priority': self.settings_model.text_priority,
@@ -197,6 +198,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         self.settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
         self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
+        self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
         self.settings_model.reverse_sorting = self.form.cleaned_data.get("reverse_sorting")
         self.settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         self.settings_model.text_priority = self.form.cleaned_data.get("text_priority")

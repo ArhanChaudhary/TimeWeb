@@ -21,19 +21,27 @@ HORIZONTAL_TAG_POSITIONS = (
     ("Middle", "Middle"),
     ("Right", "Right"),
 )
-MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in HORIZONTAL_TAG_POSITIONS], key=len))
+MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in HORIZONTAL_TAG_POSITIONS], key=len))
 
 VERTICAL_TAG_POSITIONS = (
     ("Top", "Top"),
     ("Bottom", "Bottom"),
 )
-MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in VERTICAL_TAG_POSITIONS], key=len))
+MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in VERTICAL_TAG_POSITIONS], key=len))
 
 ASSIGNMENT_SPACINGS = (
     ("Comfy", "Comfy"),
     ("Compact", "Compact"),
 )
-MAX_ASSIGNMENT_SPACINGS_LENGTH = len(max([i[0] for i in ASSIGNMENT_SPACINGS], key=len))
+MAX_ASSIGNMENT_SPACINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SPACINGS], key=len))
+
+ANIMATION_SPEED = (
+    ("1", "Normal (1x)"),
+    ("0.5", "Fast (2x)"),
+    ("0", "None (No animation)"),
+)
+MAX_ANIMATION_SPEED_LENGTH = len(max([i[1] for i in ANIMATION_SPEED], key=len))
+
 def default_works():
     return 0
 def empty_list():
@@ -279,6 +287,12 @@ class SettingsModel(models.Model):
     dark_mode = models.BooleanField(
         default=False,
         verbose_name=_('Dark Mode'),
+    )
+    animation_speed = models.CharField(
+        max_length=MAX_ANIMATION_SPEED_LENGTH,
+        choices=ANIMATION_SPEED,
+        default=_("Normal"),
+        verbose_name=_('Animation Speed'),
     )
     restore_gc_assignments = models.BooleanField(
         default=False,

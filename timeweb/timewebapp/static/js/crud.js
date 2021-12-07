@@ -16,7 +16,7 @@ class Crud {
     }
     static FORM_POSITION_TOP = 15
     static UNITS_OF_TIME = {minute: 1, hour: 60}
-    static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750
+    static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
 
     init() {

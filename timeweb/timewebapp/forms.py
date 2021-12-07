@@ -156,6 +156,7 @@ class SettingsForm(forms.ModelForm):
             "use_in_progress": "After today, your submitted work inputs will add onto the work you've done today. This is useful if you work on an assignment many times in a day. As a side effect, this also prevents you from entering work inputs in the future. To bypass this issue, enter the following syntax as a work input: \"tom [some number]\"",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
+            "animation_speed": "Controls the speed of many animations.",
             "restore_gc_assignments": "Google Classroom assignments are normally added only once. Enabling this adds every Google Classroom assignment again in case you want them back.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }

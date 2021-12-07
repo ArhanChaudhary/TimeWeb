@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_background_image").val("");
                         $("#id_horizontal_tag_position").val("Middle");
                         $("#id_assignment_spacing").val("Comfy");
+                        $("#id_animation_speed").val("Normal");
                         $("#id_vertical_tag_position").val("Top");
                         $("#id_default_dropdown_tags").val("").trigger("input");
                     }

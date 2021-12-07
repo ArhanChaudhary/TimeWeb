@@ -102,7 +102,7 @@ class Assignment {
     }
 }
 class VisualAssignment extends Assignment {
-    static CLOSE_ASSIGNMENT_TRANSITION_DURATION = 750
+    static CLOSE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static MOUSE_POSITION_TRANSFORM = {x: 0.1, y: -1.3} // Adjusts the mouse position by a few pixels to make it visually more accurate
     static RED_LINE_COLOR = {r: 233, g: 68, b: 46}
     static BLUE_LINE_COLOR = {r: 1, g: 147, b: 255}

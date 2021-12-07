@@ -838,6 +838,9 @@ utils = {
                 }, 0);
             });
         },
+        setAnimationSpeed: function() {
+            $("main").prop("style").setProperty('--animation-speed', SETTINGS.animation_speed);
+        },
         insertTutorialMessages: function() {
             if (SETTINGS.enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
@@ -1207,6 +1210,7 @@ if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
 const SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+SETTINGS.animation_speed = +SETTINGS.animation_speed;
 if (!SETTINGS.seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
@@ -1358,5 +1362,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.setAssignmentScaleUtils();
+    utils.ui.setAnimationSpeed();
     utils.ui.saveAndLoadStates();
 });
