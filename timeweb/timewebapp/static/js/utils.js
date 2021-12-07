@@ -103,7 +103,9 @@ utils = {
                 if (isNaN(estimated_completion_time.getMinutes())) {
                     estimated_completion_time.setTime(8640000000000000);
                 }
-                $("#current-time").html(` (${estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`);
+                let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
+                $("#current-time").html(` (${str})`);
                 utils.ui.old_minute_value = minute_value;
             }
         },
