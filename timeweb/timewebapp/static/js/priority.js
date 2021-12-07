@@ -397,7 +397,7 @@ class Priority {
                     }
                 }
             }
-            let str_daysleft;
+            let str_daysleft = "";
             if (status_value === Priority.NOT_YET_ASSIGNED) {
                 if (today_minus_assignment_date === -1) {
                     str_daysleft = 'Assigned Tomorrow';
