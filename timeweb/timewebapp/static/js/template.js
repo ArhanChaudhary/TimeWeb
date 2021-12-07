@@ -79,8 +79,13 @@ document.addEventListener("DOMContentLoaded", function() {
 $(function() {
     // Click element when enter is pressed
     $(document).keypress(function(e) {
-        if (e.key === "Enter" && $(document.activeElement).prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
-            $(document.activeElement).click();
+        const activeElement = $(document.activeElement);
+        if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
+            activeElement.click();
+            if (activeElement.hasClass("first-advanced-buttons"))
+                activeElement.nextAll(":not(br)").first().focus();
+            else if (activeElement.hasClass("second-advanced-buttons"))
+                activeElement.siblings(".first-advanced-buttons").prevAll(":not(br)").first().focus();
         }
     });
     // Header responiveness

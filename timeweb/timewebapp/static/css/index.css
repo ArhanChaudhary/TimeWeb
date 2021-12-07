@@ -1071,8 +1071,8 @@ input[type=number]::-webkit-inner-spin-button {
     display: inline-block;
     text-align: left;
     white-space: nowrap;
-    transform: translateX(30px);
-    transition: width calc(0.7s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1);
+    transform: translateX(50px);
+    transition: width calc(0.5s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1);
 }
 #toggle-gc-container img {
     position: relative;
@@ -1080,9 +1080,9 @@ input[type=number]::-webkit-inner-spin-button {
 #toggle-gc-container:hover #toggle-gc-label, #toggle-gc-container.open #toggle-gc-label {
     opacity: 1;
     transform: translateX(10px);
-    transition: width calc(0.7s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1),
-                opacity calc(0.5s * var(--animation-speed)) linear calc(0.15s * var(--animation-speed)),
-                transform calc(0.45s * var(--animation-speed)) linear calc(0.15s * var(--animation-speed));
+    transition: width calc(0.5s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1),
+                opacity calc(0.35s * var(--animation-speed)) linear calc(0.15s * var(--animation-speed)),
+                transform calc(0.3s * var(--animation-speed)) linear calc(0.15s * var(--animation-speed));
 }
 #toggle-gc-container:hover #toggle-gc-label {
     width: 304px;

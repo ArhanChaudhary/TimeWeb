@@ -162,7 +162,7 @@ utils = {
                     $(".skew-ratio-button, .skew-ratio-textbox, .skew-ratio-textbox + .info-button, .fixed-mode-button").toggle();
                     $(".advanced-buttons").toggle();
                 });
-                $(".second-advanced-button").toggle();
+                $(".second-advanced-buttons").toggle();
                 $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hiddenzAz in graph.js
                 // Advanced inputs for form
                 $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
