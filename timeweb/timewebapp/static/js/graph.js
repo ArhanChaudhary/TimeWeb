@@ -1066,7 +1066,7 @@ class VisualAssignment extends Assignment {
 }
 let already_ran_tutorial = false;
 $(function() {
-$(".assignment").click(function(e) {
+$(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const target = $(e.target);
     const targetInHeader = !!target.parents(".assignment-header").length || target.is(".assignment-header, .assignment");
     const targetInTags = !!target.parents(".tags").length || target.is(".tags");

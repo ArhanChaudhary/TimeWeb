@@ -120,6 +120,23 @@ utils = {
                     priority.sort();
                 });
             },
+            tickButtons: function() {
+                $(".tick-button").parent().click(function() {
+                    const dom_assignment = $(this).parents(".assignment");
+                    if (dom_assignment.hasClass('open-assignment')) {
+                        dom_assignment.find(".work-input-textbox").val("fin");
+                        dom_assignment.find(".submit-work-button").click();
+                    } else {
+                        const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
+                        VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
+                        dom_assignment.click();
+                        dom_assignment.find(".work-input-textbox").val("fin");
+                        dom_assignment.find(".submit-work-button").click();
+                        dom_assignment.click();
+                        VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
+                    }
+                });
+            },
 
             toggleEstimatedCompletionTime: function() {
                 // Hide and show estimated completion time
@@ -679,6 +696,7 @@ utils = {
                     case "i":
                     case "Backspace":
                     case "s":
+                    case "f":
                         if (!["text", "number"].includes($(document.activeElement).prop("type")))
                             switch (e.key) {
                                 case "n":
@@ -689,6 +707,7 @@ utils = {
                                 case "i":
                                 case "Backspace":
                                 case "s":
+                                case "f":
                                     let assignment_container = $(":hover").filter(".assignment-container");
                                     if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                                     if (assignment_container.length)
@@ -710,6 +729,9 @@ utils = {
                                                     assignment_container.find(".first-advanced-buttons").focus().click();
                                                 }
                                                 assignment_container.find(".skew-ratio-button").focus().click();
+                                                break;
+                                            case "f":
+                                                assignment_container.find(".tick-button").focus().click();
                                                 break;
                                         }
                                     break;
@@ -1320,6 +1342,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.markAsDoneButtons();
+    utils.ui.setClickHandlers.tickButtons();
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();

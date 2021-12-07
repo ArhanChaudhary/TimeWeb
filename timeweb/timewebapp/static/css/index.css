@@ -686,12 +686,9 @@ a[href="settings"] {
     /* negate the variable pixel value */
     margin: calc(-1 * var(--vertical-assignment-padding)) 0;
     margin-right: -4px;
-    min-width: 40px;
+    padding: 0 7px;
     cursor: pointer;
     transition: background-color 0.25s ease-out;
-}
-.button + .button {
-    margin-right: -7px;
 }
 .button:focus, .button:hover {
     outline: 0;
