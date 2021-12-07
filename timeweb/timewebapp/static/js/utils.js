@@ -242,6 +242,7 @@ utils = {
                         data: {csrfmiddlewaretoken: csrf_token},
                         success: function(authentication_url) {
                             if (authentication_url === "Disabled gc api") {
+                                $("#toggle-gc-container").removeClass("enabled");
                                 $("#toggle-gc-label").html("Enable Google Classroom integration");
                                 $this.removeClass("clicked");
                             } else {
