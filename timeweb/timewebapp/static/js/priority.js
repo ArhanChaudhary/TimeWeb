@@ -225,7 +225,7 @@ class Priority {
                 }
             }
             let alert_due_date_passed_cond;
-            let str_daysleft, status_value, status_message, status_image, due_date_minus_today;
+            let status_value, status_message, status_image, due_date_minus_today;
             if (sa.sa.needs_more_info) {
                 status_image = 'question-mark';
                 if (sa.sa.is_google_classroom_assignment) {
@@ -243,26 +243,6 @@ class Priority {
                     width: 11,
                     height: 18,
                 }).css("margin-left", 2);
-
-                // Copy paste of some below code
-                if (Number.isFinite(sa.sa.x)) {
-                    due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                    if (due_date_minus_today < -1) {
-                        str_daysleft = -due_date_minus_today + "d Ago";
-                    } else if (due_date_minus_today === -1) {
-                        str_daysleft = 'Yesterday';
-                    } else if (due_date_minus_today === 0) {
-                        str_daysleft = 'Today';
-                    } else if (due_date_minus_today === 1) {
-                        str_daysleft = 'Tomorrow';
-                    } else if (due_date_minus_today < 7) {
-                        const due_date = new Date((sa.sa.assignment_date).valueOf());
-                        due_date.setDate(due_date.getDate() + sa.sa.x);
-                        str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
-                    } else {
-                        str_daysleft = due_date_minus_today + "d";
-                    }
-                }
 
             // (complete_due_date <= complete_date_now && !sa.sa.soft)
             // This marks the assignment as completed if its due date passes
@@ -412,30 +392,37 @@ class Priority {
                         }
                         that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                     }
-                    if (due_date_minus_today < -1) {
-                        str_daysleft = -due_date_minus_today + "d Ago";
-                    } else if (due_date_minus_today === -1) {
-                        str_daysleft = 'Yesterday';
-                    } else if (due_date_minus_today === 0) {
-                        str_daysleft = 'Today';
+
+                    if ([0, 1].includes(due_date_minus_today)) {
+                        if (due_date_minus_today === 1) {
+                            that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                        }
                         if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                         }
-                    } else if (due_date_minus_today === 1) {
-                        str_daysleft = 'Tomorrow';
-                        that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
-                        if (status_value === Priority.UNFINISHED_FOR_TODAY) {
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
-                        }
-                    } else if (due_date_minus_today < 7) {
-                        const due_date = new Date(sa.sa.assignment_date.valueOf());
-                        due_date.setDate(due_date.getDate() + Math.floor(sa.sa.complete_x));
-                        str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
-                    } else {
-                        str_daysleft = due_date_minus_today + "d";
                     }
                 }
             }
+            let str_daysleft;
+            if (Number.isFinite(sa.sa.x) && status_value !== Priority.NOT_YET_ASSIGNED) {
+                due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                if (due_date_minus_today < -1) {
+                    str_daysleft = -due_date_minus_today + "d Ago";
+                } else if (due_date_minus_today === -1) {
+                    str_daysleft = 'Yesterday';
+                } else if (due_date_minus_today === 0) {
+                    str_daysleft = 'Today';
+                } else if (due_date_minus_today === 1) {
+                    str_daysleft = 'Tomorrow';
+                } else if (due_date_minus_today < 7) {
+                    const due_date = new Date((sa.sa.assignment_date).valueOf());
+                    due_date.setDate(due_date.getDate() + sa.sa.x);
+                    str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                } else {
+                    str_daysleft = due_date_minus_today + "d";
+                }
+            }
+
             // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
             // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
             // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
@@ -489,7 +476,7 @@ class Priority {
                 dom_status_image.attr("src", `https://storage.googleapis.com/twstatic/images/status-icons/${status_image}.png`);
             }
             dom_status_message.html(status_message);
-            dom_title.attr("data-daysleft", str_daysleft||"");
+            dom_title.attr("data-daysleft", str_daysleft);
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
