@@ -27,6 +27,69 @@ utils = {
                 b: parseInt(result[3], 16),
             }
         },
+        // https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/
+        rgbToHSV: function(r , g , b) {
+ 
+            // R, G, B values are divided by 255
+            // to change the range from 0..255 to 0..1
+            r = r / 255.0;
+            g = g / 255.0;
+            b = b / 255.0;
+     
+            // h, s, v = hue, saturation, value
+            var cmax = Math.max(r, Math.max(g, b)); // maximum of r, g, b
+            var cmin = Math.min(r, Math.min(g, b)); // minimum of r, g, b
+            var diff = cmax - cmin; // diff of cmax and cmin.
+            var h = -1, s = -1;
+     
+            // if cmax and cmax are equal then h = 0
+            if (cmax == cmin)
+                h = 0;
+     
+            // if cmax equal r then compute h
+            else if (cmax == r)
+                h = (60 * ((g - b) / diff) + 360) % 360;
+     
+            // if cmax equal g then compute h
+            else if (cmax == g)
+                h = (60 * ((b - r) / diff) + 120) % 360;
+     
+            // if cmax equal b then compute h
+            else if (cmax == b)
+                h = (60 * ((r - g) / diff) + 240) % 360;
+     
+            // if cmax equal zero
+            if (cmax == 0)
+                s = 0;
+            else
+                s = (diff / cmax) * 100;
+     
+            // compute v
+            var v = cmax * 100;
+            return {h, s, v};
+        },
+        // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
+        hsvToRGB: function(h, s, v) {
+            h /= 360;
+            s /= 100;
+            v /= 100;
+
+            var r, g, b, i, f, p, q, t;
+            i = Math.floor(h * 6);
+            f = h * 6 - i;
+            p = v * (1 - s);
+            q = v * (1 - f * s);
+            t = v * (1 - (1 - f) * s);
+            switch (i % 6) {
+                case 0: r = v, g = t, b = p; break;
+                case 1: r = q, g = v, b = p; break;
+                case 2: r = p, g = v, b = t; break;
+                case 3: r = p, g = q, b = v; break;
+                case 4: r = t, g = p, b = v; break;
+                case 5: r = v, g = p, b = q; break;
+            }
+            return {r: r*255, g: g*255, b: b*255};
+        },
         arrayToEnglish: function(array) {
             return `<ul><li>${array.join("</li><li>")}</li></ul>`;
         }

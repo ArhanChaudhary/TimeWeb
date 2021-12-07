@@ -3,7 +3,7 @@ class Priority {
     static ANIMATE_IN_DURATION = 1500;
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => 1.75 + Math.abs(transform_value) / 2000;
     static SORT_TIMEOUT_DURATION = 35;
-    static DARK_MODE_ALPHA = 0.75;
+    static DARK_MODE_ALPHA = 0.6;
     static ANIMATE_IN_START_MARGIN = 20; // Moves animate in a bit below the last assignment to give it more breathing room
 
     static INCOMPLETE_WORKS = 10;
@@ -21,15 +21,17 @@ class Priority {
         const that = this;
         const percentage_as_decimal = priority_percentage / 100;
         if (isNaN(percentage_as_decimal)) {
-            var r = 255;
-            var g = 255;
-            var b = 255;
+            var h = 0;
+            var s = 0;
+            var v = 100;
         } else {
-            var r = SETTINGS.lowest_priority_color.r + (SETTINGS.highest_priority_color.r - SETTINGS.lowest_priority_color.r) * percentage_as_decimal;
-            var g = SETTINGS.lowest_priority_color.g + (SETTINGS.highest_priority_color.g - SETTINGS.lowest_priority_color.g) * percentage_as_decimal;
-            var b = SETTINGS.lowest_priority_color.b + (SETTINGS.highest_priority_color.b - SETTINGS.lowest_priority_color.b) * percentage_as_decimal;
+            const low_hsv = utils.formatting.rgbToHSV(SETTINGS.lowest_priority_color.r, SETTINGS.lowest_priority_color.g, SETTINGS.lowest_priority_color.b);
+            const high_hsv = utils.formatting.rgbToHSV(SETTINGS.highest_priority_color.r, SETTINGS.highest_priority_color.g, SETTINGS.highest_priority_color.b);
+            var h = low_hsv.h + (high_hsv.h - low_hsv.h) * percentage_as_decimal;
+            var s = low_hsv.s + (high_hsv.s - low_hsv.s) * percentage_as_decimal;
+            var v = low_hsv.v + (high_hsv.v - low_hsv.v) * percentage_as_decimal;
         }
-        return {r, g, b};
+        return utils.formatting.hsvToRGB(h, s, v);
     }
     // Handles coloring and animating assignments that were just created or edited
     colorOrAnimateInAssignment(dom_assignment) {
@@ -49,7 +51,6 @@ class Priority {
                 dom_assignment.addClass("transition-instantly");
             }
             const background_color = that.percentageToColor(that.priority_percentage);
-            const a = $("html").is("#dark-mode") ? Priority.DARK_MODE_ALPHA : 1;
             dom_assignment.parents(".assignment-container").toggleClass("invert-text-color",
                 // https://awik.io/determine-color-bright-dark-using-javascript/
                 Math.sqrt(
@@ -59,9 +60,16 @@ class Priority {
                 ) <= 127.5
             );
 
-            background_color.r = Math.round(background_color.r * a);
-            background_color.g = Math.round(background_color.g * a);
-            background_color.b = Math.round(background_color.b * a);
+            const a = $("html").is("#dark-mode") ? Priority.DARK_MODE_ALPHA : 1;
+            background_color.r *= a;
+            background_color.g *= a;
+            background_color.b *= a;
+
+            // You can also do this (they are the same)
+            // background_color = utils.formatting.rgbToHSV(background_color.r, background_color.g, background_color.b);
+            // background_color.v *= a;
+            // background_color = utils.formatting.hsvToRGB(background_color.h, background_color.s, background_color.v);
+
             dom_assignment.css("background-color", `rgb(${background_color.r},${background_color.g},${background_color.b})`);
             dom_assignment.toggleClass("mark-as-done", that.mark_as_done);
             if (that.params.first_sort) {
