@@ -475,7 +475,7 @@ class Priority {
                 dom_status_image.removeAttr("src");
             } else {
                 dom_status_image.show();
-                dom_status_image.attr("src", `https://storage.googleapis.com/twstatic/images/status-icons/${status_image}.png`);
+                dom_status_image.attr("src", `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
