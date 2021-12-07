@@ -1067,6 +1067,7 @@ class VisualAssignment extends Assignment {
     }
 }
 let already_ran_tutorial = false;
+let prevent_click = false;
 $(function() {
 $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const target = $(e.target);
@@ -1074,7 +1075,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const targetInTags = !!target.parents(".tags").length || target.is(".tags");
     const targetInButton = !!target.parents(".button").length || target.is(".button");
     const dontFire = targetInTags || targetInButton;
-    if (!(targetInHeader && !dontFire)) return;
+    if (!(targetInHeader && !dontFire) || prevent_click) return;
     const dom_assignment = $(this);
     const sa_sa = utils.loadAssignmentData(dom_assignment);
     
@@ -1141,10 +1142,12 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     sa.resize();
     if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
         already_ran_tutorial = true;
+        prevent_click = true;
         $("#tutorial-click-assignment-to-open").remove();
         setTimeout(function() {
             const days_until_due = Math.floor(sa.sa.complete_x) - sa.sa.blue_line_start;
             utils.ui.graphAlertTutorial(days_until_due);
+            prevent_click = false;
         }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
     }
 });
