@@ -104,6 +104,7 @@ utils = {
                     estimated_completion_time.setTime(8640000000000000);
                 }
                 let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
                 str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
                 $("#current-time").html(` (${str})`);
                 utils.ui.old_minute_value = minute_value;
@@ -123,20 +124,43 @@ utils = {
                 });
             },
             tickButtons: function() {
+                let runningCount = 0;
                 $(".tick-button").parent().click(function() {
-                    const dom_assignment = $(this).parents(".assignment");
-                    if (dom_assignment.hasClass('open-assignment')) {
-                        dom_assignment.find(".work-input-textbox").val("fin");
-                        dom_assignment.find(".submit-work-button").click();
+                    if (runningCount) return; // The user can spam click this while a separate dispatched handler is simultaneously running, causing invalid ticks
+                    runningCount++;
+                    
+                    const $this = $(this);
+                    const dom_assignment = $this.parents(".assignment");
+
+                    // .sort is already called in the controls' click handlers
+                    if ($this.hasClass("slashed")) {
+                        if (dom_assignment.hasClass('open-assignment')) {
+                            dom_assignment.find(".delete-work-input-button").click();
+                        } else {
+                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
+                            dom_assignment.click();
+                            dom_assignment.find(".delete-work-input-button").click();
+                            dom_assignment.click();
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
+                        }
                     } else {
-                        const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
-                        VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
-                        dom_assignment.click();
-                        dom_assignment.find(".work-input-textbox").val("fin");
-                        dom_assignment.find(".submit-work-button").click();
-                        dom_assignment.click();
-                        VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
+                        if (dom_assignment.hasClass('open-assignment')) {
+                            dom_assignment.find(".work-input-textbox").val("fin");
+                            dom_assignment.find(".submit-work-button").click();
+                        } else {
+                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
+                            dom_assignment.click();
+                            dom_assignment.find(".work-input-textbox").val("fin");
+                            dom_assignment.find(".submit-work-button").click();
+                            dom_assignment.click();
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
+                        }
                     }
+                    setTimeout(function() {
+                        runningCount--;
+                    }, Priority.SORT_TIMEOUT_DURATION);
                 });
             },
 
@@ -1272,12 +1296,13 @@ for (let sa of dat) {
         
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
-            $(window).one("load", function() {
-                setTimeout(function() {
-                    priority.sort();
-                // Hardcoded delay if setTimeout isn't accurate
-                }, complete_due_date - original_date_now + 5000);
-            });
+            if (complete_due_date - original_date_now + 5000 > 0)
+                $(window).one("load", function() {
+                    setTimeout(function() {
+                        priority.sort();
+                    // Hardcoded delay if setTimeout isn't accurate
+                    }, complete_due_date - original_date_now + 5000);
+                });
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
             sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
             sa.complete_x = mathUtils.daysBetweenTwoDates(complete_due_date, sa.assignment_date, {round: false});

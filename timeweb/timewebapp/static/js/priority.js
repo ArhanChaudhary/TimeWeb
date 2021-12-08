@@ -267,9 +267,7 @@ class Priority {
                     } else {
                         alert_due_date_passed_cond = true;
                         if (!sa.sa.has_alerted_due_date_passed_notice) {
-                            that.due_date_passed_notices.push(sa.sa.name);
-                            sa.sa.has_alerted_due_date_passed_notice = true;
-                            ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
+                            that.due_date_passed_notices.push(sa.sa);
                         }
                         status_message = 'This Assignment\'s Due Date has Passed';
                     }
@@ -335,8 +333,9 @@ class Priority {
                         complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
                     }
                     due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                    const todo_is_completed = todo <= 0 || today_minus_assignment_date < len_works + sa.sa.blue_line_start;
+                    const todo_is_completed = todo <= 0;
                     const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
+                    const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
                     // Don't mark as no working days when the end of the assignment has been reached
                     const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now;
                     // use complete_due_date <= complete_date_now instead of (complete_due_date <= complete_date_now && sa.sa.soft)
@@ -356,7 +355,7 @@ class Priority {
                             width: 11,
                             height: 18,
                         }).css("margin-left", 2);
-                    } else if (todo_is_completed || current_work_input_is_break_day) {
+                    } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
                         status_image = 'finished';
                         if (current_work_input_is_break_day) {
                             status_message = 'Today is this Assignment\'s Break Day';
@@ -424,6 +423,13 @@ class Priority {
                     str_daysleft = due_date_minus_today + "d";
                 }
             }
+            // Can't just define this once because len_works changes
+            const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
+            assignment_container.find(".button").filter(function() {
+                return !!$(this).children(".tick-button").length;
+            }).toggle(
+                ![Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
+            ).toggleClass("slashed", already_entered_work_input_for_today);
 
             // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
             // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
@@ -437,10 +443,10 @@ class Priority {
             // }
             const ignore_tag_status_value = Math.round(status_value);
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            assignment_container.toggleClass("finished", ignore_tag_status_value === Priority.COMPLETELY_FINISHED);
-            assignment_container.toggleClass("incomplete-works", ignore_tag_status_value === Priority.INCOMPLETE_WORKS);
-            assignment_container.toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
-            assignment_container.toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
+            assignment_container.toggleClass("finished", ignore_tag_status_value === Priority.COMPLETELY_FINISHED)
+                                .toggleClass("incomplete-works", ignore_tag_status_value === Priority.INCOMPLETE_WORKS)
+                                .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value))
+                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
 
             let status_priority;
             if (ignore_tag_status_value === Priority.COMPLETELY_FINISHED) {
@@ -604,18 +610,33 @@ class Priority {
         that.tomorrow_total_completion_time = 0;
         that.due_date_passed_notices = [];
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
+        let title;
+        let content;
         if (that.due_date_passed_notices.length === 1) {
-            $.alert({
-                title: `Important notice: The assignment "${that.due_date_passed_notices[0]}" has been marked as completely finished because its due date has passed.`,
-                content: "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.",
-                backgroundDismiss: false,
-            });
+            title = `Important notice: The assignment "${that.due_date_passed_notices[0].name}" has been marked as completely finished because its due date has passed.`;
+            content = "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.";
         } else if (that.due_date_passed_notices.length > 1) {
+            title = `Important notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices.map(i => i.name))} have been marked as completely finished because their due dates have passed.`;
+            content = "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.";       
+        }
+        if (title && !Priority.alreadyAlerted) {
+            Priority.alreadyAlerted = true;
             $.alert({
-                title: `Important notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} have been marked as completely finished because their due dates have passed.`,
-                content: "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.",
+                title: title,
+                content: content,
                 backgroundDismiss: false,
-            });
+                buttons: {
+                    ok: {
+                        action: function() {
+                            Priority.alreadyAlerted = false;
+                            for (let sa of that.due_date_passed_notices) {
+                                sa.has_alerted_due_date_passed_notice = true;
+                                ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.has_alerted_due_date_passed_notice, sa.id);
+                            }
+                        }
+                    }
+                }
+            })
         }
         // Updates open graphs' today line and other graph text
         setTimeout(() => {

@@ -699,11 +699,29 @@ a[href="settings"] {
     background-color: rgb(173, 216, 230);
     z-index: 1;
 }
-.button:active img {
+.button:active * {
     transform: scale(0.95);
 }
-.button img {
+.button * {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
+}
+.button:active .tick-slash {
+    transform: rotate(45deg) scale(0.95);
+}
+.button.slashed .tick-button {
+    /* for help https://bennettfeely.com/clippy/ */
+    -webkit-clip-path: polygon(0 0, 0 100%, 100% 100%, 10% 0, 25% 0, 100% 85%, 100% 0%);
+            clip-path: polygon(0 0, 0 100%, 100% 100%, 10% 0, 25% 0, 100% 85%, 100% 0%);
+}
+.button-slash {
+    display: none;
+}
+.button.slashed .button-slash {
+    display: block;
+    position: absolute;
+    width: 30px;
+    border-bottom: 2px solid black;
+    transform: rotate(45deg);
 }
 .assignment-footer {
     position: relative;
