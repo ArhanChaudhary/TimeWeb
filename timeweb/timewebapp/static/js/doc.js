@@ -20,11 +20,21 @@ document.addEventListener("DOMContentLoaded", function() {
         $major_category.attr("number-major-categories", number_major_categories);
 
         const major_category_li = $(TABLE_OF_CONTENTS_MAJOR_CATEGORY_TEMPLATE);
-        major_category_li.find("a").text($major_category.text());
-        $major_category.attr("id") && major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`);
+        let minor_categories = $major_category.siblings("details");
+        if ($major_category.attr("id"))
+            minor_categories = minor_categories.add($major_category);
+        //     major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`);
+        //     major_category_li.find("a").text($major_category.text());
+        // } else {
+        //     major_category_li.find("a").remove();
+            major_category_li.find("span").text($major_category.text());
+        // }
+        
 
-        $major_category.siblings("details").each(function() {
-            const $minor_category = $(this).find(".minor-category");
+        minor_categories.each(function() {
+            let $minor_category = $(this).find(".minor-category");
+            if (!$minor_category.length)
+                $minor_category = $minor_category.add($major_category);
 
             const minor_category_li = $(TABLE_OF_CONTENTS_MINOR_CATEGORY_TEMPLATE);
             minor_category_li.find("a").attr("href", `#${$minor_category.attr("id")}`).text($minor_category.text());
