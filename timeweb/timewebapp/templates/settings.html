@@ -15,14 +15,14 @@
 <form method="POST" autocomplete="off" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form.visible_fields %}
-        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "reverse_sorting" or field.name == "assignment_spacing" or field.name == "background_image" %}
+        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "assignment_spacing" or field.name == "background_image" %}
         <fieldset>
             <legend>
                 {% if field.name == "def_break_days" %}
                     Assignment Form
                 {% elif field.name == "def_skew_ratio" %}
                     Assignment Graph
-                {% elif field.name == "reverse_sorting" %}
+                {% elif field.name == "highest_priority_color" %}
                     Assignment Priority
                 {% elif field.name == "assignment_spacing" %}
                     Assignment Header

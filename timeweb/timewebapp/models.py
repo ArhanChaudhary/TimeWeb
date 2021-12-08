@@ -231,10 +231,6 @@ class SettingsModel(models.Model):
     )
 
     # Group "Assignment Priority"
-    reverse_sorting = models.BooleanField(
-        default=False,
-        verbose_name=_('Sort Assignments in Reverse'),
-    )
     highest_priority_color = ColorField(
         default="#e8564a",
         verbose_name=_('Highest Priority Color'),
@@ -242,6 +238,10 @@ class SettingsModel(models.Model):
     lowest_priority_color = ColorField(
         default="#84d336",
         verbose_name=_('Lowest Priority Color'),
+    )
+    reverse_sorting = models.BooleanField(
+        default=False,
+        verbose_name=_('Sort Assignments in Reverse'),
     )
     color_priority = models.BooleanField(
         default=True,
