@@ -291,7 +291,7 @@ class SettingsModel(models.Model):
     animation_speed = models.CharField(
         max_length=MAX_ANIMATION_SPEED_LENGTH,
         choices=ANIMATION_SPEED,
-        default=_("Normal"),
+        default=_("1"),
         verbose_name=_('Animation Speed'),
     )
     restore_gc_assignments = models.BooleanField(
