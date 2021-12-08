@@ -1296,12 +1296,13 @@ for (let sa of dat) {
         
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
-            $(window).one("load", function() {
-                setTimeout(function() {
-                    priority.sort();
-                // Hardcoded delay if setTimeout isn't accurate
-                }, complete_due_date - original_date_now + 5000);
-            });
+            if (complete_due_date - original_date_now + 5000 > 0)
+                $(window).one("load", function() {
+                    setTimeout(function() {
+                        priority.sort();
+                    // Hardcoded delay if setTimeout isn't accurate
+                    }, complete_due_date - original_date_now + 5000);
+                });
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
             sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
             sa.complete_x = mathUtils.daysBetweenTwoDates(complete_due_date, sa.assignment_date, {round: false});

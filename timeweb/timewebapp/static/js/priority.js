@@ -267,9 +267,7 @@ class Priority {
                     } else {
                         alert_due_date_passed_cond = true;
                         if (!sa.sa.has_alerted_due_date_passed_notice) {
-                            that.due_date_passed_notices.push(sa.sa.name);
-                            sa.sa.has_alerted_due_date_passed_notice = true;
-                            ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
+                            that.due_date_passed_notices.push(sa.sa);
                         }
                         status_message = 'This Assignment\'s Due Date has Passed';
                     }
@@ -612,18 +610,33 @@ class Priority {
         that.tomorrow_total_completion_time = 0;
         that.due_date_passed_notices = [];
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
+        let title;
+        let content;
         if (that.due_date_passed_notices.length === 1) {
-            $.alert({
-                title: `Important notice: The assignment "${that.due_date_passed_notices[0]}" has been marked as completely finished because its due date has passed.`,
-                content: "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.",
-                backgroundDismiss: false,
-            });
+            title = `Important notice: The assignment "${that.due_date_passed_notices[0].name}" has been marked as completely finished because its due date has passed.`;
+            content = "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.";
         } else if (that.due_date_passed_notices.length > 1) {
+            title = `Important notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices.map(i => i.name))} have been marked as completely finished because their due dates have passed.`;
+            content = "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.";       
+        }
+        if (title && !Priority.alreadyAlerted) {
+            Priority.alreadyAlerted = true;
             $.alert({
-                title: `Important notice: The assignments ${utils.formatting.arrayToEnglish(that.due_date_passed_notices)} have been marked as completely finished because their due dates have passed.`,
-                content: "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.",
+                title: title,
+                content: content,
                 backgroundDismiss: false,
-            });
+                buttons: {
+                    ok: {
+                        action: function() {
+                            Priority.alreadyAlerted = false;
+                            for (let sa of that.due_date_passed_notices) {
+                                sa.has_alerted_due_date_passed_notice = true;
+                                ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.has_alerted_due_date_passed_notice, sa.id);
+                            }
+                        }
+                    }
+                }
+            })
         }
         // Updates open graphs' today line and other graph text
         setTimeout(() => {
