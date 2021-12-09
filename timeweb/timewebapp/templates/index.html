@@ -33,7 +33,7 @@
           {% for field in form.visible_fields %}
             <div class="field-wrapper" id="id-{{ field.name }}-field-wrapper">
               {% if field.name == "break_days" %}
-                <label id="break-days-label-title">Break Days</label>
+                <label id="break-days-label-title">Work Days</label>
                 <div id="break-days-wrapper">
                   {% for value, text in field.field.choices %}
                     <input id="id_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in checked_break_days %}checked="checked"{% endif %}>

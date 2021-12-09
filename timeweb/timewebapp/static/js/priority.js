@@ -347,7 +347,7 @@ class Priority {
                             status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                             status_value = Priority.INCOMPLETE_WORKS;
                         } else {
-                            status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Break Days';
+                            status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Work Days';
                             status_value = Priority.NO_WORKING_DAYS;
                         }
                         //hard
@@ -358,7 +358,7 @@ class Priority {
                     } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
                         status_image = 'finished';
                         if (current_work_input_is_break_day) {
-                            status_message = 'Today is this Assignment\'s Break Day';
+                            status_message = 'Today isn\'t this Assignment\'s Work Day';
                         } else {
                             status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
                         }

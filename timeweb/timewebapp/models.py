@@ -178,7 +178,7 @@ class SettingsModel(models.Model):
         choices=WEEKDAYS,
         blank=True,
         null=True,
-        verbose_name=_('Default Break Days'),
+        verbose_name=_('Default Work Days'),
     )
     def_min_work_time = models.DecimalField(
         max_digits=15,
