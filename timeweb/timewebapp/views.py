@@ -261,6 +261,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         local_now = timezone.localtime(utc_now)
         local_last_login = timezone.localtime(User.objects.get(username=request.user).last_login)
         if local_last_login.day != local_now.day:
+            breakpoint()
             # Only notify if the date has changed until 4 AM the next day after the last login
             if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
                 self.context['notify_date_changed'] = True
