@@ -118,7 +118,7 @@ def days_between_two_dates(day1, day2):
 class TimewebGenericView(View):
     def __init__(self):
         self.context = get_default_context()
-        
+
     def render_with_dynamic_context(self, request, file, context):
         if not hasattr(self, "settings_model"):
             self.settings_model = SettingsModel.objects.filter(user__username=request.user)
@@ -257,13 +257,19 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         
-        if (timezone.localtime(User.objects.get(username=request.user).last_login)).day != timezone.localtime(timezone.now()).day:
+        utc_now = timezone.now()
+        local_now = timezone.localtime(utc_now)
+        local_last_login = timezone.localtime(User.objects.get(username=request.user).last_login)
+        if local_last_login.day != local_now.day:
+            # Only notify if the date has changed until 4 AM the next day after the last login
+            if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
+                self.context['notify_date_changed'] = True
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
             TimewebModel.objects.bulk_update(self.assignment_models, ['mark_as_done'])
         self.user_model = User.objects.get(username=request.user)
-        self.user_model.last_login = timezone.now()
+        self.user_model.last_login = utc_now
         self.user_model.save()
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
