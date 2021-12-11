@@ -116,6 +116,9 @@ def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 
 class TimewebGenericView(View):
+    def __init__(self):
+        self.context = get_default_context()
+        
     def render_with_dynamic_context(self, request, file, context):
         if not hasattr(self, "settings_model"):
             self.settings_model = SettingsModel.objects.filter(user__username=request.user)
@@ -127,8 +130,6 @@ class TimewebGenericView(View):
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
 
-    def __init__(self):
-        self.context = get_default_context()
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
         initial = {
@@ -231,9 +232,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
-
-    def __init__(self):
-        self.context = get_default_context()
 
     def add_user_models_to_context(self, request):
         self.context['assignment_models'] = self.assignment_models
@@ -838,9 +836,6 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 class ImagesView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
 
-    def __init__(self):
-        self.context = get_default_context()
-
     # GS_CACHE_CONTROL in settings.py is supposed to set a cache but it doesnt for some reason
     @cache_control(public=True, max_age=604800)
     def get(self, request, imageUserId, imageName):
@@ -855,46 +850,31 @@ class ImagesView(LoginRequiredMixin, TimewebGenericView):
             return HttpResponse(status=204)
 
 class BlogView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
-
     def get(self, request):
         return self.render_with_dynamic_context(request, "blog.html", self.context)
 
 class UserguideView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
     def get(self, request):
         self.context['add_faq'] = True
         return self.render_with_dynamic_context(request, "user-guide.html", self.context)
 
 class ChangelogView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
     def get(self, request):
         self.context['changelogs'] = CHANGELOGS
         return self.render_with_dynamic_context(request, "changelog.html", self.context)
 
 class RickView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
     def get(self, request, _):
         return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
 
 class StackpileView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
     def get(self, request):
         return redirect("https://stackpile.me")
 
 class SpookyView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
     def get(self, request):
         return self.render_with_dynamic_context(request, "spooky.html", self.context)
     
 class SusView(TimewebGenericView):
-    def __init__(self):
-        self.context = get_default_context()
     def get(self, request):
         return self.render_with_dynamic_context(request, "sus.html", self.context)
