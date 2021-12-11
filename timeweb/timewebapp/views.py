@@ -167,6 +167,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user__username=request.user)
+        self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         self.isExampleAccount = request.user.username == example_account_name
         self.form = SettingsForm(data=request.POST, files=request.FILES)
         self.checked_background_image_clear = request.POST.get("background_image-clear")
@@ -192,10 +193,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
         if self.settings_model.def_funct_round_minute:
-            for model in TimewebModel.objects.filter(user__username=request.user):
-                if model.unit in ('minute', 'Minute', 'minutes', 'Minutes') and model.funct_round != 5:
-                    model.funct_round = 5
-                    model.save()
+            for assignment in self.assignment_models:
+                if assignment.unit in ('minute', 'Minute', 'minutes', 'Minutes') and assignment.funct_round != 5:
+                    assignment.funct_round = 5
+            TimewebModel.objects.bulk_update(self.assignment_models, ['funct_round'])
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         self.settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
         self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
