@@ -152,6 +152,7 @@ class SettingsForm(forms.ModelForm):
             "assignment_spacing": "Controls the height of every assignment.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
+            "show_advanced_controls": "Disabling this removes the button entirely.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "use_in_progress": "After today, your submitted work inputs will add onto the work you've done today. This is useful if you work on an assignment many times in a day. As a side effect, this also prevents you from entering work inputs in the future. To bypass this issue, enter the following syntax as a work input: \"tom [some number]\"",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",

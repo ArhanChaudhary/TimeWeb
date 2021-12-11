@@ -217,6 +217,10 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Enter Work inputs In-Place after Today'),
     )
+    show_advanced_controls = models.BooleanField(
+        default=True,
+        verbose_name=_('Show "Advanced Controls" beneath the Graph'),
+    )
     one_graph_at_a_time = models.BooleanField(
         default=False,
         verbose_name=_('Allow Only one open Graph at a Time'),
