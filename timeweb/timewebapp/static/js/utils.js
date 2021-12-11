@@ -220,7 +220,7 @@ utils = {
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
-                $("#current-date-text").text(`${notify_date_changed||1 ? "(The current date has changed) " : ""}Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+                $("#current-date-text").text(`${notify_date_changed ? "(The current date has changed) " : ""}Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
                 $("#next-day, #previous-day").click(function() {
                     utils.in_simulation = true;
                     ajaxUtils.disable_ajax = true;
