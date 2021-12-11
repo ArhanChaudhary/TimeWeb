@@ -83,7 +83,7 @@ header.animate::after {
     overflow: hidden;
     position: absolute;
 }
-#assignments-header img:not(:first-of-type), #assignments-header a img {
+#assignments-header img:not(:first-of-type), #assignments-header a {
     position: relative;
     z-index: 1;
     margin-left: 14px;
@@ -91,43 +91,50 @@ header.animate::after {
 #assignments-header img {
     cursor: pointer;
 }
+#settings {
+    /* Remove weird extra space */
+    display: block;
+}
 #close-assignments {
     order: 2;
 }
 #open-assignments {
     order: 3;
 }
-#next-day {
+#previous-day {
     order: 4;
+    transform: scaleX(-1);
 }
-#settings {
-    /* Remove weird extra space */
-    display: block;
+#next-day {
+    order: 5;
 }
 a[href="settings"] {
-    order: 5;
+    order: 6;
 }
 #assignments-header #icon-label-container img ~ div {
     position: absolute;
     order: 1;
     padding-right: 5px;
     padding-left: 20px;
-    right: 225px;
+    right: 265px;
     text-align: right;
     display: none;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
+#assignments-header img#previous-day:hover ~ div#previous-day-icon-label,
 #assignments-header img#next-day:hover ~ div#next-day-icon-label,
 #assignments-header a[href="settings"]:hover ~ div#settings-icon-label,
 #assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
 #assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
+#assignments-header img#previous-day:focus ~ div#previous-day-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label,
 #assignments-header a[href="settings"]:focus ~ div#settings-icon-label {
     display: block;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
 #assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
+#assignments-header img#previous-day:hover ~ div:not(#previous-day-icon-label),
 #assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
 #assignments-header a[href="settings"]:hover ~ div:not(#settings-icon-label) {
     display: none !important;
@@ -1163,7 +1170,7 @@ html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
             invert(var(--filter-invert, 0));
 }
 /* Fix double invert */
-#dark-mode #next-day-icon-label .grey-highlight {
+#dark-mode #next-day-icon-label .grey-highlight, #dark-mode #previous-day-icon-label .grey-highlight {
     --filter-invert: 0;
 }
 #dark-mode #overlay {

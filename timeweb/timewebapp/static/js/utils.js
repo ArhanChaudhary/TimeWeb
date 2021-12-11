@@ -219,10 +219,19 @@ utils = {
                     $(".assignment.open-assignment").click();
                 });
                 $("#current-date-text").text("Current date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                $("#next-day").click(function() {
-                    utils.in_next_day = true;
+                $("#next-day, #previous-day").click(function() {
+                    utils.in_simulation = true;
                     ajaxUtils.disable_ajax = true;
-                    date_now.setDate(date_now.getDate() + 1);
+                    let day_increment;
+                    switch ($(this).attr("id")) {
+                        case "next-day":
+                            day_increment = 1;
+                            break;
+                        case "previous-day":
+                            day_increment = -1;
+                            break;
+                    }
+                    date_now.setDate(date_now.getDate() + day_increment);
                     // mark as done is unmarked in the next day
                     $(".assignment.mark-as-done").each(function() {
                         $(this).find(".mark-as-done-button").click();
@@ -232,11 +241,16 @@ utils = {
                         position: "absolute",
                         top: -9999,
                     })
-                    $("#current-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                    $("#current-date-text").text("(No changes are saved in this state) Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                     priority.sort();
                 });
                 $("#next-day-icon-label").info("bottom",
                     `Simulates every assignments' work on the next day
+                    
+                    All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
+                );
+                $("#previous-day-icon-label").info("bottom",
+                    `Simulates every assignments' work on the previous day
                     
                     All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
                 );
@@ -1017,7 +1031,7 @@ utils = {
             setTimeout(function() {
                 // Don't reload in the next day to preserve changes made in the simulation
                 // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
-                if (utils.in_next_day || isExampleAccount) return;
+                if (utils.in_simulation || isExampleAccount) return;
                 reloadWhenAppropriate();
             }, reload_time - now.getTime());
         }
