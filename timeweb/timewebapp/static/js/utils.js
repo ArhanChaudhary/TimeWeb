@@ -1035,7 +1035,7 @@ utils = {
                 // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
                 if (utils.in_simulation || isExampleAccount) return;
                 reloadWhenAppropriate();
-            }, reload_time - now.getTime());
+            }, reload_time - now.getTime() + utils.SCHEDULED_TIMEOUT_DELAY);
         }
     },
     loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
@@ -1052,6 +1052,7 @@ utils = {
             resolver();
         }, 200);
     },
+    SCHEDULED_TIMEOUT_DELAY: 5000,
 }
 
 isExampleAccount = username === example_account_name || editing_example_account;
@@ -1312,12 +1313,12 @@ for (let sa of dat) {
         
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
-            if (complete_due_date - original_date_now + 5000 > 0)
+            if (complete_due_date - original_date_now + utils.SCHEDULED_TIMEOUT_DELAY > 0)
                 $(window).one("load", function() {
                     setTimeout(function() {
                         priority.sort();
                     // Hardcoded delay if setTimeout isn't accurate
-                    }, complete_due_date - original_date_now + 5000);
+                    }, complete_due_date - original_date_now + utils.SCHEDULED_TIMEOUT_DELAY);
                 });
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
             sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
