@@ -13,6 +13,10 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+#table-of-contents-container details {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
 #table-of-contents-container-label::after {
     content: '';
     position: absolute;
@@ -76,8 +80,12 @@ main ul {
     -webkit-margin-after: 0;
             margin-block-end: 0;
 }
-#table-of-contents-container ul {
+#table-of-contents-container details, #table-of-contents-container ul {
     font-size: 14px;
+}
+#table-of-contents-container details {
+    -webkit-padding-start: 28px;
+            padding-inline-start: 28px;
 }
 .table-of-contents-header {
     display: block;
