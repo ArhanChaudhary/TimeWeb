@@ -595,17 +595,15 @@ class VisualAssignment extends Assignment {
         screen.rotate(-Math.PI / 2);
         if (this.unit_is_of_time) {
             const plural = pluralize(this.sa.unit);
-            var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`,
-                label_x_pos = -3;
+            var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`;
         } else {
-            var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`,
-                label_x_pos = 0;
+            var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`;
         }
         if (screen.measureText(text).width > this.height - 50) {
             text = pluralize(this.sa.unit);
         }
         screen.textBaseline = "hanging";
-        screen.fillText(text, -(this.height - 50) / 2, label_x_pos);
+        screen.fillText(text, -(this.height - 50) / 2, 0);
         screen.rotate(Math.PI / 2);
 
         screen.font = '13.75px Open Sans';
@@ -659,9 +657,9 @@ class VisualAssignment extends Assignment {
                         if (number_y_pos < 4 + text_height / 2) {
                             number_y_pos = 4 + text_height / 2;
                         }
-                        if (38.5 - screen.measureText(displayed_number).width < 13 - label_x_pos) {
+                        if (38.5 - screen.measureText(displayed_number).width < 13) {
                             screen.textAlign = "left";
-                            screen.fillText(displayed_number, 13 - label_x_pos, number_y_pos);
+                            screen.fillText(displayed_number, 13, number_y_pos);
                             screen.textAlign = "right";
                         } else {
                             screen.fillText(displayed_number, 38.5, number_y_pos);
@@ -684,9 +682,9 @@ class VisualAssignment extends Assignment {
             if (number_y_pos < 4 + text_height / 2) {
                 number_y_pos = 4 + text_height / 2;
             }
-            if (38.5 - screen.measureText(bigger_index).width < 13 - label_x_pos) {
+            if (38.5 - screen.measureText(bigger_index).width < 13) {
                 screen.textAlign = "left";
-                screen.fillText(bigger_index, 13 - label_x_pos, number_y_pos);
+                screen.fillText(bigger_index, 13, number_y_pos);
                 screen.textAlign = "right";
             } else {
                 screen.fillText(bigger_index, 38.5, number_y_pos);
