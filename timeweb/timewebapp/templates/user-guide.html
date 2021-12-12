@@ -142,9 +142,9 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
             <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
-            This happens because you've already worked for today. By entering no work done, you're communicating that you've done nothing and you're not going to work any more for the rest of the day. 
+            This happens because you've already worked for today. By entering no work done, you're implying that you've done nothing and you're not going to work on that assignment for the rest of the day. 
 
-            This feature isn't exclusive to inputting no work done only; this occurs when you input less work than the assignment's daily work.
+            This functionality isn't exclusive to inputting no work done only; this also occurs when you input less work than the assignment's daily work.
         </span>
         <span class="minor-minor-category">Submit Units Done</span>
         This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -187,7 +187,7 @@ the span groups the major and minor categories together for user-guide.js {% end
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
         <img src="{% static 'images/assignment-header.png' %}">
-        The assignment header contains a brief, daily summary of the assignment and its work for today.
+        The assignment header contains a brief and daily summary of the assignment and its work for today.
 
         Above an assignment's name is its priority percentage relative to the other assignments.
         Below an assignment's name is the days left until it is due.
@@ -195,7 +195,7 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         At the center of an assignment is its header message. The message displayed will reflect the current status of the assignment. For instance, if you need to work on assignment for today, the header message will display how much you need to work for today according to the assignment graph.
 
-        At the right of the assignment header is the assignment's estimated completion time along with its hide, edit, and delete buttons.
+        At the right of the assignment header is the assignment's estimated completion time along with its hide, finish, edit, and delete buttons.
 
     </details>
     <details open>
@@ -247,6 +247,13 @@ the span groups the major and minor categories together for user-guide.js {% end
         Use this if you want to temporarily ignore an assignment's work from the total estimated completion time, to see how the esimated completion time or other assignments' priorities will change.
 
         You can also use this when you're not sure whether or not you'll complete an assignment's work for any day. Enter 0 units done instead when you are sure you won't complete any of the assignment's work.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="finish-assignment">Finish Assignment for Today</summary>
+        {% comment %} <img src="{% static 'images/finish-assignment.png' %}"> {% endcomment %}
+        
+        This button automatically submits a work input that completes an assignment's work for today.
 
     </details>
     <details open>
