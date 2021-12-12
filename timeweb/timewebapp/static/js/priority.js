@@ -225,16 +225,13 @@ class Priority {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
-            let alert_due_date_passed_cond;
+            let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
             if (sa.sa.needs_more_info) {
                 status_image = 'question-mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
-                    if (first_tag)
-                        status_value = Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG;
-                    else
-                        status_value = Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
+                    status_value = first_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
                 } else {
                     status_message = "This Assignment needs more Info!<br>Please Edit this Assignment";
                     status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
@@ -267,6 +264,7 @@ class Priority {
                     } else {
                         alert_due_date_passed_cond = true;
                         if (!sa.sa.has_alerted_due_date_passed_notice) {
+                            // sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
                             that.due_date_passed_notices.push(sa.sa);
                         }
                         status_message = 'This Assignment\'s Due Date has Passed';
@@ -278,18 +276,9 @@ class Priority {
                     }).css("margin-left", -3);
                     status_value = Priority.COMPLETELY_FINISHED;
                 } else if (today_minus_assignment_date < 0) {
-                    status_image = "no-status-image";
                     status_message = 'This Assignment hasn\'t yet been Assigned';
                     status_value = Priority.NOT_YET_ASSIGNED;
                 } else {
-                    // if (alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice)
-                    // The above code alerts the notice and ajaxs the due date passed notice as true
-                    // if !alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice)
-                    // The following code ajaxs the due date passed notice as false
-                    if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
-                        sa.sa.has_alerted_due_date_passed_notice = false;
-                        ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
-                    }
                     if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
                         for (let i = 0; i < number_of_forgotten_days; i++) {
                             if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
@@ -396,6 +385,14 @@ class Priority {
                     }
                 }
             }
+
+            // If the condition to alert the due date has passed is false, set sa.sa.has_alerted_due_date_passed_notice to true
+            // This is done so that it doesn't remain as true and fail to alert the user again
+            if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
+                sa.sa.has_alerted_due_date_passed_notice = false;
+                ajaxUtils.sendAttributeAjaxWithTimeout("has_alerted_due_date_passed_notice", sa.sa.has_alerted_due_date_passed_notice, sa.sa.id);
+            }
+
             let str_daysleft = "";
             if (status_value === Priority.NOT_YET_ASSIGNED) {
                 if (today_minus_assignment_date === -1) {
@@ -476,12 +473,12 @@ class Priority {
             };
             that.priority_data_list.push(priority_data);
 
-            if (status_image === "no-status-image") {
-                dom_status_image.hide();
-                dom_status_image.removeAttr("src");
-            } else {
+            if (status_image) {
                 dom_status_image.show();
                 dom_status_image.attr("src", `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
+            } else {
+                dom_status_image.hide();
+                dom_status_image.removeAttr("src");
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
