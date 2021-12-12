@@ -133,6 +133,8 @@ utils = {
                     const dom_assignment = $this.parents(".assignment");
 
                     // .sort is already called in the controls' click handlers
+                    const old_enable_tutoral = SETTINGS.enable_tutorial;
+                    SETTINGS.enable_tutorial = false;
                     if ($this.hasClass("slashed")) {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".delete-work-input-button").click();
@@ -158,6 +160,7 @@ utils = {
                             VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     }
+                    SETTINGS.enable_tutorial = old_enable_tutoral;
                     setTimeout(function() {
                         runningCount--;
                     }, Priority.SORT_TIMEOUT_DURATION);
