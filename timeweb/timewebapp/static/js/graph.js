@@ -82,6 +82,9 @@ class Assignment {
         const due_date = new Date(this.sa.assignment_date.valueOf());
         due_date.setDate(due_date.getDate() + this.sa.x);
         ajaxUtils.sendAttributeAjaxWithTimeout("x", due_date.getTime()/1000, this.sa.id);
+
+        this.sa.alert_due_date_incremented = true;
+        ajaxUtils.sendAttributeAjaxWithTimeout("alert_due_date_incremented", this.sa.alert_due_date_incremented, this.sa.id);
     }
     getWorkingDaysRemaining(params={reference: null}) {
         const original_red_line_start_x = this.red_line_start_x;

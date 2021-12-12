@@ -1174,7 +1174,6 @@ ajaxUtils = {
             }
         });
     },
-    notice_assignments: new Set(),
     sendAttributeAjaxWithTimeout: function(key, value, pk) {
 
         // Add key and values to the data being sent
@@ -1185,27 +1184,6 @@ ajaxUtils = {
             ajaxUtils.attributeData.assignments.push(sa);
         }
         sa[key] = value;
-
-
-        // Add data before checking disable_ajax so ajaxUtils.attributeData.assignments below is updated
-        for (const assignment of ajaxUtils.attributeData.assignments) {
-            if (!("x" in assignment)) continue;
-            ajaxUtils.notice_assignments.add(assignment.pk);
-        }
-        setTimeout(function() {
-            if (ajaxUtils.notice_assignments.size) {
-                ajaxUtils.notice_assignments = [...ajaxUtils.notice_assignments];
-                ajaxUtils.notice_assignments = ajaxUtils.notice_assignments.map(sa => utils.loadAssignmentData(sa, true).name);
-                $.alert({
-                    title: ajaxUtils.notice_assignments.length === 1 
-                    ? `Notice: the assignment "${ajaxUtils.notice_assignments[0]}" has had its due date incremented because it has soft due dates enabled.`
-                    : `Notice: the assignments ${utils.formatting.arrayToEnglish(ajaxUtils.notice_assignments)} have had their due dates incremented because they have soft due dates enabled.`,
-                    content: "This only occurs when an assignment's due date passes, but the assignment still isn't complete. If you don't want this to happen, disable soft due dates in the edit assignment form.",
-                    backgroundDismiss: false,
-                });
-                ajaxUtils.notice_assignments = new Set();
-            }
-        }, 0);
 
         if (ajaxUtils.disable_ajax) {
             // Reset data

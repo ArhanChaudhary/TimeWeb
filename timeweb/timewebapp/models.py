@@ -162,6 +162,9 @@ class TimewebModel(models.Model):
     has_alerted_due_date_passed_notice = models.BooleanField(
         default=False,
     )
+    alert_due_date_incremented = models.BooleanField(
+        default=False,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
