@@ -131,6 +131,7 @@ utils = {
                     
                     const $this = $(this);
                     const dom_assignment = $this.parents(".assignment");
+                    const assignment_container = dom_assignment.parents(".assignment-container");
 
                     // .sort is already called in the controls' click handlers
                     const old_enable_tutoral = SETTINGS.enable_tutorial;
@@ -139,25 +140,25 @@ utils = {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".delete-work-input-button").click();
                         } else {
-                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
+                            assignment_container.addClass("transform-instantly");
                             dom_assignment.click();
                             dom_assignment.find(".delete-work-input-button").click();
                             dom_assignment.click();
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
+                            assignment_container[0].offsetHeight;
+                            assignment_container.removeClass("transform-instantly");
                         }
                     } else {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
                         } else {
-                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
+                            assignment_container.addClass("transform-instantly");
                             dom_assignment.click();
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
                             dom_assignment.click();
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
+                            assignment_container[0].offsetHeight;
+                            assignment_container.removeClass("transform-instantly");
                         }
                     }
                     SETTINGS.enable_tutorial = old_enable_tutoral;
@@ -318,7 +319,9 @@ utils = {
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
-                                        crud.transitionDeleteAssignments($(".finished"), assignment_ids_to_delete);
+                                        $(".finished").each(function() {
+                                            crud.transitionDeleteAssignment($(this).children(".assignment"));
+                                        }); 
                                     }
                                     if (ajaxUtils.disable_ajax) {
                                         success();
@@ -424,7 +427,9 @@ utils = {
                                     }
                                     const success = function() {
                                         $this.off("click");
-                                        crud.transitionDeleteAssignments(assignments_to_delete, assignment_ids_to_delete);
+                                        assignments_to_delete.each(function() {
+                                            crud.transitionDeleteAssignment($(this).children(".assignment"));
+                                        });
                                     }
                 
                                     if (ajaxUtils.disable_ajax) {

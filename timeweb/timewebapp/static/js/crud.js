@@ -362,44 +362,23 @@ class Crud {
         const assignment_container = dom_assignment.parents(".assignment-container");
         // Animate height on assignment_container because it doesn't have a transition
         const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
-        assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
-            // $("#assignments-container").css("overflow", "");
-            // Remove assignment data from dat
-            dat = dat.filter(_sa => sa.id !== _sa.id);
+        assignment_container.css({
+            marginBottom: -boxHeightMinusShortcuts,
+            // Added by priority.sort, messes up the margin transition
+            transition: `margin-bottom ${Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION}ms cubic-bezier(0.33, 1, 0.68, 1)`,
+        }).on("transitionend", function(e) {
+            if (e.originalEvent.propertyName !== "margin-bottom") return;
+
             // If a shorcut is in assignment_container, take it out so it doesn't get deleted
             assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
             // Remove assignment from DOM
             assignment_container.remove();
-            // Although nothing needs to be swapped, priority.sort() still needs to be run
-            // This is to recolor and prioritize assignments and place "delete all starred assignments" accordingly
+            // $("#assignments-container").css("overflow", "");
+            dat = dat.filter(_sa => sa.id !== _sa.id);   
+            // Although nothing needs to be swapped, priority.sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
             priority.sort();
         });
         gtag("event","delete_assignment");
-    }
-    transitionDeleteAssignments($assignment_container, assignment_ids_to_delete) {
-        const that = this;
-        $assignment_container.each(function(i) {
-            gtag("event","delete_assignment");
-            const assignment_container = $(this);
-            const dom_assignment = assignment_container.children(".assignment");
-            // Opacity CSS transition
-            dom_assignment.css("opacity", "0");
-            // Use the height of dom_assignment instead of assignment_container to ignore the height of shortcuts
-            const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
-            assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
-                // If a shortcut is in assignment_container, take it out so it doesn't get deleted
-                assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
-                // Remove assignment from DOM
-                assignment_container.remove();
-                // Run on last callback
-                if (i === $assignment_container.length - 1) {
-                    // Remove from dat
-                    dat = dat.filter(_sa => !assignment_ids_to_delete.includes(_sa.id));
-                    // Although nothing needs to be swapped, priority.sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-                    priority.sort();
-                }
-            });
-        }); 
     }
     deleteAssignment($button) {
         const that = this;

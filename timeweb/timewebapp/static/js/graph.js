@@ -1108,14 +1108,17 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     // Close assignment
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
-        assignment_footer.animate({
-            marginBottom: -(assignment_footer.height() + parseFloat(dom_assignment.find(".graph-container").css("margin-top")))
-        }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
+        const footer_height = assignment_footer.height() + parseFloat(dom_assignment.find(".graph-container").css("margin-top"));
+        assignment_footer.css({
+            marginBottom: -footer_height,
+            transition: `margin-bottom ${Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION}ms cubic-bezier(0.33, 1, 0.68, 1)`,
+        }).one("transitionend", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "");
             assignment_footer.css({
                 display: "",
                 marginBottom: "",
+                transition: "",
             });
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
@@ -1128,11 +1131,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     
     const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
-    assignment_footer.stop().css({
-        display: "",
-        marginBottom: "",
-    });
-    dom_assignment.css("overflow", "");
+    assignment_footer.stop().trigger("transitionend");
     dom_assignment.addClass("open-assignment");
     priority.positionTags(dom_assignment);
     utils.ui.displayTruncateWarning(dom_assignment);

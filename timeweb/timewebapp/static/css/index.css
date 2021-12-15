@@ -148,9 +148,13 @@ a[href="settings"] {
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
+
+     /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after */
+    --last-line-wrapper-left: 4px;
+    --last-line-wrapper-width: 23px;
 }
-.assignment-container.transform-instantly {
-    transition: none;
+.assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
+    transition: none !important;
 }
 .assignment {
     box-shadow: 0 0 4px rgb(115,115,115);
@@ -270,11 +274,6 @@ a[href="settings"] {
 }
 .assignment-container.first-add-line-wrapper::before {
     height: calc(100% - 20px);
-}
-.assignment-container {
-    /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after */
-    --last-line-wrapper-left: 4px;
-    --last-line-wrapper-width: 23px;
 }
 .assignment-container.last-add-line-wrapper::after {
     content: '';

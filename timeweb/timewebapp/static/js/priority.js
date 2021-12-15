@@ -39,6 +39,8 @@ class Priority {
         if ($("#animate-in").length && that.is_element_submitted) {
             // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
+
+            // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
             dom_assignment.parents(".assignment-container").animate({
                 top: "0",
                 opacity: "1",
