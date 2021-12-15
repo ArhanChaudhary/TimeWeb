@@ -363,16 +363,16 @@ class Priority {
                         status_value = Priority.UNFINISHED_FOR_TODAY;
                         display_format_minutes = true;
                         status_image = 'unfinished';
-                        status_message = "This Assignment's Daily Work is Unfinished";
+                        status_message = "<span class=\"unfinished-message\">This Assignment's Daily Work is Unfinished<br></span>";
                         //hard
                         dom_status_image.attr({
                             width: 15,
                             height: 15,
                         }).css("margin-left", -2);
                         if (sa.unit_is_of_time) {
-                            status_message += `<br>Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} of Work Today`;
+                            status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} of Work Today`;
                         } else {
-                            status_message += `<br>Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
+                            status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
                         }
                         that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                     }

@@ -297,7 +297,7 @@ a[href="settings"] {
     position: relative;
     --description-opacity: 0.6;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(20px + 13vw);
+    --left-side-of-header-width: calc(12px + 13vw);
 }
 .description {
     position: relative;
