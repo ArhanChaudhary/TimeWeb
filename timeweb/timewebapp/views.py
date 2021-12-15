@@ -161,8 +161,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'dark_mode': self.settings_model.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
-        if self.settings_model.background_image.name:
-            self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
+        self.context['settings_object'] = self.settings_model
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return self.render_with_dynamic_context(request, "settings.html", self.context)
         
@@ -240,8 +239,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['background_image'] = self.settings_model.background_image
-        if self.settings_model.background_image.name:
-            self.context['background_image_name'] = os.path.basename(self.settings_model.background_image.name)
         self.context['assignment_spacing'] = self.settings_model.assignment_spacing
         self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
         self.context['show_advanced_controls'] = self.settings_model.show_advanced_controls
@@ -838,22 +835,6 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
         #     except HttpError:
         #         pass
-
-class ImagesView(LoginRequiredMixin, TimewebGenericView):
-    login_url = '/login/login/?next=/'
-
-    # GS_CACHE_CONTROL in settings.py is supposed to set a cache but it doesnt for some reason
-    @cache_control(public=True, max_age=604800)
-    def get(self, request, imageUserId, imageName):
-        if request.user.id != imageUserId:
-            return HttpResponseForbidden("You do not have access to this media")
-        client = storage.Client()
-        bucket = client.bucket("timeweb-308201.appspot.com")
-        blob = bucket.get_blob(f"backgrounds/{imageUserId}/{imageName}")
-        if blob:
-            return HttpResponse(blob.download_as_bytes(), content_type=blob.content_type)
-        else:
-            return HttpResponse(status=204)
 
 class BlogView(TimewebGenericView):
     def get(self, request):

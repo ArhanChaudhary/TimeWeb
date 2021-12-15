@@ -197,9 +197,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 else:
-    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    STATICFILES_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    GS_BUCKET_NAME = 'twstatic'
+    DEFAULT_FILE_STORAGE = 'timewebapp.gcloud_storages.GoogleCloudMediaFileStorage'
+    STATICFILES_STORAGE = 'timewebapp.gcloud_storages.GoogleCloudStaticFileStorage'
+    
+    GS_STATIC_BUCKET_NAME = 'twstatic'
+    GS_MEDIA_BUCKET_NAME = 'timeweb-308201.appspot.com'
 
     GS_PROJECT_ID = 'timeweb-308201'
     from google.oauth2 import service_account

@@ -73,7 +73,9 @@
     </div>
     {% endspaceless %}
 </form>
-<template id="background-image-template">
-    <img src="media/images/{{ user.get_username }}/{{ background_image_name }}">
-</template>
+{% if settings_object.background_image %}
+    <template id="background-image-template">
+        <img src="{{ settings_object.background_image.url }}">
+    </template>
+{% endif %}
 {% endblock content %}
