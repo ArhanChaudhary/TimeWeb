@@ -858,25 +858,6 @@ class VisualAssignment extends Assignment {
                     }
                 }
             }
-            // Prematurely increment for calculations
-            len_works++;
-            if (!not_applicable_message_title) {
-                if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
-                    todo = 0;
-                }
-                // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
-                if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done + last_work_input < this.sa.y
-                    && this.sa.soft) {
-                    const original_red_line_start_x = this.red_line_start_x;
-                    this.red_line_start_x = len_works + this.sa.blue_line_start;
-                    this.incrementDueDate();
-                    this.red_line_start_x = original_red_line_start_x;
-                }
-            }
-            if ((len_works-1) + this.sa.blue_line_start === this.sa.x) {
-                not_applicable_message_title = "End of Assignment.";
-                not_applicable_message_description = "You've reached the end of this assignment, and there are no more work inputs to submit.";
-            }
             if (not_applicable_message_title) {
                 $.alert({
                     title: not_applicable_message_title,
@@ -894,8 +875,9 @@ class VisualAssignment extends Assignment {
                 input_done = -last_work_input;
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
-            // len_works-1 to undo the ++ earlier
-            if (SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === (len_works-1) + this.sa.blue_line_start) {
+
+            if (SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === len_works + this.sa.blue_line_start) {
+                len_works--;
                 this.sa.works.pop();
 
                 // Attempts to undo the last work input to ensure the autotune isn't double dipped
@@ -906,7 +888,29 @@ class VisualAssignment extends Assignment {
                 }
                 this.setDynamicStartIfInDynamicMode();
             }
+            len_works++;
             this.sa.works.push(last_work_input);
+
+            // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
+            if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done < this.sa.y
+                && this.sa.soft) {
+                const original_red_line_start_x = this.red_line_start_x;
+                this.red_line_start_x = len_works + this.sa.blue_line_start;
+                this.incrementDueDate();
+                this.red_line_start_x = original_red_line_start_x;
+            }
+            // Will never run if incrementDueDate() is called
+            if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
+                this.sa.works.pop();
+                not_applicable_message_title = "End of Assignment.";
+                not_applicable_message_description = "You've reached the end of this assignment, and there are no more work inputs to submit.";
+                $.alert({
+                    title: not_applicable_message_title,
+                    content: not_applicable_message_description,
+                    onDestroy: () => work_input_textbox.focus(),
+                });
+                return;
+            }
             
             // +Add this check for setDynamicModeIfInDynamicMode
             // -Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
@@ -916,6 +920,11 @@ class VisualAssignment extends Assignment {
 
             // Remember to add this check to the above autotune if I decide to add this back
 
+            // Also remember to add this code if this is added back:
+            // if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
+            //     todo = 0;
+            // }
+            
             // if (input_done !== todo) {
                 for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
