@@ -915,7 +915,11 @@ utils = {
                     } else {
                         first_available_assignment = $(".assignment").first();
                     }
-                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>");
+                    if (!utils.ui.alreadyScrolled) {
+                        $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                        utils.ui.alreadyScrolled = true;
+                    }
                 } else {
                     $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time management app that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
                     $(".assignment-container, #current-date").hide();
