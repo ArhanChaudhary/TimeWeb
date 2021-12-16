@@ -200,14 +200,17 @@ $(function() {
 });
 window.onbeforeunload = function() {
     if (window.disable_loading) return;
-    $("main > *").hide();
-    $("main").css({
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-    });
-    $("#background-image").show();
-    $("#loading-container").css("display", "contents");
+    // setTimeout to ensure .scrollTop to record the scroll position is run before this
+    setTimeout(function() {
+        $("main > *").hide();
+        $("main").css({
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+        });
+        $("#background-image").show();
+        $("#loading-container").css("display", "contents");
+    }, 0);
 };
 
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery

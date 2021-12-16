@@ -1000,7 +1000,8 @@ utils = {
         },
         saveAndLoadStates: function() {
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
-            $(window).on('onpagehide' in self ? 'pagehide' : 'unload', function() { // lighthouse says to use onpagehide instead of unload
+            // Use beforeunload instead of unload or else the loading screen triggers and $("main").scrollTop() becomes 0
+            $(window).on('beforeunload', function() {
                 if (!SETTINGS.enable_tutorial) {
                     // Save current open assignments
                     sessionStorage.setItem("open_assignments", JSON.stringify(
@@ -1025,20 +1026,24 @@ utils = {
                 sessionStorage.removeItem("advanced_inputs");
             }
             // Ensure fonts load for the graph
-            document.fonts.ready.then(function() {
-                // Reopen closed assignments
-                if ("open_assignments" in sessionStorage && !SETTINGS.enable_tutorial) {
-                    const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".assignment").filter(function() {
-                        return open_assignments.includes($(this).attr("data-assignment-id"));
-                    }).click();
-                }
-                // Scroll to original position
-                // Needs to be here so it scrolls after assignments are opened
-                if ("scroll" in localStorage) {
-                    $("main").scrollTop(localStorage.getItem("scroll"));
-                    localStorage.removeItem("scroll");
-                }
+            document.fonts.ready.then(function() {                
+                // setTimeout so the assignments aren't clicked before the handler is set
+                setTimeout(function() {
+                    // Reopen closed assignments
+                    if ("open_assignments" in sessionStorage && !SETTINGS.enable_tutorial) {
+                        const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+                        $(".assignment").filter(function() {
+                            return open_assignments.includes($(this).attr("data-assignment-id"));
+                        }).click();
+                    }
+
+                    // Scroll to original position
+                    // Needs to scroll after assignments are opened
+                    if ("scroll" in localStorage) {
+                        $("main").scrollTop(localStorage.getItem("scroll"));
+                        localStorage.removeItem("scroll");
+                    }
+                }, 0);
             });
         },
     },
