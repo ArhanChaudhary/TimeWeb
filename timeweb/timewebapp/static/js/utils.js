@@ -216,11 +216,6 @@ utils = {
 
             headerIcons: function() {
                 // Assignments header icons
-                $("#open-assignments").click(function() {
-                    // Use .reverse() for gc assignemnts so the first assignment is focused
-                    $(".assignment:not(.open-assignment)").reverse().click();
-                });
-        
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });

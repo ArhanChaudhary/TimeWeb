@@ -98,42 +98,36 @@ header.animate::after {
 #close-assignments {
     order: 2;
 }
-#open-assignments {
-    order: 3;
-}
 #previous-day {
-    order: 4;
+    order: 3;
     transform: scaleX(-1);
 }
 #next-day {
-    order: 5;
+    order: 4;
 }
 a[href="settings"] {
-    order: 6;
+    order: 5;
 }
 #assignments-header #icon-label-container img ~ div {
     position: absolute;
     order: 1;
     padding-right: 5px;
     padding-left: 20px;
-    right: 265px;
+    right: 208px;
     text-align: right;
     display: none;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
-#assignments-header img#open-assignments:hover ~ div#open-assignments-icon-label,
 #assignments-header img#previous-day:hover ~ div#previous-day-icon-label,
 #assignments-header img#next-day:hover ~ div#next-day-icon-label,
 #assignments-header a[href="settings"]:hover ~ div#settings-icon-label,
 #assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
-#assignments-header img#open-assignments:focus ~ div#open-assignments-icon-label,
 #assignments-header img#previous-day:focus ~ div#previous-day-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label,
 #assignments-header a[href="settings"]:focus ~ div#settings-icon-label {
     display: block;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
-#assignments-header img#open-assignments:hover ~ div:not(#open-assignments-icon-label),
 #assignments-header img#previous-day:hover ~ div:not(#previous-day-icon-label),
 #assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
 #assignments-header a[href="settings"]:hover ~ div:not(#settings-icon-label) {
