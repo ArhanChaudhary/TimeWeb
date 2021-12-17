@@ -337,16 +337,7 @@ class VisualAssignment extends Assignment {
         screen.scale(this.scale, this.scale);
         screen.clearRect(0, 0, this.width, this.height);
         let move_info_down,
-            goal_for_this_day;
-        if (this.sa.blue_line_start + len_works < today_minus_assignment_date + 1) {
-            goal_for_this_day = this.funct(today_minus_assignment_date + 1);
-        } else {
-            goal_for_this_day = this.sa.works[today_minus_assignment_date - this.sa.blue_line_start + 1];
-        }
-        // negative indexing from today_minus_assignment_date - this.sa.blue_line_start + 1 (if the assignment is assigned in the future)
-        if (goal_for_this_day === undefined) {
-            goal_for_this_day = this.funct(1);
-        }
+            goal_for_this_day = this.funct(Math.max(0, today_minus_assignment_date) + 1);
         if (SETTINGS.show_progress_bar) {
             move_info_down = 0;
             let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
