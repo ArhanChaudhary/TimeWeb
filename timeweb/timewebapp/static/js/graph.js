@@ -168,7 +168,7 @@ class VisualAssignment extends Assignment {
         this.graph[0].height = this.height * this.scale;
         this.fixed_graph[0].width = this.width * this.scale;
         this.fixed_graph[0].height = this.height * this.scale;
-        if (this.dom_assignment.hasClass("open-assignment") && this.dom_assignment.is(":visible")) {
+        if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
             this.drawFixed();
             this.draw();
         }
@@ -1118,12 +1118,12 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         const footer_height = assignment_footer.height() + parseFloat(dom_assignment.find(".graph-container").css("margin-top"));
-        assignment_footer.css({
+        dom_assignment.addClass("assignment-is-closing");
+        assignment_footer.animate({
             marginBottom: -footer_height,
-            transition: `margin-bottom ${Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION}ms cubic-bezier(0.33, 1, 0.68, 1)`,
-        }).one("transitionend", function() {
+        }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             // Hide graph when transition ends
-            dom_assignment.css("overflow", "");
+            dom_assignment.css("overflow", "").removeClass("assignment-is-closing")
             assignment_footer.css({
                 display: "",
                 marginBottom: "",
@@ -1140,7 +1140,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     
     const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
-    assignment_footer.stop().trigger("transitionend");
+    assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
     priority.positionTags(dom_assignment);
     utils.ui.displayTruncateWarning(dom_assignment);

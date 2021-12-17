@@ -351,7 +351,7 @@ class Crud {
         const sa = utils.loadAssignmentData(dom_assignment);
 
         // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
-        // $("#assignments-container").css("overflow", "hidden");
+        // $("#assignments-container").css("overflow", "hidden"); (unhide this in the callback if this is added back)
         // NOTE: removed because of bugginess and just looking bad overall
 
         // Opacity CSS transition
@@ -362,19 +362,14 @@ class Crud {
         const assignment_container = dom_assignment.parents(".assignment-container");
         // Animate height on assignment_container because it doesn't have a transition
         const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
-        assignment_container.css({
-            marginBottom: -boxHeightMinusShortcuts,
-            // Added by priority.sort, messes up the margin transition
-            transition: `margin-bottom ${Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION}ms cubic-bezier(0.33, 1, 0.68, 1)`,
-        }).on("transitionend", function(e) {
-            if (e.originalEvent.propertyName !== "margin-bottom") return;
-
+        dom_assignment.addClass("assignment-is-deleting");
+        // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
+        assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
+            dat = dat.filter(_sa => sa.id !== _sa.id);
             // If a shorcut is in assignment_container, take it out so it doesn't get deleted
             assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
             // Remove assignment from DOM
             assignment_container.remove();
-            // $("#assignments-container").css("overflow", "");
-            dat = dat.filter(_sa => sa.id !== _sa.id);   
             // Although nothing needs to be swapped, priority.sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
             priority.sort();
         });

@@ -875,6 +875,7 @@ utils = {
                     priority.positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
+                // const scrollTop = $("main").scrollTop();
                 $(".unfinished-message").each(function() {
                     const $this = $(this);
                     $this.show();
@@ -884,7 +885,7 @@ utils = {
                     const w2 = $this.width();
                     $this.toggle(w1 === w2);
                 });
-
+                // $("main").scrollTop(scrollTop);
             });
             // #animate-in is initially display: hidden in priority.js, delay adding the scale
             document.fonts.ready.then(function() {
@@ -908,7 +909,9 @@ utils = {
                     return utils.loadAssignmentData($(this)).name !== example_assignment_name;
                 });
                 if (assignments_excluding_example.length) {
-                    const available_assignments = $(".assignment-container:not(.question-mark)");
+                    const available_assignments = $(".assignment-container:not(.question-mark)").filter(function() {
+                        return !$(this).children(".assignment").hasClass("assignment-is-deleting");
+                    });
                     let first_available_assignment;
                     if (available_assignments.length) {
                         first_available_assignment = available_assignments.first().children(".assignment");
