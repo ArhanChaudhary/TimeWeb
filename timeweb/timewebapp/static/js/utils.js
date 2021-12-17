@@ -870,7 +870,8 @@ utils = {
                     priority.positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
-                // const scrollTop = $("main").scrollTop();
+                // $this.css("white-space", "nowrap"); for SOME REASON scrolls main for literally no reason even though it is undoed
+                const scrollTop = $("main").scrollTop();
                 $(".unfinished-message").each(function() {
                     const $this = $(this);
                     $this.show();
@@ -880,7 +881,9 @@ utils = {
                     const w2 = $this.width();
                     $this.toggle(w1 === w2);
                 });
-                // $("main").scrollTop(scrollTop);
+                setTimeout(function() {
+                    $("main").scrollTop(scrollTop);
+                }, 0);
             });
             // #animate-in is initially display: hidden in priority.js, delay adding the scale
             document.fonts.ready.then(function() {
@@ -1011,11 +1014,11 @@ utils = {
                             return $(this).attr("data-assignment-id")
                         }).toArray()
                     ));
-                }
-                // Save scroll position
-                localStorage.setItem("scroll", $("main").scrollTop());
-                if (!$("#form-wrapper .hidden-field").length) {
-                    sessionStorage.setItem("advanced_inputs", true);
+                    // Save scroll position
+                    localStorage.setItem("scroll", $("main").scrollTop());
+                    if (!$("#form-wrapper .hidden-field").length) {
+                        sessionStorage.setItem("advanced_inputs", true);
+                    }
                 }
                 // Send ajax before close if it's on timeout
                 if (ajaxUtils.attributeData.assignments.length) {
@@ -1028,24 +1031,25 @@ utils = {
                 sessionStorage.removeItem("advanced_inputs");
             }
             // Ensure fonts load for the graph
-            document.fonts.ready.then(function() {                
-                // setTimeout so the assignments aren't clicked before the handler is set
-                setTimeout(function() {
-                    // Reopen closed assignments
-                    if ("open_assignments" in sessionStorage && !SETTINGS.enable_tutorial) {
-                        const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                        $(".assignment").filter(function() {
-                            return open_assignments.includes($(this).attr("data-assignment-id"));
-                        }).click();
-                    }
+            document.fonts.ready.then(function() {
+                if (!SETTINGS.enable_tutorial) 
+                    // setTimeout so the assignments aren't clicked before the handler is set
+                    setTimeout(function() {
+                        // Reopen closed assignments
+                        if ("open_assignments" in sessionStorage) {
+                            const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+                            $(".assignment").filter(function() {
+                                return open_assignments.includes($(this).attr("data-assignment-id"));
+                            }).click();
+                        }
 
-                    // Scroll to original position
-                    // Needs to scroll after assignments are opened
-                    if ("scroll" in localStorage) {
-                        $("main").scrollTop(localStorage.getItem("scroll"));
-                        localStorage.removeItem("scroll");
-                    }
-                }, 0);
+                        // Scroll to original position
+                        // Needs to scroll after assignments are opened
+                        if ("scroll" in localStorage) {
+                            $("main").scrollTop(localStorage.getItem("scroll"));
+                            localStorage.removeItem("scroll");
+                        }
+                    }, 0);
             });
         },
     },
