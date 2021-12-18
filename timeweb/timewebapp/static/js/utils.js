@@ -96,7 +96,7 @@ utils = {
     },
     ui: {
         tickClock: function() {
-            const estimated_completion_time = new Date();
+            const estimated_completion_time = utils.getDateNow();
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
@@ -1055,7 +1055,7 @@ utils = {
     },
     reloadAtMidnight: function() {
         // Reloads the page after midnight hour to update the graph
-        const now = new Date();
+        const now = utils.getDateNow();
         const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const reload_time = midnight.getTime() + 1000 * 60 * 60 * 24;
         if (now.getTime() < reload_time) {
@@ -1080,6 +1080,12 @@ utils = {
             $("main").off('scroll');
             resolver();
         }, 200);
+    },
+    getDateNow: function() {
+        if (SETTINGS.timezone)
+            return new Date(new Date().toLocaleString("en-US", {timeZone: SETTINGS.timezone}));
+        else
+            return new Date();
     },
     SCHEDULED_TIMEOUT_DELAY: 5000,
 }
@@ -1281,7 +1287,7 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-date_now = new Date();
+date_now = utils.getDateNow();
 original_date_now = new Date(date_now.valueOf());
 date_now = new Date(date_now.toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);

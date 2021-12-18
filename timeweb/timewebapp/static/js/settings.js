@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_assignment_spacing").val("Comfy");
                         $("#id_animation_speed").val("1");
                         $("#id_vertical_tag_position").val("Top");
+                        $("#id_timezone").val("");
                         $("#id_default_dropdown_tags").val("").trigger("input");
                     }
                 },

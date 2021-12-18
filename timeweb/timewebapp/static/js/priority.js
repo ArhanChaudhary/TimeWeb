@@ -257,7 +257,7 @@ class Priority {
                 }
                 
                 let complete_date_now = new Date(date_now.valueOf());
-                let date_now_with_time = new Date();
+                let date_now_with_time = utils.getDateNow();
                 complete_date_now.setHours(date_now_with_time.getHours(), date_now_with_time.getMinutes(), 0, 0);
                 if (last_work_input >= sa.sa.y || (complete_due_date <= complete_date_now && !sa.sa.soft)) {
                     status_image = "completely-finished";

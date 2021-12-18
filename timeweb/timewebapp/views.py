@@ -15,6 +15,7 @@ from django.dispatch import receiver
 
 # Model modules
 import datetime
+import pytz
 from django.utils import timezone
 from .models import TimewebModel, SettingsModel
 from .forms import TimewebForm, SettingsForm
@@ -24,7 +25,6 @@ from django.forms import ValidationError
 
 # Formatting modules
 from django.utils.text import Truncator
-import os.path
 
 # JSON modules
 import json
@@ -127,6 +127,25 @@ class TimewebGenericView(View):
             self.settings_model = self.settings_model.first()
         context['dark_mode'] = self.settings_model.dark_mode
         return render(request, file, context)
+
+    def utc_to_local(self, request, utctime):
+        if hasattr(self, "settings_model"):
+            use_settings_timezone = True
+        else:
+            self.settings_model = SettingsModel.objects.filter(user__username=request.user)
+            if self.settings_model.exists():
+                self.settings_model = self.settings_model.first()
+                if self.settings_model.timezone:
+                    use_settings_timezone = True
+                else:
+                    use_settings_timezone = False
+            else:
+                use_settings_timezone = False
+        if use_settings_timezone:
+            return utctime.astimezone(self.settings_model.timezone)
+        else:
+            return timezone.localtime(utctime)
+
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     login_url = '/login/login/?next=/'
 
@@ -157,6 +176,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'enable_tutorial': self.settings_model.enable_tutorial,
             'horizontal_tag_position': self.settings_model.horizontal_tag_position,
             'vertical_tag_position': self.settings_model.vertical_tag_position,
+            'timezone': self.settings_model.timezone,
             'restore_gc_assignments': False,
             'dark_mode': self.settings_model.dark_mode,
         }
@@ -217,6 +237,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
         self.settings_model.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
         self.settings_model.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
+        self.settings_model.timezone = self.form.cleaned_data.get("timezone")
         self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         if self.form.cleaned_data.get("restore_gc_assignments"):
             self.settings_model.added_gc_assignment_ids = []
@@ -238,6 +259,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['settings_model_as_json'] = model_to_dict(self.settings_model)
 
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
+        self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
         self.context['background_image'] = self.settings_model.background_image
         self.context['assignment_spacing'] = self.settings_model.assignment_spacing
         self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
@@ -255,8 +277,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.assignment_models = TimewebModel.objects.filter(user__username=request.user)
         
         utc_now = timezone.now()
-        local_now = timezone.localtime(utc_now)
-        local_last_login = timezone.localtime(User.objects.get(username=request.user).last_login)
+        local_now = self.utc_to_local(request, utc_now)
+        local_last_login = self.utc_to_local(request, User.objects.get(username=request.user).last_login)
         if local_last_login.day != local_now.day:
             # Only notify if the date has changed until 4 AM the next day after the last login
             if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
@@ -376,10 +398,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.works = [str(first_work)]
             self.sm.needs_more_info = True
         else:
-            date_now = timezone.localtime(timezone.now())
+            date_now = self.utc_to_local(request, timezone.now())
             if editing_example_account:
                 # Example account date (for below logic purposes)
-                date_now = timezone.localtime(timezone.make_aware(datetime.datetime(2021, 5, 3)))
+                date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=pytz.utc))
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if self.created_assignment or self.sm.needs_more_info:
                 self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
@@ -456,8 +478,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
                 except OverflowError:
                     self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
-                    self.sm.x = timezone.make_aware(self.sm.x)
+                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.utc)
                 if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                     x_num += 1
             else:
@@ -551,7 +572,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     include_granted_scopes='true')
                 return authorization_url
 
-        date_now = timezone.localtime(timezone.now())
+        date_now = self.utc_to_local(request, timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         service = build('classroom', 'v1', credentials=credentials)
 
@@ -572,7 +593,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
                 except ValueError:
                     assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
-                assignment_date = timezone.localtime(assignment_date.replace(tzinfo=datetime.timezone.utc))
+                assignment_date = self.utc_to_local(request, assignment_date.replace(tzinfo=pytz.utc))
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
                 tags = []
@@ -581,7 +602,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                     if "minutes" in assignment['dueTime']:
                         assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                    x = timezone.localtime(datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=datetime.timezone.utc))
+                    x = self.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=pytz.utc))
                     if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
@@ -678,7 +699,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     return HttpResponseForbidden("This assignment isn't yours")
                 if key == "x":
                     # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
-                    value = datetime.datetime.fromtimestamp(value, datetime.timezone.utc)
+                    value = datetime.datetime.fromtimestamp(value, pytz.utc)
                 elif key == "due_time":
                     value = datetime.time(**value)
                 setattr(self.sm, key, value)

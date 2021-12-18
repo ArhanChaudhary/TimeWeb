@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from colorfield.fields import ColorField
+from timezone_field import TimeZoneField
 from decimal import Decimal
 import datetime
 
@@ -301,6 +302,12 @@ class SettingsModel(models.Model):
         default=_("1"),
         verbose_name=_('Animation Speed'),
     )
+    timezone = TimeZoneField(
+        null=True,
+        blank=True,
+    )
+
+    # Group "Miscellaneous"
     restore_gc_assignments = models.BooleanField(
         default=False,
         verbose_name=_('Restore Deleted Google Classroom Assignments'),
