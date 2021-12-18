@@ -746,6 +746,8 @@ utils = {
                     case "Backspace":
                     case "s":
                     case "f":
+                    case "o":
+                    case "c":
                         if (!["text", "number"].includes($(document.activeElement).prop("type")))
                             switch (e.key) {
                                 case "n":
@@ -757,6 +759,8 @@ utils = {
                                 case "Backspace":
                                 case "s":
                                 case "f":
+                                case "o":
+                                case "c":
                                     let assignment_container = $(":hover").filter(".assignment-container");
                                     if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                                     if (assignment_container.length)
@@ -781,6 +785,12 @@ utils = {
                                                 break;
                                             case "f":
                                                 assignment_container.find(".tick-button").focus().click();
+                                                break;
+                                            case "o":
+                                                assignment_container.children(".assignment").click();
+                                                break;
+                                            case "c":
+                                                assignment_container.children(".assignment").click();
                                                 break;
                                         }
                                     break;
