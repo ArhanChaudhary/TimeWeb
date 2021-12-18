@@ -140,25 +140,27 @@ utils = {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".delete-work-input-button").click();
                         } else {
-                            assignment_container.addClass("transform-instantly");
+                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
                             dom_assignment.click();
                             dom_assignment.find(".delete-work-input-button").click();
                             dom_assignment.click();
                             assignment_container[0].offsetHeight;
-                            assignment_container.removeClass("transform-instantly");
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     } else {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
                         } else {
-                            assignment_container.addClass("transform-instantly");
+                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
                             dom_assignment.click();
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
                             dom_assignment.click();
                             assignment_container[0].offsetHeight;
-                            assignment_container.removeClass("transform-instantly");
+                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     }
                     SETTINGS.enable_tutorial = old_enable_tutoral;
