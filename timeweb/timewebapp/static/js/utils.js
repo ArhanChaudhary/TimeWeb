@@ -870,20 +870,12 @@ utils = {
                     priority.positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
-                // $this.css("white-space", "nowrap"); for SOME REASON scrolls main for literally no reason even though it is undoed
-                const scrollTop = $("main").scrollTop();
                 $(".unfinished-message").each(function() {
                     const $this = $(this);
                     $this.show();
-                    $this.css("white-space", "nowrap");
-                    const w1 = $this.width();
-                    $this.css("white-space", "");
-                    const w2 = $this.width();
-                    $this.toggle(w1 === w2);
+                    const lines = this.getClientRects().length - $this.children("br").length;
+                    $this.toggle(lines === 1); 
                 });
-                setTimeout(function() {
-                    $("main").scrollTop(scrollTop);
-                }, 0);
             });
             // #animate-in is initially display: hidden in priority.js, delay adding the scale
             document.fonts.ready.then(function() {
