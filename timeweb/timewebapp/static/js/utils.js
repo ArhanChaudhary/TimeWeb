@@ -152,6 +152,7 @@ utils = {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
+                            dom_assignment.click();
                         } else {
                             const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
                             VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
