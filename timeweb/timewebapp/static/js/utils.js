@@ -1004,7 +1004,7 @@ utils = {
             if (sessionStorage.getItem("already-alerted-example-account")) return;
             sessionStorage.setItem("already-alerted-example-account", true);
             $.alert({
-                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>Feel free to do whatever you want over here. No modifications to this account are saved.",
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>Feel free to experiment and modify any assignment. No modifications to this account are saved.",
                 backgroundDismiss: false,
             });
         },
