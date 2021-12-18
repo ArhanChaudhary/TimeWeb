@@ -476,7 +476,12 @@ utils = {
             },
         },
         dimAssignmentsHeaderInfoOnIconHover: function() {
-            $("#assignments-header #icon-label-container img").on("mouseover mouseout", function(e) {
+            $("#assignments-header #icon-label-container img").on("mouseover mouseout focusout", function(e) {
+                // If you mouseout while an icon is focused, dim is removed. This fixes that
+                if ($("#icon-label-container img").is(document.activeElement) ||
+                    // focusout doesn't update document.activeElement, use relatedTarget instead
+                    e.type === "focusout" && $("#icon-label-container img").is(e.relatedTarget)) return;
+
                 const info = $(e.target).parents("#icon-label-container").siblings("#info");
                 const visible_icon_label = $(e.target).parents("#icon-label-container").children("div:visible");
                 if (e.type === "mouseover")
