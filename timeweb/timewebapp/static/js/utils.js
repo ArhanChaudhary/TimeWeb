@@ -757,7 +757,10 @@ utils = {
                         if (!["text", "number"].includes($(document.activeElement).prop("type")))
                             switch (e.key) {
                                 case "n":
-                                    !$("#overlay").is(":visible") && $("#image-new-container").click();
+                                    // Fix typing on the assignment form itself
+                                    setTimeout(function() {
+                                        !$("#overlay").is(":visible") && $("#image-new-container").click();
+                                    }, 0);
                                     break;
                                 case "e":
                                 case "d":
@@ -772,8 +775,11 @@ utils = {
                                     if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                                     if (assignment_container.length)
                                         switch (e.key) {
+                                            // Fix typing on the assignment form itself
                                             case "e":
-                                                assignment_container.find(".update-button").focus().click();
+                                                setTimeout(function() {
+                                                    assignment_container.find(".update-button").focus().click();
+                                                }, 0);
                                                 break;
                                             case "d":
                                                 assignment_container.find(".delete-button").focus().click();
