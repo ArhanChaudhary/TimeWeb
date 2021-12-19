@@ -1132,7 +1132,7 @@ ajaxUtils = {
                 ok: {
 
                 },
-                reload: {
+                "reload this page": {
                     action: function() {
                         reloadWhenAppropriate();
                     },
