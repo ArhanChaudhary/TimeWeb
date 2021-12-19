@@ -238,7 +238,12 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.timezone = self.form.cleaned_data.get("timezone")
         self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         if self.form.cleaned_data.get("restore_gc_assignments"):
-            self.settings_model.added_gc_assignment_ids = []
+            print(self.assignment_models.count())
+            if self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
+                self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+                return self.invalid_form(request)
+            else:
+                self.settings_model.added_gc_assignment_ids = []
         self.settings_model.dark_mode = self.form.cleaned_data.get("dark_mode")
         self.settings_model.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
