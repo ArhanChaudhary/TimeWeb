@@ -6,7 +6,6 @@ from django.utils.translation import ugettext as _
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden
-from django.views.decorators.cache import cache_control
 from django.urls import reverse
 
 # Automatically creates settings model and example assignment when user is created
@@ -34,7 +33,6 @@ from decimal import Decimal
 from math import ceil, floor
 
 # Google API modules
-from google.cloud import storage
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
