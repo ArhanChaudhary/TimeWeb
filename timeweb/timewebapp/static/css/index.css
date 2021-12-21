@@ -116,6 +116,7 @@ a[href="settings"] {
     right: 208px;
     text-align: right;
     display: none;
+    font-size: 17px;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#previous-day:hover ~ div#previous-day-icon-label,

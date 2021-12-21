@@ -646,6 +646,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     min_work_time=self.settings_model.def_min_work_time,
                     break_days=self.settings_model.def_break_days,
                     dynamic_start=dynamic_start,
+                    funct_round=1,
                     description=description,
                     tags=tags,
                     needs_more_info=True,

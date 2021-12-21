@@ -407,7 +407,7 @@ utils = {
                         return _sa.is_google_classroom_assignment && _sa.tags[0] === sa.tags[0];
                     });
                     $.confirm({
-                        title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's first tag is its class name)`,
+                        title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
                         content: 'This action is irreversible.',
                         buttons: {
                             confirm: {
