@@ -284,7 +284,14 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 10000;
 Assignment.THIRD_POINT_STEP = 0.01;
 Assignment.MATRIX_ENDS_WEIGHT = 100000;
-Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
+
+// There is a deadlock netween autotuneSkewRatio and setDynamicStartInDynamicMode:
+// When dynamic start is set, skew ratio needs to be re-autotuned
+// But when skew ratio is re-autotuned, it may mess up dynamic start
+// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
+Assignment.AUTOTUNE_ITERATIONS = 4;
+
+Assignment.prototype.autotunekewRatio = function(params={ inverse: true }) {
     if (this.sa.fixed_mode) return;
     const works_without_break_days = this.sa.works.filter(function(work_input, work_input_index) {
         // If break days are enabled, filter out work inputs that are on break days
@@ -385,7 +392,7 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
         var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
 
         // Way too much to say about this, will explain later
-        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
 
         // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
         // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
@@ -397,7 +404,7 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     } else {
         // TODO: improve non inverse algorithm; this one currently works but not as well as I want
         var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
-        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / AUTOTUNE_ITERATIONS);
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
         autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
     }
     this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;

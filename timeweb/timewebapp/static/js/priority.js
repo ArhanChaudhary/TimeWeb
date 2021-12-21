@@ -307,7 +307,7 @@ class Priority {
                             sa.incrementDueDate();
                         }
                         if (has_autofilled) {
-                            for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                                 sa.setDynamicStartIfInDynamicMode();
                                 sa.autotuneSkewRatio();
                             }

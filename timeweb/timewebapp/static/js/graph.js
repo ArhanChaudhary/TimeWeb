@@ -1,11 +1,4 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-
-// There is a deadlock netween autotuneSkewRatio and setDynamicStartInDynamicMode:
-// When dynamic start is set, skew ratio needs to be re-autotuned
-// But when skew ratio is re-autotuned, it may mess up dynamic start
-// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
-const AUTOTUNE_ITERATIONS = 4;
-
 class Assignment {
     constructor(dom_assignment) {
         this.sa = utils.loadAssignmentData(dom_assignment);
@@ -177,7 +170,7 @@ class VisualAssignment extends Assignment {
         const raw_x = e.pageX - this.fixed_graph.offset().left;
         const raw_y = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
-        if (this.set_skew_ratio_using_graph && iteration_number !== AUTOTUNE_ITERATIONS + 1) {
+        if (this.set_skew_ratio_using_graph && iteration_number !== Assignment.AUTOTUNE_ITERATIONS + 1) {
             let x1 = this.sa.complete_x - this.red_line_start_x;
             let y1 = this.sa.y - this.red_line_start_y;
             if (this.sa.break_days.length) {
@@ -778,7 +771,7 @@ class VisualAssignment extends Assignment {
             }
             this.sa.works.pop();
             len_works--;
-            for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                 this.setDynamicStartIfInDynamicMode();
                 this.autotuneSkewRatio({ inverse: false });
             }
@@ -873,7 +866,7 @@ class VisualAssignment extends Assignment {
 
                 // Attempts to undo the last work input to ensure the autotune isn't double dipped
                 // Note that the invsering of the autotune algorithm is still not perfect, but usable
-                for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatio({ inverse: false });
                 }
@@ -917,7 +910,7 @@ class VisualAssignment extends Assignment {
             // }
             
             // if (input_done !== todo) {
-                for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatio();
                 }
@@ -1049,7 +1042,7 @@ class VisualAssignment extends Assignment {
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
             // Skew ratio can be changed in fixed mode, making dynamic_start inaccurate
-            for (let i = 0; i < AUTOTUNE_ITERATIONS; i++) {
+            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                 this.setDynamicStartIfInDynamicMode();
                 this.autotuneSkewRatio();
             }
