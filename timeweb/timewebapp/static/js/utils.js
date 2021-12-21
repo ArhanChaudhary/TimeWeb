@@ -400,12 +400,10 @@ utils = {
                     if (!$this.hasClass("delete-gc-assignments-from-class")) $this = $(e.target).parents(".delete-gc-assignments-from-class");
                     if (!$this.length) return;
                     const dom_assignment = $this.siblings(".assignment");
+                    const assignment_container = $this.parents(".assignment-container");
                     const sa = utils.loadAssignmentData(dom_assignment);
-                    const assignments_to_delete = $(".assignment-container").filter(function() {
-                        const dom_assignment = $(this).children(".assignment");
-                        const _sa = utils.loadAssignmentData(dom_assignment);
-                        return _sa.is_google_classroom_assignment && _sa.tags[0] === sa.tags[0];
-                    });
+                    const end_of_line_wrapper = assignment_container.nextAll(".assignment-container.last-add-line-wrapper").first();
+                    const assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);
                     $.confirm({
                         title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
                         content: 'This action is irreversible.',
