@@ -71,6 +71,7 @@ MAX_NUMBER_TAGS = 10
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
+        # The front end adjusts the assignment and due date, so we don't need to worry about using utc_to_local instead of localtime
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         TimewebModel.objects.create(**{
