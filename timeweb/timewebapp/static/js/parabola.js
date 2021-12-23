@@ -291,7 +291,7 @@ Assignment.MATRIX_ENDS_WEIGHT = 100000;
 // This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
 Assignment.AUTOTUNE_ITERATIONS = 4;
 
-Assignment.prototype.autotunekewRatio = function(params={ inverse: true }) {
+Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     if (this.sa.fixed_mode) return;
     const works_without_break_days = this.sa.works.filter(function(work_input, work_input_index) {
         // If break days are enabled, filter out work inputs that are on break days
