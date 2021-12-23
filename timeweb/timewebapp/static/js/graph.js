@@ -296,6 +296,7 @@ class VisualAssignment extends Assignment {
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+        const assignment_container = this.dom_assignment.parents(".assignment-container");
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             var mouse_x = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
@@ -335,7 +336,7 @@ class VisualAssignment extends Assignment {
             move_info_down = 0;
             let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
                 bar_move_left = should_be_done_x - this.width + 17;
-            if (bar_move_left < 0 || this.dom_assignment.hasClass("completely-finished")) {
+            if (bar_move_left < 0 || assignment_container.hasClass("finished")) {
                 bar_move_left = 0
             } else if (should_be_done_x > this.width - 8) {
                 bar_move_left = this.width - 8;
@@ -371,7 +372,7 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
             screen.font = '13.75px Open Sans';
             screen.textBaseline = "top";
-            if (this.dom_assignment.hasClass("completely-finished")) {
+            if (assignment_container.hasClass("finished")) {
                 screen.fillText("Completed!", this.width-81-bar_move_left, this.height-68);
             } else {
                 screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, this.width-81, this.height-68);
@@ -520,7 +521,7 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
-        if (!this.dom_assignment.parents(".assignment-container").hasClass("finished")) {
+        if (!assignment_container.hasClass("finished")) {
             let displayed_day;
             let str_day;
             if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
