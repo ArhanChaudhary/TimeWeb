@@ -227,9 +227,28 @@ class Priority {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
+            let complete_due_date = new Date(sa.sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
+            if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
+                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
+            }
+            
+            let complete_date_now = new Date(date_now.valueOf());
+            let date_now_with_time = utils.getDateNow();
+            complete_date_now.setHours(date_now_with_time.getHours(), date_now_with_time.getMinutes(), 0, 0);
+
+            // (complete_due_date <= complete_date_now && !sa.sa.soft)
+            // This marks the assignment as completed if its due date passes
+            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
+            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
+            // Instead, give it a question mark so it can be appropriately handled
+            const due_date_passed = complete_due_date <= complete_date_now /* Will evaluate to false if complete_due_date or complete_date_now are invalid dates */ && !sa.sa.soft;
+            const finished_work_inputs = last_work_input >= sa.sa.y;
+            const not_yet_assigned = today_minus_assignment_date < 0;
+
             let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
-            if (sa.sa.needs_more_info) {
+            if (sa.sa.needs_more_info && !(sa.sa.is_google_classroom_assignment && due_date_passed)) {
                 status_image = 'question-mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
@@ -242,148 +261,134 @@ class Priority {
                 dom_status_image.attr({
                     width: 11,
                     height: 18,
-                }).css("margin-left", 2);
-
-            // (complete_due_date <= complete_date_now && !sa.sa.soft)
-            // This marks the assignment as completed if its due date passes
-            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
-            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
-            // Instead, give it a question mark so it can be appropriately handled
+                }).css("margin-left", 2);            
+            } else if (finished_work_inputs || due_date_passed) {
+                status_image = "completely-finished";
+                if (last_work_input >= sa.sa.y && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
+                    status_message = 'You\'re Completely Finished with this Assignment';
+                } else {
+                    alert_due_date_passed_cond = true;
+                    if (!sa.sa.has_alerted_due_date_passed_notice) {
+                        // sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
+                        that.due_date_passed_notices.push(sa.sa);
+                    }
+                    status_message = 'This Assignment\'s Due Date has Passed';
+                    if (sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info) {
+                        status_message = "This Google Classroom Assignment needs more Info!<br>" + status_message;
+                    }
+                }
+                //hard
+                dom_status_image.attr({
+                    width: 16,
+                    height: 16,
+                }).css("margin-left", -3);
+                status_value = Priority.COMPLETELY_FINISHED;
+            } else if (not_yet_assigned) {
+                status_message = 'This Assignment hasn\'t yet been Assigned';
+                status_value = Priority.NOT_YET_ASSIGNED;
             } else {
-                let complete_due_date = new Date(sa.sa.assignment_date.valueOf());
+                if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
+                    for (let i = 0; i < number_of_forgotten_days; i++) {
+                        if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
+                            break;
+                        }
+                        has_autofilled = true;
+                        sa.sa.works.push(last_work_input);
+                        len_works++;
+                    }
+                    /**
+                     * 
+                     * t x   r
+                     * 1 5 > 5
+                     * 2 5 > 5
+                     * 3 5 > 5
+                     * 4 5 > 5
+                     * 5 5 > 6
+                     * 6 6 > 7
+                     * 7 7 > 8
+                     * 10 7 > 11
+                     */
+                    if (sa.sa.soft && today_minus_assignment_date >= sa.sa.x) {
+                        sa.sa.x = today_minus_assignment_date;
+                        sa.incrementDueDate();
+                    }
+                    if (has_autofilled) {
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                            sa.setDynamicStartIfInDynamicMode();
+                            sa.autotuneSkewRatio();
+                        }
+                        sa.setDynamicStartIfInDynamicMode();
+                        ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                        ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
+                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
+                    }
+                }
+                complete_due_date = new Date(sa.sa.assignment_date.valueOf());
                 complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
                 if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
                     complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
                 }
-                
-                let complete_date_now = new Date(date_now.valueOf());
-                let date_now_with_time = utils.getDateNow();
-                complete_date_now.setHours(date_now_with_time.getHours(), date_now_with_time.getMinutes(), 0, 0);
-                if (last_work_input >= sa.sa.y || (complete_due_date <= complete_date_now && !sa.sa.soft)) {
-                    status_image = "completely-finished";
-                    if (last_work_input >= sa.sa.y) {
-                        status_message = 'You\'re Completely Finished with this Assignment';
+                due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                const todo_is_completed = todo <= 0;
+                const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
+                const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
+                // Don't mark as no working days when the end of the assignment has been reached
+                const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now;
+                // use complete_due_date <= complete_date_now instead of (complete_due_date <= complete_date_now && sa.sa.soft)
+                // if the conjugate is true, (complete_due_date <= complete_date_now && !sa.sa.soft), the assignment will be marked as due date passed
+                const no_working_days = sa.getWorkingDaysRemaining({ reference: "today" }) === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
+                if (incomplete_past_inputs || no_working_days) {
+                    status_image = 'question-mark';
+                    if (incomplete_past_inputs) {
+                        status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
+                        status_value = Priority.INCOMPLETE_WORKS;
                     } else {
-                        alert_due_date_passed_cond = true;
-                        if (!sa.sa.has_alerted_due_date_passed_notice) {
-                            // sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
-                            that.due_date_passed_notices.push(sa.sa);
-                        }
-                        status_message = 'This Assignment\'s Due Date has Passed';
+                        status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Work Days';
+                        status_value = Priority.NO_WORKING_DAYS;
                     }
                     //hard
                     dom_status_image.attr({
-                        width: 16,
-                        height: 16,
-                    }).css("margin-left", -3);
-                    status_value = Priority.COMPLETELY_FINISHED;
-                } else if (today_minus_assignment_date < 0) {
-                    status_message = 'This Assignment hasn\'t yet been Assigned';
-                    status_value = Priority.NOT_YET_ASSIGNED;
-                } else {
-                    if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
-                        for (let i = 0; i < number_of_forgotten_days; i++) {
-                            if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
-                                break;
-                            }
-                            has_autofilled = true;
-                            sa.sa.works.push(last_work_input);
-                            len_works++;
-                        }
-                        /**
-                         * 
-                         * t x   r
-                         * 1 5 > 5
-                         * 2 5 > 5
-                         * 3 5 > 5
-                         * 4 5 > 5
-                         * 5 5 > 6
-                         * 6 6 > 7
-                         * 7 7 > 8
-                         * 10 7 > 11
-                         */
-                        if (sa.sa.soft && today_minus_assignment_date >= sa.sa.x) {
-                            sa.sa.x = today_minus_assignment_date;
-                            sa.incrementDueDate();
-                        }
-                        if (has_autofilled) {
-                            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                                sa.setDynamicStartIfInDynamicMode();
-                                sa.autotuneSkewRatio();
-                            }
-                            sa.setDynamicStartIfInDynamicMode();
-                            ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", sa.sa.dynamic_start, sa.sa.id);
-                            ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
-                            ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
-                            todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
-                        }
-                    }
-                    complete_due_date = new Date(sa.sa.assignment_date.valueOf());
-                    complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
-                    if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
-                        complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
-                    }
-                    due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                    const todo_is_completed = todo <= 0;
-                    const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
-                    const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
-                    // Don't mark as no working days when the end of the assignment has been reached
-                    const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now;
-                    // use complete_due_date <= complete_date_now instead of (complete_due_date <= complete_date_now && sa.sa.soft)
-                    // if the conjugate is true, (complete_due_date <= complete_date_now && !sa.sa.soft), the assignment will be marked as due date passed
-                    const no_working_days = sa.getWorkingDaysRemaining({ reference: "today" }) === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
-                    if (incomplete_past_inputs || no_working_days) {
-                        status_image = 'question-mark';
-                        if (incomplete_past_inputs) {
-                            status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
-                            status_value = Priority.INCOMPLETE_WORKS;
-                        } else {
-                            status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Work Days';
-                            status_value = Priority.NO_WORKING_DAYS;
-                        }
-                        //hard
-                        dom_status_image.attr({
-                            width: 11,
-                            height: 18,
-                        }).css("margin-left", 2);
-                    } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
-                        status_image = 'finished';
-                        if (current_work_input_is_break_day) {
-                            status_message = 'Today isn\'t this Assignment\'s Work Day';
-                        } else {
-                            status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
-                        }
-                        //hard
-                        dom_status_image.attr({
-                            width: 15,
-                            height: 15,
-                        }).css("margin-left", -2);
-                        status_value = Priority.FINISHED_FOR_TODAY;
+                        width: 11,
+                        height: 18,
+                    }).css("margin-left", 2);
+                } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
+                    status_image = 'finished';
+                    if (current_work_input_is_break_day) {
+                        status_message = 'Today isn\'t this Assignment\'s Work Day';
                     } else {
-                        status_value = Priority.UNFINISHED_FOR_TODAY;
-                        display_format_minutes = true;
-                        status_image = 'unfinished';
-                        status_message = "<span class=\"unfinished-message\">This Assignment's Daily Work is Unfinished<br></span>";
-                        //hard
-                        dom_status_image.attr({
-                            width: 15,
-                            height: 15,
-                        }).css("margin-left", -2);
-                        if (sa.unit_is_of_time) {
-                            status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} of Work Today`;
-                        } else {
-                            status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
-                        }
-                        that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                        status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
                     }
+                    //hard
+                    dom_status_image.attr({
+                        width: 15,
+                        height: 15,
+                    }).css("margin-left", -2);
+                    status_value = Priority.FINISHED_FOR_TODAY;
+                } else {
+                    status_value = Priority.UNFINISHED_FOR_TODAY;
+                    display_format_minutes = true;
+                    status_image = 'unfinished';
+                    status_message = "<span class=\"unfinished-message\">This Assignment's Daily Work is Unfinished<br></span>";
+                    //hard
+                    dom_status_image.attr({
+                        width: 15,
+                        height: 15,
+                    }).css("margin-left", -2);
+                    if (sa.unit_is_of_time) {
+                        status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} of Work Today`;
+                    } else {
+                        status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
+                    }
+                    that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                }
 
-                    if ([0, 1].includes(due_date_minus_today)) {
-                        if (due_date_minus_today === 1) {
-                            that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
-                        }
-                        if (status_value === Priority.UNFINISHED_FOR_TODAY) {
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
-                        }
+                if ([0, 1].includes(due_date_minus_today)) {
+                    if (due_date_minus_today === 1) {
+                        that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                    }
+                    if (status_value === Priority.UNFINISHED_FOR_TODAY) {
+                        status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
                 }
             }
@@ -614,7 +619,7 @@ class Priority {
 
         if (!["Not Important", "Important"].includes(sa.tags[0]))
             var current_tag = sa.tags[0];
-        if (sa.is_google_classroom_assignment && sa.needs_more_info && current_tag) {
+        if (sa.is_google_classroom_assignment && sa.needs_more_info && !dom_assignment.parents(".assignment-container").hasClass("finished") && current_tag) {
             const assignment_container = that.dom_assignment.parents(".assignment-container");
             assignment_container.addClass("add-line-wrapper");
             if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
