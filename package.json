@@ -1,0 +1,29 @@
+{
+  "name": "timeweb",
+  "version": "1.0.0",
+  "description": "TimeWeb — An online time manager that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today! MSJHS warriors!",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "babel-cli": "^6.26.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.5",
+    "@babel/preset-env": "^7.16.5"
+  },
+  "scripts": {
+    "build": "babel timeweb/static/js -d timeweb/static/js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArhanChaudhary/TimeWeb.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ArhanChaudhary/TimeWeb/issues"
+  },
+  "homepage": "https://github.com/ArhanChaudhary/TimeWeb#readme"
+}
