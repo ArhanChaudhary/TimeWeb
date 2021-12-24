@@ -116,10 +116,8 @@ utils = {
                     const sa = utils.loadAssignmentData($(this));
                     sa.mark_as_done = !sa.mark_as_done;
                     ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
-                    if (sa.mark_as_done)
-                        $(this).children("img").attr("src", "https://storage.googleapis.com/twstatic/images/show.png");
-                    else
-                        $(this).children("img").attr("src", "https://storage.googleapis.com/twstatic/images/hide.png");
+                    let status_image = sa.mark_as_done ? "show" : "hide";
+                    $(this).children("img").attr("src", DEBUG ? `static/images/${status_image}.png` : `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
                     priority.sort();
                 });
             },
@@ -1433,7 +1431,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();
-    utils.ui.setClickHandlers.expandShortcutHitboxes();
     if (isExampleAccount) {
         utils.ui.exampleAccountAlertTutorial();
     }

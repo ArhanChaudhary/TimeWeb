@@ -712,8 +712,8 @@ a[href="settings"] {
 }
 .button.slashed .tick-button {
     /* for help https://bennettfeely.com/clippy/ */
-    -webkit-clip-path: polygon(0 0, 0 100%, 100% 100%, 10% 0, 25% 0, 100% 85%, 100% 0%);
-            clip-path: polygon(0 0, 0 100%, 100% 100%, 10% 0, 25% 0, 100% 85%, 100% 0%);
+    -webkit-clip-path: polygon(0 0, 0 100%, 90% 100%, 0 0, 25% 0, 100% 85%, 100% 0);
+            clip-path: polygon(0 0, 0 100%, 90% 100%, 0 0, 25% 0, 100% 85%, 100% 0);
 }
 .button-slash {
     display: none;
