@@ -498,7 +498,7 @@ class Priority {
             dom_title.attr("data-daysleft", str_daysleft);
             // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
+            dom_completion_time.html((display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '') + (DEBUG ? ` ID: ${sa.sa.id}` : ""));
         });
     }
     alertDueDates() {
