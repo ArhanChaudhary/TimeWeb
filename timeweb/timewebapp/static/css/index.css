@@ -53,8 +53,11 @@ header.animate::after {
     flex-wrap: wrap;
 }
 #info {
-    display: inline;
+    display: flex;
     font-size: 17px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 #info.dim {
     opacity: 0;
@@ -65,14 +68,26 @@ header.animate::after {
     font-size: 17px;
 }
 #hide-button {
+    margin-right: 5px;
+}
+.generic-button {
     cursor: pointer;
-    position: relative;
-    left: 1px;
-    bottom: 1px;
     background-color: white;
     border: 2px solid rgba(0,0,0,0.45);
     border-radius: 4px;
-    margin-right: 5px;
+    display: inline-block;
+    font-size: 13px;
+    text-align: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+    padding: 1px 6px;
+    position: relative;
+}
+.generic-button:hover {
+    background-color: rgb(236, 236, 236);
+}
+.generic-button:active {
+    transform: translateY(1px);
 }
 #tomorrow-time {
     white-space: nowrap;
@@ -200,10 +215,10 @@ a[href="settings"] {
 }
 .shortcut {
     position: relative;
-    /* z-index: 1000; might be needed? */
+    /* So "Go" can be clicked easier */
+    z-index: 1000;
     margin-bottom: 15px;
     margin-top: -7px;
-    cursor: pointer;
 }
 .shortcut-text {
     white-space: nowrap;
@@ -211,14 +226,36 @@ a[href="settings"] {
     left: 50%;
     transform: translateX(-50%);
     margin-top: -10px;
+
+    display: flex;
+    gap: 5px;
+    align-items: center;
 }
 /* Info buttons */
 .shortcut-text:hover {
     z-index: 1000;
 }
+.shortcut-text .info-button {
+    bottom: unset;
+    left: unset;
+}
 #autofill-selection {
     vertical-align: top;
     font-size: 12px;
+}
+.shortcut .generic-button {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.shortcut .generic-button::after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: scale(2.6);
+    left: 0;
+    top: 0;
+    position: absolute;
 }
 .shortcut-line-left {
     left: -6px;
@@ -232,22 +269,22 @@ a[href="settings"] {
     border-top: 2px solid black;
 }
 #autofill-work-done .shortcut-line-left {
-    width: calc(50% - 103px);
-}
-#autofill-work-done .shortcut-line-right {
-    width: calc(50% - 108px);
-}
-#delete-starred-assignments .shortcut-line-left {
-    width: calc(50% - 116px);
-}
-#delete-starred-assignments .shortcut-line-right {
     width: calc(50% - 121px);
 }
+#autofill-work-done .shortcut-line-right {
+    width: calc(50% - 128px);
+}
+#delete-starred-assignments .shortcut-line-left {
+    width: calc(50% - 134px);
+}
+#delete-starred-assignments .shortcut-line-right {
+    width: calc(50% - 141px);
+}
 .delete-gc-assignments-from-class .shortcut-line-left {
-    width: calc(50% - 146px);
+    width: calc(50% - 163px);
 }
 .delete-gc-assignments-from-class .shortcut-line-right {
-    width: calc(50% - 152px);
+    width: calc(50% - 170px);
 }
 
 .shortcut-line-left::after {

@@ -296,7 +296,7 @@ utils = {
             },
 
             deleteAllStarredAssignments: function() {
-                $("#delete-starred-assignments").click(function() {
+                $("#delete-starred-assignments .generic-button").click(function() {
                     $.confirm({
                         title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
                         content: 'This action is irreversible',
@@ -340,9 +340,7 @@ utils = {
             },
 
             autofillWorkDone: function() {
-                let message;
-                $("#autofill-work-done").click(function(e) {
-                    if ($(e.target).is("#autofill-selection")) return;
+                $("#autofill-work-done .generic-button").click(function(e) {
                     $.confirm({
                         title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
                         content: "This action is irreversible.",
@@ -359,25 +357,12 @@ utils = {
                                 
                             }
                         }
-                    });                    
+                    });
                 });
-                let in_select = false;
+
+                let message;
                 replaceAutofillInfo();
-                $("#autofill-selection").on("change", function() {
-                    if (in_select) {
-                        replaceAutofillInfo();
-                        $("#autofill-work-done").click();
-                        in_select = false;
-                    }
-                // This setup runs the prompt after selecting the same option in the select because mouseover is the only event fired
-                }).on("mouseover", function() {
-                    if (in_select) {
-                        $(this).trigger("change");
-                        in_select = false;
-                    }
-                }).on("click", function() {
-                    in_select = !in_select;
-                });
+                $("#autofill-selection").on("change", replaceAutofillInfo);
                 function replaceAutofillInfo() {
                     $("#autofill-work-done .shortcut-text").find(".info-button").remove();
                     switch ($("#autofill-selection").val()) {
@@ -388,17 +373,16 @@ utils = {
                             message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for.\n\nClick the text or line wrapper to perform this action.";
                             break;
                     }
-                    $("#autofill-work-done .shortcut-text").info("bottom", message, "append").css({marginLeft: -2, marginRight: 2, left: 1, bottom: 1});
+                    $("#autofill-work-done .shortcut-text").info("bottom", message, "append");
                 }
             },
 
             deleteAssignmentsFromClass: function() {
                 $(document).click(function(e) {
                     let $this = $(e.target);
-                    if (!$this.hasClass("delete-gc-assignments-from-class")) $this = $(e.target).parents(".delete-gc-assignments-from-class");
-                    if (!$this.length) return;
-                    const dom_assignment = $this.siblings(".assignment");
+                    if (!($this.hasClass("generic-button") && $this.parents(".delete-gc-assignments-from-class").length)) return;
                     const assignment_container = $this.parents(".assignment-container");
+                    const dom_assignment = assignment_container.children(".assignment");
                     const sa = utils.loadAssignmentData(dom_assignment);
                     const end_of_line_wrapper = assignment_container.nextAll(".assignment-container.last-add-line-wrapper").first();
                     const assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);
@@ -443,31 +427,6 @@ utils = {
                             }
                         }
                     });
-                });
-            },
-
-            expandShortcutHitboxes: function() {
-                // Expand shortcut hitbox by also simulating clicking on after and before pseudo-elements
-                $(".assignment-container").click(function(e) {
-                    const assignment_container = $(this);
-                    const dom_assignment = assignment_container.children(".assignment");
-                    const hovering_line_wrapper = e.offsetX <= dom_assignment.offset().left - assignment_container.offset().left
-                                                || e.offsetY <= dom_assignment.offset().top - assignment_container.offset().top;
-                    const hovering_last_line_wrapper = assignment_container.hasClass("last-add-line-wrapper") 
-                        && e.offsetX <= parseFloat(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-left")) + parseFloat(getComputedStyle(assignment_container[0]).getPropertyValue("--last-line-wrapper-width"))
-                        && e.offsetY >= dom_assignment.offset().top - assignment_container.offset().top;
-                    if (!dom_assignment.is(":hover") && (hovering_line_wrapper || hovering_last_line_wrapper)) {
-                        assignment_container.prevAll(".assignment-container").addBack().reverse() // addBack reveres query for some reason
-                            .each(function() {
-                                const shortcut = $(this).children(".shortcut");
-                                if (shortcut.length) {
-                                    // Don't click when invisible or when alreay hovered (to prevent double clicking)
-                                    shortcut.is(":visible") && !shortcut.is(":hover") && shortcut.click();
-                                    return false;
-                                }
-                            });
-                            
-                    }
                 });
             },
         },

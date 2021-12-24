@@ -644,7 +644,7 @@ class Priority {
         if (!that.total_completion_time) {
 
             $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
-            $("#estimated-total-time").html(dat.length ? 'You have Finished everything for Today!' : 'You don\'t have any Assignments');
+            $("#estimated-total-time").html(dat.length ? 'You have Finished Everything for Today!' : 'You don\'t have any assignments');
             $("#current-time, #tomorrow-time, #hide-button").hide();
         } else {
             $("#hide-button").html() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");

@@ -350,6 +350,16 @@ nav:focus-within #nav-menu::after {
     text-align: center;
     line-height: 15px;
 }
+.info-button::after {
+    content: "";
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: scale(1.8);
+    left: 0;
+    top: 0;
+    position: absolute;
+}
 .info-button:hover, #previous-day-icon-label .info-button,
 .info-button:hover, #next-day-icon-label .info-button {
     background: rgb(16,135,148);
