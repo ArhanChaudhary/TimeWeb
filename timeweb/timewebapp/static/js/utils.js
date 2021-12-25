@@ -859,7 +859,9 @@ utils = {
                 $(".unfinished-message").each(function() {
                     const $this = $(this);
                     $this.show();
-                    const lines = this.getClientRects().length - $this.children("br").length;
+                    // For some reason, getClientRects() in firefox doesn't count br elements
+                    // So, instead of doing const lines = this.getClientRects().length - $this.children("br").length; instead do the following
+                    const lines = [...this.getClientRects()].filter(i => i.width).length;
                     $this.toggle(lines === 1); 
                 });
             });
