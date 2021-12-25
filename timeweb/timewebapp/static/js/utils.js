@@ -129,7 +129,6 @@ utils = {
                     
                     const $this = $(this);
                     const dom_assignment = $this.parents(".assignment");
-                    const assignment_container = dom_assignment.parents(".assignment-container");
 
                     // .sort is already called in the controls' click handlers
                     const old_enable_tutoral = SETTINGS.enable_tutorial;
@@ -143,14 +142,16 @@ utils = {
                             dom_assignment.click();
                             dom_assignment.find(".delete-work-input-button").click();
                             dom_assignment.click();
-                            assignment_container[0].offsetHeight;
                             VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     } else {
                         if (dom_assignment.hasClass('open-assignment')) {
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
-                            dom_assignment.click();
+                            setTimeout(function() {
+                                if ($this.hasClass("slashed"))
+                                    dom_assignment.click();
+                            }, Priority.SORT_TIMEOUT_DURATION);
                         } else {
                             const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
                             VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
@@ -158,7 +159,6 @@ utils = {
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
                             dom_assignment.click();
-                            assignment_container[0].offsetHeight;
                             VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     }
