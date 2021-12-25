@@ -520,12 +520,13 @@ a[href="settings"] {
 .tag-add::after {
     content: '';
     position: absolute;
+    z-index: -1;
     top: 0;
-    right: 0;
-    left: 4px;
-    transform: translate(-25%, -25%);
+    left: -10px;
+    width: calc(100% + 20px);
+    height: 100%;
+    transform: scaleY(2.25);
     border-radius: 17px;
-    border: 17px solid transparent;
 }
 .tag-add-text {
     opacity: 0;
