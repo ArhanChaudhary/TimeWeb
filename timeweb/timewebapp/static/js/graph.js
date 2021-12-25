@@ -68,7 +68,7 @@ class Assignment {
         this.sa.due_time = {hour: 0, minute: 0};
         do {
             this.sa.x++;
-        } while (this.getWorkingDaysRemaining({ reference: "blue line end" }) === 0);
+        } while (this.getWorkingDaysRemaining({ reference: "visual red line start" }) === 0);
         this.sa.complete_x = this.sa.x;
         ajaxUtils.sendAttributeAjaxWithTimeout("due_time", this.sa.due_time, this.sa.id);
 
@@ -84,9 +84,10 @@ class Assignment {
         if (params.reference === "today") {
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             this.red_line_start_x = today_minus_assignment_date;
-        } else if (params.reference === "blue line end") {
+        } else if (params.reference === "visual red line start") {
             let len_works = this.sa.works.length - 1;
-            this.red_line_start_x = this.sa.blue_line_start + len_works;
+            // First point the red line is drawn on, taken from draw()
+            this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.blue_line_start + len_works;
         }
         let x1 = this.sa.x - this.red_line_start_x;
         if (this.sa.break_days.length) {
@@ -828,7 +829,7 @@ class VisualAssignment extends Assignment {
                     not_applicable_message_description = "Please use the \"tom\" keyword with the format: \"tom [some number]\", with [some number] being your work input.";
                 }
                 bypass_in_progress = true;
-            } else {
+            } else
                 switch (input_done) {
                     case "done":
                     case "fin":
@@ -842,7 +843,6 @@ class VisualAssignment extends Assignment {
                         }
                     }
                 }
-            }
             if (not_applicable_message_title) {
                 $.alert({
                     title: not_applicable_message_title,
@@ -878,12 +878,8 @@ class VisualAssignment extends Assignment {
 
             // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
             if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done < this.sa.y
-                && this.sa.soft) {
-                const original_red_line_start_x = this.red_line_start_x;
-                this.red_line_start_x = len_works + this.sa.blue_line_start;
+                && this.sa.soft)
                 this.incrementDueDate();
-                this.red_line_start_x = original_red_line_start_x;
-            }
             // Will never run if incrementDueDate() is called
             if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
                 this.sa.works.pop();
@@ -946,7 +942,7 @@ class VisualAssignment extends Assignment {
                 // No need to ajax since skew ratio is the same
                 return;
             }
-            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1) {
+            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1) {
                 skew_ratio_button.onlyText("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
@@ -1003,7 +999,7 @@ class VisualAssignment extends Assignment {
                 min: -max_textbox_value,
                 max: max_textbox_value,
             });
-            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1) {
+            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1) {
                 skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_textbox);
                 not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
