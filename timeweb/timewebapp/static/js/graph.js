@@ -26,8 +26,9 @@ class Assignment {
         const skew_ratio_bound = mathUtils.precisionRound((y1 + this.min_work_time_funct_round) * x1 / y1, 10);
         return skew_ratio_bound;
     }
-    setDynamicStartIfInDynamicMode() {
+    setDynamicStartIfInDynamicMode(params={ ajax: true }) {
         if (this.sa.fixed_mode) return;
+        const old_dynamic_start = this.sa.dynamic_start;
         const len_works = this.sa.works.length - 1;
 
         let low = this.sa.blue_line_start;
@@ -61,6 +62,9 @@ class Assignment {
         this.red_line_start_x = low;
         this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
         this.sa.dynamic_start = this.red_line_start_x;
+
+        // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
+        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
         this.setParabolaValues();
     }
     // make sure to properly set red_line_start_x before running this function
@@ -211,7 +215,7 @@ class VisualAssignment extends Assignment {
             } else if (x2 >= x1) {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
-            this.setDynamicStartIfInDynamicMode();
+            this.setDynamicStartIfInDynamicMode({ ajax: false });
             this.mousemove(e, iteration_number + 1);
         } else {
             // Passes mouse x and y coords so mouse point can be drawn
@@ -778,7 +782,6 @@ class VisualAssignment extends Assignment {
                 this.autotuneSkewRatio({ inverse: false });
             }
             this.setDynamicStartIfInDynamicMode();
-            ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             priority.sort({ timeout: true });
             this.draw();
@@ -884,7 +887,7 @@ class VisualAssignment extends Assignment {
             if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
                 this.sa.works.pop();
                 not_applicable_message_title = "End of Assignment.";
-                not_applicable_message_description = "You've reached the end of this assignment, and there are no more work inputs to submit.";
+                not_applicable_message_description = "You've reached the end of this assignment; there are no more work inputs to submit.";
                 $.alert({
                     title: not_applicable_message_title,
                     content: not_applicable_message_description,
@@ -914,7 +917,6 @@ class VisualAssignment extends Assignment {
                 this.setDynamicStartIfInDynamicMode();
             // }
 
-            ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
             // Delay resize because the graphs don't draw while the assignment is clsoing
@@ -964,6 +966,7 @@ class VisualAssignment extends Assignment {
                 this.set_skew_ratio_using_graph = false;
                 skew_ratio_button.onlyText("Set Curvature of the Graph");
                 ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+                ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
                 if (!this.draw_mouse_point) {
                     this.graph.off("mousemove");
                 }

@@ -293,6 +293,8 @@ Assignment.AUTOTUNE_ITERATIONS = 4;
 
 Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     if (this.sa.fixed_mode) return;
+    const old_skew_ratio = this.sa.skew_ratio;
+
     const works_without_break_days = this.sa.works.filter(function(work_input, work_input_index) {
         // If break days are enabled, filter out work inputs that are on break days
         // Use the same logic in calcModDays to detemine whether a work input is on a break day and add -1 at the end to select the work input after every non break day
@@ -412,5 +414,5 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
     // !this.sa.needs_more_info probably isn't needed, but just in case as a safety meachanism
-    !this.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
+    !this.sa.needs_more_info && this.sa.skew_ratio !== old_skew_ratio && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", this.sa.skew_ratio, this.sa.id);
 }
