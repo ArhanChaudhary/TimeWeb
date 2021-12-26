@@ -856,13 +856,18 @@ utils = {
                     priority.positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
+                let dispatched = false;
                 $(".unfinished-message").each(function() {
                     const $this = $(this);
                     $this.show();
                     // For some reason, getClientRects() in firefox doesn't count br elements
                     // So, instead of doing const lines = this.getClientRects().length - $this.children("br").length; instead do the following
                     const lines = [...this.getClientRects()].filter(i => i.width).length;
-                    $this.toggle(lines === 1); 
+                    $this.toggle(lines === 1);
+                    if (!dispatched) {
+                        document.dispatchEvent(new Event('assignment-layouts-loaded'));
+                        dispatched = true;
+                    }
                 });
             });
             // #animate-in is initially display: hidden in priority.js, delay adding the scale
