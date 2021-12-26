@@ -1109,7 +1109,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         const footer_height = assignment_footer.height() + parseFloat(dom_assignment.find(".graph-container").css("margin-top"));
-        dom_assignment.addClass("assignment-is-closing");
+        dom_assignment.addClass("assignment-is-closing").removeClass("open-assignment").css("overflow", "hidden");
         assignment_footer.animate({
             marginBottom: -footer_height,
         }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
@@ -1122,8 +1122,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
             });
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
-        dom_assignment.removeClass("open-assignment").css("overflow", "hidden");
-        // name height can increase
+        // Assignment name dom element can change height, so repoisiton the tags
         priority.positionTags(dom_assignment);
         return;
     }
