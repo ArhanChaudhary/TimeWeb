@@ -1,5 +1,5 @@
 from django import forms
-from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTICAL_TAG_POSITIONS
+from .models import TimewebModel, SettingsModel
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 import datetime
@@ -111,8 +111,6 @@ class TimewebForm(forms.ModelForm):
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):
-    horizontal_tag_position = forms.ChoiceField(widget=forms.Select, choices=HORIZONTAL_TAG_POSITIONS)
-    vertical_tag_position = forms.ChoiceField(widget=forms.Select, choices=VERTICAL_TAG_POSITIONS)
     class Meta:
         model = SettingsModel
         fields = "__all__"
