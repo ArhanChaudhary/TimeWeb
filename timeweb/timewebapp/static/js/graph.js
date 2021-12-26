@@ -800,6 +800,7 @@ class VisualAssignment extends Assignment {
         // BEGIN Submit work button
         submit_work_button.click(() => {
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+            const in_progress = () => SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === len_works + this.sa.blue_line_start;
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
             let not_applicable_message_title;
@@ -814,6 +815,11 @@ class VisualAssignment extends Assignment {
             let todo = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             let input_done = work_input_textbox.val().trim().toLowerCase();
             let bypass_in_progress = false;
+
+            if (input_done.startsWith("tom")) {
+                input_done = input_done.replace("tom", "").trim();
+                bypass_in_progress = true;
+            }
             if (input_done.startsWith("since")) {
                 input_done = +input_done.replace("since", "").trim();
                 if (isNaN(input_done)) {
@@ -825,24 +831,23 @@ class VisualAssignment extends Assignment {
                 if (array_length < 0) return;
                 this.sa.works.push(...new Array(array_length).fill(last_work_input));
                 len_works = this.sa.works.length - 1;
-            } else if (input_done.startsWith("tom")) {
-                input_done = +input_done.replace("tom", "").trim();
-                if (isNaN(input_done)) {
-                    not_applicable_message_title = "Invalid \"tom\" format.";
-                    not_applicable_message_description = "Please use the \"tom\" keyword with the format: \"tom [some number]\", with [some number] being your work input.";
-                }
-                bypass_in_progress = true;
             } else
                 switch (input_done) {
                     case "done":
                     case "fin":
+                        if (in_progress()) return;
                         input_done = Math.max(0, todo);
                         break;
                     default: {
                         input_done = +input_done;
                         if (isNaN(input_done)) {
-                            not_applicable_message_title = "Invalid Number.";
-                            not_applicable_message_description = "Please enter a valid number into the textbox to submit a work input."
+                            if (bypass_in_progress) {
+                                not_applicable_message_title = "Invalid \"tom\" format.";
+                                not_applicable_message_description = "Please use the \"tom\" keyword with the format: \"tom [input]\", with [input] being a valid work input.";
+                            } else {
+                                not_applicable_message_title = "Invalid Input.";
+                                not_applicable_message_description = "Please enter a valid number or keyword into the textbox to submit a work input."
+                            }
                         }
                     }
                 }
@@ -864,7 +869,8 @@ class VisualAssignment extends Assignment {
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
 
-            if (SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === len_works + this.sa.blue_line_start) {
+            if (in_progress()) {
+                if (this.sa.works[len_works] === last_work_input) return; // Pointless input
                 len_works--;
                 this.sa.works.pop();
 
@@ -905,11 +911,12 @@ class VisualAssignment extends Assignment {
             // Remember to add this check to the above autotune if I decide to add this back
 
             // Also remember to add this code if this is added back:
+            // let todo_for_blue_line_end = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
             // if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
-            //     todo = 0;
+            //     todo_for_blue_line_end = 0;
             // }
             
-            // if (input_done !== todo) {
+            // if (input_done !== todo_for_blue_line_end) {
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatio();
