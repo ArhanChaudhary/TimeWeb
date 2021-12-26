@@ -472,7 +472,7 @@ utils = {
             function tagAddClick(e) {
                 const $this = $(this);
                 // Close add tag box if "Add Tag" is clicked again
-                if ($(e.target).hasClass("tag-add") && $this.hasClass("open-tag-add-box")) {
+                if (($(e.target).hasClass("tag-add") || $(e.target).parent(".tag-add").length) && $this.hasClass("open-tag-add-box")) {
                     $this.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
                     return;
