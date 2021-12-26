@@ -849,6 +849,7 @@ utils = {
         setAssignmentScaleUtils: function() {
             // width * percentx = width+10
             // percentx = 1 + 10/width
+            let dispatched = false;
             $(window).resize(function() {
                 $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
@@ -856,7 +857,6 @@ utils = {
                     priority.positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
-                let dispatched = false;
                 $(".unfinished-message").each(function() {
                     const $this = $(this);
                     $this.show();
@@ -864,11 +864,11 @@ utils = {
                     // So, instead of doing const lines = this.getClientRects().length - $this.children("br").length; instead do the following
                     const lines = [...this.getClientRects()].filter(i => i.width).length;
                     $this.toggle(lines === 1);
-                    if (!dispatched) {
-                        document.dispatchEvent(new Event('assignment-layouts-loaded'));
-                        dispatched = true;
-                    }
                 });
+                if (!dispatched) {
+                    document.dispatchEvent(new Event('assignment-layouts-loaded'));
+                    dispatched = true;
+                }
             });
             // #animate-in is initially display: hidden in priority.js, delay adding the scale
             document.fonts.ready.then(function() {
