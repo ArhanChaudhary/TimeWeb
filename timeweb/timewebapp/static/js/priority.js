@@ -570,17 +570,17 @@ class Priority {
         if (a.status_value > b.status_value) return -1;
 
         if (SETTINGS.assignment_sorting.includes("Tag Name") && !SETTINGS.assignment_sorting.includes("Normal")) {
-            // a.first_tag === undefined: Treat undefined as the lowest index lexicographic string
-            // Reference:
-            // "a" < "b" => true
-            // undefined < "b" => false (the below makes this true)
+            // b.first_tag === undefined: Treat undefined as the highst index lexicographic string
 
-            // "b" > "a" => true
-            // "b" > undefined => false (the below makes this false)
+            // "r" < "z" => true
+            // "r" < undefined => false (the below makes this true)
+            
+            // "z" > "r" => true
+            // undefined > "r" => false (the below makes this true)
 
-            // b.first_tag !== undefined: If both are undefined, skip this check
-            if (a.first_tag < b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return -1;
-            if (a.first_tag > b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return 1;
+            // a.first_tag !== undefined: If both are undefined, skip this check
+            if (a.first_tag < b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return -1;
+            if (a.first_tag > b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return 1;
         }
 
         const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
@@ -593,8 +593,8 @@ class Priority {
             if (a.status_priority < b.status_priority) return 1;
             if (a.status_priority > b.status_priority) return -1;
         }
-        if (a.first_tag < b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return -1;
-        if (a.first_tag > b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return 1;
+        if (a.first_tag < b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return -1;
+        if (a.first_tag > b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return 1;
 
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
