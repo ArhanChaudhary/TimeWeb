@@ -564,10 +564,6 @@ class Priority {
     }
     assignmentSortingComparator(a, b) {
         const that = this;
-        
-        // Max to min
-        if (a.status_value < b.status_value) return 1;
-        if (a.status_value > b.status_value) return -1;
 
         if (SETTINGS.assignment_sorting.includes("Tag Name") && !SETTINGS.assignment_sorting.includes("Normal")) {
             // b.first_tag === undefined: Treat undefined as the highst index lexicographic string
@@ -582,6 +578,10 @@ class Priority {
             if (a.first_tag < b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return -1;
             if (a.first_tag > b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return 1;
         }
+
+        // Max to min
+        if (a.status_value < b.status_value) return 1;
+        if (a.status_value > b.status_value) return -1;
 
         const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
         if (!SETTINGS.assignment_sorting.includes("Reversed") && [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
