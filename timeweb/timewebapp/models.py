@@ -30,6 +30,14 @@ VERTICAL_TAG_POSITIONS = (
 )
 MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in VERTICAL_TAG_POSITIONS], key=len))
 
+ASSIGNMENT_SORTINGS = (
+    ("Normal", "Normal"),
+    ("Reversed", "Reversed"),
+    ("Tag Name", "Tag Name"),
+    ("Tag Name Reversed", "Tag Name Reversed"),
+)
+MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SORTINGS], key=len))
+
 ASSIGNMENT_SPACINGS = (
     ("Comfy", "Comfy"),
     ("Compact", "Compact"),
@@ -247,9 +255,11 @@ class SettingsModel(models.Model):
         default="#84d336",
         verbose_name=_('Lowest Priority Color'),
     )
-    reverse_sorting = models.BooleanField(
-        default=False,
-        verbose_name=_('Sort Assignments in Reverse'),
+    assignment_sorting = models.CharField(
+        max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
+        choices=ASSIGNMENT_SORTINGS,
+        default=("Normal"),
+        verbose_name=_('Assignment Sorting: '),
     )
     color_priority = models.BooleanField(
         default=True,

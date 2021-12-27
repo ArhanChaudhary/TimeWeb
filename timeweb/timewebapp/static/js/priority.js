@@ -203,8 +203,11 @@ class Priority {
                 dom_completion_time = $(".completion-time").eq(index),
                 dom_tags = $(".tags").eq(index);
             let has_autofilled = false;
+
             let first_tag = sa.sa.tags[0];
-            if (["Important","Not Important"].includes(first_tag)) first_tag = undefined;
+            for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_tag); tag_index_iterator++) {
+                first_tag = sa.sa.tags[tag_index_iterator];
+            }
             const number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (!sa.sa.needs_more_info && that.params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 for (let i = 0; i < number_of_forgotten_days; i++) {
@@ -482,7 +485,7 @@ class Priority {
                 index,
                 // Not actually used for sorting, used for priority stuff later on
                 mark_as_done: sa.sa.mark_as_done,
-            };
+            }
             that.priority_data_list.push(priority_data);
 
             if (status_image) {
@@ -561,13 +564,28 @@ class Priority {
     }
     assignmentSortingComparator(a, b) {
         const that = this;
+        
         // Max to min
         if (a.status_value < b.status_value) return 1;
         if (a.status_value > b.status_value) return -1;
 
+        if (SETTINGS.assignment_sorting.includes("Tag Name") && !SETTINGS.assignment_sorting.includes("Normal")) {
+            // a.first_tag === undefined: Treat undefined as the lowest index lexicographic string
+            // Reference:
+            // "a" < "b" => true
+            // undefined < "b" => false (the below makes this true)
+
+            // "b" > "a" => true
+            // "b" > undefined => false (the below makes this false)
+
+            // b.first_tag !== undefined: If both are undefined, skip this check
+            if (a.first_tag < b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return -1;
+            if (a.first_tag > b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return 1;
+        }
+
         const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
-        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
-        || SETTINGS.reverse_sorting && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
+        if (!SETTINGS.assignment_sorting.includes("Reversed") && [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
+        || SETTINGS.assignment_sorting.includes("Reversed") && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
@@ -575,8 +593,8 @@ class Priority {
             if (a.status_priority < b.status_priority) return 1;
             if (a.status_priority > b.status_priority) return -1;
         }
-        if (a.first_tag < b.first_tag) return -1;
-        if (a.first_tag > b.first_tag) return 1;
+        if (a.first_tag < b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return -1;
+        if (a.first_tag > b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return 1;
 
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;

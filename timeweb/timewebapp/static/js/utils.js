@@ -258,6 +258,14 @@ utils = {
                 );
             },
 
+            assignmentSorting: function() {
+                $("#id_assignment_sorting").on("change", function() {
+                    SETTINGS.assignment_sorting = $(this).val();
+                    ajaxUtils.ajaxAssignmentSorting();
+                    priority.sort();
+                });
+            },
+
             googleClassroomAPI: function() {
                 if (!creating_gc_assignments_from_frontend && !gc_api_init_failed) {
                     if (SETTINGS.oauth_token.token) {
@@ -514,11 +522,15 @@ utils = {
                         }
                         // Add tags to dat locally
                         sa.tags.push(...tag_names);
+
+                        // There are too many conditions on whether to sort or not, so just sort every time
+
                         // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
                         // "important" and "not important" because they were designed to affect priority
-                        if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+                        // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
                             priority.sort();
-                        }
+                        // }
+
                         // Close box and add tags visually
                         $this.removeClass("open-tag-add-box");
                         transitionCloseTagBox($this);
@@ -626,10 +638,14 @@ utils = {
                 const success = function() {
                     // Remove data locally from dat
                     sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+
+                    // There are too many conditions on whether to sort or not, so just sort every time
+
                     // GC class tags
-                    if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
+                    // if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
                         priority.sort();
-                    }
+                    // }
+
                     tag_wrapper.addClass("tag-is-deleting");
                     // Transition the deletion
                     // Need to use jquery to set css for marginLeft
@@ -690,8 +706,13 @@ utils = {
                     }).map(function() {
                         return $(this).children(".tag-name").text();
                     }).toArray();
+
+                    // There are too many conditions on whether to sort or not, so just sort every time
+
                     // GC class tags
-                    sa.is_google_classroom_assignment && sa.needs_more_info && priority.sort();
+                    //sa.is_google_classroom_assignment && sa.needs_more_info && 
+                    priority.sort();
+                    
                     ajaxUtils.sendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
                 }
             });
@@ -1144,6 +1165,19 @@ ajaxUtils = {
             error: ajaxUtils.error,
         });
     },
+    ajaxAssignmentSorting: function() {
+        if (ajaxUtils.disable_ajax) return;
+        const data = {
+            'csrfmiddlewaretoken': csrf_token,
+            'action': 'assignment_sorting',
+            'assignment_sorting': SETTINGS.assignment_sorting,
+        }
+        $.ajax({
+            type: "POST",
+            data: data,
+            error: ajaxUtils.error,
+        });
+    },
     createGCAssignments: function() {
         if (ajaxUtils.disable_ajax || !creating_gc_assignments_from_frontend) return;
         const data = {
@@ -1393,6 +1427,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();
+    utils.ui.setClickHandlers.assignmentSorting();
     utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();

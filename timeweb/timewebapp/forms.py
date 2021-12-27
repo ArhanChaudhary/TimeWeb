@@ -147,7 +147,6 @@ class SettingsForm(forms.ModelForm):
             "def_skew_ratio": "Set this value to 0 to make it linear.",
             "ignore_ends": "Ignores the minimum work time for the first and last working days of EVERY assignment with a minimum work time in exchange for making their work distributions smoother. Recommended to be enabled.",
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
-            "reverse_sorting": "Sorts assignments in reverse order. Useful if you like completing easier assignments first and harder assignments last. Note that this isn't a true reverse. Some assignments may be still be placed at higher list positions due to other factors, such as them being due tomorrow.",
             "assignment_spacing": "Controls the height of every assignment.",
             "color_priority": "Colors every assignment based on their priority.",
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",

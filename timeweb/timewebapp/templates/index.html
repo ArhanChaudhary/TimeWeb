@@ -84,10 +84,14 @@
         <div id="next-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
         <div id="close-assignments-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Close all Assignments</div>
       </div>
-    </div>
-    {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
-    <div id="current-date"{% if background_image %} class="grey-highlight"{% endif %}>
-      <span id="current-date-text"></span>
+      {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
+      <div id="current-date"{% if background_image %} class="grey-highlight"{% endif %}>
+        <span id="current-date-text"></span>
+      </div>
+      <div id="sort-assignments-container">
+        {{ settings_form.assignment_sorting.label_tag }}
+        {{ settings_form.assignment_sorting }}
+      </div>
     </div>
     <div id="autofill-work-done" class="shortcut">
       <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>

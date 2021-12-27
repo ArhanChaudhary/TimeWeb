@@ -47,7 +47,6 @@ header.animate::after {
     position: relative;
     z-index: 1001;
     padding: 0 10px;
-    margin-bottom: 4px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -62,10 +61,19 @@ header.animate::after {
 #info.dim {
     opacity: 0;
 }
+#assignments-header::after {
+    content: "";
+    width: 100%;
+    margin-bottom: 4px;
+}
 #current-date {
     position: relative;
-    padding: 0 10px;
     font-size: 17px;
+    order: 1;
+}
+#sort-assignments-container {
+    margin-left: auto;
+    order: 1;
 }
 #hide-button {
     margin-right: 5px;

@@ -161,7 +161,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'show_progress_bar': self.settings_model.show_progress_bar,
             'assignment_spacing': self.settings_model.assignment_spacing,
             'animation_speed': self.settings_model.animation_speed,
-            'reverse_sorting': self.settings_model.reverse_sorting,
             'color_priority': self.settings_model.color_priority,
             'text_priority': self.settings_model.text_priority,
             'use_in_progress': self.settings_model.use_in_progress,
@@ -220,7 +219,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
         self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
         self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
-        self.settings_model.reverse_sorting = self.form.cleaned_data.get("reverse_sorting")
         self.settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         self.settings_model.text_priority = self.form.cleaned_data.get("text_priority")
         self.settings_model.use_in_progress = self.form.cleaned_data.get("use_in_progress")
@@ -296,6 +294,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.user_model.save()
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
+        self.context['settings_form'] = SettingsForm({
+            'assignment_sorting': self.settings_model.assignment_sorting,
+        })
 
         # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
         if just_created_assignment_id:
@@ -324,6 +325,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             return self.finished_tutorial(request)
         elif action == 'seen_latest_changelog':
             return self.seen_latest_changelog(request)
+        elif action == 'assignment_sorting':
+            return self.assignment_sorting(request)
         elif action == 'create_gc_assignments':
             if 'token' in self.settings_model.oauth_token:
                 redirect_url_if_creds_invalid = self.create_gc_assignments(request)
@@ -724,6 +727,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.seen_latest_changelog = True
         self.settings_model.save()
         logger.info(f"User \"{request.user}\" saved seeing their changelog")
+        return HttpResponse(status=204)
+
+    def assignment_sorting(self, request):
+        self.settings_model.assignment_sorting = request.POST['assignment_sorting']
+        self.settings_model.save()
+        logger.info(f"User \"{request.user}\" saved their assignment sorting")
         return HttpResponse(status=204)
 
     def tag_add_or_delete(self, request, action):
