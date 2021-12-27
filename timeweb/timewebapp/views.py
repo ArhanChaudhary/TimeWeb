@@ -66,7 +66,7 @@ editing_example_account = False
 example_account_name = "Example"
 example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
-MAX_NUMBER_TAGS = 10
+MAX_NUMBER_TAGS = 5
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
