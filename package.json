@@ -14,7 +14,7 @@
     "@babel/preset-env": "^7.16.5"
   },
   "scripts": {
-    "build": "babel timeweb/static/js -d timeweb/static/js"
+    "build": "babel timeweb/timewebapp/static/js -d timeweb/timewebapp/static/js"
   },
   "repository": {
     "type": "git",
