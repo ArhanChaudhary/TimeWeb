@@ -815,12 +815,14 @@ class Priority {
             // Set initial transition values for "#animate-in"
             // Needs to be after domswap or else "top" bugs out 
             
-            // First paint is before assignments-loaded; #animate-in is shown
+            // First paint is before the fonts are loaded; #animate-in is shown
+            // Use opacity 0 instead of display none so getClientRects() works in utils.js
             $("#animate-in").css({
                 position: "absolute",
                 opacity: 0,
             })
-            $(document).one("assignment-layouts-loaded", function() {
+            // Load the fonts first or height() may return the wrong values
+            document.fonts.ready.then(function() {
                 $("#animate-in").css({
                     position: "",
                     top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + Priority.ANIMATE_IN_START_MARGIN,
