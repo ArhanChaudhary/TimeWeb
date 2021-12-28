@@ -926,13 +926,9 @@ class VisualAssignment extends Assignment {
 
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             
-            // Delay resize because the graphs don't draw while the assignment is clsoing
-            if (SETTINGS.close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1) {
-                priority.sort({ timeout: true, delayResize: true });
+            if (SETTINGS.close_graph_after_work_input && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1)
                 this.dom_assignment.click();
-            } else {
-                priority.sort({ timeout: true, delayResize: false });
-            }
+            priority.sort({ timeout: true });
             this.draw();
         });
         // END Submit work button

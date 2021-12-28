@@ -680,7 +680,7 @@ class Priority {
             setInterval(utils.ui.tickClock, 1000);
         }
     }
-    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false, delayResize: false}) {
+    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false}) {
         const that = this;
         that.params = params;
         clearTimeout(that.sort_timeout);
@@ -697,20 +697,16 @@ class Priority {
         that.tomorrow_total_completion_time = 0;
         that.due_date_passed_notices = [];
         that.due_date_incremented_notices = [];
+        let scrollTop = $("main").scrollTop();
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         that.alertDueDates();
         
         // Updates open graphs' today line and other graph text
-        if (that.params.delayResize) {
-            setTimeout(() => {
-                $(window).trigger("resize");
-            }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION);
-        } else {
-            $(window).trigger("resize");
-        }
+        $(window).trigger("resize");
+        // .unfinished-text in utils.js messes up the scroll position
+        $("main").scrollTop(scrollTop);
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
-        // Source code lurkers, uncomment this for some fun
-        // function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
+        // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
             const ignore_tag_status_value = Math.round(priority_data.status_value);
             if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done) {
