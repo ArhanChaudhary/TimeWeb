@@ -107,7 +107,6 @@ class VisualAssignment extends Assignment {
     static MOUSE_POSITION_TRANSFORM = {x: 0.1, y: -1.3} // Adjusts the mouse position by a few pixels to make it visually more accurate
     static RED_LINE_COLOR = {r: 233, g: 68, b: 46}
     static BLUE_LINE_COLOR = {r: 1, g: 147, b: 255}
-    static DRAW_POINT_COLOR = {r: 0, g: 255, b: 0}
     static SKEW_RATIO_ROUND_PRECISION = 3
     static SKEW_RATIO_SNAP_DIFF = 0.05
     static ARROW_KEYDOWN_THRESHOLD = 500
@@ -326,6 +325,11 @@ class VisualAssignment extends Assignment {
             if (!this.set_skew_ratio_using_graph && this.last_mouse_x === mouse_x && this.last_mouse_y === mouse_y) {
                 return;
             }
+            if (mouse_y) {
+                var funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];
+            } else {
+                var funct_mouse_x = this.funct(mouse_x);
+            }
             this.last_mouse_x = mouse_x;
             this.last_mouse_y = mouse_y;
         }
@@ -433,14 +437,19 @@ class VisualAssignment extends Assignment {
         }
         screen.lineWidth = radius;
         screen.beginPath();
-        for (let point = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point < line_end; point += Math.ceil(1 / this.wCon)) {
-            circle_x = point * this.wCon + 50;
+        for (let point_x = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
+            let point_y = this.funct(point_x);
+            circle_x = point_x * this.wCon + 50;
             if (circle_x > this.width - 5) {
                 circle_x = this.width - 5;
             }
-            circle_y = this.height - this.funct(point) * this.hCon - 50;
-            screen.lineTo(circle_x - (point === this.red_line_start_x) * radius / 2, circle_y); // (point === this.red_line_start_x) * radius / 2 makes sure the first point is filled in properly
-            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+            circle_y = this.height - point_y * this.hCon - 50;
+            screen.lineTo(circle_x - (point_x === this.red_line_start_x) * radius / 2, circle_y); // (point_x === this.red_line_start_x) * radius / 2 makes sure the first point is filled in properly
+            if (point_x === mouse_x && point_y === funct_mouse_x) {
+                screen.arc(circle_x, circle_y, radius + 1, 0, 2 * Math.PI);
+            } else {
+                screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+            }
             screen.moveTo(circle_x, circle_y);
         }
         screen.stroke();
@@ -461,26 +470,23 @@ class VisualAssignment extends Assignment {
             )`.replace(/\s+/g, '');
         }
         screen.lineWidth = radius;
-        for (let point = 0; point < line_end; point += Math.ceil(1 / this.wCon)) {
-            circle_x = Math.min(this.sa.complete_x, point + this.sa.blue_line_start) * this.wCon + 50;
-            circle_y = this.height - this.sa.works[Math.min(len_works, point)] * this.hCon - 50;
+        for (let point_x = 0; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
+            let point_y = this.sa.works[Math.min(len_works, point_x)];
+            circle_x = Math.min(this.sa.complete_x, point_x + this.sa.blue_line_start) * this.wCon + 50;
+            circle_y = this.height - point_y * this.hCon - 50;
             
-            screen.lineTo(circle_x - (point === 0) * radius / 2, circle_y);
-            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+            screen.lineTo(circle_x - (point_x === 0) * radius / 2, circle_y);
+            if (point_x === mouse_x && point_y === funct_mouse_x) {
+                screen.arc(circle_x, circle_y, radius + 2, 0, 2 * Math.PI);
+            } else {
+                screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
+            }
             screen.moveTo(circle_x, circle_y);
         }
         radius /= 0.75;
         screen.stroke();
-        screen.textBaseline = "top";
-        screen.textAlign = "start";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
-            let funct_mouse_x;
-            if (mouse_y) {
-                funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];
-            } else {
-                funct_mouse_x = this.funct(mouse_x);
-            }
             let str_mouse_x;
             if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 str_mouse_x = new Date(this.complete_due_date.valueOf());
@@ -492,33 +498,19 @@ class VisualAssignment extends Assignment {
                 str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
                 str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
             }
-            if (this.wCon * mouse_x + 50 + screen.measureText(`(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`).width > this.width - 5) {
-                screen.textAlign = "end";
-            }
-            if (this.height - funct_mouse_x * this.hCon - 50 + screen.measureText(0).width * 2 > this.height - 50) {
-                screen.textBaseline = "bottom";
-            }
-            screen.fillStyle = "black";
-            screen.fillText(` (Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x}) `, this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50);
-            if ($("html").is("#dark-mode")) {
-                screen.fillStyle = `rgb(
-                    ${255 - VisualAssignment.DRAW_POINT_COLOR.r},
-                    ${255 - VisualAssignment.DRAW_POINT_COLOR.g},
-                    ${255 - VisualAssignment.DRAW_POINT_COLOR.b}
-                )`.replace(/\s+/g, '');
-            } else {
-                screen.fillStyle = `rgb(
-                    ${VisualAssignment.DRAW_POINT_COLOR.r},
-                    ${VisualAssignment.DRAW_POINT_COLOR.g},
-                    ${VisualAssignment.DRAW_POINT_COLOR.b}
-                )`.replace(/\s+/g, '');
-            }
-            screen.strokeStyle = screen.fillStyle;
+            const point_x = mouse_x * this.wCon + 50;
+            const point_y = this.height - funct_mouse_x * this.hCon - 50;
+            const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
+            const hover_point_label = this.dom_assignment.find(".hover-point-label");
+            hover_point_label.removeClass("hide-label");
+            hover_point_label.prop("style").setProperty("--x", point_x);
+            hover_point_label.prop("style").setProperty("--y", point_y);
+            hover_point_label.text(point_str);
+            hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width > this.width - 5);
             screen.beginPath();
-            screen.arc(this.wCon * mouse_x + 50, this.height - funct_mouse_x * this.hCon - 50, radius, 0, 2 * Math.PI);
-            screen.stroke();
+            screen.fillStyle = "white";
+            screen.arc(point_x, point_y, radius + 1, 0, 2 * Math.PI);
             screen.fill();
-            screen.fillStyle = "black";
         }
         
         screen.textAlign = "center";
@@ -981,6 +973,8 @@ class VisualAssignment extends Assignment {
                     // Disable draw point
                     this.graph.off("mousemove");
                     this.draw_mouse_point = false;
+                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                    hover_point_label.addClass("hide-label");
                     delete this.last_mouse_x;
                     this.draw();
                 }
