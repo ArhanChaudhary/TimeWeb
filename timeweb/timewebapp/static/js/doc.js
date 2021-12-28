@@ -18,29 +18,28 @@ document.addEventListener("DOMContentLoaded", function() {
     $(".major-category").reverse().each(function() {
         const $major_category = $(this);
         $major_category.attr("number-major-categories", number_major_categories);
-
         const major_category_li = $(TABLE_OF_CONTENTS_MAJOR_CATEGORY_TEMPLATE);
         let minor_categories = $major_category.siblings("details");
-        if ($major_category.attr("id"))
-            minor_categories = minor_categories.add($major_category);
-        //     major_category_li.find("a").attr("href", `#${$major_category.attr("id")}`);
-        //     major_category_li.find("a").text($major_category.text());
-        // } else {
-        //     major_category_li.find("a").remove();
-            major_category_li.find("span").text($major_category.text());
-        // }
-        
 
-        minor_categories.each(function() {
-            let $minor_category = $(this).find(".minor-category");
-            if (!$minor_category.length)
-                $minor_category = $minor_category.add($major_category);
-
+        if ($major_category.attr("id") && !$major_category.hasClass("create-dropdown")) {
             const minor_category_li = $(TABLE_OF_CONTENTS_MINOR_CATEGORY_TEMPLATE);
-            minor_category_li.find("a").attr("href", `#${$minor_category.attr("id")}`).text($minor_category.text());
-            major_category_li.find("ul").append(minor_category_li);
-        });
-        $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
+            minor_category_li.find("a").attr("href", `#${$major_category.attr("id")}`).text($major_category.text());
+            $("#table-of-contents-container #category-table-of-contents").after(minor_category_li);
+        } else {
+            minor_categories = minor_categories.add($major_category);
+            major_category_li.find("span").text($major_category.text());
+
+            minor_categories.each(function() {
+                let $minor_category = $(this).find(".minor-category");
+                if (!$minor_category.length)
+                    $minor_category = $minor_category.add($major_category);
+
+                const minor_category_li = $(TABLE_OF_CONTENTS_MINOR_CATEGORY_TEMPLATE);
+                minor_category_li.find("a").attr("href", `#${$minor_category.attr("id")}`).text($minor_category.text());
+                major_category_li.find("ul").append(minor_category_li);
+            });
+            $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
+        }
         observer.observe($major_category[0]);
     });
 
