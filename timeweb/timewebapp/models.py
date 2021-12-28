@@ -34,7 +34,6 @@ ASSIGNMENT_SORTINGS = (
     ("Normal", "Normal"),
     ("Reversed", "Reversed"),
     ("Tag Name", "Tag Name"),
-    ("Tag Name Reversed", "Tag Name Reversed"),
 )
 MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SORTINGS], key=len))
 
