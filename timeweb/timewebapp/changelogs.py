@@ -1,6 +1,37 @@
 # Could probably make this a json but multi line strings are not allowed
 CHANGELOGS = [
 {
+    "version": "v1.6.0-beta (12/28/2021)",
+    # Mention in #changelog
+    # https://discord.com/channels/832155860306362438/832155860306362442/913552985685102623
+    "updates": '''<ul>
+                    <li>Improved color scheme</li>
+                    <li>Improved curvature autotuning algorithm for deleting work inputs</li>
+                    <li>Reworked dynamic mode curvature autotuning algorithm to tend towards linear</li>
+                    <li>Added more keybinds</li>
+                    <li>Added "Finish Assignment for Today" button</li>
+                    <li>Added "Assignment Sorting" feature</li>
+                    <li>Added "Animation Speed" setting</li>
+                    <li>Added "Enter Work inputs In-Place after Today" setting</li>
+                    <li>Added "Show "Advanced Controls" beneath the Graph" setting</li>
+                    <li>Added "Timezone" setting</li>
+                    <li>Dozens of minor UI improvements</li>
+                    <li>Minor bug fixes</li>
+                    <ul>
+                        <li>Fixed assignments with soft due dates displaying question marks</li>
+                        <li>Fixed the example assignment displaying a question mark</li>
+                        <li>Fixed curvature values not being saved properly</li>
+                        <li>Fixed the progress bar not displaying</li>
+                        <li>Fixed unexpected usage of keybinds</li>
+                        <li>Fixed visual roundoff errors</li>
+                        <li>Fixed dynamic mode inconsistencies</li>
+                        <li>Fixed assignments not sorting properly when their tags are modified</li>
+                        <li>Fixed soft due date false alarms</li>
+                        <li>Fixed "delete assignments from class" deleting outside assignments</li>
+                    </ul>
+                </ul>''',
+},
+{
     "version": "v1.5.2-beta (11/24/2021)",
     "updates": '''<ul>
                     <li>Redesigned the assignment graph layout</li>
