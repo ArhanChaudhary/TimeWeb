@@ -490,7 +490,7 @@ class Priority {
 
             if (status_image) {
                 dom_status_image.show();
-                dom_status_image.attr("src", DEBUG ? `static/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
+                dom_status_image.attr("src", DEBUG === "True" ? `static/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
             } else {
                 dom_status_image.hide();
                 dom_status_image.removeAttr("src");
@@ -499,7 +499,7 @@ class Priority {
             dom_title.attr("data-daysleft", str_daysleft);
             // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            dom_completion_time.html((display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '') + (DEBUG ? ` ID: ${sa.sa.id}` : ""));
+            dom_completion_time.html((display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '') + (DEBUG === "True" ? ` ID: ${sa.sa.id}` : ""));
         });
     }
     alertDueDates() {
