@@ -1296,7 +1296,7 @@ if (!SETTINGS.seen_latest_changelog) {
             }
         });
         setTimeout(function() {
-            jconfirm.$content.css("opacity", "0.85");
+            jconfirm.$content[0].style.setProperty("opacity", "0.85", "important");
             jconfirm.$titleContainer.css("padding-bottom", 5);
         }, 0);
     }, 500);
