@@ -46,7 +46,6 @@
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=0.65, maximum-scale=1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <!-- Note: these specifc vendor file's source code has been modified for convenience -->
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
         {% block css %}{% endblock css %}
@@ -95,7 +94,7 @@
                         <span id="nav-a2hs" tabindex="0">Install on Home Screen</span>
                         <a href="{% url 'user-guide' %}">User Guide</a>
                         <a href="{% url 'changelog' %}">Changelog</a>
-                        <a href="{% comment %}{% url 'blog' %}{% endcomment %}" id="nav-blog">Blog</a>
+                        <a href="{% url 'blog' %}" id="nav-blog">Blog</a>
                         <a target='_blank' href="https://discord.gg/fQgPXX5qpD">Discord Server</a>
                         <span id="nav-credits" tabindex="0">Credits</span>
                         <a href="{% url 'policies' %}">Policies</a>
