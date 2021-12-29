@@ -511,6 +511,7 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "white";
             screen.arc(point_x, point_y, radius + 1, 0, 2 * Math.PI);
             screen.fill();
+            screen.fillStyle = "black";
         }
         
         screen.textAlign = "center";
