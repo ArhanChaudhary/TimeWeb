@@ -20,7 +20,6 @@ try:
     DEBUG = os.environ['DEBUG'] == "True"
 except KeyError:
     DEBUG = True
-# DEBUG=False
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -200,6 +199,8 @@ else:
     DEFAULT_FILE_STORAGE = 'timewebapp.gcloud_storages.GoogleCloudMediaFileStorage'
     STATICFILES_STORAGE = 'timewebapp.gcloud_storages.GoogleCloudStaticFileStorage'
     
+    GS_DEFAULT_ACL = None
+    GS_QUERYSTRING_AUTH = False
     GS_STATIC_BUCKET_NAME = 'twstatic'
     GS_MEDIA_BUCKET_NAME = 'timeweb-308201.appspot.com'
 
