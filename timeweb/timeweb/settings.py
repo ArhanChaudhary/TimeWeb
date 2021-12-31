@@ -281,7 +281,7 @@ ACCOUNT_FORMS = {
     'signup': 'timewebapp.forms.LabeledSignupForm', # Done
     'add_email': 'allauth.account.forms.AddEmailForm',
     'change_password': 'allauth.account.forms.ChangePasswordForm',
-    'set_password': 'allauth.account.forms.SetPasswordForm',
+    'set_password': 'timewebapp.forms.LabeledResetPasswordKeyForm', # Done
     'reset_password': 'timewebapp.forms.LabeledResetPasswordForm', # Done
     'reset_password_from_key': 'timewebapp.forms.LabeledResetPasswordKeyForm', # Done
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
