@@ -4,7 +4,7 @@ from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTI
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 import datetime
-from allauth.account.forms import LoginForm
+from allauth.account.forms import *
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -178,17 +178,17 @@ class UsernameResetForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 
-class LabeledSignupForm(LoginForm):
+class LabeledLoginForm(LoginForm):
 
     error_messages = {
-        "account_inactive": _("This account is currently disabled, please contact the administrator"),
+        "account_inactive": _("This account is currently disabled, please <a href=\"mailto:arhan.ch@gmail.com>contact us</a> for more information"),
         "email_password_mismatch": _(
             "Your e-mail address or password is incorrect"
         ),
     }
 
     def __init__(self, *args, **kwargs):
-        super(LabeledSignupForm, self).__init__(*args, **kwargs)
+        super(LabeledLoginForm, self).__init__(*args, **kwargs)
 
         self.fields['login'] = forms.EmailField(
             label=_("E-mail address"),
@@ -202,3 +202,38 @@ class LabeledSignupForm(LoginForm):
         )
         self.fields['password'].widget.attrs["placeholder"] = ""
         self.label_suffix = ""
+
+class LabeledResetPasswordForm(ResetPasswordForm):
+    email = forms.EmailField(
+        label=_("E-mail address"),
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "autocomplete": "email",
+            }
+        ),
+    )
+# class LabeledSignupForm(SignupForm):
+
+#     error_messages = {
+#         "duplicate_email": _("A user with that e-mail address already exists."),
+#         "password_mismatch": _("The two password fields didn't match."),
+#     }
+
+#     def __init__(self, *args, **kwargs):
+#         super(LabeledSignupForm, self).__init__(*args, **kwargs)
+
+#         self.fields['email'] = forms.EmailField(
+#             label=_("E-mail address"),
+#             required=True,
+#             widget=forms.TextInput(
+#                 attrs={
+#                     "type": "email",
+#                     "autocomplete": "email",
+#                 }
+#             ),
+#         )
+#         self.fields['password1'].widget.attrs["placeholder"] = ""
+#         self.fields['password2'].widget.attrs["placeholder"] = ""
+#         self.label_suffix = ""

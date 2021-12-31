@@ -7,21 +7,6 @@ label {
 #id_password {
     margin-bottom: 5px;
 }
-#id_login, #id_password {
-    width: 100%;
-    margin-top: 5px;
-    box-sizing: border-box;
-    border: none;
-    box-shadow: inset 0 0 2px 1px;
-    background: white;
-    height: 36px;
-    border-radius: 4px;
-    padding-left: 15px;
-}
-#id_login:focus, #id_password:focus {
-    box-shadow: inset 0 0 0 2px rgb(94, 94, 255);
-    outline: 0;
-}
 #under-password {
     white-space: nowrap;
     overflow: hidden;
@@ -68,38 +53,19 @@ label {
     color: rgb(13, 106, 255);
     text-decoration: none;
 }
-.error-note {
-    display: flex;
-    align-items: center;
-    font-size: 15px;
-    padding: 25px 10px;
-    width: 100%;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-    height: 30px;
-
-    background: rgba(255, 68, 12, 0.05);
-    color: rgb(255, 68, 12);
-    border: 1px solid rgb(255, 68, 12);
-}
 form span:first-of-type label {
     /* gap showing up for no reason >:( */
     margin-top: -5px;
 }
 #under-password {
     display: flex;
-    justify-content: space-between;
-    flex-wrap: nowrap;
+    flex-wrap: wrap-reverse;
 }
 #example-message {
-    color: rgb(61, 123, 248);
     cursor: pointer;
+    margin-left: auto;
     text-decoration: underline;
 }
 #forgor-password {
-    color: rgb(61, 123, 248);
     margin-right: 10px;
-}
-#sign-up {
-    color: rgb(61, 123, 248);
 }
