@@ -4,16 +4,19 @@
 
 {% block accounts_content %}
 <h1>Sign Up</h1>
-
-<p>Already have an account? Then please <a href="{{ login_url }}">log in</a>.</p>
-
 <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
-  {{ form.as_p }}
+  {% include "account/error_messages.html" %}
+  {% for field in form %}
+    <span>
+      <label for="{{ field.auto_id }}">{{ field.label }}</label>
+      {{ field }}
+    </span>
+  {% endfor %}
   {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button type="submit">Sign Up &raquo;</button>
+  <button id="submit-button" type="submit">Sign up</button>
 </form>
 
 {% endblock %}

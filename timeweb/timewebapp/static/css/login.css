@@ -56,7 +56,7 @@ form span:first-of-type label {
 }
 #under-password {
     display: flex;
-    flex-wrap: wrap-reverse;
+    flex-wrap: wrap;
 }
 #example-message {
     cursor: pointer;

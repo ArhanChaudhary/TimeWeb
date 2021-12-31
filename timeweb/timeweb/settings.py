@@ -278,7 +278,7 @@ ACCOUNT_EMAIL_VERIFICATION = True
 
 ACCOUNT_FORMS = {
     'login': 'timewebapp.forms.LabeledLoginForm', # Done
-    'signup': 'allauth.account.forms.SignupForm',
+    'signup': 'timewebapp.forms.LabeledSignupForm', # Done
     'add_email': 'allauth.account.forms.AddEmailForm',
     'change_password': 'allauth.account.forms.ChangePasswordForm',
     'set_password': 'allauth.account.forms.SetPasswordForm',

@@ -197,6 +197,7 @@ class LabeledLoginForm(LoginForm):
                 attrs={
                     "type": "email",
                     "autocomplete": "email",
+                    "class": "add-input-margin"
                 }
             ),
         )
@@ -220,6 +221,7 @@ class LabeledResetPasswordKeyForm(ResetPasswordKeyForm):
         super().__init__(*args, **kwargs)
         self.fields['password1'].widget.attrs["placeholder"] = ""
         self.fields['password2'].widget.attrs["placeholder"] = ""
+        self.fields['password1'].widget.attrs["class"] = "add-input-margin"
         self.label_suffix = ""
 
     def clean(self):
@@ -227,29 +229,32 @@ class LabeledResetPasswordKeyForm(ResetPasswordKeyForm):
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
         if (password1 and password2) and password1 != password2:
-            self.add_error("password2", _("Your new passwords do not match"))
+            self.add_error("password2", _("Your passwords do not match"))
         return cleaned_data
 
-# class LabeledSignupForm(SignupForm):
+class LabeledSignupForm(SignupForm):
+    username = forms.CharField(
+        label=_("Username"),
+        min_length=app_settings.USERNAME_MIN_LENGTH,
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "username",
+                "class": "add-input-margin"
+            }
+        ),
+    )
+    email = forms.EmailField(
+        label=_("E-mail address"),
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "autocomplete": "email",
+                "class": "add-input-margin"
+            }
+        )
+    )
 
-#     error_messages = {
-#         "duplicate_email": _("A user with that e-mail address already exists."),
-#         "password_mismatch": _("The two password fields didn't match."),
-#     }
-
-#     def __init__(self, *args, **kwargs):
-#         super(LabeledSignupForm, self).__init__(*args, **kwargs)
-
-#         self.fields['email'] = forms.EmailField(
-#             label=_("E-mail address"),
-#             required=True,
-#             widget=forms.TextInput(
-#                 attrs={
-#                     "type": "email",
-#                     "autocomplete": "email",
-#                 }
-#             ),
-#         )
-#         self.fields['password1'].widget.attrs["placeholder"] = ""
-#         self.fields['password2'].widget.attrs["placeholder"] = ""
-#         self.label_suffix = ""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].label = _("E-mail address")
+        self.fields['password1'].widget.attrs["placeholder"] = ""

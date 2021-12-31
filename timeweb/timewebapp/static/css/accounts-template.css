@@ -4,6 +4,7 @@
     width: clamp(290px, calc(100vw - 100px), 600px);
     min-height: 475px;
     border-radius: 25px;
+    /* For the <header> */
     transform: translateY(-35px);
     background: inherit;
     -webkit-backdrop-filter: blur(2px);
@@ -41,7 +42,7 @@
 a, #example-message {
     color: rgb(50, 87, 255);
 }
-#id_login, #id_password1 {
+.add-input-margin {
     margin-bottom: 2em;
 }
 input:not([type="submit"]) {
