@@ -45,7 +45,7 @@ a, #example-message {
 .add-input-margin {
     margin-bottom: 2em;
 }
-input:not([type="submit"]) {
+input:not([type="submit"]):not([type="radio"]) {
     width: 100%;
     margin-top: 5px;
     box-sizing: border-box;
