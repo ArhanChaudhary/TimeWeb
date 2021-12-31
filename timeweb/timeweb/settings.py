@@ -184,9 +184,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
 ]
 
 # Internationalization
@@ -286,7 +283,7 @@ ACCOUNT_FORMS = {
     'change_password': 'allauth.account.forms.ChangePasswordForm',
     'set_password': 'allauth.account.forms.SetPasswordForm',
     'reset_password': 'timewebapp.forms.LabeledResetPasswordForm', # Done
-    'reset_password_from_key': 'allauth.account.forms.ResetPasswordKeyForm',
+    'reset_password_from_key': 'timewebapp.forms.LabeledResetPasswordKeyForm', # Done
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
 }
 

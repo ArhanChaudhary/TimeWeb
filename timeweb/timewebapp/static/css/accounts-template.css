@@ -4,6 +4,7 @@
     width: clamp(290px, calc(100vw - 100px), 600px);
     min-height: 475px;
     border-radius: 25px;
+    transform: translateY(-35px);
     background: inherit;
     -webkit-backdrop-filter: blur(2px);
             backdrop-filter: blur(2px);
@@ -40,6 +41,9 @@
 a, #example-message {
     color: rgb(50, 87, 255);
 }
+#id_login, #id_password1 {
+    margin-bottom: 2em;
+}
 input:not([type="submit"]) {
     width: 100%;
     margin-top: 5px;
@@ -66,8 +70,8 @@ input:not([type="submit"]):focus {
     height: 30px;
 
     background: rgba(255, 68, 12, 0.05);
-    color: rgb(255, 12, 12);
-    border: 1px solid rgb(255, 12, 12);
+    color: rgb(237 28 36);
+    border: 1px solid rgb(237 28 36);
 }
 #image {
     left: 30px;

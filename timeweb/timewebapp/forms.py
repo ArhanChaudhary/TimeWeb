@@ -214,6 +214,14 @@ class LabeledResetPasswordForm(ResetPasswordForm):
             }
         ),
     )
+
+class LabeledResetPasswordKeyForm(ResetPasswordKeyForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs["placeholder"] = ""
+        self.fields['password2'].widget.attrs["placeholder"] = ""
+        self.label_suffix = ""
+
 # class LabeledSignupForm(SignupForm):
 
 #     error_messages = {
