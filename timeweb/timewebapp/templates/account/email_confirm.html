@@ -16,7 +16,7 @@
 
 <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 {% csrf_token %}
-    <button type="submit">Confirm</button>
+    <button type="submit" id="submit-button">Confirm</button>
 </form>
 
 {% else %}
