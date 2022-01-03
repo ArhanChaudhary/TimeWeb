@@ -855,9 +855,8 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
         if self.form.is_valid():
             return self.valid_form(request)
         else:
-            return self.invalid_form(request)
-            
-    
+            return self.invalid_form(request)  
+
     def valid_form(self, request):
         if self.isExampleAccount: return redirect("home")
         self.user_model = User.objects.get(email=request.user.email)
@@ -865,7 +864,7 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
         self.user_model.save()
         logger.info(f'User \"{request.user}\" updated their username')
         return redirect("home")
-    
+
     def invalid_form(self, request):
         self.context['form'] = self.form
         return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)

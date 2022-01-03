@@ -168,7 +168,7 @@ class UsernameResetForm(forms.ModelForm):
         model = get_user_model()
         fields = ("username", )
         widgets = {
-            "username": forms.TextInput(attrs={"placeholder": "Username"}),
+            "username": forms.TextInput(),
         }
         help_texts = {
             "username": "Enter your new username:",

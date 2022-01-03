@@ -7,7 +7,13 @@
 
     <form method="POST" action="{% url 'reset_username' %}" class="username_change">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" name="action">Change Username</button>
+        {% include "account/error_messages.html" %}
+        {% for field in form %}
+            <span>
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {{ field }}
+            </span>
+        {% endfor %}
+        <button type="submit" name="action" id="submit-button">Change username</button>
     </form>
 {% endblock %}
