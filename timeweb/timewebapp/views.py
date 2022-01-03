@@ -869,7 +869,6 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
         self.context['form'] = self.form
         return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
 
-
 class UserguideView(TimewebGenericView):
     def __init__(self):
         self.context = get_default_context()
