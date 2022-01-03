@@ -280,10 +280,10 @@ ACCOUNT_FORMS = {
     'login': 'timewebapp.forms.LabeledLoginForm', # Done
     'signup': 'timewebapp.forms.LabeledSignupForm', # Done
     'add_email': 'allauth.account.forms.AddEmailForm',
-    'change_password': 'allauth.account.forms.ChangePasswordForm',
-    'set_password': 'timewebapp.forms.LabeledResetPasswordKeyForm', # Done
+    'change_password': 'timewebapp.forms.LabeledChangePasswordForm', # Done
+    'set_password': 'timewebapp.forms.LabeledTwoPasswordForm', # Done
     'reset_password': 'timewebapp.forms.LabeledResetPasswordForm', # Done
-    'reset_password_from_key': 'timewebapp.forms.LabeledResetPasswordKeyForm', # Done
+    'reset_password_from_key': 'timewebapp.forms.LabeledTwoPasswordForm', # Done
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
 }
 

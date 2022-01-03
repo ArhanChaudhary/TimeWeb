@@ -216,7 +216,7 @@ class LabeledResetPasswordForm(ResetPasswordForm):
         ),
     )
 
-class LabeledResetPasswordKeyForm(ResetPasswordKeyForm):
+class LabeledTwoPasswordForm(ResetPasswordKeyForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['password1'].widget.attrs["placeholder"] = ""
@@ -232,6 +232,15 @@ class LabeledResetPasswordKeyForm(ResetPasswordKeyForm):
             self.add_error("password2", _("Your passwords do not match"))
         return cleaned_data
 
+class LabeledChangePasswordForm(ChangePasswordForm):
+    clean = LabeledTwoPasswordForm.clean
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs["placeholder"] = ""
+        self.fields['password2'].widget.attrs["placeholder"] = ""
+        self.fields['oldpassword'].widget.attrs["placeholder"] = ""
+        self.label_suffix = ""
 class LabeledSignupForm(SignupForm):
     username = forms.CharField(
         label=_("Username"),
