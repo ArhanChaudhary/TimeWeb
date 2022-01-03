@@ -97,6 +97,13 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         })
         SettingsModel.objects.create(user=instance)
         logger.info(f'Created settings model for user "{instance.username}"')
+        if settings.DEBUG:
+            instance.is_staff = True
+            from django.contrib.auth.models import Permission
+            permissions = Permission.objects.all()
+            for permission in permissions:
+                instance.user_permissions.add(permission)
+            instance.save()
 
 
 def custom_permission_denied_view(request, exception=None):
