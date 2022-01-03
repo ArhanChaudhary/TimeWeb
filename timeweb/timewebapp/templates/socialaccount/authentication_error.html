@@ -8,6 +8,6 @@
 
     {% get_providers as socialaccount_providers %}
     {% with socialaccount_providers|first as provider %}
-        <p>An error occurred while attempting to login via Google. Please <a href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">try again</a></p>
+        <p>An error occurred while attempting to login via Google. Please <a href="{% provider_login_url provider.id process="login" scope=scope auth_params=auth_params %}">try again.</a></p>
     {% endwith %}
 {% endblock %}

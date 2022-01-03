@@ -4,6 +4,8 @@ from .models import TimewebModel, SettingsModel, HORIZONTAL_TAG_POSITIONS, VERTI
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 import datetime
+
+from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
 from allauth.account.forms import *
 
 class DateInput(forms.DateInput):
@@ -267,3 +269,17 @@ class LabeledSignupForm(SignupForm):
         super().__init__(*args, **kwargs)
         self.fields['email'].label = _("E-mail address")
         self.fields['password1'].widget.attrs["placeholder"] = ""
+
+class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
+    username = forms.CharField(
+        label=_("Username"),
+        min_length=app_settings.USERNAME_MIN_LENGTH,
+        widget=forms.TextInput(
+            attrs={"autocomplete": "username"}
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+        self.fields['email'].widget = forms.HiddenInput()
