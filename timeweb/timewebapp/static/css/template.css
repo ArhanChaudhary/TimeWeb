@@ -16,7 +16,7 @@ input, textarea {
     /* Firefox */
     filter: none;
 }
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
     -webkit-appearance: auto;
 }
 header {
