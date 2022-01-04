@@ -1,15 +1,18 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-from allauth.account.adapter import DefaultAccountAdapter
-DefaultAccountAdapter.clean_username.__defaults__ = (True,)
 
 # Django modules
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.views.decorators.cache import cache_control
 from django.urls import reverse
+
+# Allauth modules
+from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.views import PasswordSetView, sensitive_post_parameters_m
+DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
@@ -875,6 +878,13 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     def invalid_form(self, request):
         self.context['form'] = self.form
         return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
+
+class RedirectHomePasswordSetView(PasswordSetView):
+    @sensitive_post_parameters_m
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.has_usable_password():
+            return HttpResponseRedirect(reverse("home"))
+        return super(PasswordSetView, self).dispatch(request, *args, **kwargs)
 
 class UserguideView(TimewebGenericView):
     def __init__(self):
