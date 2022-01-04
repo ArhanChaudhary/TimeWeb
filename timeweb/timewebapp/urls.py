@@ -4,6 +4,7 @@ from django.views.generic import RedirectView
 from django.http import HttpResponse
 from django.conf import settings
 from allauth.account.urls import urlpatterns as allauth_urls
+from django.views.defaults import page_not_found
 
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
@@ -34,6 +35,8 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('favicon.ico', RedirectView.as_view(url='/static/images/icons/favicon.ico')),
     path('mstile-150x150.png', RedirectView.as_view(url='/static/images/icons/mstile-150x150.png')),
     path('safari-pinned-tab.svg', RedirectView.as_view(url='/static/images/icons/safari-pinned-tab.svg')),
+
+    path('accounts/logout', page_not_found),
 
     path('stackpile', views.StackpileView.as_view(), name='stackpile'),
     path('spooky', views.SpookyView.as_view(), name="spooky"),
