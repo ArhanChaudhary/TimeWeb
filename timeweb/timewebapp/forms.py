@@ -118,7 +118,6 @@ class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
         fields = "__all__"
-        exclude = ('assignment_sorting',)
         widgets = {
             "user": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min": "0"}),

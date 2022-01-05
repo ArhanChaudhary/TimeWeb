@@ -192,6 +192,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'dark_mode': self.settings_model.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
+
+        # The assignment_sorting field must be exlucded dynamically. Using exclude=("assignment_sorting", ) doesn't render it in the home page
+        self.context['form'].fields.pop("assignment_sorting")
+
         self.context['settings_object'] = self.settings_model
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return self.render_with_dynamic_context(request, "settings.html", self.context)
