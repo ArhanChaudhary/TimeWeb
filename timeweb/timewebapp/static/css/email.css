@@ -1,9 +1,10 @@
 .email {
-    margin-right: auto;
+    display: flex;
+    flex-grow: 1;
+    overflow-wrap: anywhere;
 }
 .email-container label {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 3px 5px;
 }

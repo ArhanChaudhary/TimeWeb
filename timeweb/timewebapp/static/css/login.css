@@ -11,11 +11,14 @@ label {
 .password-image {
     position: absolute;
     right: 0;
-    transform: translate(-50px, 13px);
     cursor: pointer;
+}
+.show-password-image {
+    transform: translate(-50px, 13px);
 }
 .hide-password-image {
     display: none;
+    transform: translate(-50px, 15px);
 }
 .socialaccount-button {
     padding: 10px 0;

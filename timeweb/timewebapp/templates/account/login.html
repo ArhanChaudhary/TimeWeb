@@ -29,8 +29,8 @@
     </span>
   {% endfor %}
 
-  <img src="{% static 'images/hide.png' %}" class="password-image show-password-image" height="20">
-  <img src="{% static 'images/show.png' %}" class="password-image hide-password-image" height="20">
+  <img src="{% static 'images/hide.png' %}" class="password-image show-password-image" width="22">
+  <img src="{% static 'images/show.png' %}" class="password-image hide-password-image" width="22">
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}

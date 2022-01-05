@@ -1,12 +1,12 @@
 body {
     --body-background: rgb(218, 218, 218);
 }
-form {
+main form {
     width: calc(100% - 30px);
     font-size: 17px;
     transform: translate(15px, 15px);
 }
-form select {
+main form select {
     display: block;
 }
 .button-container {
@@ -38,18 +38,18 @@ form select {
 #submit-settings-button {
     margin-left: 10px;
 }
-form fieldset {
+main form fieldset {
     overflow: hidden;
     margin-bottom: 10px;
     padding-bottom: 5px;
 }
-form fieldset.closed {
+main form fieldset.closed {
     height: 0;
 }
-form fieldset.closed legend {
+main form fieldset.closed legend {
     list-style-type: disclosure-closed;
 }
-form legend {
+main form legend {
     display: list-item;
     cursor: pointer;
     list-style: inside disclosure-open;
