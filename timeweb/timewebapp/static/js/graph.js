@@ -168,6 +168,8 @@ class VisualAssignment extends Assignment {
         if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
             this.drawFixed();
             this.draw();
+            const hover_point_label = this.dom_assignment.find(".hover-point-label");
+            hover_point_label.addClass("hide-label");
         }
     }
     mousemove(e, iteration_number=1) {
