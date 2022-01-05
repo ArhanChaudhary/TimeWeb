@@ -1,1 +1,1 @@
-The social account is already connected to a different account.
+The Google account {{sociallogin|str_sociallogin}} is already associated to another TimeWeb account

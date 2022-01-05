@@ -1,0 +1,2 @@
+The Google account {{sociallogin|str_sociallogin}} has been connected
+<p hidden>**Success**</p>

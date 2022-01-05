@@ -7,7 +7,7 @@
 
     <form method="POST" action="{% url 'reset_username' %}" class="username_change">
         {% csrf_token %}
-        {% include "account/error_messages.html" %}
+        {% include "account/accounts_messages.html" %}
         {% for field in form %}
             <span>
             <label for="{{ field.auto_id }}">{{ field.label }}</label>

@@ -243,6 +243,7 @@ class LabeledChangePasswordForm(ChangePasswordForm):
         self.fields['password2'].widget.attrs["placeholder"] = ""
         self.fields['oldpassword'].widget.attrs["placeholder"] = ""
         self.label_suffix = ""
+
 class LabeledSignupForm(SignupForm):
     username = forms.CharField(
         label=_("Username"),
@@ -269,6 +270,19 @@ class LabeledSignupForm(SignupForm):
         super().__init__(*args, **kwargs)
         self.fields['email'].label = _("E-mail address")
         self.fields['password1'].widget.attrs["placeholder"] = ""
+
+class LabeledAddEmailForm(AddEmailForm):
+    email = forms.EmailField(
+        label=_("E-mail address"),
+        required=True,
+        widget=forms.TextInput(
+            attrs={"type": "email"}
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
 
 class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
     username = forms.CharField(

@@ -19,6 +19,9 @@ input, textarea {
 input[type="checkbox"], input[type="radio"] {
     -webkit-appearance: auto;
 }
+input[type="radio"] {
+    margin: 0;
+}
 header {
     width: 100%;
     background: rgb(13,26,38);

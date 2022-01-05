@@ -37,7 +37,6 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('safari-pinned-tab.svg', RedirectView.as_view(url='/static/images/icons/safari-pinned-tab.svg')),
 
     path('accounts/logout', page_not_found),
-    path('accounts/password/set', views.RedirectHomePasswordSetView.as_view(), name='account_set_password'),
 
     path('stackpile', views.StackpileView.as_view(), name='stackpile'),
     path('spooky', views.SpookyView.as_view(), name="spooky"),

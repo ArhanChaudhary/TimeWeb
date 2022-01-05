@@ -1,1 +1,2 @@
-Confirmation e-mail sent to {{email}}.
+Confirmation e-mail sent to {{email}}
+<p hidden>**Success**</p>

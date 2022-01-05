@@ -1,0 +1,38 @@
+.email {
+    margin-right: auto;
+}
+.email-container label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 5px;
+}
+.email-container.primary {
+    margin: 5px 0;
+}
+.email-container.primary label {
+    position: relative;
+    border: 1px solid rgb(157, 157, 0);
+    border-radius: 4px;
+    padding: 10px 5px !important;
+}
+.email-container.primary label::before {
+    content: "Primary e-mail address";
+    position: absolute;
+    background-color: white;
+    top: 0;
+    left: 15px;
+    transform: translateY(-50%);
+    font-size: 13px;
+}
+.email_radio {
+    margin: 5px !important;
+}
+.buttonHolder {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+}
+.buttonHolder button {
+    margin-top: 0 !important;
+}

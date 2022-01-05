@@ -1,33 +1,22 @@
 {% extends "template.html" %}
 {% load static %}
-{% load socialaccount %}
 
 {% block js %}
-<script src="{% static 'js/accounts-template.js' %}"></script>
-{% block accounts_js %}{% endblock accounts_js %}
+  <script src="{% static 'js/accounts-template.js' %}"></script>
+  {% block accounts_js %}{% endblock accounts_js %}
 {% endblock js %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/accounts-template.css' %}">
-{% if not user.is_authenticated %}
-<link rel="stylesheet" href="{% static 'css/logged_out.css' %}">
-{% endif %}
-{% block accounts_css %}{% endblock accounts_css %}
+  <link rel="stylesheet" href="{% static 'css/accounts-template.css' %}">
+  {% if not user.is_authenticated %}
+    <link rel="stylesheet" href="{% static 'css/logged_out.css' %}">
+  {% endif %}
+  {% block accounts_css %}{% endblock accounts_css %}
 {% endblock css %}
 
 {% block content %}
   <div id="image"></div>
   <div id="accounts-container">
     {% block accounts_content %}{% endblock accounts_content %}
-    {% if messages and request.META.HTTP_HOST == "localhost:8000" %}
-      <div>
-        <strong>Messages:</strong>
-        <ul>
-          {% for message in messages %}
-            <li>{{message}}</li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
   </div>
 {% endblock content %}

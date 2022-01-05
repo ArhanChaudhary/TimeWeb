@@ -179,9 +179,6 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
 ]
@@ -277,19 +274,19 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_VERIFICATION = True
 
 ACCOUNT_FORMS = {
-    'login': 'timewebapp.forms.LabeledLoginForm', # Done
-    'signup': 'timewebapp.forms.LabeledSignupForm', # Done
-    'add_email': 'allauth.account.forms.AddEmailForm',
-    'change_password': 'timewebapp.forms.LabeledChangePasswordForm', # Done
-    'set_password': 'timewebapp.forms.LabeledTwoPasswordForm', # Done
-    'reset_password': 'timewebapp.forms.LabeledResetPasswordForm', # Done
-    'reset_password_from_key': 'timewebapp.forms.LabeledTwoPasswordForm', # Done
+    'login': 'timewebapp.forms.LabeledLoginForm',
+    'signup': 'timewebapp.forms.LabeledSignupForm',
+    'add_email': 'timewebapp.forms.LabeledAddEmailForm',
+    'change_password': 'timewebapp.forms.LabeledChangePasswordForm',
+    'set_password': 'timewebapp.forms.LabeledTwoPasswordForm',
+    'reset_password': 'timewebapp.forms.LabeledResetPasswordForm',
+    'reset_password_from_key': 'timewebapp.forms.LabeledTwoPasswordForm',
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
 }
 
 SOCIALACCOUNT_FORMS = {
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
-    'signup': 'timewebapp.forms.LabeledSocialaccountSignupForm', # Done
+    'signup': 'timewebapp.forms.LabeledSocialaccountSignupForm',
 }
 
 if DEBUG:
