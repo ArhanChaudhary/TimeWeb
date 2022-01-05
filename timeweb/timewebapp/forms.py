@@ -19,7 +19,7 @@ class TimewebForm(forms.ModelForm):
         model = TimewebModel
         fields = "__all__"
         widgets = {
-            'namef': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
+            'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'assignment_date': DateInput(),
             'x': DateInput(),
             'due_time': TimeInput(),
