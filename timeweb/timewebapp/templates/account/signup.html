@@ -1,0 +1,24 @@
+{% extends "account/accounts-template.html" %}
+
+{% block head_title %}Signup{% endblock %}
+
+{% block accounts_content %}
+  <h1>Sign Up</h1>
+  <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {% include "account/accounts_messages.html" %}
+
+    {% for field in form %}
+      <span>
+        <label for="{{ field.auto_id }}">{{ field.label }}</label>
+        {{ field }}
+      </span>
+    {% endfor %}
+
+    {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    <button id="submit-button" type="submit">Sign up</button>
+  </form>
+{% endblock %}

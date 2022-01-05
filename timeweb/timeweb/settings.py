@@ -71,12 +71,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django.contrib.sites',
+
     'timewebapp',
     'multiselectfield',
     'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'pwa',
     'colorfield',
     'django_cleanup.apps.CleanupConfig',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -108,8 +116,12 @@ TEMPLATES = [
         },
     },
 ]
-# Redirect to home URL after login
+
+SITE_ID = 8
+
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 
 MAX_UPLOAD_SIZE = 5242880 # 40 MiB (max background image size)
@@ -163,16 +175,9 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
 ]
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -242,3 +247,54 @@ LOGGING = {
         },
     },
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            # We only need to request for email
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
+        }
+    }
+}
+AUTH_USER_MODEL = 'timewebapp.TimewebUser'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DEBUG else "https"
+SOCIALACCOUNT_AUTO_SIGNUP = False # Always prompt for username
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = True
+
+ACCOUNT_FORMS = {
+    'login': 'timewebapp.forms.LabeledLoginForm',
+    'signup': 'timewebapp.forms.LabeledSignupForm',
+    'add_email': 'timewebapp.forms.LabeledAddEmailForm',
+    'change_password': 'timewebapp.forms.LabeledChangePasswordForm',
+    'set_password': 'timewebapp.forms.LabeledTwoPasswordForm',
+    'reset_password': 'timewebapp.forms.LabeledResetPasswordForm',
+    'reset_password_from_key': 'timewebapp.forms.LabeledTwoPasswordForm',
+    'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
+}
+
+SOCIALACCOUNT_FORMS = {
+    'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
+    'signup': 'timewebapp.forms.LabeledSocialaccountSignupForm',
+}
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'arhanc.cs@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ['GMAILPASSWORD']

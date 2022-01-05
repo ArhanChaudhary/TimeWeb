@@ -1,0 +1,6 @@
+{% extends "account/email/base_message.txt" %}
+{% load account %}
+{% comment %} current_site.name for site name {% endcomment %}
+{% block content %}{% autoescape off %}{% user_display user as user_display %}You're receiving this e-mail because user {{ user_display }} has given your e-mail address to register an account on {{ current_site.domain }}.
+
+To confirm this is correct, go to {{ activate_url }}{% endautoescape %}{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "account/accounts-template.html" %}
+
+{% block head_title %}Change Username{% endblock %}
+
+{% block accounts_content %}
+    <h1>Change Username</h1>
+
+    <form method="POST" action="{% url 'reset_username' %}" class="username_change">
+        {% csrf_token %}
+        {% include "account/accounts_messages.html" %}
+        {% for field in form %}
+            <span>
+            <label for="{{ field.auto_id }}">{{ field.label }}</label>
+            {{ field }}
+            </span>
+        {% endfor %}
+        <button type="submit" name="action" id="submit-button">Change username</button>
+    </form>
+{% endblock %}

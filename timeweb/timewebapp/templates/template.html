@@ -19,7 +19,7 @@
 
             gtag('config', 'G-3K1HRD42V7');
             username = "{{ user.get_username }}";
-            example_account_name = "{{ example_account_name }}";
+            example_account_email = "{{ example_account_email }}";
             example_assignment_name = "{{ example_assignment_name }}";
             {% comment %} make these dont crash in case these arent passed into context {% endcomment %}
             max_number_tags = +"{{ max_number_tags }}";
@@ -75,9 +75,17 @@
                     <div id="user-greeting">
                         <span id="welcome">Welcome, </span>
                         <div tabindex="1" id="username">
-                            {{ user.get_username }}
+                            {{ user.username }}
                             <div id="account-dropdown">
-                                <a href="{% url 'logout' %}?next={{request.path}}">Log out</a>
+                                <form method="post" action="{% url 'account_logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Log out</button>
+                                </form>
+                                <div id="div-seperator"></div>
+                                <a href="{% url 'account_change_password' %}">Change Password</a>
+                                <a href="{% url 'reset_username' %}">Change Username</a>
+                                <a href="{% url 'account_email' %}">Manage<br>E-mail Login</a>
+                                <a href="{% url 'socialaccount_connections' %}">Manage Google Login</a>
                             </div>
                         </div>
                     </div>

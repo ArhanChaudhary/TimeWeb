@@ -16,8 +16,11 @@ input, textarea {
     /* Firefox */
     filter: none;
 }
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
     -webkit-appearance: auto;
+}
+input[type="radio"] {
+    margin: 0;
 }
 header {
     width: 100%;
@@ -225,7 +228,7 @@ body {
     background: rgb(43, 56, 68);
     color: white;
     transform: translate(50%, 16px);
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     -webkit-text-fill-color: currentcolor;
 }
 #username:focus-within #account-dropdown {
@@ -241,18 +244,34 @@ body {
     transform: translateX(-50%);
     position: absolute;
 }
-#account-dropdown * {
+#account-dropdown :hover {
+    background: rgb(73, 86, 98);
+}
+#account-dropdown #div-seperator {
+    width: 100%;
+    margin: 4px auto;
+    height: 1px;
+    background: rgb(101, 101, 101);
+}
+#account-dropdown a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 6px;
+    text-align: center;
+}
+#account-dropdown button {
     display: block;
     text-align: center;
     padding: 6px;
     font-size: 15px;
-}
-#account-dropdown *:hover {
-    background: rgb(73, 86, 98);
-}
-#account-dropdown a {
-    color: white;
-    text-decoration: none;
+    width: 100%;
+    background: none;
+	color: inherit;
+	border: none;
+	cursor: pointer;
+	outline: inherit;
 }
 #menu {
     float: right;

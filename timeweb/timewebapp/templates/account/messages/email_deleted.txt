@@ -1,0 +1,2 @@
+Removed e-mail address {{email}}
+<p hidden>**Success**</p>

@@ -8,6 +8,24 @@ from timezone_field import TimeZoneField
 from decimal import Decimal
 import datetime
 
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
+class TimewebUser(AbstractUser):
+    username_validator = UnicodeUsernameValidator()
+
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=False,
+        validators=[username_validator],
+    )
+    email = models.EmailField(_('email address'), max_length = 255, unique=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ['username']
+
+    def __str__(self):
+        return self.email
+
 WEEKDAYS = (
     ("1",_("Monday")),
     ("2",_("Tuesday")),
@@ -61,7 +79,8 @@ def empty_dict():
 def get_midnight_time():
     return datetime.time(0, 0, 0)
 def create_image_path(instance, filename):
-    return f"backgrounds/{instance.user.username}/{filename}"
+    return f"backgrounds/{instance.user.id}/{filename}"
+
 class TimewebModel(models.Model):
     name = models.CharField(
         max_length=200,

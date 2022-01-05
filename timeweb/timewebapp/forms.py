@@ -1,8 +1,12 @@
 from django import forms
 from .models import TimewebModel, SettingsModel
+from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
 import datetime
+
+from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
+from allauth.account.forms import *
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -164,3 +168,136 @@ class SettingsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
+
+class UsernameResetForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ("username", )
+        widgets = {
+            "username": forms.TextInput(),
+        }
+        help_texts = {
+            "username": "Enter your new username:",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
+class LabeledLoginForm(LoginForm):
+
+    error_messages = {
+        "account_inactive": _("This account is currently disabled, please <a href=\"mailto:arhan.ch@gmail.com>contact us</a> for more information"),
+        "email_password_mismatch": _(
+            "Your e-mail address or password is incorrect"
+        ),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(LabeledLoginForm, self).__init__(*args, **kwargs)
+
+        self.fields['login'] = forms.EmailField(
+            label=_("E-mail address"),
+            required=True,
+            widget=forms.TextInput(
+                attrs={
+                    "type": "email",
+                    "autocomplete": "email",
+                    "class": "add-input-margin"
+                }
+            ),
+        )
+        self.fields['password'].widget.attrs["placeholder"] = ""
+        self.label_suffix = ""
+
+class LabeledResetPasswordForm(ResetPasswordForm):
+    email = forms.EmailField(
+        label=_("E-mail address"),
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "autocomplete": "email",
+            }
+        ),
+    )
+
+class LabeledTwoPasswordForm(ResetPasswordKeyForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs["placeholder"] = ""
+        self.fields['password2'].widget.attrs["placeholder"] = ""
+        self.fields['password1'].widget.attrs["class"] = "add-input-margin"
+        self.label_suffix = ""
+
+    def clean(self):
+        cleaned_data = super(PasswordVerificationMixin, self).clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+        if (password1 and password2) and password1 != password2:
+            self.add_error("password2", _("Your passwords do not match"))
+        return cleaned_data
+
+class LabeledChangePasswordForm(ChangePasswordForm):
+    clean = LabeledTwoPasswordForm.clean
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs["placeholder"] = ""
+        self.fields['password2'].widget.attrs["placeholder"] = ""
+        self.fields['oldpassword'].widget.attrs["placeholder"] = ""
+        self.label_suffix = ""
+
+class LabeledSignupForm(SignupForm):
+    username = forms.CharField(
+        label=_("Username"),
+        min_length=app_settings.USERNAME_MIN_LENGTH,
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "username",
+                "class": "add-input-margin"
+            }
+        ),
+    )
+    email = forms.EmailField(
+        label=_("E-mail address"),
+        widget=forms.TextInput(
+            attrs={
+                "type": "email",
+                "autocomplete": "email",
+                "class": "add-input-margin"
+            }
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].label = _("E-mail address")
+        self.fields['password1'].widget.attrs["placeholder"] = ""
+
+class LabeledAddEmailForm(AddEmailForm):
+    email = forms.EmailField(
+        label=_("E-mail address"),
+        required=True,
+        widget=forms.TextInput(
+            attrs={"type": "email"}
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+
+class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
+    username = forms.CharField(
+        label=_("Username"),
+        min_length=app_settings.USERNAME_MIN_LENGTH,
+        widget=forms.TextInput(
+            attrs={"autocomplete": "username"}
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_suffix = ""
+        self.fields['email'].widget = forms.HiddenInput()

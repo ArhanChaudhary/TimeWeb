@@ -1,244 +1,68 @@
-/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
-#login {
-    position: relative;
-    width: clamp(290px, calc(100vw - 160px), 1000px);
-    height: clamp(440px, calc(100vh - 310px), 500px);
-    border-radius: 25px;
-    background: inherit;
-    -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(2px);
-    box-sizing: border-box;
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    opacity: 0;
-    -webkit-animation: 1s cubic-bezier(.29,.81,.37,.99) 0.5s 1 scale;
-            animation: 1s cubic-bezier(.29,.81,.37,.99) 0.5s 1 scale;
-    -webkit-animation-fill-mode: forwards;
-            animation-fill-mode: forwards;
-}
-#login::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    box-shadow: inset 0 0 200px white, 0 0 3px 1px black;
-    z-index: -1;
-    background: inherit;
-    border-radius: 25px;
-}
-#login::after {
-    content: '';
-    position: absolute;
-    top: 90px;
-    left: 90px;
-    right: 90px;
-    bottom: 90px;
-    box-shadow: 0 0 50px 75px white;
-    background: white;
-    border-radius: 25px;
-    z-index: -1;
-}
-#first-smallvw, #second-smallvw {
-    position: absolute;
-    display: none;
-}
-#first-smallvw {
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 154px;
-    margin: 0 30px;
-}
-#second-smallvw {
-    text-align: center;
-    bottom: 60px;
-}
-#image {
-    left: 30px;
-    margin: -10px;
-    position: absolute;
-    height: 2452px;
-    width: calc(100% - 40px);
-    background-image: url(https://storage.googleapis.com/twstatic/images/wide-scroller.png);
-    background-size: 100%;
-    z-index: -2;
-    opacity: 0;
-    top: 10px; /* Override flexbox */
-    -webkit-animation: slide 100s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
-            animation: slide 100s linear 1.3s infinite, 1s ease-out 1.3s 1 fade;
-    -webkit-animation-fill-mode: forwards;
-            animation-fill-mode: forwards;
-}
-@media screen and (max-width: 790px) {
-    #login span {
-        display: none;
-    }
-    #login {
-        justify-content: center;
-    }
-    #first-smallvw, #second-smallvw {
-        display: flex !important;
-    }
-    #image {
-        background-image: url(https://storage.googleapis.com/twstatic/images/narrow-scroller.png);
-    }
-}
-#login span {
-    font-size: 40px;
-    font-family: 'Varela';
-}
 label {
     display: block;
-    text-align: center;
-}
-#id_username {
-    margin-bottom: 5px;
 }
 #id_password {
-    margin-bottom: 35px;
+    margin-bottom: 5px;
 }
-#id_username, #id_password {
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 20px;
-    border-color: transparent;
-    box-shadow: inset 0 0 3px 1px;
-    background: white;
-    height: 36px;
-    font-size: 20px;
-    padding-left: 15px;
+#under-password {
+    white-space: nowrap;
+    overflow: hidden;
 }
-#id_username:focus, #id_password:focus {
-    box-shadow: inset 0 0 0 2px rgb(0,95,204);
-    outline: 0;
-}
-#error-message {
-    text-align: center;
+.password-image {
     position: absolute;
-    margin-top: -35px;
-    font-size: 9.75px;
-    text-align: center;
-    width: 100%;
-    color: rgb(226,30,54);
+    right: 0;
+    transform: translate(-50px, 13px);
+    cursor: pointer;
+}
+.hide-password-image {
+    display: none;
+}
+.socialaccount-button {
+    padding: 10px 0;
+    position: relative;
+    background: rgb(238, 245, 255);
+    width: calc(100% - 2px);
+    box-sizing: unset;
+    height: 30px;
+    cursor: pointer;
+
+    border: 1px solid rgb(13, 106, 255);
+    box-shadow: 0 0 3px 1px rgba(13, 106, 255, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s cubic-bezier(.5,-1,.5,2), margin 0s;
+}
+.socialaccount-button:hover {
+    transform: scale(1.05, 1.02);
+    box-shadow: 0 0 4px 1px rgba(13, 106, 255, 0.5);
+    background: white;
+}
+.socialaccount-button:active {
+    margin-top: 1px;
+    margin-bottom: -1px;
+}
+.socialaccount-image {
+    height: calc(100% - 8px);
+    margin-right: 8px;
+}
+.socialaccount_provider {
+    color: rgb(13, 106, 255);
+    text-decoration: none;
+}
+form span:first-of-type label {
+    /* gap showing up for no reason >:( */
+    margin-top: -5px;
+}
+#under-password {
+    display: flex;
+    flex-wrap: wrap;
 }
 #example-message {
-    color: -webkit-link;
     cursor: pointer;
+    margin-left: auto;
     text-decoration: underline;
-    width: 100%;
-    position: absolute;
-    font-size: 10px;
-    margin-top: -60px;
-    text-align: center;
 }
-#beta-message {
-    position: absolute;
-    text-decoration: none;
-    font-size: 10px;
-    text-align: center;
-}
-#beta-message a:visited {
-    text-decoration: none;
-    color: blue;
-}
-#discord-promo {
-    position: absolute;
-    right: 12px;
-    bottom: 5px;
-    display: flex;
-    font-size: 13px;
-    align-items: center;
-    text-decoration: none;
-    color: black;
-}
-#discord-image {
-    margin-left: 4px;
-}
-#submit-button {
-    width: 100%;
-    background: rgb(0, 150, 255);
-    border-radius: 4px;
-    color: white;
-    border: none;
-    height: 25px;
-    cursor: pointer;
-}
-#submit-button:focus, #submit-button:hover {
-    background: rgba(0, 150, 255, 0.75);
-    outline: 0;
-}
-#submit-button:active {
-    background: rgba(0, 150, 255, 0.9);
-}
-#form-wrapper {
-    margin-left: 15px;
-    width: 300px;
-    position: relative;
-}
-@-webkit-keyframes slide {
-    from {
-        transform: translateY(-100%) translateY(100vh);
-    }
-    to {
-        transform: none;
-    }
-}
-@keyframes slide {
-    from {
-        transform: translateY(-100%) translateY(100vh);
-    }
-    to {
-        transform: none;
-    }
-}
-@-webkit-keyframes scale {
-    from {
-        transform: scale(0.85);
-        opacity: 0;
-    }
-    to {
-        transform: none;
-        opacity: 1;
-    }
-}
-@keyframes scale {
-    from {
-        transform: scale(0.85);
-        opacity: 0;
-    }
-    to {
-        transform: none;
-        opacity: 1;
-    }
-}
-@-webkit-keyframes fade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 0.75;
-    }
-}
-@keyframes fade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 0.75;
-    }
-}
-/* VarelaRound-Regular */
-@font-face {
-    font-family: 'Varela';
-    font-style: normal;
-    font-weight: 800;
-    src: local(''),
-         url('../fonts/VarelaRound-Regular.ttf') format('truetype');
+#forgor-password {
+    margin-right: 10px;
 }

@@ -1,0 +1,55 @@
+{% extends "account/accounts-template.html" %}
+{% load static %}
+
+{% block accounts_css %}
+<link rel="stylesheet" href="{% static 'css/email.css' %}">
+{% endblock %}
+
+{% block head_title %}E-mail Addresses{% endblock %}
+
+{% block accounts_content %}
+  <h1>E-mail Addresses</h1>
+  {% include "account/accounts_messages.html" %}
+
+  <p>The following e-mail addresses are associated with your account:</p>
+  <form action="{% url 'account_email' %}" class="email_list" method="post">
+    {% csrf_token %}
+
+    {% for emailaddress in user.emailaddress_set.all %}
+      <div class="email-container{% if emailaddress.primary %} primary{% endif %}">
+        <label for="email_radio_{{forloop.counter}}">
+          <input id="email_radio_{{forloop.counter}}" class="email_radio" type="radio" name="email" value="{{emailaddress.email}}"/>
+          <span class="email">{{ emailaddress.email }}</span>
+
+          {% if emailaddress.verified %}
+            <span class="verified">Verified</span>
+          {% else %}
+            <span class="unverified">Unverified</span>
+          {% endif %}
+        </label>
+      </div>
+    {% endfor %}
+
+    <div class="buttonHolder">
+      <button class="secondaryAction" id="submit-button" type="submit" name="action_primary" >Make primary</button>
+      <button class="secondaryAction" id="submit-button" type="submit" name="action_send" >Re-send verification</button>
+      <button class="primaryAction" id="submit-button" type="submit" name="action_remove" >Remove</button>
+    </div>
+  </form>
+
+  {% if can_add_email %}
+    <h2>Add E-mail Address</h2>
+
+    <form method="post" action="{% url 'account_email' %}" class="add_email">
+      {% csrf_token %}
+      {% for field in form %}
+        <span>
+          <label for="{{ field.auto_id }}">{{ field.label }}</label>
+          {{ field }}
+        </span>
+      {% endfor %}
+      <button name="action_add" id="submit-button" type="submit">Add e-mail</button>
+    </form>
+  {% endif %}
+
+{% endblock %}

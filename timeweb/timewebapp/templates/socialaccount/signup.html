@@ -1,0 +1,27 @@
+{% extends "socialaccount/base.html" %}
+
+{% block head_title %}Set Username{% endblock %}
+
+{% block accounts_content %}
+  <h1>Set Username</h1>
+  {% include "account/accounts_messages.html" %}
+
+  <p>Please enter a username to finalize logging in with your {{account.get_provider.name}} account.</p>
+
+  <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+    {% csrf_token %}
+    {% for field in form.visible_fields %}
+      <span>
+        <label for="{{ field.auto_id }}">{{ field.label }}</label>
+        {{ field }}
+      </span>
+    {% endfor %}
+    {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+    {% endfor %}
+    {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <button type="submit" id="submit-button">Create account</button>
+  </form>
+{% endblock %}

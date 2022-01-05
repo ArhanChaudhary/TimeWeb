@@ -1,0 +1,14 @@
+{% extends "socialaccount/base.html" %}
+
+{% block head_title %}Login Cancelled{% endblock %}
+
+{% block accounts_content %}
+
+    <h1>Login Cancelled</h1>
+
+    {% url 'account_login' as login_url %}
+    {% include "account/accounts_messages.html" %}
+    
+    <p>You decided to cancel logging in via Google. If this was a mistake, please <a href="{{login_url}}">log in</a>.</p>
+
+{% endblock %}
