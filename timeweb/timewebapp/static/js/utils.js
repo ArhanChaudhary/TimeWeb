@@ -924,7 +924,7 @@ utils = {
                         utils.ui.alreadyScrolled = true;
                     }
                 } else {
-                    $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb — An online time management app that prioritizes, sorts, and lists each of your daily school or work assignments. Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started</div></div>');
+                    $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment to get started.</div></div>');
                     $(".assignment-container, #current-date").hide();
                 }
             }
