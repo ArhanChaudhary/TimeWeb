@@ -504,11 +504,18 @@ class VisualAssignment extends Assignment {
             const point_y = this.height - funct_mouse_x * this.hCon - 50;
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
             const hover_point_label = this.dom_assignment.find(".hover-point-label");
+            if (hover_point_label.hasClass("initial-position")) {
+                hover_point_label.addClass("disable-hover-point-label-transition");
+            }
             hover_point_label.removeClass("hide-label");
             hover_point_label.prop("style").setProperty("--x", point_x);
             hover_point_label.prop("style").setProperty("--y", point_y);
             hover_point_label.text(point_str);
             hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width > this.width - 5);
+            if (hover_point_label.hasClass("initial-position")) {
+                hover_point_label[0].offsetHeight;
+                hover_point_label.removeClass("disable-hover-point-label-transition initial-position");
+            }
             screen.beginPath();
             screen.fillStyle = "white";
             screen.arc(point_x, point_y, radius + 1, 0, 2 * Math.PI);
