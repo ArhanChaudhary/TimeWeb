@@ -133,6 +133,8 @@ class TimewebGenericView(View):
     def render_with_dynamic_context(self, request, file, context):
 
         if not hasattr(self, "settings_model"):
+            if not request.user.is_authenticated:
+                return render(request, file, context)
             self.settings_model = SettingsModel.objects.filter(user=request.user)
             if not self.settings_model.exists():
                 return render(request, file, context)
@@ -144,7 +146,7 @@ class TimewebGenericView(View):
     def utc_to_local(self, request, utctime):
         if hasattr(self, "settings_model"):
             use_settings_timezone = True
-        else:
+        elif request.user.is_authenticated:
             self.settings_model = SettingsModel.objects.filter(user=request.user)
             if self.settings_model.exists():
                 self.settings_model = self.settings_model.first()
@@ -154,6 +156,9 @@ class TimewebGenericView(View):
                     use_settings_timezone = False
             else:
                 use_settings_timezone = False
+        else:
+            use_settings_timezone = False
+
         if use_settings_timezone:
             return utctime.astimezone(self.settings_model.timezone)
         else:
