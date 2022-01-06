@@ -17,7 +17,7 @@ input, textarea {
     filter: none;
 }
 input[type="checkbox"], input[type="radio"] {
-    -webkit-appearance: auto;
+    -webkit-appearance: revert;
 }
 input[type="radio"] {
     margin: 0;
