@@ -96,55 +96,48 @@ $(function() {
     // Checks if user is authenticated and on home page
     if ($("#image-new-container").length) {
         $(window).resize(function() {
-            // Check if the username protrudes into the logo
-            if (username.offset().left-10 < window.innerWidth/2+115) {
-                logo.hide();
-                // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the username protrudes into it
-                newassignmenttext.css("max-width",Math.max(0, username.offset().left-69-10));
-                // If it does, checks if 
+            welcome.toggle(!collision(welcome, logo, { margin: 10 }));
+
+            logo.css({
+                left: '',
+                transform: '',
+            });
+            logo.find("img").attr("width", 211);
+            if (collision(username, logo, { margin: 10 })) {
+                logo.css({
+                    left: 65,
+                    transform: "none",
+                });
+                welcome.toggle(!collision(welcome, logo, { margin: 10 }));
+                newassignmenttext.css("max-width", 0);
+                if (collision(username, logo, { margin: 10 })) {
+                    // compress the logo
+                    logo.find("img").attr("width", Math.max(0, username.offset().left-60-20-5));
+                }
             } else {
-                logo.show();
-                // If it does, makes sure the "New Assignment" behaves as if it were positioned relatively by a text ellipsis if the logo protrudes into it
                 newassignmenttext.css("max-width",window.innerWidth/2-115-69);
-            }
-            // Checks if "Welcome, " protrudes into the logo
-            if (username.offset().left-10 - 100 < window.innerWidth/2+115) {
-                // If it does, hide welcome
-                welcome.hide();
-            } else {
-                newassignmenttext.css("max-width","");
-                welcome.show();
             }
         });
     // Checks if user is authenticated and not on home page
     } else if ($("#user-greeting").length) {
         $(window).resize(function() {
-            // Checks if "Welcome, " protrudes into the logo
-            if (username.offset().left-10 - 100 < window.innerWidth/2+115) {
-                // If it does, hide welcome
-                welcome.hide();
-                // If it does, checks if the username protrudes into the logo
-                if (username.offset().left-10 < window.innerWidth/2+115) {
-                    // If it does, float the logo left
-                    $("#logo-container").css({
-                        left: 5,
-                        transform: "none",
-                    });
-                    if (username.offset().left-20 < 211+5) {
-                        // If it does, shorten the logo
-                        logo.css("width", username.offset().left-20-5);
-                    } else {
-                        logo.css("width", 211);
-                    }
-                } else {
-                    // If it does not, reset css
-                    $("#logo-container").css({
-                        left: '',
-                        transform: '',
-                    });
+            welcome.toggle(!collision(welcome, logo, { margin: 10 }));
+
+            logo.css({
+                left: '',
+                transform: '',
+            });
+            logo.find("img").css("width", "");
+            if (collision(username, logo, { margin: 10 })) {
+                logo.css({
+                    left: 5,
+                    transform: "none",
+                });
+                welcome.toggle(!collision(welcome, logo, { margin: 10 }));
+                if (collision(username, logo, { margin: 10 })) {
+                    // compress the logo
+                    logo.find("img").css("width", Math.max(0, username.offset().left-20-5));
                 }
-            } else {
-                welcome.show();
             }
         });
     }
@@ -214,21 +207,29 @@ window.onbeforeunload = function() {
 };
 
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
-function collision($div1, $div2) {
-    var x1 = $div1.offset().left;
-    var y1 = $div1.offset().top;
-    var h1 = $div1.outerHeight(true);
-    var w1 = $div1.outerWidth(true);
-    var b1 = y1 + h1;
-    var r1 = x1 + w1;
-    var x2 = $div2.offset().left;
-    var y2 = $div2.offset().top;
-    var h2 = $div2.outerHeight(true);
-    var w2 = $div2.outerWidth(true);
-    var b2 = y2 + h2;
-    var r2 = x2 + w2;
+function collision($div1, $div2, params={ margin: 0}) {
+    if ($div1.css("display") == "none") {
+        var hide_$div1 = true;
+        $div1.show();
+    }
+    if ($div2.css("display") == "none") {
+        var hide_$div2 = true;
+        $div2.show();
+    }
+    var left1 = $div1.offset().left;
+    var top1 = $div1.offset().top;
+    var bottom1 = top1 + $div1.outerHeight(true);
+    var right1 = left1 + $div1.outerWidth(true);
 
-    if (b1 < y2 || y1 > b2 || r1 < x2 || x1 > r2) return false;
+    var left2 = $div2.offset().left;
+    var top2 = $div2.offset().top;
+    var bottom2 = top2 + $div2.outerHeight(true);;
+    var right2 = left2 + $div2.outerWidth(true);;
+
+    hide_$div1 && $div1.hide();
+    hide_$div2 && $div2.hide();
+
+    if (bottom1 + params.margin < top2 || top1 - params.margin > bottom2 || right1 + params.margin < left2 || left1 - params.margin > right2) return false;
     return true;
 }
 
