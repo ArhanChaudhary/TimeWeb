@@ -8,9 +8,6 @@
 
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/accounts-template.css' %}">
-  {% if not user.is_authenticated %}
-    <link rel="stylesheet" href="{% static 'css/logged_out.css' %}">
-  {% endif %}
   {% block accounts_css %}{% endblock accounts_css %}
 {% endblock css %}
 
