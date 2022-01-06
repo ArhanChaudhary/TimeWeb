@@ -56,8 +56,8 @@ else:
     ALLOWED_HOSTS = ['timeweb.io', 'timeweb-308201.wl.r.appspot.com', 'www.timeweb.io', 'www.timeweb-308201.wl.r.appspot.com']
 # Application definition
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 604800 # 7 days
