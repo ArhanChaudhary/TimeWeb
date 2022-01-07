@@ -68,10 +68,9 @@ os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 editing_example_account = False
 
-example_account_email = "timeweb@example.com"
-example_assignment_name = "Reading a Book (EXAMPLE ASSIGNMENT)"
+EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
-MAX_NUMBER_TAGS = 5
+MAX_NUMBER_OF_TAGS = 5
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -80,7 +79,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         TimewebModel.objects.create(**{
-            "name": example_assignment_name,
+            "name": EXAMPLE_ASSIGNMENT_NAME,
             "assignment_date": date_now,
             "x": date_now + datetime.timedelta(30),
             "unit": "Page",
@@ -116,9 +115,9 @@ logger = getLogger('django')
 logger.propagate = False
 def get_default_context():
     return {
-        "example_account_email": example_account_email,
-        "example_assignment_name": example_assignment_name,
-        "max_number_tags": MAX_NUMBER_TAGS,
+        "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
+        "EXAMPLE_ASSIGNMENT_NAME": EXAMPLE_ASSIGNMENT_NAME,
+        "MAX_NUMBER_OF_TAGS": MAX_NUMBER_OF_TAGS,
         "editing_example_account": editing_example_account,
         "DEBUG": settings.DEBUG,
     }
@@ -208,7 +207,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
-        self.isExampleAccount = request.user.email == example_account_email
+        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         self.form = SettingsForm(data=request.POST, files=request.FILES)
         self.checked_background_image_clear = request.POST.get("background_image-clear")
         form_is_valid = True
@@ -259,7 +258,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.timezone = self.form.cleaned_data.get("timezone")
         self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         if self.form.cleaned_data.get("restore_gc_assignments"):
-            print(self.assignment_models.count())
             if self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
                 self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
                 return self.invalid_form(request)
@@ -334,7 +332,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def post(self, request):
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
         self.settings_model = SettingsModel.objects.get(user=request.user)
-        self.isExampleAccount = request.user.email == example_account_email
+        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
         if self.isExampleAccount and not editing_example_account: return HttpResponse(status=204)
@@ -770,7 +768,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
             tag_names = [tag_name for tag_name in tag_names if tag_name not in self.sm.tags]
-            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_TAGS: return HttpResponseForbidden("Too Many Tags!")
+            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_OF_TAGS: return HttpResponseForbidden("Too Many Tags!")
             self.sm.tags.extend(tag_names)
 
         elif action == "tag_delete":
@@ -805,7 +803,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
-        self.isExampleAccount = request.user.email == example_account_email
+        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         if self.isExampleAccount: return redirect("home")
         self.settings_model = SettingsModel.objects.get(user=request.user)
         # Callback URI
@@ -842,7 +840,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
-        self.isExampleAccount = request.user.email == example_account_email
+        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         if self.isExampleAccount: return HttpResponse(status=204)
         # self.settings_model.oauth_token stores the user's access and refresh tokens
         if 'token' in self.settings_model.oauth_token:
@@ -902,7 +900,6 @@ class BlogView(TimewebGenericView):
         return self.render_with_dynamic_context(request, "blog.html", self.context)
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
-
     def get(self, request):
         initial = {
             "username": request.user.username,

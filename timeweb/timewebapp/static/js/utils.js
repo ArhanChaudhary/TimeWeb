@@ -510,7 +510,7 @@ utils = {
                     }
                     tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
 
-                    if (sa.tags.length + tag_names.size > max_number_tags) {
+                    if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
                         $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
                         $(this).find(".tag-add-input").val("Too Many Tags!");
                         tag_names = new Set();
@@ -906,7 +906,7 @@ utils = {
         insertTutorialMessages: function() {
             if (SETTINGS.enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return utils.loadAssignmentData($(this)).name !== example_assignment_name;
+                    return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
                 });
                 if (assignments_excluding_example.length) {
                     const available_assignments = $(".assignment-container:not(.question-mark)").filter(function() {
@@ -1092,7 +1092,7 @@ utils = {
     SCHEDULED_TIMEOUT_DELAY: 5000,
 }
 
-isExampleAccount = username === example_account_email || editing_example_account;
+isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || editing_example_account;
 ajaxUtils = {
     disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
@@ -1361,7 +1361,7 @@ for (let sa of dat) {
         if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
             sa.x++;
         }
-        if (sa.name === example_assignment_name) {
+        if (sa.name === EXAMPLE_ASSIGNMENT_NAME) {
             sa.assignment_date = new Date(date_now.valueOf());
             sa.fake_assignment_date = false;
         }

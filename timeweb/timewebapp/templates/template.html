@@ -18,11 +18,11 @@
             gtag('js', new Date());
 
             gtag('config', 'G-3K1HRD42V7');
-            username = "{{ user.get_username }}";
-            example_account_email = "{{ example_account_email }}";
-            example_assignment_name = "{{ example_assignment_name }}";
+            ACCOUNT_EMAIL = "{{ user.get_username }}";
+            EXAMPLE_ACCOUNT_EMAIL = "{{ EXAMPLE_ACCOUNT_EMAIL }}";
+            EXAMPLE_ASSIGNMENT_NAME = "{{ EXAMPLE_ASSIGNMENT_NAME }}";
             {% comment %} make these dont crash in case these arent passed into context {% endcomment %}
-            max_number_tags = +"{{ max_number_tags }}";
+            MAX_NUMBER_OF_TAGS = +"{{ MAX_NUMBER_OF_TAGS }}";
 
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
             gc_api_init_failed = {% if gc_api_init_failed %}true{% else %}false{% endif %};

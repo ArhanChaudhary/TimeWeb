@@ -46,7 +46,7 @@
               {% endif %}
               {% for error in field.errors %}
                 {% comment %} Only adds form errors to the name field in the example account {% endcomment %}
-                {% if user.email != example_account_email or field.name == "name" %}
+                {% if user.email != EXAMPLE_ACCOUNT_EMAIL or field.name == "name" %}
                   <div class="error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</div>
                 {% endif %}
               {% endfor %}
