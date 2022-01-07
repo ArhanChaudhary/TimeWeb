@@ -275,6 +275,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_VERIFICATION = True
 
+SOCIALACCOUNT_ADAPTER = 'timewebapp.adapter.ExampleAccountSocialLoginAdapter'
+
 ACCOUNT_FORMS = {
     'login': 'timewebapp.forms.LabeledLoginForm',
     'signup': 'timewebapp.forms.LabeledSignupForm',

@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
@@ -175,9 +176,6 @@ class UsernameResetForm(forms.ModelForm):
         widgets = {
             "username": forms.TextInput(),
         }
-        help_texts = {
-            "username": "Enter your new username:",
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -247,6 +245,11 @@ class LabeledChangePasswordForm(ChangePasswordForm):
         self.fields['oldpassword'].widget.attrs["placeholder"] = ""
         self.label_suffix = ""
 
+    def clean(self, *args, **kwargs):
+        if str(self.user) == settings.EXAMPLE_ACCOUNT_EMAIL:
+            raise forms.ValidationError(_("You cannot modify the example account"))
+        super().clean(*args, **kwargs)
+
 class LabeledSignupForm(SignupForm):
     username = forms.CharField(
         label=_("Username"),
@@ -284,9 +287,14 @@ class LabeledAddEmailForm(AddEmailForm):
     )
 
     def __init__(self, *args, **kwargs):
+        self.instance_email = str(kwargs['user'])
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 
+    def clean_email(self):
+        if self.instance_email == settings.EXAMPLE_ACCOUNT_EMAIL:
+            raise forms.ValidationError(_("You cannot modify the example account"))
+        return super(LabeledAddEmailForm, self).clean_email()
 class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
     username = forms.CharField(
         label=_("Username"),

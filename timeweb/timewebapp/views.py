@@ -911,15 +911,19 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
         return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
 
     def post(self, request):
-        self.isExampleAccount = request.user.email == example_account_email
         self.form = UsernameResetForm(data=request.POST)
-        if self.form.is_valid():
+        form_is_valid = True
+        if not self.form.is_valid():
+            form_is_valid = False
+        elif request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
+            form_is_valid = False
+            self.form.add_error("username", ValidationError("You cannot modify the example account"))
+        if form_is_valid:
             return self.valid_form(request)
         else:
             return self.invalid_form(request)  
 
     def valid_form(self, request):
-        if self.isExampleAccount: return redirect("home")
         self.user_model = User.objects.get(email=request.user.email)
         self.user_model.username = self.form.cleaned_data.get('username')
         self.user_model.save()
