@@ -719,6 +719,8 @@ class Priority {
         that.prev_tag = undefined;
         that.already_found_first_incomplete_works = false;
         that.already_found_first_finished = false;
+        let first_available_tutorial_assignment_fallback;
+        let first_available_tutorial_assignment;
         $("#autofill-work-done, #delete-starred-assignments").hide();
         $(".delete-gc-assignments-from-class").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
@@ -731,6 +733,10 @@ class Priority {
 
             const dom_assignment = $(".assignment").eq(that.priority_data.index); // Need to define this so the resolved promise can access it
             that.dom_assignment = dom_assignment;
+
+            if (!first_available_tutorial_assignment_fallback) {
+                first_available_tutorial_assignment_fallback = dom_assignment;
+            }
 
             const assignment_container = that.dom_assignment.parents(".assignment-container");            
 
@@ -784,11 +790,20 @@ class Priority {
                 that.colorOrAnimateInAssignment(dom_assignment);
             }
             that.addAssignmentShortcut(that.dom_assignment);
+            if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
+                first_available_tutorial_assignment = dom_assignment;
+            }
         }
         // End part of addAssignmentShortcut
         if (that.prev_assignment_container) {
             that.prev_assignment_container.addClass("last-add-line-wrapper");
         }
+
+        if (!first_available_tutorial_assignment) {
+            first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
+        }
+        utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
+
         if (!that.params.first_sort) {
             $(".assignment-container").each(function() {
                 that.setInitialAssignmentTopOffset($(this));
@@ -832,8 +847,6 @@ class Priority {
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
         $(".incomplete-works").last().addClass("last-add-line-wrapper");
 
-        $("#tutorial-click-assignment-to-open").remove();
-        utils.ui.insertTutorialMessages();
 
         that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");

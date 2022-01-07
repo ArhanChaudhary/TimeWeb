@@ -903,24 +903,19 @@ utils = {
         setAnimationSpeed: function() {
             $("main").prop("style").setProperty('--animation-speed', SETTINGS.animation_speed);
         },
-        insertTutorialMessages: function() {
+        insertTutorialMessages: function(first_available_assignment) {
+            $("#tutorial-click-assignment-to-open").remove();
             if (SETTINGS.enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
                     return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
                 });
                 if (assignments_excluding_example.length) {
-                    const available_assignments = $(".assignment-container:not(.question-mark)").filter(function() {
-                        return !$(this).children(".assignment").hasClass("assignment-is-deleting");
-                    });
-                    let first_available_assignment;
-                    if (available_assignments.length) {
-                        first_available_assignment = available_assignments.first().children(".assignment");
-                    } else {
-                        first_available_assignment = $(".assignment").first();
-                    }
                     first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>");
                     if (!utils.ui.alreadyScrolled) {
-                        $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                        // setTimeout needed because this runs before domSort
+                        setTimeout(function() {
+                            $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                        }, 0);
                         utils.ui.alreadyScrolled = true;
                     }
                 } else {
