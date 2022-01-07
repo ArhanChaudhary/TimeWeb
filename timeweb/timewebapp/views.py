@@ -186,6 +186,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'close_graph_after_work_input': self.settings_model.close_graph_after_work_input,
             'highest_priority_color': self.settings_model.highest_priority_color,
             'lowest_priority_color': self.settings_model.lowest_priority_color,
+            'assignment_sorting': self.settings_model.assignment_sorting,
             'default_dropdown_tags': self.settings_model.default_dropdown_tags,
             'background_image': self.settings_model.background_image,
             'enable_tutorial': self.settings_model.enable_tutorial,
@@ -196,9 +197,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'dark_mode': self.settings_model.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
-
-        # The assignment_sorting field must be exlucded dynamically. Using exclude=("assignment_sorting", ) doesn't render it in the home page
-        self.context['form'].fields.pop("assignment_sorting")
 
         self.context['settings_object'] = self.settings_model
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
