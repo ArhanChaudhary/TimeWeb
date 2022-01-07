@@ -1,9 +1,10 @@
 {% extends "doc-template.html" %}
-
 {% load static %}
 
+{% block head_title %}User Guide{% endblock %}
+
 {% block doc_css %}
-<link rel="stylesheet" href="{% static 'css/user-guide.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user-guide.css' %}">
 {% endblock %}
 
 {% block doc_content %}{% comment %} Turn on word wrap if viewing from an IDE

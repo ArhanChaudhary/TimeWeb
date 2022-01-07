@@ -2,84 +2,84 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}">
 {% endblock css %}
 
 {% block js %}
-<script src="{% static 'js/settings.js' %}"></script>
+    <script src="{% static 'js/settings.js' %}"></script>
 {% endblock js %}
 
 {% block content %}
-{% comment %} Injects libraries for the color picker {% endcomment %}
-{{ form.media }}
-<form method="POST" autocomplete="off" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% for field in form.visible_fields %}
-        {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "assignment_spacing" or field.name == "background_image" or field.name == "restore_gc_assignments" %}
-        <fieldset>
-            <legend>
-                {% if field.name == "def_break_days" %}
-                    Assignment Form
-                {% elif field.name == "def_skew_ratio" %}
-                    Assignment Graph
-                {% elif field.name == "highest_priority_color" %}
-                    Assignment Priority
-                {% elif field.name == "assignment_spacing" %}
-                    Assignment Header
-                {% elif field.name == "background_image" %}
-                    Personalize
-                {% elif field.name == "restore_gc_assignments" %}
-                    Miscellaneous
+    {% comment %} Injects libraries for the color picker {% endcomment %}
+    {{ form.media }}
+    <form method="POST" autocomplete="off" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+            {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "assignment_spacing" or field.name == "background_image" or field.name == "restore_gc_assignments" %}
+            <fieldset>
+                <legend>
+                    {% if field.name == "def_break_days" %}
+                        Assignment Form
+                    {% elif field.name == "def_skew_ratio" %}
+                        Assignment Graph
+                    {% elif field.name == "highest_priority_color" %}
+                        Assignment Priority
+                    {% elif field.name == "assignment_spacing" %}
+                        Assignment Header
+                    {% elif field.name == "background_image" %}
+                        Personalize
+                    {% elif field.name == "restore_gc_assignments" %}
+                        Miscellaneous
+                    {% endif %}
+                </legend>
                 {% endif %}
-            </legend>
+                {% if field.name == "assignment_sorting" %}
+                    {{ field.as_hidden }}
+                {% else %}
+                    <table>
+                        <tbody>
+                            <tr class="{% cycle 'odd' 'even' %}">
+                                <th>
+                                    {{ field.label_tag }}
+                                    <div class="setting-description">{{ field.help_text }}</div>
+                                </th>
+                                {% if field.name == "def_break_days" %}
+                                    <td id="break-days-wrapper">
+                                        {% for value, text in field.field.choices %}
+                                            <input id="id_def_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in form.initial|get_def_break_days %}checked="checked"{% endif %}>
+                                            <label tabindex="0" class="break-days-label" for="id_def_break_days_{{ forloop.counter0 }}">{{ text }}</label>
+                                        {% endfor %}
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        {% for error in field.errors %}
+                                            <h3 class="error-note">{{ error|escape }}</h3>
+                                        {% endfor %}
+                                        {{ field }}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+            {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "vertical_tag_position" or field.name == "timezone" or field.name == "enable_tutorial" %}
+            </fieldset>
             {% endif %}
-            {% if field.name == "assignment_sorting" %}
-                {{ field.as_hidden }}
-            {% else %}
-                <table>
-                    <tbody>
-                        <tr class="{% cycle 'odd' 'even' %}">
-                            <th>
-                                {{ field.label_tag }}
-                                <div class="setting-description">{{ field.help_text }}</div>
-                            </th>
-                            {% if field.name == "def_break_days" %}
-                                <td id="break-days-wrapper">
-                                    {% for value, text in field.field.choices %}
-                                        <input id="id_def_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in form.initial|get_def_break_days %}checked="checked"{% endif %}>
-                                        <label tabindex="0" class="break-days-label" for="id_def_break_days_{{ forloop.counter0 }}">{{ text }}</label>
-                                    {% endfor %}
-                                </td>
-                            {% else %}
-                                <td>
-                                    {% for error in field.errors %}
-                                        <h3 class="error-note">{{ error|escape }}</h3>
-                                    {% endfor %}
-                                    {{ field }}
-                                </td>
-                            {% endif %}
-                        </tr>
-                    </tbody>
-                </table>
-            {% endif %}
-        {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "text_priority" or field.name == "vertical_tag_position" or field.name == "timezone" or field.name == "enable_tutorial" %}
-        </fieldset>
-        {% endif %}
-    {% endfor %}
-    {% comment %} Needs to be here to form.is_valid() isnt false {% endcomment %}
-    {% for hidden in form.hidden_fields %}
-        {{ hidden }}
-    {% endfor %}
-    {% spaceless %}
-    <div class="button-container">
-        <input type="button" value="Reset" id="reset-settings-button">
-        <input type="submit" value="Save" id="submit-settings-button">
-    </div>
-    {% endspaceless %}
-</form>
-{% if settings_object.background_image %}
-    <template id="background-image-template">
-        <img src="{{ settings_object.background_image.url }}">
-    </template>
-{% endif %}
+        {% endfor %}
+        {% comment %} Needs to be here to form.is_valid() isnt false {% endcomment %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+        {% spaceless %}
+        <div class="button-container">
+            <input type="button" value="Reset" id="reset-settings-button">
+            <input type="submit" value="Save" id="submit-settings-button">
+        </div>
+        {% endspaceless %}
+    </form>
+    {% if settings_object.background_image %}
+        <template id="background-image-template">
+            <img src="{{ settings_object.background_image.url }}">
+        </template>
+    {% endif %}
 {% endblock content %}

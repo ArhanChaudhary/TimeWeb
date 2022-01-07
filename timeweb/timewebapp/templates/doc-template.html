@@ -1,48 +1,47 @@
 {% extends "template.html" %}
-
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/doc.css' %}">
-{% block doc_css %}{% endblock doc_css %}
+    <link rel="stylesheet" href="{% static 'css/doc.css' %}">
+    {% block doc_css %}{% endblock doc_css %}
 {% endblock css %}
 
 {% block js %}
-<script src="{% static 'js/doc.js' %}"></script>
-{% block doc_js %}{% endblock doc_js %}
+    <script src="{% static 'js/doc.js' %}"></script>
+    {% block doc_js %}{% endblock doc_js %}
 {% endblock js %}
 
 {% block content %}
-<div id="flex-container">
-    <div id="table-of-contents-container-label" tabindex="0">
-        <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
+    <div id="flex-container">
+        <div id="table-of-contents-container-label" tabindex="0">
+            <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
+        </div>
+        <div id="table-of-contents-container">
+            <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
+            {% if add_faq %}<span class="table-of-contents-header" id="category-important-labels">FAQs</span>{% endif %}
+            <ul id="category-doc-labels"></ul>
+        </div>
+        {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
+        <div id="doc-container">
+            {% block doc_content %}{% endblock doc_content %}
+        </div>
     </div>
-    <div id="table-of-contents-container">
-        <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
-        {% if add_faq %}<span class="table-of-contents-header" id="category-important-labels">FAQs</span>{% endif %}
-        <ul id="category-doc-labels"></ul>
-    </div>
-    {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
-    <div id="doc-container">
-        {% block doc_content %}{% endblock doc_content %}
-    </div>
-</div>
-<template id="table-of-contents-major-category-template">
-    <details class="table-of-contents-item" open>
-        <summary>
-            <span></span>
-        </summary>
-        <ul></ul>
-    </details>
-</template>
-<template id="table-of-contents-minor-category-template">
-    <li class="table-of-contents-item">
-        <a></a>
-    </li>
-</template>
-<template id="label-icon-template">
-    <div class="label-icon-container">
-        <img class="label-icon" height="25" src="{% static 'images/question-mark.png' %}">
-    </div>
-</template>
+    <template id="table-of-contents-major-category-template">
+        <details class="table-of-contents-item" open>
+            <summary>
+                <span></span>
+            </summary>
+            <ul></ul>
+        </details>
+    </template>
+    <template id="table-of-contents-minor-category-template">
+        <li class="table-of-contents-item">
+            <a></a>
+        </li>
+    </template>
+    <template id="label-icon-template">
+        <div class="label-icon-container">
+            <img class="label-icon" height="25" src="{% static 'images/question-mark.png' %}">
+        </div>
+    </template>
 {% endblock content %}

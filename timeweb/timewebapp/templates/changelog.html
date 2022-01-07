@@ -1,22 +1,24 @@
 {% extends "doc-template.html" %}
 {% load static %}
 
+{% block head_title %}Changelog{% endblock %}
+
 {% block doc_css %}
-<link rel="stylesheet" href="{% static 'css/changelog.css' %}">
+    <link rel="stylesheet" href="{% static 'css/changelog.css' %}">
 {% endblock doc_css %}
 
 {% block doc_js %}
-<script src="{% static 'js/changelog.js' %}"></script>
+    <script src="{% static 'js/changelog.js' %}"></script>
 {% endblock doc_js %}
 
 {% block doc_content %}
-<br><br><br>
-{% autoescape off %}
-{% for changelog in changelogs %}
-<span>
-    <div class="major-category" id="{{ changelog.version|get_version_id }}">{{ changelog.version }}</div>
-    {{ changelog.updates }}
-</span>
-{% endfor %}
-{% endautoescape %}
+    <br><br><br>
+    {% autoescape off %}
+        {% for changelog in changelogs %}
+            <span>
+                <div class="major-category" id="{{ changelog.version|get_version_id }}">{{ changelog.version }}</div>
+                {{ changelog.updates }}
+            </span>
+        {% endfor %}
+    {% endautoescape %}
 {% endblock doc_content %}

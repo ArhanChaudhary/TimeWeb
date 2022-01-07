@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 {% load pwa %}
+
 <html lang="en-US"{% if dark_mode %} id="dark-mode"{% endif %}>
     <head>
         <meta charset="UTF-8">
@@ -29,7 +30,7 @@
             editing_example_account = {% if editing_example_account %}true{% else %}false{% endif %};
             notify_date_changed = {% if notify_date_changed %}true{% else %}false{% endif %};
         </script>
-        <title>TimeWeb</title>
+        <title>{% block head_title %}TimeWeb{% endblock %}</title>
         {% progressive_web_app_meta %}
         <meta name="title" content="TimeWeb">
         <meta name="description" content="TimeWeb — An online time management app that prioritizes, sorts, and lists each of your daily school or work assignments. Get started with your free account today!">
