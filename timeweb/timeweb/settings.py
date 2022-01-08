@@ -96,7 +96,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
-    'timewebapp.middleware.CatchRequestDataTooBig',
+    'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
 ]
 
 ROOT_URLCONF = 'timeweb.urls'
