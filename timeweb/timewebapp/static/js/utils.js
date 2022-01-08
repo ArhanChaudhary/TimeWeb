@@ -453,6 +453,16 @@ utils = {
                 else
                     info.removeClass("dim");
             });
+            $(window).resize(function() {
+                const visible_icon_label = $("#assignments-header #icon-label-container div:visible");
+                const info = $("#info");
+
+                if (visible_icon_label.length) {
+                    info.toggleClass("dim", collision(info, visible_icon_label));
+                } else {
+                    info.removeClass("dim")
+                }
+            });
         },
         addTagHandlers: function() {
             const TAG_ADD_SELECTION_ITEM_TEMPLATE = $("#tag-add-selection-item-template").html();
