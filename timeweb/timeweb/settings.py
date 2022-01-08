@@ -201,6 +201,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 else:
+    # Bunch of gitignored files ;)
     DEFAULT_FILE_STORAGE = 'timewebapp.gcloud_storages.GoogleCloudMediaFileStorage'
     STATICFILES_STORAGE = 'timewebapp.gcloud_storages.GoogleCloudStaticFileStorage'
     
