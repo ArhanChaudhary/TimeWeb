@@ -6,7 +6,7 @@
     <head>
         <meta charset="UTF-8">
         {% if not DEBUG %}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         {% endif %}
         <script nonce="{{request.csp_nonce}}">
             window.dataLayer = window.dataLayer || [];
@@ -48,9 +48,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=0.65, maximum-scale=1">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="{% static 'css/template.css' %}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
         {% block css %}{% endblock css %}
-        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
         <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
