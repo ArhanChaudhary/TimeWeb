@@ -297,6 +297,20 @@ class VisualAssignment extends Assignment {
         priority.sort({ timeout: true });
         this.draw();
     }
+    static RGBToString(color, params={ invert: false }) {
+        if (params.invert)
+            return `rgb(
+                ${255 - color.r},
+                ${255 - color.g},
+                ${255 - color.b}
+            )`.replace(/\s+/g, '');
+        else
+            return `rgb(
+                ${color.r},
+                ${color.g},
+                ${color.b}
+            )`.replace(/\s+/g, '');
+    }
     //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
@@ -424,19 +438,7 @@ class VisualAssignment extends Assignment {
         let circle_x,
             circle_y,
             line_end = this.sa.complete_x + Math.ceil(1 / this.wCon);
-        if ($("html").is("#dark-mode")) {
-            screen.strokeStyle = `rgb(
-                ${255 - VisualAssignment.RED_LINE_COLOR.r},
-                ${255 - VisualAssignment.RED_LINE_COLOR.g},
-                ${255 - VisualAssignment.RED_LINE_COLOR.b}
-            )`.replace(/\s+/g, '');
-        } else {
-            screen.strokeStyle = `rgb(
-                ${VisualAssignment.RED_LINE_COLOR.r},
-                ${VisualAssignment.RED_LINE_COLOR.g},
-                ${VisualAssignment.RED_LINE_COLOR.b}
-            )`.replace(/\s+/g, '');
-        }
+        screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
         screen.lineWidth = radius;
         screen.beginPath();
         for (let point_x = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
@@ -447,30 +449,14 @@ class VisualAssignment extends Assignment {
             }
             circle_y = this.height - point_y * this.hCon - 50;
             screen.lineTo(circle_x - (point_x === this.red_line_start_x) * radius / 2, circle_y); // (point_x === this.red_line_start_x) * radius / 2 makes sure the first point is filled in properly
-            if (point_x === mouse_x && point_y === funct_mouse_x) {
-                screen.arc(circle_x, circle_y, radius + 1, 0, 2 * Math.PI);
-            } else {
-                screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
-            }
+            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI)
             screen.moveTo(circle_x, circle_y);
         }
         screen.stroke();
         screen.beginPath();
         radius *= 0.75;
         line_end = Math.min(line_end, len_works + Math.ceil(1 / this.wCon));
-        if ($("html").is("#dark-mode")) {
-            screen.strokeStyle = `rgb(
-                ${255 - VisualAssignment.BLUE_LINE_COLOR.r},
-                ${255 - VisualAssignment.BLUE_LINE_COLOR.g},
-                ${255 - VisualAssignment.BLUE_LINE_COLOR.b}
-            )`.replace(/\s+/g, '');
-        } else {
-            screen.strokeStyle = `rgb(
-                ${VisualAssignment.BLUE_LINE_COLOR.r},
-                ${VisualAssignment.BLUE_LINE_COLOR.g},
-                ${VisualAssignment.BLUE_LINE_COLOR.b}
-            )`.replace(/\s+/g, '');
-        }
+        screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
         screen.lineWidth = radius;
         for (let point_x = 0; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.sa.works[Math.min(len_works, point_x)];
@@ -478,11 +464,7 @@ class VisualAssignment extends Assignment {
             circle_y = this.height - point_y * this.hCon - 50;
             
             screen.lineTo(circle_x - (point_x === 0) * radius / 2, circle_y);
-            if (point_x === mouse_x && point_y === funct_mouse_x) {
-                screen.arc(circle_x, circle_y, radius + 2, 0, 2 * Math.PI);
-            } else {
-                screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
-            }
+            screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
             screen.moveTo(circle_x, circle_y);
         }
         radius /= 0.75;
@@ -517,9 +499,18 @@ class VisualAssignment extends Assignment {
                 hover_point_label.removeClass("disable-hover-point-label-transition initial-position");
             }
             screen.beginPath();
+
+            if (this.sa.works[mouse_x - this.sa.blue_line_start] === funct_mouse_x) {
+                screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+            } else if (this.funct(mouse_x) === funct_mouse_x) {
+                screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+            }
+            
             screen.fillStyle = "white";
-            screen.arc(point_x, point_y, radius + 1, 0, 2 * Math.PI);
+            screen.arc(point_x, point_y, radius + 2, 0, 2 * Math.PI);
             screen.fill();
+            screen.lineWidth = 2;
+            screen.stroke();
             screen.fillStyle = "black";
         }
         
