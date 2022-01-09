@@ -5,7 +5,8 @@ class Priority {
     static SORT_TIMEOUT_DURATION = 35;
     static DARK_MODE_ALPHA = 0.6;
     static ANIMATE_IN_START_MARGIN = 20; // Moves animate in a bit below the last assignment to give it more breathing room
-
+    static TOO_MUCH_TO_AUTOFILL_CUTOFF = 7500;
+    
     static INCOMPLETE_WORKS = 10;
     static NO_WORKING_DAYS = 9;
     static NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT = 8;
@@ -219,6 +220,15 @@ class Priority {
                     sa.sa.works.push(last_work_input);
                     len_works++;
 
+                    if (number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                            sa.setDynamicStartIfInDynamicMode();
+                            sa.autotuneSkewRatio();
+                        }
+                        sa.setDynamicStartIfInDynamicMode();
+                    }
+                }
+                if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                         sa.setDynamicStartIfInDynamicMode();
                         sa.autotuneSkewRatio();
@@ -292,12 +302,22 @@ class Priority {
             } else {
                 if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
                     for (let i = 0; i < number_of_forgotten_days; i++) {
+                        
                         if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
                             break;
                         }
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
+                        if (number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
+                            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                                sa.setDynamicStartIfInDynamicMode();
+                                sa.autotuneSkewRatio();
+                            }
+                            sa.setDynamicStartIfInDynamicMode();
+                        }
+                    }
+                    if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                             sa.setDynamicStartIfInDynamicMode();
                             sa.autotuneSkewRatio();
