@@ -809,6 +809,9 @@ a[href="settings"] {
 .hover-point-label.hide-label {
     transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%) scale(0);
 }
+.hover-point-label.initial-position {
+    transform: scale(0);
+}
 .hover-point-label.move-left {
     --translatex: calc(-100% - 10px);
 }
