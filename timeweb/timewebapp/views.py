@@ -1,6 +1,7 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 
 # Django modules
+from re import template
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
@@ -133,6 +134,9 @@ class TimewebGenericView(View):
     def __init__(self):
         self.context = get_default_context()
 
+    def get(self, request):
+        return self.render_with_dynamic_context(request, self.template_name, self.context)
+
     def render_with_dynamic_context(self, request, file, context):
 
         if not hasattr(self, "settings_model"):
@@ -168,6 +172,7 @@ class TimewebGenericView(View):
             return timezone.localtime(utctime)
 
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
+    template_name = "settings.html"
 
     def get(self,request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
@@ -204,7 +209,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
 
         self.context['settings_object'] = self.settings_model
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
-        return self.render_with_dynamic_context(request, "settings.html", self.context)
+        return super().get(request)
         
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
@@ -272,9 +277,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def invalid_form(self, request):
         self.context['form'] = self.form
-        return self.render_with_dynamic_context(request, "settings.html", self.context)
+        return super().get(request)
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
+    template_name = 'index.html'
 
     def add_user_models_to_context(self, request):
         self.context['assignment_models'] = self.assignment_models
@@ -329,7 +335,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if request.GET.get("gc-api-init-failed") == "true":
             self.context["gc_api_init_failed"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
-        return self.render_with_dynamic_context(request, "index.html", self.context)
+        return super().get(request)
 
     def post(self, request):
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
@@ -576,7 +582,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form
         self.add_user_models_to_context(request)
-        return self.render_with_dynamic_context(request, "index.html", self.context)
+        return super().get(request)
  
     def create_gc_assignments(self, request):
         # The file token.json stores the user's access and refresh tokens, and is
@@ -898,8 +904,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         pass
 
 class BlogView(TimewebGenericView):
-    def get(self, request):
-        return self.render_with_dynamic_context(request, "blog.html", self.context)
+    template_name = "blog.html"
 
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
@@ -913,12 +918,14 @@ class ContactFormView(BaseContactFormView):
         return super().post(request)
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
+    template_name = "account/username-reset.html"
+
     def get(self, request):
         initial = {
             "username": request.user.username,
         }
         self.context['form'] = UsernameResetForm(initial=initial)
-        return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
+        return super().get(request)
 
     def post(self, request):
         self.form = UsernameResetForm(data=request.POST)
@@ -942,17 +949,21 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
 
     def invalid_form(self, request):
         self.context['form'] = self.form
-        return self.render_with_dynamic_context(request, "account/username-reset.html", self.context)
+        return super().get(request)
 
 class UserguideView(TimewebGenericView):
+    template_name = "user-guide.html"
+    
     def get(self, request):
         self.context['add_faq'] = True
-        return self.render_with_dynamic_context(request, "user-guide.html", self.context)
+        return super().get(request)
 
 class ChangelogView(TimewebGenericView):
+    template_name = "changelog.html"
+
     def get(self, request):
         self.context['changelogs'] = CHANGELOGS
-        return self.render_with_dynamic_context(request, "changelog.html", self.context)
+        return super().get(request)
 
 class RickView(TimewebGenericView):
     def get(self, request, _):
@@ -963,9 +974,7 @@ class StackpileView(TimewebGenericView):
         return redirect("https://stackpile.me")
 
 class SpookyView(TimewebGenericView):
-    def get(self, request):
-        return self.render_with_dynamic_context(request, "spooky.html", self.context)
+    template_name = "spooky.html"
     
 class SusView(TimewebGenericView):
-    def get(self, request):
-        return self.render_with_dynamic_context(request, "sus.html", self.context)
+    template_name = "sus.html"
