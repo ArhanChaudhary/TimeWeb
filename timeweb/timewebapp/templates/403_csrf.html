@@ -1,4 +1,24 @@
 Your session has expired or is invalid. Ways to resolve this issue:<br>
 1) If you've logged in from a different tab, please close this tab and use TimeWeb from there.<br>
-2) Refresh this page.<br>
+2) Go <a id="back-link">back</a> to the previous page.<br>
 3) Close this tab and open a new one.<br>
+<script nonce="{{ request.csp_nonce }}">
+    {% comment %} https://stackoverflow.com/questions/8814472/how-to-make-an-html-back-link {% endcomment %}
+    var element = document.getElementById('back-link');
+
+    // Provide a standard href to facilitate standard browser features such as 
+    //  - Hover to see link
+    //  - Right click and copy link
+    //  - Right click and open in new tab
+    element.setAttribute('href', document.referrer);
+
+    // We can't let the browser use the above href for navigation. If it does, 
+    // the browser will think that it is a regular link, and place the current 
+    // page on the browser history, so that if the user clicks "back" again,
+    // it'll actually return to this page. We need to perform a native back to
+    // integrate properly into the browser's history behavior
+    element.onclick = function() {
+    history.back();
+    return false;
+    }
+</script>

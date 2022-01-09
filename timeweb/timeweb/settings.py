@@ -98,7 +98,7 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
 ]
-
+CSRF_FAILURE_VIEW = 'timewebapp.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
 
 TEMPLATES = [

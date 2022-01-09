@@ -110,8 +110,8 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             instance.save()
 
 
-def custom_permission_denied_view(request, exception=None):
-    response = render(request, "403_csrf.html", {})
+def custom_permission_denied_view(request, reason=""):
+    response = render(request, "403_csrf.html", {"request": request})
     response.status_code = 403
     return response
 
