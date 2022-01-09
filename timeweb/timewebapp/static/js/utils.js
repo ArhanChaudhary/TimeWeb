@@ -1111,7 +1111,7 @@ ajaxUtils = {
             content = "Refresh or try again.";
         } else if (response.status == 500) {
             title = "Internal server error.";
-            content = "Please <a target='_blank' href='contact'>contact us</a> if you see this, and try to provide context on how the issue happened.";
+            content = "Please <a href='contact'>contact us</a> if you see this, and try to provide context on how the issue happened.";
         } else if (exception === 'timeout' || response.status == 502) {
             title = "Request timed out.";
             content = "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.";
