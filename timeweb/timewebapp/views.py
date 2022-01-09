@@ -1,7 +1,6 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 
 # Django modules
-from re import template
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
@@ -134,6 +133,11 @@ class TimewebGenericView(View):
     def __init__(self):
         self.context = get_default_context()
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         return self.render_with_dynamic_context(request, self.template_name, self.context)
 
@@ -214,7 +218,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
-        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         self.form = SettingsForm(data=request.POST, files=request.FILES)
         self.checked_background_image_clear = request.POST.get("background_image-clear")
         form_is_valid = True
@@ -340,7 +343,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def post(self, request):
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
         self.settings_model = SettingsModel.objects.get(user=request.user)
-        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
         if self.isExampleAccount and not editing_example_account: return HttpResponse(status=204)
@@ -811,7 +813,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
-        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         if self.isExampleAccount: return redirect("home")
         self.settings_model = SettingsModel.objects.get(user=request.user)
         # Callback URI
@@ -848,7 +849,6 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
-        self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         if self.isExampleAccount: return HttpResponse(status=204)
         # self.settings_model.oauth_token stores the user's access and refresh tokens
         if 'token' in self.settings_model.oauth_token:
