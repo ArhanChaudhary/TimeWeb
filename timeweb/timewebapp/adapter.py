@@ -9,7 +9,7 @@ message = "socialaccount/messages/cannot_modify_example_account.txt"
 
 class ExampleAccountSocialLoginAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):        
-        if request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
+        if request.user.is_authenticated and request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
             default_next = self.get_connect_redirect_url(
                 request, sociallogin.account
             )
