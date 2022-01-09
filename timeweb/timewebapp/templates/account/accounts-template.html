@@ -13,7 +13,9 @@
 
 {% block content %}
   <div id="image"></div>
-  <div id="accounts-container">
-    {% block accounts_content %}{% endblock accounts_content %}
+  <div id="accounts-scroller">
+    <div id="accounts-container">
+      {% block accounts_content %}{% endblock accounts_content %}
+    </div>
   </div>
 {% endblock content %}
