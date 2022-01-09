@@ -52,6 +52,9 @@ from logging import getLogger
 from os import environ as os_environ
 from django.conf import settings
 from .changelogs import CHANGELOGS
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
+from django.contrib import messages
 
 User = get_user_model()
 
@@ -900,6 +903,14 @@ class BlogView(TimewebGenericView):
 
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
+
+    @method_decorator(ratelimit(key='user_or_ip', rate='1/5m', method='POST'))
+    def post(self, request):
+        was_ratelimited = getattr(request, 'limited', False)
+        if was_ratelimited:
+            messages.error(request, "You must wait five minutes before sending another e-mail")
+            return self.get(request)
+        return super().post(request)
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     def get(self, request):

@@ -180,7 +180,7 @@ class ContactForm(BaseContactForm):
             self.request
         ).strip()
         if message:
-            messages.add_message(self.request, messages.SUCCESS, message)
+            messages.success(self.request, message)
         super().save(*args, **kwargs)
 
 class UsernameResetForm(forms.ModelForm):
