@@ -63,14 +63,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }
-    // Mailto links
-    $(document).click(function(e) {
-        if (!$(e.target).is("a[href^='mailto']")) return;
-        e.preventDefault();
-        const href = $(e.target).attr("href");
-        const target = $(e.target).attr("target") || '_self';
-        window.open(href, target);
-    });
     // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
     $(document.body).on("focus", function() {
         $("main").focus();

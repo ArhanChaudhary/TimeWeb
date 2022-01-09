@@ -2,8 +2,11 @@ from django import forms
 from django.conf import settings
 from .models import TimewebModel, SettingsModel
 from django.contrib.auth import get_user_model
+from django.contrib import messages
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from colorfield.widgets import ColorWidget
+from contact_form.views import ContactForm as BaseContactForm
 import datetime
 
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
@@ -169,6 +172,17 @@ class SettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 
+class ContactForm(BaseContactForm):
+    def save(self, *args, **kwargs):
+        message = render_to_string(
+            "contact_form/contact_e-mail_sent.txt",
+            {},
+            self.request
+        ).strip()
+        if message:
+            messages.add_message(self.request, messages.SUCCESS, message)
+        super().save(*args, **kwargs)
+
 class UsernameResetForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
@@ -184,7 +198,7 @@ class UsernameResetForm(forms.ModelForm):
 class LabeledLoginForm(LoginForm):
 
     error_messages = {
-        "account_inactive": _("This account is currently disabled, please <a href=\"mailto:arhan.ch@gmail.com>contact us</a> for more information"),
+        "account_inactive": _("This account is currently disabled, please <a href=\"contact\">contact us</a> for more information"),
         "email_password_mismatch": _(
             "Your e-mail address or password is incorrect"
         ),

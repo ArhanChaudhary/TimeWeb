@@ -21,6 +21,7 @@ admin_url = os.environ.get("ADMINURL", "admin/")
 urlpatterns = [
     path(admin_url, admin.site.urls),
     path('accounts/', include('allauth.urls')),
+    path('contact/', include('contact_form.urls')),
     path('', include('timewebapp.urls')),
     path('', include('pwa.urls')),
 ]

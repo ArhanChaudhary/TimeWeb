@@ -1,0 +1,2 @@
+Contact e-mail successfully sent
+<p hidden>**Success**</p>

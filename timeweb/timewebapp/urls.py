@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-from . import views
+from . import views, forms
 from django.views.generic import RedirectView
 from django.http import HttpResponse
 from django.conf import settings
@@ -12,7 +12,9 @@ urlpatterns = [
     path('blog', views.BlogView.as_view(),name='blog'),
     path('user-guide', views.UserguideView.as_view(), name='user-guide'),
     path('changelog', views.ChangelogView.as_view(),name='changelog'),
-    path('credits', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/credits.html'), name='credits'),
+
+    path('contact', views.ContactFormView.as_view(form_class=forms.ContactForm), name='contact_form'),
+
     path('policies', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/policies/policies.html'), name='policies'),
     path('cookies', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/policies/cookies.html')),
     path('disclaimer', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/policies/disclaimer.html')),

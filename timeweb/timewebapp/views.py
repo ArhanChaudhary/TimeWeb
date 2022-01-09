@@ -4,9 +4,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.views import View
+from contact_form.views import ContactFormView as BaseContactFormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseForbidden
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 # Allauth modules
 from allauth.account.adapter import DefaultAccountAdapter
@@ -896,6 +897,9 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 class BlogView(TimewebGenericView):
     def get(self, request):
         return self.render_with_dynamic_context(request, "blog.html", self.context)
+
+class ContactFormView(BaseContactFormView):
+    success_url = reverse_lazy("contact_form")
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     def get(self, request):

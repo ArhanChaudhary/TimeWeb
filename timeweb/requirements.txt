@@ -10,6 +10,7 @@ Django==3.2.10
 django-allauth==0.46.0
 django-cleanup==5.2.0
 django-colorfield==0.4.3
+django-contact-form==1.9
 django-csp==3.7
 django-multiselectfield==0.1.12
 django-pwa @ git+git://github.com/ArhanChaudhary/django-pwa.git@6304a7d6d85e005f11082479b9e0ef9a2f5ea606
