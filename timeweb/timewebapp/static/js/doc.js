@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", function() {
             minor_category_li.find("a").attr("href", `#${$major_category.attr("id")}`).text($major_category.text());
             $("#table-of-contents-container #category-table-of-contents").after(minor_category_li);
         } else {
-            minor_categories = minor_categories.add($major_category);
+            if (!minor_categories.length)
+                minor_categories = minor_categories.add($major_category);
             major_category_li.find("span").text($major_category.text());
 
             minor_categories.each(function() {
