@@ -253,7 +253,7 @@ class SettingsModel(models.Model):
     )
     one_graph_at_a_time = models.BooleanField(
         default=False,
-        verbose_name=_('Allow Only one open Graph at a Time'),
+        verbose_name=_('Allow Only One Open Graph at a Time'),
     )
     close_graph_after_work_input = models.BooleanField(
         default=False,
