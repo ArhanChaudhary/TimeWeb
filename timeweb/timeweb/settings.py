@@ -31,7 +31,7 @@ CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
 CSP_IMG_SRC = ("'self'", "data:", "https://storage.googleapis.com")
 
-PWA_SERVICE_WORKER_PATH = "https://storage.googleapis.com/twstatic/js/serviceworker.js"
+PWA_SERVICE_WORKER_PATH = BASE_DIR / 'timewebapp/static/js/serviceworker.js' if DEBUG else "https://storage.googleapis.com/twstatic/js/serviceworker.js"
 PWA_APP_DEBUG_MODE = False
 PWA_APP_NAME = "TimeWeb PS" if DEBUG else "TimeWeb"
 PWA_APP_DESCRIPTION = "TimeWeb PS APP" if DEBUG else "TimeWeb App"

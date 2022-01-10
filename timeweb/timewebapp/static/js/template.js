@@ -1,18 +1,6 @@
 if (!window.gtag) {
     function gtag() {};
 }
-// Initialize the service worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/serviceworker.js', {
-        scope: '/'
-    }).then(function (registration) {
-        // Registration was successful
-        
-    }, function (err) {
-        // registration failed :(
-
-    });
-}
 // https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
 window.mobileAndTabletCheck = function() {
     if (navigator.userAgent) {
