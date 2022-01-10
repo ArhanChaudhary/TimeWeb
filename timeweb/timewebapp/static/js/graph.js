@@ -286,9 +286,9 @@ class VisualAssignment extends Assignment {
         const skew_ratio_bound = this.calcSkewRatioBound();
         // use original_skew_ratio to allow one more arrow before bound so the parabols completely flattens
         // add && or else holding down will cause themselves to trigger each other in an infinite loop
-        if (original_skew_ratio >= skew_ratio_bound && this.pressed_arrow_key === "ArrowUp") {
+        if ((original_skew_ratio >= skew_ratio_bound || next_intersection_x === 0) && this.pressed_arrow_key === "ArrowUp") {
             this.sa.skew_ratio = 2 - skew_ratio_bound;
-        } else if (original_skew_ratio <= 2 - skew_ratio_bound && this.pressed_arrow_key === "ArrowDown") {
+        } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && this.pressed_arrow_key === "ArrowDown") {
             this.sa.skew_ratio = skew_ratio_bound;
         }
 
