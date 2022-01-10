@@ -909,11 +909,11 @@ class BlogView(TimewebGenericView):
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
-    @method_decorator(ratelimit(key='user_or_ip', rate='1/5m', method='POST'))
+    @method_decorator(ratelimit(key='user_or_ip', rate='1/15m', method='POST'))
     def post(self, request):
         was_ratelimited = getattr(request, 'limited', False)
         if was_ratelimited:
-            messages.error(request, "You must wait five minutes before sending another e-mail")
+            messages.error(request, "You must wait fifteen minutes before sending another e-mail")
             return self.get(request)
         return super().post(request)
 
