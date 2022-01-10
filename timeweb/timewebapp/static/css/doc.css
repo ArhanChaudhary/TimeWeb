@@ -139,7 +139,9 @@ a:visited {
     border-radius: 10px;
     box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
-
+code {
+    white-space: pre-wrap;
+}
 .major-category {
     margin-left: -50px;
     font-family: 'Roboto Slab';

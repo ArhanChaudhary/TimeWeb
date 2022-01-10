@@ -4,7 +4,7 @@
 {% block head_title %}Blog{% endblock %}
 
 {% block doc_css %}
-<link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
 {% endblock doc_css %}
 
 {% block doc_content %}
@@ -31,11 +31,26 @@
 </span>
 <span>
     <div class="major-category" id="humble-beginnings">Humble beginnings</div>
-    python
-    no friends to help
-    fruitfulagilecharmap
-    bad code
-    summer break slumber
+    Although I barely knew anything about computers and had a very basic prior understanding of programming, I spent a Friday night learning how to use pygame, a python-based graphical library, not knowing anything else to use. I managed to finish the <a href="https://replit.com/@arhan6/FruitfulAgileCharmap#main.py">first ever prototype</a> of my command line program. As a result of having no friends who coded and not knowing basic code organization practices, my code back then was unbelievably bad, almost impressively bad. A short snippet of some original code to further illustrate what I mean:
+    <code>
+            else:
+                nodis = True
+                isfin = "? Whoops! You have not Entered in your Work completed! Enter it in now."
+                bli.append([4,todo*ct,ffiles.index(file)])
+            li.append(str(file).ljust(len(max(ffiles,key=len))+2)+isfin)
+        bli = sorted(bli,reverse=True)
+        for i in bli:
+            nffiles.append(ffiles[i[-1]])
+            ndat.append(dat[i[-1]])
+            dli.append((str(bli.index(i)+1)+")").ljust(len(str(len(ffiles)))+2)+li[i[-1]])
+        ffiles = nffiles[:]
+        if dat != ndat:
+            dat = ndat[:]
+            dump()
+        if nodis == True:
+    </code>
+    
+    Despite this, I was still determined to finish building a minimum viable product. After taking a hiatus during the summer of 2020, I managed to finish my python program in the beginning of my sophomore year, or around November 2020, featuring around 4000 lines of code. My code was still terrible, as evident by the fact that all 4000 lines were written on a single file.
 </span>
 <span>
     <div class="major-category" id="web-development">Web development</div>
