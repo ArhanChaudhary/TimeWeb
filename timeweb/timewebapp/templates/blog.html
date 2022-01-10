@@ -27,38 +27,40 @@
 </span>
 <span>
     <div class="major-category" id="ideation">Ideation</div>
-    My journey creating TimeWeb began on October, 2019. I was an 8th grade student at middle school in Fremont, California. In my science class, my teacher played a <a href="https://www.youtube.com/watch?v=arj7oStGLkU">motivational video</a> about procrastination. I had seen the video before, in fact. It featured a simple graph of daily work to complete over time for an assignment. Though I found it entertaining, I didn't think much of it. However, after rewatching the video in class, I had an idea: what if you could code a similar graph system for your own work?
+    My journey creating TimeWeb began on October, 2019. I was an 8th grade student at middle school in Fremont, California. In my science class, my teacher played a <a href="https://www.youtube.com/watch?v=arj7oStGLkU">motivational Ted Talk</a> about procrastination. I had seen the video before, in fact. It featured a simple graph of daily work to complete over time for an assignment. Though I found it entertaining, I didn't think much of it. However, after rewatching the video in class, I had an idea: what if you could code a similar graph system for your own work?
 </span>
 <span>
     <div class="major-category" id="humble-beginnings">Humble beginnings</div>
     Although I barely knew anything about computers and had a very basic prior understanding of programming, I spent a Friday night learning how to use pygame, a python-based graphical library, not knowing anything else to use. I managed to finish the <a href="https://replit.com/@arhan6/FruitfulAgileCharmap#main.py">first ever prototype</a> of my command line program. Not knowing basic code organization practices, my code back then was unbelievably bad, almost impressively bad. A short snippet of some original code to further illustrate what I mean:
     <code>
-            else:
-                nodis = True
-                isfin = "? Whoops! You have not Entered in your Work completed! Enter it in now."
-                bli.append([4,todo*ct,ffiles.index(file)])
-            li.append(str(file).ljust(len(max(ffiles,key=len))+2)+isfin)
-        bli = sorted(bli,reverse=True)
-        for i in bli:
-            nffiles.append(ffiles[i[-1]])
-            ndat.append(dat[i[-1]])
-            dli.append((str(bli.index(i)+1)+")").ljust(len(str(len(ffiles)))+2)+li[i[-1]])
-        ffiles = nffiles[:]
-        if dat != ndat:
-            dat = ndat[:]
-            dump()
-        if nodis == True:
+    else:
+        nodis = True
+        isfin = "? Whoops! You have not Entered in your Work completed! Enter it in now."
+        bli.append([4,todo*ct,ffiles.index(file)])
+    li.append(str(file).ljust(len(max(ffiles,key=len))+2)+isfin)
+bli = sorted(bli,reverse=True)
+for i in bli:
+    nffiles.append(ffiles[i[-1]])
+    ndat.append(dat[i[-1]])
+    dli.append((str(bli.index(i)+1)+")").ljust(len(str(len(ffiles)))+2)+li[i[-1]])
+ffiles = nffiles[:]
+if dat != ndat:
+    dat = ndat[:]
+    dump()
+if nodis == True:
     </code>
     
-    Despite this, I was still determined to finish building a minimum viable product. After taking a hiatus during the summer of 2020, I managed to finish my python program around November 2020. My code was still terrible, as evident by the fact that 4000 lines of code were written on a single file.
+    Despite this, I was still determined to finish building a minimum viable product. After taking a hiatus during the summer of 2020, I managed to finish my python program around the November of that year. My code was still terrible, as evident by the fact that 4000 lines of code were written on a single file.
 </span>
 <span>
     <div class="major-category" id="web-development">Web development</div>
-    I reached out to a close family friend about my project, and he was genuinely impressed. He recommended me to broaden my vision of my program to the web, specifically with the Django framework. Confident and determined, I went home and searched up how to use Django. It dawned upon me just how little I knew about web development. Some terms I googled include "Convert python to javascript" and "Upload program to Django". In distress, I asked my dad for help, so he sat down to help me set up a basic Django project. His main goal wasn't for me to learn Django, but rather to learn how to learn. For the next week, we went through the documentation and learned the basics of Django architecture. I had finally reached a comfortable level of knowledge to begin building a web application.
+    I reached out to a close family friend about my project, and he was genuinely impressed. He recommended me to broaden my vision of my program to the web, specifically with the Django framework. Confident and determined, I went home and searched up how to use Django. It dawned upon me just how little I knew about web development. Some terms I googled include "Convert python to javascript" and "Upload program to Django".
+    
+    In distress, I asked my dad for help, so he sat down to help me set up a basic Django project. His main goal wasn't for me to learn Django, but rather to learn how to learn. For the next week, we went through the documentation and learned the basics of Django architecture. I had finally reached a comfortable level of knowledge to begin building a web application.
 </span>
 <span>
     <div class="major-category" id="getting-the-hang-of-it">Getting the hang of it</div>
-    We also learned about the technologies required for a frontend. I naively continued to build my frontend without a framework. 
+    We also learned about the technologies required for a frontend. I naively continued to build my frontend without a framework, which is true to this day.
     throw out proportion of code
     git
     gcp
