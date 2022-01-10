@@ -5,14 +5,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     const TABLE_OF_CONTENTS_MAJOR_CATEGORY_TEMPLATE = $("#table-of-contents-major-category-template").html();
     const TABLE_OF_CONTENTS_MINOR_CATEGORY_TEMPLATE = $("#table-of-contents-minor-category-template").html();
-    // https://stackoverflow.com/questions/16302483/event-to-detect-when-positionsticky-is-triggered
-    const observer = new IntersectionObserver( 
-        ([e]) => {
-            $(".ignoreSticky").removeClass("ignoreSticky");
-            $(e.target).toggleClass('isSticky', e.intersectionRatio < 1).addClass('ignoreSticky');
-        },
-        {threshold: [1]}
-    );
 
     const number_major_categories = $(".major-category").length;
     $(".major-category").reverse().each(function() {
@@ -40,7 +32,13 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
         }
-        observer.observe($major_category[0]);
+    });
+
+    $("#doc-container").scroll(function() {
+        $(".major-category").each(function() {
+            $(this).toggleClass("isSticky", $(this).position().top === 0);
+        });
+        $(".major-category.isSticky").last().removeClass("isSticky");
     });
 
     $(".label-question").each(function() {

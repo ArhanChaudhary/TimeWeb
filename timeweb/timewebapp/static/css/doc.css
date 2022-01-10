@@ -145,10 +145,8 @@ a:visited {
     font-family: 'Roboto Slab';
     font-size: 40px;
     z-index: 1;
-    /* isSticky trick */
     position: sticky;
-    top: -1px;
-    padding-top: 1px;
+    top: 0;
 
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -165,7 +163,7 @@ a:visited {
     transform: scaleX(2);
     box-shadow: 0 0 9px -7px rgb(132, 132, 132);
 }
-.major-category.isSticky:not(.ignoreSticky)::before {
+.major-category.isSticky::before {
     box-shadow: none;
 }
 .major-category::after {
