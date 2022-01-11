@@ -359,6 +359,7 @@ a[href="settings"] {
     content: "[Description shortened]";
     opacity: var(--description-opacity);
     font-size: var(--description-font-size);
+    white-space: nowrap;
     margin-top: 1em;
     margin-bottom: 2px;
     max-width: var(--left-side-of-header-width);
