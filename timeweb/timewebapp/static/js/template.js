@@ -162,7 +162,7 @@ $(function() {
                 if (isMobile) {
                     $.alert({
                         title: "Please use Safari to install TimeWeb on your home screen.",
-                        content: "Once you're there, click the share icon on your screen (the up arrow in a square icon) and scroll to \"Add to Home Screen\".",
+                        content: "Once you're there, click the share icon on your screen (the up arrow in a square icon) and scroll to \"Add to Home Screen\". Ignore this if you already have TimeWeb installed.",
                     });
                 } else {
                     $.alert({
