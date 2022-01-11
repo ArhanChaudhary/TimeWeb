@@ -243,7 +243,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         # Automatically reflect rounding to multiples of 5 minutes
         if self.settings_model.def_funct_round_minute:
             for assignment in self.assignment_models:
-                if assignment.unit.lower() in ('minute', 'minutes') and assignment.funct_round != 5:
+                if assignment.unit and assignment.unit.lower() in ('minute', 'minutes') and assignment.funct_round != 5:
                     assignment.funct_round = 5
             TimewebModel.objects.bulk_update(self.assignment_models, ['funct_round'])
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
