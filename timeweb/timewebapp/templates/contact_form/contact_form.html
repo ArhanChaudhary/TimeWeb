@@ -5,10 +5,10 @@
     <script src="{% static 'js/contact.js' %}"></script>
 {% endblock %}
 
-{% block head_title %}Contact Us{% endblock %}
+{% block head_title %}Contact{% endblock %}
 
 {% block accounts_content %}
-    <h1>Contact Us</h1>
+    <h1>Contact</h1>
 
     <form method="POST" action="{% url 'contact_form' %}" class="contact_us">
         {% csrf_token %}

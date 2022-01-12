@@ -245,9 +245,9 @@ body {
     position: absolute;
 }
 #account-dropdown :hover {
-    background: rgb(73, 86, 98);
+    background: rgb(82,107,130);
 }
-#account-dropdown #div-seperator {
+.nav-hr {
     width: 100%;
     margin: 4px auto;
     height: 1px;
@@ -317,8 +317,9 @@ rect {
 #nav-items {
     overflow: auto;
     max-height: calc(100vh - 65px);
+    background: rgb(45,59,71);
 }
-#nav-items * {
+#nav-items :not(.nav-hr) {
     text-decoration: none;
     text-align: center;
     display: block;
@@ -327,9 +328,11 @@ rect {
     cursor: pointer;
     font-family: "Open Sans";
     font-size: 12.5px;
-    background: rgb(45,59,71);
 }
-#nav-items *:hover, #nav-items *:focus {
+#nav-items .nav-hr {
+    width: calc(100% - 10px);
+}
+#nav-items :hover, #nav-items :focus {
     background: rgb(82,107,130);
 }
 #nav-menu svg {
