@@ -6,10 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const TABLE_OF_CONTENTS_MAJOR_CATEGORY_TEMPLATE = $("#table-of-contents-major-category-template").html();
     const TABLE_OF_CONTENTS_MINOR_CATEGORY_TEMPLATE = $("#table-of-contents-minor-category-template").html();
 
-    const number_major_categories = $(".major-category").length;
     $(".major-category").reverse().each(function() {
         const $major_category = $(this);
-        $major_category.attr("number-major-categories", number_major_categories);
         const major_category_li = $(TABLE_OF_CONTENTS_MAJOR_CATEGORY_TEMPLATE);
         let minor_categories = $major_category.siblings("details");
 
