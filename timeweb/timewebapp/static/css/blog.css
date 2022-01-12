@@ -7,6 +7,11 @@
 #table-of-contents-container, #table-of-contents-container-label {
     width: 210px;
 }
+#category-table-of-contents-label {
+    text-align: revert;
+    padding-left: 15px;
+}
+
 /* Make sure to change user-guide.css and others if this media query is modified */
 @media screen and (max-width: 810px) {
     #table-of-contents-container {
