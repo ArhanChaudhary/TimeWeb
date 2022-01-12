@@ -151,7 +151,6 @@ code {
     top: 0;
 
     white-space: nowrap;
-    text-overflow: ellipsis;
 }
 .major-category::before {
     content: '';
@@ -174,6 +173,7 @@ code {
     padding-left: 20px;
     padding-right: 50px;
     margin-right: -50px;
+    margin-left: 20px;
     box-shadow: inset 5px 0px 3px -4px lightgrey;
     background-color: white;
     counter-increment: major-category-counter;
