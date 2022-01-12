@@ -1,7 +1,7 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.4.2/workbox-sw.js');
 
 workbox.routing.registerRoute(
-    /.*/,
+    ({ request }) => !(request.url === 'http://localhost:8000/' || request.url === "https://timeweb.io/"),
     new workbox.strategies.StaleWhileRevalidate({
         cacheName: 'twcache',
         plugins: [
