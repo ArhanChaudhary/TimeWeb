@@ -301,8 +301,15 @@ mathUtils = {
         return Math.round(number * factor) / factor;
     },
     daysBetweenTwoDates: function(larger_date, smaller_date, params={round: true}) {
-        const diff = (larger_date - smaller_date) / 86400000;
-        return params.round ? Math.round(diff) : diff; // Round for DST
+        if (params.round) {
+            const diff = (larger_date - smaller_date) / 86400000;
+            return Math.round(diff); // Round for DST too
+        } else {
+            const no_dst_date = new Date(larger_date.valueOf());
+            no_dst_date.setHours(no_dst_date.getHours() + (smaller_date.getTimezoneOffset() - larger_date.getTimezoneOffset()) / 60);
+            const diff = (no_dst_date - smaller_date) / 86400000;
+            return diff;
+        }
     },
     clamp: function(low, value, high) {
         return Math.min(Math.max(value, low), high)
