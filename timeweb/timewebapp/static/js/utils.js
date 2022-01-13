@@ -490,9 +490,10 @@ utils = {
             let tag_names = new Set();
             function tagAddClick(e) {
                 const $this = $(this);
+                const dom_assignment = $this.parents(".assignment");
                 // Close add tag box if "Add Tag" is clicked again
-                if (($(e.target).hasClass("tag-add") || $(e.target).parent(".tag-add").length) && $this.hasClass("open-tag-add-box")) {
-                    $this.removeClass("open-tag-add-box");
+                if (($(e.target).hasClass("tag-add") || $(e.target).parent(".tag-add").length) && dom_assignment.hasClass("open-tag-add-box")) {
+                    dom_assignment.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
                     return;
                 }
@@ -543,7 +544,7 @@ utils = {
                         // }
 
                         // Close box and add tags visually
-                        $this.removeClass("open-tag-add-box");
+                        dom_assignment.removeClass("open-tag-add-box");
                         transitionCloseTagBox($this);
                         for (let tag_name of tag_names) {
                             const tag = $(TAG_TEMPLATE);
@@ -594,8 +595,8 @@ utils = {
                     return;
                 }
                 // Tag add textbox was selected or tags were selected
-                if ($this.hasClass("open-tag-add-box")) return;
-                $this.addClass("open-tag-add-box");
+                if (dom_assignment.hasClass("open-tag-add-box")) return;
+                dom_assignment.addClass("open-tag-add-box");
                 $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
                 $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
@@ -688,6 +689,7 @@ utils = {
             }
             $(".tag-add").focusout(function() {
                 const $this = $(this);
+                const dom_assignment = $this.parents(".assignment");
                 setTimeout(function() {
                     // const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
 
@@ -695,7 +697,7 @@ utils = {
                     // I can't just do !$(e.target).is($this) because the tag modal may already be open without the user already previously clicking .tag-add to close it, and the transitionend event is needed in this case
                     // So, only return when the tag modal is closed by adding || $this.find(".tag-add-box").css("height") === 0
                     if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this) || parseFloat($this.find(".tag-add-box").css("height")) === 0) return;
-                    $this.removeClass("open-tag-add-box");
+                    dom_assignment.removeClass("open-tag-add-box");
                     transitionCloseTagBox($this);
                 }, 0);
             });

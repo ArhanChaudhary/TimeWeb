@@ -556,10 +556,10 @@ a[href="settings"] {
 .tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
 }
-.tag-add:hover, .tag-add.open-tag-add-box {
+.tag-add:hover, .assignment.open-tag-add-box .tag-add {
     width: 57px;
 }
-.tag-add:hover .tag-add-text, .tag-add.open-tag-add-box .tag-add-text {
+.tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
 }
 .tag-add-box {
@@ -577,7 +577,10 @@ a[href="settings"] {
     pointer-events: none;
     bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
 }
-.tag-add.open-tag-add-box .tag-add-box {
+.assignment.open-tag-add-box {
+    z-index: 1001;
+}
+.assignment.open-tag-add-box .tag-add-box {
     transform: translateX(-50%) translateX(6px) !important;
     opacity: 1;
     height: unset;

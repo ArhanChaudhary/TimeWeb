@@ -833,9 +833,6 @@ class Priority {
         const number_of_assignments = $(".assignment").length;
         $(".assignment-container").each(function(index) {
             const assignment_container = $(this);
-            // Fixes the tag add box going behind the below assignment on hover
-            const dom_assignment = assignment_container.children(".assignment");
-            dom_assignment.css("z-index", number_of_assignments - index);
             if (!that.params.first_sort) {
                 that.transitionSwap(assignment_container);
             }
