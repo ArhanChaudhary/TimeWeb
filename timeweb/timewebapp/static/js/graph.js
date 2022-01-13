@@ -799,7 +799,7 @@ class VisualAssignment extends Assignment {
             let not_applicable_message_description;
             if (!work_input_textbox.val()) {
                 not_applicable_message_title = "Enter a Value.";
-                not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"user-guide#standard-assignment-graph-controls\">user guide</a>) into the textbox to submit a work input."
+                not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"/user-guide#standard-assignment-graph-controls\">user guide</a>) into the textbox to submit a work input."
             } else if (last_work_input >= this.sa.y) {
                 not_applicable_message_title = "Already Finished.";
                 not_applicable_message_description = "You've already finished this assignment, so you can't enter any more work inputs.";

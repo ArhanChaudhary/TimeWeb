@@ -1113,7 +1113,7 @@ ajaxUtils = {
             content = "Refresh or try again.";
         } else if (response.status == 500) {
             title = "Internal server error.";
-            content = "Please <a href='contact'>contact us</a> if you see this, and try to provide context on how the issue happened.";
+            content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
         } else if (exception === 'timeout' || response.status == 502) {
             title = "Request timed out.";
             content = "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.";
@@ -1295,7 +1295,7 @@ if (!SETTINGS.seen_latest_changelog) {
     setTimeout(function() {
         const jconfirm = $.alert({
             title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version}`,
-            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"changelog\">changelog.</a>",
+            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog.</a>",
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;

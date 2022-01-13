@@ -198,7 +198,7 @@ class UsernameResetForm(forms.ModelForm):
 class LabeledLoginForm(LoginForm):
 
     error_messages = {
-        "account_inactive": _("This account is currently disabled, please <a href=\"contact\">contact us</a> for more information"),
+        "account_inactive": _("This account is currently disabled, please <a href=\"/contact\">contact us</a> for more information"),
         "email_password_mismatch": _(
             "Your e-mail address or password is incorrect"
         ),
