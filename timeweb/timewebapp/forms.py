@@ -242,6 +242,7 @@ class LabeledTwoPasswordForm(ResetPasswordKeyForm):
         self.label_suffix = ""
 
     def clean(self):
+        # Copied from below
         cleaned_data = super(PasswordVerificationMixin, self).clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
@@ -250,7 +251,6 @@ class LabeledTwoPasswordForm(ResetPasswordKeyForm):
         return cleaned_data
 
 class LabeledChangePasswordForm(ChangePasswordForm):
-    clean = LabeledTwoPasswordForm.clean
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -262,7 +262,13 @@ class LabeledChangePasswordForm(ChangePasswordForm):
     def clean(self, *args, **kwargs):
         if str(self.user) == settings.EXAMPLE_ACCOUNT_EMAIL:
             raise forms.ValidationError(_("You cannot modify the example account"))
-        super().clean(*args, **kwargs)
+        # Copied from above
+        cleaned_data = super(PasswordVerificationMixin, self).clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+        if (password1 and password2) and password1 != password2:
+            self.add_error("password2", _("Your passwords do not match"))
+        return cleaned_data
 
 class LabeledSignupForm(SignupForm):
     username = forms.CharField(
