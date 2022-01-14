@@ -426,6 +426,7 @@ class Priority {
             }
 
             let str_daysleft = "";
+            let long_str_daysleft = "";
             if (status_value === Priority.NOT_YET_ASSIGNED) {
                 if (today_minus_assignment_date === -1) {
                     str_daysleft = 'Assigned Tomorrow';
@@ -434,8 +435,10 @@ class Priority {
                 } else {
                     str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
                 }
+                long_str_daysleft = sa.sa.assignment_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
             } else if (Number.isFinite(sa.sa.x)) {
                 due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                const due_date = new Date((sa.sa.assignment_date).valueOf());
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
                 } else if (due_date_minus_today === -1) {
@@ -445,12 +448,12 @@ class Priority {
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
                 } else if (due_date_minus_today < 7) {
-                    const due_date = new Date((sa.sa.assignment_date).valueOf());
                     due_date.setDate(due_date.getDate() + sa.sa.x);
                     str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {
                     str_daysleft = due_date_minus_today + "d";
                 }
+                long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
             }
             // Can't just define this once because len_works changes
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
@@ -517,6 +520,7 @@ class Priority {
             }
             dom_status_message.html(status_message);
             dom_title.attr("data-daysleft", str_daysleft);
+            dom_title.attr("data-long-daysleft", long_str_daysleft);
             // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.html((display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '') + (DEBUG === "True" ? ` ID: ${sa.sa.id}` : ""));

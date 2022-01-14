@@ -880,6 +880,13 @@ utils = {
             const relative_positioning_wrapper = $assignment.find(".relative-positioning-wrapper");
             relative_positioning_wrapper.toggleClass("display-truncate-warning", relative_positioning_wrapper.find(".description").hasOverflown());
         },
+        displayFullDueDateOnHover: function() {
+            $(".title").on("mouseover mousemove", function(e) {
+                $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
+            }).on("mouseout", function() {
+                $(this).removeClass("show-long-daysleft");
+            });
+        },
         setAssignmentScaleUtils: function() {
             // width * percentx = width+10
             // percentx = 1 + 10/width
@@ -1441,6 +1448,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.dimAssignmentsHeaderInfoOnIconHover();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
+    utils.ui.displayFullDueDateOnHover();
     utils.ui.setAssignmentScaleUtils();
     utils.ui.setAnimationSpeed();
     utils.ui.saveAndLoadStates();
