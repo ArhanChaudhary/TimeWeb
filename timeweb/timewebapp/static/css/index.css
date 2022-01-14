@@ -128,7 +128,7 @@ header.animate::after {
 #next-day {
     order: 4;
 }
-a[href="settings"] {
+a[href="/settings"] {
     order: 5;
 }
 #assignments-header #icon-label-container img ~ div {
@@ -144,17 +144,17 @@ a[href="settings"] {
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#previous-day:hover ~ div#previous-day-icon-label,
 #assignments-header img#next-day:hover ~ div#next-day-icon-label,
-#assignments-header a[href="settings"]:hover ~ div#settings-icon-label,
+#assignments-header a[href="/settings"]:hover ~ div#settings-icon-label,
 #assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
 #assignments-header img#previous-day:focus ~ div#previous-day-icon-label,
 #assignments-header img#next-day:focus ~ div#next-day-icon-label,
-#assignments-header a[href="settings"]:focus ~ div#settings-icon-label {
+#assignments-header a[href="/settings"]:focus ~ div#settings-icon-label {
     display: block;
 }
 #assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
 #assignments-header img#previous-day:hover ~ div:not(#previous-day-icon-label),
 #assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
-#assignments-header a[href="settings"]:hover ~ div:not(#settings-icon-label) {
+#assignments-header a[href="/settings"]:hover ~ div:not(#settings-icon-label) {
     display: none !important;
 }
 .assignment-container {
