@@ -304,6 +304,6 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 DEFAULT_FROM_EMAIL = 'TimeWeb E-mail Service <arhanc.cs@gmail.com>'
 EMAIL_HOST_USER = 'arhanc.cs@gmail.com'
 MANAGERS = [('Arhan', 'arhan.ch@gmail.com')]
-EMAIL_HOST_PASSWORD = os.environ['GMAILPASSWORD']
+EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
 
 EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
