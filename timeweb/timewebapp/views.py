@@ -23,7 +23,7 @@ import pytz
 from django.utils import timezone
 from .models import TimewebModel, SettingsModel
 from .forms import TimewebForm, SettingsForm, UsernameResetForm
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, logout, login
 from django.forms.models import model_to_dict
 from django.forms import ValidationError
 
@@ -142,7 +142,6 @@ class TimewebGenericView(View):
         return self.render_with_dynamic_context(request, self.template_name, self.context)
 
     def render_with_dynamic_context(self, request, file, context):
-
         if not hasattr(self, "settings_model"):
             if not request.user.is_authenticated:
                 return render(request, file, context)
@@ -964,6 +963,15 @@ class ChangelogView(TimewebGenericView):
     def get(self, request):
         self.context['changelogs'] = CHANGELOGS
         return super().get(request)
+
+class ExampleAccountView(TimewebView):
+    template_name = "index.html"
+
+    def get(self, request):
+        logout(request)
+        login(request, User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL), 'allauth.account.auth_backends.AuthenticationBackend')
+        return super().get(request)
+
 
 class RickView(TimewebGenericView):
     def get(self, request, _):
