@@ -908,7 +908,7 @@ class BlogView(TimewebGenericView):
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
-    @method_decorator(ratelimit(key='user_or_ip', rate='1/15m', method='POST'))
+    @method_decorator(ratelimit(key='ip', rate='1/15m', method='POST'))
     def post(self, request):
         was_ratelimited = getattr(request, 'limited', False)
         if was_ratelimited:
