@@ -881,8 +881,9 @@ utils = {
             relative_positioning_wrapper.toggleClass("display-truncate-warning", relative_positioning_wrapper.find(".description").hasOverflown());
         },
         displayFullDueDateOnHover: function() {
-            $(".title").on("mouseover mousemove", function(e) {
+            $(".title").on("mouseover mousemove click", function(e) {
                 $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
+                return false;
             }).on("mouseout", function() {
                 $(this).removeClass("show-long-daysleft");
             });
