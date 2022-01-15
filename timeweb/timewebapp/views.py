@@ -967,6 +967,9 @@ class ChangelogView(TimewebGenericView):
 class ExampleAccountView(TimewebView):
     template_name = "index.html"
 
+    def dispatch(self, *args, **kwargs):
+        return super(TimewebGenericView, self).dispatch(*args, **kwargs)
+
     def get(self, request):
         logout(request)
         login(request, User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL), 'allauth.account.auth_backends.AuthenticationBackend')
