@@ -35,14 +35,14 @@ class Priority {
         return utils.formatting.hsvToRGB(h, s, v);
     }
     // Handles coloring and animating assignments that were just created or edited
-    colorOrAnimateInAssignment(dom_assignment) {
+    colorOrAnimateInAssignment(params) {
         const that = this;
-        if ($("#animate-in").length && that.is_element_submitted) {
+        if ($("#animate-in").length && params.is_element_submitted) {
             // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
 
             // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
-            dom_assignment.parents(".assignment-container").animate({
+            params.dom_assignment.parents(".assignment-container").animate({
                 top: "0",
                 opacity: "1",
                 marginBottom: "0",
@@ -50,11 +50,11 @@ class Priority {
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
         if (SETTINGS.color_priority) {
-            if (that.params.first_sort) {
-                dom_assignment.addClass("transition-instantly");
+            if (params.first_sort) {
+                params.dom_assignment.addClass("transition-instantly");
             }
-            const background_color = that.percentageToColor(that.priority_percentage);
-            dom_assignment.parents(".assignment-container").toggleClass("invert-text-color",
+            const background_color = that.percentageToColor(params.priority_percentage);
+            params.dom_assignment.parents(".assignment-container").toggleClass("invert-text-color",
                 // https://awik.io/determine-color-bright-dark-using-javascript/
                 Math.sqrt(
                     0.299 * (background_color.r * background_color.r) +
@@ -73,11 +73,11 @@ class Priority {
             // background_color.v *= a;
             // background_color = utils.formatting.hsvToRGB(background_color.h, background_color.s, background_color.v);
 
-            dom_assignment.css("background-color", `rgb(${background_color.r},${background_color.g},${background_color.b})`);
-            dom_assignment.toggleClass("mark-as-done", that.mark_as_done);
-            if (that.params.first_sort) {
-                dom_assignment[0].offsetHeight;
-                dom_assignment.removeClass("transition-instantly");
+            params.dom_assignment.css("background-color", `rgb(${background_color.r},${background_color.g},${background_color.b})`);
+            params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
+            if (params.first_sort) {
+                params.dom_assignment[0].offsetHeight;
+                params.dom_assignment.removeClass("transition-instantly");
             }
         }
     }
@@ -644,7 +644,7 @@ class Priority {
         }
         return priority_percentage;
     }
-    addAssignmentShortcut(dom_assignment) {
+    addAssignmentShortcut(dom_assignment, priority_data) {
         const that = this;
         // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
         // Uses the same below logic for delete starred assignments and autoill work done
@@ -655,12 +655,12 @@ class Priority {
         // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
         const sa = utils.loadAssignmentData(dom_assignment);
 
-        const ignore_tag_status_value = Math.round(that.priority_data.status_value);
+        const ignore_tag_status_value = Math.round(priority_data.status_value);
 
         if (!["Not Important", "Important"].includes(sa.tags[0]))
             var current_tag = sa.tags[0];
         if (sa.is_google_classroom_assignment && sa.needs_more_info && !dom_assignment.parents(".assignment-container").hasClass("finished") && current_tag) {
-            const assignment_container = that.dom_assignment.parents(".assignment-container");
+            const assignment_container = dom_assignment.parents(".assignment-container");
             assignment_container.addClass("add-line-wrapper");
             if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                 if (that.prev_assignment_container) that.prev_assignment_container.addClass("last-add-line-wrapper");
@@ -749,30 +749,22 @@ class Priority {
         $(".delete-gc-assignments-from-class").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
-            that.priority_data = priority_data;
-            const ignore_tag_status_value = Math.round(that.priority_data.status_value);
-
-            const mark_as_done = that.priority_data.mark_as_done;
-            that.mark_as_done = mark_as_done;
-
-            const dom_assignment = $(".assignment").eq(that.priority_data.index); // Need to define this so the resolved promise can access it
-            that.dom_assignment = dom_assignment;
+            const ignore_tag_status_value = Math.round(priority_data.status_value);
+            const dom_assignment = $(".assignment").eq(priority_data.index);
+            const assignment_container = dom_assignment.parents(".assignment-container");
 
             if (!first_available_tutorial_assignment_fallback) {
                 first_available_tutorial_assignment_fallback = dom_assignment;
             }
 
-            const assignment_container = that.dom_assignment.parents(".assignment-container");            
+            let priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
+            const add_priority_percentage = SETTINGS.text_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done;
+            const dom_title = $(".title").eq(priority_data.index);
+            dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
-            let priority_percentage = that.priorityDataToPriorityPercentage(that.priority_data);
-            that.priority_percentage = priority_percentage;
-            const add_priority_percentage = SETTINGS.text_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !that.mark_as_done;
-            const dom_title = $(".title").eq(that.priority_data.index);
-            dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${that.priority_percentage}%` : "");
-
-            const first_sort = that.params.first_sort;
+            const first_sort = that.params.first_sort; // Needs to be set as a closure for the resolved promise
             new Promise(function(resolve) {
-                if (that.params.first_sort) {
+                if (first_sort) {
                     $(window).one("load", resolve);
                 } else {
                     resolve();
@@ -780,7 +772,7 @@ class Priority {
             }).then(function() {
                 that.positionTags(dom_assignment);
             });
-            if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
+            if (first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
@@ -803,17 +795,24 @@ class Priority {
                         utils.scroll(resolve);
                     });
                 }).then(function() {
-                    that.is_element_submitted = true;
-                    that.priority_percentage = priority_percentage;
-                    that.params.first_sort = first_sort;
-                    that.mark_as_done = mark_as_done;
-                    that.colorOrAnimateInAssignment(dom_assignment);
+                    that.colorOrAnimateInAssignment({
+                        dom_assignment,
+                        mark_as_done: priority_data.mark_as_done,
+                        is_element_submitted: true,
+                        priority_percentage,
+                        first_sort
+                    });
                 });
             } else {
-                that.is_element_submitted = false;
-                that.colorOrAnimateInAssignment(dom_assignment);
+                that.colorOrAnimateInAssignment({
+                    dom_assignment,
+                    mark_as_done: priority_data.mark_as_done,
+                    is_element_submitted: true,
+                    priority_percentage,
+                    first_sort
+                });
             }
-            that.addAssignmentShortcut(that.dom_assignment);
+            that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
                 first_available_tutorial_assignment = dom_assignment;
             }
@@ -828,19 +827,17 @@ class Priority {
         }
         utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
-        if (!that.params.first_sort) {
+        if (!that.params.first_sort)
             $(".assignment-container").each(function() {
                 that.setInitialAssignmentTopOffset($(this));
             });
-        }
         that.domSortAssignments(that.priority_data_list);
-        const number_of_assignments = $(".assignment").length;
-        $(".assignment-container").each(function(index) {
-            const assignment_container = $(this);
-            if (!that.params.first_sort) {
+
+        if (!that.params.first_sort)
+            $(".assignment-container").each(function() {
+                const assignment_container = $(this);
                 that.transitionSwap(assignment_container);
-            }
-        });
+            });
 
         // Make sure this is set after assignments are sorted and swapped
         if (that.params.first_sort && $("#animate-in").length) {
