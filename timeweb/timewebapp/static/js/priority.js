@@ -4,7 +4,7 @@ class Priority {
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
     static SORT_TIMEOUT_DURATION = 35;
     static DARK_MODE_ALPHA = 0.6;
-    static ANIMATE_IN_START_MARGIN = 20; // Moves animate in a bit below the last assignment to give it more breathing room
+    static ANIMATE_IN_START_MARGIN = 100; // Moves #animate-in a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 7500;
     
     static INCOMPLETE_WORKS = 10;
@@ -297,7 +297,7 @@ class Priority {
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
             } else if (not_yet_assigned) {
-                status_message = 'This Assignment hasn\'t yet been Assigned';
+                status_message = 'This Assignment hasn\'t Yet been Assigned';
                 status_value = Priority.NOT_YET_ASSIGNED;
             } else {
                 if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
@@ -858,7 +858,7 @@ class Priority {
             document.fonts.ready.then(function() {
                 $("#animate-in").css({
                     position: "",
-                    top: $("#assignments-container").offset().top + $("#assignments-container").height() - $("#animate-in").offset().top + Priority.ANIMATE_IN_START_MARGIN,
+                    top: $("#assignments-container").offset().top + $("#assignments-container").outerHeight() - $("#animate-in").offset().top + Priority.ANIMATE_IN_START_MARGIN,
                     marginBottom: -$("#animate-in").outerHeight(),
                 });
             });
