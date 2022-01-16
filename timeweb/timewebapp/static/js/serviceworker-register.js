@@ -5,7 +5,6 @@ if ('serviceWorker' in navigator) {
             scope: '/'
         }).then(function (registration) {
             if (!window.SETTINGS.seen_latest_changelog) {
-                debugger;
                 registration.unregister();
             }
         }, function (err) {
