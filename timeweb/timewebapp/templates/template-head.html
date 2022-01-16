@@ -32,13 +32,15 @@
             notify_date_changed = {% if notify_date_changed %}true{% else %}false{% endif %};
 
             document.addEventListener("securitypolicyviolation", function() {
-                for (let registration of registrations) {
-                    registration.unregister();
-                }
-                // Prevent infinite reloading loop in case the above doesn't work to allow the user to close the tab
-                setTimeout(function() {
-                    window.location.reload();
-                }, 1500);
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
+                    // Prevent infinite reloading loop in case the above doesn't work to allow the user to close the tab
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1500);
+                });
             });
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
