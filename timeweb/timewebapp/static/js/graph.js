@@ -968,16 +968,14 @@ class VisualAssignment extends Assignment {
                 priority.sort();
                 this.draw();
             } else if (this.draw_mouse_point) {
-                if (!isMobile) {
-                    // Runs if (!set_skew_ratio_using_graph && draw_mouse_point) and not on mobile
-                    // Disable draw point
-                    this.graph.off("mousemove");
-                    this.draw_mouse_point = false;
-                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                    hover_point_label.addClass("hide-label");
-                    delete this.last_mouse_x;
-                    this.draw();
-                }
+                // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
+                // Disable draw point
+                this.graph.off("mousemove");
+                this.draw_mouse_point = false;
+                const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                hover_point_label.addClass("hide-label");
+                delete this.last_mouse_x;
+                this.draw();
             } else {
                 // Runs if (!set_skew_ratio_using_graph && !draw_mouse_point)
                 // Enable draw point

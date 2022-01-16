@@ -14,6 +14,7 @@ window.mobileAndTabletCheck = function() {
     return false;
 };
 isMobile = mobileAndTabletCheck();
+isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
 // Use "document.addEventListener("DOMContentLoaded", function() {" instead of "$(function() {" because "$(function() {" runs after first paint, messing up the initial transition
 document.addEventListener("DOMContentLoaded", function() {
     CREDITS_TEMPLATE = $("#credits-template").html();
