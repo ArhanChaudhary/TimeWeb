@@ -31,7 +31,7 @@
             editing_example_account = {% if editing_example_account %}true{% else %}false{% endif %};
             notify_date_changed = {% if notify_date_changed %}true{% else %}false{% endif %};
 
-            document.addEventListener("securitypolicyviolation", function() {
+            {% comment %} document.addEventListener("securitypolicyviolation", function() {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
                         registration.unregister();
@@ -41,7 +41,7 @@
                         window.location.reload();
                     }, 1500);
                 });
-            });
+            }); {% endcomment %}
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
         {% progressive_web_app_meta %}
