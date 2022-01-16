@@ -22,13 +22,24 @@
             ACCOUNT_EMAIL = "{{ user.get_username }}";
             EXAMPLE_ACCOUNT_EMAIL = "{{ EXAMPLE_ACCOUNT_EMAIL }}";
             EXAMPLE_ASSIGNMENT_NAME = "{{ EXAMPLE_ASSIGNMENT_NAME }}";
-            {% comment %} make these dont crash in case these arent passed into context {% endcomment %}
-            MAX_NUMBER_OF_TAGS = +"{{ MAX_NUMBER_OF_TAGS }}";
+            {% if MAX_NUMBER_OF_TAGS %}
+            MAX_NUMBER_OF_TAGS = {{ MAX_NUMBER_OF_TAGS }};
+            {% endif%}
 
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
             gc_api_init_failed = {% if gc_api_init_failed %}true{% else %}false{% endif %};
             editing_example_account = {% if editing_example_account %}true{% else %}false{% endif %};
             notify_date_changed = {% if notify_date_changed %}true{% else %}false{% endif %};
+
+            document.addEventListener("securitypolicyviolation", function() {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+                // Prevent infinite reloading loop in case the above doesn't work to allow the user to close the tab
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1500);
+            });
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
         {% progressive_web_app_meta %}
