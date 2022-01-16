@@ -97,6 +97,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
     'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
+    'timewebapp.middleware.AddSiteID.AddSiteID',
 ]
 CSRF_FAILURE_VIEW = 'timewebapp.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
@@ -116,8 +117,6 @@ TEMPLATES = [
         },
     },
 ]
-
-SITE_ID = 9
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
