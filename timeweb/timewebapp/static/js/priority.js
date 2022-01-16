@@ -438,7 +438,8 @@ class Priority {
                 long_str_daysleft = sa.sa.assignment_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
             } else if (Number.isFinite(sa.sa.x)) {
                 due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                const due_date = new Date((sa.sa.assignment_date).valueOf());
+                const due_date = new Date(sa.sa.assignment_date.valueOf());
+                due_date.setDate(due_date.getDate() + sa.sa.x);
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
                 } else if (due_date_minus_today === -1) {
@@ -448,12 +449,15 @@ class Priority {
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
                 } else if (due_date_minus_today < 7) {
-                    due_date.setDate(due_date.getDate() + sa.sa.x);
                     str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {
                     str_daysleft = due_date_minus_today + "d";
                 }
-                long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
+                if (complete_date_now.getFullYear() === due_date.getFullYear()) {
+                    long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
+                } else {
+                    long_str_daysleft = due_date.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'});
+                }
             }
             // Can't just define this once because len_works changes
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
