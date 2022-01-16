@@ -1296,7 +1296,7 @@ ajaxUtils = {
 if ( window.history.replaceState ) {
     window.history.replaceState( null, null, window.location.href );
 }
-const SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
 SETTINGS.animation_speed = +SETTINGS.animation_speed;
 if (!SETTINGS.seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);

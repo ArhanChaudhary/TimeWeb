@@ -31,3 +31,7 @@ workbox.routing.registerRoute(
         ],
     }),
 );
+
+self.addEventListener('install', event => {
+    self.skipWaiting();
+});

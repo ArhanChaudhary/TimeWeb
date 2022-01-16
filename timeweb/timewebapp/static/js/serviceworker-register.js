@@ -4,11 +4,12 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/serviceworker.js', {
             scope: '/'
         }).then(function (registration) {
-            // Registration was successful
-            console.log(registration);
+            if (!window.SETTINGS.seen_latest_changelog) {
+                debugger;
+                registration.unregister();
+            }
         }, function (err) {
-            // registration failed :(
-            console.log(err);
+            
         });
     });
 }
