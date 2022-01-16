@@ -307,10 +307,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
+        self.user_model = User.objects.get(email=request.user.email)
         
         utc_now = timezone.now()
         local_now = self.utc_to_local(request, utc_now)
-        local_last_login = self.utc_to_local(request, User.objects.get(email=request.user.email).last_login)
+        local_last_login = self.utc_to_local(request, self.user_model.last_login)
         if local_last_login.day != local_now.day:
             # Only notify if the date has changed until 4 AM the next day after the last login
             if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
@@ -319,7 +320,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
             TimewebModel.objects.bulk_update(self.assignment_models, ['mark_as_done'])
-        self.user_model = User.objects.get(email=request.user.email)
         self.user_model.last_login = utc_now
         self.user_model.save()
         self.add_user_models_to_context(request)
@@ -403,14 +403,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # Convert this to a decimal object because it can be a float
             first_work = Decimal(str(self.sm.works))
             # Fill in foreignkey
-            self.sm.user = User.objects.get(email=request.user.email)
+            self.user_model = User.objects.get(email=request.user.email)
+            self.sm.user = self.user_model
         elif self.updated_assignment:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
                 return HttpResponseForbidden("The assignment you're trying to edit isn't yours")
-            if self.isExampleAccount and not editing_example_account:
-                return self.get(self.request)
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
 
@@ -613,6 +612,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         date_now = self.utc_to_local(request, timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        self.user_model = User.objects.get(email=request.user.email)
         service = build('classroom', 'v1', credentials=credentials)
 
         def add_gc_assignments_from_response(response_id, course_coursework, exception):
@@ -670,7 +670,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if blue_line_start < 0:
                     blue_line_start = 0
                 dynamic_start = blue_line_start
-                user = User.objects.get(email=request.user.email)
+                user = self.user_model
                 gc_models_to_create.append(TimewebModel(
                     name=name,
                     assignment_date=assignment_date,
