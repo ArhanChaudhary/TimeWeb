@@ -1214,7 +1214,7 @@ ajaxUtils = {
             if (authentication_url) {
                 $.alert({
                     title: "Invalid credentials",
-                    content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable your Google Classroom integration.",
+                    content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the Google Classroom integration.",
                     buttons: {
                         "Disable integration": {
                             action: function() {
@@ -1225,11 +1225,11 @@ ajaxUtils = {
                             action: function() {
                                 reloadWhenAppropriate({href: authentication_url});
                             }
-                        },
-                        onClose: function() {
-                            $("#toggle-gc-container").removeClass("open");
-                        },
-                    }
+                        },  
+                    },
+                    onClose: function() {
+                        $("#toggle-gc-container").removeClass("open");
+                    },
                 });
             } else {
                 reloadWhenAppropriate();
