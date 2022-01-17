@@ -166,6 +166,9 @@ code {
 .major-category.isSticky::before {
     box-shadow: none;
 }
+.written-on {
+    transform: translateX(-45px);
+}
 summary {
     cursor: pointer;
 }

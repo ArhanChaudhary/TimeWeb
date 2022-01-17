@@ -9,31 +9,36 @@
 
 {% block doc_content %}
 <span>
-    <div class="major-category" id="Introduction">Introduction</div>
-    Hey there! My name is Arhan Chaudhary, a junior at Mission San Jose High School at the time of writing, and I am the sole creator of TimeWeb! Before I start, I'd like to personally thank some of my close friends for providing genuine emotional support:
-    {% spaceless %}
-    <ul>
-        <li>Siddhant Kuwar</li>
-        <li>Ryan Guan</li>
-        <li>Krutang Thaker</li>
-        <li>Yash Killem</li>
-        <li>Rohan Bhagat</li>
-        <li>Ansh Bhatagnar</li>
-        <li>Vikram Srinivasan</li>
-        <li>Abhik Mullick</li>
-        <li>Aakarsh Jain</li>
-    </ul>
-    {% endspaceless %}
-    In this blog, I'll share some insight into my journey creating TimeWeb and everything I've experienced along the way.
-</span>
-<span>
-    <div class="major-category" id="ideation">Ideation</div>
-    My journey creating TimeWeb began on October, 2019. I was an 8th grade student at middle school. In my science class, my teacher played a <a href="https://www.youtube.com/watch?v=arj7oStGLkU">motivational Ted Talk</a> about procrastination. I had seen the video before, in fact. The beginning of the video featured a simple graph of daily work to complete over time for an assignment. Though I had found it entertaining, I didn't think much of it. However, after rewatching the video in class, I had an idea: what if you could code a similar graph system for your own work?
-</span>
-<span>
-    <div class="major-category" id="humble-beginnings">Humble beginnings</div>
-    Although I barely knew anything about computers and had a very basic prior understanding of programming, I spent a Friday night learning how to use pygame, a python-based graphical library, not knowing anything else to use. I managed to finish the <a href="https://replit.com/@arhan6/FruitfulAgileCharmap#main.py">first ever prototype</a> of my command line program. Not knowing basic code organization practices, my code back then was unbelievably bad, almost impressively bad. A short snippet of some original code to further illustrate what I mean:
-    <code>
+    <div class="major-category">TimeWeb's story</div><div class="written-on">Written on January 17, 2021</div>
+    <details open>
+        <summary class="minor-category" id="introduction">Introduction</summary>
+        Hey there! My name is Arhan Chaudhary, a junior at Mission San Jose High School at the time of writing, and I am the sole creator of TimeWeb! Before I start, I'd like to personally thank some of my close friends for providing genuine emotional support:
+
+        {% spaceless %}
+        <ul>
+            <li>Siddhant Kuwar</li>
+            <li>Ryan Guan</li>
+            <li>Krutang Thaker</li>
+            <li>Yash Killem</li>
+            <li>Rohan Bhagat</li>
+            <li>Ansh Bhatagnar</li>
+            <li>Vikram Srinivasan</li>
+            <li>Abhik Mullick</li>
+            <li>Aakarsh Jain</li>
+        </ul>
+        {% endspaceless %}
+        In this blog, I'll share some insight into my journey creating TimeWeb and everything I've experienced along the way.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="ideation">Ideation</summary>
+        My journey creating TimeWeb began on October, 2019. I was an 8th grade student at middle school. In my science class, my teacher played a <a href="https://www.youtube.com/watch?v=arj7oStGLkU">motivational Ted Talk</a> about procrastination. I had seen the video before, in fact. The beginning of the video featured a simple graph of daily work to complete over time for an assignment. Though I had found it entertaining, I didn't think much of it. However, after rewatching the video in class, I had an idea: what if you could code a similar graph system for your own work?
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="humble-beginnings">Humble beginnings</summary>
+        Although I barely knew anything about computers and had a very basic prior understanding of programming, I spent a Friday night learning how to use pygame, a python-based graphical library, not knowing anything else to use. I managed to finish the <a href="https://replit.com/@arhan6/FruitfulAgileCharmap#main.py">first ever prototype</a> of my command line program. Not knowing basic code organization practices, my code back then was unbelievably bad, almost impressively bad. A short snippet of some original code to further illustrate what I mean:
+        <code>
     else:
         nodis = True
         isfin = "? Whoops! You have not Entered in your Work completed! Enter it in now."
@@ -49,40 +54,47 @@ if dat != ndat:
     dat = ndat[:]
     dump()
 if nodis == True:
-    </code>
-    
-    Despite this, I was still determined to finish building a minimum viable product. After taking a hiatus during the summer of 2020, I managed to finish my python program on the November of that year. My code was still terrible, as evident by the fact that 4,000 lines of code were written on a single file.
-</span>
-<span>
-    <div class="major-category" id="web-development">Web development</div>
-    I reached out to a close family friend about my project, and he was genuinely impressed. He recommended me to broaden my vision of my program to the web, specifically with the Django framework. Confident and determined, I went home and searched up how to use Django. It dawned upon me just how little I knew about web development. Some terms I googled include "Convert python to javascript" and "Upload program to Django".
-    
-    In distress, I asked my dad for help, so he sat down to help me set up a basic Django project. His main goal wasn't for me to learn Django, but rather to learn how to learn. We went through the documentation and learned the basics of Django architecture. By this point, I was referring to my creation as "time management" or "the program": it was clear I needed a name. I brainstormed dozens of possible names, none of which I liked. It was my dad after hours of thinking who recomended the name "TimeWeb". One week of mentoring later, I had finally reached a comfortable level of knowledge to begin building a web application.
-</span>
-<span>
-    <div class="major-category" id="getting-the-hang-of-it">Getting the hang of it</div>
-    Following my motivational first week of progress, I continued to code and design TimeWeb. For the next few months, I learned a vast number of technologies, some of which include javascript, css, git, google cloud platform, google cloud storages, and google classroom API. As TimeWeb grew and grew, I began to consider receiving help from other people. I was shy and scared of talking to strangers at the time, so I continued to work alone in my comfort zone. However, because of my limited perspective as the only developer, I struggled to decide how certain user interface features should be implemented.
-    
-    So, I created a <a href="https://discord.gg/fQgPXX5qpD">discord server</a>, a social media platform for communities to interact with each other. There, I invited my close friends so we could discuss about TimeWeb and how to improve it. Most importantly, it featured a place where my friends could vote on features. At the time of writing, my discord server now has over 130 members and over 100 user suggestions. The discord server has given me the opportunity I never would have had if I continued to work alone to meet incredible people with similar intests and respond to real criticisms.
-</span>
-<span>
-    <div class="major-category" id="beta-launch">Beta launch</div>
-    May 3, 2021: TimeWeb's beta release was officially launched to my entire school. I was eager and at the same time full of doubt and fear. Over the next week, I received roughly 500 unique page views and was contacted by over 20 potential beta testers, the majority of which only used TimeWeb for a few days. Only a select few decided to commit to using TimeWeb. Despite an underwhelming amount of users, I consider this launch to be a success. I had definitely received much more attention than expected. I was also able to get more comprehensive feedback now that real people were using TimeWeb instead of just myself. Little did I know, my successes would soon be short-lived. TimeWeb's beta launch would mark the peak of my development before a slow, debilitating decline.
-</span>
-<span>
-    <div class="major-category" id="facing-reality">Facing reality</div>
-    My high points of happiness and success were followed with shrouded low points of sadness and dejection. After TimeWeb's beta release, my parents' excitement had visibly diminished. Their vision of TimeWeb ended at its beta launch, while I wanted to keep going and release TimeWeb's soft launch. I was pressured and encouraged to move on to something else, leading to frequent arguments between us. Our disagreement on ideas to an increasing tension between my parents and I on the subject of TimeWeb, and I would continue my journey without their support. Many of my friends' excitement had also visibly diminished, and I would slowly receieve less and less support from them.
-    
-    Despite my best efforts during the summer of my sophomore year, I was unable to complete TimeWeb, shattering the optimism which had previously been so abundant. My original plan was to launch TimeWeb by the beginning of my junior year so I could focus more on my studies, but TimeWeb wasn't even close to launching by then. A combination of burnout, school, self-doubt, perfectionism, pressure from my parents and myself, and other personal struggles led to a collapse of my mental health in a period lasting from the end of summer through the beginning of my junior year. It felt like I had hit rock bottom.
-    
-    As time went on, I slowly began to repair my mental well-being and pull myself out of my depression. I didn't lose hope and persevered through struggles with school, relationships, and my own internal conflicts. I have since recovered from my  distressing ordeals and continue to remain optimisitic and happy.
-</span>
-<span>
-    <div class="major-category" id="looking-back">Looking back</div>
-    friends
-    soft launch
-    success or not, still
-    contributors, break out of social shell
-    hated development, but was good in the end, whether or not this will succeed
+        </code>
+        
+        Despite this, I was still determined to finish building a minimum viable product. After taking a hiatus during the summer of 2020, I managed to finish my python program on the November of that year. My code was still terrible, as evident by the fact that 4,000 lines of code were written on a single file.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="web-development">Web development</summary>
+        I reached out to a close family friend about my project, and he was genuinely impressed. He recommended me to broaden my vision of my program to the web, specifically with the Django framework. Confident and determined, I went home and searched up how to use Django. It dawned upon me just how little I knew about web development. Some terms I googled include "Convert python to javascript" and "Upload program to Django".
+        
+        In distress, I asked my dad for help, so he sat down to help me set up a basic Django project. His main goal wasn't for me to learn Django, but rather to learn how to learn. We went through the documentation and learned the basics of Django architecture. By this point, I was referring to my creation as "time management" or "the program": it was clear I needed a name. I brainstormed dozens of possible names, none of which I liked. It was my dad after hours of thinking who recomended the name "TimeWeb". One week of mentoring later, I had finally reached a comfortable level of knowledge to begin building a web application.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="getting-the-hang-of-it">Getting the hang of it</summary>
+        Following my motivational first week of progress, I continued to code and design TimeWeb. For the next few months, I learned a vast number of technologies, some of which include javascript, css, git, google cloud platform, google cloud storages, and google classroom API. As TimeWeb grew and grew, I began to consider receiving help from other people. I was shy and scared of talking to strangers at the time, so I continued to work alone in my comfort zone. However, because of my limited perspective as the only developer, I struggled to decide how certain user interface features should be implemented.
+        
+        So, I created a <a href="https://discord.gg/fQgPXX5qpD">discord server</a>, a social media platform for communities to interact with each other. There, I invited my close friends so we could discuss about TimeWeb and how to improve it. Most importantly, it featured a place where my friends could vote on features. At the time of writing, my discord server now has over 130 members and over 100 user suggestions. The discord server has given me the opportunity I never would have had if I continued to work alone to meet incredible people with similar intests and respond to real criticisms.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="beta-launch">Beta launch</summary>
+        May 3, 2021: TimeWeb's beta release was officially launched to my entire school. I was eager and at the same time full of doubt and fear. Over the next week, I received roughly 500 unique page views and was contacted by over 20 potential beta testers, the majority of which only used TimeWeb for a few days. Only a select few decided to commit to using TimeWeb. Despite an underwhelming amount of users, I consider this launch to be a success. I had definitely received much more attention than expected. I was also able to get more comprehensive feedback now that real people were using TimeWeb instead of just myself. Little did I know, my successes would soon be short-lived. TimeWeb's beta launch would mark the peak of my development before a slow, debilitating decline.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="facing-reality">Facing reality</summary>
+        My high points of happiness and success were followed with shrouded low points of sadness and dejection. After TimeWeb's beta release, my parents' excitement had visibly diminished. Their vision of TimeWeb ended at its beta launch, while I wanted to keep going and release TimeWeb's soft launch. I was pressured and encouraged to move on to something else, leading to frequent arguments between us. Our disagreement on ideas to an increasing tension between my parents and I on the subject of TimeWeb, and I would continue my journey without their support. Many of my friends' excitement had also visibly diminished, and I would slowly receieve less and less support from them.
+        
+        Despite my best efforts during the summer of my sophomore year, I was unable to complete TimeWeb, shattering the optimism which had previously been so abundant. My original plan was to launch TimeWeb by the beginning of my junior year so I could focus more on my studies, but TimeWeb wasn't even close to launching by then. A combination of burnout, school, self-doubt, perfectionism, pressure from my parents and myself, and other personal struggles led to a collapse of my mental health in a period lasting from the end of summer through the beginning of my junior year. It felt like I had hit rock bottom.
+        
+        As time went on, I slowly began to repair my mental well-being and pull myself out of my depression. I didn't lose hope and persevered through struggles with school, relationships, and my own internal conflicts. I have since recovered from my  distressing ordeals and continue to remain optimisitic and happy.
+
+    </details>
+    <details open>
+        <summary class="minor-category" id="looking-back">Looking back</summary>
+        friends
+        soft launch
+        success or not, still
+        contributors, break out of social shell
+        hated development, but was good in the end, whether or not this will succeed
+
+    </details>
 </span>
 {% endblock doc_content %}

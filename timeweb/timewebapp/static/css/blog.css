@@ -5,15 +5,11 @@
             margin-block-end: 1em;
 }
 #table-of-contents-container, #table-of-contents-container-label {
-    width: 210px;
-}
-#category-table-of-contents-label {
-    text-align: revert;
-    padding-left: 15px;
+    width: 260px;
 }
 
 /* Make sure to change user-guide.css and others if this media query is modified */
-@media screen and (max-width: 810px) {
+@media screen and (max-width: 860px) {
     #table-of-contents-container {
         position: absolute;
         z-index: 2;
