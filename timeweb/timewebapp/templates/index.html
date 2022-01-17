@@ -254,8 +254,8 @@
       </div>
     </div>
   </template>
-  <div id="toggle-gc-container"{% if creating_gc_assignments_from_frontend or gc_api_init_failed %} class="open{% if creating_gc_assignments_from_frontend %} enabled{% endif%}"{% endif %}>
-    <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% elif gc_api_init_failed %}Authentication failed. Please try again{% endif %}</span>
+  <div id="toggle-gc-container"{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %} class="open{% if creating_gc_assignments_from_frontend %} enabled{% endif%}"{% endif %}>
+    <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% elif GC_API_INIT_FAILED %}Authentication failed. Please try again{% endif %}</span>
     <img src="{% static 'images/gc-icon.png' %}" width="42" height="42">
   </div>
   {% endspaceless %}

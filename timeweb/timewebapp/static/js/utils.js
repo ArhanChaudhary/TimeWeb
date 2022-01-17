@@ -220,7 +220,7 @@ utils = {
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
-                $("#current-date-text").text(`${notify_date_changed ? "(The current date has changed) " : ""}Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+                $("#current-date-text").text(`${NOTIFY_DATE_CHANGED ? "(The current date has changed) " : ""}Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
                 $("#next-day, #previous-day").click(function() {
                     utils.in_simulation = true;
                     ajaxUtils.disable_ajax = true;
@@ -267,7 +267,7 @@ utils = {
             },
 
             googleClassroomAPI: function() {
-                if (!creating_gc_assignments_from_frontend && !gc_api_init_failed) {
+                if (!creating_gc_assignments_from_frontend && !GC_API_INIT_FAILED) {
                     if (SETTINGS.oauth_token.token) {
                         $("#toggle-gc-label").html("Disable Google Classroom integration");
                     } else {
@@ -1107,9 +1107,9 @@ utils = {
     SCHEDULED_TIMEOUT_DELAY: 5000,
 }
 
-isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || editing_example_account;
+isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
 ajaxUtils = {
-    disable_ajax: isExampleAccount && !editing_example_account, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
+    disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
         let title;
         let content;

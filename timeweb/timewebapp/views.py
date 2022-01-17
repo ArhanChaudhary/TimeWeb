@@ -70,7 +70,7 @@ else:
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
-editing_example_account = False
+EDITING_EXAMPLE_ACCOUNT = False
 
 EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
@@ -122,7 +122,7 @@ def get_default_context():
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
         "EXAMPLE_ASSIGNMENT_NAME": EXAMPLE_ASSIGNMENT_NAME,
         "MAX_NUMBER_OF_TAGS": MAX_NUMBER_OF_TAGS,
-        "editing_example_account": editing_example_account,
+        "EDITING_EXAMPLE_ACCOUNT": EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
     }
 
@@ -315,7 +315,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if local_last_login.day != local_now.day:
             # Only notify if the date has changed until 4 AM the next day after the last login
             if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
-                self.context['notify_date_changed'] = True
+                self.context['NOTIFY_DATE_CHANGED'] = True
             for assignment in self.assignment_models:
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
@@ -335,7 +335,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['just_updated_assignment_id'] = just_updated_assignment_id
         
         if request.GET.get("gc-api-init-failed") == "true":
-            self.context["gc_api_init_failed"] = True
+            self.context["GC_API_INIT_FAILED"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
 
@@ -344,7 +344,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
-        if self.isExampleAccount and not editing_example_account: return HttpResponse(status=204)
+        if self.isExampleAccount and not EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
 
         action = request.POST['action']
         if action == 'delete_assignment':
@@ -380,7 +380,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         # Parts of the form that can only validate in views
         form_is_valid = True
-        if self.isExampleAccount and not editing_example_account:
+        if self.isExampleAccount and not EDITING_EXAMPLE_ACCOUNT:
             self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
         elif self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
@@ -437,18 +437,18 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.needs_more_info = True
         else:
             date_now = self.utc_to_local(request, timezone.now())
-            if editing_example_account:
+            if EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
                 date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=pytz.utc))
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if self.created_assignment or self.sm.needs_more_info:
                 self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
-                if self.sm.blue_line_start < 0 or editing_example_account:
+                if self.sm.blue_line_start < 0 or EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
                 self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or editing_example_account:
+                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
                 removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
