@@ -4,7 +4,7 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/serviceworker.js', {
             scope: '/'
         }).then(function (registration) {
-            if (!window.SETTINGS.seen_latest_changelog) {
+            if (window.SETTINGS && !window.SETTINGS.seen_latest_changelog) {
                 registration.unregister();
             }
         }, function (err) {
