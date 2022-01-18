@@ -73,7 +73,6 @@ else:
 os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 EDITING_EXAMPLE_ACCOUNT = False
-
 EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_OF_TAGS = 5
@@ -991,3 +990,6 @@ class SpookyView(TimewebGenericView):
     
 class SusView(TimewebGenericView):
     template_name = "sus.html"
+
+class ChungusView(TimewebGenericView):
+    template_name = "chungus.html"
