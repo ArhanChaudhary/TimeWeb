@@ -1,0 +1,130 @@
+[
+    {
+       "version":"v1.6.0-beta (12/28/2021)",
+       "updates":"<ul>\n<li>Improved color scheme</li>\n<li>Improved curvature autotuning algorithm for deleting work inputs</li>\n<li>Reworked dynamic mode curvature autotuning algorithm to tend towards linear</li>\n<li>Added more keybinds</li>\n<li>Added \"Finish Assignment for Today\" button</li>\n<li>Added \"Assignment Sorting\" feature</li>\n<li>Added \"Animation Speed\" setting</li>\n<li>Added \"Enter Work inputs In-Place after Today\" setting</li>\n<li>Added \"Show \"Advanced Controls\" beneath the Graph\" setting</li>\n<li>Added \"Timezone\" setting</li>\n<li>Dozens of minor UI improvements</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed assignments with soft due dates displaying question marks</li>\n<li>Fixed the example assignment displaying a question mark</li>\n<li>Fixed curvature values not being saved properly</li>\n<li>Fixed the progress bar not displaying</li>\n<li>Fixed unexpected usage of keybinds</li>\n<li>Fixed visual roundoff errors</li>\n<li>Fixed dynamic mode inconsistencies</li>\n<li>Fixed assignments not sorting properly when their tags are modified</li>\n<li>Fixed soft due date false alarms</li>\n<li>Fixed \"delete assignments from class\" deleting outside assignments</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.5.2-beta (11/24/2021)",
+       "updates":"<ul>\n<li>Redesigned the assignment graph layout</li>\n<li>Renamed \"Skew Ratio\" to \"Curvature\"</li>\n<li>Added due times</li>\n<li>Added \"Close Graph After Submitting Work Input\" setting</li>\n<li>Added \"Allow Only one open Graph at a Time\" setting</li>\n<li>Added \"Default Due Time\" setting</li>\n<li>Added \"Restore Deleted Google Classroom\" option to the settings</li>\n<li>Removed being unable to open other assignments if other assignments are more urgent</li>\n<li>Finished adding all the keybinds</li>\n<li>Increased zoom on mobile</li>\n<li>Dozens of minor UI improvements</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed soft due date incompatibility with break days</li>\n<li>Fixed scrolling on Firefox not working</li>\n<li>Fixed assignments not being marked as no more working days</li>\n<li>Fixed default skew ratio not properly saving</li>\n<li>Fixed NaN curvature</li>\n<li>Fixed unbounded curvature</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.5.1-beta (11/7/2021)",
+       "updates":"<ul>\n<li>Added soft due dates</li>\n<li>Added \"since\" keyword to the work input</li>\n<li>Added changelog alert updates</li>\n<li>Added \"assignment spacing\" setting</li>\n<li>Improved priority algorithm</li>\n<li>Improved dynamic mode algorithm</li>\n<li>Improved example account</li>\n<li>Improved dark mode</li>\n<li>Increased work input validation flexibility</li>\n<li>Dozens of minor UI improvements</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed \"Next Assignment\" button sometimes not working</li>\n<li>Fixed rare Google Classroom API errors</li>\n<li>Fixed skew ratio not capping properly</li>\n<li>Fixed submitting duplicate assignment tags</li>\n<li>Fixed default minimum work time not showing up for Google Classroom assignments</li>\n<li>Fixed incorrect Google Classroom assignment creation validation</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.5.0-beta (10/12/2021)",
+       "updates":"<ul>\n<li>Major UI improvements</li>\n<li>Added the ability to enter assignment fields later</li>\n<li>Added more keybinds</li>\n<li>Added \"Important\" and \"Not Important\" tags</li>\n<li>Added \"Sort Assignments in Reverse\" setting</li>\n<li>Added \"Default Dropdown Tags\" setting</li>\n<li>Added \"Dark Mode\" setting</li>\n<li>Styled the settings</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed rare dynamic mode crashes and bugs</li>\n<li>Fixed Google Classroom API crashes and incorrect dates</li>\n<li>Fixed work inputs incorrectly readjusting on edit assignment</li>\n<li>Fixed \"ignore minimum work time\" inconsistencies</li>\n<li>Fixed incorrect original form values</li>\n<li>Fixed incorrect form validation errors</li>\n<li>Fixed ignoring assignments bugs</li>\n<li>Fixed midnight bugs</li>\n<li>Fixed many other less relevant bugs</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.4.4-beta (8/12/2021)",
+       "updates":"<ul>\n<li>Updated policies</li>\n<li>Improved \"ignore minimum work time ends\" functionality</li>\n<li>Improved \"dynamic mode\" functionality</li>\n<li>Removed default autofill</li>\n<li>Removed \"not yet assigned\" status icon</li>\n<li>Removed \"warning\" status icon</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed Google Classroom API sometimes not enabling</li>\n<li>Fixed alerts not showing up in the settings</li>\n<li>Fixed custom cursors not working</li>\n<li>Fixed \"set skew ratio using graph\" being unresponsive</li>\n<li>Fixed small left tag position paddings</li>\n<li>Fixed skew ratio arrow keys not holding</li>\n<li>Fixed assignments instantly completing</li>\n<li>Fixed assignment descriptions not resizing on re-enter</li>\n<li>Fixed hidden logo on mobile</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.4.3-beta (7/27/2021)",
+       "updates":"<ul>\n<li>Improved the assignment form UI</li>\n<li>Restyled alerts</li>\n<li>Improved delete assignment transition</li>\n<li>Added \"tag position\" setting</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed deleting tags from Google Classroom assignments crashing the page</li>\n<li>Fixed the example assignment not updating its dates</li>\n<li>Fixed long assignments crashing the page</li>\n<li>Fixed unexpected line wrappers</li>\n<li>Fixed early assignment dates not showing up on re-enter</li>\n<li>Fixed timezone issues</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.4.2-beta (7/19/2021)",
+       "updates":"<ul>\n<li>Improved Google Classroom API loading speeds</li>\n<li>Added \"delete assignments from class\" shortcut</li>\n<li>Added assignment descriptions</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed \"fixed mode\" crashing the graph</li>\n<li>Fixed being unable to edit the first assignment</li>\n<li>Fixed Safari issues</li>\n<li>Fixed double login</li>\n<li>Fixed adding wrong Google Classroom tags</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.4.1-beta (7/12/2021)",
+       "updates":"<ul>\n<li>Improved Google Classroom API loading speeds</li>\n<li>Clamped long assignment names</li>\n<li>Polished tabbing</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed incorrect \"default skew ratio\" values in settings</li>\n<li>Fixed \"enable tutorial\" not working in settings</li>\n<li>Fixed assignments having excess height</li>\n<li>Fixed cancelling setting the skew ratio using graph not working</li>\n<li>Fixed the red line rarely disconnecting with the blue line</li>\n<li>Fixed unexpected behavior with \"ignore minimum work time ends\"</li>\n<li>Fixed tags sometimes not deleting</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.4.0-beta (7/8/2021)",
+       "updates":"<ul>\n<li>Implemented Google Classroom API</li>\n<li>Replaced \"Advanced\" with icons</li>\n<li>Fixed timezone issues</li>\n<li>Improved loading speeds</li>\n</ul>"
+    },
+    {
+       "version":"v1.3.3-beta (7/1/2021)",
+       "updates":"<ul>\n<li>Made tags draggable to allow resorting</li>\n<li>Synced the example account's assignments' dates with today</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed \"show progress bar\" crashing the graph</li>\n<li>Fixed original field values not showing on edit assignment</li>\n<li>Fixed the assignment form forcing you to scroll up</li>\n<li>Fixed the assignment form sometimes not fully being on screen</li>\n<li>Fixed assignments sometimes not opening</li>\n<li>Fixed briefly being able to see unsorted assignments on reload</li>\n<li>Fixed background images resetting when the settings is saved</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.3.2-beta (6/28/2021)",
+       "updates":"<ul>\n<li>Made info buttons hoverable</li>\n<li>Changed assignment header button icons</li>\n<li>Improved the delete assignment transition</li>\n<li>Added shift + arrow key keybinds</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed the graph crashing for small window heights</li>\n<li>Fixed the existing up and down keybinds not changing the skew ratio</li>\n<li>Fixed assignments sometimes not opening</li>\n<li>Fixed assignments overlaying the tag add box</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.3.1-beta (6/26/2021)",
+       "updates":"<ul>\n<li>Completely rewrote a large portion of code</li>\n<li>Added shortcut line wrappers around their assignments</li>\n<li>Moved \"re-enable tutorial\" to the settings</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed marginless text</li>\n<li>Fixed scrolling past the assignment form overlay</li>\n<li>Fixed assignments obscuring the tag box</li>\n<li>Fixed assignments phasing into \"delete all starred assignments\"</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.3.0-beta (6/23/2021)",
+       "updates":"<ul>\n<li>Added assignment tags</li>\n</ul>"
+    },
+    {
+       "version":"v1.2.2-beta (6/16/2021)",
+       "updates":"<ul>\n<li>Added custom background images</li>\n<li>Removed delete assignment queue</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed sorting issues</li>\n<li>Fixed assignments sometimes becoming unclickable</li>\n<li>Fixed \"delete all starred assignments\" sometimes disappearing</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.2.1-beta (6/7/2021)",
+       "updates":"<ul>\n<li>Reworked the assignment sorting algorithm</li>\n<li>Removed \"in progress\"</li>\n<li>Added \"Hour\" as a unit of time</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed rarely displaying incorrect assignment dates</li>\n<li>Fixed \"(Invalid Date)\" shown as the estimated time to completion</li>\n<li>Fixed assignments with break days finishing too early</li>\n<li>Fixed \"delete finished assignments\" not doing anything</li>\n<li>Fixed \"re-enable tutorial\"</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.2.0-beta (5/29/2021)",
+       "updates":"<ul>\n<li>Slightly adjusted favicon</li>\n<li>Added full device support for favicons and PWAs</li>\n<li>Removed \"show info button\" setting</li>\n<li>Removed \"show past work inputs\" setting</li>\n<li>Added \"default unit of work to minute\" setting</li>\n<li>Added \"autofill work done\" shortcut</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed linear assignments not behaving linearly</li>\n<li>Fixed the graph rarely not completing an assignment at the due date</li>\n<li>Fixed shortcuts sometimes not showing up</li>\n</ul>\n<li>Removed Herobrine</li>\n</ul>"
+    },
+    {
+       "version":"v1.1.11-beta (5/22/2021)",
+       "updates":"<ul>\n<li>Added highest and lowest custom priority colors in the settings</li>\n<li>Added a reset button to the settings</li>\n<li>Added a shortcut to delete all starred assignments</li>\n<li>Added \"Autofill All Work Done\" to advanced</li>\n<li>Increased sort timeout</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed \"fin\" not working</li>\n<li>Fixed going to the next day bugging assignments in progress</li>\n<li>Fixed set skew ratio in graph rarely crashing</li>\n<li>Fixed linear assignments messing up the red line</li>\n<li>Fixed NaN priority</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.10-beta (5/20/2021)",
+       "updates":"<ul>\n<li>Implemented a system to ensure users fully complete their assignments, even if their due dates pass</li>\n<li>Removed skew ratio sort timeout</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed minimum work time rarely not working</li>\n<li>Fixed the graph being blank for assignments with a due date before today</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.9-beta (5/19/2021)",
+       "updates":"<ul>\n<li>Rewrote tutorial alert text</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed outline not showing on graph buttons</li>\n<li>Fixed invisible ghost assignments when deleting them too quickly</li>\n<li>Fixed info buttons sometimes being invisible</li>\n<li>Fixed incorrect priority values for assignments due tomorrow</li>\n<li>Fixed the example assignment sometimes crashing the page</li>\n<li>Fixed editing assignments unintentionally removing work inputs</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.8-beta (5/18/2021)",
+       "updates":"<ul>\n<li>Added a label for advanced buttons on the graph footer</li>\n<li>Rearranged graph footer buttons</li>\n<li>Changed \"Enter total units done\" to \"Enter units done\"</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed resorting after creating an assignment glitching out</li>\n<li>Fixed the example assignment initially being visible on first login</li>\n<li>Fixed displaying the wrong date after midnight</li>\n<li>Fixed assignments not being saved after the page is quickly closed</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.7-beta (5/17/2021)",
+       "updates":"<ul>\n<li>Added example account to login page</li>\n<li>Removed unnecessary graph text</li>\n<li>Completely refactored a lot of code</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed showing incorrect break days on edit assignment</li>\n<li>Fixed deleting all finished assignments only visually deleting them locally</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.6-beta (5/13/2021)",
+       "updates":"<ul>\n<li>Added status icon images</li>\n<li>Repositioned status icons</li>\n</ul>"
+    },
+    {
+       "version":"v1.1.5-beta (5/13/2021)",
+       "updates":"<ul>\n<li>Changed edit icon</li>\n<li>Changed delete icon</li>\n<li>Changed discord icon</li>\n<li>Minor bug fix</li>\n<ul>\n<li>Fixed resorting during another resort messing up the swapping algorithm</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.4-beta (5/12/2021)",
+       "updates":"<ul>\n<li>Enabling round to multiples of 5 minutes automatically changes every assignment appropriately</li>\n<li>Increased sort timeout to avoid assignments resorting too fast</li>\n<li>Automatically create an example assignment in the tutorial</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed an overflow error for longer due dates</li>\n<li>Fixed the graph disappearing after re-entering the due date</li>\n<li>Fixed work inputs not cutting off from a re-entered due date</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.3-beta (5/11/2021)",
+       "updates":"<ul>\n<li>Added \"Go to Next Day\" in advanced</li>\n<li>Added shift + click delete icon keybind to skip the prompt for deleting an assignment</li>\n<li>Minor bug fix</li>\n<ul>\n<li>Fixed assignments assigned after midnight causing unexpected behavior</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.2-beta (5/11/2021)",
+       "updates":"<ul>\n<li>Made assignments unclickable if an assignment without past work inputs or no working days is present to force users to resolve the issue</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed advanced controls and account dropdown initially being visible</li>\n<li>Fixed changing the break days for one assignment applying to every assignment</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.1-beta (5/10/2021)",
+       "updates":"<ul>\n<li>Marked all other assignments as completed when an assignment without past work inputs is present to urge users to enter their progress</li>\n<li>Marked all other assignments as completed when an assignment with no working days is present to urge users to re-enter its break days</li>\n<li>Lowered opacity for assignments marked as completed</li>\n<li>Improved Form UI</li>\n<li>Fixed edit assignment not doing anything</li>\n<li>Fixed internal errors</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed edit assignment causing form to disappear</li>\n<li>Fixed the displayed date on the graph unexpectedly changing</li>\n<li>Fixed scaling constants not updating on browser resize</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.1.0-beta (5/8/2021)",
+       "updates":"<ul>\n<li>Added \"mark assignment as completed\" button below the graph</li>\n<li>Improved Form UI</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed issue with assignments being marked as completed at midnight</li>\n<li>Fixed graph not updating after being autofilled from changing the skew ratio</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.0.3-beta (5/7/2021)",
+       "updates":"<ul>\n<li>Removed excessive caching</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed delete work input messing up the new start of the red line</li>\n<li>Fixed NaN priority</li>\n<li>Fixed assignments not saving if page is closed too fast</li>\n<li>Fixed incorrect login scroller image positioning on mobile</li>\n<li><a href=\"https://www.youtube.com/watch?v=oHg5SJYRHA0\">Rosho was here</a></li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.0.2-beta (5/6/2021)",
+       "updates":"<ul>\n<li>Allowed assignments to be open during swaps</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed dynamic mode sometimes not working</li>\n<li>Decreased swap duration</li>\n<li>Changed expired discord link on login screen</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.0.1-beta (5/3/2021)",
+       "updates":"<ul>\n<li>Updated scroller image</li>\n<li>Colored assignments without past work inputs white</li>\n<li>Minor bug fixes</li>\n<ul>\n<li>Fixed units to complete at a time not working when unit is minute</li>\n<li>Fixed new assignment animation not working on Firefox</li>\n<li>Fixed new assignments scrolling too far down</li>\n<li>Fixed assignments assigned in the future coloring pink</li>\n</ul>\n</ul>"
+    },
+    {
+       "version":"v1.0.0-beta (5/3/2021)",
+       "updates":"<ul>\n<li>Official beta release! :D</li>\n</ul>"
+    }
+ ]

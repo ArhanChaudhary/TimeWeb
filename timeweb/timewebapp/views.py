@@ -51,10 +51,12 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from logging import getLogger
 from os import environ as os_environ
 from django.conf import settings
-from .changelogs import CHANGELOGS
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 from django.contrib import messages
+
+with open("timewebapp/changelogs.json", "r") as f:
+    CHANGELOGS = json.load(f)
 
 User = get_user_model()
 
