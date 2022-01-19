@@ -43,6 +43,7 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('stackpile', views.StackpileView.as_view(), name='stackpile'),
     path('spooky', views.SpookyView.as_view(), name="spooky"),
     path('sus', views.SusView.as_view(), name="sus"),
+    path('mc.blogcraft.dev', lambda x: HttpResponse(status=418), name="bithub"),
     path('chungus', views.ChungusView.as_view(), name="chungus"),
     re_path(r"^(wp|wordpress)", views.RickView.as_view()),
 ]
