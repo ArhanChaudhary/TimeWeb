@@ -8,6 +8,7 @@ from timezone_field import TimeZoneField
 from decimal import Decimal
 import secrets
 import datetime
+import pathlib
 
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
@@ -80,7 +81,7 @@ def empty_dict():
 def get_midnight_time():
     return datetime.time(0, 0, 0)
 def create_image_path(instance, filename):
-    return f"backgrounds/{secrets.token_urlsafe(32)}"
+    return f"backgrounds/{secrets.token_urlsafe(32)}{pathlib.Path(filename).suffix}"
 
 class TimewebModel(models.Model):
     name = models.CharField(
