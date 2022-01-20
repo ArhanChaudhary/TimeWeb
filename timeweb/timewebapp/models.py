@@ -6,6 +6,7 @@ from django.conf import settings
 from colorfield.fields import ColorField
 from timezone_field import TimeZoneField
 from decimal import Decimal
+import secrets
 import datetime
 
 from django.contrib.auth.models import AbstractUser
@@ -79,7 +80,7 @@ def empty_dict():
 def get_midnight_time():
     return datetime.time(0, 0, 0)
 def create_image_path(instance, filename):
-    return f"backgrounds/{instance.user.id}/{filename}"
+    return f"backgrounds/{secrets.token_urlsafe(32)}"
 
 class TimewebModel(models.Model):
     name = models.CharField(

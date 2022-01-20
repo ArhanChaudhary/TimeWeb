@@ -50,8 +50,6 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
 if settings.DEBUG:
     from django.conf.urls.static import static
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
-    urlpatterns.append(path('media/images/<str:imageUser>/<str:imageName>', views.ImagesView.as_view(), name='images'))
 
 allauth_urls += [
     path('username/reset', views.UsernameResetView.as_view(), name='reset_username'),

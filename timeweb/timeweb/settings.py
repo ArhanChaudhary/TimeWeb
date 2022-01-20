@@ -207,7 +207,7 @@ else:
     GS_DEFAULT_ACL = None
     GS_QUERYSTRING_AUTH = False
     GS_STATIC_BUCKET_NAME = 'twstatic'
-    GS_MEDIA_BUCKET_NAME = 'timeweb-308201.appspot.com'
+    GS_MEDIA_BUCKET_NAME = 'twmedia'
 
     GS_PROJECT_ID = 'timeweb-308201'
     from google.oauth2 import service_account
