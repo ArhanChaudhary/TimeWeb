@@ -19,7 +19,6 @@ from django.dispatch import receiver
 
 # Model modules
 import datetime
-import pytz
 from django.utils import timezone
 from .models import TimewebModel, SettingsModel
 from .forms import TimewebForm, SettingsForm, UsernameResetForm
@@ -438,10 +437,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.needs_more_info = True
         else:
             date_now = self.utc_to_local(request, timezone.now())
+            date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
-                date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=pytz.utc))
-            date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+                date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
             if self.created_assignment or self.sm.needs_more_info:
                 self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
                 if self.sm.blue_line_start < 0 or EDITING_EXAMPLE_ACCOUNT:
@@ -517,7 +516,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
                 except OverflowError:
                     self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.utc)
+                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
                 if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                     x_num += 1
             else:
@@ -633,7 +632,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
                 except ValueError:
                     assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
-                assignment_date = self.utc_to_local(request, assignment_date.replace(tzinfo=pytz.utc))
+                assignment_date = self.utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
                 tags = []
@@ -642,7 +641,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                     if "minutes" in assignment['dueTime']:
                         assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                    x = self.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=pytz.utc))
+                    x = self.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
                     if x < date_now:
                         self.gc_skipped_assignment += 1
                         continue
@@ -740,7 +739,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     return HttpResponseForbidden("This assignment isn't yours")
                 if key == "x":
                     # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
-                    value = datetime.datetime.fromtimestamp(value, pytz.utc)
+                    value = datetime.datetime.fromtimestamp(value, timezone.utc)
                 elif key == "due_time":
                     value = datetime.time(**value)
                 setattr(self.sm, key, value)

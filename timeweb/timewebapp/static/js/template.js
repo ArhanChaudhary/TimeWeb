@@ -98,7 +98,7 @@ $(function() {
                 left: '',
                 transform: '',
             });
-            logo.find("img").attr("width", 211);
+            logo.find("img").css("width", "");
             if (collision(username, logo, { margin: 10 })) {
                 logo.css({
                     left: 65,
