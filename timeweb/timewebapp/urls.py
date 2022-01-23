@@ -19,7 +19,7 @@ urlpatterns = [
     path('disclaimer', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/policies/disclaimer.html')),
     path('privacy', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/policies/privacy.html')),
     path('terms', RedirectView.as_view(url='https://storage.googleapis.com/twstatic/policies/terms.html')),
-    path('discord', RedirectView.as_view(url='https://discord.gg/fQgPXX5qpD')),
+    path('discord', RedirectView.as_view(url='https://discord.gg/fQgPXX5qpD'), name="discord"),
     path('gc-api-auth-init', views.GCOAuthView.as_view()),
     path('gc-api-auth-callback', views.GCOAuthView.as_view()),
 
