@@ -30,6 +30,20 @@
             NOTIFY_DATE_CHANGED = {% if NOTIFY_DATE_CHANGED %}true{% else %}false{% endif %};
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
 
+            // Initialize the service worker
+            window.onload = function() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/serviceworker.js', {
+                        scope: '/'
+                    }).then(function (registration) {
+                        if (window.SETTINGS && !window.SETTINGS.seen_latest_changelog) {
+                            registration.unregister();
+                        }
+                    }, function (err) {
+                        
+                    });
+                }
+            }
             {% comment %} document.addEventListener("securitypolicyviolation", function() {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                     for (let registration of registrations) {
@@ -64,7 +78,6 @@
         {% block css %}{% endblock css %}
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
-        <script src="{% static 'js/serviceworker-register.js' %}"></script>
         <script src="{% static 'js/template.js' %}"></script>
         {% block js %}{% endblock js %}
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
