@@ -31,18 +31,18 @@
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
 
             // Initialize the service worker
-            window.onload = function() {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/serviceworker.js', {
-                        scope: '/'
-                    }).then(function (registration) {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/serviceworker.js', {
+                    scope: '/'
+                }).then(function (registration) {
+                    window.onload = function() {
                         if (window.SETTINGS && !window.SETTINGS.seen_latest_changelog) {
                             registration.unregister();
                         }
-                    }, function (err) {
-                        
-                    });
-                }
+                    }
+                }, function (err) {
+                    
+                });
             }
             {% comment %} document.addEventListener("securitypolicyviolation", function() {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
