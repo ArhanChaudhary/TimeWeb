@@ -327,6 +327,7 @@ a[href="/settings"] {
 .assignment-header {
     display: flex;
     align-items: center;
+    --arrow-margin-left: max(5px,calc(-5px + 2vw));
 }
 .relative-positioning-wrapper {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
@@ -400,7 +401,7 @@ a[href="/settings"] {
     position: absolute;
     font-size: 0.7em;
     transform: translateY(100%) translateY(-2px);
-    width: 100%;
+    width: calc(100% + var(--arrow-margin-left));
     height: 35px;
     left: 0;
     bottom: 0;
@@ -410,7 +411,7 @@ a[href="/settings"] {
 }
 .arrow-container {
     float: left;
-    margin-left: max(5px,calc(-5px + 2vw));
+    margin-left: var(--arrow-margin-left);
     overflow: visible;
 }
 .right-side-of-header {
