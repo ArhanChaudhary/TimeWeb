@@ -16,6 +16,9 @@ input, textarea {
     /* Firefox */
     filter: none;
 }
+textarea {
+    resize: none;
+}
 input[type="checkbox"], input[type="radio"] {
     -webkit-appearance: revert;
 }

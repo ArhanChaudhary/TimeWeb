@@ -108,7 +108,6 @@ tr.odd {
     box-sizing: border-box; 
     display: block;
     width: 100%;
-    resize: none;
 }
 #dark-mode body {
     --body-background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);

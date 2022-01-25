@@ -1092,9 +1092,6 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input:not(.disabled-field), #form-wrapper textarea {
     padding: 1px;
 }
-#form-wrapper textarea {
-    resize: none;
-}
 #form-wrapper input.disabled-field {
     opacity: 0.75 !important;
     background-color: rgb(228,228,228);
