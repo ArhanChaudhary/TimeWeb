@@ -850,6 +850,7 @@ a[href="/settings"] {
     box-shadow: none;
 }
 .graph-footer {
+    font-size: 15px;
     padding: 0 13px;
     position: relative;
     margin-top: 10px;
@@ -857,7 +858,7 @@ a[href="/settings"] {
     margin-bottom: -7px;
 }
 .graph-footer * {
-    font-size: 13.3333px;
+    font-size: 15px;
     border-radius: 20px;
     border: none;
     padding: 3px 6px;
@@ -890,8 +891,8 @@ a[href="/settings"] {
 }
 .advanced-buttons {
     border-bottom: 1px solid;
-    width: 127px;
-    font-size: 12px;
+    width: 146px;
+    font-size: 14px;
 }
 .first-advanced-buttons {
     margin-top: 7px;
@@ -903,14 +904,14 @@ a[href="/settings"] {
 }
 /* 2nd row */
 .skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
-    margin-top: 9px;
+    margin-top: 13px;
     margin-bottom: 7px;
 }
 .work-input-textbox {
-    width: 111px;
+    width: 122px;
 }
 .skew-ratio-textbox {
-    width: 123px;
+    width: 136px;
 }
 .skew-ratio-textbox::-webkit-inner-spin-button {
     transform: translateX(-2px);
