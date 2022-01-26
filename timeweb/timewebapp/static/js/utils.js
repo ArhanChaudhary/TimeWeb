@@ -339,8 +339,9 @@ utils = {
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
-                                        $(".finished").each(function() {
-                                            crud.transitionDeleteAssignment($(this).children(".assignment"));
+                                        const assignments_to_delete = $(".finished");
+                                        assignments_to_delete.each(function(i) {
+                                            crud.transitionDeleteAssignment($(this).children(".assignment"), {final_iteration: i === assignments_to_delete.length - 1});
                                         }); 
                                     }
                                     if (ajaxUtils.disable_ajax) {
@@ -430,8 +431,8 @@ utils = {
                                     }
                                     const success = function() {
                                         $this.off("click");
-                                        assignments_to_delete.each(function() {
-                                            crud.transitionDeleteAssignment($(this).children(".assignment"));
+                                        assignments_to_delete.each(function(i) {
+                                            crud.transitionDeleteAssignment($(this).children(".assignment"), {final_iteration: i === assignments_to_delete.length - 1});
                                         });
                                     }
                 
