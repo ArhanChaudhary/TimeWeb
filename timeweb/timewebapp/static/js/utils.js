@@ -222,40 +222,56 @@ utils = {
                 });
                 $("#current-date-text").text(`${NOTIFY_DATE_CHANGED ? "(The current date has changed) " : ""}Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
                 $("#next-day, #previous-day").click(function() {
-                    utils.in_simulation = true;
-                    ajaxUtils.disable_ajax = true;
-                    let day_increment;
+                    let previous_day = false;
+                    let next_day = false;
+                    let confirm_title_name;
+                    let confirm_content;
                     switch ($(this).attr("id")) {
                         case "next-day":
-                            day_increment = 1;
+                            next_day = true;
+                            confirm_title_name = "next";
+                            confirm_content = `This shortcut simulates every assignments' work on the next day.<br><br>NONE of the changes your make in the simulation are saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page (i.e. irreversible actions will be undone)`
                             break;
                         case "previous-day":
-                            day_increment = -1;
+                            previous_day = true;
+                            confirm_title_name = "previous";
+                            confirm_content = `This shortcut simulates every assignments' work on the previous day.<br><br>NONE of the changes your make in the simulation are saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page (i.e. irreversible actions will be undone)`
                             break;
                     }
-                    date_now.setDate(date_now.getDate() + day_increment);
-                    // mark as done is unmarked in the next day
-                    $(".assignment.mark-as-done").each(function() {
-                        $(this).find(".mark-as-done-button").click();
+                    $.confirm({
+                        title: `Are you sure you want to go to the ${confirm_title_name} day?`,
+                        content: confirm_content,
+                        buttons: {
+                            confirm: {
+                                keys: ['Enter'],
+                                action: function() {
+                                    utils.in_simulation = true;
+                                    ajaxUtils.disable_ajax = true;
+                                    if (next_day) {
+                                        date_now.setDate(date_now.getDate() + 1);
+                                    } else if (previous_day) {
+                                        date_now.setDate(date_now.getDate() - 1);
+                                    }
+                                    // mark as done is unmarked in the next day
+                                    $(".assignment.mark-as-done").each(function() {
+                                        $(this).find(".mark-as-done-button").click();
+                                    });
+                                    // Hide current time without using display none, as that can be affected by .toggle
+                                    $("#current-time").css({
+                                        position: "absolute",
+                                        top: -9999,
+                                    })
+                                    $("#current-date-text").text("(No changes are saved in this state) Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                                    priority.sort();
+                                }
+                            },
+                            cancel: function() {
+                                
+                            }
+                        }
                     });
-                    // Hide current time without using display none, as that can be affected by .toggle
-                    $("#current-time").css({
-                        position: "absolute",
-                        top: -9999,
-                    })
-                    $("#current-date-text").text("(No changes are saved in this state) Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                    priority.sort();
+
                 });
-                $("#next-day-icon-label").info("bottom",
-                    `Simulates every assignments' work on the next day
-                    
-                    All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
-                );
-                $("#previous-day-icon-label").info("bottom",
-                    `Simulates every assignments' work on the previous day
-                    
-                    All changes made in the simulation are NOT saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page`
-                );
             },
 
             assignmentSorting: function() {
