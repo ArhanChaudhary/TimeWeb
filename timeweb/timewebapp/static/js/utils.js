@@ -225,22 +225,19 @@ utils = {
                     let previous_day = false;
                     let next_day = false;
                     let confirm_title_name;
-                    let confirm_content;
                     switch ($(this).attr("id")) {
                         case "next-day":
                             next_day = true;
                             confirm_title_name = "next";
-                            confirm_content = `This shortcut simulates every assignments' work on the next day.<br><br>NONE of the changes your make in the simulation are saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page (i.e. irreversible actions will be undone)`
                             break;
                         case "previous-day":
                             previous_day = true;
                             confirm_title_name = "previous";
-                            confirm_content = `This shortcut simulates every assignments' work on the previous day.<br><br>NONE of the changes your make in the simulation are saved, except for adding or editing assignments. Your assignments can be restored by refreshing this page (i.e. irreversible actions will be undone)`
                             break;
                     }
                     $.confirm({
                         title: `Are you sure you want to go to the ${confirm_title_name} day?`,
-                        content: confirm_content,
+                        content: `This shortcut simulates every assignments' work on the ${confirm_title_name} day.<br><br>NONE of the changes your make in the simulation are saved. Your assignments can be restored by refreshing this page (i.e. every action, including irreversible actions, will be undone)`,
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],

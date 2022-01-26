@@ -229,7 +229,11 @@ class Crud {
         $("#id_description").expandableTextareaHeight();
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
-            this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
+            if (utils.in_simulation) {
+                this.setCustomValidity("You can't add or edit assignments in the simulation");
+            } else {
+                this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
+            }
         });
         let alert_already_shown = false;
         $("#id_min_work_time, #id_time_per_unit").on("focusout", () => {
