@@ -1015,7 +1015,7 @@ input[type=number]::-webkit-inner-spin-button {
     position: relative;
 }
 #form-wrapper .field-wrapper {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
     margin-top: -1px;
@@ -1046,13 +1046,13 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
-    transform: translateY(-33px);
+    transform: translateY(-38px);
     right: 10px;
 }
 #form-wrapper .field-wrapper#id-due_time-field-wrapper {
     position: absolute;
     margin-left: 10px;
-    transform: translate(calc(var(--right-translate, 0) * 1px), -33px);
+    transform: translate(calc(var(--right-translate, 0) * 1px), -38px);
 }
 #form-wrapper #id_due_time {
     border: none;
