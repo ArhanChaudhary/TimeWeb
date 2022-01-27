@@ -442,16 +442,22 @@ class Priority {
                 due_date.setDate(due_date.getDate() + sa.sa.x);
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
-                } else if (due_date_minus_today === -1) {
-                    str_daysleft = 'Yesterday';
-                } else if (due_date_minus_today === 0) {
-                    str_daysleft = 'Today';
-                } else if (due_date_minus_today === 1) {
-                    str_daysleft = 'Tomorrow';
-                } else if (due_date_minus_today < 7) {
-                    str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
                 } else {
-                    str_daysleft = due_date_minus_today + "d";
+                    if (due_date_minus_today === -1) {
+                        str_daysleft = 'Yesterday';
+                    } else if (due_date_minus_today === 0) {
+                        str_daysleft = 'Today';
+                    } else if (due_date_minus_today === 1) {
+                        str_daysleft = 'Tomorrow';
+                    } else if (due_date_minus_today < 7) {
+                        str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                    } else {
+                        str_daysleft = due_date_minus_today + "d";
+                    }
+                    if (sa.sa.break_days.length) {
+                        const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today" });
+                        str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
+                    }
                 }
                 if (complete_date_now.getFullYear() === due_date.getFullYear()) {
                     long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
