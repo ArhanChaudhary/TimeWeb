@@ -406,9 +406,13 @@ utils = {
                     const assignment_container = $this.parents(".assignment-container");
                     const dom_assignment = assignment_container.children(".assignment");
                     const sa = utils.loadAssignmentData(dom_assignment);
-                    const end_of_line_wrapper = assignment_container.nextAll(".assignment-container.last-add-line-wrapper").first();
-                    // Adding a filter to ensure nextUntil doesn't accidentally delete external assignments isn't necessary because this shortcut should never get broken up and the wrapper should remain continuous
-                    const assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);//.filter(assignment_container => 
+                    if (assignment_container.hasClass("last-add-line-wrapper")) {
+                        var assignments_to_delete = assignment_container;
+                    } else {
+                        const end_of_line_wrapper = assignment_container.nextAll(".assignment-container.last-add-line-wrapper").first();
+                        // Adding a filter to ensure nextUntil doesn't accidentally delete external assignments isn't necessary because this shortcut should never get broken up and the wrapper should remain continuous
+                        var assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);//.filter(assignment_container => 
+                    }
                     $.confirm({
                         title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
                         content: 'This action is irreversible.',
