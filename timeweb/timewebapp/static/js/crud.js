@@ -390,7 +390,7 @@ class Crud {
         dom_assignment.css("pointer-events", "none");
         // Send data to backend and animates its deletion
         const success = function() {
-            that.transitionDeleteAssignment(dom_assignment);
+            that.transitionDeleteAssignment(dom_assignment, {final_iteration: true});
         }
         if (ajaxUtils.disable_ajax) {
             success();
