@@ -186,7 +186,7 @@ class VisualAssignment extends Assignment {
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
             let x2 = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon - this.red_line_start_x;
-            let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y;
+            let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y - (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
             // Handles break days
             if (this.sa.break_days.length) {
                 const floorx2 = Math.floor(x2);
@@ -274,7 +274,6 @@ class VisualAssignment extends Assignment {
             var next_intersection_x = intersection_x - x_step;
         else if (this.pressed_arrow_key === "ArrowDown")
             var next_intersection_x = intersection_x + x_step;
-        else return // safety
         
         // plug in next_intersection_x as x into y = y1 - x(y1/x1)
         let next_intersection = [next_intersection_x, y1 - next_intersection_x * y1/x1];

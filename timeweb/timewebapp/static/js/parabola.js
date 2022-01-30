@@ -249,6 +249,9 @@ Assignment.prototype.funct = function(x, params={translateX: true}) {
         // Get raw untranslated y coordinate
         var output = this.sa.funct_round * Math.round(x * (this.a * x + this.b) / this.sa.funct_round);
     }
+    if (output) {
+        output += (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
+    }
     // Return translated y coordinate
     return mathUtils.precisionRound(output + this.red_line_start_y, 10);
 }
