@@ -156,7 +156,7 @@ class Crud {
                     return utils.formatting.stringifyDate(due_date);
                 })(),
                 "#id_due_time": (function() {
-                    if (!sa.due_time) return SETTINGS.def_due_time;
+                    if (!sa.due_time) return "";
                     const hour = (sa.due_time.hour < 10 ? "0" : "") + sa.due_time.hour;
                     const minute = (sa.due_time.minute < 10 ? "0" : "") + sa.due_time.minute;
                     return `${hour}:${minute}`;
