@@ -150,8 +150,8 @@ class SettingsForm(forms.ModelForm):
             }
         }
         help_texts = {
-            "def_unit_to_minute": "Sets the default unit of work to \"Minute\" for every new assignment, meaning it's divided up into units of time. Useful in case you don't know how to divide an assignment into units of work.",
-            "def_funct_round_minute": "If your unit of work for any assignment is \"Minute,\" meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 Minutes. Unrounded values look ugly (e.g: 17 Minutes, 49 Minutes).",
+            "def_unit_to_minute": "Sets the default unit of work to \"Minute\" for every new assignment, dividing it up into units of time. Useful in case you don't know how to divide an assignment into units of work.",
+            "def_funct_round_minute": "If your unit of work for any assignment is \"Minute\", meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 minutes. Unrounded values look ugly (such as 17 minutes, 49 minutes).",
             "def_skew_ratio": "Set this value to 0 to make it linear.",
             "ignore_ends": "Ignores the minimum work time for the first and last working days of EVERY assignment with a minimum work time in exchange for making their work distributions smoother. Recommended to be enabled.",
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
@@ -160,7 +160,7 @@ class SettingsForm(forms.ModelForm):
             "text_priority": "Displays the priority percentage in text above the name of every assignment.",
             "show_advanced_controls": "Disabling this removes the button entirely.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
-            "use_in_progress": "After today, your submitted work inputs will add onto the work you've done today. This is useful if you work on an assignment many times in a day. As a side effect, this also prevents you from entering work inputs in the future. To bypass this issue, enter the following syntax as a work input: \"tom [your input]\"",
+            "use_in_progress": "After today, your submitted work inputs will add onto the work you've done today. This is useful if you work on an assignment many times in a day. As a side effect, this also prevents you from entering work inputs in the future. To bypass this, enter the following syntax as a work input: \"tom [your input]\"",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
             "animation_speed": "Controls the speed of most animations.",
