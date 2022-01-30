@@ -66,7 +66,7 @@ if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
     os_environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
-    GC_REDIRECT_URI = "https://www.timeweb.io/gc-api-auth-callback"
+    GC_REDIRECT_URI = "https://timeweb.io/gc-api-auth-callback"
     
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
