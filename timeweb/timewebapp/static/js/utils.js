@@ -754,7 +754,7 @@ utils = {
                     case "n":
                     case "e":
                     case "d":
-                    case "i":
+                    case "h":
                     case "Backspace":
                     case "s":
                     case "f":
@@ -771,7 +771,7 @@ utils = {
                                     break;
                                 case "e":
                                 case "d":
-                                case "i":
+                                case "h":
                                 case "Backspace":
                                 case "s":
                                 case "f":
@@ -791,7 +791,7 @@ utils = {
                                             case "d":
                                                 assignment_container.find(".delete-button").focus().click();
                                                 break;
-                                            case "i":
+                                            case "h":
                                                 assignment_container.find(".mark-as-done-button").focus().click();
                                                 break;
                                             case "Backspace":
