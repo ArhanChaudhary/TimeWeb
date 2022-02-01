@@ -1062,27 +1062,11 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const targetInTags = !!target.parents(".tags").length || target.is(".tags");
     const targetInButton = !!target.parents(".button").length || target.is(".button");
     const dontFire = targetInTags || targetInButton;
-    if (!(targetInHeader && !dontFire) || prevent_click) return;
+    if (!targetInHeader || dontFire || prevent_click) return;
     const dom_assignment = $(this);
     const sa_sa = utils.loadAssignmentData(dom_assignment);
     
-    // If the assignment is marked as completed but marked as completed isn't enabled, it must have been marked because of break days, an incomplete work schedule, or needs more information
-    if (dom_assignment.is(".mark-as-done:not(.open-assignment)") && !sa_sa.mark_as_done) {
-        let assignment_to_shake = $(".assignment").first();
-        new Promise(function(resolve) {
-                setTimeout(function() {
-                    // scrollIntoView sometimes doesn't work without setTimeout
-                    assignment_to_shake[0].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'nearest',
-                    });
-                }, 0);
-                // utils.scroll determines when the page has stopped scrolling and internally resolves the promise
-                $("main").scroll(() => utils.scroll(resolve));
-                utils.scroll(resolve);
-        }).then(() => VisualAssignment.shake_assignment(assignment_to_shake.focus()));
-        return;
-    } else if (sa_sa.needs_more_info) {
+    if (sa_sa.needs_more_info) {
         VisualAssignment.shake_assignment(dom_assignment);
         dom_assignment.find(".update-button").parents(".button").focus();
         return;
