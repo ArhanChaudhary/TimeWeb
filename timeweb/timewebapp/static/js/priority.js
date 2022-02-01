@@ -507,7 +507,7 @@ class Priority {
             } else {
                 // If due times are enabled, it's possible for (sa.sa.x - sa.sa.blue_line_start - len_works) to become negative
                 // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                status_priority = todo * sa.sa.time_per_unit / (sa.sa.x - sa.sa.blue_line_start - len_works);
+                status_priority = todo * sa.sa.time_per_unit / (sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }
 
             const priority_data = {
