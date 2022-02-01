@@ -515,8 +515,18 @@ nav:focus-within #nav-menu::after {
 #changelog-container {
     padding: 0 10px;
 }
+.jconfirm .jconfirm-content-pane {
+    max-height: 60vh !important;
+}
+.jconfirm .jconfirm-box {
+    width: min(70%, 800px) !important;
+}
 .jconfirm .jconfirm-box div.jconfirm-content-pane .jconfirm-content {
     opacity: 0.55 !important;
+}
+.jconfirm .jconfirm-buttons {
+    transform: scale(1.1);
+    transform-origin: right;
 }
 .jconfirm .jconfirm-box div.jconfirm-title-c {
     font-size: 16px !important;
