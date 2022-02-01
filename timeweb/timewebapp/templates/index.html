@@ -68,7 +68,22 @@
   </div>
   <div id="assignments-container" class="{% if assignment_spacing == "Comfy" %}comfy{% elif assignment_spacing == "Compact" %}compact{% endif %}">
     <script nonce="{{request.csp_nonce}}">
-      if (window.add_animate_to_assignments_container) $("#assignments-container").addClass("animate");
+      if (!$("main").hasClass("finished-header-transition")) {
+        // If the animation has not already been run, add the class "animate" to the elements that will be animated
+        // The animation will happen instantly, because the transitions are only applied to :not(.animate)
+        // Then, when the window loads, remove ".animate". This will cause the actual transition
+        // Note: Using keyframes still required this same process
+        $("main, header, #assignments-container").addClass("animate");
+        sessionStorage.setItem("animation-ran", true);
+        $(window).one('load', function() {
+            $("main, header, #assignments-container").removeClass("animate");
+            // Run when the header animation completely ends since the header animation takes the longest
+            $("header").one("transitionend", function() {
+                // Position content such that the scrollbar doesn't clip into the header
+                $("main").addClass("finished-header-transition");
+            });
+        });
+      }
     </script>
     <div id="assignments-header">
       <div id="info"{% if background_image %} class="grey-highlight"{% endif %}>
