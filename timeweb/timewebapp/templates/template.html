@@ -3,7 +3,8 @@
 
 {% block template_body %}
 <header>
-    {% if user.is_authenticated and request.path == "/" %}
+    {% url 'home' as home %}
+    {% if user.is_authenticated and request.path == home %}
         <div id="image-new-container" tabindex="1">
             <img width="60" height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
             <div id="new-assignment-text">New Assignment</div>
@@ -62,6 +63,28 @@
     </a>
 </header>
 <main>
+    {% comment %} Use an inline script so .animate is added as EARLY as possible, otherwise the unanimated frames can show up {% endcomment %}
+    <script nonce="{{request.csp_nonce}}">
+        if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
+            $("main").addClass("finished-header-transition");
+        } else {
+            // If the animation has not already been run, add the class "animate" to the elements that will be animated
+            // The animation will happen instantly, because the transitions are only applied to :not(.animate)
+            // Then, when the window loads, remove ".animate". This will cause the actual transition
+            // Note: Using keyframes still required this same process
+            $("main, header").addClass("animate");
+            window.add_animate_to_assignments_container = true;
+            sessionStorage.setItem("animation-ran", true);
+            $(window).one('load', function() {
+                $("main, header, #assignments-container").removeClass("animate");
+                // Run when the header animation completely ends since the header animation takes the longest
+                $("header").one("transitionend", function() {
+                    // Position content such that the scrollbar doesn't clip into the header
+                    $("main").addClass("finished-header-transition");
+                });
+            });
+        }
+    </script>
     {% if background_image %}
     <img id="background-image" src="{{ background_image.url }}" width="{{background_image.width}}" height="{{background_image.height}}" draggable="false">
     {% endif %}

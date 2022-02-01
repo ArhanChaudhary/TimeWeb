@@ -14,55 +14,11 @@ isMobile = (function() {
     return false;
 })();
 isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-// Use "document.addEventListener("DOMContentLoaded", function() {" instead of "$(function() {" because "$(function() {" runs after first paint, messing up the initial transition
-document.addEventListener("DOMContentLoaded", function() {
-    CREDITS_TEMPLATE = $("#credits-template").html();
-    INFO_BUTTON_TEMPLATE = $("#info-button-template").html();
-    // Position content such that the scrollbar doesn't clip into the header
-    if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
-        $("main").css({
-            overflowY: "overlay",
-            height: "calc(100vh - 70px)",
-            padding: "10px 20px",
-            marginTop: 70,
-        });
-        // $(window).one('load', function() {
-        //     $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
-        // });
-    // Do starting animation
-    } else {
-        // If the animation has not already been run, add the class "animate" to the elements that will be animated
-        // The animation will happen instantly, because the transitions are only applied to :not(.animate)
-        // Then, when the window loads, remove ".animate". This will cause the actual transition
-        // Note: Using keyframes still required this same process
-        $("main, header, #assignments-container").addClass("animate");
-        sessionStorage.setItem("animation-ran", true);
-        $(window).one('load', function() {
-            // Only start loading background image after window.one("load")
-            // $("#background-image").attr("src", $("#background-image").attr("ignored-window-onload-src")).removeAttr("ignored-window-onload-src");
-            setTimeout(function(){
-                // This hides the address bar: (not anymore)
-                window.scrollTo(0, 1);
-            }, 0);
-            $("main, header, #assignments-container").removeClass("animate");
-            // Run when the header animation completely ends since the header animation takes the longest
-            $("header").one("transitionend", function() {
-                // Position content such that the scrollbar doesn't clip into the header
-                $("main").css({
-                    overflowY: "overlay",
-                    height: "calc(100vh - 70px)",
-                    padding: "10px 20px",
-                    marginTop: 70,
-                });
-            });
-        });
-    }
+$(function() {
     // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
     $(document.body).on("focus", function() {
         $("main").focus();
     })
-});
-$(function() {
     $("a").filter(function() {
         var url = this.href;
 
@@ -138,6 +94,10 @@ $(function() {
     }
     $(window).one("load", function() {
         $(window).trigger("resize");
+        setTimeout(function(){
+            // This hides the address bar (not anymore)
+            window.scrollTo(0, 1);
+        }, 0);
     });
     // https://web.dev/customize-install/
     let prompt;
@@ -180,7 +140,7 @@ $(function() {
         });
     }
     $("#nav-credits").click(() => $.alert({
-        title: CREDITS_TEMPLATE,
+        title: $("#credits-template").html(),
     }));
 });
 window.onbeforeunload = function() {
@@ -257,7 +217,7 @@ jconfirm.defaults = {
 $.fn.reverse = Array.prototype.reverse;
 // Info tooltip
 $.fn.info = function(facing,text,position) {
-    const info_button = $(INFO_BUTTON_TEMPLATE);
+    const info_button = $($("#info-button-template").html());
     info_button.find(".info-button-text").addClass(`info-${facing}`).text(text);
     info_button.click(() => false);
     switch (position) {

@@ -67,6 +67,9 @@
     </div>
   </div>
   <div id="assignments-container" class="{% if assignment_spacing == "Comfy" %}comfy{% elif assignment_spacing == "Compact" %}compact{% endif %}">
+    <script nonce="{{request.csp_nonce}}">
+      if (window.add_animate_to_assignments_container) $("#assignments-container").addClass("animate");
+    </script>
     <div id="assignments-header">
       <div id="info"{% if background_image %} class="grey-highlight"{% endif %}>
         Estimated completion time: <span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>

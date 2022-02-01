@@ -81,6 +81,13 @@ main {
     /* Firefox doesnt support "overlay" */
     overflow-y: scroll;
 }
+/* Position content such that the scrollbar doesn't clip into the header */
+main.finished-header-transition {
+    overflow-y: overlay !important;
+    height: calc(100vh - 70px);
+    padding: 10px 20px;
+    margin-top: 70px !important;
+}
 #background-image {
     bottom: 0;
     left: 0;

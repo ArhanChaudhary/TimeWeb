@@ -72,7 +72,7 @@ class Crud {
             }).children("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
         // Fallback if "overlay" doesn't exist
-        $("main").css("overflow-y", "");
+        $("main").css("overflow-y", "scroll");
         $("main").css("overflow-y", "overlay");
     }
     replaceUnit() {

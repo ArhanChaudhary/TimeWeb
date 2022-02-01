@@ -1,12 +1,10 @@
 $(function() {
     // Position login
     $("main").css({
-        overflowY: "hidden",
-
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-    });
+    })[0].style.setProperty("overflow", "hidden", "important");
     $("#form-wrapper form").submit(function() {
         $("#submit-button").attr("disabled", true);
     });
