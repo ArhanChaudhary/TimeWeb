@@ -1129,6 +1129,7 @@ isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_AC
 ajaxUtils = {
     disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, exception) {
+        if (ajaxUtils.silence_errors) return;
         let title;
         let content;
         if (response.status == 0) {
