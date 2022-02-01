@@ -791,7 +791,7 @@ class VisualAssignment extends Assignment {
         // BEGIN Submit work button
         submit_work_button.click(() => {
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-            const in_progress = () => SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === len_works + this.sa.blue_line_start;
+            const in_progress = () => SETTINGS.use_in_progress && !bypass_in_progress && today_minus_assignment_date + 1 === len_works + this.sa.blue_line_start && today_minus_assignment_date >= 0; // last condition ensures the assignment has been assigned
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
             let not_applicable_message_title;
