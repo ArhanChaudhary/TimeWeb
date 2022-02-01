@@ -760,24 +760,6 @@ a[href="/settings"] {
 .button * {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
-.button.slashed:active .button-slash {
-    transform: rotate(45deg) scale(0.95);
-}
-.button.slashed .tick-button {
-    /* for help https://bennettfeely.com/clippy/ */
-    -webkit-clip-path: polygon(0 0, 0 100%, 90% 100%, 0 0, 25% 0, 100% 85%, 100% 0);
-            clip-path: polygon(0 0, 0 100%, 90% 100%, 0 0, 25% 0, 100% 85%, 100% 0);
-}
-.button-slash {
-    display: none;
-}
-.button.slashed .button-slash {
-    display: block;
-    position: absolute;
-    width: 30px;
-    border-bottom: 2px solid black;
-    transform: rotate(45deg);
-}
 .assignment-footer {
     position: relative;
     top: calc(var(--vertical-assignment-padding) - 5px); /* -5px because display inline block is stupid */

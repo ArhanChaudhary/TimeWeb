@@ -474,7 +474,10 @@ class Priority {
                     [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
                     || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
                 )
-            ).toggleClass("slashed", already_entered_work_input_for_today);
+            ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("src", (function() {
+                const tick_image = already_entered_work_input_for_today ? "slashed-tick" : "tick";
+                return DEBUG ? `/static/images/${tick_image}.svg` : `https://storage.googleapis.com/twstatic/images/${tick_image}.svg`;
+            })())
 
             // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
             // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
