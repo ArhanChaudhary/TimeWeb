@@ -439,7 +439,7 @@ class Priority {
             } else if (Number.isFinite(sa.sa.x)) {
                 due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                 const due_date = new Date(sa.sa.assignment_date.valueOf());
-                due_date.setDate(due_date.getDate() + sa.sa.x);
+                due_date.setDate(due_date.getDate() + Math.floor(sa.sa.complete_x));
                 if (due_date_minus_today < -1) {
                     str_daysleft = -due_date_minus_today + "d Ago";
                 } else {
