@@ -1034,7 +1034,7 @@ utils = {
             if (sessionStorage.getItem("already-alerted-example-account")) return;
             sessionStorage.setItem("already-alerted-example-account", true);
             $.alert({
-                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear view of how you should expect your schedule to look like<br><br>Feel free to experiment and modify any assignment. No modifications to this account are saved.",
+                title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear perspective of how you should expect TimeWeb to look like<br><br>Feel free to look around or make any changes you want to any assignment",
                 backgroundDismiss: false,
             });
         },
@@ -1442,7 +1442,7 @@ for (let sa of dat) {
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
-    csrf_token = $("form input:first-of-type").val();
+    csrf_token = $("input[name=\"csrfmiddlewaretoken\"]").first().val();
     // Initial ajax data for sendAttributeAjax
     ajaxUtils.attributeData = {
         'csrfmiddlewaretoken': csrf_token,
@@ -1461,9 +1461,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();
-    if (isExampleAccount) {
-        utils.ui.exampleAccountAlertTutorial();
-    }
+    if (isExampleAccount) utils.ui.exampleAccountAlertTutorial();
     utils.ui.dimAssignmentsHeaderInfoOnIconHover();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
