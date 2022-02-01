@@ -277,13 +277,9 @@ class SettingsModel(models.Model):
         default=("Normal"),
         verbose_name=_('Assignment Sorting: '),
     )
-    color_priority = models.BooleanField(
+    show_priority = models.BooleanField(
         default=True,
-        verbose_name=_('Show Priority Colors'),
-    )
-    text_priority = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Priority Text'),
+        verbose_name=_('Show Priority'),
     )
     
     # Group "Assignment Header"

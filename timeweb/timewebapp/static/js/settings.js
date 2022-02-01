@@ -19,8 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_def_unit_to_minute").prop("checked", false);
                         $("#id_def_due_time").val("00:00");
                         $("#id_show_progress_bar").prop("checked", true);
-                        $("#id_color_priority").prop("checked", true);
-                        $("#id_text_priority").prop("checked", true);
+                        $("#id_show_priority").prop("checked", true);
                         $("#id_show_advanced_controls").prop("checked", true);
                         $("#id_one_graph_at_a_time").prop("checked", false);
                         $("#id_close_graph_after_work_input").prop("checked", false);

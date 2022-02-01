@@ -49,7 +49,7 @@ class Priority {
             }, Priority.ANIMATE_IN_DURATION, "easeOutCubic");
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-        if (SETTINGS.color_priority) {
+        if (SETTINGS.show_priority) {
             if (params.first_sort) {
                 params.dom_assignment.addClass("transition-instantly");
             }
@@ -768,7 +768,7 @@ class Priority {
             }
 
             let priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
-            const add_priority_percentage = SETTINGS.text_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done;
+            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done;
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
