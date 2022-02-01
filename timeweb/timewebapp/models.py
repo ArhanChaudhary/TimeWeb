@@ -263,6 +263,10 @@ class SettingsModel(models.Model):
     )
 
     # Group "Assignment Priority"
+    show_priority = models.BooleanField(
+        default=True,
+        verbose_name=_('Show Priority'),
+    )
     highest_priority_color = ColorField(
         default="#e8564a",
         verbose_name=_('Highest Priority Color'),
@@ -276,10 +280,6 @@ class SettingsModel(models.Model):
         choices=ASSIGNMENT_SORTINGS,
         default=("Normal"),
         verbose_name=_('Assignment Sorting: '),
-    )
-    show_priority = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Priority'),
     )
     
     # Group "Assignment Header"

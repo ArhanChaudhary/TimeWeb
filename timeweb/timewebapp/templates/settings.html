@@ -15,14 +15,14 @@
     <form method="POST" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form.visible_fields %}
-            {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "highest_priority_color" or field.name == "assignment_spacing" or field.name == "background_image" or field.name == "restore_gc_assignments" %}
+            {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "assignment_spacing" or field.name == "background_image" or field.name == "restore_gc_assignments" %}
             <fieldset>
                 <legend>
                     {% if field.name == "def_break_days" %}
                         Assignment Form
                     {% elif field.name == "def_skew_ratio" %}
                         Assignment Graph
-                    {% elif field.name == "highest_priority_color" %}
+                    {% elif field.name == "show_priority" %}
                         Assignment Priority
                     {% elif field.name == "assignment_spacing" %}
                         Assignment Header
@@ -62,7 +62,7 @@
                         </tbody>
                     </table>
                 {% endif %}
-            {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "show_priority" or field.name == "vertical_tag_position" or field.name == "timezone" or field.name == "enable_tutorial" %}
+            {% if field.name == "def_funct_round_minute" or field.name == "show_progress_bar" or field.name == "lowest_priority_color" or field.name == "vertical_tag_position" or field.name == "timezone" or field.name == "enable_tutorial" %}
             </fieldset>
             {% endif %}
         {% endfor %}
