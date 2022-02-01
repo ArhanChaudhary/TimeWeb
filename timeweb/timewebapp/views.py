@@ -192,7 +192,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'animation_speed': self.settings_model.animation_speed,
             'color_priority': self.settings_model.color_priority,
             'text_priority': self.settings_model.text_priority,
-            'use_in_progress': self.settings_model.use_in_progress,
             'show_advanced_controls': self.settings_model.show_advanced_controls,
             'one_graph_at_a_time': self.settings_model.one_graph_at_a_time,
             'close_graph_after_work_input': self.settings_model.close_graph_after_work_input,
@@ -251,7 +250,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
         self.settings_model.color_priority = self.form.cleaned_data.get("color_priority")
         self.settings_model.text_priority = self.form.cleaned_data.get("text_priority")
-        self.settings_model.use_in_progress = self.form.cleaned_data.get("use_in_progress")
         self.settings_model.show_advanced_controls = self.form.cleaned_data.get("show_advanced_controls")
         self.settings_model.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
         self.settings_model.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")

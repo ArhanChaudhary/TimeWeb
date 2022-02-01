@@ -245,10 +245,6 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
-    use_in_progress = models.BooleanField(
-        default=False,
-        verbose_name=_('Enter Work inputs In-Place after Today'),
-    )
     show_advanced_controls = models.BooleanField(
         default=True,
         verbose_name=_('Show "Advanced Controls" beneath the Graph'),

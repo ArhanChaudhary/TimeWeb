@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_show_progress_bar").prop("checked", true);
                         $("#id_color_priority").prop("checked", true);
                         $("#id_text_priority").prop("checked", true);
-                        $("#id_use_in_progress").prop("checked", false);
                         $("#id_show_advanced_controls").prop("checked", true);
                         $("#id_one_graph_at_a_time").prop("checked", false);
                         $("#id_close_graph_after_work_input").prop("checked", false);
