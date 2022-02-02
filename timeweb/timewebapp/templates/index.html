@@ -189,7 +189,7 @@
               <span class="completion-time"></span>
             </div>
             <div class="button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <img class="tick-button" width="25" src="{% static 'images/tick.png' %}" draggable="false"/>
+              <img class="tick-button" width="25" src="{% static 'images/tick.svg' %}" draggable="false"/>
             </div>
             <div class="button" title="Hide Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <img class="mark-as-done-button" width="26" src="{% if assignment.mark_as_done %}{% static 'images/show.png' %}{% else %}{% static 'images/hide.png' %}{% endif %}" draggable="false"/>
