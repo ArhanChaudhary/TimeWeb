@@ -5,9 +5,6 @@ workbox.routing.registerRoute(
     new workbox.strategies.StaleWhileRevalidate({
         cacheName: 'twcache',
         plugins: [
-            new workbox.cacheableResponse.CacheableResponsePlugin({
-                statuses: [0, 200],
-            }),
             new workbox.expiration.ExpirationPlugin({
                 maxEntries: 1000,
                 maxAgeSeconds: 60 * 60 * 24 * 7, // 7 Days
@@ -21,9 +18,6 @@ workbox.routing.registerRoute(
     new workbox.strategies.CacheFirst({
         cacheName: 'twcdncache',
         plugins: [
-            new workbox.cacheableResponse.CacheableResponsePlugin({
-                statuses: [0, 200],
-            }),
             new workbox.expiration.ExpirationPlugin({
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 7, // 7 Days
