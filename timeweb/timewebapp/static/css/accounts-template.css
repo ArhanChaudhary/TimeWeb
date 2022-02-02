@@ -131,3 +131,9 @@ hr {
         transform: none;
     }
 }
+
+.grecaptcha-badge {
+    position: absolute;
+    top: 78px;
+    right: 40px !important;
+}
