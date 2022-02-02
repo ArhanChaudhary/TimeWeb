@@ -50,8 +50,7 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from logging import getLogger
 from os import environ as os_environ
 from django.conf import settings
-from django.utils.decorators import method_decorator
-from ratelimit.decorators import ratelimit
+from requests import get as requests_get
 from django.contrib import messages
 
 with open("timewebapp/changelogs.json", "r") as f:
@@ -908,14 +907,14 @@ class BlogView(TimewebGenericView):
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
-    @method_decorator(ratelimit(key='ip', rate='1/15m', method='POST'))
     def post(self, request):
-        was_ratelimited = getattr(request, 'limited', False)
-        if was_ratelimited:
-            messages.error(request, "You must wait fifteen minutes before sending another e-mail")
+        recaptcha_token = request.POST.get('g-recaptcha-response')
+        auth = requests_get(f"https://www.google.com/recaptcha/api/siteverify?secret={settings.RECAPTCHA_SECRET_KEY}&response={recaptcha_token}")
+        if auth.json()['success']:
+            return super().post(request)
+        else:
+            messages.error(request, "Your submission was not authentic. Please try again.")
             return self.get(request)
-        return super().post(request)
-
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username-reset.html"
 

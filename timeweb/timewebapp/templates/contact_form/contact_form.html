@@ -3,6 +3,7 @@
 
 {% block accounts_js %}
     <script src="{% static 'js/contact.js' %}"></script>
+    <script src="https://www.google.com/recaptcha/api.js"></script>
 {% endblock %}
 
 {% block head_title %}Contact{% endblock %}
@@ -10,7 +11,7 @@
 {% block accounts_content %}
     <h1>Contact</h1>
 
-    <form method="POST" action="{% url 'contact_form' %}" class="contact_us">
+    <form method="POST" action="{% url 'contact_form' %}" id="contact-form">
         {% csrf_token %}
         {% include "account/accounts_messages.html" %}
         {% for field in form %}
@@ -19,6 +20,9 @@
                 {{ field }}
             </span>
         {% endfor %}
-        <button type="submit" name="action" id="submit-button">Send e-mail</button>
+        <button class="g-recaptcha" 
+                data-sitekey="6LdfDVIeAAAAAHqod332oJv3ICHdeQnFBBoOjICR" 
+                data-callback='submitContactForm' 
+                data-action='submit'>Send e-mail</button>
     </form>
 {% endblock %}

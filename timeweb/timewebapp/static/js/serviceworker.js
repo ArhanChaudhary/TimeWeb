@@ -14,7 +14,7 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-    ({ request }) => request.url.startsWith("https://cdn"),
+    ({ request }) => request.url.startsWith("https://cdn") || ["https://www.google.com/recaptcha/api.js"].includes(request.url),
     new workbox.strategies.CacheFirst({
         cacheName: 'twcdncache',
         plugins: [
