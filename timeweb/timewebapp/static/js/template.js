@@ -144,7 +144,7 @@ $(function() {
     }));
 });
 window.onbeforeunload = function() {
-    ajaxUtils.silence_errors = true;
+    if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
     if (window.disable_loading) return;
     // setTimeout to ensure .scrollTop to record the scroll position is run before this
     setTimeout(function() {
