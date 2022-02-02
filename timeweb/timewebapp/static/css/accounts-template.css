@@ -3,42 +3,16 @@
     position: relative;
     width: clamp(290px, calc(100vw - 100px), 600px);
     min-height: 475px;
-    border-radius: 25px;
     /* For the <header> */
     transform: translateY(-35px);
-    background: inherit;
-    -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(2px);
+    background: white;
     box-sizing: border-box;
     /* https://stackoverflow.com/questions/30483055/unable-to-scroll-div-within-fixed-div/30484023 */
     margin: auto;
     padding: 40px;
     padding-top: 65px;
     padding-bottom: 25px;
-}
-#accounts-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* change  0 0 0 200px to 0 0 200px for fog */
-    box-shadow: inset 0 0 0 200px white, 0 0 3px 1px black;
-    z-index: -1;
-    background: inherit;
-}
-#accounts-container::after {
-    content: '';
-    position: absolute;
-    top: 90px;
-    left: 90px;
-    right: 90px;
-    bottom: 90px;
-    box-shadow: 0 0 60px 80px white;
-    background: white;
-    border-radius: 25px;
-    z-index: -1;
+    box-shadow: 0 0 3px 1px black;
 }
 main {
     padding-top: 0 !important;
