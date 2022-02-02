@@ -804,7 +804,7 @@ utils = {
                                                 assignment_container.find(".skew-ratio-button").focus().click();
                                                 break;
                                             case "f":
-                                                assignment_container.find(".tick-button").focus().click();
+                                                assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").focus().click();
                                                 break;
                                             case "o":
                                                 assignment_container.children(".assignment").click();

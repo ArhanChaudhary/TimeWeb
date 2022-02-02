@@ -356,7 +356,7 @@ class VisualAssignment extends Assignment {
         screen.clearRect(0, 0, this.width, this.height);
         let move_info_down,
             goal_for_this_day = this.funct(Math.max(0, today_minus_assignment_date) + 1);
-        if (SETTINGS.show_progress_bar) {
+        if (SETTINGS.show_progress_bar && !this.sa.needs_more_info) {
             move_info_down = 0;
             let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
                 bar_move_left = should_be_done_x - this.width + 17;
@@ -425,8 +425,10 @@ class VisualAssignment extends Assignment {
         screen.fillStyle = "black";
         screen.textBaseline = "top";
         screen.font = '13.75px Open Sans';
-        screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-        screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
+        if (!this.sa.needs_more_info) {
+            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
+            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
+        }
         let radius = this.wCon / 3;
         if (radius > 3) {
             radius = 3;
@@ -469,7 +471,7 @@ class VisualAssignment extends Assignment {
         radius /= 0.75;
         screen.stroke();
         screen.font = VisualAssignment.font_size + 'px Open Sans';
-        if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
+        if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y) && !this.sa.needs_more_info) {
             let str_mouse_x;
             if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 str_mouse_x = new Date(this.complete_due_date.valueOf());
@@ -518,7 +520,7 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
-        if (!assignment_container.hasClass("finished")) {
+        if (!assignment_container.hasClass("finished") && !this.sa.needs_more_info) {
             let displayed_day;
             let str_day;
             if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
@@ -576,19 +578,21 @@ class VisualAssignment extends Assignment {
         screen.fillText("Days", (this.width - 50) / 2 + 50, this.height - 5);
 
         // y axis label
-        screen.rotate(-Math.PI / 2);
-        if (this.unit_is_of_time) {
-            const plural = pluralize(this.sa.unit);
-            var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`;
-        } else {
-            var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`;
+        if (this.sa.unit) {
+            screen.rotate(-Math.PI / 2);
+            if (this.unit_is_of_time) {
+                const plural = pluralize(this.sa.unit);
+                var text = `${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} of Work`;
+            } else {
+                var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`;
+            }
+            if (screen.measureText(text).width > this.height - 50) {
+                text = pluralize(this.sa.unit);
+            }
+            screen.textBaseline = "hanging";
+            screen.fillText(text, -(this.height - 50) / 2, 0);
+            screen.rotate(Math.PI / 2);
         }
-        if (screen.measureText(text).width > this.height - 50) {
-            text = pluralize(this.sa.unit);
-        }
-        screen.textBaseline = "hanging";
-        screen.fillText(text, -(this.height - 50) / 2, 0);
-        screen.rotate(Math.PI / 2);
 
         screen.font = '13.75px Open Sans';
         screen.textBaseline = "top";
@@ -619,59 +623,61 @@ class VisualAssignment extends Assignment {
 
         screen.textBaseline = "alphabetic";
         screen.textAlign = "right";
-        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
-        let font_size2 = 16.90625 - Math.ceil(this.sa.y - this.sa.y % y_axis_scale).toString().length * 1.71875;
-        if (this.sa.y >= 10) {
-            const small_y_axis_scale = y_axis_scale / 5;
-            if (font_size2 < 8.5) {
-                font_size2 = 8.5;
-            }
-            screen.font = font_size2 + 'px Open Sans';
-            const text_height = screen.measureText(0).width * 2,
-                label_index = text_height < small_y_axis_scale * this.hCon;
-            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
-                const displayed_number = smaller_index * small_y_axis_scale;
-                if (smaller_index % 5) {
-                    const gradient_percent = 1 - (displayed_number * this.hCon) / (this.height - 50);
-                    screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
-                    screen.fillRect(50, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
-                    screen.fillStyle = "rgb(80,80,80)";
-                    if (label_index) {
-                        let number_y_pos = this.height - displayed_number * this.hCon - 54 + text_height / 2;
-                        if (number_y_pos < 4 + text_height / 2) {
-                            number_y_pos = 4 + text_height / 2;
-                        }
-                        if (38.5 - screen.measureText(displayed_number).width < 13) {
-                            screen.textAlign = "left";
-                            screen.fillText(displayed_number, 13, number_y_pos);
-                            screen.textAlign = "right";
-                        } else {
-                            screen.fillText(displayed_number, 38.5, number_y_pos);
+        if (!this.sa.needs_more_info) {
+            const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
+            let font_size2 = 16.90625 - Math.ceil(this.sa.y - this.sa.y % y_axis_scale).toString().length * 1.71875;
+            if (this.sa.y >= 10) {
+                const small_y_axis_scale = y_axis_scale / 5;
+                if (font_size2 < 8.5) {
+                    font_size2 = 8.5;
+                }
+                screen.font = font_size2 + 'px Open Sans';
+                const text_height = screen.measureText(0).width * 2,
+                    label_index = text_height < small_y_axis_scale * this.hCon;
+                for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
+                    const displayed_number = smaller_index * small_y_axis_scale;
+                    if (smaller_index % 5) {
+                        const gradient_percent = 1 - (displayed_number * this.hCon) / (this.height - 50);
+                        screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
+                        screen.fillRect(50, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
+                        screen.fillStyle = "rgb(80,80,80)";
+                        if (label_index) {
+                            let number_y_pos = this.height - displayed_number * this.hCon - 54 + text_height / 2;
+                            if (number_y_pos < 4 + text_height / 2) {
+                                number_y_pos = 4 + text_height / 2;
+                            }
+                            if (38.5 - screen.measureText(displayed_number).width < 13) {
+                                screen.textAlign = "left";
+                                screen.fillText(displayed_number, 13, number_y_pos);
+                                screen.textAlign = "right";
+                            } else {
+                                screen.fillText(displayed_number, 38.5, number_y_pos);
+                            }
                         }
                     }
                 }
             }
-        }
-        font_size2 *= 1.2;
-        screen.font = font_size2 + 'px Open Sans';
-        const text_height = screen.measureText(0).width * 2;
-        for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
-            if (bigger_index * 2 < y_axis_scale) {
-                break;
-            }
-            screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(50, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
-            screen.fillStyle = "black";
-            let number_y_pos = this.height - bigger_index * this.hCon - 54 + text_height / 2;
-            if (number_y_pos < 4 + text_height / 2) {
-                number_y_pos = 4 + text_height / 2;
-            }
-            if (38.5 - screen.measureText(bigger_index).width < 13) {
-                screen.textAlign = "left";
-                screen.fillText(bigger_index, 13, number_y_pos);
-                screen.textAlign = "right";
-            } else {
-                screen.fillText(bigger_index, 38.5, number_y_pos);
+            font_size2 *= 1.2;
+            screen.font = font_size2 + 'px Open Sans';
+            const text_height = screen.measureText(0).width * 2;
+            for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
+                if (bigger_index * 2 < y_axis_scale) {
+                    break;
+                }
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(50, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
+                screen.fillStyle = "black";
+                let number_y_pos = this.height - bigger_index * this.hCon - 54 + text_height / 2;
+                if (number_y_pos < 4 + text_height / 2) {
+                    number_y_pos = 4 + text_height / 2;
+                }
+                if (38.5 - screen.measureText(bigger_index).width < 13) {
+                    screen.textAlign = "left";
+                    screen.fillText(bigger_index, 13, number_y_pos);
+                    screen.textAlign = "right";
+                } else {
+                    screen.fillText(bigger_index, 38.5, number_y_pos);
+                }
             }
         }
         screen.fillText(0, 39, this.height - 52);
@@ -759,11 +765,11 @@ class VisualAssignment extends Assignment {
         delete_work_input_button.click(() => {
             let len_works = this.sa.works.length - 1;
             if (!len_works) {
-                delete_work_input_button.html("Nothing to Delete");
+                delete_work_input_button.html(this.sa.needs_more_info ? "Not Applicable" : "Delete Work Input");
                 clearTimeout(not_applicable_timeout_delete_work_input_button);
                 not_applicable_timeout_delete_work_input_button = setTimeout(function() {
                     delete_work_input_button.html("Delete Work Input");
-                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                }.bind(this), VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             this.sa.works.pop();
@@ -780,7 +786,17 @@ class VisualAssignment extends Assignment {
         // END Delete work input button
 
         // BEGIN Work input textbox
-        work_input_textbox.keydown(e => {
+        let not_applicable_timeout_work_input_textbox;
+        work_input_textbox.on("keydown paste click keyup", e => {
+            if (this.sa.needs_more_info) {
+                work_input_textbox.val('').attr("placeholder", "Not Applicable");
+                clearTimeout(not_applicable_timeout_work_input_textbox);
+                not_applicable_timeout_work_input_textbox = setTimeout(function() {
+                    work_input_textbox.attr("placeholder", "Enter Units Done");
+                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                return;
+            }
+
             if (e.key === "Enter") {
                 submit_work_button.click();
                 work_input_textbox.val("");
@@ -789,7 +805,17 @@ class VisualAssignment extends Assignment {
         // END Work input textbox
 
         // BEGIN Submit work button
+        let not_applicable_timeout_submit_work_button;
         submit_work_button.click(() => {
+            if (this.sa.needs_more_info) {
+                submit_work_button.html("Not Applicable");
+                clearTimeout(not_applicable_timeout_submit_work_button);
+                not_applicable_timeout_submit_work_button = setTimeout(function() {
+                    submit_work_button.html("Submit Work Input");
+                }.bind(this), VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                return;
+            }
+
             const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             let len_works = this.sa.works.length - 1;
             let last_work_input = this.sa.works[len_works];
@@ -937,7 +963,7 @@ class VisualAssignment extends Assignment {
                 // No need to ajax since skew ratio is the same
                 return;
             }
-            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1) {
+            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1 || this.sa.needs_more_info) {
                 skew_ratio_button.onlyText("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
@@ -946,7 +972,7 @@ class VisualAssignment extends Assignment {
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
-            skew_ratio_button.onlyText("Hover the graph. Click again to cancel");
+            skew_ratio_button.onlyText("Hover the graph, click again to cancel");
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.graph.trigger("mousemove");
@@ -995,7 +1021,7 @@ class VisualAssignment extends Assignment {
                 min: -max_textbox_value,
                 max: max_textbox_value,
             });
-            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1) {
+            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1 || this.sa.needs_more_info) {
                 skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_textbox);
                 not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
@@ -1023,7 +1049,18 @@ class VisualAssignment extends Assignment {
         // END Skew ratio textbox
 
         // BEGIN Fixed/dynamic mode button
+        let not_applicable_timeout_fixed_mode_button;
         fixed_mode_button.click(() => {
+            if (this.sa.needs_more_info) {
+                const original_text = fixed_mode_button.text();
+                fixed_mode_button.html("Not Applicable");
+                clearTimeout(not_applicable_timeout_fixed_mode_button);
+                not_applicable_timeout_fixed_mode_button = setTimeout(function() {
+                    fixed_mode_button.html(original_text);
+                }.bind(this), VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                return;
+            }
+
             this.sa.fixed_mode = !this.sa.fixed_mode;
             fixed_mode_button.onlyText(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
             ajaxUtils.sendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
@@ -1066,7 +1103,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const dom_assignment = $(this);
     const sa_sa = utils.loadAssignmentData(dom_assignment);
     
-    if (sa_sa.needs_more_info) {
+    if (sa_sa.needs_more_info && !Number.isFinite(sa_sa.x)) {
         VisualAssignment.shake_assignment(dom_assignment);
         dom_assignment.find(".update-button").parents(".button").focus();
         return;
