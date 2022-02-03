@@ -3,6 +3,7 @@
     position: relative;
     width: clamp(290px, calc(100vw - 100px), 600px);
     min-height: 475px;
+    border-radius: 20px;
     /* For the <header> */
     transform: translateY(-35px);
     background: white;
