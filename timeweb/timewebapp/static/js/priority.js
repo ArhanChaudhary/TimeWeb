@@ -209,6 +209,13 @@ class Priority {
             for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_tag); tag_index_iterator++) {
                 first_tag = sa.sa.tags[tag_index_iterator];
             }
+            
+            if (sa.sa.tags.includes("Important")) {
+                var has_important_tag = true;
+            } else if (sa.sa.tags.includes("Not Important")) {
+                var has_not_important_tag = true;
+            }
+
             const number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (!sa.sa.needs_more_info && that.params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 for (let i = 0; i < number_of_forgotten_days; i++) {
@@ -479,29 +486,18 @@ class Priority {
                 return DEBUG ? `/static/images/${tick_image}.svg` : `https://storage.googleapis.com/twstatic/images/${tick_image}.svg`;
             })())
 
-            // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
-            // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
-            // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
-                if (sa.sa.tags.includes("Important")) {
-                    status_value += 0.25;
-                }
-                if (sa.sa.tags.includes("Not Important")) {
-                    status_value -= 0.25;
-                }
-            // }
-            const ignore_tag_status_value = Math.round(status_value);
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
-            assignment_container.toggleClass("finished", ignore_tag_status_value === Priority.COMPLETELY_FINISHED)
-                                .toggleClass("incomplete-works", ignore_tag_status_value === Priority.INCOMPLETE_WORKS)
-                                .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value))
-                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value));
+            assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
+                                .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
+                                .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
+                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
 
             let status_priority;
-            if (ignore_tag_status_value === Priority.COMPLETELY_FINISHED) {
+            if (status_value === Priority.COMPLETELY_FINISHED) {
                 status_priority = -index;
-            } else if (ignore_tag_status_value === Priority.NOT_YET_ASSIGNED) {
+            } else if (status_value === Priority.NOT_YET_ASSIGNED) {
                 status_priority = today_minus_assignment_date;
-            } else if ([Priority.FINISHED_FOR_TODAY, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(ignore_tag_status_value)) {
+            } else if ([Priority.FINISHED_FOR_TODAY, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(status_value)) {
                 // Include Priority.FINISHED_FOR_TODAY
                 // If you're submitting work inputs for a check marked assignments ahead of time, it might swap with other check marked assignments, if this wasn't here and it went to the end of the if chain, which would make no sense
 
@@ -517,6 +513,8 @@ class Priority {
                 status_value,
                 status_priority,
                 first_tag,
+                has_important_tag,
+                has_not_important_tag,
                 name: sa.sa.name,
                 index,
                 // Not actually used for sorting, used for priority stuff later on
@@ -616,13 +614,35 @@ class Priority {
             if (a.first_tag > b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return 1;
         }
 
-        // Max to min
-        if (a.status_value < b.status_value) return 1;
-        if (a.status_value > b.status_value) return -1;
+        
+        let a_status_value = a.status_value;
+        let b_status_value = b.status_value;
+        // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
+        // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
+        // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
+            if (a.has_important_tag) {
+                a_status_value += 0.25;
+            }
+            if (a.has_not_important_tag) {
+                a_status_value -= 0.25;
+            }
+            if (b.has_important_tag) {
+                b_status_value += 0.25;
+            }
+            if (b.has_not_important_tag) {
+                b_status_value -= 0.25;
+            }
+            // }
 
-        const ignore_tag_status_value = Math.round(a.status_value); // using b.status_value also works
-        if (!SETTINGS.assignment_sorting.includes("Reversed") && [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(ignore_tag_status_value) 
-        || SETTINGS.assignment_sorting.includes("Reversed") && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value)) {
+        // Max to min
+        if (a_status_value < b_status_value) return 1;
+        if (a_status_value > b_status_value) return -1;
+
+        // a.status_value and b.status_value must be equal at this point, so define a shared variable for readability
+        let status_value = a.status_value;
+
+        if (!SETTINGS.assignment_sorting === "Reversed" && [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value) 
+        || SETTINGS.assignment_sorting === "Reversed" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
@@ -643,11 +663,10 @@ class Priority {
     }
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
-        const ignore_tag_status_value = Math.round(priority_data.status_value);
 
-        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(ignore_tag_status_value)) {
+        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(priority_data.status_value)) {
             var priority_percentage = NaN;
-        } else if (priority_data.mark_as_done || [Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(ignore_tag_status_value) /* Priority.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
+        } else if (priority_data.mark_as_done || [Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(priority_data.status_value) /* Priority.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
             var priority_percentage = 0;
         } else {
             var priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
@@ -668,8 +687,6 @@ class Priority {
         // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
         const sa = utils.loadAssignmentData(dom_assignment);
 
-        const ignore_tag_status_value = Math.round(priority_data.status_value);
-
         if (!["Not Important", "Important"].includes(sa.tags[0]))
             var current_tag = sa.tags[0];
         if (sa.is_google_classroom_assignment && sa.needs_more_info && !dom_assignment.parents(".assignment-container").hasClass("finished") && current_tag) {
@@ -683,11 +700,11 @@ class Priority {
             that.prev_assignment_container = assignment_container;
         }
 
-        if (ignore_tag_status_value === Priority.INCOMPLETE_WORKS && !that.already_found_first_incomplete_works) {
+        if (priority_data.status_value === Priority.INCOMPLETE_WORKS && !that.already_found_first_incomplete_works) {
             $("#autofill-work-done").show().insertBefore(dom_assignment);
             that.already_found_first_incomplete_works = true;
         }
-        if (ignore_tag_status_value === Priority.COMPLETELY_FINISHED && !that.already_found_first_finished) {
+        if (priority_data.status_value === Priority.COMPLETELY_FINISHED && !that.already_found_first_finished) {
             $("#delete-starred-assignments").show().insertBefore(dom_assignment);
             that.already_found_first_finished = true;
         }
@@ -745,8 +762,7 @@ class Priority {
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
-            const ignore_tag_status_value = Math.round(priority_data.status_value);
-            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done) {
+            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(priority_data.status_value) && !priority_data.mark_as_done) {
                 return priority_data.status_priority;
             } else {
                 return -Infinity;
@@ -762,7 +778,6 @@ class Priority {
         $(".delete-gc-assignments-from-class").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
-            const ignore_tag_status_value = Math.round(priority_data.status_value);
             const dom_assignment = $(".assignment").eq(priority_data.index);
             const assignment_container = dom_assignment.parents(".assignment-container");
 
@@ -771,7 +786,7 @@ class Priority {
             }
 
             let priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
-            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(ignore_tag_status_value) && !priority_data.mark_as_done;
+            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(priority_data.status_value) && !priority_data.mark_as_done;
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
