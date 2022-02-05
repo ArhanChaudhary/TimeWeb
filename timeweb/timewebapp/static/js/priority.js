@@ -600,7 +600,10 @@ class Priority {
     assignmentSortingComparator(a, b) {
         const that = this;
 
-        if (SETTINGS.assignment_sorting.includes("Tag Name") && !SETTINGS.assignment_sorting.includes("Normal")) {
+        if (SETTINGS.assignment_sorting === "Tag Name") {
+            if (b.has_important_tag && !a.has_important_tag || a.has_not_important_tag && !b.has_not_important_tag) return 1;
+            if (a.has_important_tag && !b.has_important_tag || b.has_not_important_tag && !a.has_not_important_tag) return -1;
+
             // b.first_tag === undefined: Treat undefined as the highst index lexicographic string
 
             // "r" < "z" => true
