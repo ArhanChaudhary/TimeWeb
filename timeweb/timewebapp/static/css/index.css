@@ -924,7 +924,7 @@ input[type=number]::-webkit-inner-spin-button {
     display: block;
     font-size: 12px;
     right: -10px;
-    bottom: -3px;
+    bottom: -6px;
     transform: translateY(100%);
 }
 #form-wrapper input::-webkit-datetime-edit {
@@ -945,7 +945,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper label[for='id_min_work_time']::after {
     content: '(Disabled if left empty)';
-    bottom: -2px !important;
+    bottom: -5px !important;
 }
 #form-wrapper {
     width: min(100vw, 490px);
@@ -998,7 +998,7 @@ input[type=number]::-webkit-inner-spin-button {
     position: relative;
 }
 #form-wrapper .field-wrapper {
-    margin-top: 15px;
+    margin-top: 16px;
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
     margin-top: -1px;
@@ -1029,13 +1029,13 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
-    transform: translateY(-38px);
+    transform: translateY(-40px);
     right: 10px;
 }
 #form-wrapper .field-wrapper#id-due_time-field-wrapper {
     position: absolute;
     margin-left: 10px;
-    transform: translate(calc(var(--right-translate, 0) * 1px), -38px);
+    transform: translate(calc(var(--right-translate, 0) * 1px), -43px);
 }
 #form-wrapper #id_due_time {
     border: none;
@@ -1073,7 +1073,8 @@ input[type=number]::-webkit-inner-spin-button {
     transition: opacity .25s ease-out;
 }
 #form-wrapper input:not(.disabled-field), #form-wrapper textarea {
-    padding: 1px;
+    margin-top: 1px;
+    padding: 3px 1px;
 }
 #form-wrapper input.disabled-field {
     opacity: 0.75 !important;
