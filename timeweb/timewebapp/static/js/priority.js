@@ -205,9 +205,9 @@ class Priority {
                 dom_tags = $(".tags").eq(index);
             let has_autofilled = false;
 
-            let first_tag = sa.sa.tags[0];
-            for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_tag); tag_index_iterator++) {
-                first_tag = sa.sa.tags[tag_index_iterator];
+            let first_real_tag = sa.sa.tags[0];
+            for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_real_tag); tag_index_iterator++) {
+                first_real_tag = sa.sa.tags[tag_index_iterator];
             }
             
             if (sa.sa.tags.includes("Important")) {
@@ -272,7 +272,7 @@ class Priority {
                 status_image = 'question-mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
-                    status_value = first_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
+                    status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
                 } else {
                     status_message = "This Assignment needs more Info!<br>Please Edit this Assignment";
                     status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
@@ -515,7 +515,7 @@ class Priority {
             const priority_data = {
                 status_value,
                 status_priority,
-                first_tag,
+                first_real_tag,
                 has_important_tag,
                 has_not_important_tag,
                 name: sa.sa.name,
@@ -607,7 +607,7 @@ class Priority {
             if (b.has_important_tag && !a.has_important_tag || a.has_not_important_tag && !b.has_not_important_tag) return 1;
             if (a.has_important_tag && !b.has_important_tag || b.has_not_important_tag && !a.has_not_important_tag) return -1;
 
-            // b.first_tag === undefined: Treat undefined as the highst index lexicographic string
+            // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
 
             // "r" < "z" => true
             // "r" < undefined => false (the below makes this true)
@@ -615,9 +615,9 @@ class Priority {
             // "z" > "r" => true
             // undefined > "r" => false (the below makes this true)
 
-            // a.first_tag !== undefined: If both are undefined, skip this check
-            if (a.first_tag < b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return -1;
-            if (a.first_tag > b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return 1;
+            // a.first_real_tag !== undefined: If both are undefined, skip this check
+            if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
+            if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
         }
 
         
@@ -656,8 +656,8 @@ class Priority {
             if (a.status_priority < b.status_priority) return 1;
             if (a.status_priority > b.status_priority) return -1;
         }
-        if (a.first_tag < b.first_tag || b.first_tag === undefined && a.first_tag !== undefined) return -1;
-        if (a.first_tag > b.first_tag || a.first_tag === undefined && b.first_tag !== undefined) return 1;
+        if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
+        if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
 
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
