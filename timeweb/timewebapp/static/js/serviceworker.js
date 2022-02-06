@@ -1,7 +1,16 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.4.2/workbox-sw.js');
 
+function shouldCacheFirst(request) {
+    return request.destination !== "document" && (
+        request.destination === "font" || 
+        request.url.startsWith("https://cdn") || 
+        request.url.startsWith("https://www.googletagmanager.com/gtag/js") ||
+        ["https://www.google.com/recaptcha/api.js"].includes(request.url)
+    );
+}
+
 workbox.routing.registerRoute(
-    ({ request }) => request.destination !== "document" && !request.url.startsWith("https://cdn"),
+    ({ request }) => !shouldCacheFirst(request),
     new workbox.strategies.StaleWhileRevalidate({
         cacheName: 'twcache',
         plugins: [
@@ -14,7 +23,7 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-    ({ request }) => request.url.startsWith("https://cdn") || ["https://www.google.com/recaptcha/api.js"].includes(request.url),
+    ({ request }) => shouldCacheFirst(request),
     new workbox.strategies.CacheFirst({
         cacheName: 'twcdncache',
         plugins: [
