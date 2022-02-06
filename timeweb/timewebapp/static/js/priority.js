@@ -616,9 +616,6 @@ class Priority {
             // a.first_real_tag !== undefined: If both are undefined, skip this check
             if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
             if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
-
-            if (b.has_important_tag && !a.has_important_tag || a.has_not_important_tag && !b.has_not_important_tag) return 1;
-            if (a.has_important_tag && !b.has_important_tag || b.has_not_important_tag && !a.has_not_important_tag) return -1;
         }
 
         
