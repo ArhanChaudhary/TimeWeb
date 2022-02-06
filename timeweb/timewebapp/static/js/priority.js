@@ -412,9 +412,12 @@ class Priority {
                 }
 
                 if ([0, 1].includes(due_date_minus_today)) {
-                    if (due_date_minus_today === 1) {
-                        that.tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                    if (due_date_minus_today === 0) {
+                        that.display_due_today_completion_time = true;
+                    } else if (due_date_minus_today === 1) {
+                        that.display_due_tomorrow_completion_time = true;
                     }
+                    that.today_and_tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                     if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                         status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
@@ -723,13 +726,16 @@ class Priority {
             $("#hide-button").html() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
             $("#current-time, #tomorrow-time, #hide-button").show();
             $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
-            if (that.tomorrow_total_completion_time === that.total_completion_time) {
-                $("#tomorrow-time").html(" (Everything is due Tomorrow)");
-            } else if (that.tomorrow_total_completion_time === 0) {
-                $("#tomorrow-time").html(" (Nothing is due Tomorrow)");
+
+            let relative_today_and_tomorrow_date;
+            if (that.display_due_today_completion_time && that.display_due_tomorrow_completion_time) {
+                relative_today_and_tomorrow_date = "Today and Tomorrow";
+            } else if (that.display_due_today_completion_time) {
+                relative_today_and_tomorrow_date = "Today";
             } else {
-                $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.tomorrow_total_completion_time)} due Tomorrow)`);
+                relative_today_and_tomorrow_date = "Tomorrow";
             }
+            $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
         }
         utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
         utils.ui.tickClock();
@@ -751,9 +757,11 @@ class Priority {
         const that = this;
         that.priority_data_list = [];
         that.total_completion_time = 0;
-        that.tomorrow_total_completion_time = 0;
+        that.today_and_tomorrow_total_completion_time = 0;
         that.due_date_passed_notices = [];
         that.due_date_incremented_notices = [];
+        that.display_due_today_completion_time = false;
+        that.display_due_tomorrow_completion_time = false;
         let scrollTop = $("main").scrollTop();
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         that.alertDueDates();
