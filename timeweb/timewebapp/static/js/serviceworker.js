@@ -1,7 +1,7 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.4.2/workbox-sw.js');
 
 function shouldCacheFirst(request) {
-    return request.destination !== "document" && (
+    return (
         request.destination === "font" || 
         request.url.startsWith("https://cdn") || 
         request.url.startsWith("https://www.googletagmanager.com/gtag/js") ||
@@ -10,7 +10,7 @@ function shouldCacheFirst(request) {
 }
 
 workbox.routing.registerRoute(
-    ({ request }) => !shouldCacheFirst(request),
+    ({ request }) => request.destination !== "document" && !shouldCacheFirst(request),
     new workbox.strategies.StaleWhileRevalidate({
         cacheName: 'twcache',
         plugins: [
@@ -23,7 +23,7 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
-    ({ request }) => shouldCacheFirst(request),
+    ({ request }) => request.destination !== "document" && shouldCacheFirst(request),
     new workbox.strategies.CacheFirst({
         cacheName: 'twcdncache',
         plugins: [
