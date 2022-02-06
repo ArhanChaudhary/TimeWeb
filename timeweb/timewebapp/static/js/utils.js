@@ -750,6 +750,7 @@ utils = {
         },
         setKeybinds: function() {
             $(document).keydown(function(e) {
+                if (e.ctrlKey || e.metaKey) return;
                 switch (e.key) {
                     case "n":
                     case "e":
