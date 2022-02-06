@@ -604,8 +604,6 @@ class Priority {
         const that = this;
 
         if (SETTINGS.assignment_sorting === "Tag Name") {
-            if (b.has_important_tag && !a.has_important_tag || a.has_not_important_tag && !b.has_not_important_tag) return 1;
-            if (a.has_important_tag && !b.has_important_tag || b.has_not_important_tag && !a.has_not_important_tag) return -1;
 
             // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
 
@@ -614,10 +612,13 @@ class Priority {
             
             // "z" > "r" => true
             // undefined > "r" => false (the below makes this true)
-
+            
             // a.first_real_tag !== undefined: If both are undefined, skip this check
             if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
             if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+
+            if (b.has_important_tag && !a.has_important_tag || a.has_not_important_tag && !b.has_not_important_tag) return 1;
+            if (a.has_important_tag && !b.has_important_tag || b.has_not_important_tag && !a.has_not_important_tag) return -1;
         }
 
         
