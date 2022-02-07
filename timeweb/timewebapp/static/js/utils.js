@@ -90,6 +90,20 @@ utils = {
             }
             return {r: r*255, g: g*255, b: b*255};
         },
+        RGBToString(color, params={ invert: false }) {
+            if (params.invert)
+                return `rgb(
+                    ${255 - color.r},
+                    ${255 - color.g},
+                    ${255 - color.b}
+                )`.replace(/\s+/g, '');
+            else
+                return `rgb(
+                    ${color.r},
+                    ${color.g},
+                    ${color.b}
+                )`.replace(/\s+/g, '');
+        },
         arrayToEnglish: function(array) {
             return `<ul><li>${array.join("</li><li>")}</li></ul>`;
         }

@@ -297,20 +297,6 @@ class VisualAssignment extends Assignment {
         new Priority().sort({ timeout: true });
         this.draw();
     }
-    static RGBToString(color, params={ invert: false }) {
-        if (params.invert)
-            return `rgb(
-                ${255 - color.r},
-                ${255 - color.g},
-                ${255 - color.b}
-            )`.replace(/\s+/g, '');
-        else
-            return `rgb(
-                ${color.r},
-                ${color.g},
-                ${color.b}
-            )`.replace(/\s+/g, '');
-    }
     //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
@@ -440,7 +426,7 @@ class VisualAssignment extends Assignment {
         let circle_x,
             circle_y,
             line_end = this.sa.complete_x + Math.ceil(1 / this.wCon);
-        screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+        screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
         screen.lineWidth = radius;
         screen.beginPath();
         for (let point_x = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
@@ -458,7 +444,7 @@ class VisualAssignment extends Assignment {
         screen.beginPath();
         radius *= 0.75;
         line_end = Math.min(line_end, len_works + Math.ceil(1 / this.wCon));
-        screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+        screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
         screen.lineWidth = radius;
         for (let point_x = 0; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.sa.works[Math.min(len_works, point_x)];
@@ -503,9 +489,9 @@ class VisualAssignment extends Assignment {
             screen.beginPath();
 
             if (this.sa.works[mouse_x - this.sa.blue_line_start] === funct_mouse_x) {
-                screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+                screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
             } else if (this.funct(mouse_x) === funct_mouse_x) {
-                screen.strokeStyle = VisualAssignment.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+                screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
             }
             
             screen.fillStyle = "white";
