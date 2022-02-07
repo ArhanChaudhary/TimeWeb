@@ -855,7 +855,7 @@ utils = {
                     case "ArrowDown":
                     case "ArrowUp":
                         const open_assignmens_on_screen = $(".open-assignment").filter(function() {
-                            return VisualAssignment.assignmentGraphOnScreen($(this));
+                            return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
                         });
                         if (e.shiftKey) {
                             if (e.key === "ArrowDown") {

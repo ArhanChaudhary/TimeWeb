@@ -701,9 +701,8 @@ class VisualAssignment extends Assignment {
             screen.rotate(-Math.PI / 2);
         }
     }
-    static assignmentGraphOnScreen($dom_assignment) {
-        const fixed_graph = $dom_assignment.find(".fixed-graph");
-        const rect = fixed_graph[0].getBoundingClientRect();
+    assignmentGraphIsOnScreen() {
+        const rect = this.fixed_graph[0].getBoundingClientRect();
         // Makes sure graph is on screen
         return rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight;
     }
@@ -724,7 +723,7 @@ class VisualAssignment extends Assignment {
             arrow_key_fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
             graphinterval;
         $(document).keydown(e => {
-            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && VisualAssignment.assignmentGraphOnScreen(this.dom_assignment) && !arrow_key_fired) {
+            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.assignmentGraphIsOnScreen() && !arrow_key_fired) {
                 // "arrow_key_fired" makes .keydown fire only when a key is pressed, not repeatedly
                 arrow_key_fired = true;
                 this.pressed_arrow_key = e.key;
