@@ -917,10 +917,6 @@ utils = {
                 }
             });
         },
-        displayTruncateWarning: function($assignment) {
-            const relative_positioning_wrapper = $assignment.find(".relative-positioning-wrapper");
-            relative_positioning_wrapper.toggleClass("display-truncate-warning", relative_positioning_wrapper.find(".description").hasOverflown());
-        },
         displayFullDueDateOnHover: function() {
             $(".title").on("mouseover mousemove click", function(e) {
                 $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
@@ -936,8 +932,9 @@ utils = {
                 $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
                     const $this = $(this);
-                    new VisualAssignment($this).positionTags();
-                    utils.ui.displayTruncateWarning($this);
+                    const sa = new VisualAssignment($this);
+                    sa.positionTags();
+                    sa.displayTruncateWarning();
                 });
                 $(".unfinished-message").each(function() {
                     const $this = $(this);

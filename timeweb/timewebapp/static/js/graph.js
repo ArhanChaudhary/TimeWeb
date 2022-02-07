@@ -1131,6 +1131,10 @@ class VisualAssignment extends Assignment {
         dom_assignment_footer.css("top", parseFloat(this.dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
         dom_tags.prop("style").setProperty('--margin-top', parseFloat(this.dom_assignment.css("padding-bottom")));
     }
+    displayTruncateWarning() {
+        const relative_positioning_wrapper = this.dom_assignment.find(".relative-positioning-wrapper");
+        relative_positioning_wrapper.toggleClass("display-truncate-warning", relative_positioning_wrapper.find(".description").hasOverflown());
+    }
 }
 let already_ran_tutorial = false;
 let prevent_click = false;
@@ -1181,7 +1185,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
     sa.positionTags();
-    utils.ui.displayTruncateWarning(dom_assignment);
+    sa.displayTruncateWarning();
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click
