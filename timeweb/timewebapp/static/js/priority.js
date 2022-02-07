@@ -779,11 +779,13 @@ class Priority {
                             assignment_to_scroll_to = dom_assignment;
                         }
                         setTimeout(function() {
-                            // scrollIntoView sometimes doesn't work without setTimeout
-                            assignment_to_scroll_to[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'nearest',
-                            });
+                            setTimeout(function() {
+                                // scrollIntoView sometimes doesn't work without two setTimeouts
+                                assignment_to_scroll_to[0].scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'nearest',
+                                });
+                            }, 0);
                         }, 0);
                         // utils.scroll determines when the page has stopped scrolling and internally resolves the promise
                         $("main").scroll(() => utils.scroll(resolve));
