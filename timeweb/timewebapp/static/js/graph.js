@@ -72,7 +72,7 @@ class Assignment {
         this.sa.due_time = {hour: 0, minute: 0};
         do {
             this.sa.x++;
-        } while (this.getWorkingDaysRemaining({ reference: "visual red line start" }) === 0);
+        } while (this.getWorkingDaysRemaining({ reference: "blue line end" }) === 0);
         this.sa.complete_x = this.sa.x;
         ajaxUtils.sendAttributeAjaxWithTimeout("due_time", this.sa.due_time, this.sa.id);
 
@@ -89,10 +89,9 @@ class Assignment {
             // Unused for now but I might use it in the future
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             this.red_line_start_x = today_minus_assignment_date;
-        } else if (params.reference === "visual red line start") {
+        } else if (params.reference === "blue line end") {
             let len_works = this.sa.works.length - 1;
-            // First point the red line is drawn on, taken from draw()
-            this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.blue_line_start + len_works;
+            this.red_line_start_x = this.sa.blue_line_start + len_works;
         }
         let x1 = this.sa.x - this.red_line_start_x;
         if (this.sa.break_days.length) {
@@ -959,7 +958,7 @@ class VisualAssignment extends Assignment {
                 // No need to ajax since skew ratio is the same
                 return;
             }
-            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1 || this.sa.needs_more_info) {
+            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1 || this.sa.needs_more_info) {
                 skew_ratio_button.onlyText("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
@@ -1019,7 +1018,7 @@ class VisualAssignment extends Assignment {
                 min: -max_textbox_value,
                 max: max_textbox_value,
             });
-            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1 || this.sa.needs_more_info) {
+            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1 || this.sa.needs_more_info) {
                 skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_textbox);
                 not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
