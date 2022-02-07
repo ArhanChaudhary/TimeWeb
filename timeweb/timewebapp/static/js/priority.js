@@ -137,45 +137,6 @@ class Priority {
                 });
     }        
 
-    positionTags(dom_assignment) {
-        const that = this;
-        dom_assignment.removeClass("tags-bottom");
-        SETTINGS.horizontal_tag_position === "Left" && that.positionTagLeftAndTagBottom(dom_assignment);
-        SETTINGS.vertical_tag_position === "Bottom" && dom_assignment.addClass("tags-bottom");
-    }
-    positionTagLeftAndTagBottom(dom_assignment) {
-        const that = this;
-        const dom_title = dom_assignment.find(".title");
-        const dom_tags = dom_assignment.find(".tags");
-        const dom_button = dom_assignment.find(".button");
-        const dom_assignment_footer = dom_assignment.find(".assignment-footer");
-        const add_priority_percentage = !!dom_title.attr("data-priority");
-        // Even though this is always true, it'll add this here for compatibility
-        const add_daysleft = !!dom_title.attr("data-daysleft");
-        dom_assignment.css({paddingTop: "", paddingBottom: ""});
-        dom_button.css({marginTop: "", marginBottom: ""});
-
-        const tag_top = dom_tags.offset().top;
-        const tag_height = dom_tags.height();
-
-        let title_top = dom_title.offset().top;
-        if (SETTINGS.horizontal_tag_position === "Left") {
-            //hard
-            if (SETTINGS.vertical_tag_position === "Bottom") {
-                if (add_daysleft) title_top -= 14;
-            } else if (add_priority_percentage) {
-                title_top -= 10;
-            } else {
-                title_top += 3;
-            }
-        }
-        
-        const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
-        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
-        dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
-        dom_assignment_footer.css("top", parseFloat(dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
-        dom_tags.prop("style").setProperty('--margin-top', parseFloat(dom_assignment.css("padding-bottom")));
-    }
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
         $(".assignment").each(function(index) {
@@ -804,7 +765,7 @@ class Priority {
                     resolve();
                 }
             }).then(function() {
-                that.positionTags(dom_assignment);
+                VisualAssignment.positionTags(dom_assignment);
             });
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {

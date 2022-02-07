@@ -922,7 +922,7 @@ utils = {
                 $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
                     const $this = $(this);
-                    new Priority().positionTags($this);
+                    VisualAssignment.positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
                 $(".unfinished-message").each(function() {
