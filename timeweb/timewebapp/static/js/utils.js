@@ -1193,6 +1193,7 @@ ajaxUtils = {
     },
     ajaxChangeSetting: function(kwargs={}) {
         if (ajaxUtils.disable_ajax) return;
+        kwargs.value = JSON.stringify(kwargs.value);
         const data = {...{
                 csrfmiddlewaretoken: csrf_token,
                 action: 'change_setting',
