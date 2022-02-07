@@ -70,7 +70,7 @@ else:
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
-EDITING_EXAMPLE_ACCOUNT = False
+EDITING_EXAMPLE_ACCOUNT = True
 EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_OF_TAGS = 5
@@ -431,7 +431,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
+                original_date_now = date_now
                 date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
+                self.sm.assignment_date -= original_date_now - date_now
+                self.sm.x -= original_date_now - date_now
             if self.created_assignment or self.sm.needs_more_info:
                 self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
                 if self.sm.blue_line_start < 0 or EDITING_EXAMPLE_ACCOUNT:
