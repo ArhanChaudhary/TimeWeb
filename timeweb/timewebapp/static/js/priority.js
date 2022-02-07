@@ -17,6 +17,15 @@ class Priority {
     static FINISHED_FOR_TODAY = 3;
     static NOT_YET_ASSIGNED = 2;
     static COMPLETELY_FINISHED = 1;
+
+    constructor() {
+        const that = this;
+        that.due_date_passed_notices = [];
+        that.due_date_incremented_notices = [];
+        that.priority_data_list = [];
+        that.total_completion_time = 0;
+        that.today_and_tomorrow_total_completion_time = 0;
+    }
     
     percentageToColor(priority_percentage) {
         const that = this;
@@ -698,7 +707,7 @@ class Priority {
             assignment_container.addClass("add-line-wrapper");
             if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                 if (that.prev_assignment_container) that.prev_assignment_container.addClass("last-add-line-wrapper");
-                assignment_container.addClass("first-add-line-wrapper").prepend($(DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE));
+                assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-from-class-template").html());
             }
             that.prev_tag = current_tag;
             that.prev_assignment_container = assignment_container;
@@ -753,13 +762,6 @@ class Priority {
     }
     sortWithoutTimeout() {
         const that = this;
-        that.priority_data_list = [];
-        that.total_completion_time = 0;
-        that.today_and_tomorrow_total_completion_time = 0;
-        that.due_date_passed_notices = [];
-        that.due_date_incremented_notices = [];
-        that.display_due_today_completion_time = false;
-        that.display_due_tomorrow_completion_time = false;
         let scrollTop = $("main").scrollTop();
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         that.alertDueDates();
@@ -777,10 +779,6 @@ class Priority {
                 return -Infinity;
             }
         }));
-        that.prev_assignment_container = undefined;
-        that.prev_tag = undefined;
-        that.already_found_first_incomplete_works = false;
-        that.already_found_first_finished = false;
         let first_available_tutorial_assignment_fallback;
         let first_available_tutorial_assignment;
         $("#autofill-work-done, #delete-starred-assignments").hide();
@@ -799,9 +797,8 @@ class Priority {
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
-            const first_sort = that.params.first_sort; // Needs to be set as a closure for the resolved promise
             new Promise(function(resolve) {
-                if (first_sort) {
+                if (that.params.first_sort) {
                     $(window).one("load", resolve);
                 } else {
                     resolve();
@@ -809,7 +806,7 @@ class Priority {
             }).then(function() {
                 that.positionTags(dom_assignment);
             });
-            if (first_sort && assignment_container.is("#animate-color, #animate-in")) {
+            if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
@@ -837,7 +834,7 @@ class Priority {
                         mark_as_done: priority_data.mark_as_done,
                         is_element_submitted: true,
                         priority_percentage,
-                        first_sort
+                        first_sort: that.params.first_sort,
                     });
                 });
             } else {
@@ -846,7 +843,7 @@ class Priority {
                     mark_as_done: priority_data.mark_as_done,
                     is_element_submitted: true,
                     priority_percentage,
-                    first_sort
+                    first_sort: that.params.first_sort,
                 });
             }
             that.addAssignmentShortcut(dom_assignment, priority_data);
@@ -909,7 +906,5 @@ class Priority {
     }
 }
 document.addEventListener("DOMContentLoaded", function() {
-    DELETE_GC_ASSIGNMENTS_FROM_CLASS_TEMPLATE = $("#delete-gc-assignments-from-class-template").html();
-    priority = new Priority();
-    priority.sort({ first_sort: true });
+    new Priority().sort({ first_sort: true });
 });

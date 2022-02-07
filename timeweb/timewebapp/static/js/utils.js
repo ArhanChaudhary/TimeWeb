@@ -118,7 +118,7 @@ utils = {
                     ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
                     let status_image = sa.mark_as_done ? "show" : "hide";
                     $(this).children("img").attr("src", DEBUG === "True" ? `static/images/${status_image}.png` : `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
-                    priority.sort();
+                    new Priority().sort();
                 });
             },
             tickButtons: function() {
@@ -255,7 +255,7 @@ utils = {
                             top: -9999,
                         })
                         $("#current-date-text").text("(No changes are saved in this state) Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                        priority.sort();
+                        new Priority().sort();
                     }
 
                     if (utils.in_simulation) {
@@ -283,7 +283,7 @@ utils = {
                 $("#id_assignment_sorting").on("change", function() {
                     SETTINGS.assignment_sorting = $(this).val();
                     ajaxUtils.ajaxChangeSetting({setting: "assignment_sorting", value: SETTINGS.assignment_sorting});
-                    priority.sort();
+                    new Priority().sort();
                 });
             },
 
@@ -380,7 +380,7 @@ utils = {
                                 action: function() {
                                     const params = {};
                                     params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = true;
-                                    priority.sort(params);
+                                    new Priority().sort(params);
                                 }
                             },
                             cancel: function() {
@@ -566,7 +566,7 @@ utils = {
                         // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
                         // "important" and "not important" because they were designed to affect priority
                         // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
-                            priority.sort();
+                            new Priority().sort();
                         // }
 
                         // Close box and add tags visually
@@ -681,7 +681,7 @@ utils = {
 
                     // GC class tags
                     // if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
-                        priority.sort();
+                        new Priority().sort();
                     // }
 
                     tag_wrapper.addClass("tag-is-deleting");
@@ -750,7 +750,7 @@ utils = {
 
                     // GC class tags
                     //sa.is_google_classroom_assignment && sa.needs_more_info && 
-                    priority.sort();
+                    new Priority().sort();
                     
                     ajaxUtils.sendAttributeAjaxWithTimeout("tags", sa.tags, sa.id);
                 }
@@ -922,7 +922,7 @@ utils = {
                 $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
                     const $this = $(this);
-                    priority.positionTags($this);
+                    new Priority().positionTags($this);
                     utils.ui.displayTruncateWarning($this);
                 });
                 $(".unfinished-message").each(function() {
@@ -1362,7 +1362,7 @@ for (let sa of dat) {
             if (complete_due_date - original_date_now + utils.SCHEDULED_TIMEOUT_DELAY > 0)
                 $(window).one("load", function() {
                     setTimeout(function() {
-                        priority.sort();
+                        new Priority().sort();
                     // Hardcoded delay if setTimeout isn't accurate
                     }, complete_due_date - original_date_now + utils.SCHEDULED_TIMEOUT_DELAY);
                 });

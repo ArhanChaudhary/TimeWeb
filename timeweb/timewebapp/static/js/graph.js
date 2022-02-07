@@ -294,7 +294,7 @@ class VisualAssignment extends Assignment {
 
         this.setDynamicStartIfInDynamicMode();
         ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-        priority.sort({ timeout: true });
+        new Priority().sort({ timeout: true });
         this.draw();
     }
     static RGBToString(color, params={ invert: false }) {
@@ -781,7 +781,7 @@ class VisualAssignment extends Assignment {
             }
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
-            priority.sort({ timeout: true });
+            new Priority().sort({ timeout: true });
             this.draw();
         });
         }
@@ -953,7 +953,7 @@ class VisualAssignment extends Assignment {
             
             if (SETTINGS.close_graph_after_work_input && this.dom_assignment.hasClass("open-assignment") && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1)
                 this.dom_assignment.click();
-            priority.sort({ timeout: true });
+            new Priority().sort({ timeout: true });
             this.draw();
         });
         }
@@ -1000,7 +1000,7 @@ class VisualAssignment extends Assignment {
                 if (!this.draw_mouse_point) {
                     this.graph.off("mousemove");
                 }
-                priority.sort();
+                new Priority().sort();
                 this.draw();
             } else if (this.draw_mouse_point) {
                 // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
@@ -1057,7 +1057,7 @@ class VisualAssignment extends Assignment {
             }
         }).focusout(() => {
             skew_ratio_textbox.val('');
-            priority.sort();
+            new Priority().sort();
         });
         }
         // END Skew ratio textbox
@@ -1092,7 +1092,7 @@ class VisualAssignment extends Assignment {
                 this.autotuneSkewRatio();
             }
             this.setDynamicStartIfInDynamicMode();
-            priority.sort();
+            new Priority().sort();
             this.draw();
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
         }
@@ -1146,7 +1146,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         // Assignment name dom element can change height, so repoisiton the tags
-        priority.positionTags(dom_assignment);
+        new Priority().positionTags(dom_assignment);
         return;
     }
     SETTINGS.one_graph_at_a_time && $("#close-assignments").click();
@@ -1155,7 +1155,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     // If the assignment was clicked while it was closing, stop the closing animation and open it
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
-    priority.positionTags(dom_assignment);
+    new Priority().positionTags(dom_assignment);
     utils.ui.displayTruncateWarning(dom_assignment);
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
