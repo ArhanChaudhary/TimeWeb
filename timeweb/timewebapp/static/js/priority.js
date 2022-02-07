@@ -765,7 +765,7 @@ class Priority {
                     resolve();
                 }
             }).then(function() {
-                VisualAssignment.positionTags(dom_assignment);
+                new VisualAssignment(dom_assignment).positionTags();
             });
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {

@@ -936,7 +936,7 @@ utils = {
                 $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
                     const $this = $(this);
-                    VisualAssignment.positionTags($this);
+                    new VisualAssignment($this).positionTags();
                     utils.ui.displayTruncateWarning($this);
                 });
                 $(".unfinished-message").each(function() {

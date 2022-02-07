@@ -1092,20 +1092,20 @@ class VisualAssignment extends Assignment {
         });
     }
 
-    static positionTags(dom_assignment) {
-        dom_assignment.removeClass("tags-bottom");
-        SETTINGS.horizontal_tag_position === "Left" && VisualAssignment.positionTagLeftAndTagBottom(dom_assignment);
-        SETTINGS.vertical_tag_position === "Bottom" && dom_assignment.addClass("tags-bottom");
+    positionTags() {
+        this.dom_assignment.removeClass("tags-bottom");
+        SETTINGS.horizontal_tag_position === "Left" && this.positionTagLeftAndTagBottom();
+        SETTINGS.vertical_tag_position === "Bottom" && this.dom_assignment.addClass("tags-bottom");
     }
-    static positionTagLeftAndTagBottom(dom_assignment) {
-        const dom_title = dom_assignment.find(".title");
-        const dom_tags = dom_assignment.find(".tags");
-        const dom_button = dom_assignment.find(".button");
-        const dom_assignment_footer = dom_assignment.find(".assignment-footer");
+    positionTagLeftAndTagBottom() {
+        const dom_title = this.dom_assignment.find(".title");
+        const dom_tags = this.dom_assignment.find(".tags");
+        const dom_button = this.dom_assignment.find(".button");
+        const dom_assignment_footer = this.dom_assignment.find(".assignment-footer");
         const add_priority_percentage = !!dom_title.attr("data-priority");
         // Even though this is always true, it'll add this here for compatibility
         const add_daysleft = !!dom_title.attr("data-daysleft");
-        dom_assignment.css({paddingTop: "", paddingBottom: ""});
+        this.dom_assignment.css({paddingTop: "", paddingBottom: ""});
         dom_button.css({marginTop: "", marginBottom: ""});
 
         const tag_top = dom_tags.offset().top;
@@ -1125,11 +1125,11 @@ class VisualAssignment extends Assignment {
         }
         
         const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
-        dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
+        this.dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
         dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
 
-        dom_assignment_footer.css("top", parseFloat(dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
-        dom_tags.prop("style").setProperty('--margin-top', parseFloat(dom_assignment.css("padding-bottom")));
+        dom_assignment_footer.css("top", parseFloat(this.dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
+        dom_tags.prop("style").setProperty('--margin-top', parseFloat(this.dom_assignment.css("padding-bottom")));
     }
 }
 let already_ran_tutorial = false;
@@ -1172,7 +1172,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         // Assignment name dom element can change height, so repoisiton the tags
-        VisualAssignment.positionTags(dom_assignment);
+        sa.positionTags();
         return;
     }
     SETTINGS.one_graph_at_a_time && $("#close-assignments").click();
@@ -1180,7 +1180,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     // If the assignment was clicked while it was closing, stop the closing animation and open it
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
-    VisualAssignment.positionTags(dom_assignment);
+    sa.positionTags();
     utils.ui.displayTruncateWarning(dom_assignment);
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
