@@ -7,9 +7,6 @@
     -webkit-margin-after: 1em;
             margin-block-end: 1em;
 }
-.major-category::after {
-    counter-increment: major-category-counter -1;
-}
 #table-of-contents-container, #table-of-contents-container-label {
     width: 225px;
 }
