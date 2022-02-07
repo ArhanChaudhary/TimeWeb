@@ -732,35 +732,35 @@ class VisualAssignment extends Assignment {
         $(window).resize(this.resize.bind(this));
 
         // BEGIN Up and down arrow event handler
+        {
         let graphtimeout,
-            fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
+            arrow_key_fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
             graphinterval;
         $(document).keydown(e => {
-            // fixed_graph.is(":visible") to make sure it doesnt change when the assignment is closed
-            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.fixed_graph.is(":visible")) {
-                if (VisualAssignment.assignmentGraphOnScreen(this.dom_assignment) && !fired) {
-                    // "fired" makes .keydown fire only when a key is pressed, not repeatedly
-                    fired = true;
-                    this.pressed_arrow_key = e.key;
-                    this.arrowSkewRatio();
-                    graphtimeout = setTimeout(function() {
-                        clearInterval(graphinterval);
-                        graphinterval = setInterval(this.arrowSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
-                    }.bind(this), VisualAssignment.ARROW_KEYDOWN_THRESHOLD);
-                }
+            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && VisualAssignment.assignmentGraphOnScreen(this.dom_assignment) && !arrow_key_fired) {
+                // "arrow_key_fired" makes .keydown fire only when a key is pressed, not repeatedly
+                arrow_key_fired = true;
+                this.pressed_arrow_key = e.key;
+                this.arrowSkewRatio();
+                graphtimeout = setTimeout(function() {
+                    clearInterval(graphinterval);
+                    graphinterval = setInterval(this.arrowSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
+                }.bind(this), VisualAssignment.ARROW_KEYDOWN_THRESHOLD);
             }
         }).keyup(e => {
             // Ensures the same key pressed fires the keyup to stop change skew ratio
             // Without this, you could press another key while the down arrow is being pressed for example and stop graphinterval
             if (e.key === this.pressed_arrow_key) {
-                fired = false;
+                arrow_key_fired = false;
                 clearTimeout(graphtimeout);
                 clearInterval(graphinterval);
             }
         });
+        }
         // END Up and down arrow event handler
 
         // BEGIN Delete work input button
+        {
         let not_applicable_timeout_delete_work_input_button;
         delete_work_input_button.click(() => {
             let len_works = this.sa.works.length - 1;
@@ -783,9 +783,11 @@ class VisualAssignment extends Assignment {
             priority.sort({ timeout: true });
             this.draw();
         });
+        }
         // END Delete work input button
 
         // BEGIN Work input textbox
+        {
         let not_applicable_timeout_work_input_textbox;
         let enter_fired = false;
         work_input_textbox.keydown(e => {
@@ -806,9 +808,11 @@ class VisualAssignment extends Assignment {
             if (e.key === "Enter")
                 enter_fired = false;
         });
+        }
         // END Work input textbox
 
         // BEGIN Submit work button
+        {
         let not_applicable_timeout_submit_work_button;
         submit_work_button.click(() => {
             if (this.sa.needs_more_info) {
@@ -951,9 +955,11 @@ class VisualAssignment extends Assignment {
             priority.sort({ timeout: true });
             this.draw();
         });
+        }
         // END Submit work button
 
         // BEGIN Set skew ratio using graph button
+        {
         let original_skew_ratio;
         let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
@@ -1014,9 +1020,11 @@ class VisualAssignment extends Assignment {
                 this.mousemove(e);
             }
         });
+        }
         // END Set skew ratio button using graph button
 
         // BEGIN Skew ratio textbox
+        {
         let not_applicable_timeout_skew_ratio_textbox;
         skew_ratio_textbox.on("keydown paste click keyup", () => { // keyup for delete
             const skew_ratio_bound = this.calcSkewRatioBound();
@@ -1050,9 +1058,11 @@ class VisualAssignment extends Assignment {
             skew_ratio_textbox.val('');
             priority.sort();
         });
+        }
         // END Skew ratio textbox
 
         // BEGIN Fixed/dynamic mode button
+        {
         let not_applicable_timeout_fixed_mode_button;
         fixed_mode_button.click(() => {
             if (this.sa.needs_more_info) {
@@ -1084,6 +1094,7 @@ class VisualAssignment extends Assignment {
             priority.sort();
             this.draw();
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+        }
         // END Fixed/dynamic mode button        
     }
     static shake_assignment($assignment_to_shake) {
