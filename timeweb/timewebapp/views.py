@@ -346,12 +346,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             return self.deleted_assignment(request)
         elif action == 'save_assignment':
             return self.saved_assignment(request)
-        elif action == 'finished_tutorial':
-            return self.finished_tutorial(request)
-        elif action == 'seen_latest_changelog':
-            return self.seen_latest_changelog(request)
-        elif action == 'assignment_sorting':
-            return self.assignment_sorting(request)
+        elif action == 'change_setting':
+            return self.change_setting(request)
         elif action == 'create_gc_assignments':
             if 'token' in self.settings_model.oauth_token:
                 redirect_url_if_creds_invalid = self.create_gc_assignments(request)
@@ -721,6 +717,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.save()
 
         request.session["already_created_gc_assignments_from_frontend"] = True
+
     def deleted_assignment(self, request):
         assignments = request.POST.getlist('assignments[]')
         TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
@@ -747,23 +744,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             except NameError: # Forgot why I put this here
                 pass
         return HttpResponse(status=204)
-        
-    def finished_tutorial(self, request):
-        self.settings_model.enable_tutorial = False
-        self.settings_model.save()
-        logger.info(f"User \"{request.user}\" finished their tutorial")
-        return HttpResponse(status=204)
-    
-    def seen_latest_changelog(self, request):
-        self.settings_model.seen_latest_changelog = True
-        self.settings_model.save()
-        logger.info(f"User \"{request.user}\" saved seeing their changelog")
-        return HttpResponse(status=204)
 
-    def assignment_sorting(self, request):
-        self.settings_model.assignment_sorting = request.POST['assignment_sorting']
+    def change_setting(self, request):
+        setting = request.POST['setting']
+        value = json.loads(request.POST['value'])
+        setattr(self.settings_model, setting, value)
         self.settings_model.save()
-        logger.info(f"User \"{request.user}\" saved their assignment sorting")
         return HttpResponse(status=204)
 
     def tag_add_or_delete(self, request, action):

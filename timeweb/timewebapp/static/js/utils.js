@@ -282,7 +282,7 @@ utils = {
             assignmentSorting: function() {
                 $("#id_assignment_sorting").on("change", function() {
                     SETTINGS.assignment_sorting = $(this).val();
-                    ajaxUtils.ajaxAssignmentSorting();
+                    ajaxUtils.ajaxChangeSetting({setting: "assignment_sorting", value: SETTINGS.assignment_sorting});
                     priority.sort();
                 });
             },
@@ -1031,11 +1031,11 @@ utils = {
                 //         },
                 //         onClose: function() {
                 //             SETTINGS.enable_tutorial = false;
-                //             ajaxUtils.ajaxFinishedTutorial();
+                //             ajaxUtils.ajaxChangeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
                 //         },
                 //     });
                     SETTINGS.enable_tutorial = false;
-                    ajaxUtils.ajaxFinishedTutorial();
+                    ajaxUtils.ajaxChangeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
                 }
             });
         },
@@ -1180,37 +1180,12 @@ ajaxUtils = {
             },
         });
     },
-    ajaxFinishedTutorial: function() {
+    ajaxChangeSetting: function(kwargs={}) {
         if (ajaxUtils.disable_ajax) return;
-        const data = {
-            'csrfmiddlewaretoken': csrf_token,
-            'action': 'finished_tutorial',
-        }
-        $.ajax({
-            type: "POST",
-            data: data,
-            error: ajaxUtils.error,
-        });
-    },
-    ajaxSeenLatestChangelog: function() {
-        if (ajaxUtils.disable_ajax) return;
-        const data = {
-            'csrfmiddlewaretoken': csrf_token,
-            'action': 'seen_latest_changelog',
-        }
-        $.ajax({
-            type: "POST",
-            data: data,
-            error: ajaxUtils.error,
-        });
-    },
-    ajaxAssignmentSorting: function() {
-        if (ajaxUtils.disable_ajax) return;
-        const data = {
-            'csrfmiddlewaretoken': csrf_token,
-            'action': 'assignment_sorting',
-            'assignment_sorting': SETTINGS.assignment_sorting,
-        }
+        const data = {...{
+                csrfmiddlewaretoken: csrf_token,
+                action: 'change_setting',
+            }, ...kwargs}
         $.ajax({
             type: "POST",
             data: data,
@@ -1335,7 +1310,7 @@ if (!SETTINGS.seen_latest_changelog) {
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;
-                ajaxUtils.ajaxSeenLatestChangelog();
+                ajaxUtils.ajaxChangeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
             }
         });
         setTimeout(function() {
