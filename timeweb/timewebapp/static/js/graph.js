@@ -1083,10 +1083,11 @@ class VisualAssignment extends Assignment {
         }
         // END Fixed/dynamic mode button        
     }
-    static shake_assignment($assignment_to_shake) {
-        $assignment_to_shake.animate({left: -5}, 75, "easeOutCubic", function() {
-            $assignment_to_shake.animate({left: 5}, 75, "easeOutCubic", function() {
-                $assignment_to_shake.animate({left: 0}, 75, "easeOutCubic");
+    shake() {
+        const that = this;
+        that.dom_assignment.animate({left: -5}, 75, "easeOutCubic", function() {
+            that.dom_assignment.animate({left: 5}, 75, "easeOutCubic", function() {
+                that.dom_assignment.animate({left: 0}, 75, "easeOutCubic");
             });
         });
     }
@@ -1145,7 +1146,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const sa = new VisualAssignment(dom_assignment);
     
     if (sa.sa.needs_more_info && !Number.isFinite(sa.sa.x)) {
-        VisualAssignment.shake_assignment(dom_assignment);
+        sa.shake();
         dom_assignment.find(".update-button").parents(".button").focus();
         return;
     }
