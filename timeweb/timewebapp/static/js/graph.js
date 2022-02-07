@@ -1142,9 +1142,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const dontFire = targetInTags || targetInButton;
     if (!targetInHeader || dontFire || prevent_click) return;
     const dom_assignment = $(this);
-    const sa_sa = utils.loadAssignmentData(dom_assignment);
+    const sa = new VisualAssignment(dom_assignment);
     
-    if (sa_sa.needs_more_info && !Number.isFinite(sa_sa.x)) {
+    if (sa.sa.needs_more_info && !Number.isFinite(sa.sa.x)) {
         VisualAssignment.shake_assignment(dom_assignment);
         dom_assignment.find(".update-button").parents(".button").focus();
         return;
@@ -1176,7 +1176,6 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     }
     SETTINGS.one_graph_at_a_time && $("#close-assignments").click();
     
-    const sa = new VisualAssignment(dom_assignment);
     // If the assignment was clicked while it was closing, stop the closing animation and open it
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
