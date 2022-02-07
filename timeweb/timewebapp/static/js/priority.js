@@ -265,6 +265,7 @@ class Priority {
             const due_date_passed = complete_due_date <= complete_date_now /* Will evaluate to false if complete_due_date or complete_date_now are invalid dates */ && !sa.sa.soft;
             const finished_work_inputs = last_work_input >= sa.sa.y;
             const not_yet_assigned = today_minus_assignment_date < 0;
+            const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "visual red line start" });
 
             let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
@@ -365,7 +366,7 @@ class Priority {
                 const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now;
                 // use complete_due_date <= complete_date_now instead of (complete_due_date <= complete_date_now && sa.sa.soft)
                 // if the conjugate is true, (complete_due_date <= complete_date_now && !sa.sa.soft), the assignment will be marked as due date passed
-                const no_working_days = sa.getWorkingDaysRemaining({ reference: "today" }) === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
+                const no_working_days = remaining_work_days === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
                 if (incomplete_past_inputs || no_working_days) {
                     status_image = 'question-mark';
                     if (incomplete_past_inputs) {
@@ -465,7 +466,6 @@ class Priority {
                         str_daysleft = due_date_minus_today + "d";
                     }
                     if (sa.sa.break_days.length) {
-                        const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today" });
                         str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
                     }
                 }

@@ -86,6 +86,7 @@ class Assignment {
     getWorkingDaysRemaining(params={reference: null}) {
         const original_red_line_start_x = this.red_line_start_x;
         if (params.reference === "today") {
+            // Unused for now but I might use it in the future
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
             this.red_line_start_x = today_minus_assignment_date;
         } else if (params.reference === "visual red line start") {
