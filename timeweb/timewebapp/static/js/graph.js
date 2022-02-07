@@ -787,7 +787,8 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Work input textbox
         let not_applicable_timeout_work_input_textbox;
-        work_input_textbox.on("keydown paste click keyup", e => {
+        let enter_fired = false;
+        work_input_textbox.keydown(e => {
             if (this.sa.needs_more_info) {
                 work_input_textbox.val('').attr("placeholder", "Not Applicable");
                 clearTimeout(not_applicable_timeout_work_input_textbox);
@@ -796,11 +797,14 @@ class VisualAssignment extends Assignment {
                 }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
-
-            if (e.key === "Enter") {
+            
+            if (e.key === "Enter" && !enter_fired) {
+                enter_fired = true;
                 submit_work_button.click();
-                work_input_textbox.val("");
             }
+        }).keyup(e => {
+            if (e.key === "Enter")
+                enter_fired = false;
         });
         // END Work input textbox
 
