@@ -241,7 +241,7 @@ $.fn.isFullyScrolled = function() {
 $.fn.expandableTextareaHeight = function() {
     $(this).on("input", function() {
         $(this).css("height", "auto"); // Needed for expanding with text
-        $(this).css("height", $(this).prop("scrollHeight") + parseFloat($(this).css("padding-top")) + parseFloat($(this).css("padding-bottom")));
+        $(this).css("height", $(this).prop("scrollHeight") + parseFloat($(this).css("padding-top")));
     });
     return $(this);
 }
