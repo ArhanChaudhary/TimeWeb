@@ -216,7 +216,7 @@ utils = {
                 $("#break-days-wrapper").addClass("hidden-field");
                 $("#form-wrapper #advanced-inputs").click(function() {
                     if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
-                        crud.replaceUnit();
+                        new Crud().replaceUnit();
                         $("#fields-wrapper > div:first-of-type")[0].scrollIntoView({
                             behavior: "smooth",
                             block: "end",
@@ -358,7 +358,7 @@ utils = {
                                     const success = function() {
                                         const assignments_to_delete = $(".finished");
                                         assignments_to_delete.each(function(i) {
-                                            crud.transitionDeleteAssignment($(this).children(".assignment"), {final_iteration: i === assignments_to_delete.length - 1});
+                                            new Crud().transitionDeleteAssignment($(this).children(".assignment"), {final_iteration: i === assignments_to_delete.length - 1});
                                         }); 
                                     }
                                     if (ajaxUtils.disable_ajax) {
@@ -453,7 +453,7 @@ utils = {
                                     const success = function() {
                                         $this.off("click");
                                         assignments_to_delete.each(function(i) {
-                                            crud.transitionDeleteAssignment($(this).children(".assignment"), {final_iteration: i === assignments_to_delete.length - 1});
+                                            new Crud().transitionDeleteAssignment($(this).children(".assignment"), {final_iteration: i === assignments_to_delete.length - 1});
                                         });
                                     }
                 
@@ -848,7 +848,7 @@ utils = {
                         setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
                         break;
                     case "Escape":
-                        crud.hideForm();
+                        new Crud().hideForm();
                         break;
                     case "ArrowDown":
                     case "ArrowUp":

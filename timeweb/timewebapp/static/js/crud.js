@@ -431,6 +431,5 @@ class Crud {
     }
 }
 $(window).one("load", function() {
-    crud = new Crud();
-    crud.init();
+    new Crud().init();
 });
