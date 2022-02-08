@@ -234,9 +234,9 @@ $.fn.hasOverflown = function() {
     if (!e) return false;
     return e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth;
 }
-$.fn.isFullyScrolled = function() {
+$.fn.isFullyScrolled = function(params={}) {
     const e = this[0];
-    return e.scrollTop + e.clientHeight >= e.scrollHeight;
+    return e.scrollTop + e.clientHeight + params.leeway >= e.scrollHeight;
 }
 $.fn.expandableTextareaHeight = function() {
     $(this).on("input", function() {

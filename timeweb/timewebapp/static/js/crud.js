@@ -31,6 +31,14 @@ class Crud {
             that.hideForm({ hide_instantly: true });
         }
         
+        $("#fields-wrapper").scroll(function() {
+            let scroll_percentage = this.scrollTop / (this.scrollHeight - this.clientHeight) || 0;
+
+            const unscrolled_height = +$(this).attr("unscrolled-height");
+            const scrolled_height = +$(this).attr("scrolled-height");
+            $("#fields-wrapper").css("height", unscrolled_height + (scrolled_height - unscrolled_height) * scroll_percentage);
+        });
+
         if (that.invalidOnlyInAdvanced()) {
             $("#form-wrapper #advanced-inputs").click();
         }
@@ -117,7 +125,9 @@ class Crud {
         }
         that.old_unit_value = singularToLowerCase;
         // +1 to show the line under "Advanced Inputs"
-        $("#fields-wrapper").css("height", Math.ceil($("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseFloat($("#advanced-inputs").css("margin-top")) + 1 + $("#fields-wrapper").scrollTop()));
+        $("#fields-wrapper").attr("unscrolled-height", Math.ceil($("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseFloat($("#advanced-inputs").css("margin-top")) + 5 + $("#fields-wrapper").scrollTop()));
+        $("#fields-wrapper").attr("scrolled-height", $("#fields-wrapper > :last-child").position().top + $("#fields-wrapper > :last-child").height() - $("#form-wrapper #advanced-inputs").position().top + 15);
+        $("#fields-wrapper").trigger("scroll");
     }
     setCrudHandlers() {
         const that = this;

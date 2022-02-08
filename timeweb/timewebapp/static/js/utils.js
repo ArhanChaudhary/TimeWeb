@@ -211,20 +211,18 @@ utils = {
                     $(".second-advanced-buttons").toggle();
                     $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hiddenzAz in graph.js
                 }
-                // Advanced inputs for form
+                // Advanced inputs for form, don't add to works because
                 $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
                 $("#break-days-wrapper").addClass("hidden-field");
                 $("#form-wrapper #advanced-inputs").click(function() {
-                    if ($(this).parents("#fields-wrapper").isFullyScrolled()) {
-                        this.scrollIntoView({
+                    if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
+                        crud.replaceUnit();
+                        $("#fields-wrapper > div:first-of-type")[0].scrollIntoView({
                             behavior: "smooth",
                             block: "end",
                         });
                     } else {
-                        $("#fields-wrapper > :last-child")[0].scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                        });
+                        $("#fields-wrapper").animate({scrollTop: $("#fields-wrapper").height()}, 500)
                     }                    
                 });
             },
