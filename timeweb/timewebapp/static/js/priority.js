@@ -252,7 +252,7 @@ class Priority {
                 }).css("margin-left", 2);            
             } else if (finished_work_inputs || due_date_passed) {
                 status_image = "completely-finished";
-                if (last_work_input >= sa.sa.y && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
+                if (finished_work_inputs && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
                     status_message = 'You\'re Completely Finished with this Assignment';
                 } else {
                     alert_due_date_passed_cond = true;
@@ -292,13 +292,6 @@ class Priority {
                             sa.setDynamicStartIfInDynamicMode();
                         }
                     }
-                    if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                            sa.setDynamicStartIfInDynamicMode();
-                            sa.autotuneSkewRatio();
-                        }
-                        sa.setDynamicStartIfInDynamicMode();
-                    }
                     /**
                      * 
                      * t x   r
@@ -311,10 +304,20 @@ class Priority {
                      * 7 7 > 8
                      * 10 7 > 11
                      */
-                    if (sa.sa.soft && today_minus_assignment_date >= sa.sa.x) {
+                    const increment_due_date_condition = sa.sa.soft && today_minus_assignment_date >= sa.sa.x;
+                    if (increment_due_date_condition) {
                         sa.sa.x = today_minus_assignment_date;
                         sa.incrementDueDate();
                     }
+
+                    if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                            sa.setDynamicStartIfInDynamicMode();
+                            sa.autotuneSkewRatio();
+                        }
+                        sa.setDynamicStartIfInDynamicMode();
+                    }
+
                     if (has_autofilled) {
                         ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
