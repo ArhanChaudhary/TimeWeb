@@ -110,7 +110,7 @@ utils = {
     },
     ui: {
         tickClock: function() {
-            const estimated_completion_time = utils.getDateNow();
+            const estimated_completion_time = utils.getRawDateNow();
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
@@ -1108,7 +1108,7 @@ utils = {
     },
     reloadAtMidnight: function() {
         // Reloads the page after midnight hour to update the graph
-        const now = utils.getDateNow();
+        const now = utils.getRawDateNow();
         const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const reload_time = midnight.getTime() + 1000 * 60 * 60 * 24;
         if (now.getTime() < reload_time) {
@@ -1134,11 +1134,19 @@ utils = {
             resolver();
         }, 200);
     },
-    getDateNow: function() {
-        if (SETTINGS.timezone)
-            return new Date(new Date().toLocaleString("en-US", {timeZone: SETTINGS.timezone}));
-        else
-            return new Date();
+    getRawDateNow: function(params={ accurate_in_simulation: true }) {
+        if (SETTINGS.timezone) {
+            var raw_date_now = new Date(new Date().toLocaleString("en-US", {timeZone: SETTINGS.timezone}));
+        } else {
+            var raw_date_now = new Date();
+        }
+        if (params.accurate_in_simulation) {
+            let complete_date_now = new Date(date_now.valueOf());
+            complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), 0, 0);
+            return complete_date_now;
+        } else {
+            return raw_date_now;
+        }
     },
     SCHEDULED_TIMEOUT_DELAY: 5000,
 }
@@ -1330,9 +1338,7 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-date_now = utils.getDateNow();
-original_date_now = new Date(date_now.valueOf());
-date_now = new Date(date_now.toDateString());
+date_now = new Date(utils.getRawDateNow().toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
@@ -1369,12 +1375,14 @@ for (let sa of dat) {
         
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
-            if (complete_due_date - original_date_now + utils.SCHEDULED_TIMEOUT_DELAY > 0)
+            let raw_date_now = new Date(utils.getRawDateNow().valueOf());
+            let time_diff = complete_due_date - raw_date_now;
+            if (time_diff + utils.SCHEDULED_TIMEOUT_DELAY > 0)
                 $(window).one("load", function() {
                     setTimeout(function() {
                         new Priority().sort();
                     // Hardcoded delay if setTimeout isn't accurate
-                    }, complete_due_date - original_date_now + utils.SCHEDULED_TIMEOUT_DELAY);
+                    }, time_diff + utils.SCHEDULED_TIMEOUT_DELAY);
                 });
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
             sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);

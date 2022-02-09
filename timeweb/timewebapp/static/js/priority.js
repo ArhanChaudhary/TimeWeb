@@ -139,6 +139,7 @@ class Priority {
 
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
+        let complete_date_now = utils.getRawDateNow();
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
@@ -223,10 +224,6 @@ class Priority {
                 complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
             }
             
-            let complete_date_now = new Date(date_now.valueOf());
-            let date_now_with_time = utils.getDateNow();
-            complete_date_now.setHours(date_now_with_time.getHours(), date_now_with_time.getMinutes(), 0, 0);
-
             // (complete_due_date <= complete_date_now && !sa.sa.soft)
             // This marks the assignment as completed if its due date passes
             // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
@@ -332,10 +329,8 @@ class Priority {
                 const todo_is_completed = todo <= 0;
                 const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
                 const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
+                const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now && sa.sa.soft;
                 // Don't mark as no working days when the end of the assignment has been reached
-                const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now;
-                // use complete_due_date <= complete_date_now instead of (complete_due_date <= complete_date_now && sa.sa.soft)
-                // if the conjugate is true, (complete_due_date <= complete_date_now && !sa.sa.soft), the assignment will be marked as due date passed
                 const no_working_days = remaining_work_days === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
                 if (incomplete_past_inputs || no_working_days) {
                     status_image = 'question-mark';
