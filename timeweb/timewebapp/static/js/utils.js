@@ -115,7 +115,7 @@ utils = {
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
-                if (isNaN(estimated_completion_time.getMinutes())) {t
+                if (isNaN(estimated_completion_time.getMinutes())) {
                     estimated_completion_time.setTime(8640000000000000);
                 }
                 let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -129,6 +129,7 @@ utils = {
                     if (utils.in_simulation || isExampleAccount) return;
                     reloadWhenAppropriate();
                 }
+                $(window).resize();
             }
         },
         setClickHandlers: {

@@ -683,7 +683,7 @@ class VisualAssignment extends Assignment {
             screen.fillText(bigger_index, number_x_pos, this.height - 39);
         }
         screen.fillText(0, 55.5, this.height - 38.5);
-        const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);;
+        const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(utils.getRawDateNow(), this.sa.assignment_date, {round: false});
         if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.complete_x) {
             let today_x = today_minus_assignment_date * this.wCon + 47.5;
             screen.fillStyle = "rgb(150,150,150)";
