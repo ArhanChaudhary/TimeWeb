@@ -70,7 +70,7 @@ else:
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
-EDITING_EXAMPLE_ACCOUNT = True
+EDITING_EXAMPLE_ACCOUNT = False
 EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
 MAX_NUMBER_ASSIGNMENTS = 100
 MAX_NUMBER_OF_TAGS = 5

@@ -366,7 +366,7 @@ class Priority {
                 } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
                     status_image = 'finished';
                     if (current_work_input_is_break_day) {
-                        status_message = 'Today isn\'t this Assignment\'s Work Day';
+                        status_message = 'Today isn\'t a Working Day for this Assignment';
                     } else {
                         status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
                     }
