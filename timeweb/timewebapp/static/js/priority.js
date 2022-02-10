@@ -196,7 +196,9 @@ class Priority {
             // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
             // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
             // Instead, give it a question mark so it can be appropriately handled
-            const due_date_passed = complete_due_date <= complete_date_now /* Will evaluate to false if complete_due_date or complete_date_now are invalid dates */ && !sa.sa.soft;
+            
+            // This evaluates to false if complete_due_date or complete_date_now are invalid dates
+            const due_date_passed = complete_due_date <= complete_date_now;
 
             let number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             // Think of Math.floor(sa.sa.complete_x) === today_minus_assignment_date as Math.floor(sa.sa.complete_x) === Math.floor(complete_today_minus_assignment_date)
@@ -244,7 +246,7 @@ class Priority {
 
             let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
-            if (sa.sa.needs_more_info && !(sa.sa.is_google_classroom_assignment && due_date_passed)) {
+            if (sa.sa.needs_more_info && !(sa.sa.is_google_classroom_assignment && due_date_passed && !sa.sa.soft)) {
                 status_image = 'question-mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
@@ -258,7 +260,7 @@ class Priority {
                     width: 11,
                     height: 18,
                 }).css("margin-left", 2);            
-            } else if (finished_work_inputs || due_date_passed) {
+            } else if (finished_work_inputs || due_date_passed && !sa.sa.soft) {
                 status_image = "completely-finished";
                 if (finished_work_inputs && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
                     status_message = 'You\'re Completely Finished with this Assignment';
