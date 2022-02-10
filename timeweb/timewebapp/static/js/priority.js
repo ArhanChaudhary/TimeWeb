@@ -310,7 +310,7 @@ class Priority {
                         sa.incrementDueDate();
                     }
 
-                    if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
+                    if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
                         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                             sa.setDynamicStartIfInDynamicMode();
                             sa.autotuneSkewRatio();
