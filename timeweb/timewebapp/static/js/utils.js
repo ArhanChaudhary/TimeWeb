@@ -1134,13 +1134,13 @@ utils = {
             resolver();
         }, 200);
     },
-    getRawDateNow: function(params={ accurate_in_simulation: true }) {
+    getRawDateNow: function(params={ accurate_in_simulation: true, initial_define: false }) {
         if (SETTINGS.timezone) {
             var raw_date_now = new Date(new Date().toLocaleString("en-US", {timeZone: SETTINGS.timezone}));
         } else {
             var raw_date_now = new Date();
         }
-        if (params.accurate_in_simulation) {
+        if (params.accurate_in_simulation && !params.initial_define) {
             let complete_date_now = new Date(date_now.valueOf());
             complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), 0, 0);
             return complete_date_now;
@@ -1338,7 +1338,7 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-date_now = new Date(utils.getRawDateNow().toDateString());
+date_now = new Date(utils.getRawDateNow({ initial_define: true }).toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
