@@ -174,7 +174,6 @@ class Priority {
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index),
                 dom_tags = $(".tags").eq(index);
-            let has_autofilled = false;
 
             let first_real_tag = sa.sa.tags[0];
             for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_real_tag); tag_index_iterator++) {
@@ -189,6 +188,7 @@ class Priority {
 
             const number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             if (!sa.sa.needs_more_info && that.params.autofill_all_work_done && number_of_forgotten_days > 0) {
+                let has_autofilled = false;
                 for (let i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                     // Don't use "sa.sa.soft" logic because this will always complete the assignment if the due date already passed
@@ -275,7 +275,8 @@ class Priority {
                 status_message = 'This Assignment hasn\'t Yet been Assigned';
                 status_value = Priority.NOT_YET_ASSIGNED;
             } else {
-                if (that.params.autofill_no_work_done && number_of_forgotten_days > 0) {
+                let has_autofilled = false;
+                if (that.params.autofill_no_work_done && number_of_forgotten_days > 0)
                     for (let i = 0; i < number_of_forgotten_days; i++) {
                         
                         if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
@@ -292,37 +293,40 @@ class Priority {
                             sa.setDynamicStartIfInDynamicMode();
                         }
                     }
-                    /**
-                     * 
-                     * t x   r
-                     * 1 5 > 5
-                     * 2 5 > 5
-                     * 3 5 > 5
-                     * 4 5 > 5
-                     * 5 5 > 6
-                     * 6 6 > 7
-                     * 7 7 > 8
-                     * 10 7 > 11
-                     */
-                    const increment_due_date_condition = sa.sa.soft && today_minus_assignment_date >= sa.sa.x;
-                    if (increment_due_date_condition) {
-                        sa.sa.x = today_minus_assignment_date;
-                        sa.incrementDueDate();
-                    }
-
-                    if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                            sa.setDynamicStartIfInDynamicMode();
-                            sa.autotuneSkewRatio();
-                        }
-                        sa.setDynamicStartIfInDynamicMode();
-                    }
-
-                    if (has_autofilled) {
-                        ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
-                        todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
-                    }
+                /**
+                 * 
+                 * 1st column: today_minus_assignment_date
+                 * 2nd column: sa.sa.x
+                 * 3rd column: ideal value for the new due date
+                 * 1 5 > 5
+                 * 2 5 > 5
+                 * 3 5 > 5
+                 * 4 5 > 5
+                 * 5 5 > 6
+                 * 6 6 > 7
+                 * 7 7 > 8
+                 * 10 7 > 11
+                 * We can deduce the following logic to properly set x:
+                 */
+                const increment_due_date_condition = sa.sa.soft && today_minus_assignment_date >= sa.sa.x;
+                if (increment_due_date_condition) {
+                    sa.sa.x = today_minus_assignment_date;
+                    sa.incrementDueDate();
                 }
+
+                if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
+                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                        sa.setDynamicStartIfInDynamicMode();
+                        sa.autotuneSkewRatio();
+                    }
+                    sa.setDynamicStartIfInDynamicMode();
+                }
+
+                if (has_autofilled) {
+                    ajaxUtils.sendAttributeAjaxWithTimeout("works", sa.sa.works.map(String), sa.sa.id);
+                    todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
+                }
+
                 complete_due_date = new Date(sa.sa.assignment_date.valueOf());
                 complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
                 if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
