@@ -186,7 +186,26 @@ class Priority {
                 var has_not_important_tag = true;
             }
 
-            const number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
+            let complete_due_date = new Date(sa.sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
+            if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
+                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
+            }
+            // (complete_due_date <= complete_date_now && !sa.sa.soft)
+            // This marks the assignment as completed if its due date passes
+            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
+            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
+            // Instead, give it a question mark so it can be appropriately handled
+            const due_date_passed = complete_due_date <= complete_date_now /* Will evaluate to false if complete_due_date or complete_date_now are invalid dates */ && !sa.sa.soft;
+
+            let number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
+            // Think of Math.floor(sa.sa.complete_x) === today_minus_assignment_date as Math.floor(sa.sa.complete_x) === Math.floor(complete_today_minus_assignment_date)
+            if (sa.sa.soft && due_date_passed && Math.floor(sa.sa.complete_x) === today_minus_assignment_date) {
+                // If complete_x = 2.5, today_minus_assignment_date = 2 (but the raw value is 2.75), and sa.sa.blue_line_start + len_works is 2, then number_of_forgotten_days = 0
+                // However, this will mean nothing will autofill
+                // Increment number_of_forgotten_days to fix this
+                number_of_forgotten_days++;
+            }
             if (!sa.sa.needs_more_info && that.params.autofill_all_work_done && number_of_forgotten_days > 0) {
                 let has_autofilled = false;
                 for (let i = 0; i < number_of_forgotten_days; i++) {
@@ -218,18 +237,7 @@ class Priority {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
-            let complete_due_date = new Date(sa.sa.assignment_date.valueOf());
-            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
-            if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
-                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
-            }
             
-            // (complete_due_date <= complete_date_now && !sa.sa.soft)
-            // This marks the assignment as completed if its due date passes
-            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
-            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
-            // Instead, give it a question mark so it can be appropriately handled
-            const due_date_passed = complete_due_date <= complete_date_now /* Will evaluate to false if complete_due_date or complete_date_now are invalid dates */ && !sa.sa.soft;
             const finished_work_inputs = last_work_input >= sa.sa.y;
             const not_yet_assigned = today_minus_assignment_date < 0;
             const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "blue line end" });
