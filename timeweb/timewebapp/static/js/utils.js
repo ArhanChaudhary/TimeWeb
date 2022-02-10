@@ -110,11 +110,12 @@ utils = {
     },
     ui: {
         tickClock: function() {
-            const estimated_completion_time = utils.getRawDateNow();
+            const now = utils.getRawDateNow();
+            const estimated_completion_time = new Date(now.valueOf());
             const minute_value = estimated_completion_time.getMinutes();
             if (minute_value !== utils.ui.old_minute_value) {
                 estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
-                if (isNaN(estimated_completion_time.getMinutes())) {
+                if (isNaN(estimated_completion_time.getMinutes())) {t
                     estimated_completion_time.setTime(8640000000000000);
                 }
                 let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -122,6 +123,12 @@ utils = {
                 str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
                 $("#current-time").html(` (${str})`);
                 utils.ui.old_minute_value = minute_value;
+
+                const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+                if (midnight.valueOf() !== date_now.valueOf()) {
+                    if (utils.in_simulation || isExampleAccount) return;
+                    reloadWhenAppropriate();
+                }
             }
         },
         setClickHandlers: {
@@ -1109,6 +1116,7 @@ utils = {
     reloadAtMidnight: function() {
         // Reloads the page after midnight hour to update the graph
         const now = utils.getRawDateNow();
+        // this is essentially doing floor() + 1
         const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const reload_time = midnight.getTime() + 1000 * 60 * 60 * 24;
         if (now.getTime() < reload_time) {
