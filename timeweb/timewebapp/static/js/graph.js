@@ -895,7 +895,7 @@ class VisualAssignment extends Assignment {
             this.sa.works.push(last_work_input);
 
             // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
-            if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && input_done < this.sa.y
+            if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && last_work_input < this.sa.y
                 && this.sa.soft)
                 this.incrementDueDate();
             // Will never run if incrementDueDate() is called
