@@ -264,7 +264,8 @@ a[href="/settings"] {
     position: absolute;
 }
 .shortcut-line-left {
-    left: -14px;
+    --left: -14px;
+    left: var(--left);
     border-top: 2px solid black;
     top: 2px;
     position: relative;
@@ -274,19 +275,19 @@ a[href="/settings"] {
     border-top: 2px solid black;
 }
 #autofill-work-done .shortcut-line-left {
-    width: calc(50% - 113px);
+    width: calc(50% - 127px - var(--left));
 }
 #autofill-work-done .shortcut-line-right {
     width: calc(50% - 128px);
 }
 #delete-starred-assignments .shortcut-line-left {
-    width: calc(50% - 126px);
+    width: calc(50% - 140px - var(--left));
 }
 #delete-starred-assignments .shortcut-line-right {
     width: calc(50% - 141px);
 }
 .delete-gc-assignments-from-class .shortcut-line-left {
-    width: calc(50% - 155px);
+    width: calc(50% - 169px - var(--left));
 }
 .delete-gc-assignments-from-class .shortcut-line-right {
     width: calc(50% - 170px);
@@ -306,7 +307,7 @@ a[href="/settings"] {
     /* Put the before wrapper in front of the after wrapper, which are both visible with grey-highlight */
     z-index: 1;
     height: 100%;
-    left: calc(var(--outer-assignment-horizontal-padding) - 15px);
+    left: 10px;
     bottom: -1px;
     border-left: 2px solid black;
 }
@@ -316,12 +317,29 @@ a[href="/settings"] {
 .assignment-container.last-add-line-wrapper::after {
     content: '';
     position: absolute;
-    width: calc(43px - var(--outer-assignment-horizontal-padding) * 0.44);
+    width: 32px;
     /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after. So, make this left slightly inside the wrapper */
-    left: calc(var(--outer-assignment-horizontal-padding) * 0.44);
+    left: 11px;
     bottom: -1px;
     border-bottom: 2px solid black;
 }
+
+@media screen and (max-width: 900px) {
+    #assignments-container {
+        --outer-assignment-horizontal-padding: 10px;
+    }
+    .assignment-container.add-line-wrapper::before {
+        left: 3px;
+    }
+    .assignment-container.add-line-wrapper::after {
+        width: 23px;
+        left: 4px;
+    }
+    .shortcut-line-left {
+        --left: -6px;
+    }
+}
+
 .assignment-header {
     display: flex;
     align-items: center;
