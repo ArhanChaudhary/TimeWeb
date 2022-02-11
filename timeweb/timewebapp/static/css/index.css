@@ -6,7 +6,8 @@
     padding-top: 10px;
     opacity: 0;
     --scale-percent-y: 1.05;
-    --outer-assignment-padding: 7px;
+    --outer-assignment-vertical-padding: 7px;
+    --outer-assignment-horizontal-padding: 25px;
 }
 #assignments-container.comfy {
     --vertical-assignment-padding: 25px;
@@ -47,7 +48,7 @@ header.animate::after {
 #assignments-header {
     position: relative;
     z-index: 1001;
-    padding: 0 10px;
+    padding: 0 var(--outer-assignment-horizontal-padding);
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -137,7 +138,7 @@ a[href="/settings"] {
     order: 1;
     padding-right: 5px;
     padding-left: 20px;
-    right: 208px;
+    right: calc(198px + var(--outer-assignment-horizontal-padding));
     text-align: right;
     display: none;
     font-size: 17px;
@@ -162,15 +163,11 @@ a[href="/settings"] {
     /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
     position: relative;
-    padding: var(--outer-assignment-padding) 10px;
+    padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-
-     /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after */
-    --last-line-wrapper-left: 4px;
-    --last-line-wrapper-width: 23px;
 }
 .assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
     transition: none !important;
@@ -226,14 +223,14 @@ a[href="/settings"] {
     position: relative;
     /* So "Go" can be clicked easier */
     z-index: 1000;
-    margin-bottom: calc(4px + var(--outer-assignment-padding) * 2);
+    margin-bottom: calc(4px + var(--outer-assignment-vertical-padding) * 2);
 }
 .shortcut-text {
     white-space: nowrap;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: -10px;
+    margin-top: -11px;
 
     display: flex;
     gap: 5px;
@@ -252,6 +249,7 @@ a[href="/settings"] {
     font-size: 12px;
 }
 .shortcut .generic-button {
+    margin-top: 1px;
     padding-top: 0;
     padding-bottom: 0;
 }
@@ -266,7 +264,7 @@ a[href="/settings"] {
     position: absolute;
 }
 .shortcut-line-left {
-    left: -6px;
+    left: -14px;
     border-top: 2px solid black;
     top: 2px;
     position: relative;
@@ -276,19 +274,19 @@ a[href="/settings"] {
     border-top: 2px solid black;
 }
 #autofill-work-done .shortcut-line-left {
-    width: calc(50% - 121px);
+    width: calc(50% - 113px);
 }
 #autofill-work-done .shortcut-line-right {
     width: calc(50% - 128px);
 }
 #delete-starred-assignments .shortcut-line-left {
-    width: calc(50% - 134px);
+    width: calc(50% - 126px);
 }
 #delete-starred-assignments .shortcut-line-right {
     width: calc(50% - 141px);
 }
 .delete-gc-assignments-from-class .shortcut-line-left {
-    width: calc(50% - 163px);
+    width: calc(50% - 155px);
 }
 .delete-gc-assignments-from-class .shortcut-line-right {
     width: calc(50% - 170px);
@@ -308,7 +306,7 @@ a[href="/settings"] {
     /* Put the before wrapper in front of the after wrapper, which are both visible with grey-highlight */
     z-index: 1;
     height: 100%;
-    left: 3px;
+    left: calc(var(--outer-assignment-horizontal-padding) - 15px);
     bottom: -1px;
     border-left: 2px solid black;
 }
@@ -318,8 +316,9 @@ a[href="/settings"] {
 .assignment-container.last-add-line-wrapper::after {
     content: '';
     position: absolute;
-    width: var(--last-line-wrapper-width);
-    left: var(--last-line-wrapper-left);
+    width: calc(43px - var(--outer-assignment-horizontal-padding) * 0.44);
+    /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after. So, make this left slightly inside the wrapper */
+    left: calc(var(--outer-assignment-horizontal-padding) * 0.44);
     bottom: -1px;
     border-bottom: 2px solid black;
 }
