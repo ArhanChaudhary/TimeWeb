@@ -63,7 +63,7 @@ $(function() {
                 newassignmenttext.css("max-width", 0);
                 if (collision(username, logo, { margin: 10 })) {
                     // compress the logo
-                    logo.find("img").attr("width", Math.max(0, username.offset().left-60-20-5));
+                    logo.find("img").css("width", Math.max(0, username.offset().left-60-20-5));
                 }
             } else {
                 newassignmenttext.css("max-width",window.innerWidth/2-115-69);
