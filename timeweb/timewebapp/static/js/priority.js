@@ -717,8 +717,7 @@ class Priority {
             }
             $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
         }
-        utils.ui.old_minute_value = undefined; // Force tickClock to update. Without this, it may not update and display (Invalid Date)
-        utils.ui.tickClock();
+        utils.ui.tickClock({ force_update: true });
         if (that.params.first_sort) {
             setInterval(utils.ui.tickClock, 1000);
         }

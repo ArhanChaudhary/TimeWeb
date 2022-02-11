@@ -109,7 +109,8 @@ utils = {
         }
     },
     ui: {
-        tickClock: function() {
+        tickClock: function(params={force_update: false}) {
+            if (params.force_update) utils.ui.old_minute_value = undefined; // Without this, it may not update and display (Invalid Date)
             const now = utils.getRawDateNow();
             const estimated_completion_time = new Date(now.valueOf());
             const minute_value = estimated_completion_time.getMinutes();
