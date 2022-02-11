@@ -417,6 +417,7 @@ a[href="/settings"] {
     position: absolute;
     font-size: 0.7em;
     transform: translateY(100%) translateY(-2px);
+    white-space: nowrap;
     width: calc(100% + var(--arrow-margin-left));
     height: 35px;
     left: 0;
