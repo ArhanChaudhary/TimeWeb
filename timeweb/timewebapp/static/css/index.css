@@ -6,6 +6,7 @@
     padding-top: 10px;
     opacity: 0;
     --scale-percent-y: 1.05;
+    --outer-assignment-padding: 7px;
 }
 #assignments-container.comfy {
     --vertical-assignment-padding: 25px;
@@ -161,7 +162,7 @@ a[href="/settings"] {
     /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
     position: relative;
-    padding: 5px 10px;
+    padding: var(--outer-assignment-padding) 10px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
@@ -225,8 +226,7 @@ a[href="/settings"] {
     position: relative;
     /* So "Go" can be clicked easier */
     z-index: 1000;
-    margin-bottom: 15px;
-    margin-top: -7px;
+    margin-bottom: calc(4px + var(--outer-assignment-padding) * 2);
 }
 .shortcut-text {
     white-space: nowrap;
@@ -267,7 +267,6 @@ a[href="/settings"] {
 }
 .shortcut-line-left {
     left: -6px;
-    margin-top: 9px;
     border-top: 2px solid black;
     top: 2px;
     position: relative;
