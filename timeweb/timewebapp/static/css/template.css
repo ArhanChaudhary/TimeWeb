@@ -511,14 +511,6 @@ nav:focus-within #nav-menu::after {
     margin-top: 1px;
     margin-bottom: 3px;
 }
-/* open-sans 600 */
-@font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 600;
-    src: local(''),
-         url('../fonts/open-sans-v18-latin-600.woff2') format('woff2'); /* Chrome 26+, Opera 23+, Firefox 39+ */
-}
 #changelog-container {
     padding: 0 10px;
 }

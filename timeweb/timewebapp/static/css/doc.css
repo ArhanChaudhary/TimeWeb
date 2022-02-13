@@ -242,14 +242,6 @@ details > img {
 .label-icon {
     position: absolute;
 }
-@font-face {
-    font-family: 'Roboto Slab';
-    font-style: normal;
-	font-weight: 700;
-    src: local(''),
-         url('../fonts/roboto-slab-v7-bold.woff2') format('woff2');
-}
-
 #dark-mode body {
     --body-background: black;
 }
