@@ -221,8 +221,6 @@ utils = {
                     $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hiddenzAz in graph.js
                 }
                 // Advanced inputs for form, don't add to works because
-                $("#id_funct_round, #id_min_work_time, #break-days-label-title, #id_description").parent().addClass("hidden-field");
-                $("#break-days-wrapper").addClass("hidden-field");
                 $("#form-wrapper #advanced-inputs").click(function() {
                     if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
                         new Crud().replaceUnit();
@@ -231,7 +229,7 @@ utils = {
                             block: "end",
                         });
                     } else {
-                        $("#fields-wrapper").animate({scrollTop: $("#fields-wrapper").height()}, 500)
+                        $("#fields-wrapper").animate({scrollTop: $("#fields-wrapper").height()}, 500, "swing");
                     }                    
                 });
             },
@@ -1078,9 +1076,6 @@ utils = {
                     ));
                     // Save scroll position
                     localStorage.setItem("scroll", $("main").scrollTop());
-                    if (!$("#form-wrapper .hidden-field").length) {
-                        sessionStorage.setItem("advanced_inputs", true);
-                    }
                 }
                 // Send ajax before close if it's on timeout
                 if (ajaxUtils.attributeData.assignments.length) {
@@ -1088,10 +1083,6 @@ utils = {
                 }
             });
 
-            if ("advanced_inputs" in sessionStorage) {
-                $("#form-wrapper #advanced-inputs").click();
-                sessionStorage.removeItem("advanced_inputs");
-            }
             // Ensure fonts load for the graph
             document.fonts.ready.then(function() {
                 if (!SETTINGS.enable_tutorial) 
