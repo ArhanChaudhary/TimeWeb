@@ -27,7 +27,7 @@
       <form method="POST" autocomplete="off">
         <img id="cancel-button" width="20" height="20" src="{% static 'images/x.png' %}" alt="cancel" draggable="false" tabindex="0">
         <div id="new-title-line"></div>
-        <div id="new-title">New Assignment</div>
+        <div id="new-title">{{submit}}</div>
         <div id="fields-wrapper">
           {% csrf_token %}
           {% for field in form.visible_fields %}
