@@ -23,7 +23,7 @@ class Crud {
         const that = this;
         that.setCrudHandlers();
         that.addInfoButtons();
-        setTimeout(() => that.styleErorrs());
+        setTimeout(() => that.styleErrors());
 
         if ($(".error-note").length) {
             that.showForm({ show_instantly: true })
@@ -339,18 +339,11 @@ class Crud {
             marginRight: 9,
         })
     }
-    styleErorrs() {
+    styleErrors() {
         const that = this;
         // Style errors if form is invalid
         $("#form-wrapper .error-note").each(function() {
             $(this).siblings("input, textarea").addClass("invalid");
-            // Give the previous field an error if appropriate
-            if (this.id === "error_id_x" && $(this).text().includes("assignment date")) {
-                $("#id_assignment_date").addClass("invalid");
-            }
-            if (this.id === "error_id_works" && $(this).text().includes("of")) {
-                $("#id_y").addClass("invalid");
-            }
         });
         if ($("#id_x.invalid").length) {
             $(".field-wrapper#id-soft-field-wrapper, .field-wrapper#id-due_time-field-wrapper").each(function() {

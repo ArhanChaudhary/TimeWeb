@@ -108,6 +108,7 @@ class TimewebForm(forms.ModelForm):
                     'equal_to_or_greater_than': "equal to" if works == y else "greater than",
                 })
             )
+            self.add_error("y", forms.ValidationError(""))
         if x != None:
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
         if x != None and assignment_date != None and complete_due_date <= assignment_date:
@@ -116,6 +117,7 @@ class TimewebForm(forms.ModelForm):
                     'on_or_before': "on" if complete_due_date == assignment_date else "before"
                 })
             )
+            self.add_error("assignment_date", forms.ValidationError(""))
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):
