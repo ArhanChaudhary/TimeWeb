@@ -83,7 +83,7 @@ header.animate::after {
 .generic-button {
     cursor: pointer;
     background-color: white;
-    border: 2px solid rgba(0,0,0,0.45);
+    border: 1px solid rgb(147, 147, 147);
     border-radius: 4px;
     display: inline-block;
     font-size: 13px;
@@ -98,6 +98,7 @@ header.animate::after {
 }
 .generic-button:active {
     transform: translateY(1px);
+    box-shadow: none;
 }
 #tomorrow-time {
     white-space: nowrap;
@@ -250,8 +251,6 @@ a[href="/settings"] {
 }
 .shortcut .generic-button {
     margin-top: 1px;
-    padding-top: 0;
-    padding-bottom: 0;
 }
 .shortcut .generic-button::after {
     content: "";
@@ -1113,10 +1112,7 @@ input[type=number]::-webkit-inner-spin-button {
     display: block;
     padding: 20px 45px;
     font-size: 19px;
-    -webkit-appearance: none;
     background: rgb(238, 238, 238);
-    border-radius: 3px;
-    border: 1px solid rgb(79, 79, 79);
 }
 #submit-assignment-button:hover {
     background: rgb(229, 229, 229);
