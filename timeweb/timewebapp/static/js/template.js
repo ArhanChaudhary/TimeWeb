@@ -142,6 +142,9 @@ $(function() {
     $("#nav-credits").click(() => $.alert({
         title: $("#credits-template").html(),
     }));
+    $("#nav-socials").click(() => $.alert({
+        title: $("#socials-template").html(),
+    }));
 });
 window.onbeforeunload = function() {
     if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
