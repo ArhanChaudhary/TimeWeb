@@ -97,6 +97,43 @@ main.finished-header-transition {
     -o-object-fit: cover;
        object-fit: cover;
 }
+.generic-button {
+    cursor: pointer;
+    background-color: white;
+    border: 1px solid rgb(147, 147, 147);
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 13px;
+    text-align: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+    padding: 1px 6px;
+    position: relative;
+}
+.generic-button:hover {
+    background-color: rgb(236, 236, 236);
+}
+.generic-button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+.daterangepicker .generic-button {
+    padding: 2px 10px;
+}
+.daterangepicker .drp-calendar {
+    padding-right: 8px !important;
+}
+.daterangepicker .drp-calendar .calendar-table {
+    padding-right: unset !important;
+}
+/* styles from the daterangepicker library */
+.daterangepicker .drp-buttons .applyBtn {
+    margin-left: 5px;
+
+    border-color: transparent;
+    background-color: #357ebd;
+    color: #fff;
+}
 #loading-container {
     display: none;
     --circle-count: 8;

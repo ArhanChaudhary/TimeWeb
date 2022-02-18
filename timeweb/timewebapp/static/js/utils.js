@@ -1,15 +1,13 @@
 gtag("event", "home");
 utils = {
     formatting: {
-        // Reverses utils.formatting.parseDate
-        // Converts Date objects to YYYY-MM-DD
         stringifyDate: function(date) {
             if (!date instanceof Date) return "";
             return [
-                ('000' + date.getFullYear()).slice(-4),
                 ('0' + (date.getMonth() + 1)).slice(-2),
                 ('0' + date.getDate()).slice(-2),
-            ].join('-');
+                ('000' + date.getFullYear()).slice(-4),
+            ].join('/');
         },
         formatMinutes: function(total_minutes) {
             const hour = Math.floor(total_minutes / 60),
@@ -1342,6 +1340,11 @@ SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
 date_now = new Date(utils.getRawDateNow({ initial_define: true }).toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
+SETTINGS.def_due_time = SETTINGS.def_due_time.split(":");
+SETTINGS.def_due_time = {
+    hour: +SETTINGS.def_due_time[0],
+    minute: +SETTINGS.def_due_time[1],
+}
 if (isExampleAccount) {
     window.gtag = function(){};
     x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));

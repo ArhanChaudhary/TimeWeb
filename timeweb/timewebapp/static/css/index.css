@@ -80,26 +80,6 @@ header.animate::after {
 #hide-button {
     margin-right: 5px;
 }
-.generic-button {
-    cursor: pointer;
-    background-color: white;
-    border: 1px solid rgb(147, 147, 147);
-    border-radius: 4px;
-    display: inline-block;
-    font-size: 13px;
-    text-align: center;
-    align-items: flex-start;
-    box-sizing: border-box;
-    padding: 1px 6px;
-    position: relative;
-}
-.generic-button:hover {
-    background-color: rgb(236, 236, 236);
-}
-.generic-button:active {
-    transform: translateY(1px);
-    box-shadow: none;
-}
 #tomorrow-time {
     white-space: nowrap;
 }
@@ -931,10 +911,6 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
 }
-#form-wrapper input[type=date] {
-    /* Mobile */
-    background: white !important;
-}
 #form-wrapper label::after {
     position: absolute;
     display: block;
@@ -1039,27 +1015,13 @@ input[type=number]::-webkit-inner-spin-button {
     border: 1px solid black;
     border-radius: 3px;
 }
-#form-wrapper input[type="date"] {
-    /* IOS */
-    min-width: calc(100% - 30px);
-}
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
     transform: translateY(-40px);
     right: 10px;
 }
-#form-wrapper .field-wrapper#id-due_time-field-wrapper {
-    position: absolute;
-    margin-left: 10px;
-    transform: translate(calc(var(--right-translate, 0) * 1px), -44px);
-}
 #form-wrapper .field-wrapper#id-unit-field-wrapper {
     margin-top: 40px;
-}
-#form-wrapper #id_due_time {
-    border: none;
-    width: unset;
-    background-color: unset;
 }
 #form-wrapper #id_soft {
     width: unset;
@@ -1074,6 +1036,9 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper #id_x {
     min-width: calc(100% - 30px - var(--soft-label-width));
     width: calc(100% - 20px - var(--soft-label-width));
+}
+#form-wrapper #id_x, #form-wrapper #id_assignment_date {
+    letter-spacing: 0.5px;
 }
 #form-wrapper .field-wrapper label[for='id_x']::after {
     right: calc(var(--soft-label-width) - 10px);

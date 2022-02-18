@@ -214,7 +214,13 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def post(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
+
+        # for parsing default due times in forms.py
+        _mutable = request.POST._mutable
+        request.POST._mutable = True
         self.form = SettingsForm(data=request.POST, files=request.FILES)
+        request.POST._mutable = _mutable
+
         self.checked_background_image_clear = request.POST.get("background_image-clear")
         form_is_valid = True
         if not self.form.is_valid():
@@ -367,7 +373,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             self.created_assignment = False
             self.updated_assignment = True
+        
+        # for parsing due times in forms.py
+        _mutable = request.POST._mutable
+        request.POST._mutable = True
         self.form = TimewebForm(data=request.POST, files=request.FILES)
+        request.POST._mutable = _mutable
 
         # Parts of the form that can only validate in views
         form_is_valid = True

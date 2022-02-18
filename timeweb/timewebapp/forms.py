@@ -12,21 +12,13 @@ import datetime
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
 from allauth.account.forms import *
 
-class DateInput(forms.DateInput):
-    input_type = 'date'
-
-class TimeInput(forms.TimeInput):
-    input_type = 'time'
-
 class TimewebForm(forms.ModelForm):
     class Meta:
         model = TimewebModel
         fields = "__all__"
         widgets = {
             'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
-            'assignment_date': DateInput(),
-            'x': DateInput(),
-            'due_time': TimeInput(),
+            'due_time': forms.HiddenInput(),
             'blue_line_start': forms.HiddenInput(),
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
@@ -90,6 +82,13 @@ class TimewebForm(forms.ModelForm):
             },
         }
     def __init__(self, *args, **kwargs):
+        if 'data' in kwargs and 'x' in kwargs['data'] and kwargs['data']['x']:
+            kwargs['data']['due_time'] = kwargs['data']['x'].split(" ", 1)[1]
+            kwargs['data']['due_time'] = datetime.datetime.strptime(kwargs['data']['due_time'], '%I:%M %p').time()
+            kwargs['data']['due_time'] = kwargs['data']['due_time'].strftime('%H:%M')
+
+            kwargs['data']['x'] = kwargs['data']['x'].split(" ", 1)[0]
+
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 
@@ -111,13 +110,13 @@ class TimewebForm(forms.ModelForm):
             self.add_error("y", forms.ValidationError(""))
         if x != None:
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
-        if x != None and assignment_date != None and complete_due_date <= assignment_date:
-            self.add_error("x",
-                forms.ValidationError(_("The due date can't be %(on_or_before)s the assignment date"),code='invalid',params={
-                    'on_or_before': "on" if complete_due_date == assignment_date else "before"
-                })
-            )
-            self.add_error("assignment_date", forms.ValidationError(""))
+            if complete_due_date <= assignment_date:
+                self.add_error("x",
+                    forms.ValidationError(_("The due date can't be%(before)sthe assignment date"),code='invalid',params={
+                        'before': "" if complete_due_date == assignment_date else " before "
+                    })
+                )
+                self.add_error("assignment_date", forms.ValidationError(""))
         return cleaned_data
 
 class SettingsForm(forms.ModelForm):
@@ -127,7 +126,6 @@ class SettingsForm(forms.ModelForm):
         widgets = {
             "user": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min": "0"}),
-            'def_due_time': forms.TimeInput(attrs={"type": "time"}),
             'date_now': forms.HiddenInput(),
             'oauth_token': forms.HiddenInput(),
             'highest_priority_color': ColorWidget,
@@ -169,6 +167,10 @@ class SettingsForm(forms.ModelForm):
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
+        if 'data' in kwargs and 'def_due_time' in kwargs['data'] and kwargs['data']['def_due_time']:
+            kwargs['data']['def_due_time'] = datetime.datetime.strptime(kwargs['data']['def_due_time'], '%I:%M %p').time()
+            kwargs['data']['def_due_time'] = kwargs['data']['def_due_time'].strftime('%H:%M')
+
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 

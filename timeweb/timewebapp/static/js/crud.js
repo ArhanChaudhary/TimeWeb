@@ -1,10 +1,14 @@
 class Crud {
     static FORM_ANIMATION_DURATION = 300
-    static DEFAULT_FORM_FIELDS = {
+    static getDefaultAssignmentFormFields = _ => ({
         "#id_name": '',
-        "#id_assignment_date": utils.formatting.stringifyDate(date_now),
+        "#id_assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
+        "#id_x_daterangepicker": (function() {
+            const due_time = new Date(date_now.valueOf());
+            due_time.setMinutes(SETTINGS.def_due_time.hour * 60 + SETTINGS.def_due_time.minute);
+            return moment(due_time);
+        })(),
         "#id_x": '',
-        '#id_due_time': SETTINGS.def_due_time.slice(0, -3),
         "#id_soft": false,
         "#id_unit": SETTINGS.def_unit_to_minute ? "Minute" : '',
         "#id_y": '',
@@ -13,6 +17,54 @@ class Crud {
         "#id_description": '',
         "#id_funct_round": '1',
         "#id_min_work_time": +SETTINGS.def_min_work_time||'',
+        "#id_break_days": SETTINGS.def_break_days,
+    })
+    static getAssignmentFormFields = sa => ({
+        "#id_name": sa.name,
+        "#id_assignment_date_daterangepicker": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
+        "#id_x_daterangepicker": (function() {
+            const due_date = new Date(sa.assignment_date.valueOf());
+            due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));
+            due_date.setMinutes(due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            return moment(due_date);
+        })(),
+        "#id_soft": sa.soft,
+        "#id_unit": sa.unit,
+        "#id_y": sa.y,
+        "#id_time_per_unit": sa.time_per_unit,
+        "#id_description": sa.description,
+        "#id_works": sa.works[0],
+        "#id_funct_round": sa.funct_round,
+        "#id_min_work_time": sa.original_min_work_time||'',
+        "#id_break_days": sa.break_days,
+    })
+    static setAssignmentFormFields(formDict) {
+        for (let [field, value] of Object.entries(formDict)) {
+            if (field === "#id_break_days") continue;
+            
+            const field_is_daterangepicker = field.endsWith("_daterangepicker");
+            if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
+
+            const $field = $(field);
+            if ($field.attr("type") === "checkbox")
+                $field.prop("checked", value);
+            else if (field_is_daterangepicker) {
+                $field.data("daterangepicker").setStartDate(value);
+                $field.data("daterangepicker").setEndDate(value);
+            } else
+                $field.val(value);
+        }
+        for (let break_day of Array(7).keys()) {
+            // (break_day+6)%7) is for an ordering issue, ignore that
+            // Treat this as $("#id_break_days_"+break_day)
+            $(`#id_break_days_${(break_day+6) % 7}`).prop("checked", formDict["#id_break_days"].includes(break_day));
+        }
+    }
+    static DEFAULT_DATERANGEPICKER_OPTIONS = {
+        buttonClasses: "generic-button",
+        parentEl: "main",
+        showDropdowns: true,
+        singleDatePicker: true,
     }
     static FORM_POSITION_TOP = 15
     static UNITS_OF_TIME = {minute: 1, hour: 60}
@@ -21,16 +73,34 @@ class Crud {
 
     init() {
         const that = this;
+        $("#id_assignment_date").daterangepicker({
+            ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
+            autoApply: true,
+            locale: {
+                format: 'MM/DD/YYYY'
+            },
+        });
+        $("#id_x").daterangepicker({
+            ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
+            locale: {
+                format: 'MM/DD/YYYY h:mm A'
+            },
+            timePicker: true,
+            isInvalidDate: function(date) {
+                return date.toDate() < new Date($("#id_assignment_date").val());
+            },
+        });
         that.setCrudHandlers();
         that.addInfoButtons();
-        setTimeout(() => that.styleErrors());
+        setTimeout(() => {
+            that.styleErrors();
+            // For when you enter more total units already completed than there are in the assignment
+            if (that.invalidOnlyInAdvanced() || !!$("#id_y.invalid").length && !!$("#id_works.invalid").length) {
+                $("#form-wrapper #advanced-inputs").click();
+            }
+        }, 0);
 
-        if ($(".error-note").length) {
-            that.showForm({ show_instantly: true })
-        } else {
-            that.hideForm({ hide_instantly: true });
-        }
-        
+        // Place the handler before showForm so the .trigger("scroll") inside of it works
         $("#fields-wrapper").scroll(function() {
             let scroll_percentage = this.scrollTop / (this.scrollHeight - this.clientHeight) || 0;
 
@@ -39,15 +109,16 @@ class Crud {
             $("#fields-wrapper").css("height", unscrolled_height + (scrolled_height - unscrolled_height) * scroll_percentage);
         });
 
-        if (that.invalidOnlyInAdvanced()) {
-            $("#form-wrapper #advanced-inputs").click();
+        if ($(".error-note").length) {
+            that.showForm({ show_instantly: true })
+        } else {
+            that.hideForm({ hide_instantly: true });
         }
     }
     showForm(params={show_instantly: false}) {
         const that = this;
         setTimeout(function() {
             $("#id_description").trigger("input");
-            $("#id_x").trigger("keydown");
         }, 0);
         if (params.show_instantly) {
             $('#overlay').show().children("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
@@ -126,71 +197,24 @@ class Crud {
         that.old_unit_value = singularToLowerCase;
         // +1 to show the line under "Advanced Inputs"
         $("#fields-wrapper").attr("unscrolled-height", Math.ceil($("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseFloat($("#advanced-inputs").css("margin-top")) + 5 + $("#fields-wrapper").scrollTop()));
-        $("#fields-wrapper").attr("scrolled-height", $("#fields-wrapper > :last-child").position().top + $("#fields-wrapper > :last-child").height() - $("#form-wrapper #advanced-inputs").position().top + 15);
+        $("#fields-wrapper").attr("scrolled-height", $("#fields-wrapper > .field-wrapper:last").position().top + $("#fields-wrapper > .field-wrapper:last").height() - $("#form-wrapper #advanced-inputs").position().top + 15);
         $("#fields-wrapper").trigger("scroll");
     }
     setCrudHandlers() {
         const that = this;
         // Create and show a new form when user clicks new assignment
         $("#image-new-container").click(function() {
-            for (const field in Crud.DEFAULT_FORM_FIELDS) {
-                if ($(field).attr("type") === "checkbox")
-                    $(field).prop("checked", Crud.DEFAULT_FORM_FIELDS[field]);
-                else
-                    $(field).val(Crud.DEFAULT_FORM_FIELDS[field]);
-            }
-            for (let break_day of Array(7).keys()) {
-                // (break_days+6)%7) is for ordering I think
-                // Treat this as: $("#id_break_days_"+break_days).prop("checked", SETTINGS.def_break_days.includes(break_days));
-                $("#id_break_days_"+((break_day+6)%7)).prop("checked", SETTINGS.def_break_days.includes(break_day));
-            }
-            // Set form text
+            Crud.setAssignmentFormFields(Crud.getDefaultAssignmentFormFields());
             $("#new-title").html("New Assignment");
             $("#submit-assignment-button").html("Create Assignment").val('');
-            // Show form
             that.showForm();
         });
         // Populate form on edit
         $('.update-button').parent().click(function() {
-            // Set form text
             $("#new-title").html("Edit Assignment");
             $("#submit-assignment-button").html("Edit Assignment");
-            // Find which assignment in dat was clicked
             const sa = utils.loadAssignmentData($(this));
-            const ASSIGNMENT_FORM_FIELDS = {
-                "#id_name": sa.name,
-                "#id_assignment_date": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
-                "#id_x": (function() {
-                    const due_date = new Date(sa.assignment_date.valueOf());
-                    due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));
-                    return utils.formatting.stringifyDate(due_date);
-                })(),
-                "#id_due_time": (function() {
-                    if (!sa.due_time) return "";
-                    const hour = (sa.due_time.hour < 10 ? "0" : "") + sa.due_time.hour;
-                    const minute = (sa.due_time.minute < 10 ? "0" : "") + sa.due_time.minute;
-                    return `${hour}:${minute}`;
-                })(),
-                "#id_soft": sa.soft,
-                "#id_unit": sa.unit,
-                "#id_y": sa.y,
-                "#id_time_per_unit": sa.time_per_unit,
-                "#id_description": sa.description,
-                "#id_works": sa.works[0],
-                "#id_funct_round": sa.funct_round,
-                "#id_min_work_time": sa.original_min_work_time||'',
-            }
-            for (const field in ASSIGNMENT_FORM_FIELDS) {
-                if ($(field).attr("type") === "checkbox")
-                    $(field).prop("checked", ASSIGNMENT_FORM_FIELDS[field]);
-                else
-                    $(field).val(ASSIGNMENT_FORM_FIELDS[field]);
-            }
-            for (let break_day of Array(7).keys()) {
-                // (break_day+6)%7) is for an ordering issue, ignore that
-                // Treat this as: $("#id_break_days_"+break_day).prop("checked", sa.break_days.includes(break_day));
-                $("#id_break_days_"+((break_day+6)%7)).prop("checked", sa.break_days.includes(break_day));
-            }
+            Crud.setAssignmentFormFields(Crud.getAssignmentFormFields(sa));
             if (sa.needs_more_info) {
                 $.merge($("#form-wrapper #advanced-inputs").prevAll(), $("#form-wrapper #id-funct_round-field-wrapper")).each(function() {
                     const input = $(this).children("input");
@@ -229,13 +253,6 @@ class Crud {
         // Arrow function to preserve this
         $("#form-wrapper #cancel-button").click(() => that.hideForm());
         $("#id_unit").on('input', () => that.replaceUnit());
-        $("#id_x").on("keydown", function() {
-            setTimeout(() => {
-                $(this).css({width: "unset", minWidth: "unset"});
-                $(".field-wrapper#id-due_time-field-wrapper").prop("style").setProperty("--right-translate", $(this).width());
-                $(this).css({width: "", minWidth: ""});
-            }, 0);
-        });
         $("#id_description").expandableTextareaHeight();
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
@@ -346,10 +363,8 @@ class Crud {
             $(this).siblings("input, textarea").addClass("invalid");
         });
         if ($("#id_x.invalid").length) {
-            $(".field-wrapper#id-soft-field-wrapper, .field-wrapper#id-due_time-field-wrapper").each(function() {
-                // Subtract one more px for minor positioning issues
-                $(this).css("margin-top", `-=${$("#error_id_x").height()+1}`);
-            });
+            // Subtract one more px for minor positioning issues
+            $(".field-wrapper#id-soft-field-wrapper").css("margin-top", `-=${$("#error_id_x").height()+1}`);
         }
     }
     // Delete assignment
