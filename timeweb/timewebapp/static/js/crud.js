@@ -89,6 +89,10 @@ class Crud {
             isInvalidDate: function(date) {
                 return date.toDate() < new Date($("#id_assignment_date").val());
             },
+        }).on("show.daterangepicker", function(e, picker) {
+            // There's a random invisible datepicker, so only query the one that's visible
+            const minuteselect = picker.container.find(".minuteselect:visible");
+            minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
         });
         that.setCrudHandlers();
         that.addInfoButtons();
