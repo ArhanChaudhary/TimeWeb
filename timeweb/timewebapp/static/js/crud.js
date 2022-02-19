@@ -25,7 +25,9 @@ class Crud {
         "#id_x_daterangepicker": (function() {
             const due_date = new Date(sa.assignment_date.valueOf());
             due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));
-            due_date.setMinutes(due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
+                due_date.setMinutes(due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            }
             return moment(due_date);
         })(),
         "#id_soft": sa.soft,
