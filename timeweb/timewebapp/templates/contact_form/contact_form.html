@@ -2,7 +2,14 @@
 {% load static %}
 
 {% block accounts_js %}
-    <script src="{% static 'js/contact.js' %}"></script>
+    <script nonce="{{request.csp_nonce}}">
+        $(window).one("load", function() {
+            $("#id_body").expandableTextareaHeight().trigger("input");
+        })
+        function submitContactForm(token) {
+            $("#contact-form")[0].submit();
+        }
+    </script>
     <script src="https://www.google.com/recaptcha/api.js"></script>
 {% endblock %}
 
