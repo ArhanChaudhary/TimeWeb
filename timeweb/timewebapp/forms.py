@@ -175,6 +175,8 @@ class SettingsForm(forms.ModelForm):
         self.label_suffix = ""
 
 class ContactForm(BaseContactForm):
+    body = forms.CharField(widget=forms.Textarea, label=_("Ask me anything"))
+
     def save(self, *args, **kwargs):
         message = render_to_string(
             "contact_form/contact_e-mail_sent.txt",
