@@ -1,31 +1,35 @@
-/* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
+body {
+    background-color: #ffffff;
+    background-image: linear-gradient(315deg, #ffffff 0%, #d7e1ec 74%);
+}
 #accounts-container {
+    border-radius: 10px;
+    box-shadow: 0 0 100px -63px black;
     position: relative;
     width: clamp(290px, calc(100vw - 100px), 600px);
-    min-height: 475px;
-    border-radius: 20px;
-    /* For the <header> */
-    transform: translateY(-35px);
     background: white;
-    box-sizing: border-box;
-    /* https://stackoverflow.com/questions/30483055/unable-to-scroll-div-within-fixed-div/30484023 */
     margin: auto;
-    padding: 40px;
-    padding-top: 65px;
-    padding-bottom: 25px;
-    box-shadow: 0 0 3px 1px black;
+    box-sizing: border-box;
+    padding: 15px 40px 25px;
+}
+#accounts-container > a:first-of-type img {
+    display: block;
+    margin: auto;
+    margin-bottom: 5px;
+}
+#accounts-container > h1:first-of-type {
+    margin-top: 0;
+}
+.socialaccount-container {
+    margin-top: 1em;
 }
 main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
-}
-#accounts-scroller {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: scroll;
 }
 a, #example-message {
     color: rgb(50, 87, 255);
@@ -38,14 +42,14 @@ input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea 
     margin-top: 5px;
     box-sizing: border-box;
     border: none;
-    box-shadow: inset 0 0 2px 1px;
-    background: white;
+    box-shadow: inset 0 0 3px black;
+    background: white !important;
     height: 36px;
     border-radius: 4px;
     padding-left: 15px;
 }
 input:not([type="submit"]):focus, textarea:focus {
-    box-shadow: inset 0 0 0 2px rgb(94, 94, 255);
+    box-shadow: inset 0 0 0 2px rgb(0, 109, 249) !important;;
     outline: 0;
 }
 .error-note, .success-note {
@@ -67,26 +71,6 @@ input:not([type="submit"]):focus, textarea:focus {
     color: rgb(0 190 53);
     border: 1px solid rgb(28, 186, 0);
 }
-#image {
-    left: 30px;
-    margin: -10px;
-    position: absolute;
-    height: 2452px;
-    width: calc(100% - 40px);
-    background-image: url(/static/images/wide-scroller.png);
-    background-size: 100%;
-    z-index: -2;
-    top: 10px; /* Override flexbox */
-    -webkit-animation: slide 100s linear infinite;
-            animation: slide 100s linear infinite;
-    -webkit-animation-fill-mode: forwards;
-            animation-fill-mode: forwards;
-}
-@media screen and (max-width: 790px) {
-    #image {
-        background-image: url(/static/images/narrow-scroller.png);
-    }
-}
 hr {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -95,13 +79,12 @@ hr {
     position: absolute;
     left: 50%;
     padding: 0 5px;
-    transform: translate(-50%, -156%);
+    transform: translate(-50%, -34px);
     background-color: white;
 }
 #submit-button {
     width: 100%;
-    background: rgb(0, 150, 255);
-    border-radius: 4px;
+    background: rgb(0, 109, 249);
     color: white;
     border: none;
     padding: 5px 5px;
@@ -110,33 +93,17 @@ hr {
     font: inherit;
 }
 #submit-button:focus, #submit-button:hover {
-    background: rgba(0, 150, 255, 0.9);
+    background: rgba(0, 109, 249, 0.9);
     outline: 0;
 }
 #submit-button:active {
     transform: translateY(1px);
-}
-@-webkit-keyframes slide {
-    from {
-        transform: translateY(-100%) translateY(100vh);
-    }
-    to {
-        transform: none;
-    }
-}
-@keyframes slide {
-    from {
-        transform: translateY(-100%) translateY(100vh);
-    }
-    to {
-        transform: none;
-    }
 }
 
 .grecaptcha-badge {
     transform-origin: right;
     transform: scale(0.85);
     position: absolute !important;
-    top: 78px;
+    top: 92px;
     right: 40px !important;
 }

@@ -1,21 +1,25 @@
-{% extends "template.html" %}
+{% extends "template-head.html" %}
 {% load static %}
 
-{% block js %}
+{% block template_head_js %}
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="{% static 'js/jquery-extensions.js' %}"></script>
   <script src="{% static 'js/accounts-template.js' %}"></script>
-  {% block accounts_js %}{% endblock accounts_js %}
-{% endblock js %}
+  {% block accounts_js %}{% endblock %}
+{% endblock %}
 
-{% block css %}
+{% block template_head_css %}
   <link rel="stylesheet" href="{% static 'css/accounts-template.css' %}">
-  {% block accounts_css %}{% endblock accounts_css %}
-{% endblock css %}
+  {% block accounts_css %}{% endblock %}
+{% endblock %}
 
-{% block content %}
-  <div id="image"></div>
-  <div id="accounts-scroller">
+{% block template_head_body %}
+  <main>
     <div id="accounts-container">
-      {% block accounts_content %}{% endblock accounts_content %}
+      <a href="{% url 'home' %}" id="logo-container">
+        <img height="80" src="{% static 'images/timeweb.png' %}" border="0" draggable="false"/>
+      </a>
+      {% block accounts_content %}{% endblock %}
     </div>
-  </div>
-{% endblock content %}
+  </main>
+{% endblock %}
