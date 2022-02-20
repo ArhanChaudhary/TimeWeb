@@ -925,15 +925,11 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input::-webkit-calendar-picker-indicator {
     margin-left: unset;
 }
-@media screen and (min-width: 456px) {
-    #form-wrapper label[for='id_x']::after {
-        content: '(Predicted if left empty)';
-    }
+#form-wrapper label[for='id_x']::after {
+    content: '(Predicted if left empty)';
 }
-@media screen and (min-width: 344px) {
-    #form-wrapper label[for='id_assignment_date']::after {
-        content: "(Enter today if you don't remember)";
-    }
+#form-wrapper label[for='id_assignment_date']::after {
+    content: "(Enter today if you don't remember)";
 }
 #form-wrapper label[for='id_min_work_time']::after {
     content: '(Disabled if left empty)';
