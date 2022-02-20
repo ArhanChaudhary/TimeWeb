@@ -83,8 +83,28 @@
     </head>
     <body tabindex="-1">
         <div id="site">
-            {% comment %} remember to have a <main> on these blocks, many stylesheets and scripts rely on that being present {% endcomment %}
+            {% comment %} 
+            remember to have a <main> on these blocks, many stylesheets and scripts rely on that being present 
+            also remember to have #loading-container (for the below code)
+            {% endcomment %}
             {% block template_head_body %}{% endblock %}
+            <script nonce="{{request.csp_nonce}}">
+                window.onbeforeunload = function() {
+                    if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
+                    if (window.disable_loading) return;
+                    // setTimeout to ensure .scrollTop to record the scroll position is run before this
+                    setTimeout(function() {
+                        document.querySelectorAll("main > *").forEach(e => {
+                            e.style.display = "none";
+                        });
+                        document.getElementsByTagName("main")[0].style.display = "flex";
+                        document.getElementsByTagName("main")[0].style.justifyContent = "center";
+                        document.getElementsByTagName("main")[0].style.alignItems = "center";
+                        if (document.getElementById("background-image")) document.getElementById("background-image").style.display = "block";
+                        document.getElementById("loading-container").style.display = "contents";
+                    }, 0);
+                };
+            </script>
         </div>
     </body>
 </html>
