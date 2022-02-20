@@ -12,6 +12,7 @@ import datetime
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
 from allauth.account.forms import *
 
+User = get_user_model()
 class TimewebForm(forms.ModelForm):
     class Meta:
         model = TimewebModel
@@ -189,7 +190,7 @@ class ContactForm(BaseContactForm):
 
 class UsernameResetForm(forms.ModelForm):
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ("username", )
         widgets = {
             "username": forms.TextInput(),
@@ -197,7 +198,9 @@ class UsernameResetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['username'].label = "New username"
         self.label_suffix = ""
+
 
 class LabeledLoginForm(LoginForm):
 
