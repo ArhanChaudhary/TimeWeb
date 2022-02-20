@@ -1,27 +1,4 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
-* {
-    font-family: "Open Sans", sans-serif;
-}
-html {
-    scroll-behavior: smooth;
-}
-input, textarea {
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
-    /* Mobile */
-    -webkit-appearance: none;
-    padding: 1px 2px;
-    /* Firefox */
-    filter: none;
-}
-textarea {
-    resize: none;
-}
-input[type="checkbox"], input[type="radio"] {
-    -webkit-appearance: revert;
-}
 input[type="radio"] {
     margin: 0;
 }
@@ -568,17 +545,3 @@ nav:focus-within #nav-menu::after {
     font-size: 16px !important;
     line-height: 18px !important;
 }
-html {
-    line-height: unset !important;
-}
-button,
-input,
-optgroup,
-select,
-textarea
-{
-    font-size: revert;
-    line-height: normal;
-    margin: revert;
-}
-

@@ -1,0 +1,37 @@
+* {
+    font-family: "Open Sans", sans-serif;
+}
+html {
+    scroll-behavior: smooth;
+}
+input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    /* Mobile */
+    -webkit-appearance: none;
+    padding: 1px 2px;
+    /* Firefox */
+    filter: none;
+}
+textarea {
+    resize: none;
+}
+input[type="checkbox"], input[type="radio"] {
+    -webkit-appearance: revert;
+}
+/* Override normalize.css */
+html {
+    line-height: unset !important;
+}
+button,
+input,
+optgroup,
+select,
+textarea
+{
+    font-size: revert;
+    line-height: normal;
+    margin: revert;
+}
