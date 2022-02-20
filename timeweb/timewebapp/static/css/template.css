@@ -470,3 +470,9 @@ nav:focus-within #nav-menu::after {
     font-size: 16px !important;
     line-height: 18px !important;
 }
+@media screen and (max-width: 700px) {
+    .jconfirm .jconfirm-box {
+        /* First 30 for the padding due to a lack of border-box, second 30 for the right and left margin */
+        width: calc(100% - 30px - 30px) !important;
+    }
+}
