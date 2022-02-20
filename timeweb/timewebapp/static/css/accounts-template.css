@@ -134,7 +134,9 @@ hr {
 }
 
 .grecaptcha-badge {
-    position: absolute;
+    transform-origin: right;
+    transform: scale(0.85);
+    position: absolute !important;
     top: 78px;
     right: 40px !important;
 }
