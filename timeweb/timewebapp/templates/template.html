@@ -9,6 +9,7 @@
 
 {% block template_head_js %}
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static 'js/jquery-extensions.js' %}"></script>
     <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
     <script src="{% static 'js/template.js' %}"></script>
     {% block js %}{% endblock %}
