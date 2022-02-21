@@ -742,16 +742,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         assignments = json.loads(request.POST['assignments'])
         for assignment in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
-            del assignment['pk'] # Don't loop through the assignment's pk value
+            del assignment['pk']
             
             model_fields = {i.name: getattr(self.sm, i.name) for i in TimewebModel._meta.get_fields()}
             model_fields.update(assignment)
-            if not TimewebForm(model_fields).is_valid():
-                if settings.DEBUG:
-                    a = TimewebForm(model_fields)
-                    a.is_valid()
-                    logger.warning(f"Form is not valid: {a.errors}")
-                continue
+            validation_form = TimewebForm(model_fields)
+            if not validation_form.is_valid():
+                assignment = {field: value for (field, value) in assignment.items() if field not in validation_form.errors}
+                if not assignment: continue # It's pointless to finish the loop
 
             for key, value in assignment.items():
                 if request.user != self.sm.user:
