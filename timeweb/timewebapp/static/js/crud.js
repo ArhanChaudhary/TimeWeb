@@ -399,7 +399,7 @@ class Crud {
             // Remove assignment from DOM
             assignment_container.remove();
             // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
-            dom_assignment.removeClass("assignment-is-closing");
+            dom_assignment.removeClass("assignment-is-closing open-assignment");
             // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
             params.final_iteration && new Priority().sort();
         });
