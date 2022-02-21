@@ -100,7 +100,7 @@ class TimewebForm(forms.ModelForm):
         assignment_date = cleaned_data.get("assignment_date")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
-        if works != None and y != None and works >= y >= 1:
+        if not isinstance(works, list) and works != None and y != None and works >= y >= 1:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
                     'value': works,

@@ -743,6 +743,16 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         for assignment in assignments:
             self.sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
             del assignment['pk'] # Don't loop through the assignment's pk value
+            
+            model_fields = {i.name: getattr(self.sm, i.name) for i in TimewebModel._meta.get_fields()}
+            model_fields.update(assignment)
+            if not TimewebForm(model_fields).is_valid():
+                if settings.DEBUG:
+                    a = TimewebForm(model_fields)
+                    a.is_valid()
+                    logger.warning(f"Form is not valid: {a.errors}")
+                continue
+
             for key, value in assignment.items():
                 if request.user != self.sm.user:
                     logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
