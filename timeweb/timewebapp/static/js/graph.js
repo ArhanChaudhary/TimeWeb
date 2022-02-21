@@ -107,6 +107,7 @@ class VisualAssignment extends Assignment {
     static MOUSE_POSITION_TRANSFORM = {x: 0.1, y: -1.3} // Adjusts the mouse position by a few pixels to make it visually more accurate
     static RED_LINE_COLOR = {r: 233, g: 68, b: 46}
     static BLUE_LINE_COLOR = {r: 1, g: 147, b: 255}
+    static MINIMUM_CIRCLE_Y = -1000
     static SKEW_RATIO_ROUND_PRECISION = 3
     static SKEW_RATIO_SNAP_DIFF = 0.05
     static ARROW_KEYDOWN_THRESHOLD = 500
@@ -434,7 +435,7 @@ class VisualAssignment extends Assignment {
             if (circle_x > this.width - 5) {
                 circle_x = this.width - 5;
             }
-            circle_y = this.height - point_y * this.hCon - 50;
+            circle_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - point_y * this.hCon - 50);
             screen.lineTo(circle_x - (point_x === this.red_line_start_x) * radius / 2, circle_y); // (point_x === this.red_line_start_x) * radius / 2 makes sure the first point is filled in properly
             screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI)
             screen.moveTo(circle_x, circle_y);
@@ -448,7 +449,7 @@ class VisualAssignment extends Assignment {
         for (let point_x = 0; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.sa.works[Math.min(len_works, point_x)];
             circle_x = Math.min(this.sa.complete_x, point_x + this.sa.blue_line_start) * this.wCon + 50;
-            circle_y = this.height - point_y * this.hCon - 50;
+            circle_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - point_y * this.hCon - 50);
             
             screen.lineTo(circle_x - (point_x === 0) * radius / 2, circle_y);
             screen.arc(circle_x, circle_y, radius, 0, 2 * Math.PI);
@@ -470,7 +471,7 @@ class VisualAssignment extends Assignment {
                 str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
             }
             const point_x = mouse_x * this.wCon + 50;
-            const point_y = this.height - funct_mouse_x * this.hCon - 50;
+            const point_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - funct_mouse_x * this.hCon - 50);
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
             const hover_point_label = this.dom_assignment.find(".hover-point-label");
             if (hover_point_label.hasClass("initial-position")) {
