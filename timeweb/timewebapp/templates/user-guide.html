@@ -22,7 +22,7 @@ the span groups the major and minor categories together for user-guide.js {% end
         
         TimeWeb was designed with a main focus on customizability and convenience. As we'll get to later on in this guide, TimeWeb supports many advanced parameters and options that can be configured for you and your work style.
 
-        Take a look at TimeWeb's <a href="https://youtu.be/filler-link">YouTube demo</a> or <a href="/example">example account</a> to get an idea of what you should expect your homepage to look like.
+        Take a look at TimeWeb's <a href="/example">example account</a> to get an idea of what you should expect your homepage to look like.
 
     </details>
 </span>
@@ -31,20 +31,16 @@ the span groups the major and minor categories together for user-guide.js {% end
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
         <img src={% static 'images/assignment-form.png' %} width="550">
-        The assignment form is what you'll use to input your assignments into TimeWeb. The assignment form is used either to create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or to edit an existing assignment, which can be done by clicking its edit button.
+        The assignment form is used to either create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or edit an already existing assignment, which can be done by clicking its edit button.
         
-        The assignment form has 12 inputs in total:
-
-        6 of these inputs are required for a complete assignment.
-
-        6 of these are advanced and optional. Default input values, which can be set in the settings, are accordingly set for these inputs every time you open the form, and they can be manually overridden.
+        The assignment form has 12 inputs in total. 6 of these inputs are required for a complete assignment, and 6 of these inputs are optional.
         
     </details>
     <details open>
         <summary class="minor-category" id="needs-more-info">"Needs more Info"</summary>
         You can still create an assignment without the required inputs, but its graph won't be usable and it will be marked as "needs more info". You will need to edit the assignment and re-enter its required inputs to make it a complete assignment.
         
-        One use of this feature is for assignments you don't want to have a graph for. The "needs more info" functionality acts as a sort of reminder system in this case.
+        One use of this feature is for assignments you don't want to have a graph for, such as assignments due tomorrow or assignments that take a short time to complete.
         
         If you don't have time to enter a complete assignment, another use of this feature is to remind yourself to enter the required inputs later.
         
@@ -109,9 +105,11 @@ the span groups the major and minor categories together for user-guide.js {% end
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
         <img id="assignment-graph-image">
-        After creating an assignment, click it to open its graph. The assignment line graph provides a visualization of how your assignment's work schedule will look like. The x-axis represents days, and the y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
+        After creating an assignment, click it to open its graph. The graph provides a visualization of your assignment's entire work schedule. 
+        
+        Its x-axis represents days, while its y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
 
-        As you progress through your assignment, there needs to be some way to measure your progress so each assignment can be prioritized accordingly. So, you must input the amount of work you complete every day for every assignment. This will be plotted and connected in blue.
+        As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.
         
         The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure the assignment graph is tuned for you and your work style.
         
@@ -134,9 +132,9 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
             <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
-            This happens because you've already worked for today. By entering no work done, you're implying that you've done nothing and you're not going to work on that assignment for the rest of the day. 
+            This happens because you've already worked for today; by entering no work done, you're implying that you've done nothing and you're not going to work on that assignment for the rest of the day. 
 
-            This functionality isn't exclusive to inputting no work done only; this also occurs when you input less work than the assignment's daily work.
+            This functionality isn't exclusive to inputting no work done only. This occurs when you input less work than the assignment's daily work.
         </span>
         <span class="minor-minor-category">Submit Units Done</span>
         This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -144,7 +142,7 @@ the span groups the major and minor categories together for user-guide.js {% end
     </details>
     <details open>
         <summary class="minor-category" id="advanced-assignment-graph-controls">Advanced controls</summary>
-        The advanced controls are completely optional to use and provide better control of your work distribution. Before getting to the advanced controls, we must first understand what the curvature is. The curvature controls the curvature of the graph and, in turn, your work schedule.
+        The advanced controls are completely optional to use but provide better control of your work schedule. Before getting to the advanced controls, you must first understand what the curvature is. The curvature controls the curvature of the graph and, in turn, your work schedule.
         
         A more positive curvature yields a work schedule in which you work more at the beginning and less at the end of an assignment.
         A more negative curvature yields a work schedule in which you work less at the beginning and more at the end of an assignment.
@@ -181,13 +179,11 @@ the span groups the major and minor categories together for user-guide.js {% end
         <img src="{% static 'images/assignment-header.png' %}">
         The assignment header contains a brief and daily summary of the assignment and its work for today.
 
-        Above an assignment's name is its priority percentage relative to the other assignments.
-        Below an assignment's name is the days left until it is due.
-        Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".
+        Above the assignment's name is its priority percentage relative to the other assignments. Below the assignment's name is the days left until it is due. Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".
 
-        At the center of an assignment is its header message. The message displayed will reflect the current status of the assignment. For instance, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.
+        At the center of an assignment is its header message, which reflects the current status of the assignment. For example, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.
 
-        At the right of the assignment header is the assignment's estimated completion time along with its hide, finish, edit, and delete buttons.
+        At the right of the assignment header is the assignment's estimated completion time along with its finish, hide, edit, and delete buttons.
 
     </details>
     <details open>
@@ -243,7 +239,7 @@ the span groups the major and minor categories together for user-guide.js {% end
     </details>
     <details open>
         <summary class="minor-category" id="finish-assignment">Finish Assignment for Today</summary>
-        {% comment %} <img src="{% static 'images/finish-assignment.png' %}"> {% endcomment %}
+        <img src="{% static 'images/finish-assignment.png' %}">
         
         This button automatically submits a work input that completes an assignment's work for today.
 
