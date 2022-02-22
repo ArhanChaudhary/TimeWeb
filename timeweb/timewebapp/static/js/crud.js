@@ -19,27 +19,35 @@ class Crud {
         "#id_min_work_time": +SETTINGS.def_min_work_time||'',
         "#id_break_days": SETTINGS.def_break_days,
     })
-    static getAssignmentFormFields = sa => ({
-        "#id_name": sa.name,
-        "#id_assignment_date_daterangepicker": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
-        "#id_x_daterangepicker": (function() {
-            const due_date = new Date(sa.assignment_date.valueOf());
-            due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));
-            if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
-                due_date.setMinutes(due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
-            }
-            return moment(due_date);
-        })(),
-        "#id_soft": sa.soft,
-        "#id_unit": sa.unit,
-        "#id_y": sa.y,
-        "#id_time_per_unit": sa.time_per_unit,
-        "#id_description": sa.description,
-        "#id_works": sa.works[0],
-        "#id_funct_round": sa.funct_round,
-        "#id_min_work_time": sa.original_min_work_time||'',
-        "#id_break_days": sa.break_days,
-    })
+    static getAssignmentFormFields = sa => {
+        const fields = {
+            "#id_name": sa.name,
+            "#id_assignment_date_daterangepicker": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
+            "#id_x_daterangepicker": (function() {
+                const due_date = new Date(sa.assignment_date.valueOf());
+                if (!sa.complete_x) {
+                    due_date.setMinutes(SETTINGS.def_due_time.hour * 60 + SETTINGS.def_due_time.minute);
+                    return moment(due_date);
+                }
+                due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));
+                if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
+                    due_date.setMinutes(due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+                }
+                return moment(due_date);
+            })(),
+            "#id_soft": sa.soft,
+            "#id_unit": sa.unit,
+            "#id_y": sa.y,
+            "#id_time_per_unit": sa.time_per_unit,
+            "#id_description": sa.description,
+            "#id_works": sa.works[0],
+            "#id_funct_round": sa.funct_round,
+            "#id_min_work_time": sa.original_min_work_time||'',
+            "#id_break_days": sa.break_days,
+        }
+        if (!sa.complete_x) fields["#id_x"] = "";
+        return fields;
+    }
     static setAssignmentFormFields(formDict) {
         for (let [field, value] of Object.entries(formDict)) {
             if (field === "#id_break_days") continue;
