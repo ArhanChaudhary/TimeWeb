@@ -429,7 +429,7 @@ class VisualAssignment extends Assignment {
         screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
         screen.lineWidth = radius;
         screen.beginPath();
-        for (let point_x = (this.sa.fixed_mode || DEBUG === "True") ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
+        for (let point_x = (this.sa.fixed_mode || DEBUG) ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.funct(point_x);
             circle_x = point_x * this.wCon + 50;
             if (circle_x > this.width - 5) {

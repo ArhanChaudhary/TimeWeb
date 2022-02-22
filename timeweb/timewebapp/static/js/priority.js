@@ -509,7 +509,7 @@ class Priority {
 
             if (status_image) {
                 dom_status_image.show();
-                dom_status_image.attr("src", DEBUG === "True" ? `static/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
+                dom_status_image.attr("src", DEBUG ? `static/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
             } else {
                 dom_status_image.hide();
                 dom_status_image.removeAttr("src");

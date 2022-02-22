@@ -10,8 +10,8 @@
         {% endif %}
         <script nonce="{{request.csp_nonce}}">
             window.dataLayer = window.dataLayer || [];
-            const DEBUG = "{{ DEBUG }}";
-            if (DEBUG !== "False") {
+            const DEBUG = "{{ DEBUG }}" === "True";
+            if ("{{ DEBUG }}" !== "False") {
                 function gtag(){}
             } else {
                 function gtag(){dataLayer.push(arguments);}

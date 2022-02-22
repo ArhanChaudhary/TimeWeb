@@ -138,7 +138,7 @@ utils = {
                     sa.mark_as_done = !sa.mark_as_done;
                     ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
                     let status_image = sa.mark_as_done ? "show" : "hide";
-                    $(this).children("img").attr("src", DEBUG === "True" ? `static/images/${status_image}.png` : `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
+                    $(this).children("img").attr("src", DEBUG ? `static/images/${status_image}.png` : `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
                     new Priority().sort();
                 });
             },
