@@ -463,8 +463,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.min_work_time /= self.sm.time_per_unit
 
             if self.sm.x == None:
-                # y - first work = min_work_time_funct_round * x
-                # x = (y - first_work) / min_work_time_funct_round
+                # ctime*(y - first work) = min_work_time_funct_round * x
+                # x = (y - first_work*ctime) / min_work_time_funct_round
                 # Solve for first work:
                 # originally: works = [works[n] - works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
                 # so first work is when n = removed_works_start
@@ -473,14 +473,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # y - old_data.works[removed_works_start] + old_data.works[0] - first_work
                 if self.created_assignment or self.sm.needs_more_info:
                     if self.sm.min_work_time:
-                        x_num = self.sm.time_per_unit * (self.sm.y - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
+                        x_num = (self.sm.y - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
                     else:
-                        x_num = self.sm.time_per_unit * (self.sm.y - first_work)/self.sm.funct_round
+                        x_num = (self.sm.y - first_work)/self.sm.funct_round
                 elif self.updated_assignment:
                     if self.sm.min_work_time:
-                        x_num = self.sm.time_per_unit * (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
+                        x_num = (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
                     else:
-                        x_num = self.sm.time_per_unit * (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/self.sm.funct_round
+                        x_num = (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/self.sm.funct_round
                 x_num = ceil(x_num)
                 if self.sm.blue_line_start >= x_num:
                     self.sm.blue_line_start = 0
