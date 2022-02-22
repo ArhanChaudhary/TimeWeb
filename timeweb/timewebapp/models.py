@@ -98,7 +98,10 @@ class TimewebModel(models.Model):
         blank=True,
         verbose_name=_('Due Date'),
     )
-    due_time = models.TimeField(null=True)
+    due_time = models.TimeField(
+        null=True,
+        blank=True,
+    )
     soft = models.BooleanField(
         default=False,
     )
