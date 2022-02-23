@@ -1,3 +1,5 @@
 E-mail from {{email}} via {{site}}'s contact form:
 
-{{body}}
+{{body|safe}} {% comment %} 
+|safe to fix html fragments (i.e apostrophes in the e-mail become &#x27;)
+G-mail automatically escapes HTML, so xss isn't a concern {% endcomment %}
