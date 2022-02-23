@@ -980,7 +980,8 @@ class ExampleAccountView(TimewebView):
     def get(self, request):
         logout(request)
         login(request, User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL), 'allauth.account.auth_backends.AuthenticationBackend')
-        return super().get(request)
+        # Must be a redirect so document.location is at home directory, which things using request.path need
+        return redirect("home")
 
 
 class RickView(TimewebGenericView):
