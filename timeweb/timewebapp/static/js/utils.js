@@ -1323,7 +1323,7 @@ if (!SETTINGS.seen_latest_changelog) {
     setTimeout(function() {
         const jconfirm = $.alert({
             title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version}`,
-            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog.</a>",
+            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;
