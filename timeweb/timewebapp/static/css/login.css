@@ -63,9 +63,7 @@ form span:first-of-type label {
     flex-wrap: wrap;
 }
 #example-message {
-    cursor: pointer;
     margin-left: auto;
-    text-decoration: underline;
 }
 #forgor-password {
     margin-right: 10px;
