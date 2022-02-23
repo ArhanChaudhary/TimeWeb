@@ -53,7 +53,7 @@ $(function() {
                 transform: '',
             });
             logo.find("img").css("width", "");
-            welcome.toggle(!collision(welcome, logo, { margin: 10 }));
+            welcome.toggle(!collision(welcome, logo, { margin: 10 })); // Do this toggle after the logo's css is reset or it might clip into the logo
             if (collision(username, logo, { margin: 10 })) {
                 logo.css({
                     left: 65,
