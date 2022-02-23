@@ -50,6 +50,7 @@ label {
     margin-right: 8px;
 }
 .socialaccount_provider {
+    font-size: 15px;
     color: rgb(13, 106, 255);
     text-decoration: none;
 }
