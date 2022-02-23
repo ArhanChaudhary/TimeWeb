@@ -463,7 +463,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.min_work_time /= self.sm.time_per_unit
 
             if self.sm.x == None:
-                # ctime*(y - first work) = min_work_time_funct_round * x
+                # ctime*(y - first work) = (min_work_time_funct_round*ctime) * x (Multiply by ctime to undo the normalization done on minimum_work_time_funct_round)
                 # x = (y - first_work*ctime) / min_work_time_funct_round
                 # Solve for first work:
                 # originally: works = [works[n] - works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
