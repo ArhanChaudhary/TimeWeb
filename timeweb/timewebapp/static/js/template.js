@@ -47,13 +47,13 @@ $(function() {
     // Checks if user is authenticated and on home page
     if ($("#image-new-container").length) {
         $(window).resize(function() {
-            welcome.toggle(!collision(welcome, logo, { margin: 10 }));
 
             logo.css({
                 left: '',
                 transform: '',
             });
             logo.find("img").css("width", "");
+            welcome.toggle(!collision(welcome, logo, { margin: 10 }));
             if (collision(username, logo, { margin: 10 })) {
                 logo.css({
                     left: 65,
