@@ -308,9 +308,7 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
             <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
-            This isn't a problem on my end. According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a>, which contains every type of permission I can ask for, there isn't a single permission for just viewing your course work, and I'm forced to unintentionally ask to view grades.<br>
-            <br>
-            If you would like, you can inspect TimeWeb's <a href="https://github.com/ArhanChaudhary/TimeWeb/blob/master/timeweb/timewebapp/views.py">backend source code</a> to see I don't use your grades in any way.
+            According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a> there isn't a permission for just viewing your course work, so I am forced to ask to view your grades, too.
         </span>
     </details>
     <details open>
@@ -363,5 +361,5 @@ the span groups the major and minor categories together for user-guide.js {% end
     
 </details>
 <hr>
-You've reached the end of TimeWeb's user guide! Feel free to <a href="{% url 'contact_form' %}">contact us</a> to suggest adding anything or if you're still confused about anything. Have a great day!
+You've reached the end of TimeWeb's user guide! Feel free to <a href="{% url 'contact_form' %}">contact us</a> for further clarification on a feature. Have a great day!
 {% endblock doc_content %}
