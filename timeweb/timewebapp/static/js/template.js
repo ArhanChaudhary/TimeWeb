@@ -194,6 +194,7 @@ function reloadWhenAppropriate(params={href: null}) {
 jconfirm.defaults = {
     escapeKey: true,
     backgroundDismiss: true,
+    draggable: false,
 
     boxWidth: '50%',
     useBootstrap: false,
