@@ -36,6 +36,7 @@ header::after {
 #image-new-container img {
     float: left;
     transform: scale(0.8);
+    filter: hue-rotate(92deg);
 }
 #new-assignment-text {
     margin-left: 4px;
