@@ -71,6 +71,7 @@ main.finished-header-transition {
     width: 100%;
     height: calc(100% - 70px);
     position: fixed;
+    pointer-events: none;
     -o-object-fit: cover;
        object-fit: cover;
 }
