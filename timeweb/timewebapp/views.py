@@ -664,6 +664,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     if date_now == x:
                         tags.append("Important")
                 else:
+                    if days_between_two_dates(date_now, assignment_date) > 30:
+                        continue
                     due_time = None
                 name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length).strip()
                 tags.insert(0, course_names[assignment['courseId']])
