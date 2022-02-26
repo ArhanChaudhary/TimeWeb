@@ -37,6 +37,32 @@
         this.style.setProperty("--random-stagger", `${Math.floor(Math.random()*11-5)}s`);
         this.style.setProperty("--x", `calc(-${100-vws[i]}% + ${vws[i]}vw)`);
       });
+
+      if (localStorage.getItem("low-detail-mode")) {
+        $("#circles-background").css("filter", "none");
+      } else {
+        // Let's wait for a half a second to give the browser some time to adjust
+        setTimeout(function() {
+          var get_frames = true;
+          var judgement_time = 1;
+          var framerate_threshold = 45;
+          var frames = 0;
+          function requestAnimFrame() {
+            if (!get_frames) return;
+
+            frames++;
+            requestAnimationFrame(requestAnimFrame);
+          }
+          requestAnimationFrame(requestAnimFrame);
+          setTimeout(function() {
+            if (frames < framerate_threshold * judgement_time) {
+              $("#circles-background").css("filter", "none");
+              localStorage.setItem("low-detail-mode", true);
+            }
+            get_frames = false;
+          }, judgement_time * 1000);
+        }, 500);
+      }
     });
   </script>
   {% block accounts_js %}{% endblock %}
