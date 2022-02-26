@@ -6,8 +6,36 @@
   <script src="{% static 'js/jquery-extensions.js' %}"></script>
   <script nonce="{{request.csp_nonce}}">
     $(function() {
+      function shuffle(o) {
+        for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+        return o;
+      };
+
       $("#form-wrapper form").submit(function() {
         $("#submit-button").attr("disabled", true);
+      });
+
+      let number_of_circles = $("#circles-background .circle").length;
+      $("#circles-background")[0].style.setProperty("--highest-circle-number", number_of_circles - 1);
+
+      let vws = new Array(number_of_circles);
+      for (let i = 0; i < number_of_circles; i++) {
+        vws[i] = Math.floor(i/(number_of_circles-1) * 96 + 2);
+      }
+      vws = shuffle(vws);
+
+      let front_color = {r: 93, g: 198, b: 201};
+      // let back_color = {r: 49, g: 75, b: 110};
+      let back_color = {r: 71, g: 137, b: 156};
+
+      $("#circles-background .circle").each(function(i) {
+        let background_gradient_factor = 1 - i / (number_of_circles - 1);
+        $(this).css("background", i % 5 !== -1 ?
+          `rgb(${front_color.r + background_gradient_factor * (back_color.r - front_color.r)}, ${front_color.g + background_gradient_factor * (back_color.g - front_color.g)}, ${front_color.b + background_gradient_factor * (back_color.b - front_color.b)})`
+          : "url({% static 'images/icons/icon-512x512.png' %})");
+        this.style.setProperty("--circle-number", i);
+        this.style.setProperty("--random-stagger", `${Math.floor(Math.random()*11-5)}s`);
+        this.style.setProperty("--x", `calc(-${100-vws[i]}% + ${vws[i]}vw)`);
       });
     });
   </script>
@@ -21,6 +49,11 @@
 
 {% block template_head_body %}
   <main>
+    <div id="circles-background">
+      {% for i in "x"|rjust:"100" %}
+        <div class="circle"></div>
+      {% endfor %}
+    </div>
     <div id="accounts-container">
       <a href="{% url 'home' %}" id="logo-container">
         <img height="80" src="{% static 'images/timeweb.png' %}" border="0" draggable="false"/>
@@ -38,4 +71,13 @@
       <div class="loading-circle"></div>
     </div>
   </main>
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+    <defs>
+      <filter id="goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur"/>
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+        <feBlend in="SourceGraphic" in2="goo"/>
+      </filter>
+    </defs>
+  </svg>
 {% endblock %}
