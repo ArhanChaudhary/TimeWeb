@@ -32,14 +32,14 @@ body {
 #circles-background .circle {
     position: absolute;
 
-    width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-animation)) / var(--highest-circle-number));
-    height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-animation)) / var(--highest-circle-number));
+    width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
+    height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
     background-size: contain !important;
     --max-animation-duration: 30s;
     --min-animation-duration: 10s;
     --max-size: 100px;
-    --min-animation: 25px;
+    --min-size: 25px;
     -webkit-animation: bubbleUp1 calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-stagger)) linear -5000s infinite normal;
             animation: bubbleUp1 calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-stagger)) linear -5000s infinite normal;
 }
