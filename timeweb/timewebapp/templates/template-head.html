@@ -101,7 +101,10 @@
                         document.getElementsByTagName("main")[0].style.justifyContent = "center";
                         document.getElementsByTagName("main")[0].style.alignItems = "center";
                         if (document.getElementById("background-image")) document.getElementById("background-image").style.display = "block";
-                        document.getElementById("loading-container").style.display = "contents";
+                        if (document.getElementById("circles-background"))
+                            document.getElementById("circles-background").style.display = "block";
+                        else 
+                            document.getElementById("loading-container").style.display = "contents";
                     }, 0);
                 };
             </script>
