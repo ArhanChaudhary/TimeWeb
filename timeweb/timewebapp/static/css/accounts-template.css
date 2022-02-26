@@ -35,7 +35,6 @@ body {
     width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
-    background-size: contain !important;
     --max-animation-duration: 30s;
     --min-animation-duration: 10s;
     --max-size: 100px;
