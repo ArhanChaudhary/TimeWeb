@@ -780,6 +780,7 @@ utils = {
                     case "n":
                     case "e":
                     case "d":
+                    case "D":
                     case "h":
                     case "Backspace":
                     case "s":
@@ -797,6 +798,7 @@ utils = {
                                     break;
                                 case "e":
                                 case "d":
+                                case "D":
                                 case "h":
                                 case "Backspace":
                                 case "s":
@@ -816,6 +818,11 @@ utils = {
                                                 break;
                                             case "d":
                                                 assignment_container.find(".delete-button").focus().click();
+                                                break;
+                                            case "D":
+                                                const click_delete_button = $.Event("click");
+                                                click_delete_button.shiftKey = e.shiftKey;
+                                                assignment_container.find(".delete-button").focus().trigger(click_delete_button);
                                                 break;
                                             case "h":
                                                 assignment_container.find(".mark-as-done-button").focus().click();
