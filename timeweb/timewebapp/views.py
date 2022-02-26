@@ -632,7 +632,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 return
             course_coursework = course_coursework['courseWork']
             for assignment in course_coursework:
-                self.gc_assignment += 1
 
                 # Load and interpret json data
                 assignment_id = int(assignment['id'], 10)
@@ -652,14 +651,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
                     x = self.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
                     if x < date_now:
-                        self.gc_skipped_assignment += 1
                         continue
 
                     due_time = datetime.time(x.hour, x.minute)
                     x = x.replace(hour=0, minute=0, second=0, microsecond=0)
                         
                     if assignment_date >= x:
-                        self.gc_skipped_assignment += 1
                         continue
                     if date_now == x:
                         tags.append("Important")
@@ -708,14 +705,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
 
         course_names = {}
-        self.gc_course = 0
-        self.gc_skipped_course = 0
-        self.gc_assignment = 0
-        self.gc_skipped_assignment = 0
         for course in courses:
-            self.gc_course += 1
             if course['courseState'] == "ARCHIVED":
-                self.gc_skipped_course += 1
                 continue
             course_names[course['id']] = course['name']
             batch.add(coursework_lazy.list(courseId=course['id']))
@@ -724,9 +715,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
         gc_models_to_create = []
-        logger.info(f"Requested for {self.gc_course} courses ({self.gc_skipped_course} archieved)")
         batch.execute()
-        logger.info(f"Requested for {self.gc_assignment} assignments ({self.gc_skipped_assignment} due dates passed) and created {len(gc_models_to_create)} assignments")
         TimewebModel.objects.bulk_create(gc_models_to_create)
         if not gc_models_to_create: return "No new gc assignments were added" # or do new_gc_assignment_ids == set_added_gc_assignment_ids
         self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
