@@ -34,6 +34,7 @@ $(function() {
         $(this).css("background", `rgb(${front_color.r + background_gradient_factor * (back_color.r - front_color.r)}, ${front_color.g + background_gradient_factor * (back_color.g - front_color.g)}, ${front_color.b + background_gradient_factor * (back_color.b - front_color.b)})`);
         this.style.setProperty("--circle-number", i);
         this.style.setProperty("--random-delay", `${Math.floor(Math.random()*11-5)}s`);
+        this.style.setProperty("--random-x", `${Math.floor(Math.random()*61-30)}vw`);
         this.style.setProperty("--x", `calc(${vws[i]-100}% + ${vws[i]}vw)`);
     });
 

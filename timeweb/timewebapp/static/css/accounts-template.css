@@ -52,7 +52,7 @@ body {
 }
 @keyframes bubbleUp1 {
     from {
-        transform: translate(var(--x), 100vh);
+        transform: translate(calc(var(--x) + var(--random-x)), 100vh);
     }
     to {
         transform: translate(var(--x), -100%);
