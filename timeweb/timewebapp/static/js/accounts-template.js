@@ -1,4 +1,4 @@
-$(function() {
+$(window).one("load", function() {
     function shuffle(o) {
         for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
         return o;
@@ -41,7 +41,7 @@ $(function() {
     if (localStorage.getItem("low-detail-mode")) {
         $("#circles-background").css("filter", "none");
     } else {
-        // Let's wait for a half a second to give the browser some time to adjust
+        // Let's wait for a bit to give the browser some time to adjust
         setTimeout(function() {
             var get_frames = true;
             var judgement_time = 1000;
@@ -63,6 +63,6 @@ $(function() {
                 }
                 get_frames = false;
             }, judgement_time);
-        }, 500);
+        }, 250);
     }
 });
