@@ -44,18 +44,19 @@ $(function() {
         setTimeout(function() {
             var get_frames = true;
             var judgement_time = 1000;
-            var framerate_threshold = 45;
+            var framerate_threshold = 40;
             var frames = 0;
 
-            function requestAnimFrame() {
+            function requestNextFrame() {
                 if (!get_frames) return;
 
                 frames++;
-                requestAnimationFrame(requestAnimFrame);
+                requestAnimationFrame(requestNextFrame);
             }
-            requestAnimationFrame(requestAnimFrame);
+            requestAnimationFrame(requestNextFrame);
             setTimeout(function() {
                 if (frames < framerate_threshold * judgement_time/1000) {
+                    console.log(`Low detail mode activated at ${frames/judgement_time*1000} fps`);
                     $("#circles-background").css("filter", "none");
                     localStorage.setItem("low-detail-mode", true);
                 }
