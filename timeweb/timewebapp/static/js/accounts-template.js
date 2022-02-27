@@ -36,6 +36,28 @@ $(window).one("load", function() {
         this.style.setProperty("--random-delay", `${Math.floor(Math.random()*11-5)}s`);
         this.style.setProperty("--random-x", `${Math.floor(Math.random()*61-30)}vw`);
         this.style.setProperty("--x", `calc(${vws[i]-100}% + ${vws[i]}vw)`);
+
+        // In case I want to use something other than linear:
+
+        // this is completely random x
+        // function easeInOutBack(x) {
+        //     const c1 = 1.70158;
+        //     const c2 = c1 * 1.525;
+            
+        //     return Math.round((x < 0.5
+        //     ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+        //     : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2)*1000)/1000;
+        // }
+        // const initial_back_percentage = Math.random();
+        // // without this: --0: 0.2846 --100: 1.2846
+        // const percentage_translate_left = easeInOutBack(initial_back_percentage);
+        // for (let i = 0; i < 1.01; i += 0.01) {
+        //     if (i + initial_back_percentage > 0.99) {
+        //         this.style.setProperty(`--${Math.round(i*100)}`, easeInOutBack(i + initial_back_percentage - 1) + 1 - percentage_translate_left);
+        //     } else {
+        //         this.style.setProperty(`--${Math.round(i*100)}`, easeInOutBack(i + initial_back_percentage) - percentage_translate_left);
+        //     }
+        // }
     });
 
     if (localStorage.getItem("low-detail-mode")) {
