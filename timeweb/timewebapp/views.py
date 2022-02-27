@@ -336,6 +336,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['just_updated_assignment_id'] = just_updated_assignment_id
         
         if request.session.get("gc-api-init-failed", False):
+            del request.session["gc-api-init-failed"]
             self.context["GC_API_INIT_FAILED"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
