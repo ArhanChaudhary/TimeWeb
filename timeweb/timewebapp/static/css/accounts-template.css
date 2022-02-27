@@ -39,8 +39,8 @@ body {
     --min-animation-duration: 10s;
     --max-size: 100px;
     --min-size: 25px;
-    -webkit-animation: bubbleUp1 calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-stagger)) linear -5000s infinite normal;
-            animation: bubbleUp1 calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-stagger)) linear -5000s infinite normal;
+    -webkit-animation: bubbleUp1 calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
+            animation: bubbleUp1 calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
 }
 @-webkit-keyframes bubbleUp1 {
     from {
