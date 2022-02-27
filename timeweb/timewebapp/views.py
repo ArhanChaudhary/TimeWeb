@@ -458,30 +458,20 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
                     removed_works_start = 0
-            if self.sm.min_work_time != None:
-                original_min_work_time = self.sm.min_work_time
-                self.sm.min_work_time /= self.sm.time_per_unit
 
             if self.sm.x == None:
-                # ctime*(y - first work) = (min_work_time_funct_round*ctime) * x (Multiply by ctime to undo the normalization done on minimum_work_time_funct_round)
-                # x = (y - first_work*ctime) / min_work_time_funct_round
-                # Solve for first work:
-                # originally: works = [works[n] - works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
-                # so first work is when n = removed_works_start
-                # first_work = works[removed_works_start] - works[0] + first_work
-                # first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
-                # y - old_data.works[removed_works_start] + old_data.works[0] - first_work
+                # ctime * (y - new_first_work) = min_work_time_funct_round * x
+                # x = ctime * (y - new_first_work) / min_work_time_funct_round
+                # Solve for new_first_work:
+                # reference: works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                # new_first_work is when n = removed_works_start
+                # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
+                min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
                 if self.created_assignment or self.sm.needs_more_info:
-                    if self.sm.min_work_time:
-                        x_num = (self.sm.y - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
-                    else:
-                        x_num = (self.sm.y - first_work)/self.sm.funct_round
+                    new_first_work = first_work
                 elif self.updated_assignment:
-                    if self.sm.min_work_time:
-                        x_num = (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/ceil(ceil(self.sm.min_work_time/self.sm.funct_round)*self.sm.funct_round)
-                    else:
-                        x_num = (self.sm.y - Decimal(old_data.works[removed_works_start]) + Decimal(old_data.works[0]) - first_work)/self.sm.funct_round
-                x_num = ceil(x_num)
+                    new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
+                x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
                 if self.sm.blue_line_start >= x_num:
                     self.sm.blue_line_start = 0
                     # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
@@ -532,8 +522,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.blue_line_start = 0
                     if self.created_assignment or self.sm.needs_more_info:
                         self.sm.dynamic_start = 0
-            if self.sm.min_work_time != None:
-                self.sm.min_work_time = original_min_work_time
             if self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
