@@ -63,27 +63,31 @@ $(window).one("load", function() {
     if (sessionStorage.getItem("low-detail-mode")) {
         $("#circles-background").css("filter", "none");
     } else {
-        var get_frames = true;
-        var judgement_time = 250;
-        var framerate_threshold = 40;
-        var frames = 0;
+        $("#circles-background .circle").first().on("animationstart", function() {
+            console.log("Animation started: " + Date.now());
 
-        function requestNextFrame() {
-            if (!get_frames) return;
+            var get_frames = true;
+            var judgement_time = 250;
+            var framerate_threshold = 40;
+            var frames = 0;
 
-            frames++;
-            requestAnimationFrame(requestNextFrame);
-        }
-        requestAnimationFrame(requestNextFrame);
-        setTimeout(function() {
-            if (frames < framerate_threshold * judgement_time/1000) {
-                console.log(`Low detail mode activated at ${frames/judgement_time*1000} fps`);
-                $("#circles-background").css("filter", "none");
-                sessionStorage.setItem("low-detail-mode", true);
-            } else {
-                console.log(`Low detail mode skipped activating at ${frames/judgement_time*1000} fps`);
+            function requestNextFrame() {
+                if (!get_frames) return;
+
+                frames++;
+                requestAnimationFrame(requestNextFrame);
             }
-            get_frames = false;
-        }, judgement_time);
+            requestAnimationFrame(requestNextFrame);
+            setTimeout(function() {
+                if (frames < framerate_threshold * judgement_time/1000) {
+                    console.log(`Low detail mode activated at ${frames/judgement_time*1000} fps`);
+                    $("#circles-background").css("filter", "none");
+                    sessionStorage.setItem("low-detail-mode", true);
+                } else {
+                    console.log(`Low detail mode skipped activating at ${frames/judgement_time*1000} fps`);
+                }
+                get_frames = false;
+            }, judgement_time);
+        });
     }
 });
