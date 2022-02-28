@@ -31,14 +31,13 @@ body {
 }
 #circles-background .circle {
     position: absolute;
-
     width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
     --max-animation-duration: 30s;
     --min-animation-duration: 10s;
-    --max-size: 100px;
-    --min-size: 25px;
+    --max-size: calc(5vw + 40px);
+    --min-size: calc(0.8vw + 15px);
     -webkit-animation: bubbleUp calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
             animation: bubbleUp calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
 }
