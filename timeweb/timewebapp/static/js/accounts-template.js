@@ -82,6 +82,8 @@ $(window).one("load", function() {
                     console.log(`Low detail mode activated at ${frames/judgement_time*1000} fps`);
                     $("#circles-background").css("filter", "none");
                     localStorage.setItem("low-detail-mode", true);
+                } else {
+                    console.log(`Low detail mode skipped activating at ${frames/judgement_time*1000} fps`);
                 }
                 get_frames = false;
             }, judgement_time);
