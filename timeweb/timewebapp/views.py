@@ -236,7 +236,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def valid_form(self, request):
         if self.isExampleAccount: return redirect("home")
-        self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
+        self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time") or None
         self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         self.settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
         self.settings_model.def_due_time = self.form.cleaned_data.get("def_due_time")
@@ -431,7 +431,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
-            self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
+            self.sm.min_work_time = self.form.cleaned_data.get("min_work_time") or None
             self.sm.break_days = self.form.cleaned_data.get("break_days")
         if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit or not self.sm.funct_round:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used

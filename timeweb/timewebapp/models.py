@@ -155,7 +155,7 @@ class TimewebModel(models.Model):
     min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"),_("The minimum work time must be positive"))],
+        validators=[MinValueValidator(Decimal("0"),_("The minimum work time must be positive or zero"))],
         blank=True,
         null=True,
         verbose_name=_('Minimum Daily Work Time in Minutes'),
@@ -214,7 +214,7 @@ class SettingsModel(models.Model):
     def_min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"),_("The default minimum work time must be positive"))],
+        validators=[MinValueValidator(Decimal("0"),_("The default minimum work time must be positive or zero"))],
         default=15,
         blank=True,
         null=True,
