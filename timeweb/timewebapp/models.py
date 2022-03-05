@@ -323,15 +323,15 @@ class SettingsModel(models.Model):
         default=_("1"),
         verbose_name=_('Animation Speed'),
     )
-    timezone = TimeZoneField(
-        null=True,
-        blank=True,
-    )
 
     # Group "Miscellaneous"
     restore_gc_assignments = models.BooleanField(
         default=False,
         verbose_name=_('Restore Deleted Google Classroom Assignments'),
+    )
+    timezone = TimeZoneField(
+        null=True,
+        blank=True,
     )
     enable_tutorial = models.BooleanField(
         default=True,
