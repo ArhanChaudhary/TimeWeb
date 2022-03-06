@@ -297,8 +297,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if not self.settings_model.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]
 
+        self.context['enabled_gc_api'] = 'token' in self.settings_model.oauth_token
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
-            self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
+            self.context['creating_gc_assignments_from_frontend'] = self.context['enabled_gc_api']
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
 
