@@ -43,18 +43,18 @@ body {
 }
 @-webkit-keyframes bubbleUp {
     from {
-        transform: translate(calc(var(--x) + var(--random-x)), 100vh);
+        transform: translate(var(--x), 100vh);
     }
     to {
-        transform: translate(var(--x), -100%);
+        transform: translate(calc(var(--x) + var(--random-x)), -100%);
     }
 }
 @keyframes bubbleUp {
     from {
-        transform: translate(calc(var(--x) + var(--random-x)), 100vh);
+        transform: translate(var(--x), 100vh);
     }
     to {
-        transform: translate(var(--x), -100%);
+        transform: translate(calc(var(--x) + var(--random-x)), -100%);
     }
 }
 /* 
