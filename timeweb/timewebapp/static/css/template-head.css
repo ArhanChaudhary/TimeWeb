@@ -51,8 +51,8 @@ textarea
     border-radius: 50%;
     transform: translate(calc(var(--x) * var(--radius) * 1px), calc(var(--y) * var(--radius) * 1px));
     /* -6 for rotating the circle */
-    -webkit-animation: animateLoading 1s cubic-bezier(0.71, 0, 0.6, 0.79) calc(1s * (var(--circle-number) - var(--circle-count) - 6) / var(--circle-count)) infinite;
-            animation: animateLoading 1s cubic-bezier(0.71, 0, 0.6, 0.79) calc(1s * (var(--circle-number) - var(--circle-count) - 6) / var(--circle-count)) infinite;
+    -webkit-animation: animateLoading 1s cubic-bezier(0.71, 0, 0.6, 0.79) calc(1s * (var(--circle-number) - var(--circle-count) - 3) / var(--circle-count)) infinite reverse;
+            animation: animateLoading 1s cubic-bezier(0.71, 0, 0.6, 0.79) calc(1s * (var(--circle-number) - var(--circle-count) - 3) / var(--circle-count)) infinite reverse;
 }
 .loading-circle:nth-child(1) {
     --circle-number: 1;
