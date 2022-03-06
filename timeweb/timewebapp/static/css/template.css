@@ -23,6 +23,9 @@ header::after {
     z-index: -1;
     transform: translateY(-20px);
 }
+header > * {
+    visibility: hidden;
+}
 #image-new-container {
     -webkit-user-select: none;
        -moz-user-select: none;

@@ -14,6 +14,35 @@ isMobile = (function() {
     return false;
 })();
 isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+function resetHeaderLayout() {
+    const username = $("#user-greeting #username"),
+        logo = $("#logo-container"),
+        welcome = $("#welcome"),
+        plus_button = $("#image-new-container img"),
+        plus_button_width = plus_button.width()||0,
+        newassignmenttext = $("#new-assignment-text");
+
+    logo.css({
+        left: '',
+        transform: '',
+    });
+    logo.find("img").css("width", "");
+    welcome.toggle(!collision(welcome, logo, { margin: 10 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+    if (collision(username, logo, { margin: 10 })) {
+        logo.css({
+            left: 5 + plus_button_width,
+            transform: "none",
+        });
+        welcome.toggle(!collision(welcome, logo, { margin: 10 }));
+        newassignmenttext.css("max-width", 0);
+        if (collision(username, logo, { margin: 10 })) {
+            // compress the logo
+            logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+        }
+    } else {
+        newassignmenttext.css("max-width",window.innerWidth/2-115-69);
+    }
+}
 $(function() {
     // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
     $(document.body).on("focus", function() {
@@ -39,66 +68,13 @@ $(function() {
                 activeElement.siblings(".first-advanced-buttons").prevAll(":not(br)").first().focus();
         }
     });
-    // Header responiveness
-    const username = $("#user-greeting #username"),
-        logo = $("#logo-container"),
-        welcome = $("#welcome"),
-        newassignmenttext = $("#new-assignment-text");
-    // Checks if user is authenticated and on home page
-    if ($("#image-new-container").length) {
-        $(window).resize(function() {
 
-            logo.css({
-                left: '',
-                transform: '',
-            });
-            logo.find("img").css("width", "");
-            welcome.toggle(!collision(welcome, logo, { margin: 10 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-            if (collision(username, logo, { margin: 10 })) {
-                logo.css({
-                    left: 65,
-                    transform: "none",
-                });
-                welcome.toggle(!collision(welcome, logo, { margin: 10 }));
-                newassignmenttext.css("max-width", 0);
-                if (collision(username, logo, { margin: 10 })) {
-                    // compress the logo
-                    logo.find("img").css("width", Math.max(0, username.offset().left-60-20-5));
-                }
-            } else {
-                newassignmenttext.css("max-width",window.innerWidth/2-115-69);
-            }
-        });
-    // Checks if user is authenticated and not on home page
-    } else if ($("#user-greeting").length) {
-        $(window).resize(function() {
-            welcome.toggle(!collision(welcome, logo, { margin: 10 }));
-
-            logo.css({
-                left: '',
-                transform: '',
-            });
-            logo.find("img").css("width", "");
-            if (collision(username, logo, { margin: 10 })) {
-                logo.css({
-                    left: 5,
-                    transform: "none",
-                });
-                welcome.toggle(!collision(welcome, logo, { margin: 10 }));
-                if (collision(username, logo, { margin: 10 })) {
-                    // compress the logo
-                    logo.find("img").css("width", Math.max(0, username.offset().left-20-5));
-                }
-            }
-        });
+    // Checks if user is authenticated
+    if ($("#user-greeting").length) {
+        $(window).resize(resetHeaderLayout);
+        resetHeaderLayout();
     }
-    $(window).one("load", function() {
-        $(window).trigger("resize");
-        setTimeout(function(){
-            // This hides the address bar (not anymore)
-            window.scrollTo(0, 1);
-        }, 0);
-    });
+    $("header > *").css("visibility", "visible");
     // https://web.dev/customize-install/
     let prompt;
     window.addEventListener('beforeinstallprompt', function(e) {
