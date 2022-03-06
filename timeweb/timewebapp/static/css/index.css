@@ -844,17 +844,11 @@ a[href="/settings"] {
     background: rgba(219,219,219,0.9);
     box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
-.graph-footer *:not(.info-button):not(.advanced-buttons):focus {
+.graph-footer *:not(.info-button):focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
     box-shadow: 0 0 0 3px rgb(0,95,204);
-}
-.advanced-buttons, .advanced-buttons svg {
-    background: none;
-    border-radius: unset;
-    padding: 0;
-    box-shadow: none;
 }
 /* 1st column */
 .delete-work-input-button, .skew-ratio-button {
@@ -862,18 +856,10 @@ a[href="/settings"] {
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .skew-ratio-textbox, .advanced-buttons  {
+.work-input-textbox, .skew-ratio-textbox  {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
-}
-.advanced-buttons {
-    border-bottom: 1px solid;
-    width: 146px;
-    font-size: 14px;
-}
-.first-advanced-buttons {
-    margin-top: 7px;
 }
 /* 3rd column */
 .submit-work-button, .fixed-mode-button {
@@ -1193,8 +1179,6 @@ input[type=number]::-webkit-inner-spin-button {
 #dark-mode .tags,
 
 /* Undo filter already applied by #dark-mode .assignment-footer */
-#dark-mode .assignment-container:not(.invert-text-color) .advanced-buttons,
-html:not(#dark-mode) .assignment-container.invert-text-color .advanced-buttons,
 #dark-mode .assignment-footer,
 
 #dark-mode #assignments-container .info-button-text:not(.tag-add-box),

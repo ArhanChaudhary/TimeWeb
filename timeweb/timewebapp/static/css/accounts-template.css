@@ -42,6 +42,161 @@ body {
     -webkit-animation: bubbleUp calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
             animation: bubbleUp calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
 }
+@-webkit-keyframes bubbleUp {
+    0% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--0)), 100vh);
+    }
+    2% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--2)), calc(98vh - 2%));
+    }
+    4% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--4)), calc(96vh - 4%));
+    }
+    6% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--6)), calc(94vh - 6%));
+    }
+    8% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--8)), calc(92vh - 8%));
+    }
+    10% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--10)), calc(90vh - 10%));
+    }
+    12% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--12)), calc(88vh - 12%));
+    }
+    14% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--14)), calc(86vh - 14%));
+    }
+    16% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--16)), calc(84vh - 16%));
+    }
+    18% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--18)), calc(82vh - 18%));
+    }
+    20% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--20)), calc(80vh - 20%));
+    }
+    22% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--22)), calc(78vh - 22%));
+    }
+    24% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--24)), calc(76vh - 24%));
+    }
+    26% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--26)), calc(74vh - 26%));
+    }
+    28% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--28)), calc(72vh - 28%));
+    }
+    30% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--30)), calc(70vh - 30%));
+    }
+    32% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--32)), calc(68vh - 32%));
+    }
+    34% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--34)), calc(66vh - 34%));
+    }
+    36% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--36)), calc(64vh - 36%));
+    }
+    38% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--38)), calc(62vh - 38%));
+    }
+    40% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--40)), calc(60vh - 40%));
+    }
+    42% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--42)), calc(58vh - 42%));
+    }
+    44% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--44)), calc(56vh - 44%));
+    }
+    46% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--46)), calc(54vh - 46%));
+    }
+    48% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--48)), calc(52vh - 48%));
+    }
+    50% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--50)), calc(50vh - 50%));
+    }
+    52% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--52)), calc(48vh - 52%));
+    }
+    54% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--54)), calc(46vh - 54%));
+    }
+    56% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--56)), calc(44vh - 56%));
+    }
+    58% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--58)), calc(42vh - 58%));
+    }
+    60% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--60)), calc(40vh - 60%));
+    }
+    62% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--62)), calc(38vh - 62%));
+    }
+    64% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--64)), calc(36vh - 64%));
+    }
+    66% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--66)), calc(34vh - 66%));
+    }
+    68% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--68)), calc(32vh - 68%));
+    }
+    70% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--70)), calc(30vh - 70%));
+    }
+    72% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--72)), calc(28vh - 72%));
+    }
+    74% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--74)), calc(26vh - 74%));
+    }
+    76% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--76)), calc(24vh - 76%));
+    }
+    78% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--78)), calc(22vh - 78%));
+    }
+    80% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--80)), calc(20vh - 80%));
+    }
+    82% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--82)), calc(18vh - 82%));
+    }
+    84% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--84)), calc(16vh - 84%));
+    }
+    86% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--86)), calc(14vh - 86%));
+    }
+    88% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--88)), calc(12vh - 88%));
+    }
+    90% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--90)), calc(10vh - 90%));
+    }
+    92% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--92)), calc(8vh - 92%));
+    }
+    94% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--94)), calc(6vh - 94%));
+    }
+    96% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--96)), calc(4vh - 96%));
+    }
+    98% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--98)), calc(2vh - 98%));
+    }
+    100% {
+        transform: translate(calc(var(--x) + var(--random-x) * var(--100)), -100%);
+    }
+}
 @keyframes bubbleUp {
     0% {
         transform: translate(calc(var(--x) + var(--random-x) * var(--0)), 100vh);

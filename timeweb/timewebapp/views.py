@@ -190,7 +190,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'assignment_spacing': self.settings_model.assignment_spacing,
             'animation_speed': self.settings_model.animation_speed,
             'show_priority': self.settings_model.show_priority,
-            'show_advanced_controls': self.settings_model.show_advanced_controls,
             'one_graph_at_a_time': self.settings_model.one_graph_at_a_time,
             'close_graph_after_work_input': self.settings_model.close_graph_after_work_input,
             'highest_priority_color': self.settings_model.highest_priority_color,
@@ -253,7 +252,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
         self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
         self.settings_model.show_priority = self.form.cleaned_data.get("show_priority")
-        self.settings_model.show_advanced_controls = self.form.cleaned_data.get("show_advanced_controls")
         self.settings_model.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
         self.settings_model.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")
         self.settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
@@ -295,7 +293,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['background_image'] = self.settings_model.background_image
         self.context['assignment_spacing'] = self.settings_model.assignment_spacing
         self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
-        self.context['show_advanced_controls'] = self.settings_model.show_advanced_controls
 
         if not self.settings_model.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]

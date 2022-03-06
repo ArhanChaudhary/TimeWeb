@@ -244,10 +244,6 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Ignore Minimum Work Time Ends'),
     )
-    show_advanced_controls = models.BooleanField(
-        default=True,
-        verbose_name=_('Show "Advanced Controls" beneath the Graph'),
-    )
     one_graph_at_a_time = models.BooleanField(
         default=False,
         verbose_name=_('Allow Only One Open Graph at a Time'),

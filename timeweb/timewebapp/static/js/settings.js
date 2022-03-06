@@ -32,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_def_due_time").data("daterangepicker").setStartDate(moment(new Date().setHours(0, 0, 0, 0)));
                         $("#id_show_progress_bar").prop("checked", true);
                         $("#id_show_priority").prop("checked", true);
-                        $("#id_show_advanced_controls").prop("checked", true);
                         $("#id_one_graph_at_a_time").prop("checked", false);
                         $("#id_close_graph_after_work_input").prop("checked", false);
                         $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");

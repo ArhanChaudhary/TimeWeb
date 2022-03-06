@@ -209,15 +209,6 @@ utils = {
             },
 
             advancedInputs: function() {
-                // Advanced inputs for the graph
-                if (SETTINGS.show_advanced_controls) {
-                    $(".advanced-buttons").click(function() {
-                        $(".skew-ratio-button, .skew-ratio-textbox, .skew-ratio-textbox + .info-button, .fixed-mode-button").toggle();
-                        $(".advanced-buttons").toggle();
-                    });
-                    $(".second-advanced-buttons").toggle();
-                    $(".skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button").toggle(); // .skew-ratio-textbox + .info-button is hiddenzAz in graph.js
-                }
                 // Advanced inputs for form, don't add to works because
                 $("#form-wrapper #advanced-inputs").click(function() {
                     if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
@@ -831,9 +822,6 @@ utils = {
                                                 assignment_container.find(".delete-work-input-button").focus().click();
                                                 break;
                                             case "s":
-                                                if (!assignment_container.find(".skew-ratio-button").is(":visible")) {
-                                                    assignment_container.find(".first-advanced-buttons").focus().click();
-                                                }
                                                 assignment_container.find(".skew-ratio-button").focus().click();
                                                 break;
                                             case "f":

@@ -157,7 +157,6 @@ class SettingsForm(forms.ModelForm):
             "show_progress_bar": "Displays a progress bar that measures how close you are to completing an assignment on every assignment's graph.",
             "assignment_spacing": "Controls the height of every assignment.",
             "show_priority": "Displays the priority percentage and color for every assignment.",
-            "show_advanced_controls": "Disabling this removes the button entirely.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
