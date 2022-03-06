@@ -1143,12 +1143,12 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight:not(.assignment-container),
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
-    --filter-drop-shadow-blur: 1px;
     --filter-drop-shadow-color: white;
     font-size: 19px !important;
-    filter: drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent)) 
+    filter: drop-shadow(0 1px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 -1px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(1px 0 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(-1px 0 0 var(--filter-drop-shadow-color, transparent))
             invert(var(--filter-invert, 0));
 }
 .grey-highlight.shortcut-text {
@@ -1185,9 +1185,10 @@ input[type=number]::-webkit-inner-spin-button {
 
 #dark-mode #tutorial-click-assignment-to-open {
     --filter-invert: 1;
-    filter: drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 0 var(--filter-drop-shadow-blur, 0) var(--filter-drop-shadow-color, transparent)) 
+    filter: drop-shadow(0 1px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 -1px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(1px 0 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(-1px 0 0 var(--filter-drop-shadow-color, transparent))
             invert(var(--filter-invert, 0));
 }
 /* Fix double invert */
