@@ -42,25 +42,6 @@ body {
     -webkit-animation: bubbleUp calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
             animation: bubbleUp calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay)) linear -5000s infinite normal;
 }
-@-webkit-keyframes bubbleUp {
-    from {
-        transform: translate(var(--x), 100vh);
-    }
-    to {
-        transform: translate(calc(var(--x) + var(--random-x)), -100%);
-    }
-}
-@keyframes bubbleUp {
-    from {
-        transform: translate(var(--x), 100vh);
-    }
-    to {
-        transform: translate(calc(var(--x) + var(--random-x)), -100%);
-    }
-}
-/* 
-In case I use something other than linear:
-
 @keyframes bubbleUp {
     0% {
         transform: translate(calc(var(--x) + var(--random-x) * var(--0)), 100vh);
@@ -215,7 +196,7 @@ In case I use something other than linear:
     100% {
         transform: translate(calc(var(--x) + var(--random-x) * var(--100)), -100%);
     }
-} */
+}
 .socialaccount-container {
     margin-top: 1em;
 }
