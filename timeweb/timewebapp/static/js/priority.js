@@ -447,7 +447,9 @@ class Priority {
                         str_daysleft = due_date_minus_today + "d";
                     }
                     if (sa.sa.break_days.length) {
-                        const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today" });
+                        // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
+                        // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
+                        const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true });
                         str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
                     }
                 }
@@ -489,7 +491,7 @@ class Priority {
                 // Don't use NaN because NaN === NaN is false for calculations used later
                 status_priority = undefined;
             } else {
-                // If due times are enabled, it's possible for (sa.sa.x - sa.sa.blue_line_start - len_works) to become negative
+                // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
                 // However this doesn't happen because the assignment will have been marked have completed in this scenario
                 status_priority = todo * sa.sa.time_per_unit / (sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }

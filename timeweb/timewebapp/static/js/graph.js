@@ -2,13 +2,15 @@
 class Assignment {
     constructor(dom_assignment) {
         this.sa = utils.loadAssignmentData(dom_assignment);
-        if (!this.sa.needs_more_info) {
-            this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
-            this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
-            this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
-            this.assign_day_of_week = this.sa.assignment_date.getDay();
-            this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
+        this.assign_day_of_week = this.sa.assignment_date?.getDay();
+        this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
+        this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
+        if (!Number.isFinite(this.red_line_start_x) || !Number.isFinite(this.red_line_start_y)) {
+            this.red_line_start_x = undefined;
+            this.red_line_start_y = undefined;
         }
+        this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
+        if (this.sa.unit) this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
     }
     calcSkewRatioBound() {
         let x1 = this.sa.complete_x;
@@ -83,7 +85,7 @@ class Assignment {
         this.sa.alert_due_date_incremented = true;
         ajaxUtils.sendAttributeAjaxWithTimeout("alert_due_date_incremented", this.sa.alert_due_date_incremented, this.sa.id);
     }
-    getWorkingDaysRemaining(params={reference: null}) {
+    getWorkingDaysRemaining(params={reference: null, floor_due_time: false}) {
         const original_red_line_start_x = this.red_line_start_x;
         if (params.reference === "today") {
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
@@ -92,7 +94,11 @@ class Assignment {
             let len_works = this.sa.works.length - 1;
             this.red_line_start_x = this.sa.blue_line_start + len_works;
         }
-        let x1 = this.sa.x - this.red_line_start_x;
+        if (params.floor_due_time) {
+            var x1 = Math.floor(this.sa.complete_x) - this.red_line_start_x;
+        } else {
+            var x1 = this.sa.x - this.red_line_start_x;
+        }
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
