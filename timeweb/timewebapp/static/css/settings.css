@@ -16,21 +16,12 @@ main form select {
     padding: 0;
 }
 #reset-settings-button, #submit-settings-button {
-    box-sizing: border-box;
-    background: rgb(243, 243, 243);
-    border: 2px solid black;
     font-size: 20px;
-    border-radius: 4px;
     margin-top: 5px;
+    border-width: 2px;
     width: min(600px, calc(50% - 10px));
     height: 50px;
     margin-bottom: 100px;
-}
-#reset-settings-button:hover, #submit-settings-button:hover {
-    filter: brightness(0.95);
-}
-#reset-settings-button:active, #submit-settings-button:active {
-    transform: translateY(1px);
 }
 #reset-settings-button {
     margin-right: 10px;
