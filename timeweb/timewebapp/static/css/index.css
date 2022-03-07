@@ -925,11 +925,10 @@ input[type=number]::-webkit-inner-spin-button {
     width: min(100vw, 490px);
     box-sizing: border-box;
     background: white;
-    box-shadow: 0 0 8px black;
+    box-shadow: 0 0 100px -23px black;
     margin: 5px auto 35px;
-    border: 1px solid black;
     border-radius: 15px;
-    padding: 5px 5px 25px 5px;
+    padding: 5px 5px 25px;
     position: relative;
 }
 #form-wrapper #cancel-button {
@@ -1078,7 +1077,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #overlay {
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.2);
     position: fixed;
     top: 0;
     left: 0;
