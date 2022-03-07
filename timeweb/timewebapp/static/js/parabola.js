@@ -37,6 +37,9 @@ Assignment.prototype.setParabolaValues = function() {
     if (this.sa.break_days.length) {
         const mods = this.calcModDays();
         x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+        if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+            x1 = Math.ceil(x1);
+        }
     }
     const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
     this.a = parabola.a;
@@ -316,6 +319,9 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     if (this.sa.break_days.length) {
         const mods = this.calcModDays();
         x1_from_blue_line_start -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
+        if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+            x1_from_blue_line_start = Math.ceil(x1_from_blue_line_start);
+        }
     }
     // Roundoff errors
     if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE) return;
@@ -370,6 +376,9 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) & 7]; // Handles break days, explained later
+            if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+                x1 = Math.ceil(x1);
+            }
         }
 
         // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start

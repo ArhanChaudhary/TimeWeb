@@ -182,6 +182,9 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.length) {
                 const mods = this.calcModDays();
                 x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+                if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+                    x1 = Math.ceil(x1);
+                }
             }
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
@@ -252,6 +255,9 @@ class VisualAssignment extends Assignment {
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+            if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+                x1 = Math.ceil(x1);
+            }
         }
 
         let a = this.a;
