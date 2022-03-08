@@ -18,6 +18,9 @@ class Assignment {
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x1 -= Math.floor(this.sa.x / 7) * this.sa.break_days.length + mods[this.sa.x % 7];
+            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+                x1 = Math.ceil(x1);
+            }
         }
         if (!y1) return 0;
         /*
@@ -101,6 +104,7 @@ class Assignment {
         }
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
+            // dont apply the ceiling logic on other instances of this code because x1 will anyways always be an integer
             x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
         }
         this.red_line_start_x = original_red_line_start_x;
@@ -188,7 +192,7 @@ class VisualAssignment extends Assignment {
             if (this.sa.break_days.length) {
                 const mods = this.calcModDays();
                 x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-                if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+                if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
                     x1 = Math.ceil(x1);
                 }
             }
@@ -198,6 +202,7 @@ class VisualAssignment extends Assignment {
             let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y - (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
             // Handles break days
             if (this.sa.break_days.length) {
+                // i don't think ceiling logic is needed here because it seems to work as intended without it
                 const floorx2 = Math.floor(x2);
                 if (this.sa.break_days.includes((this.assign_day_of_week + floorx2 + this.red_line_start_x) % 7)) {
                     x2 = floorx2;
@@ -261,7 +266,7 @@ class VisualAssignment extends Assignment {
         if (this.sa.break_days.length) {
             const mods = this.calcModDays();
             x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-            if (this.sa.break_days.includes(this.assign_day_of_week + this.red_line_start_x + Math.floor(this.sa.complete_x))) {
+            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
                 x1 = Math.ceil(x1);
             }
         }
