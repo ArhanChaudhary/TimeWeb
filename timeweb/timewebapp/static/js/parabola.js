@@ -34,13 +34,13 @@ Assignment.prototype.setParabolaValues = function() {
     // Define (x1, y1) and translate both variables to (0,0)
     let x1 = this.sa.complete_x - this.red_line_start_x,
         y1 = this.sa.y - this.red_line_start_y;
-    if (this.sa.break_days.length) {
-        const mods = this.calcModDays();
-        x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-            x1 = Math.ceil(x1);
-        }
+
+    const mods = this.calcModDays();
+    x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+    if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+        x1 = Math.ceil(x1);
     }
+
     const parabola = this.calcAandBfromOriginAndTwoPoints([1, y1/x1 * this.sa.skew_ratio], [x1, y1]);
     this.a = parabola.a;
     this.b = parabola.b;
@@ -231,7 +231,7 @@ Assignment.prototype.funct = function(x, params={translateX: true}) {
     if (params.translateX !== false) {
         // Translate x coordinate and break days
         x -= this.red_line_start_x;
-        if (this.sa.break_days.length) {
+        if (this.sa.break_days.length) { // let's keep this if statement here because the efficiency of this function matters
             const mods = this.calcModDays();
             x -= Math.floor(x / 7) * this.sa.break_days.length + mods[x % 7];
         }
@@ -316,13 +316,13 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
     this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
     let x1_from_blue_line_start = this.sa.complete_x - this.red_line_start_x;
     let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
-    if (this.sa.break_days.length) {
-        const mods = this.calcModDays();
-        x1_from_blue_line_start -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
-        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-            x1_from_blue_line_start = Math.ceil(x1_from_blue_line_start);
-        }
+
+    const mods = this.calcModDays();
+    x1_from_blue_line_start -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
+    if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+        x1_from_blue_line_start = Math.ceil(x1_from_blue_line_start);
     }
+
     // Roundoff errors
     if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE) return;
     // The first part calculates the a and b values for the least squares curve from works_without_break_days using WLS quadratic regression
@@ -373,12 +373,11 @@ Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
         this.red_line_start_y = original_red_line_start_y;
         let x1 = this.sa.complete_x - this.red_line_start_x;
         let y1 = this.sa.y - this.red_line_start_y;
-        if (this.sa.break_days.length) {
-            const mods = this.calcModDays();
-            x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) & 7]; // Handles break days, explained later
-            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-                x1 = Math.ceil(x1);
-            }
+
+        const mods = this.calcModDays();
+        x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) & 7]; // Handles break days, explained later
+        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+            x1 = Math.ceil(x1);
         }
 
         // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start

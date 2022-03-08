@@ -15,13 +15,13 @@ class Assignment {
     calcSkewRatioBound() {
         let x1 = this.sa.complete_x;
         let y1 = this.sa.y;
-        if (this.sa.break_days.length) {
-            const mods = this.calcModDays();
-            x1 -= Math.floor(this.sa.x / 7) * this.sa.break_days.length + mods[this.sa.x % 7];
-            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-                x1 = Math.ceil(x1);
-            }
+
+        const mods = this.calcModDays();
+        x1 -= Math.floor(this.sa.x / 7) * this.sa.break_days.length + mods[this.sa.x % 7];
+        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+            x1 = Math.ceil(x1);
         }
+
         if (!y1) return 0;
         /*
         skew_ratio = (a + b) * x1 / y1; 
@@ -102,11 +102,11 @@ class Assignment {
         } else {
             var x1 = this.sa.x - this.red_line_start_x;
         }
-        if (this.sa.break_days.length) {
-            const mods = this.calcModDays();
-            // dont apply the ceiling logic on other instances of this code because x1 will anyways always be an integer
-            x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
-        }
+
+        const mods = this.calcModDays();
+        // dont apply the ceiling logic on other instances of this code because x1 will anyways always be an integer
+        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+
         this.red_line_start_x = original_red_line_start_x;
         return x1;
     }
@@ -189,27 +189,25 @@ class VisualAssignment extends Assignment {
         if (this.set_skew_ratio_using_graph && iteration_number !== Assignment.AUTOTUNE_ITERATIONS + 1) {
             let x1 = this.sa.complete_x - this.red_line_start_x;
             let y1 = this.sa.y - this.red_line_start_y;
-            if (this.sa.break_days.length) {
-                const mods = this.calcModDays();
-                x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-                if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-                    x1 = Math.ceil(x1);
-                }
+
+            const mods = this.calcModDays();
+            x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+                x1 = Math.ceil(x1);
             }
+
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
             let x2 = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon - this.red_line_start_x;
             let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y - (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
-            // Handles break days
-            if (this.sa.break_days.length) {
-                // i don't think ceiling logic is needed here because it seems to work as intended without it
-                const floorx2 = Math.floor(x2);
-                if (this.sa.break_days.includes((this.assign_day_of_week + floorx2 + this.red_line_start_x) % 7)) {
-                    x2 = floorx2;
-                }
-                const mods = this.calcModDays();
-                x2 -= Math.floor(x2 / 7) * this.sa.break_days.length + mods[floorx2 % 7];
+
+            // i don't think ceiling logic is needed here because it seems to work as intended without it
+            const floorx2 = Math.floor(x2);
+            if (this.sa.break_days.includes((this.assign_day_of_week + floorx2 + this.red_line_start_x) % 7)) {
+                x2 = floorx2;
             }
+            x2 -= Math.floor(x2 / 7) * this.sa.break_days.length + mods[floorx2 % 7];
+
             const skew_ratio_bound = this.calcSkewRatioBound();
             // If the mouse is outside the graph to the left or right, ignore it
             // x2 can be NaN from being outside of the graph caused by negative indexing by floorx2. Doesn't matter if this happens
@@ -263,12 +261,11 @@ class VisualAssignment extends Assignment {
          */
         let x1 = this.sa.complete_x - this.red_line_start_x;
         let y1 = this.sa.y - this.red_line_start_y;
-        if (this.sa.break_days.length) {
-            const mods = this.calcModDays();
-            x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-                x1 = Math.ceil(x1);
-            }
+
+        const mods = this.calcModDays();
+        x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+            x1 = Math.ceil(x1);
         }
 
         let a = this.a;
