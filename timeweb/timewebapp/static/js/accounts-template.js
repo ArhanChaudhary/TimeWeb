@@ -29,6 +29,10 @@ $(window).one("load", function() {
         b: 156
     };
 
+    const initial_sin_percentage = -0.5;
+    for (let i = 0; i < 1.01; i += 0.01) {
+        $("#circles-background")[0].style.setProperty(`--${Math.round(i*100)}`, Math.sin((i + initial_sin_percentage)*Math.PI));
+    }
     $("#circles-background .circle").each(function(i) {
         let background_gradient_factor = 1 - i / (number_of_circles - 1);
         $(this).css("background", `rgb(${front_color.r + background_gradient_factor * (back_color.r - front_color.r)}, ${front_color.g + background_gradient_factor * (back_color.g - front_color.g)}, ${front_color.b + background_gradient_factor * (back_color.b - front_color.b)})`);
@@ -36,11 +40,6 @@ $(window).one("load", function() {
         this.style.setProperty("--random-delay", `${Math.floor(Math.random()*11-5)}s`);
         this.style.setProperty("--random-x", `${Math.random()*6+5}vw`);
         this.style.setProperty("--x", `calc(${vws[i]-100}% + ${vws[i]}vw)`);
-
-        const initial_sin_percentage = -0.5;
-        for (let i = 0; i < 1.01; i += 0.01) {
-            this.style.setProperty(`--${Math.round(i*100)}`, Math.sin((i + initial_sin_percentage)*Math.PI));
-        }
     });
 
     if (sessionStorage.getItem("low-detail-mode")) {
