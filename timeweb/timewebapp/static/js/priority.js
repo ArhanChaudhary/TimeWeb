@@ -804,7 +804,7 @@ class Priority {
                         let scrollTimeout = setTimeout(resolve, 200);
                         $("main").scroll(() => {
                             clearTimeout(scrollTimeout);
-                            scrollTimeout = setTimeout(resolver, 200);
+                            scrollTimeout = setTimeout(resolve, 200);
                         });
                     });
                 }).then(function() {
