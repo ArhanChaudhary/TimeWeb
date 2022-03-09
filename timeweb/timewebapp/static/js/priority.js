@@ -800,11 +800,15 @@ class Priority {
                                 });
                             }, 0);
                         }, 0);
-                        // utils.scroll determines when the page has stopped scrolling and internally resolves the promise
-                        $("main").scroll(() => utils.scroll(resolve));
-                        utils.scroll(resolve);
+
+                        let scrollTimeout = setTimeout(resolve, 200);
+                        $("main").scroll(() => {
+                            clearTimeout(scrollTimeout);
+                            scrollTimeout = setTimeout(resolver, 200);
+                        });
                     });
                 }).then(function() {
+                    $("main").off('scroll');
                     that.colorOrAnimateInAssignment({
                         dom_assignment,
                         mark_as_done: priority_data.mark_as_done,

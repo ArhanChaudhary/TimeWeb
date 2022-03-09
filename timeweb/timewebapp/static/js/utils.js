@@ -212,19 +212,20 @@ utils = {
                 // Advanced inputs for form, don't add to works because
 
                 $("#form-wrapper #advanced-inputs").click(function() {
+                    new Crud().replaceUnit();
+                    let run_interval = true;
                     if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
-                        new Crud().replaceUnit();
                         $("#fields-wrapper > div:first-of-type")[0].scrollIntoView({
                             behavior: "smooth",
                             block: "end",
                         });
                     } else {
-                        new Crud().replaceUnit();
                         $("#fields-wrapper > div:last")[0].scrollIntoView({
                             behavior: "smooth",
                             block: "start",
                         });
-                    }                    
+                    }
+
                 });
             },
 
@@ -1122,16 +1123,6 @@ utils = {
     loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
         if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
         return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
-    },
-    // Resolves a promise function when automatic scrolling ends
-    // Scrolling detected with $("main").scroll(utils.scroll);
-    scroll: function(resolver) {
-        clearTimeout(utils.scrollTimeout);
-        // Runs when scroll ends
-        utils.scrollTimeout = setTimeout(function() {
-            $("main").off('scroll');
-            resolver();
-        }, 200);
     },
     getRawDateNow: function(params={ accurate_in_simulation: true, initial_define: false }) {
         if (SETTINGS.timezone) {
