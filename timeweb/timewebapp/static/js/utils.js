@@ -210,6 +210,7 @@ utils = {
 
             advancedInputs: function() {
                 // Advanced inputs for form, don't add to works because
+
                 $("#form-wrapper #advanced-inputs").click(function() {
                     if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
                         new Crud().replaceUnit();
@@ -218,7 +219,11 @@ utils = {
                             block: "end",
                         });
                     } else {
-                        $("#fields-wrapper").animate({scrollTop: $("#fields-wrapper").height()}, 500, "swing");
+                        new Crud().replaceUnit();
+                        $("#fields-wrapper > div:last")[0].scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
                     }                    
                 });
             },

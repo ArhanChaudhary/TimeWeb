@@ -10,12 +10,12 @@ class Crud {
         })(),
         "#id_x": '',
         "#id_soft": false,
-        "#id_unit": SETTINGS.def_unit_to_minute ? "Minute" : '',
+        "#id_unit": '',
         "#id_y": '',
-        "#id_works": '0',
+        "#id_works": 0,
         "#id_time_per_unit": '',
         "#id_description": '',
-        "#id_funct_round": '1',
+        "#id_funct_round": 1,
         "#id_min_work_time": +SETTINGS.def_min_work_time||'',
         "#id_break_days": SETTINGS.def_break_days,
     })
@@ -42,7 +42,7 @@ class Crud {
             "#id_description": sa.description,
             "#id_works": sa.works[0],
             "#id_funct_round": sa.funct_round,
-            "#id_min_work_time": sa.original_min_work_time||'',
+            "#id_min_work_time": Number.isFinite(sa.original_min_work_time) ? sa.original_min_work_time : '',
             "#id_break_days": sa.break_days,
         }
         if (!sa.complete_x) fields["#id_x"] = "";
@@ -77,7 +77,6 @@ class Crud {
         singleDatePicker: true,
     }
     static FORM_POSITION_TOP = 15
-    static UNITS_OF_TIME = {minute: 1, hour: 60}
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
 
@@ -146,8 +145,9 @@ class Crud {
         }
         $("main").css("overflow-y", "hidden");
         that.old_unit_value = undefined;
+        $("#id-time_per_unit-field-wrapper").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight());
         that.replaceUnit();    
-        
+
         if (that.invalidOnlyInAdvanced()) {
             $("#form-wrapper #advanced-inputs").click();
         }
@@ -171,47 +171,41 @@ class Crud {
     replaceUnit() {
         const that = this;
         const val = $("#id_unit").val().trim();
-        const plural = pluralize(val),
-            singular = pluralize(val, 1),
-            singularToLowerCase = singular.toLowerCase();
+        const plural = val ? pluralize(val) : "Minutes",
+            singular = val ? pluralize(val, 1) : "Minute";
+        $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
+        $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
+        $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (val) {
-            if (singularToLowerCase in Crud.UNITS_OF_TIME) {
-                $("label[for='id_y']").text(`Estimate how many ${plural[0].toUpperCase() + plural.substring(1).toLowerCase()} this assignment will Take to Complete`);
-            } else {
-                $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
-            }
-            $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
-            $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
-            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
+            $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
+            that.old_unit_value === "" && $("#id_time_per_unit").val("");
+            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
         } else {
-            $("label[for='id_y']").html("Total number of Units in this Assignment");
-            $("label[for='id_works']").onlyText("Total number of Units already Completed");
-            $("label[for='id_time_per_unit']").html("Estimated number of Minutes to complete each Unit");
-            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text("This is the number of units of work you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)")
-        }
-        if (singularToLowerCase in Crud.UNITS_OF_TIME) {
-            $("#id_time_per_unit").val(Crud.UNITS_OF_TIME[singularToLowerCase]);
-            $("#id_time_per_unit").prop("disabled",true).addClass("disabled-field");
-            $("label[for='id_time_per_unit']").addClass("disabled-field");
-            if (SETTINGS.def_funct_round_minute && singularToLowerCase === "minute") {
+            $("label[for='id_y']").text(`How Long will this Assignment take to Complete`);
+            $("#id-time_per_unit-field-wrapper").addClass("hide-field");
+            $("#id_time_per_unit").val(1);
+            if (SETTINGS.def_funct_round_minute && !val) {
                 $("#id_funct_round").val(5);
-                $("#id_funct_round").prop("disabled",true).addClass("disabled-field");
-                $("label[for='id_funct_round']").addClass("disabled-field");
             }
-        } else {
-            that.old_unit_value in Crud.UNITS_OF_TIME && $("#id_time_per_unit").val("");
-            $("#id_time_per_unit").prop("disabled",false).removeClass("disabled-field");
-            $("label[for='id_time_per_unit']").removeClass("disabled-field");   
         }
-        if (SETTINGS.def_funct_round_minute && singularToLowerCase !== "minute") {
-            that.old_unit_value in Crud.UNITS_OF_TIME && $("#id_funct_round").val("1");
-            $("#id_funct_round").prop("disabled",false).removeClass("disabled-field");
-            $("label[for='id_funct_round']").removeClass("disabled-field");
+        if (SETTINGS.def_funct_round_minute && val) {
+            that.old_unit_value === "" && $("#id_funct_round").val(1);
+            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
         }
-        that.old_unit_value = singularToLowerCase;
-        // +1 to show the line under "Advanced Inputs"
-        $("#fields-wrapper").attr("unscrolled-height", Math.ceil($("#advanced-inputs").position().top + $("#advanced-inputs").height() + parseFloat($("#advanced-inputs").css("margin-top")) + 5 + $("#fields-wrapper").scrollTop()));
-        $("#fields-wrapper").attr("scrolled-height", $("#fields-wrapper > .field-wrapper:last").position().top + $("#fields-wrapper > .field-wrapper:last").height() - $("#form-wrapper #advanced-inputs").position().top + 15);
+        that.old_unit_value = val;
+        $("#fields-wrapper").attr("unscrolled-height", 
+            Math.ceil(
+                $("#advanced-inputs").position().top +
+                $("#advanced-inputs").outerHeight() + 
+                $("#fields-wrapper").scrollTop() + 1 + 3 // +1 to show the line under "Advanced Inputs"
+            )
+        );
+        $("#fields-wrapper").attr("scrolled-height", 
+            $("#fields-wrapper > .field-wrapper:last").position().top + 
+            $("#fields-wrapper > .field-wrapper:last").outerHeight() - 
+            $("#form-wrapper #advanced-inputs").position().top -
+            parseFloat($("#fields-wrapper > .field-wrapper:last").css("padding-top"))
+        );
         $("#fields-wrapper").trigger("scroll");
     }
     setCrudHandlers() {

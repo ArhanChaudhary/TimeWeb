@@ -183,7 +183,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_skew_ratio': self.settings_model.def_skew_ratio,
             'def_break_days': self.settings_model.def_break_days,
             'def_due_time': self.settings_model.def_due_time,
-            'def_unit_to_minute': self.settings_model.def_unit_to_minute,
             'def_funct_round_minute': self.settings_model.def_funct_round_minute,
             'ignore_ends': self.settings_model.ignore_ends,
             'show_progress_bar': self.settings_model.show_progress_bar,
@@ -235,11 +234,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def valid_form(self, request):
         if self.isExampleAccount: return redirect("home")
-        self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time") or None
+        self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
         self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         self.settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
         self.settings_model.def_due_time = self.form.cleaned_data.get("def_due_time")
-        self.settings_model.def_unit_to_minute = self.form.cleaned_data.get("def_unit_to_minute")
         self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
         if self.settings_model.def_funct_round_minute:
@@ -398,12 +396,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def valid_form(self, request):
         if self.created_assignment:
             self.sm = self.form.save(commit=False)
+            if not self.sm.unit:
+                self.sm.unit = "Minute"
             # Set defaults
             self.sm.skew_ratio = self.settings_model.def_skew_ratio
             # first_work is works[0]
             # Convert this to a decimal object because it can be a float
             first_work = Decimal(str(self.sm.works))
-            # Fill in foreignkey
             self.user_model = User.objects.get(email=request.user.email)
             self.sm.user = self.user_model
         elif self.updated_assignment:
@@ -423,13 +422,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.due_time = self.form.cleaned_data.get("due_time")
             self.sm.soft = self.form.cleaned_data.get("soft")
-            self.sm.unit = self.form.cleaned_data.get("unit")
+            self.sm.unit = self.form.cleaned_data.get("unit") or "Minute"
             self.sm.y = self.form.cleaned_data.get("y")
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
-            self.sm.min_work_time = self.form.cleaned_data.get("min_work_time") or None
+            self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
         if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit or not self.sm.funct_round:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
@@ -683,7 +682,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     is_google_classroom_assignment=True,
                     user=user,
 
-                    unit="Minute" if self.settings_model.def_unit_to_minute else None
+                    unit="Minute"
                     # y, time_per_unit, and unit are missing
                 ))
         # .execute() rarely leads to 503s which I expect may have been from a temporary outage

@@ -406,16 +406,14 @@ nav:focus-within {
     display: none !important;
 }
 #break-days-wrapper input:checked + .break-days-label {
-    border-color: rgb(128,0,0);
-    background: rgb(255,127,127);
+    background: grey;
 }
 #break-days-wrapper .break-days-label {
-    background: rgb(127,255,127);
+    cursor: pointer;
+    background: white;
     display: inline-block;
-    margin-right: 4px;
-    margin-bottom: 4px;
-    border: 1px solid green;
-    border-radius: 5px;
+    flex-grow: 1;
+    border: 1px solid black;
     padding: 4px;
     -webkit-user-select: none;
        -moz-user-select: none;
@@ -423,12 +421,8 @@ nav:focus-within {
             user-select: none;
     transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
 }
-#break-days-wrapper .break-days-label:hover, #break-days-wrapper .break-days-label:focus {
-    transform: scale(1.04);
-}
 #break-days-wrapper .break-days-label:active {
-    margin-top: 1px;
-    margin-bottom: 3px;
+    transform: translateY(1px);
 }
 #changelog-container {
     padding: 0 10px;

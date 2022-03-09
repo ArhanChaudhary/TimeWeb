@@ -29,13 +29,13 @@ class TimewebUser(AbstractUser):
         return self.email
 
 WEEKDAYS = (
-    ("1",_("Monday")),
-    ("2",_("Tuesday")),
-    ("3",_("Wednesday")),
-    ("4",_("Thursday")),
-    ("5",_("Friday")),
-    ("6",_("Saturday")),
-    ("0",_("Sunday")),
+    ("1",_("Mon")),
+    ("2",_("Tue")),
+    ("3",_("Wed")),
+    ("4",_("Thu")),
+    ("5",_("Fri")),
+    ("6",_("Sat")),
+    ("0",_("Sun")),
 )
 HORIZONTAL_TAG_POSITIONS = (
     ("Left", "Left"),
@@ -105,12 +105,6 @@ class TimewebModel(models.Model):
     soft = models.BooleanField(
         default=False,
     )
-    unit = models.CharField(
-        null=True,
-        blank=True,
-        max_length=40,
-        verbose_name=_('Name of each Unit of Work'),
-    )
     y = models.DecimalField(
         null=True,
         blank=True,
@@ -128,17 +122,23 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_('Assignment Description'),
+    )
+    unit = models.CharField(
+        null=True,
+        blank=True,
+        max_length=40,
+        verbose_name=_('Name of each Unit of Work'),
+    )
     time_per_unit = models.DecimalField(
         blank=True,
         null=True,
         max_digits=15,
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
-    )
-    description = models.TextField(
-        null=True,
-        blank=True,
-        verbose_name=_('Assignment Description'),
     )
     works = models.JSONField(
         default=list_with_zero,
@@ -158,7 +158,7 @@ class TimewebModel(models.Model):
         validators=[MinValueValidator(Decimal("0"),_("The minimum work time must be positive or zero"))],
         blank=True,
         null=True,
-        verbose_name=_('Minimum Daily Work Time in Minutes'),
+        verbose_name=_('Minimum Daily Work Time'),
     )
     break_days = MultiSelectField(
         choices=WEEKDAYS,
@@ -218,15 +218,11 @@ class SettingsModel(models.Model):
         default=15,
         blank=True,
         null=True,
-        verbose_name=_('Default Minimum Daily Work Time in Minutes'),
+        verbose_name=_('Default Minimum Daily Work Time'),
     )
     def_due_time = models.TimeField(
         default=get_midnight_time,
         verbose_name=_('Default Due Time'),
-    )
-    def_unit_to_minute = models.BooleanField(
-        default=False,
-        verbose_name=_('Default Unit of Work to "Minute"'),
     )
     def_funct_round_minute = models.BooleanField(
         default=False,

@@ -917,10 +917,6 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper label[for='id_assignment_date']::after {
     content: "(Enter today if you don't remember)";
 }
-#form-wrapper label[for='id_min_work_time']::after {
-    content: '(Disabled if left empty)';
-    bottom: -5px !important;
-}
 #form-wrapper {
     width: min(100vw, 490px);
     box-sizing: border-box;
@@ -971,7 +967,9 @@ input[type=number]::-webkit-inner-spin-button {
     position: relative;
 }
 #form-wrapper .field-wrapper {
-    margin-top: 16px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    transition: margin-top 0.4s ease-in-out, opacity 0.6s ease-in-out 0.1s;
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
     margin-top: -1px;
@@ -998,17 +996,15 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
-    transform: translateY(-40px);
+    transform: translateY(-49px);
     right: 10px;
-}
-#form-wrapper .field-wrapper#id-unit-field-wrapper {
-    margin-top: 40px;
 }
 #form-wrapper #id_soft {
     width: unset;
     display: inline;
     margin-right: 3px;
     margin-left: 0;
+    transform: translateY(1px);
 }
 #form-wrapper label[for='id_soft'] {
     display: inline;
@@ -1021,36 +1017,27 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper #id_x, #form-wrapper #id_assignment_date {
     letter-spacing: 0.5px;
 }
+#form-wrapper #fields-wrapper .hide-field {
+    z-index: -1;
+    position: relative;
+    opacity: 0;
+}
+#form-wrapper #fields-wrapper :not(.hide-field) {
+    margin-top: 0 !important;
+}
 #form-wrapper .field-wrapper label[for='id_x']::after {
     right: calc(var(--soft-label-width) - 10px);
 }
 #form-wrapper #advanced-inputs {
     border-bottom: 1px solid;
+    padding-top: 20px;
     cursor: pointer;
     width: 149px;
-    margin: 10px auto 0;
+    margin: 25px auto 0;
 }
-#form-wrapper input.disabled-field, #form-wrapper label.disabled-field {
-    opacity: 1;
-}
-#form-wrapper label.disabled-field {
-    opacity: 0.6 !important;
-    transition: opacity .25s ease-out;
-}
-#form-wrapper input:not(.disabled-field), #form-wrapper textarea {
+#form-wrapper input, #form-wrapper textarea {
     margin-top: 1px;
     padding: 3px 1px;
-}
-#form-wrapper input.disabled-field {
-    opacity: 0.75 !important;
-    background-color: rgb(228,228,228);
-    border-color: rgb(103,103,103);
-    border-width: 2px;
-    padding: 0;
-    padding-left: 1px;
-    cursor: not-allowed;
-    color: black;
-    transition: all .25s ease-out, border-width 0s, padding 0s;
 }
 #submit-assignment-button {
     width: calc(100% - 140px);
@@ -1088,9 +1075,8 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #break-days-wrapper {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 0 50px;
+    justify-content: space-between;
+    margin: 0 10px;
 }
 #toggle-gc-container {
     display: flex;
