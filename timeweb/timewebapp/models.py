@@ -248,10 +248,6 @@ class SettingsModel(models.Model):
         default=False,
         verbose_name=_('Close Graph After Submitting Work Input'),
     )
-    show_progress_bar = models.BooleanField(
-        default=True,
-        verbose_name=_('Show Graph Progress Bar'),
-    )
 
     # Group "Assignment Priority"
     show_priority = models.BooleanField(

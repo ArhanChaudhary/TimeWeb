@@ -354,71 +354,8 @@ class VisualAssignment extends Assignment {
         const screen = this.graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
         screen.clearRect(0, 0, this.width, this.height);
-        let move_info_down,
+        let move_info_down = 72,
             goal_for_this_day = this.funct(Math.max(0, today_minus_assignment_date) + 1);
-        if (SETTINGS.show_progress_bar && !this.sa.needs_more_info) {
-            move_info_down = 0;
-            let should_be_done_x = this.width - 155 + goal_for_this_day / this.sa.y * 146,
-                bar_move_left = should_be_done_x - this.width + 17;
-            if (bar_move_left < 0 || assignment_container.hasClass("finished")) {
-                bar_move_left = 0
-            } else if (should_be_done_x > this.width - 8) {
-                bar_move_left = this.width - 8;
-            }
-            // bar move left
-            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(200,200,200)" : "rgb(55,55,55)";
-            screen.fillRect(this.width-155-bar_move_left, this.height-121,148,50);
-            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(255,0,255)" : "rgb(0,255,0)";
-            screen.fillRect(this.width-153-bar_move_left, this.height-119,144,46);
-
-            screen.fillStyle = $("html").is("#dark-mode") ? "rgb(255,127,255)" : "rgb(0,128,0)";
-            const slash_x = this.width - 142 - bar_move_left;
-            screen.beginPath();
-            screen.moveTo(slash_x,this.height-119);
-            screen.lineTo(slash_x+15,this.height-119);
-            screen.lineTo(slash_x+52.5,this.height-73);
-            screen.lineTo(slash_x+37.5,this.height-73);
-            screen.fill();
-            screen.beginPath();
-            screen.moveTo(slash_x+35,this.height-119);
-            screen.lineTo(slash_x+50,this.height-119);
-            screen.lineTo(slash_x+87.5,this.height-73);
-            screen.lineTo(slash_x+72.5,this.height-73);
-            screen.fill();
-            screen.beginPath();
-            screen.moveTo(slash_x+70,this.height-119);
-            screen.lineTo(slash_x+85,this.height-119);
-            screen.lineTo(slash_x+122.5,this.height-73);
-            screen.lineTo(slash_x+107.5,this.height-73);
-            screen.fill();
-
-            screen.textAlign = "center";
-            screen.fillStyle = "black";
-            screen.font = '13.75px Open Sans';
-            screen.textBaseline = "top";
-            if (assignment_container.hasClass("finished")) {
-                screen.fillText("Completed!", this.width-81-bar_move_left, this.height-68);
-            } else {
-                screen.fillText(`Your Progress: ${Math.floor(last_work_input/this.sa.y*100)}%`, this.width-81, this.height-68);
-                const done_x = this.width-153+last_work_input/this.sa.y*144-bar_move_left;
-                screen.fillStyle = "white";
-                screen.fillRect(done_x, this.height-119, this.width-9-bar_move_left-done_x, 46);
-                if (should_be_done_x >= this.width - 153) {
-                    screen.fillStyle = "black";
-                    if (should_be_done_x > this.width - 17) {
-                        should_be_done_x = this.width - 17;
-                    }
-                    screen.rotate(Math.PI / 2);
-                    // (x, y) => (y, -x)
-                    screen.fillText("Goal", this.height-95, -should_be_done_x-14);
-                    screen.rotate(-Math.PI / 2);
-                    screen.fillStyle = "rgb(55,55,55)";
-                    screen.fillRect(should_be_done_x, this.height-119, 2, 46);
-                }
-            }
-        } else {
-            move_info_down = 72;
-        }
         
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";

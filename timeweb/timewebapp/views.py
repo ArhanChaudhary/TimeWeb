@@ -185,7 +185,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_due_time': self.settings_model.def_due_time,
             'def_funct_round_minute': self.settings_model.def_funct_round_minute,
             'ignore_ends': self.settings_model.ignore_ends,
-            'show_progress_bar': self.settings_model.show_progress_bar,
             'assignment_spacing': self.settings_model.assignment_spacing,
             'animation_speed': self.settings_model.animation_speed,
             'show_priority': self.settings_model.show_priority,
@@ -246,7 +245,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                     assignment.funct_round = 5
             TimewebModel.objects.bulk_update(self.assignment_models, ['funct_round'])
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
-        self.settings_model.show_progress_bar = self.form.cleaned_data.get("show_progress_bar")
         self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
         self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
         self.settings_model.show_priority = self.form.cleaned_data.get("show_priority")
