@@ -323,7 +323,7 @@ class SettingsModel(models.Model):
     )
     enable_tutorial = models.BooleanField(
         default=True,
-        verbose_name=_('Enable Tutorial'),
+        verbose_name=_('Tutorial'),
     )
 
     # Hidden
