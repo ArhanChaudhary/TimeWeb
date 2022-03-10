@@ -456,7 +456,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "bottom";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
-        const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
+        const center = (str, y_pos) => screen.fillText(str, this.width/2, row_height*y_pos);
         if (!assignment_container.hasClass("finished") && !this.sa.needs_more_info) {
             let displayed_day;
             let str_day;
@@ -512,7 +512,7 @@ class VisualAssignment extends Assignment {
         screen.fillStyle = "black";
         screen.textAlign = "center";
         screen.font = '17.1875px Open Sans';
-        screen.fillText("Days", (this.width - 50) / 2 + 50, this.height - 5);
+        screen.fillText("Days", this.width / 2, this.height - 5);
 
         // y axis label
         if (this.sa.unit) {

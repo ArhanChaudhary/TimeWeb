@@ -766,10 +766,8 @@ a[href="/settings"] {
 .graph-container {
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
-    width: calc(100% - 34px);
     position: relative;
-    margin: 5px;
-    margin-left: 13px;
+    margin: 5px 0 5px;
     border: 4px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
 }
 .graph-container canvas {
