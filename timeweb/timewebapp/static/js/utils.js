@@ -404,21 +404,18 @@ utils = {
                     });
                 });
 
-                let message;
-                replaceAutofillInfo();
-                $("#autofill-selection").on("change", replaceAutofillInfo);
-                function replaceAutofillInfo() {
+                $("#autofill-selection").on("change", function() {
                     $("#autofill-work-done .shortcut-text").find(".info-button").remove();
                     switch ($("#autofill-selection").val()) {
                         case "No":
-                            message = "Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for.\n\nClick the text or line wrapper to perform this action.";
+                            var message = "Assumes you haven't done anything since your last work input and autofills in no work done until today. This applies to ALL assignments you haven't entered past work inputs for";
                             break;
                         case "All":
-                            message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for.\n\nClick the text or line wrapper to perform this action.";
+                            var message = "Assumes you followed your work schedule since your last work input and autofills in all work done until today. This applies to ALL assignments you haven't entered past work inputs for";
                             break;
                     }
                     $("#autofill-work-done .shortcut-text").info("bottom", message, "append");
-                }
+                }).trigger("change");
             },
 
             deleteAssignmentsFromClass: function() {
