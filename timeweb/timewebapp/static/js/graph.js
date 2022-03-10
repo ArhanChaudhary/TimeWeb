@@ -456,7 +456,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "bottom";
         screen.font = VisualAssignment.font_size + 'px Open Sans';
         const row_height = screen.measureText(0).width * 2;
-        const center = (str, y_pos) => screen.fillText(str, this.width/2, row_height*y_pos);
+        const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
         if (!assignment_container.hasClass("finished") && !this.sa.needs_more_info) {
             let displayed_day;
             let str_day;
