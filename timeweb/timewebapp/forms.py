@@ -249,7 +249,7 @@ class LabeledTwoPasswordForm(ResetPasswordKeyForm):
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
         if (password1 and password2) and password1 != password2:
-            self.add_error("password2", _("Your passwords do not match"))
+            self.add_error("password2", _("Your passwords don't match"))
         return cleaned_data
 
 class LabeledChangePasswordForm(ChangePasswordForm):

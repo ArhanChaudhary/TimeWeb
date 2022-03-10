@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#reset-settings-button").click(function() {
         $.confirm({
             title: "Are you sure you want to reset your settings?",
-            content: 'If you accidentally reset your settings, do not click save and instead refresh the page',
+            content: 'If you accidentally reset your settings, don\'t click save and instead refresh the page',
             buttons: {
                 confirm: {
                     keys: ['Enter'],
