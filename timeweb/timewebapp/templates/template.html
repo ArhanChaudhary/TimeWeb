@@ -3,12 +3,12 @@
 
 {% block template_head_css %}
     <link rel="stylesheet" href="{% static 'css/template.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://unpkg.com/jquery-confirm@3.3.4/dist/jquery-confirm.min.css" crossorigin="anonymous">
     {% block css %}{% endblock %}
 {% endblock %}
 
 {% block template_head_js %}
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="{% static 'js/jquery-extensions.js' %}"></script>
     <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
     <script src="{% static 'js/template.js' %}"></script>
