@@ -9,7 +9,7 @@
 }
 
 /* Make sure to change user-guide.css and others if this media query is modified */
-@media screen and (max-width: 860px) {
+@media screen and (max-width: 790px) {
     #table-of-contents-container {
         position: absolute;
         z-index: 2;
