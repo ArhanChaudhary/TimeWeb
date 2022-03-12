@@ -44,19 +44,8 @@ function resetHeaderLayout() {
     }
 }
 $(function() {
-    // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
-    $(document.body).on("focus", () => $("main").focus());
+    $(document.body).on("focus", () => $("main").focus()); // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
     $(window).on("focus", () => $(window).trigger("resize"));
-    $("a").filter(function() {
-        var url = this.href;
-
-        // https://stackoverflow.com/questions/6238351/fastest-way-to-detect-external-urls
-        var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
-        if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
-        if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":("+{"http:":80,"https:":443}[location.protocol]+")?$"), "") !== location.host) return true;
-        return false;
-    }).attr("rel", "noreferrer");
-    // Click element when enter is pressed
     $(document).keypress(function(e) {
         const activeElement = $(document.activeElement);
         if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
@@ -64,7 +53,6 @@ $(function() {
         }
     });
 
-    // Checks if user is authenticated
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);
         resetHeaderLayout();
