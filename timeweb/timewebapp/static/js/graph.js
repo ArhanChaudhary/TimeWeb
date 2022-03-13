@@ -310,6 +310,7 @@ class VisualAssignment extends Assignment {
         new Priority().sort({ timeout: true });
         this.draw();
     }
+    static getCanvasFont = font_size => `${font_size}px Open Sans`;
     //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
@@ -361,7 +362,7 @@ class VisualAssignment extends Assignment {
         screen.textAlign = "end";
         screen.fillStyle = "black";
         screen.textBaseline = "top";
-        screen.font = '13.75px Open Sans';
+        screen.font = VisualAssignment.getCanvasFont(13.75);
         if (!this.sa.needs_more_info) {
             screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
             screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
@@ -407,7 +408,7 @@ class VisualAssignment extends Assignment {
         }
         radius /= 0.75;
         screen.stroke();
-        screen.font = VisualAssignment.font_size + 'px Open Sans';
+        screen.font = VisualAssignment.getCanvasFont(VisualAssignment.font_size);
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y) && !this.sa.needs_more_info) {
             let str_mouse_x;
             if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
@@ -454,7 +455,7 @@ class VisualAssignment extends Assignment {
         
         screen.textAlign = "center";
         screen.textBaseline = "bottom";
-        screen.font = VisualAssignment.font_size + 'px Open Sans';
+        screen.font = VisualAssignment.getCanvasFont(VisualAssignment.font_size);
         const row_height = screen.measureText(0).width * 2;
         const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
         if (!assignment_container.hasClass("finished") && !this.sa.needs_more_info) {
@@ -511,7 +512,7 @@ class VisualAssignment extends Assignment {
         // x axis label
         screen.fillStyle = "black";
         screen.textAlign = "center";
-        screen.font = '17.1875px Open Sans';
+        screen.font = VisualAssignment.getCanvasFont(17.1875);
         screen.fillText("Days", this.width / 2, this.height - 5);
 
         // y axis label
@@ -531,7 +532,7 @@ class VisualAssignment extends Assignment {
             screen.rotate(Math.PI / 2);
         }
 
-        screen.font = '13.75px Open Sans';
+        screen.font = VisualAssignment.getCanvasFont(13.75);
         screen.textBaseline = "top";
         const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - 100) / 100));
         if (this.sa.complete_x >= 10) {
@@ -568,7 +569,7 @@ class VisualAssignment extends Assignment {
                 if (font_size2 < 8.5) {
                     font_size2 = 8.5;
                 }
-                screen.font = font_size2 + 'px Open Sans';
+                screen.font = VisualAssignment.getCanvasFont(font_size2);
                 const text_height = screen.measureText(0).width * 2,
                     label_index = text_height < small_y_axis_scale * this.hCon;
                 for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
@@ -595,7 +596,7 @@ class VisualAssignment extends Assignment {
                 }
             }
             font_size2 *= 1.2;
-            screen.font = font_size2 + 'px Open Sans';
+            screen.font = VisualAssignment.getCanvasFont(font_size2);
             const text_height = screen.measureText(0).width * 2;
             for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
                 if (bigger_index * 2 < y_axis_scale) {
@@ -621,7 +622,7 @@ class VisualAssignment extends Assignment {
 
         screen.textBaseline = "top";
         screen.textAlign = "center";
-        screen.font = '16.5px Open Sans';
+        screen.font = VisualAssignment.getCanvasFont(16.5);
         for (let bigger_index = Math.ceil(this.sa.complete_x - this.sa.complete_x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
             screen.fillStyle = "rgb(205,205,205)";
             screen.fillRect(bigger_index * this.wCon + 47.5, 0, 5, this.height - 50);
@@ -643,7 +644,7 @@ class VisualAssignment extends Assignment {
             screen.rotate(Math.PI / 2);
             screen.textAlign = "center";
             screen.textBaseline = "middle";
-            screen.font = '17.1875px Open Sans';
+            screen.font = VisualAssignment.getCanvasFont(17.1875);
             if (today_x > this.width - 12.5) {
                 today_x = this.width - 12.5;
             }
