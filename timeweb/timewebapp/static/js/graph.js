@@ -102,6 +102,7 @@ class Assignment {
         } else {
             var x1 = this.sa.x - this.red_line_start_x;
         }
+        // note: this returns NaN when x1 is negative
 
         const mods = this.calcModDays();
         // dont apply the ceiling logic on other instances of this code because x1 will anyways always be an integer
