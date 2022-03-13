@@ -310,7 +310,7 @@ class VisualAssignment extends Assignment {
         new Priority().sort({ timeout: true });
         this.draw();
     }
-    static getCanvasFont = font_size => `${font_size}px Open Sans`;
+    static getCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
     //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
