@@ -9,7 +9,7 @@ $(window).one("load", function() {
     });
 
     let number_of_circles = $("#circles-background .circle").length;
-    $("#circles-background")[0].style.setProperty("--highest-circle-number", number_of_circles - 1);
+    $("#circles-background").prop("style").setProperty("--highest-circle-number", number_of_circles - 1);
 
     let vws = new Array(number_of_circles);
     for (let i = 0; i < number_of_circles; i++) {
@@ -31,7 +31,7 @@ $(window).one("load", function() {
 
     const initial_sin_percentage = -0.5;
     for (let i = 0; i < 1.01; i += 0.01) {
-        $("#circles-background")[0].style.setProperty(`--${Math.round(i*100)}`, Math.sin((i + initial_sin_percentage)*Math.PI));
+        $("#circles-background").prop("style").setProperty(`--${Math.round(i*100)}`, Math.sin((i + initial_sin_percentage)*Math.PI));
     }
     $("#circles-background .circle").each(function(i) {
         let background_gradient_factor = 1 - i / (number_of_circles - 1);
