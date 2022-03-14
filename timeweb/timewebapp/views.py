@@ -723,6 +723,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
                 return HttpResponseForbidden("This assignment isn't yours")
 
+            for key, value in assignment.items():
+                if key == "x":
+                    # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
+                    assignment[key] = datetime.datetime.fromtimestamp(value, timezone.utc)
+                elif key == "due_time":
+                    assignment[key] = datetime.time(**value)
+            
             model_fields = {i.name: getattr(self.sm, i.name) for i in TimewebModel._meta.get_fields()}
             model_fields.update(assignment)
             validation_form = TimewebForm(model_fields)
@@ -731,14 +738,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if not assignment: continue # It's pointless to finish the loop
 
             for key, value in assignment.items():
-                if request.user != self.sm.user:
-                    logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
-                    return HttpResponseForbidden("This assignment isn't yours")
-                if key == "x":
-                    # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
-                    value = datetime.datetime.fromtimestamp(value, timezone.utc)
-                elif key == "due_time":
-                    value = datetime.time(**value)
                 setattr(self.sm, key, value)
             try:
                 self.sm.save()
