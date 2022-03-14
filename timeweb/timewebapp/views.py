@@ -721,7 +721,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
-                return HttpResponseForbidden("This assignment isn't yours")
+                continue
 
             for key, value in assignment.items():
                 if key == "x":
