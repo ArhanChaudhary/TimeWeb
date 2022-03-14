@@ -719,6 +719,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
             del assignment['pk']
             
+            if request.user != self.sm.user:
+                logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
+                return HttpResponseForbidden("This assignment isn't yours")
+
             model_fields = {i.name: getattr(self.sm, i.name) for i in TimewebModel._meta.get_fields()}
             model_fields.update(assignment)
             validation_form = TimewebForm(model_fields)
