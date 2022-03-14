@@ -305,6 +305,6 @@ EMAIL_HOST_USER = 'arhanc.cs@gmail.com'
 MANAGERS = [('Arhan', 'arhan.ch@gmail.com')]
 EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
 
-EXAMPLE_ACCOUNT_EMAIL = 'timeweb@exampleh.com'
+EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
 
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
