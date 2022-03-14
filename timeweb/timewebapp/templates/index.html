@@ -146,7 +146,7 @@
             <div class="relative-positioning-wrapper">
               <span class="title">{{ assignment.name }}</span>
               {% if assignment.description %}
-                <div class="description">{{ assignment.description }}</div>
+                <div class="description">{{ assignment.description|linebreaks }}</div>
               {% endif %}
             </div>
             <svg width="30px" height="20px" class="arrow-container">

@@ -321,7 +321,6 @@ a[href="/settings"] {
     position: relative;
     display: none;
     opacity: var(--description-opacity);
-    white-space: pre-wrap;
     transform: translateY(-2px);
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
