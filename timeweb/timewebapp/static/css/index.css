@@ -154,56 +154,41 @@ a[href="/settings"] {
     transition: none !important;
 }
 .assignment {
-    box-shadow: 0 0 4px rgb(115,115,115);
-    background: white; /* Set white so it doesnt transition background initially if added by priority.js */
-    /*  background: rgb(226,91,80);
-    background: rgb(132,200,65); */
+    box-shadow: 0 0 0 black;
+    background: var(--offwhite); /* Set white so it doesnt transition background initially if added by priority.js */
     padding: var(--vertical-assignment-padding) 15px;
-    border: 2px solid rgb(80,80,80);
     border-radius: 5px;
     position: relative;
-    width: 100%; /* Needed for when it becomes position: absolute during deletion */
-    box-sizing: border-box;
     scroll-margin: 20px;
-    transition: all .2s ease-in-out, opacity .375s ease-in-out, background calc(2s * var(--animation-speed)), left 0s, padding 0s;
+    transition: all .2s ease-in-out, opacity .375s ease-in-out, left 0s, padding 0s;
 }
 .assignment.mark-as-done {
-    opacity: 0.6;
+    opacity: 0.5;
 }
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly::before {
     transition: none;
 }
-.assignment:not(.open-assignment):hover {
+.assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
     transform: scale(var(--scale-percent-x), var(--scale-percent-y));
-    border-color: rgba(0,0,0,0.7);
     cursor: pointer;
-    box-shadow: 0 0 7px rgb(52,52,52);
 }
 .assignment:focus {
     outline: 0;
-    border: 2px solid rgb(0,95,204) !important;
-    box-shadow: 0 0 1px 2px rgb(0,95,204) !important;
 }
-.assignment::after {
+.assignment::before {
     content: '';
     position: absolute;
-    top: 0;
     left: 0;
-    border-radius: 5px;
-    opacity: 0;
-    width: 100%;
+    top: 0;
     height: 100%;
-    z-index: -1;
-    transition: opacity .2s ease-in-out;
-}
-.assignment:not(:focus):not(.open-assignment):hover::after {
-    box-shadow: 0 0 7px rgb(52,52,52);
-    opacity: 1;
+    /* for some reason this is very laggy with background instead of background-color*/
+    background-color: var(--priority-color);
+    width: 7px;
+    border-radius: 5px 0 0 5px;
+    transition: background-color calc(2s * var(--animation-speed));
 }
 .shortcut {
     position: relative;
-    /* So "Go" can be clicked easier */
-    z-index: 1000;
     margin-bottom: calc(4px + var(--outer-assignment-vertical-padding) * 2);
 }
 .shortcut-text {
@@ -767,17 +752,13 @@ a[href="/settings"] {
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
     position: relative;
-    margin: 5px 0 5px;
-    border: 4px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
+    margin: 9px 0 5px;
+    border: 2px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
 }
 .graph-container canvas {
     width: 100%;
     height: 100%;
-    border-radius: 7px;
-}
-.graph-container:focus {
-    box-shadow: 0 0 0 3px rgb(0,95,204);
-    outline: 0;
+    border-radius: 10px;
 }
 .hover-point-label {
     position: absolute;
@@ -829,9 +810,6 @@ a[href="/settings"] {
     font-size: 15px;
     padding: 0 13px;
     position: relative;
-    margin-top: 10px;
-    padding-bottom: 7px;
-    margin-bottom: -7px;
 }
 .graph-footer * {
     font-size: 15px;
@@ -842,7 +820,7 @@ a[href="/settings"] {
     background: rgba(219,219,219,0.9);
     box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
-.graph-footer *:not(.info-button):focus {
+.graph-footer :not(.info-button):focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
@@ -863,6 +841,10 @@ a[href="/settings"] {
 .submit-work-button, .fixed-mode-button {
     position: absolute;
     right: 0;
+}
+/* 1st row */
+.delete-work-input-button, .work-input-textbox, .submit-work-button {
+    margin-top: 8px;
 }
 /* 2nd row */
 .skew-ratio-button, .skew-ratio-textbox, .fixed-mode-button {
@@ -890,7 +872,7 @@ input[type=number]::-webkit-inner-spin-button {
 
 #form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {
     outline: 0;
-    box-shadow: 0 0 4px rgba(0,95,204,0.6), inset 0 0 0 1px rgb(0,95,204) !important; 
+    box-shadow: 0 0 4px rgba(0,95,204,0.4), inset 0 0 0 1px rgb(0,95,204) !important; 
 }
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
@@ -1128,10 +1110,10 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight.assignment-container::before {
     --filter-drop-shadow-color: white;
     font-size: 19px !important;
-    filter: drop-shadow(0 1px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 -1px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(1px 0 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(-1px 0 0 var(--filter-drop-shadow-color, transparent))
+    filter: drop-shadow(0 0.5px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 -0.5px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0.5px 0 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(-0.5px 0 0 var(--filter-drop-shadow-color, transparent))
             invert(var(--filter-invert, 0));
 }
 .grey-highlight.shortcut-text {

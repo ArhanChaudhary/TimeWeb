@@ -1,6 +1,3 @@
-body {
-    --body-background: rgb(218, 218, 218);
-}
 main form {
     width: calc(100% - 30px);
     font-size: 17px;
@@ -78,7 +75,7 @@ th {
     text-align: left;
 }
 tr.even {
-    background: rgb(193, 193, 193);
+    background: rgb(215, 215, 215);
 }
 tr.odd {
     background: rgb(238, 238, 238);

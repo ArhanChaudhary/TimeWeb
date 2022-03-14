@@ -55,9 +55,10 @@ header > * {
 }
 main {
     position: relative; /* Needed for positioning the background image */
+    --offwhite: rgb(234, 234, 234);
     height: 100vh;
     padding: 80px 20px 0 20px;
-    box-shadow: inset 20px 0 0 0 gray, inset -20px 0 0 0 gray;
+    box-shadow: inset 20px 0 0 0 var(--offwhite), inset -20px 0 0 0 var(--offwhite);
     box-sizing: border-box;
     /* Firefox doesnt support "overlay" */
     overflow-y: scroll;
@@ -127,7 +128,7 @@ main.finished-header-transition {
 }
 body {
     margin: 0;
-    --body-background: radial-gradient(circle, rgb(245,245,245) 0, rgb(192,192,192) 100%);
+    --body-background: white;
     background: var(--body-background);
 }
 #site {

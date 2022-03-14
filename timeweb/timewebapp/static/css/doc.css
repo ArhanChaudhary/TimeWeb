@@ -1,6 +1,5 @@
 body {
     --roboto-font-weight: 700;
-    --body-background: white;
 }
 #flex-container {
     height: calc(100vh - 70px);
