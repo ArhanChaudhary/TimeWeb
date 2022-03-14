@@ -293,6 +293,7 @@ nav:focus-within {
     border-radius: 50%;
     background: rgb(33,163,177) !important;
     font-size: 14px;
+    font-weight: 400;
     font-style: italic;
     font-family: "Serif";
     text-shadow: none; /* Disable parent text shadow if user has a background image */
