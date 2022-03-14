@@ -59,35 +59,37 @@ class Priority {
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
         if (SETTINGS.show_priority) {
-            if (params.first_sort) {
-                params.dom_assignment.addClass("transition-instantly");
-            }
-            const background_color = that.percentageToColor(params.priority_percentage);
-            params.dom_assignment.parents(".assignment-container").toggleClass("invert-text-color",
-                // https://awik.io/determine-color-bright-dark-using-javascript/
-                Math.sqrt(
-                    0.299 * (background_color.r * background_color.r) +
-                    0.587 * (background_color.g * background_color.g) +
-                    0.114 * (background_color.b * background_color.b)
-                ) <= 127.5
-            );
-
-            const a = $("html").is("#dark-mode") ? Priority.DARK_MODE_ALPHA : 1;
-            background_color.r *= a;
-            background_color.g *= a;
-            background_color.b *= a;
-
-            // You can also do this (they are the same)
-            // background_color = utils.formatting.rgbToHSV(background_color.r, background_color.g, background_color.b);
-            // background_color.v *= a;
-            // background_color = utils.formatting.hsvToRGB(background_color.h, background_color.s, background_color.v);
-
-            params.dom_assignment.css("background-color", `rgb(${background_color.r},${background_color.g},${background_color.b})`);
-            params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
-            if (params.first_sort) {
-                params.dom_assignment[0].offsetHeight;
-                params.dom_assignment.removeClass("transition-instantly");
-            }
+            setTimeout(() => {
+                if (params.first_sort) {
+                    params.dom_assignment.addClass("transition-instantly");
+                }
+                const background_color = that.percentageToColor(params.priority_percentage);
+                params.dom_assignment.parents(".assignment-container").toggleClass("invert-text-color",
+                    // https://awik.io/determine-color-bright-dark-using-javascript/
+                    Math.sqrt(
+                        0.299 * (background_color.r * background_color.r) +
+                        0.587 * (background_color.g * background_color.g) +
+                        0.114 * (background_color.b * background_color.b)
+                    ) <= 127.5
+                );
+    
+                const a = $("html").is("#dark-mode") ? Priority.DARK_MODE_ALPHA : 1;
+                background_color.r *= a;
+                background_color.g *= a;
+                background_color.b *= a;
+    
+                // You can also do this (they are the same)
+                // background_color = utils.formatting.rgbToHSV(background_color.r, background_color.g, background_color.b);
+                // background_color.v *= a;
+                // background_color = utils.formatting.hsvToRGB(background_color.h, background_color.s, background_color.v);
+    
+                params.dom_assignment.css("background-color", `rgb(${background_color.r},${background_color.g},${background_color.b})`);
+                params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
+                if (params.first_sort) {
+                    params.dom_assignment[0].offsetHeight;
+                    params.dom_assignment.removeClass("transition-instantly");
+                }
+            }, 0);
         }
     }
     setInitialAssignmentTopOffset($assignment_container) {
