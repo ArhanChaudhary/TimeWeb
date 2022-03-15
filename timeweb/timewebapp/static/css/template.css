@@ -27,10 +27,6 @@ header > * {
     visibility: hidden;
 }
 #image-new-container {
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
     cursor: pointer;
     display: inline-block;
     height: 60px;
