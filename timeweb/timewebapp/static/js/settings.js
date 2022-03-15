@@ -79,6 +79,11 @@ document.addEventListener("DOMContentLoaded", function() {
         alreadyHasSubmitted = true;
     });
 });
+$(window).one("load", function() {
+    $("main form fieldset").each(function() {
+        $(this).css("height", $(this).height());
+    });
+});
 function textareaToJSON($textarea) {
     let $textareaVal = $textarea.val();
     if ($textareaVal) {
