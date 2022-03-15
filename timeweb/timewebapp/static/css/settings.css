@@ -27,15 +27,27 @@ main form select {
     margin-left: 10px;
 }
 main form fieldset {
+    transition: height 0.75s cubic-bezier(0.46, 0.03, 0.4, 1);
     overflow: hidden;
+    position: relative;
     margin-bottom: 10px;
     padding-bottom: 5px;
+    border-bottom: none;
+    border-right: none;
 }
 main form fieldset.closed {
     height: 21px !important;
 }
 main form fieldset.closed legend {
     list-style-type: disclosure-closed;
+}
+main form fieldset::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-top: threedface 2px groove;
+    width: 30px;
 }
 main form legend {
     display: list-item;
