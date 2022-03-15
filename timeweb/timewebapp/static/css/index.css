@@ -879,6 +879,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper label::after {
     position: absolute;
     display: block;
+    color: rgb(117, 117, 117); /* Default chrome placeholder color */
     font-size: 12px;
     right: -10px;
     bottom: -4px;
