@@ -257,7 +257,6 @@ rect {
     overflow: auto;
     max-height: calc(100vh - 65px);
     background: rgb(43, 56, 68);
-    box-shadow: 0 0 4px 2px black;
 }
 #nav-items :not(.nav-hr) {
     text-decoration: none;
