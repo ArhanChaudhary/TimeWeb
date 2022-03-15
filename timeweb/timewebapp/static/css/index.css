@@ -353,7 +353,7 @@ a[href="/settings"] {
 .title {
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
-    font-size: min(16.76px, calc(11px + 0.4vw));
+    font-size: clamp(13px, calc(11px + 0.4vw), 17px);
     overflow-wrap: break-word;
 }
 /* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
