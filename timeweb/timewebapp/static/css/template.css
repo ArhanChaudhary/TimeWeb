@@ -51,10 +51,10 @@ header > * {
 }
 main {
     position: relative; /* Needed for positioning the background image */
-    --offwhite: rgb(234, 234, 234);
+    --app-color: white;
     height: 100vh;
     padding: 80px 20px 0 20px;
-    box-shadow: inset 20px 0 0 0 var(--offwhite), inset -20px 0 0 0 var(--offwhite);
+    box-shadow: inset 20px 0 0 0 var(--app-color), inset -20px 0 0 0 var(--app-color);
     box-sizing: border-box;
     /* Firefox doesnt support "overlay" */
     overflow-y: scroll;
@@ -124,8 +124,7 @@ main.finished-header-transition {
 }
 body {
     margin: 0;
-    --body-background: white;
-    background: var(--body-background);
+    background: rgb(234, 234, 234);
 }
 #site {
     position: relative;
