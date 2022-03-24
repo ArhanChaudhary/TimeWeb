@@ -1068,7 +1068,7 @@ class VisualAssignment extends Assignment {
         if (SETTINGS.horizontal_tag_position === "Left") {
             //hard
             if (SETTINGS.vertical_tag_position === "Bottom") {
-                if (add_daysleft) title_top -= 14;
+                if (add_daysleft) title_top -= 16;
             } else if (add_priority_percentage) {
                 title_top -= 10;
             } else {
