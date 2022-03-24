@@ -94,7 +94,6 @@ main ul {
     position: sticky;
     background-color: inherit;
     filter: brightness(0.95);
-    box-shadow: 0 0 3px 1px lightgray;
     line-height: 40px;
     text-align: center;
     font-family: 'Roboto Slab';
