@@ -132,9 +132,9 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
             <span class="label-title">Why are assignments marked as finished for today after inputting no work done?</span>
-            This happens because you've already worked for today; by entering no work done, you're implying that you've done nothing and you're not going to work on that assignment for the rest of the day. 
+            By entering no work done, you're implying that you haven't done any work for that assignment and are not going to for the rest of the day.
 
-            This functionality isn't exclusive to inputting no work done only. This occurs when you input less work than the assignment's daily work.
+            This functionality isn't exclusive to inputting no work done only, this also occurs when you input less work than the assignment's daily work.
         </span>
         <span class="minor-minor-category">Submit Units Done</span>
         This button submits the value of the "Enter Units Done" textbox to the graph. Or, you can instead press enter in the textbox.
@@ -149,22 +149,12 @@ the span groups the major and minor categories together for user-guide.js {% end
         A curvature of 0, or linear, yields a work schedule in which you work an equal amount for every day of an assignment.
 
         There are 3 advanced controls for the assignment graph:
-
-        <span class="minor-minor-category">Set Curvature of the Graph</span>
+        <span class="minor-minor-category">Set Curvature</span>
         This button allows you to be able to hover over the graph to manually set your curvature. Click the graph to save, and click this button again to cancel.
 
-        <span class="minor-minor-category">Enter Curvature</span>
-        This input allows you to manually enter a numeric curvature value. The graph is updated by this value in real-time.
+        In fixed mode, the work schedule isn't affected by work inputs throughout the entire assignment. If you don't finish a day's work, you'll have to make it up on the next day.
 
-        <span class="minor-minor-category">Switch to Fixed/Dynamic mode</span>
-        This button switches the graph to fixed mode or dynamic mode.
-
-        Fixed mode:
-        The work schedule isn't affected by work inputs throughout the entire assignment. If you don't finish a day's work, you'll have to make it up on the next day.
-
-        Dynamic mode:
-        The work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden. Note that dynamic mode discourages extremely low or high curvatures, as it tends to make your work schedule more linear as you enter more work inputs.
-        
+        In dynamic mode, the work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden. Note that dynamic mode discourages extremely low or high curvatures, as it tends to make your work schedule more linear as you enter more work inputs.
         <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
             <span class="label-title">Why do similar curvature values result in different work distributions in dynamic mode?</span>
             Unfortunately, this is a side effect of dynamic mode's implementation, occasionally occurring after submitting and deleting work inputs. Try to re-adjust the curvature to its original state if this happens.
@@ -183,8 +173,9 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         At the center of an assignment is its header message, which reflects the current status of the assignment. For example, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.
 
-        At the right of the assignment header is the assignment's estimated completion time along with its finish, hide, edit, and delete buttons.
+        At the center of the assignment header is the assignment's tags. Tags allow you to label an assignment by a broader category, for example a school class period. You can also sort tags in the order you like by dragging them around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around.
 
+        At the right of the assignment header is the assignment's estimated completion time along with its finish, hide, edit, and delete buttons.
     </details>
     <details open>
         <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
@@ -199,7 +190,7 @@ the span groups the major and minor categories together for user-guide.js {% end
             <br>
             If you look carefully, there will always be a reason why this is the case; other external factors may make an assignment more urgent than others. For instance, the assignment could be due tomorrow.<br>
             <br>
-            Check out the advanced example below for a better understanding of this functionality.
+            Check out the <a href="#advanced-example">advanced example</a> for a better understanding of this functionality.
         </span>
 
         <span class="minor-minor-category">An advanced example</span>
@@ -246,7 +237,7 @@ the span groups the major and minor categories together for user-guide.js {% end
     </details>
     <details open>
         <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" assignment tags</summary>
-        Above every assignment's header message, there's a plus icon used to add tags. Tags allow you to label an assignment by broader category, such as a school class period. Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions.
+        Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions. 
         
         Adding the "Important" tag moves the assignment to the highest appropriate list position while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom, as more urgent assignments may come first or less urgent assignments may come last.
     
@@ -283,20 +274,21 @@ the span groups the major and minor categories together for user-guide.js {% end
 
         A Google Classroom assignment's first tag, which is automatically set to the Google Classroom class name, determines which class it belongs to. So, you can delete or replace a Google Classroom assignment's first tag if you don't want the assignment to be deleted with this shortcut.
 
+        Refer to the <a href="#advanced-example">advanced example</a> for a more in depth explanation.
+
     </details>
 </span>
 <span>
     <div class="major-category">Google Classroom integration</div>
     <details open>
         <summary class="minor-category" id="what-is-the-google-classroom-integration">What is the Google Classroom integration?</summary>
-        The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authentication, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not modify Google Classroom assignments in any way.
-
+        The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authentication, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not affect Google Classroom assignments in any way.
     </details>
     <details open>
         <summary class="minor-category" id="enabling-the-google-classroom-integration">Enabling the Google Classroom integration</summary>
         <img src="{% static 'images/google-classroom-integration.png' %}">
         
-        To enable the Google Classroom integration, you must first click the Google Classroom icon at the bottom right of the home page. This will bring up Google's authentication service. You MUST enable both permissions to finalize enabling the Google Classroom integration.
+        To enable the Google Classroom integration, click the Google Classroom icon at the bottom right of the main page. This will bring up Google's authentication service. You MUST agree to both of the requested permissions for this to properly enable.
 
         <span class="label-question" id="why-do-i-ask-for-pemission-to-view-your-grades-on-google-classroom">
             <span class="label-title">Why do I ask for permission to view your grades on Google Classroom?</span>
@@ -305,7 +297,7 @@ the span groups the major and minor categories together for user-guide.js {% end
     </details>
     <details open>
         <summary class="minor-category" id="adding-google-classroom-assignments">Adding Google Classroom assignments</summary>
-        Google Classroom assignments are added right after viewing the home page. If a Google Classroom assignment meets the following criteria, the page will be refreshed with the added assignment:
+        Google Classroom assignments are added right after viewing the main page. If a Google Classroom assignment meets the following criteria, the page will be refreshed with the added assignment:
 
         {% spaceless %}<ul>
             <li>You must be a student of the assignment's class</li>
@@ -350,7 +342,7 @@ the span groups the major and minor categories together for user-guide.js {% end
 
     <button class="generic-button">Backspace</button> : Delete the most recent work input (ASSIGNMENT MUST BE OPEN)
 
-    <button class="generic-button">s</button> : Enable "Set Curvature of the Graph" (ASSIGNMENT MUST BE OPEN)
+    <button class="generic-button">s</button> : Enable "Set Curvature" (ASSIGNMENT MUST BE OPEN)
 
     <button class="generic-button">f</button> : Finish an assignment for today
     
