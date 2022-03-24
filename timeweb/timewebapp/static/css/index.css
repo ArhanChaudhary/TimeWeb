@@ -846,16 +846,15 @@ a[href="/settings"] {
     font-size: 15px;
     border-radius: 20px;
     border: none;
-    padding: 3px 6px;
+    padding: 5px 10px;
     cursor: pointer;
     background: rgba(219,219,219,0.9);
-    box-shadow: 0 0 2px 2px rgba(189,189,189,0.9);
 }
 .graph-footer :not(.info-button):focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;
-    box-shadow: 0 0 0 3px rgb(0,95,204);
+    box-shadow: inset 0 0 0 3px rgb(0,95,204);
 }
 /* 1st column */
 .delete-work-input-button, .skew-ratio-button {
