@@ -121,7 +121,7 @@ main.finished-header-transition {
 }
 body {
     margin: 0;
-    background: rgb(234, 234, 234);
+    background: white;
 }
 #site {
     position: relative;

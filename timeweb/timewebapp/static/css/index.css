@@ -1,4 +1,7 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
+body {
+    background: rgb(234, 234, 234);
+}
 #assignments-container {
     position: relative;
     /* Ensure things dont get cutoff when crud.js puts overflow: hidden on this when an assignment is being deleted */

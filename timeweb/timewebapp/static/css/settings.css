@@ -1,3 +1,6 @@
+body {
+    background: rgb(234, 234, 234);
+}
 main form {
     width: calc(100% - 30px);
     font-size: 17px;
