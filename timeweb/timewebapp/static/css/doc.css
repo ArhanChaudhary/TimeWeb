@@ -48,7 +48,6 @@ body {
     box-shadow: 6px 2px 6px -4px gray;
 }
 #table-of-contents-container, #table-of-contents-container-label {
-    margin-left: -20px;
     width: 300px;
     position: relative;
     z-index: 2;
@@ -69,6 +68,11 @@ body {
     to {
         transform: none;
     }
+}
+main {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-shadow: none !important;
 }
 main ul {
     -webkit-margin-before: 0;
