@@ -360,7 +360,6 @@ main {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow-y: scroll;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
