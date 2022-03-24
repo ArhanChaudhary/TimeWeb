@@ -1,8 +1,10 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-
-# Django modules
+from django.conf import settings
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
+from django.utils import timezone
 from django.views import View
 from contact_form.views import ContactFormView as BaseContactFormView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +14,13 @@ from django.urls import reverse, reverse_lazy
 # Allauth modules
 from allauth.account.adapter import DefaultAccountAdapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
+from allauth import ratelimit
+def consume_or_message(request, message="You are submitting too many requests. Please wait a bit before trying again", *args, **kwargs):
+    if not ratelimit.consume(request, *args, **kwargs):
+        messages.error(request, message)
+        return redirect(request.META['HTTP_REFERER'])
+ratelimit.consume_or_429 = consume_or_message
+from allauth.decorators import rate_limit
 
 # Automatically creates settings model and example assignment when user is created
 from django.db.models.signals import post_save
@@ -19,7 +28,6 @@ from django.dispatch import receiver
 
 # Model modules
 import datetime
-from django.utils import timezone
 from .models import TimewebModel, SettingsModel
 from .forms import TimewebForm, SettingsForm, UsernameResetForm
 from django.contrib.auth import get_user_model, logout, login
@@ -49,9 +57,7 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 # Misc
 from logging import getLogger
 from os import environ as os_environ
-from django.conf import settings
 from requests import get as requests_get
-from django.contrib import messages
 
 with open("timewebapp/changelogs.json", "r") as f:
     CHANGELOGS = json.load(f)
@@ -894,6 +900,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 class BlogView(TimewebGenericView):
     template_name = "blog.html"
 
+@method_decorator(rate_limit(action="contact", message="You must wait for one minute before submitting another contact form."), name="post")
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
