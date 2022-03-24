@@ -14,3 +14,9 @@
                 animation: slideLabelIn 0.35s ease-out 0.2s 1 forwards;
     }
 }
+.label-question p:first-of-type {
+    margin-top: 0;
+}
+.label-question p:last-of-type {
+    margin-bottom: 0;
+}

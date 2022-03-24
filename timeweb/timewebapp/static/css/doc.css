@@ -125,7 +125,6 @@ a:visited {
     overflow-y: scroll;
     max-width: 90ch;
     position: relative;
-    white-space: pre-line;
 }
 
 #doc-container::-webkit-scrollbar {
@@ -140,10 +139,10 @@ a:visited {
     box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 }
 code {
-    white-space: pre-wrap;
     font-weight: 400;
 }
 .major-category {
+    margin-top: 2em;
     margin-left: -50px;
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
@@ -177,7 +176,7 @@ summary {
 }
 details > img {
     max-width: 100%;
-    margin-bottom: 30px;
+    margin-bottom: 2em;
     filter: drop-shadow(0 9px 10px gray)
 }
 
@@ -190,6 +189,7 @@ details > img {
     }
 }
 .minor-category {
+    margin-top: 2rem;
     margin-left: -30px;
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
@@ -203,7 +203,7 @@ details > img {
 .label-question {
     --label-color: rgb(150, 232, 253);
 }
-.minor-category, .label-question {
+.minor-category, .label-question, .minor-minor-category {
     scroll-margin-top: 75px;
 }
 .label-question {

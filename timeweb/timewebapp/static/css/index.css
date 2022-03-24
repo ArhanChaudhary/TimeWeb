@@ -353,6 +353,12 @@ a[href="/settings"] {
     word-wrap: break-word;
     font-size: var(--description-font-size);
 }
+.description p:first-of-type {
+    margin-top: 0;
+}
+.description p:last-of-type {
+    margin-bottom: 0;
+}
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description {
     display: -webkit-box;
