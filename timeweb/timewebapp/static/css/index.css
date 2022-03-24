@@ -263,7 +263,7 @@ a[href="/settings"] {
     border-left: 2px solid black;
     top: -2px;
     left: -1px;
-    height: 12px;
+    height: 20px;
 }
 .assignment-container.add-line-wrapper::before {
     content: '';
@@ -291,6 +291,7 @@ a[href="/settings"] {
 @media screen and (max-width: 900px) {
     #assignments-container {
         --outer-assignment-horizontal-padding: 10px;
+        --outer-assignment-vertical-padding: 5px;
     }
     .assignment-container.add-line-wrapper::before {
         left: 3px;
@@ -301,6 +302,28 @@ a[href="/settings"] {
     }
     .shortcut-line-left {
         --left: -6px;
+    }
+    .shortcut-text {
+        font-size: 15px;
+    }
+
+    #autofill-work-done .shortcut-line-left {
+        width: calc(50% - 122px - var(--left));
+    }
+    #autofill-work-done .shortcut-line-right {
+        width: calc(50% - 123px);
+    }
+    #delete-starred-assignments .shortcut-line-left {
+        width: calc(50% - 133px - var(--left));
+    }
+    #delete-starred-assignments .shortcut-line-right {
+        width: calc(50% - 135px);
+    }
+    .delete-gc-assignments-from-class .shortcut-line-left {
+        width: calc(50% - 159px - var(--left));
+    }
+    .delete-gc-assignments-from-class .shortcut-line-right {
+        width: calc(50% - 161px);
     }
 }
 
