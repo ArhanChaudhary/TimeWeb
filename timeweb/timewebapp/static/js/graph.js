@@ -902,7 +902,7 @@ class VisualAssignment extends Assignment {
         let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
-                skew_ratio_button.onlyText("Set Curvature of the Graph");
+                skew_ratio_button.onlyText("Set Curvature");
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
@@ -915,7 +915,7 @@ class VisualAssignment extends Assignment {
                 skew_ratio_button.onlyText("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
-                    skew_ratio_button.onlyText("Set Curvature of the Graph");
+                    skew_ratio_button.onlyText("Set Curvature");
                 }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
@@ -931,7 +931,7 @@ class VisualAssignment extends Assignment {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.onlyText("Set Curvature of the Graph");
+                skew_ratio_button.onlyText("Set Curvature");
                 ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
                 if (!this.draw_mouse_point) {
