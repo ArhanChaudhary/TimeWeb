@@ -372,13 +372,13 @@ a[href="/settings"] {
 .title[data-priority]::before {
     content: attr(data-priority) !important;
     position: absolute;
-    font-size: 0.7em;
+    font-size: 0.75em;
     margin-top: -12px;
 }
 .title[data-daysleft]::after {
     content: attr(data-daysleft) !important;
     position: absolute;
-    font-size: 0.7em;
+    font-size: 0.75em;
     transform: translateY(100%) translateY(-2px);
     white-space: nowrap;
     width: calc(100% + var(--arrow-margin-left));
