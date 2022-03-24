@@ -299,7 +299,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
 
-    def get(self, request, just_created_assignment_id=False, just_updated_assignment_id=False):
+    def get(self, request):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
         self.user_model = User.objects.get(email=request.user.email)
@@ -324,11 +324,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         })
 
         # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-        if just_created_assignment_id:
-            self.context['just_created_assignment_id'] = just_created_assignment_id
-        elif just_updated_assignment_id:
-            self.context['just_updated_assignment_id'] = just_updated_assignment_id
-        
+        if request.session.get("just_created_assignment_id"):
+            self.context['just_created_assignment_id'] = request.session.get("just_created_assignment_id")
+            del request.session["just_created_assignment_id"]
+        elif request.session.get("just_updated_assignment_id"):
+            self.context['just_updated_assignment_id'] = request.session.get("just_updated_assignment_id")
+            del request.session["just_updated_assignment_id"]
+
         if request.session.get("gc-api-init-failed", False):
             del request.session["gc-api-init-failed"]
             self.context["GC_API_INIT_FAILED"] = True
@@ -560,12 +562,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         self.sm.save()
         if self.created_assignment:
-            logger.info(f'User \"{request.user}\" added assignment "{self.sm.name}"')
-            return self.get(request, just_created_assignment_id=self.sm.pk)
+            logger.info(f'User \"{request.user}\" created assignment "{self.sm.name}"')
+            request.session["just_created_assignment_id"] = self.sm.pk
         elif self.updated_assignment:
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
-            return self.get(request, just_updated_assignment_id=self.sm.pk)
-
+            request.session['just_updated_assignment_id'] = self.sm.pk
+        return redirect(request.path_info)
+        
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
         if self.created_assignment:
@@ -901,7 +904,7 @@ class ContactFormView(BaseContactFormView):
             return super().post(request)
         else:
             messages.error(request, "Your submission was not authentic. Please try again.")
-            return self.get(request)
+            return redirect(request.path_info)
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username-reset.html"
 
