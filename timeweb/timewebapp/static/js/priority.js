@@ -682,13 +682,12 @@ class Priority {
     updateInfoHeader() {
         const that = this;
         if (!that.total_completion_time) {
-
             $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
+            $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
             $("#estimated-total-time").html(dat.length ? 'You have Finished Everything for Today!' : 'You don\'t have any assignments');
-            $("#current-time, #tomorrow-time, #hide-button").hide();
         } else {
             $("#hide-button").html() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
-            $("#current-time, #tomorrow-time, #hide-button").show();
+            $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
             $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
 
             let relative_today_and_tomorrow_date;
