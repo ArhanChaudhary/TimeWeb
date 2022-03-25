@@ -684,7 +684,7 @@ class Priority {
         if (!that.total_completion_time) {
             $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
             $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
-            $("#estimated-total-time").html(dat.length ? 'You have Finished Everything for Today!' : 'You don\'t have any assignments');
+            $("#estimated-total-time").html(dat.length ? 'You have Finished Everything for Today!' : 'You Don\'t have any Assignments');
         } else {
             $("#hide-button").html() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
             $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
