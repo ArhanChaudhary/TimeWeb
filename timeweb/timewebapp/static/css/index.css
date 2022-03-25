@@ -192,15 +192,18 @@ a[href="/settings"] {
 }
 .shortcut {
     position: relative;
-    margin-bottom: calc(4px + var(--outer-assignment-vertical-padding) * 2);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: -11px;
+    margin-bottom: 3px;
 }
 .shortcut-text {
     white-space: nowrap;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: -11px;
+    margin-right: 3px;
+    margin-left: 3px;
 
+    flex-grow: 0;
     display: flex;
     gap: 5px;
     align-items: center;
@@ -230,34 +233,19 @@ a[href="/settings"] {
     top: 0;
     position: absolute;
 }
+.shortcut-line-left, .shortcut-line-right {
+    flex-grow: 1;
+}
 .shortcut-line-left {
     --left: -14px;
     left: var(--left);
+    margin-right: var(--left);
     border-top: 2px solid black;
-    top: 2px;
     position: relative;
 }
 .shortcut-line-right {
     float: right;
     border-top: 2px solid black;
-}
-#autofill-work-done .shortcut-line-left {
-    width: calc(50% - 127px - var(--left));
-}
-#autofill-work-done .shortcut-line-right {
-    width: calc(50% - 128px);
-}
-#delete-starred-assignments .shortcut-line-left {
-    width: calc(50% - 140px - var(--left));
-}
-#delete-starred-assignments .shortcut-line-right {
-    width: calc(50% - 141px);
-}
-.delete-gc-assignments-from-class .shortcut-line-left {
-    width: calc(50% - 169px - var(--left));
-}
-.delete-gc-assignments-from-class .shortcut-line-right {
-    width: calc(50% - 170px);
 }
 
 .shortcut-line-left::after {
@@ -308,25 +296,6 @@ a[href="/settings"] {
     }
     .shortcut-text {
         font-size: 15px;
-    }
-
-    #autofill-work-done .shortcut-line-left {
-        width: calc(50% - 122px - var(--left));
-    }
-    #autofill-work-done .shortcut-line-right {
-        width: calc(50% - 123px);
-    }
-    #delete-starred-assignments .shortcut-line-left {
-        width: calc(50% - 133px - var(--left));
-    }
-    #delete-starred-assignments .shortcut-line-right {
-        width: calc(50% - 135px);
-    }
-    .delete-gc-assignments-from-class .shortcut-line-left {
-        width: calc(50% - 159px - var(--left));
-    }
-    .delete-gc-assignments-from-class .shortcut-line-right {
-        width: calc(50% - 161px);
     }
 }
 

@@ -119,7 +119,6 @@
     </div>
     <div id="autofill-work-done" class="shortcut">
       <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>
-      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
         Autofill
         <select id="autofill-selection">
@@ -129,14 +128,15 @@
         Work Done
         <div class="generic-button">Go</div>
       </span>
+      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
     </div>
     <div id="delete-starred-assignments" class="shortcut">
       <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>
-      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
         Delete all Starred Assignments
         <div class="generic-button">Go</div>
       </span>
+      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
     </div>
     {% for assignment in assignment_models %}
       {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
@@ -228,11 +228,11 @@
   <template id="delete-gc-assignments-from-class-template">
     <div class="delete-gc-assignments-from-class shortcut">
       <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>
-      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
       <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
         Delete all Assignments from this Class
         <div class="generic-button">Go</div>
       </span>
+      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
     </div>
   </template>
   <template id="tag-add-selection-item-template">
