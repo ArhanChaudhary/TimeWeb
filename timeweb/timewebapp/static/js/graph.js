@@ -662,7 +662,6 @@ class VisualAssignment extends Assignment {
         // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
-                skew_ratio_textbox = this.dom_assignment.find(".skew-ratio-textbox"),
                 submit_work_button = this.dom_assignment.find(".submit-work-button"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
@@ -961,43 +960,6 @@ class VisualAssignment extends Assignment {
         }
         // END Set skew ratio button using graph button
 
-        // BEGIN Skew ratio textbox
-        {
-        let not_applicable_timeout_skew_ratio_textbox;
-        skew_ratio_textbox.on("keydown paste click keyup", () => { // keyup for delete
-            const skew_ratio_bound = this.calcSkewRatioBound();
-            const max_textbox_value = Math.max(skew_ratio_bound - 1, 0.1);
-            skew_ratio_textbox.attr({
-                min: -max_textbox_value,
-                max: max_textbox_value,
-            });
-            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1 || this.sa.needs_more_info) {
-                skew_ratio_textbox.val('').attr("placeholder", "Not Applicable");
-                clearTimeout(not_applicable_timeout_skew_ratio_textbox);
-                not_applicable_timeout_skew_ratio_textbox = setTimeout(function() {
-                    skew_ratio_textbox.attr("placeholder", "Enter Curvature");
-                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
-                return;
-            }
-            if (skew_ratio_textbox.val()) {
-                // Sets and caps skew ratio
-                // The skew ratio in the code is 1 more than the displayed skew ratio
-                this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, +skew_ratio_textbox.val() + 1, skew_ratio_bound);
-                ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-            }
-            this.setDynamicStartIfInDynamicMode();
-            this.draw();
-        }).keypress(e => {
-            if (e.key === "Enter") {
-                // Triggers the below
-                skew_ratio_textbox.blur();
-            }
-        }).focusout(() => {
-            skew_ratio_textbox.val('');
-            new Priority().sort();
-        });
-        }
-        // END Skew ratio textbox
 
         // BEGIN Fixed/dynamic mode button
         {
