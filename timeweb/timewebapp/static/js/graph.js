@@ -901,7 +901,7 @@ class VisualAssignment extends Assignment {
         let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
-                skew_ratio_button.onlyText("Set Curvature");
+                skew_ratio_button.text("Set Curvature");
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
@@ -911,15 +911,15 @@ class VisualAssignment extends Assignment {
                 return;
             }
             if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1 || this.sa.needs_more_info) {
-                skew_ratio_button.onlyText("Not Applicable");
+                skew_ratio_button.text("Not Applicable");
                 clearTimeout(not_applicable_timeout_skew_ratio_button);
                 not_applicable_timeout_skew_ratio_button = setTimeout(function() {
-                    skew_ratio_button.onlyText("Set Curvature");
+                    skew_ratio_button.text("Set Curvature");
                 }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
-            skew_ratio_button.onlyText("Hover the graph, click again to cancel");
+            skew_ratio_button.text("Hover the graph, click again to cancel");
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.graph.trigger("mousemove");
@@ -930,7 +930,7 @@ class VisualAssignment extends Assignment {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.onlyText("Set Curvature");
+                skew_ratio_button.text("Set Curvature");
                 ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
                 if (!this.draw_mouse_point) {
@@ -976,7 +976,7 @@ class VisualAssignment extends Assignment {
             }
 
             this.sa.fixed_mode = !this.sa.fixed_mode;
-            fixed_mode_button.onlyText(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+            fixed_mode_button.text(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
             ajaxUtils.sendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
             if (this.sa.fixed_mode) {
                 this.red_line_start_x = 0;
