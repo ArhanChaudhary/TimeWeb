@@ -506,8 +506,6 @@ utils = {
             });
         },
         addTagHandlers: function() {
-            const TAG_ADD_SELECTION_ITEM_TEMPLATE = $("#tag-add-selection-item-template").html();
-            const TAG_TEMPLATE = $("#tag-template").html();
             function transitionCloseTagBox($tag_add) {
                 const tag_add_box = $tag_add.find(".tag-add-box");
 
@@ -588,7 +586,7 @@ utils = {
                         dom_assignment.removeClass("open-tag-add-box");
                         transitionCloseTagBox($this);
                         for (let tag_name of tag_names) {
-                            const tag = $(TAG_TEMPLATE);
+                            const tag = $($("#tag-template").html());
                             tag.find(".tag-name").text(tag_name);
                             tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
                             tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
@@ -664,7 +662,7 @@ utils = {
                 tag_add_box.trigger("transitionend");
 
                 for (let tag of final_allTags) {
-                    const tag_add_selection_item = $(TAG_ADD_SELECTION_ITEM_TEMPLATE);
+                    const tag_add_selection_item = $($("#tag-add-selection-item-template").html());
                     tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
                     container_for_tags.append(tag_add_selection_item);
                     tag_add_selection_item.click(function() {
