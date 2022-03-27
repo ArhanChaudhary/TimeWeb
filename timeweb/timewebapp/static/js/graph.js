@@ -994,12 +994,6 @@ class VisualAssignment extends Assignment {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
-            // Skew ratio can be changed in fixed mode, making dynamic_start inaccurate
-            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                this.setDynamicStartIfInDynamicMode();
-                this.autotuneSkewRatio();
-            }
-            this.setDynamicStartIfInDynamicMode();
             new Priority().sort();
             this.draw();
         }).html(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
