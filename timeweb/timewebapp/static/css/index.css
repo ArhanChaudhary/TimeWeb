@@ -9,6 +9,7 @@ body {
     padding-top: 10px;
     opacity: 0;
     --scale-percent-y: 1.05;
+    --horizontal-assignment-padding: 15px;
     --outer-assignment-vertical-padding: 7px;
     --outer-assignment-horizontal-padding: 25px;
 }
@@ -159,7 +160,7 @@ a[href="/settings"] {
 .assignment {
     box-shadow: 0 0 0 black;
     background: var(--app-color); /* Set white so it doesnt transition background initially if added by priority.js */
-    padding: var(--vertical-assignment-padding) 15px;
+    padding: var(--vertical-assignment-padding) var(--horizontal-assignment-padding);
     border-radius: 5px;
     position: relative;
     scroll-margin: 20px;
@@ -729,10 +730,14 @@ a[href="/settings"] {
     cursor: pointer;
     transition: background-color 0.25s ease-out;
 }
+.assignment.open-assignment .button,
+.assignment.assignment-is-closing .button {
+    padding-bottom: 40px;
+    margin-bottom: calc(-1 * var(--vertical-assignment-padding) - 40px);
+}
 .button:focus, .button:hover {
     outline: 0;
     background-color: rgb(173, 216, 230);
-    z-index: 1;
 }
 .button:active * {
     transform: scale(0.95);
@@ -746,6 +751,17 @@ a[href="/settings"] {
     display: none;
     /* firefox acts weirdly without this */
     width: 100%;
+}
+.assignment-footer::before {
+    content: '';
+    position: absolute;
+    padding-left: 40px;
+    margin-left: -40px;
+    top: 0;
+    height: 40px;
+    background-color: white;
+    width: var(--horizontal-assignment-padding);
+    left: 100%;
 }
 .graph-container {
     border-radius: 12px;
