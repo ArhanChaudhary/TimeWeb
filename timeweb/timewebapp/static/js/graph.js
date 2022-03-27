@@ -96,6 +96,10 @@ class Assignment {
         } else if (params.reference === "blue line end") {
             let len_works = this.sa.works.length - 1;
             this.red_line_start_x = this.sa.blue_line_start + len_works;
+        } else if (params.reference === "visual red line start") {
+            let len_works = this.sa.works.length - 1;
+            // First point the red line is drawn on, taken from draw()
+            this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.blue_line_start + len_works;
         }
         if (params.floor_due_time) {
             var x1 = Math.floor(this.sa.complete_x) - this.red_line_start_x;
@@ -929,7 +933,7 @@ class VisualAssignment extends Assignment {
                 // No need to ajax since skew ratio is the same
                 return;
             }
-            if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1 || this.sa.needs_more_info) {
+            if (this.getWorkingDaysRemaining({ reference: "visual red line start" }) <= 1 || this.sa.needs_more_info) {
                 VisualAssignment.flashNotApplicable(skew_ratio_button);
                 return;
             }
@@ -994,6 +998,9 @@ class VisualAssignment extends Assignment {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
+            // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+            // However, we still need to call setDynamicStartIfInDynamicMode() to compensate if the skew ratio in fixed mode was modified
+            sa.setDynamicStartIfInDynamicMode();
             new Priority().sort();
             this.draw();
         }).text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
