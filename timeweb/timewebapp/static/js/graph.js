@@ -760,9 +760,15 @@ class VisualAssignment extends Assignment {
                 enter_fired = true;
                 submit_work_button.click();
             }
-        }).keyup(e => {
-            if (e.key === "Enter")
-                enter_fired = false;
+        })
+        // an alert can sometimes cause the enter to be fired on another element, instead listen to the event's propagation to the root
+        $(document).keyup(e => {
+            if (e.key === "Enter") enter_fired = false;
+
+            if (this.sa.needs_more_info) {
+                VisualAssignment.flashNotApplicable(work_input_textbox);
+                return;
+            }
         });
         }
         // END Work input textbox
