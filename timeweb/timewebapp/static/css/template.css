@@ -34,7 +34,7 @@ header > * {
 }
 #image-new-container img {
     float: left;
-    transform: scale(0.8);
+    transform: scale(0.7);
     filter: hue-rotate(92deg);
 }
 #new-assignment-text {
