@@ -996,7 +996,7 @@ class VisualAssignment extends Assignment {
             }
             new Priority().sort();
             this.draw();
-        }).text(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+        }).text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
         }
         // END Fixed/dynamic mode button        
     }
