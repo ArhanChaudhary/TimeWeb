@@ -433,24 +433,29 @@ a[href="/settings"] {
     top: unset;
     bottom: 2px;
 }
-.assignment.open-assignment.tags-bottom .assignment-header {
+.assignment.open-assignment.tags-bottom .assignment-header,
+.assignment.assignment-is-closing.tags-bottom .assignment-header {
     position: relative;
 }
-.assignment.open-assignment.tags-bottom .tags {
+.assignment.open-assignment.tags-bottom .tags,
+.assignment.assignment-is-closing.tags-bottom .tags {
     top: 100%;
     bottom: unset;
     margin-top: -3px;
 }
-.assignment.open-assignment.tags-bottom.tags-right .tags {
+.assignment.open-assignment.tags-bottom.tags-right .tags,
+.assignment.assignment-is-closing.tags-bottom.tags-right .tags {
     right: 2px;
     /* Dirty hardcoded fix to position tags with different assignment paddings */
     top: calc(100% + var(--vertical-assignment-padding) - 15px);
 }
-.assignment.open-assignment.tags-bottom.tags-left .tags {
+.assignment.open-assignment.tags-bottom.tags-left .tags,
+.assignment.assignment-is-closing.tags-bottom.tags-left .tags {
     left: 0;
     margin-top: unset;
 }
-.assignment.open-assignment.tags-bottom.tags-left .tags.assignment-has-daysleft {
+.assignment.open-assignment.tags-bottom.tags-left .tags.assignment-has-daysleft,
+.assignment.assignment-is-closing.tags-bottom.tags-left .tags.assignment-has-daysleft {
     margin-top: calc(1px * var(--margin-top));
     transform: translateY(-100%) translateY(-2px);
 }

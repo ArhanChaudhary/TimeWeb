@@ -1090,10 +1090,10 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
                 marginBottom: "",
                 transition: "",
             });
+            // Assignment name dom element can change height and the assignment header buttons can mess up their negative margins, so repoisiton the tags
+            sa.positionTags();
         });
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
-        // Assignment name dom element can change height, so repoisiton the tags
-        sa.positionTags();
         return;
     }
     SETTINGS.one_graph_at_a_time && $("#close-assignments").click();
