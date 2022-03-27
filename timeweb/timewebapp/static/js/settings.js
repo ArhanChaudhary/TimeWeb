@@ -50,8 +50,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
     // verbose name doesnt work on tag position for literally no reason
-    $("label[for=\"id_horizontal_tag_position\"]").html("Horizontal Assignment Tag Position");
-    $("label[for=\"id_vertical_tag_position\"]").html("Vertical Assignment Tag Position");
+    $("label[for=\"id_horizontal_tag_position\"]").text("Horizontal Assignment Tag Position");
+    $("label[for=\"id_vertical_tag_position\"]").text("Vertical Assignment Tag Position");
     $("table input:visible:not([name^=\"background_image\"]):not([name=\"def_break_days\"]):not(.jscolor):not([type=\"time\"])").each(function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });

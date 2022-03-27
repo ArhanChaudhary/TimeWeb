@@ -120,7 +120,7 @@ utils = {
                 let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
                 str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
-                $("#current-time").html(` (${str})`);
+                $("#current-time").text(` (${str})`);
                 utils.ui.old_minute_value = minute_value;
 
                 const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -193,12 +193,12 @@ utils = {
             toggleEstimatedCompletionTime: function() {
                 // Hide and show estimated completion time
                 $("#hide-button").click(function() {
-                    if ($(this).html() === "Hide") {
-                        $(this).html("Show");
+                    if ($(this).text() === "Hide") {
+                        $(this).text("Show");
                         $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
                         localStorage.setItem("hide-button", true);
                     } else {
-                        $(this).html("Hide");
+                        $(this).text("Hide");
                         $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
                         localStorage.removeItem("hide-button");
                     }
@@ -304,9 +304,9 @@ utils = {
             googleClassroomAPI: function() {
                 if (!creating_gc_assignments_from_frontend && !GC_API_INIT_FAILED) {
                     if (SETTINGS.oauth_token.token) {
-                        $("#toggle-gc-label").html("Disable Google Classroom integration");
+                        $("#toggle-gc-label").text("Disable Google Classroom integration");
                     } else {
-                        $("#toggle-gc-label").html("Enable Google Classroom integration");
+                        $("#toggle-gc-label").text("Enable Google Classroom integration");
                     }
                 }
                 $("#toggle-gc-container").click(function() {
@@ -328,7 +328,7 @@ utils = {
                         success: function(authentication_url) {
                             if (authentication_url === "Disabled gc api") {
                                 $("#toggle-gc-container").removeClass("enabled");
-                                $("#toggle-gc-label").html("Enable Google Classroom integration");
+                                $("#toggle-gc-label").text("Enable Google Classroom integration");
                                 $this.removeClass("clicked");
                             } else {
                                 reloadWhenAppropriate({ href: authentication_url });
@@ -1213,12 +1213,11 @@ ajaxUtils = {
             error: ajaxUtils.error,
         }).done(function(authentication_url) {
             if (authentication_url === "No new gc assignments were added") {
-                $("#toggle-gc-label").html("");
                 $("#toggle-gc-container").removeClass("open");
                 if (SETTINGS.oauth_token.token) {
-                    $("#toggle-gc-label").html("Disable Google Classroom integration");
+                    $("#toggle-gc-label").text("Disable Google Classroom integration");
                 } else {
-                    $("#toggle-gc-label").html("Enable Google Classroom integration");
+                    $("#toggle-gc-label").text("Enable Google Classroom integration");
                 }
                 creating_gc_assignments_from_frontend = false;
                 return;

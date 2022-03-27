@@ -213,14 +213,14 @@ class Crud {
         // Create and show a new form when user clicks new assignment
         $("#image-new-container").click(function() {
             Crud.setAssignmentFormFields(Crud.getDefaultAssignmentFormFields());
-            $("#new-title").html("New Assignment");
-            $("#submit-assignment-button").html("Create Assignment").val('');
+            $("#new-title").text("New Assignment");
+            $("#submit-assignment-button").text("Create Assignment").val('');
             that.showForm();
         });
         // Populate form on edit
         $('.update-button').parent().click(function() {
-            $("#new-title").html("Edit Assignment");
-            $("#submit-assignment-button").html("Edit Assignment");
+            $("#new-title").text("Edit Assignment");
+            $("#submit-assignment-button").text("Edit Assignment");
             const sa = utils.loadAssignmentData($(this));
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {

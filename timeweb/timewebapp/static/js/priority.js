@@ -498,12 +498,12 @@ class Priority {
                 dom_status_image.hide();
                 dom_status_image.removeAttr("src");
             }
-            dom_status_message.html(status_message);
+            dom_status_message.html(status_message); // use .html() instead of .text() so that .unfinished-message is parsed as an HTML element
             dom_title.attr("data-daysleft", str_daysleft);
             dom_title.attr("data-long-daysleft", long_str_daysleft);
             // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            dom_completion_time.html(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
+            dom_completion_time.text(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '');
         });
     }
     alertDueDates() {
@@ -684,11 +684,11 @@ class Priority {
         if (!that.total_completion_time) {
             $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
             $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
-            $("#estimated-total-time").html(dat.length ? 'You have Finished Everything for Today!' : 'You Don\'t have any Assignments');
+            $("#estimated-total-time").text(dat.length ? 'You have Finished Everything for Today!' : 'You Don\'t have any Assignments');
         } else {
-            $("#hide-button").html() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
+            $("#hide-button").text() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
             $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
-            $("#estimated-total-time").html(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
+            $("#estimated-total-time").text(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
 
             let relative_today_and_tomorrow_date;
             if (that.display_due_today_completion_time && that.display_due_tomorrow_completion_time) {
@@ -698,7 +698,7 @@ class Priority {
             } else {
                 relative_today_and_tomorrow_date = "Tomorrow";
             }
-            $("#tomorrow-time").html(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
+            $("#tomorrow-time").text(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
         }
         utils.ui.tickClock({ force_update: true });
         if (that.params.first_sort) {
