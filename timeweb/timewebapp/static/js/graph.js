@@ -920,7 +920,7 @@ class VisualAssignment extends Assignment {
         let original_skew_ratio;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
-                skew_ratio_button.text("Set Curvature");
+                skew_ratio_button.text(skew_ratio_button.attr("data-label"));
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
@@ -934,7 +934,7 @@ class VisualAssignment extends Assignment {
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
-            skew_ratio_button.text("Hover the graph, click again to cancel");
+            skew_ratio_button.text(skew_ratio_button.attr("data-active-label"));
             // Turn off mousemove to ensure there is only one mousemove handler at a time
             this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
             this.graph.trigger("mousemove");
@@ -945,7 +945,7 @@ class VisualAssignment extends Assignment {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.text("Set Curvature");
+                skew_ratio_button.text(skew_ratio_button.attr("data-label"));
                 ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
                 if (!this.draw_mouse_point) {
@@ -985,7 +985,7 @@ class VisualAssignment extends Assignment {
             }
 
             this.sa.fixed_mode = !this.sa.fixed_mode;
-            fixed_mode_button.text(this.sa.fixed_mode ? "Switch to Dynamic mode" : "Switch to Fixed mode");
+            fixed_mode_button.text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
             ajaxUtils.sendAttributeAjaxWithTimeout('fixed_mode', this.sa.fixed_mode, this.sa.id);
             if (this.sa.fixed_mode) {
                 this.red_line_start_x = 0;
