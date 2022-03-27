@@ -735,8 +735,6 @@ class VisualAssignment extends Assignment {
         delete_work_input_button.click(() => {
             let len_works = this.sa.works.length - 1;
             if (!len_works) {
-                // remove this next commit
-                // if (!this.sa.needs_more_info) return;
                 VisualAssignment.flashNotApplicable(delete_work_input_button);
                 return;
             }
