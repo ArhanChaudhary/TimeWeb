@@ -5,7 +5,7 @@ from django.utils.deprecation import MiddlewareMixin
 class AddSiteID(MiddlewareMixin):
     def process_request(self, request):
         try:
-            current_site = Site.objects.get(domain=request.get_host())
+            current_site = Site.objects.get(domain=request.get_host() if settings.DEBUG else "timeweb.io")
         except Site.DoesNotExist:
             current_site = Site.objects.get(domain="example.com")
 
