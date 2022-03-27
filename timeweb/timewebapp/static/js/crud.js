@@ -19,7 +19,7 @@ class Crud {
         "#id_min_work_time": +SETTINGS.def_min_work_time||'',
         "#id_break_days": SETTINGS.def_break_days,
     })
-    static getAssignmentFormFields = sa => {
+    static generateAssignmentFormFields = sa => {
         const fields = {
             "#id_name": sa.name,
             "#id_assignment_date_daterangepicker": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
@@ -222,7 +222,7 @@ class Crud {
             $("#new-title").html("Edit Assignment");
             $("#submit-assignment-button").html("Edit Assignment");
             const sa = utils.loadAssignmentData($(this));
-            Crud.setAssignmentFormFields(Crud.getAssignmentFormFields(sa));
+            Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
                 $.merge($("#form-wrapper #advanced-inputs").prevAll(), $("#form-wrapper #id-funct_round-field-wrapper")).each(function() {
                     const input = $(this).children("input");

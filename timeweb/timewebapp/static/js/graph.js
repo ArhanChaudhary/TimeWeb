@@ -658,6 +658,40 @@ class VisualAssignment extends Assignment {
         // Makes sure graph is on screen
         return rect.bottom - rect.height / 1.5 > 70 && rect.y + rect.height / 1.5 < window.innerHeight;
     }
+    static IDGeneratorCounter = 0
+    static notApplicableTimeouts = {}
+    static flashNotApplicable($graph_button) {
+        
+        switch ($graph_button.prop("tagName").toLowerCase()) {
+            case "button":
+                var original_text = $graph_button.text();
+                $graph_button.text("Not Applicable");
+                break;
+            case "input":
+                var original_text = $graph_button.attr("placeholder");
+                $graph_button.val("").attr("placeholder", "Not Applicable");
+                break;
+        }
+        if ($graph_button.hasClass("is-flashing")) return;
+        $graph_button.addClass("is-flashing");
+        
+        clearTimeout(VisualAssignment.notApplicableTimeouts[VisualAssignment.getGraphButtonID($graph_button)]);
+        VisualAssignment.notApplicableTimeouts[VisualAssignment.getGraphButtonID($graph_button)] = setTimeout(() => {
+            $graph_button.removeClass("is-flashing");
+            switch ($graph_button.prop("tagName").toLowerCase()) {
+                case "button":
+                    $graph_button.text(original_text);
+                    break;
+                case "input":
+                    $graph_button.attr("placeholder", original_text);
+                    break;
+            }
+        }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+    }
+    static getGraphButtonID($graph_button) {
+        if (!$graph_button.attr("data-timeout-id")) $graph_button.attr("data-timeout-id", ++VisualAssignment.IDGeneratorCounter);
+        return $graph_button.attr("data-timeout-id");
+    }
     setGraphButtonEventListeners() {
         // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
@@ -698,15 +732,12 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Delete work input button
         {
-        let not_applicable_timeout_delete_work_input_button;
         delete_work_input_button.click(() => {
             let len_works = this.sa.works.length - 1;
             if (!len_works) {
-                delete_work_input_button.html(this.sa.needs_more_info ? "Not Applicable" : "Delete Work Input");
-                clearTimeout(not_applicable_timeout_delete_work_input_button);
-                not_applicable_timeout_delete_work_input_button = setTimeout(function() {
-                    delete_work_input_button.html("Delete Work Input");
-                }.bind(this), VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                // remove this next commit
+                // if (!this.sa.needs_more_info) return;
+                VisualAssignment.flashNotApplicable(delete_work_input_button);
                 return;
             }
             this.sa.works.pop();
@@ -725,18 +756,8 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Work input textbox
         {
-        let not_applicable_timeout_work_input_textbox;
         let enter_fired = false;
         work_input_textbox.keydown(e => {
-            if (this.sa.needs_more_info) {
-                work_input_textbox.val('').attr("placeholder", "Not Applicable");
-                clearTimeout(not_applicable_timeout_work_input_textbox);
-                not_applicable_timeout_work_input_textbox = setTimeout(function() {
-                    work_input_textbox.attr("placeholder", "Enter Units Done");
-                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
-                return;
-            }
-            
             if (e.key === "Enter" && !enter_fired) {
                 enter_fired = true;
                 submit_work_button.click();
@@ -750,14 +771,9 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Submit work button
         {
-        let not_applicable_timeout_submit_work_button;
         submit_work_button.click(() => {
             if (this.sa.needs_more_info) {
-                submit_work_button.html("Not Applicable");
-                clearTimeout(not_applicable_timeout_submit_work_button);
-                not_applicable_timeout_submit_work_button = setTimeout(function() {
-                    submit_work_button.html("Submit Work Input");
-                }.bind(this), VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                VisualAssignment.flashNotApplicable(submit_work_button);
                 return;
             }
 
@@ -898,7 +914,6 @@ class VisualAssignment extends Assignment {
         // BEGIN Set skew ratio using graph button
         {
         let original_skew_ratio;
-        let not_applicable_timeout_skew_ratio_button;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
                 skew_ratio_button.text("Set Curvature");
@@ -911,11 +926,7 @@ class VisualAssignment extends Assignment {
                 return;
             }
             if (this.getWorkingDaysRemaining({ reference: "blue line end" }) <= 1 || this.sa.needs_more_info) {
-                skew_ratio_button.text("Not Applicable");
-                clearTimeout(not_applicable_timeout_skew_ratio_button);
-                not_applicable_timeout_skew_ratio_button = setTimeout(function() {
-                    skew_ratio_button.text("Set Curvature");
-                }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                VisualAssignment.flashNotApplicable(skew_ratio_button);
                 return;
             }
             original_skew_ratio = this.sa.skew_ratio;
@@ -963,15 +974,9 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Fixed/dynamic mode button
         {
-        let not_applicable_timeout_fixed_mode_button;
         fixed_mode_button.click(() => {
             if (this.sa.needs_more_info) {
-                const original_text = fixed_mode_button.text();
-                fixed_mode_button.html("Not Applicable");
-                clearTimeout(not_applicable_timeout_fixed_mode_button);
-                not_applicable_timeout_fixed_mode_button = setTimeout(function() {
-                    fixed_mode_button.html(original_text);
-                }.bind(this), VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
+                VisualAssignment.flashNotApplicable(fixed_mode_button);
                 return;
             }
 
