@@ -842,7 +842,7 @@ a[href="/settings"] {
 }
 /* 1st row */
 .delete-work-input-button, .work-input-textbox, .submit-work-button {
-    margin-top: 8px;
+    margin-top: 7px;
 }
 /* 2nd row */
 .skew-ratio-button, .placeholder-button, .fixed-mode-button {
