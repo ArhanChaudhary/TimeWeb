@@ -93,18 +93,18 @@
       <div id="info"{% if background_image %} class="grey-highlight"{% endif %}>
         <span id="estimated-total-time-label">Estimated completion time:</span><span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <div id="hide-button" class="generic-button">Hide</div>
-      </div>
-      <div id="icon-label-container">
-        <img id="close-assignments"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="32" src="{% static 'images/close-all-assignments.png' %}">
-        <img id="previous-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
-        <img id="next-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="26" width="32" src="{% static 'images/next-day.png' %}">
-        <a href="/settings">
-          <img id="settings"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="32" src="{% static 'images/settings.png' %}">
-        </a>
-        <div id="settings-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Settings</div>
-        <div id="previous-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Previous Day</span></div>
-        <div id="next-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
-        <div id="close-assignments-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Close all Assignments</div>
+        <div id="icon-label-container">
+          <img id="close-assignments"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'images/close-all-assignments.png' %}">
+          <img id="previous-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'images/next-day.png' %}">
+          <img id="next-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'images/next-day.png' %}">
+          <a href="/settings">
+            <img id="settings"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="27" src="{% static 'images/settings.png' %}">
+          </a>
+          <div id="settings-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Settings</div>
+          <div id="previous-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Previous Day</span></div>
+          <div id="next-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
+          <div id="close-assignments-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Close all Assignments</div>
+        </div>
       </div>
       {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
       <div id="current-date"{% if background_image %} class="grey-highlight"{% endif %}>

@@ -96,7 +96,7 @@ header.animate::after {
 #assignments-header img:not(:first-of-type), #assignments-header a {
     position: relative;
     z-index: 1;
-    margin-left: 14px;
+    margin-left: 10px;
 }
 #assignments-header img {
     cursor: pointer;
@@ -123,7 +123,7 @@ a[href="/settings"] {
     order: 1;
     padding-right: 5px;
     padding-left: 20px;
-    right: calc(198px + var(--outer-assignment-horizontal-padding));
+    right: calc(154px + var(--outer-assignment-horizontal-padding));
     text-align: right;
     display: none;
     font-size: 17px;
