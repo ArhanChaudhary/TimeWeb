@@ -58,6 +58,7 @@ header.animate::after {
     flex-wrap: wrap;
 }
 #info {
+    width: 100%;
     display: flex;
     font-size: 17px;
     align-items: center;
