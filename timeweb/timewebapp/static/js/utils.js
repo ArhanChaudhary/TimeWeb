@@ -487,12 +487,12 @@ utils = {
                     // focusout doesn't update document.activeElement, use relatedTarget instead
                     e.type === "focusout" && $("#icon-label-container img").is(e.relatedTarget)) return;
 
-                const info = $(e.target).parents("#icon-label-container").siblings("#info");
+                const hide_button = $(e.target).parents("#info").children("#hide-button");
                 const visible_icon_label = $(e.target).parents("#icon-label-container").children("div:visible");
                 if (e.type === "mouseover")
-                    info.toggleClass("dim", collision(info, visible_icon_label));
+                    $("#assignments-header").find("#info").toggleClass("dim", collision(hide_button, visible_icon_label));
                 else
-                    info.removeClass("dim");
+                    $("#assignments-header").find("#info").removeClass("dim");
             });
             $(window).resize(function() {
                 const visible_icon_label = $("#assignments-header #icon-label-container div:visible");

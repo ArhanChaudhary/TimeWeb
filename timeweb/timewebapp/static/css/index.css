@@ -64,7 +64,7 @@ header.animate::after {
     flex-wrap: wrap;
     gap: 5px;
 }
-#info.dim {
+#info.dim > :not(#icon-label-container) {
     opacity: 0;
 }
 #assignments-header::after {
