@@ -702,6 +702,7 @@ class VisualAssignment extends Assignment {
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
                 submit_work_button = this.dom_assignment.find(".submit-work-button"),
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
+                hide_assignment_button = this.dom_assignment.find(".hide-assignment-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
         this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
@@ -733,6 +734,15 @@ class VisualAssignment extends Assignment {
         });
         }
         // END Up and down arrow event handler
+
+        // BEGIN Hide assignment button
+        hide_assignment_button.click(() => {
+            this.sa.mark_as_done = !this.sa.mark_as_done;
+            hide_assignment_button.text(hide_assignment_button.attr(`data-${this.sa.mark_as_done ? "show" : "hide"}-label`));
+            ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.a.id);
+            new Priority().sort();
+        }).text(hide_assignment_button.attr(`data-${this.sa.mark_as_done ? "show" : "hide"}-label`));
+        // END Hide assignment button
 
         // BEGIN Delete work input button
         {

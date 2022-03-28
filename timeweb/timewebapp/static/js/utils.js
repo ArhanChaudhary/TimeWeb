@@ -132,16 +132,6 @@ utils = {
             }
         },
         setClickHandlers: {
-            markAsDoneButtons: function() {
-                $(".mark-as-done-button").parent().click(function() {
-                    const sa = utils.loadAssignmentData($(this));
-                    sa.mark_as_done = !sa.mark_as_done;
-                    ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', sa.mark_as_done, sa.id);
-                    let status_image = sa.mark_as_done ? "show" : "hide";
-                    $(this).children("img").attr("src", DEBUG ? `static/images/${status_image}.png` : `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
-                    new Priority().sort();
-                });
-            },
             tickButtons: function() {
                 let runningCount = 0;
                 $(".tick-button").parent().click(function() {
@@ -259,9 +249,8 @@ utils = {
                         } else if (previous_day) {
                             date_now.setDate(date_now.getDate() - 1);
                         }
-                        // mark as done is unmarked in the next day
                         $(".assignment.mark-as-done").each(function() {
-                            $(this).find(".mark-as-done-button").click();
+                            $(this).find(".hide-assignment-button").click();
                         });
                         // Hide current time without using display none, as that can be affected by .toggle
                         $("#current-time").css({
@@ -821,7 +810,7 @@ utils = {
                                                 assignment_container.find(".delete-button").focus().trigger(click_delete_button);
                                                 break;
                                             case "h":
-                                                assignment_container.find(".mark-as-done-button").focus().click();
+                                                assignment_container.find(".hide-assignment-button").focus().click();
                                                 break;
                                             case "Backspace":
                                                 assignment_container.find(".delete-work-input-button").focus().click();
@@ -1447,7 +1436,6 @@ document.addEventListener("DOMContentLoaded", function() {
     },
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
-    utils.ui.setClickHandlers.markAsDoneButtons();
     utils.ui.setClickHandlers.tickButtons();
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.advancedInputs();

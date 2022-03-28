@@ -851,7 +851,7 @@ a[href="/settings"] {
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .placeholder-button {
+.work-input-textbox, .hide-assignment-button {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -866,7 +866,7 @@ a[href="/settings"] {
     margin-top: 7px;
 }
 /* 2nd row */
-.skew-ratio-button, .placeholder-button, .fixed-mode-button {
+.skew-ratio-button, .hide-assignment-button, .fixed-mode-button {
     margin-top: 13px;
     margin-bottom: 7px;
 }
