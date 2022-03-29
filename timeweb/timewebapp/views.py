@@ -758,6 +758,19 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def change_setting(self, request):
         setting = request.POST['setting']
         value = json.loads(request.POST['value'])
+
+        settings_model = self.settings_model # python for literally no reason at all doesn't allow self to be used in a list comprehension
+        model_fields = {i.name: getattr(settings_model, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
+        if setting not in model_fields:
+            logger.warning(f"User \"{request.user}\" tried to change a setting that doesn't exist")
+            return HttpResponse(f"The setting \"{setting}\" doesn't exist.", status=404)
+            
+        model_fields[setting] = value
+        validation_form = SettingsForm(model_fields)
+        if not validation_form.is_valid(): 
+            logger.warn(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
+            return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
+
         setattr(self.settings_model, setting, value)
         self.settings_model.save()
         return HttpResponse(status=204)
