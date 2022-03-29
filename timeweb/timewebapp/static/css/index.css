@@ -193,8 +193,9 @@ a[href="/settings"] {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin-top: -11px;
-    margin-bottom: 3px;
+    --margin-top-and-bottom: 3px; 
+    margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
+    margin-bottom: var(--margin-top-and-bottom);
 }
 .shortcut-text {
     white-space: nowrap;
