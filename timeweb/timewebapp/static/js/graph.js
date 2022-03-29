@@ -1010,7 +1010,7 @@ class VisualAssignment extends Assignment {
             }
             // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
             // However, we still need to call setDynamicStartIfInDynamicMode() to compensate if the skew ratio in fixed mode was modified
-            sa.setDynamicStartIfInDynamicMode();
+            this.setDynamicStartIfInDynamicMode();
             new Priority().sort();
             this.draw();
         }).text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
