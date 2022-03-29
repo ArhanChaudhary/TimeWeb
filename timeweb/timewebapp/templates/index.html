@@ -80,6 +80,7 @@
         $("main, header, #assignments-container").addClass("animate");
         sessionStorage.setItem("animation-ran", true);
         $(window).one('load', function() {
+          if (isExampleAccount) setTimeout(utils.ui.exampleAccountAlertTutorial, 1000);
           $("main, header, #assignments-container").removeClass("animate");
           // Run when the header animation completely ends since the header animation takes the longest
           $("header").one("transitionend", function() {

@@ -1437,7 +1437,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();
-    if (isExampleAccount) utils.ui.exampleAccountAlertTutorial();
     utils.ui.dimAssignmentsHeaderInfoOnIconHover();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
