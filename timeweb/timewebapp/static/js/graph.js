@@ -32,44 +32,47 @@ class Assignment {
         return skew_ratio_bound;
     }
     setDynamicStartIfInDynamicMode(params={ ajax: true }) {
-        if (this.sa.fixed_mode) return;
-        const old_dynamic_start = this.sa.dynamic_start;
-        const len_works = this.sa.works.length - 1;
+        if (!this.sa.fixed_mode) {
+            const old_dynamic_start = this.sa.dynamic_start;
+            const len_works = this.sa.works.length - 1;
 
-        let low = this.sa.blue_line_start;
-        let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
-        while (low < high) {
-            const mid = Math.floor((low + high) / 2);
-            this.red_line_start_x = mid;
-            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-            this.setParabolaValues();
+            let low = this.sa.blue_line_start;
+            let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
+            while (low < high) {
+                const mid = Math.floor((low + high) / 2);
+                this.red_line_start_x = mid;
+                this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                this.setParabolaValues();
 
-            let valid_red_line_start_x = true;
-            // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
-            let next_funct = this.funct(this.red_line_start_x),
-                next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-            for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
-                const this_funct = next_funct,
-                    this_work = next_work;
-                next_funct = this.funct(i + 1),
-                next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-                if (next_funct - this_funct !== next_work - this_work) {
-                    valid_red_line_start_x = false;
-                    break;
+                let valid_red_line_start_x = true;
+                // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+                let next_funct = this.funct(this.red_line_start_x),
+                    next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
+                    const this_funct = next_funct,
+                        this_work = next_work;
+                    next_funct = this.funct(i + 1),
+                    next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+                    if (next_funct - this_funct !== next_work - this_work) {
+                        valid_red_line_start_x = false;
+                        break;
+                    }
+                }
+                if (valid_red_line_start_x) {
+                    high = mid;
+                } else {
+                    low = mid + 1;
                 }
             }
-            if (valid_red_line_start_x) {
-                high = mid;
-            } else {
-                low = mid + 1;
-            }
-        }
-        this.red_line_start_x = low;
-        this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-        this.sa.dynamic_start = this.red_line_start_x;
+            this.red_line_start_x = low;
+            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+            this.sa.dynamic_start = this.red_line_start_x;
 
-        // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
-        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+            // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
+            params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+        }
+        // We still need to setParabolaValues() in fixed mode
+        // some functions (such as mousemove()) assume the parabola is reset when this is called, which does not happen in fixed mode if i were to simply use a guard clause
         this.setParabolaValues();
     }
     // make sure to properly set red_line_start_x before running this function
