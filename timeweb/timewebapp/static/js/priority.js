@@ -688,7 +688,7 @@ class Priority {
         } else {
             $("#hide-button").text() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
             $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
-            $("#estimated-total-time").text(utils.formatting.formatMinutes(that.total_completion_time)).attr("data-minutes", that.total_completion_time);
+            $("#estimated-total-time").text(` ${utils.formatting.formatMinutes(that.total_completion_time)}`).attr("data-minutes", that.total_completion_time);
 
             let relative_today_and_tomorrow_date;
             if (that.display_due_today_completion_time && that.display_due_tomorrow_completion_time) {

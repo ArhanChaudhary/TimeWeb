@@ -45,12 +45,13 @@ header.animate::after {
     padding: 0 10px;
 }
 #icon-label-container {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    margin-left: auto;
+    float: right;
 }
 #assignments-header {
     position: relative;
+    font-size: 17px;
     z-index: 1001;
     padding: 0 var(--outer-assignment-horizontal-padding);
     display: flex;
@@ -59,11 +60,6 @@ header.animate::after {
 }
 #info {
     width: 100%;
-    display: flex;
-    font-size: 17px;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 5px;
 }
 #info.dim > :not(#icon-label-container) {
     opacity: 0;
@@ -79,14 +75,14 @@ header.animate::after {
     order: 1;
 }
 #sort-assignments-container {
+    display: flex;
+    align-items: center;
+    gap: 3px;
     margin-left: auto;
     order: 1;
 }
 #hide-button {
     margin-right: 5px;
-}
-#tomorrow-time {
-    white-space: nowrap;
 }
 .hide-info {
     height: 0;
