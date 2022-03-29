@@ -717,14 +717,11 @@ class Priority {
     }
     sortWithoutTimeout() {
         const that = this;
-        let scrollTop = $("main").scrollTop();
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         that.alertDueDates();
         
         // Updates open graphs' today line and other graph text
         $(window).trigger("resize");
-        // .unfinished-text in utils.js messes up the scroll position
-        $("main").scrollTop(scrollTop);
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {

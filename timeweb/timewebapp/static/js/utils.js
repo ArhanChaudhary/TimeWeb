@@ -773,7 +773,7 @@ utils = {
                     case "o":
                     case "c":
                     case "t":
-                        if (!["text", "number"].includes($(document.activeElement).prop("type")))
+                        if ($(document.activeElement).prop("tagName").toLowerCase() !== "input")
                             switch (e.key) {
                                 case "n":
                                     // Fix typing on the assignment form itself
@@ -927,14 +927,6 @@ utils = {
                     const sa = new VisualAssignment($this);
                     sa.positionTags();
                     sa.displayTruncateWarning();
-                });
-                $(".unfinished-message").each(function() {
-                    const $this = $(this);
-                    $this.show();
-                    // For some reason, getClientRects() in firefox doesn't count br elements
-                    // So, instead of doing const lines = this.getClientRects().length - $this.children("br").length; instead do the following
-                    const lines = [...this.getClientRects()].filter(i => i.width).length;
-                    $this.toggle(lines === 1);
                 });
             });
             // #animate-in is initially display: hidden in priority.js, delay adding the scale

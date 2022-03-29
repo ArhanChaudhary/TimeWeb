@@ -412,6 +412,11 @@ a[href="/settings"] {
     margin-right: 6px;
     margin-left: 18px;
 }
+@media screen and (max-width: 700px) {
+    .unfinished-message {
+        display: none;
+    }
+}
 .tags {
     position: absolute;
     z-index: 1;
