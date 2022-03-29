@@ -415,7 +415,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
-                return HttpResponseForbidden("The assignment you're trying to edit isn't yours")
+                return HttpResponse(status=404)
+                
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
 
@@ -730,7 +731,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             
             if request.user != self.sm.user:
                 logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
-                continue
+                return HttpResponse(status=404)
 
             for key, value in assignment.items():
                 if key == "x":
@@ -764,9 +765,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def tag_add_or_delete(self, request, action):
         self.pk = request.POST['pk']
         self.sm = get_object_or_404(TimewebModel, pk=self.pk)
+
         if request.user != self.sm.user:
-            logger.warning(f"User \"{request.user}\" can't save add a tag to an assignment that isn't theirs")
-            return HttpResponseForbidden("This assignment isn't yours")
+            logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
+            return HttpResponse(status=404)
 
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
