@@ -22,9 +22,16 @@
       {% endfor %}
     </div>
     <div id="accounts-container">
-      <a href="{% url 'home' %}" id="logo-container">
-        <img height="80" src="{% static 'images/timeweb.png' %}" border="0" draggable="false"/>
-      </a>
+      <div id="logo-container">
+        <a id="accounts-arrow-anchor" href="{% block back_arrow_url %}{% url 'home' %}{% endblock %}">
+          <div id="accounts-arrow-container">
+            <div id="accounts-arrow-horizontal"></div>
+          </div>
+        </a>
+        <a href="{% url 'home' %}">
+          <img height="80" src="{% static 'images/timeweb.png' %}" border="0" draggable="false"/>
+        </a>
+      </div>
       {% block accounts_content %}{% endblock %}
     </div>
     <div id="loading-container">

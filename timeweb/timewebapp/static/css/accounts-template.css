@@ -21,6 +21,52 @@ body {
 #accounts-container > h1:first-of-type {
     margin-top: 0;
 }
+#accounts-arrow-anchor {
+    position: absolute;
+    left: 0;
+}
+#accounts-arrow-container {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    display: none; /* unused css for now */
+    align-items: center;
+}
+#accounts-arrow-horizontal {
+    width: 30px;
+    height: 2px;
+    background-color: #afafaf;
+}
+#accounts-arrow-container::before, #accounts-arrow-container::after {
+    content: "";
+    position: absolute;
+    border-bottom: solid 2px #afafaf;
+    border-left: solid 2px #afafaf;
+    width: 12px;
+    height: 12px;
+    transition: all cubic-bezier(0.77, 0, 0.175, 1) 0.75s;
+}
+#accounts-arrow-container::before {
+    transform: rotate(45deg) translate(1px, -1px);
+}
+#accounts-arrow-container:hover::before {
+    transform: rotate(45deg) translate(-20px, 20px) scale(0.5);
+    opacity: 0;
+}
+#accounts-arrow-container::after {
+    transform: rotate(45deg) translate(22px, -22px) scale(0.5);
+    opacity: 0;
+}
+#accounts-arrow-container:hover::after {
+    transform: rotate(45deg) translate(1px, -1px);
+    opacity: 1;
+}
+#logo-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 #circles-background {
     filter: url("#goo");
     overflow: hidden;
