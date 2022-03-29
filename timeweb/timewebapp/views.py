@@ -740,7 +740,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 elif key == "due_time":
                     assignment[key] = datetime.time(**value)
             
-            model_fields = {i.name: getattr(self.sm, i.name) for i in TimewebModel._meta.get_fields()}
+            model_fields = {i.name: getattr(self.sm, i.name) for i in TimewebModel._meta.get_fields() if not i.unique}
             model_fields.update(assignment)
             validation_form = TimewebForm(model_fields)
             if not validation_form.is_valid():
