@@ -364,7 +364,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     return HttpResponse(redirect_url_if_creds_invalid)
         elif action == "tag_add" or action == "tag_delete":
             return self.tag_add_or_delete(request, action)
-        return HttpResponse(status=204)
+        return HttpResponse("Method not found.", status=404)
 
     def assignment_form_submitted(self, request):
         # The frontend adds the assignment's pk as the "value" attribute to the submit button
@@ -773,7 +773,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
             tag_names = [tag_name for tag_name in tag_names if tag_name not in self.sm.tags]
-            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_OF_TAGS: return HttpResponseForbidden("Too Many Tags!")
+            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=405)
             self.sm.tags.extend(tag_names)
 
         elif action == "tag_delete":
