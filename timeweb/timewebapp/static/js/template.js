@@ -40,7 +40,7 @@ function resetHeaderLayout() {
             logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
         }
     } else {
-        newassignmenttext.css("max-width",window.innerWidth/2-115-69);
+        newassignmenttext.css("max-width",window.innerWidth/2-184);
     }
 }
 $(function() {
