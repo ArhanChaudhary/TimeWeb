@@ -443,7 +443,7 @@ class Priority {
             }
             // Can't just define this once because len_works changes
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
-            assignment_container.find(".button").filter(function() {
+            assignment_container.find(".assignment-header-button").filter(function() {
                 return !!$(this).children(".tick-button").length;
             }).toggle(
                 !(

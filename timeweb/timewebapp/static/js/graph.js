@@ -1037,7 +1037,7 @@ class VisualAssignment extends Assignment {
     positionTagLeftAndTagBottom() {
         const dom_title = this.dom_assignment.find(".title");
         const dom_tags = this.dom_assignment.find(".tags");
-        const dom_button = this.dom_assignment.find(".button");
+        const dom_button = this.dom_assignment.find(".assignment-header-button");
         const dom_assignment_footer = this.dom_assignment.find(".assignment-footer");
         const add_priority_percentage = !!dom_title.attr("data-priority");
         // Even though this is always true, it'll add this here for compatibility
@@ -1080,7 +1080,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const target = $(e.target);
     const targetInHeader = !!target.parents(".assignment-header").length || target.is(".assignment-header, .assignment");
     const targetInTags = !!target.parents(".tags").length || target.is(".tags");
-    const targetInButton = !!target.parents(".button").length || target.is(".button");
+    const targetInButton = !!target.parents(".assignment-header-button").length || target.is(".assignment-header-button");
     const dontFire = targetInTags || targetInButton;
     if (!targetInHeader || dontFire || prevent_click) return;
     const dom_assignment = $(this);
@@ -1088,7 +1088,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     
     if (sa.sa.needs_more_info && !Number.isFinite(sa.sa.x)) {
         sa.shake();
-        dom_assignment.find(".update-button").parents(".button").focus();
+        dom_assignment.find(".update-button").parents(".assignment-header-button").focus();
         return;
     }
    

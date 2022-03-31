@@ -725,7 +725,7 @@ a[href="/settings"] {
     white-space: nowrap;
     margin-left: auto;
 }
-.button {
+.assignment-header-button {
     position: relative;
     display: flex;
     align-items: center;
@@ -738,19 +738,19 @@ a[href="/settings"] {
     cursor: pointer;
     transition: background-color 0.25s ease-out;
 }
-.assignment.open-assignment .button,
-.assignment.assignment-is-closing .button {
+.assignment.open-assignment .assignment-header-button,
+.assignment.assignment-is-closing .assignment-header-button {
     padding-bottom: 40px;
     margin-bottom: calc(-1 * var(--vertical-assignment-padding) - 40px);
 }
-.button:focus, .button:hover {
+.assignment-header-button:focus, .assignment-header-button:hover {
     outline: 0;
     background-color: rgb(173, 216, 230);
 }
-.button:active * {
+.assignment-header-button:active * {
     transform: scale(0.95);
 }
-.button * {
+.assignment-header-button * {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
 .assignment-footer {
@@ -1153,8 +1153,8 @@ input[type=number]::-webkit-inner-spin-button {
 #dark-mode #assignments-header #icon-label-container img ~ div > .info-button,
 
 /* Need these annoying rules instead of just doing ".assignment-container.invert-text-color .assignment-header *" because it messes up positioning */
-.assignment-container.invert-text-color .assignment-header > :not(.right-side-of-header):not(.button),
-.assignment-container.invert-text-color .assignment-header > .button > *,
+.assignment-container.invert-text-color .assignment-header > :not(.right-side-of-header):not(.assignment-header-button),
+.assignment-container.invert-text-color .assignment-header > .assignment-header-button > *,
 .assignment-container.invert-text-color .assignment-header > .right-side-of-header > :not(.align-to-status-message-container),
 .assignment-container.invert-text-color .assignment-header > .right-side-of-header > .align-to-status-message-container > :not(.tags),
 
