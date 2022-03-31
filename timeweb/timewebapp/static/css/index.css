@@ -842,7 +842,7 @@ a[href="/settings"] {
     cursor: pointer;
     background: rgba(219,219,219,0.9);
 }
-.graph-footer :not(.info-button):focus {
+.graph-footer :focus {
     outline: 0;
     border-color: rgb(0,95,204);
     background: white;

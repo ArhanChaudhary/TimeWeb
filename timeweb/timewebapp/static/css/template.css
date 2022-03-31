@@ -304,14 +304,11 @@ nav:focus-within {
     top: 0;
     position: absolute;
 }
-.info-button:hover, #previous-day-icon-label .info-button,
-.info-button:hover, #next-day-icon-label .info-button {
+.info-button:hover {
     background: rgb(16,135,148);
     outline: 0;
 }
-.info-button:hover .info-button-text,
-#previous-day-icon-label .info-button .info-button-text,
-#next-day-icon-label .info-button .info-button-text {
+.info-button:hover .info-button-text {
     height: unset;
     border: 2px solid black;
     overflow: visible;
