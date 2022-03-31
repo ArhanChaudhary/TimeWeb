@@ -1,6 +1,7 @@
 * {
     font-weight: 600;
     font-family: "Open Sans", sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 html {
     scroll-behavior: smooth;
