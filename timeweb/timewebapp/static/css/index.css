@@ -9,15 +9,10 @@ body {
     padding-top: 10px;
     opacity: 0;
     --scale-percent-y: 1.05;
+    --vertical-assignment-padding: 25px;
     --horizontal-assignment-padding: 15px;
     --outer-assignment-vertical-padding: 7px;
     --outer-assignment-horizontal-padding: 25px;
-}
-#assignments-container.comfy {
-    --vertical-assignment-padding: 25px;
-}
-#assignments-container.compact {
-    --vertical-assignment-padding: 15px;
 }
 main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);

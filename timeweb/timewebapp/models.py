@@ -57,12 +57,6 @@ ASSIGNMENT_SORTINGS = (
 )
 MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SORTINGS], key=len))
 
-ASSIGNMENT_SPACINGS = (
-    ("Comfy", "Comfy"),
-    ("Compact", "Compact"),
-)
-MAX_ASSIGNMENT_SPACINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SPACINGS], key=len))
-
 ANIMATION_SPEED = (
     ("1", "Normal (1x)"),
     ("0.5", "Fast (2x)"),
@@ -270,12 +264,6 @@ class SettingsModel(models.Model):
     )
     
     # Group "Assignment Header"
-    assignment_spacing = models.CharField(
-        max_length=MAX_ASSIGNMENT_SPACINGS_LENGTH,
-        choices=ASSIGNMENT_SPACINGS,
-        default=("Comfy"),
-        verbose_name=_('Assignment Spacing'),
-    )
     default_dropdown_tags = models.JSONField(
         default=empty_list,
         blank=True,

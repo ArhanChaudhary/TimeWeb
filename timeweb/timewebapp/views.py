@@ -191,7 +191,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_due_time': self.settings_model.def_due_time,
             'def_funct_round_minute': self.settings_model.def_funct_round_minute,
             'ignore_ends': self.settings_model.ignore_ends,
-            'assignment_spacing': self.settings_model.assignment_spacing,
             'animation_speed': self.settings_model.animation_speed,
             'show_priority': self.settings_model.show_priority,
             'one_graph_at_a_time': self.settings_model.one_graph_at_a_time,
@@ -251,7 +250,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                     assignment.funct_round = 5
             TimewebModel.objects.bulk_update(self.assignment_models, ['funct_round'])
         self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
-        self.settings_model.assignment_spacing = self.form.cleaned_data.get("assignment_spacing")
         self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
         self.settings_model.show_priority = self.form.cleaned_data.get("show_priority")
         self.settings_model.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
@@ -293,7 +291,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
         self.context['background_image'] = self.settings_model.background_image
-        self.context['assignment_spacing'] = self.settings_model.assignment_spacing
         self.context['horizontal_tag_position'] = self.settings_model.horizontal_tag_position
 
         if not self.settings_model.seen_latest_changelog:

@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");
                         $("#id_background_image").val("");
                         $("#id_horizontal_tag_position").val("Middle");
-                        $("#id_assignment_spacing").val("Comfy");
                         $("#id_animation_speed").val("1");
                         $("#id_vertical_tag_position").val("Top");
                         $("#id_timezone").val("");
@@ -78,11 +77,13 @@ document.addEventListener("DOMContentLoaded", function() {
         alreadyHasSubmitted = true;
     });
 });
-$(window).one("load", function() {
+$(window).resize(function() {
     $("main form fieldset").each(function() {
+        this.style.setProperty("height", "auto", "important");
+        $(this).css("transition-duration", $(this).height()/600 + "s");
         $(this).css("height", $(this).height());
     });
-});
+}).one("load", () => $(window).trigger("resize"));
 function textareaToJSON($textarea) {
     let $textareaVal = $textarea.val();
     if ($textareaVal) {
