@@ -421,6 +421,9 @@ a[href="/settings"] {
     white-space: nowrap;
     font-size: min(10.25px, 0.87em);
 }
+.tags [tabindex]:focus, .tags input:focus {
+    outline: 0;
+}
 
 .assignment.tags-right .tags {
     right: 17px;
@@ -615,9 +618,6 @@ a[href="/settings"] {
 .tag-add-button:hover::after {
     opacity: 0.75;
 }
-.tag-add-button:focus {
-    outline: 0;
-}
 .tag-add-button.tag-add-red-box-shadow::after {
     box-shadow: 0 0 4px 1px rgb(170, 0, 0);
 }
@@ -636,9 +636,6 @@ a[href="/settings"] {
     background-color: rgb(220,220,220);
     padding: 10px 12px;
     padding-right: 38px;
-}
-.tag-add-input:focus {
-    outline: 0;
 }
 
 .tag-add-selection-item {
@@ -662,9 +659,6 @@ a[href="/settings"] {
 }
 .tag-add-selection-item:hover::after, .tag-add-selection-item:focus::after {
     transform: none;
-}
-.tag-add-selection-item:focus {
-    outline: 0;
 }
 .tag-add-selection-item.checked::after {
     background-color: lightblue;
