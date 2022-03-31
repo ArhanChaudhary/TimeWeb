@@ -2,6 +2,7 @@
     font-weight: 600;
     font-family: "Open Sans", sans-serif;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 html {
     scroll-behavior: smooth;
