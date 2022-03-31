@@ -116,8 +116,9 @@ main.finished-header-transition {
 #logo-container {
     display: inline-block;
     position: relative;
+    margin-top: 3px;
     left: 50%;
-    transform: translate(-50%, 3px);
+    transform: translateX(-50%);
 }
 body {
     margin: 0;
