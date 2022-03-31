@@ -45,6 +45,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         $("#table-of-contents-container #category-doc-labels").append(minor_category_li);
     });
+
+    $("details > img").each(function() {
+        if (!$(this).parents(".label-icon-container").length)
+        $(this).wrap("<div class=\"img-ignore-padding-container\">");
+    });
 });
 // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
 function rgbToHex(r, g, b) {

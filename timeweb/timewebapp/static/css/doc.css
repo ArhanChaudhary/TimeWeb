@@ -120,8 +120,10 @@ a:visited {
             text-decoration-color: rgba(0,0,0,0.3);
 }
 #doc-container {
-    padding-left: 100px;
-    padding-right: 50px;
+    --container-padding-right: 50px;
+    --container-padding-left: 100px;
+    padding-left: var(--container-padding-left);
+    padding-right: var(--container-padding-right);
     padding-bottom: 150px;
     flex: 1;
     overflow-x: hidden;
@@ -177,10 +179,18 @@ code {
 summary {
     cursor: pointer;
 }
-details > img {
-    max-width: 100%;
+details > .img-ignore-padding-container {
+    display: flex;
+    justify-content: center;
     margin-bottom: 2em;
-    filter: drop-shadow(0 9px 10px gray)
+}
+details > .img-ignore-padding-container img {
+    filter: drop-shadow(0 9px 10px gray);
+    --image-margin: 20px;
+    max-height: 600px;
+    max-width: calc(100% + var(--container-padding-left) + var(--container-padding-right) - 2 * var(--image-margin));
+    margin-right: calc(-1 * var(--container-padding-right) + var(--image-margin));
+    margin-left: calc(-1 * var(--container-padding-left) + var(--image-margin));
 }
 
 #assignment-graph-image {
