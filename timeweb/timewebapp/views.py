@@ -358,7 +358,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if 'token' in self.settings_model.oauth_token:
                 return self.create_gc_assignments(request)
             else:
-                return HttpResponse(status=204)
+                return HttpResponse(status=401)
         elif action == "tag_add" or action == "tag_delete":
             return self.tag_add_or_delete(request, action)
         return HttpResponse("Method not found.", status=404)
