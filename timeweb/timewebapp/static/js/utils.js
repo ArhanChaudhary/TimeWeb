@@ -1190,39 +1190,45 @@ ajaxUtils = {
             type: "POST",
             data: data,
             error: ajaxUtils.error,
-        }).done(function(authentication_url) {
-            if (authentication_url === "No new gc assignments were added") {
-                $("#toggle-gc-container").removeClass("open");
-                if (SETTINGS.oauth_token.token) {
-                    $("#toggle-gc-label").text("Disable Google Classroom integration");
-                } else {
-                    $("#toggle-gc-label").text("Enable Google Classroom integration");
-                }
-                creating_gc_assignments_from_frontend = false;
-                return;
-            }
-            if (authentication_url) {
-                $.alert({
-                    title: "Invalid credentials",
-                    content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the Google Classroom integration.",
-                    buttons: {
-                        "Disable integration": {
-                            action: function() {
-                                $("#toggle-gc-container").click();
-                            }
+        }).done(function(authentication_url, textStatus, jqXHR) {
+            switch (jqXHR.status) {
+
+                case 204:
+                    creating_gc_assignments_from_frontend = false;
+                    $("#toggle-gc-container").removeClass("open");
+                    if (SETTINGS.oauth_token.token) {
+                        $("#toggle-gc-label").text("Disable Google Classroom integration");
+                    } else {
+                        $("#toggle-gc-label").text("Enable Google Classroom integration");
+                    }
+                    break;
+
+                case 200:
+                    creating_gc_assignments_from_frontend = false;
+                    $.alert({
+                        title: "Invalid credentials",
+                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
+                        buttons: {
+                            "disable integration": {
+                                action: function() {
+                                    $("#toggle-gc-container").click();
+                                }
+                            },
+                            "authenticate again": {
+                                action: function() {
+                                    reloadWhenAppropriate({href: authentication_url});
+                                }
+                            },  
                         },
-                        authenticate: {
-                            action: function() {
-                                reloadWhenAppropriate({href: authentication_url});
-                            }
-                        },  
-                    },
-                    onClose: function() {
-                        $("#toggle-gc-container").removeClass("open");
-                    },
-                });
-            } else {
-                reloadWhenAppropriate();
+                        onClose: function() {
+                            $("#toggle-gc-container").removeClass("open");
+                        },
+                    });
+                    break;
+
+                case 205:
+                    reloadWhenAppropriate();
+                    break;
             }
         });
     },

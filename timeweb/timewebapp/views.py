@@ -356,9 +356,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             return self.change_setting(request)
         elif action == 'create_gc_assignments':
             if 'token' in self.settings_model.oauth_token:
-                redirect_url_if_creds_invalid = self.create_gc_assignments(request)
-                if redirect_url_if_creds_invalid:
-                    return HttpResponse(redirect_url_if_creds_invalid)
+                return self.create_gc_assignments(request)
+            else:
+                return HttpResponse(status=204)
         elif action == "tag_add" or action == "tag_delete":
             return self.tag_add_or_delete(request, action)
         return HttpResponse("Method not found.", status=404)
@@ -608,7 +608,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     access_type='offline',
                     # Enable incremental authorization. Recommended as a best practice.
                     include_granted_scopes='true')
-                return authorization_url
+                return HttpResponse(authorization_url)
 
         date_now = self.utc_to_local(request, timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -708,11 +708,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         gc_models_to_create = []
         batch.execute()
         TimewebModel.objects.bulk_create(gc_models_to_create)
-        if not gc_models_to_create: return "No new gc assignments were added" # or do new_gc_assignment_ids == set_added_gc_assignment_ids
+        if not gc_models_to_create: return HttpResponse(status=204) # or do new_gc_assignment_ids == set_added_gc_assignment_ids
         self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
         self.settings_model.save()
 
         request.session["already_created_gc_assignments_from_frontend"] = True
+        return HttpResponse(status=205)
 
     def deleted_assignment(self, request):
         assignments = request.POST.getlist('assignments[]')
