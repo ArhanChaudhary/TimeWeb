@@ -1144,7 +1144,7 @@ ajaxUtils = {
             title = "Request aborted.";
             content = "Try refreshing or try again.";
         } else {
-            title = "<p>Uncaught error while trying to connect with the server:</p>" + response.responseText;
+            title = `<p>Uncaught error while trying to connect with the server:</p>${response.responseText||response.statusText}`;
         }
         $.alert({
             title: title,
