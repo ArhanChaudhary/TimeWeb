@@ -25,6 +25,9 @@
 {% endblock js %}
 
 {% block content %}
+  {% if settings_model.background_image %}
+    <img id="background-image" src="{{ settings_model.background_image.url }}" width="{{settings_model.background_image.width}}" height="{{settings_model.background_image.height}}" draggable="false">
+  {% endif %}
   <div id="overlay">
     <div id="form-wrapper">
       <form method="POST" autocomplete="off">
