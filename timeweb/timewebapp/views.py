@@ -278,6 +278,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def invalid_form(self, request):
         self.context['form'] = self.form
+        # It's ok to return a 2xx from invalid form, because there is no danger of the user resubmitting because its invalid
         return super().get(request)
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
@@ -919,10 +920,12 @@ class ContactFormView(BaseContactFormView):
         recaptcha_token = request.POST.get('g-recaptcha-response')
         auth = requests_get(f"https://www.google.com/recaptcha/api/siteverify?secret={settings.RECAPTCHA_SECRET_KEY}&response={recaptcha_token}")
         if auth.json()['success']:
+            # should 3xx: ProcessFormView.post -> ContactFormView.form_valid -> FormMixin.form_valid -> redirect
             return super().post(request)
         else:
             messages.error(request, "Your submission was not authentic. Please try again.")
-            return redirect(request.path_info)
+            return super().get(request)
+
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username-reset.html"
 
