@@ -147,7 +147,7 @@
       <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
         <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
-            <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ vertical_tag_position|lower }}">
+            <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
               {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
               {% spaceless %}
               <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
