@@ -290,9 +290,6 @@ a[href="/settings"] {
     .shortcut-text {
         font-size: 15px;
     }
-    .arrow-container {
-        transform: none !important;
-    }
 }
 
 .assignment-header {
@@ -389,7 +386,6 @@ a[href="/settings"] {
 }
 .arrow-container {
     float: left;
-    transform: scale(1.1);
     margin-left: var(--arrow-margin-left);
     overflow: visible;
 }
