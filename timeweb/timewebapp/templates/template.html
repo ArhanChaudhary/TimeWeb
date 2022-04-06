@@ -84,8 +84,8 @@
             $("main").addClass("finished-header-transition");
         }
     </script>
-    {% if background_image %}
-    <img id="background-image" src="{{ background_image.url }}" width="{{background_image.width}}" height="{{background_image.height}}" draggable="false">
+    {% if settings_model.background_image %}
+    <img id="background-image" src="{{ settings_model.background_image.url }}" width="{{settings_model.background_image.width}}" height="{{settings_model.background_image.height}}" draggable="false">
     {% endif %}
     {% block content %}{% endblock content %}
     <div id="loading-container">

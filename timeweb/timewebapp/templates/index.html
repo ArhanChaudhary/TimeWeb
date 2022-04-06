@@ -91,36 +91,36 @@
       })();
     </script>
     <div id="assignments-header">
-      <div id="info"{% if background_image %} class="grey-highlight"{% endif %}>
+      <div id="info"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
         <span id="estimated-total-time-label">Estimated completion time:</span><span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <div id="hide-button" class="generic-button">Hide</div>
         <div id="icon-label-container">
-          <img id="close-assignments"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'images/close-all-assignments.png' %}">
-          <img id="previous-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'images/next-day.png' %}">
-          <img id="next-day"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'images/next-day.png' %}">
+          <img id="close-assignments"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'images/close-all-assignments.png' %}">
+          <img id="previous-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'images/next-day.png' %}">
+          <img id="next-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'images/next-day.png' %}">
           <a href="/settings">
-            <img id="settings"{% if background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="27" src="{% static 'images/settings.png' %}">
+            <img id="settings"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="27" src="{% static 'images/settings.png' %}">
           </a>
-          <div id="settings-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Settings</div>
-          <div id="previous-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Previous Day</span></div>
-          <div id="next-day-icon-label"><span {% if background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
-          <div id="close-assignments-icon-label"{% if background_image %} class="grey-highlight"{% endif %}>Close all Assignments</div>
+          <div id="settings-icon-label"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>Settings</div>
+          <div id="previous-day-icon-label"><span {% if settings_model.background_image %} class="grey-highlight"{% endif %}>Go to Previous Day</span></div>
+          <div id="next-day-icon-label"><span {% if settings_model.background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
+          <div id="close-assignments-icon-label"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>Close all Assignments</div>
         </div>
       </div>
       {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
-      <div id="current-date"{% if background_image %} class="grey-highlight"{% endif %}>
+      <div id="current-date"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
         <span id="current-date-text"></span>
       </div>
       <div id="sort-assignments-container">
-        <label for="{{ settings_form.assignment_sorting.auto_id }}"{% if background_image %} class="grey-highlight"{% endif %}>
+        <label for="{{ settings_form.assignment_sorting.auto_id }}"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
           {{ settings_form.assignment_sorting.label }}
         </label>
         {{ settings_form.assignment_sorting }}
       </div>
     </div>
     <div id="autofill-work-done" class="shortcut">
-      <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
+      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
         Autofill
         <select id="autofill-selection">
           <option>No</option>
@@ -129,22 +129,22 @@
         Work Done
         <div class="generic-button">Go</div>
       </span>
-      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
     </div>
     <div id="delete-starred-assignments" class="shortcut">
-      <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
+      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
         Delete all Starred Assignments
         <div class="generic-button">Go</div>
       </span>
-      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
     </div>
     {% for assignment in assignment_models %}
       {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
-      <div class="assignment-container{% if background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
+      <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
         <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
-            <div class="tags tags-{{ horizontal_tag_position|lower }} tags-{{ vertical_tag_position|lower }}">
+            <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ vertical_tag_position|lower }}">
               {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
               {% spaceless %}
               <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
@@ -225,12 +225,12 @@
   </div>
   <template id="delete-gc-assignments-from-class-template">
     <div class="delete-gc-assignments-from-class shortcut">
-      <div class="shortcut-line-left{% if background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if background_image %} grey-highlight{% endif %}">
+      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
         Delete all Assignments from this Class
         <div class="generic-button">Go</div>
       </span>
-      <div class="shortcut-line-right{% if background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
     </div>
   </template>
   <template id="tag-add-selection-item-template">
@@ -257,7 +257,7 @@
       </div>
     </div>
   </template>
-  <div id="toggle-gc-container" class="{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %}open {% endif %}{% if enabled_gc_api %}enabled{% endif%}">
+  <div id="toggle-gc-container" class="{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in self.settings_model.oauth_token %}enabled{% endif%}">
     <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% elif GC_API_INIT_FAILED %}Authentication failed. Please try again{% endif %}</span>
     <img src="{% static 'images/gc-icon.png' %}" width="42" height="42">
   </div>

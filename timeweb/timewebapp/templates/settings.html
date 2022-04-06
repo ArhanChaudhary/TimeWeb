@@ -80,9 +80,9 @@
         </div>
         {% endspaceless %}
     </form>
-    {% if settings_object.background_image %}
+    {% if settings_model.background_image %}
         <template id="background-image-template">
-            <img src="{{ settings_object.background_image.url }}">
+            <img src="{{ settings_model.background_image.url }}">
         </template>
     {% endif %}
 {% endblock content %}
