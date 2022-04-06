@@ -385,7 +385,7 @@ a[href="/settings"] {
 }
 .arrow-container {
     float: left;
-    transform: scale(1.15);
+    transform: scale(1.1);
     margin-left: var(--arrow-margin-left);
     overflow: visible;
 }
