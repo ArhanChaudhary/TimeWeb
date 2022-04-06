@@ -152,7 +152,6 @@ a[href="/settings"] {
 .assignment {
     box-shadow: 0 0 0 black;
     background: var(--app-color); /* Set white so it doesnt transition background initially if added by priority.js */
-    padding: var(--vertical-assignment-padding) var(--horizontal-assignment-padding);
     border-radius: 5px;
     position: relative;
     scroll-margin: 20px;
@@ -298,6 +297,8 @@ a[href="/settings"] {
 
 .assignment-header {
     display: flex;
+    position: relative;
+    padding: var(--vertical-assignment-padding) var(--horizontal-assignment-padding);
     align-items: center;
     --arrow-margin-left: max(5px,calc(-5px + 2vw));
 }
@@ -340,6 +341,9 @@ a[href="/settings"] {
     margin-top: 1em;
     margin-bottom: 2px;
     max-width: var(--left-side-of-header-width);
+}
+.assignment.open-assignment, .assignment.assignment-is-closing {
+    padding-bottom: unset;
 }
 .assignment:not(.open-assignment):not(.needs-more-info) .title {
     display: -webkit-box;
@@ -413,55 +417,37 @@ a[href="/settings"] {
 .tags {
     position: absolute;
     z-index: 1;
-    top: 2px;
     white-space: nowrap;
     font-size: min(10.25px, 0.87em);
+    --tags-left--margin-top: 7px;
+    --tags-bottom--margin-bottom: 2px;
+    --tags-right--margin-right: 2px;
+    --tags-top--margin-top: 2px;
 }
 .tags [tabindex]:focus, .tags input:focus {
     outline: 0;
 }
 
-.assignment.tags-right .tags {
-    right: 17px;
+
+.tags.tags-right {
+    right: calc(var(--tags-right--margin-right) + var(--horizontal-assignment-padding));
     z-index: 2;
 }
-.assignment.tags-left .tags {
-    left: 15px;
+/* .tags.tags-middle isn't required because it's prepended to another element to position it */
+.tags.tags-left {
+    left: var(--horizontal-assignment-padding);
 }
+.tags.tags-top {
+    top: var(--tags-top--margin-top)
+}
+.tags.tags-bottom {
+    bottom: var(--tags-bottom--margin-bottom);
+}
+
+
 .assignment.tags-left .tag-add-box {
     left: 23px;
 }
-.assignment.tags-bottom .tags {
-    top: unset;
-    bottom: 2px;
-}
-.assignment.open-assignment.tags-bottom .assignment-header,
-.assignment.assignment-is-closing.tags-bottom .assignment-header {
-    position: relative;
-}
-.assignment.open-assignment.tags-bottom .tags,
-.assignment.assignment-is-closing.tags-bottom .tags {
-    top: 100%;
-    bottom: unset;
-    margin-top: -3px;
-}
-.assignment.open-assignment.tags-bottom.tags-right .tags,
-.assignment.assignment-is-closing.tags-bottom.tags-right .tags {
-    right: 2px;
-    /* Dirty hardcoded fix to position tags with different assignment paddings */
-    top: calc(100% + var(--vertical-assignment-padding) - 15px);
-}
-.assignment.open-assignment.tags-bottom.tags-left .tags,
-.assignment.assignment-is-closing.tags-bottom.tags-left .tags {
-    left: 0;
-    margin-top: unset;
-}
-.assignment.open-assignment.tags-bottom.tags-left .tags.assignment-has-daysleft,
-.assignment.assignment-is-closing.tags-bottom.tags-left .tags.assignment-has-daysleft {
-    margin-top: calc(1px * var(--margin-top));
-    transform: translateY(-100%) translateY(-2px);
-}
-
 .tag-wrapper {
     position: relative;
     display: inline-block;
@@ -751,7 +737,6 @@ a[href="/settings"] {
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
     position: relative;
-    margin: 9px 0 5px;
     border: 2px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
 }
 .graph-container canvas {

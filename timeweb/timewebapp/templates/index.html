@@ -142,8 +142,38 @@
     {% for assignment in assignment_models %}
       {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
       <div class="assignment-container{% if background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
-        <div class="assignment tags-{{ horizontal_tag_position|lower }}{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+        <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
+            <div class="tags tags-{{ horizontal_tag_position|lower }} tags-{{ vertical_tag_position|lower }}">
+              {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
+              {% spaceless %}
+              <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
+                {% for tag in assignment.tags %}
+                  <div class="tag-wrapper">
+                    <div class="tag-name">{{ tag }}</div>
+                    <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
+                      <span class="icon-slash x-icon-first-slash"></span>
+                      <span class="icon-slash x-icon-second-slash"></span>
+                    </div>
+                  </div>
+                {% endfor %}
+              </span>
+              <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
+              {% endspaceless %}
+                <span class="icon-slash plus-first-slash"></span>
+                <span class="icon-slash plus-second-slash"></span>
+                <span class="info-button-text info-bottom tag-add-box">
+                  <div class="tag-add-overflow-hidden-container">
+                    <input class="tag-add-input" placeholder="New Tag" tabindex="-1">
+                    <div class="tag-add-button">
+                      <span class="icon-slash tag-add-plus tag-add-plus-first-slash"></span>
+                      <span class="icon-slash tag-add-plus tag-add-plus-second-slash"></span>
+                    </div>
+                  </div>
+                </span>
+                <div class="tag-add-text">Add Tag</div>
+              </div>
+            </div>
             <div class="relative-positioning-wrapper">
               <span class="title">{{ assignment.name }}</span>
               {% if assignment.description %}
@@ -159,36 +189,6 @@
             <div class="right-side-of-header">
               <img class="status-image">
               <div class="align-to-status-message-container">
-                <div class="tags">
-                  {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
-                  {% spaceless %}
-                  <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
-                    {% for tag in assignment.tags %}
-                      <div class="tag-wrapper">
-                        <div class="tag-name">{{ tag }}</div>
-                        <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
-                          <span class="icon-slash x-icon-first-slash"></span>
-                          <span class="icon-slash x-icon-second-slash"></span>
-                        </div>
-                      </div>
-                    {% endfor %}
-                  </span>
-                  <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
-                  {% endspaceless %}
-                    <span class="icon-slash plus-first-slash"></span>
-                    <span class="icon-slash plus-second-slash"></span>
-                    <span class="info-button-text info-bottom tag-add-box">
-                      <div class="tag-add-overflow-hidden-container">
-                        <input class="tag-add-input" placeholder="New Tag" tabindex="-1">
-                        <div class="tag-add-button">
-                          <span class="icon-slash tag-add-plus tag-add-plus-first-slash"></span>
-                          <span class="icon-slash tag-add-plus tag-add-plus-second-slash"></span>
-                        </div>
-                      </div>
-                    </span>
-                    <div class="tag-add-text">Add Tag</div>
-                  </div>
-                </div>
                 <span class="status-message"></span>
               </div>
               <span class="completion-time"></span>

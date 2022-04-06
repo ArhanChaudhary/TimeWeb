@@ -1028,43 +1028,39 @@ class VisualAssignment extends Assignment {
     }
 
     positionTags() {
-        this.dom_assignment.removeClass("tags-bottom");
-        SETTINGS.horizontal_tag_position === "Left" && this.positionTagLeftAndTagBottom();
-        SETTINGS.vertical_tag_position === "Bottom" && this.dom_assignment.addClass("tags-bottom");
-    }
-    positionTagLeftAndTagBottom() {
-        const dom_title = this.dom_assignment.find(".title");
         const dom_tags = this.dom_assignment.find(".tags");
-        const dom_button = this.dom_assignment.find(".assignment-header-button");
-        const dom_assignment_footer = this.dom_assignment.find(".assignment-footer");
-        const add_priority_percentage = !!dom_title.attr("data-priority");
-        // Even though this is always true, it'll add this here for compatibility
-        const add_daysleft = !!dom_title.attr("data-daysleft");
-        this.dom_assignment.css({paddingTop: "", paddingBottom: ""});
-        dom_button.css({marginTop: "", marginBottom: ""});
+        switch (SETTINGS.horizontal_tag_position) {
+            case "Left":
+                if (SETTINGS.vertical_tag_position === "Top") {
+                    dom_tags.removeClass("tags-top");
+                    dom_tags.addClass("tags-bottom");
+                }
+                
+                const dom_title = this.dom_assignment.find(".title");
+                const dom_title_and_description_container = this.dom_assignment.find(".relative-positioning-wrapper");
 
-        const tag_top = dom_tags.offset().top;
-        const tag_height = dom_tags.height();
+                this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", "unset");
+                // use offsetTop to ignore the transform scale
+                let tag_top = dom_tags[0].offsetTop;
+                let title_top = dom_title_and_description_container[0].offsetTop;
+                let title_height = dom_title_and_description_container.height() + parseFloat(window.getComputedStyle(dom_title[0], "::after").height) - parseFloat(window.getComputedStyle(dom_title[0]).getPropertyValue("--smush-daysleft"));
 
-        // good luck trying to understand this lol
-        let title_top = dom_title.offset().top;
-        if (SETTINGS.horizontal_tag_position === "Left") {
-            //hard
-            if (SETTINGS.vertical_tag_position === "Bottom") {
-                if (add_daysleft) title_top -= 16;
-            } else if (add_priority_percentage) {
-                title_top -= 10;
-            } else {
-                title_top += 3;
-            }
+                // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
+                const padding_to_add = title_top + title_height - tag_top + parseFloat(window.getComputedStyle(dom_tags[0]).getPropertyValue("--tags-left--margin-top"));
+                this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", `${Math.max(0, padding_to_add + parseFloat(window.getComputedStyle($("#assignments-container")[0]).getPropertyValue("--vertical-assignment-padding")))}px`);
+
+                if (SETTINGS.vertical_tag_position === "Top") {
+                    dom_tags.addClass("tags-top");
+                    dom_tags.removeClass("tags-bottom");
+                }
+                break;
+
+            case "Middle":
+                if (!dom_tags.parents(".align-to-status-message-container").length) {
+                    dom_tags.prependTo(this.dom_assignment.find(".align-to-status-message-container"));
+                }
+                break;
         }
-        
-        const padding_to_add = Math.max(0, tag_top - title_top + tag_height);
-        this.dom_assignment.css({paddingTop: "+=" + padding_to_add, paddingBottom: "+=" + padding_to_add});
-        dom_button.css({marginTop: "-=" + padding_to_add, marginBottom: "-=" + padding_to_add});
-
-        dom_assignment_footer.css("top", parseFloat(this.dom_assignment.css("padding-bottom")) - parseFloat(dom_assignment_footer.find(".graph-container").first().css("margin-top")));
-        dom_tags.prop("style").setProperty('--margin-top', parseFloat(this.dom_assignment.css("padding-bottom")));
     }
     displayTruncateWarning() {
         const relative_positioning_wrapper = this.dom_assignment.find(".relative-positioning-wrapper");
@@ -1096,10 +1092,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     // Close assignment
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
-        const footer_height = assignment_footer.height() + parseFloat(dom_assignment.find(".graph-container").css("margin-top"));
         dom_assignment.addClass("assignment-is-closing").removeClass("open-assignment").css("overflow", "hidden");
         assignment_footer.animate({
-            marginBottom: -footer_height,
+            marginBottom: -assignment_footer.height(),
         }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "").removeClass("assignment-is-closing")
