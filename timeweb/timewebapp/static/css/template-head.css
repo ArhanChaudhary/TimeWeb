@@ -1,10 +1,11 @@
 * {
     font-weight: 600;
+    /* keep this as selector as * so fonts arent inherited (for example .info-button) */
     font-family: "Open Sans", sans-serif;
-    -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
 html {
+    -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
 }
 input, textarea {
