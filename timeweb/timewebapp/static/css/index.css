@@ -722,16 +722,12 @@ a[href="/settings"] {
     align-self: normal;
     justify-content: center;
     /* negate the variable pixel value */
-    margin: calc(-1 * var(--vertical-assignment-padding)) 0;
+    margin-top: calc(-1 * var(--vertical-assignment-padding));
+    margin-bottom: calc(-1 * var(--vertical-assignment-padding));
     margin-right: -4px;
     padding: 0 7px;
     cursor: pointer;
     transition: background-color 0.25s ease-out;
-}
-.assignment.open-assignment .assignment-header-button,
-.assignment.assignment-is-closing .assignment-header-button {
-    padding-bottom: 40px;
-    margin-bottom: calc(-1 * var(--vertical-assignment-padding) - 40px);
 }
 .assignment-header-button:focus, .assignment-header-button:hover {
     outline: 0;
@@ -744,22 +740,12 @@ a[href="/settings"] {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
 .assignment-footer {
-    position: relative;
-    top: calc(var(--vertical-assignment-padding) - 5px); /* -5px because display inline block is stupid */
+    padding-right: var(--horizontal-assignment-padding);
+    padding-left: var(--horizontal-assignment-padding);
+    box-sizing: border-box;
     display: none;
     /* firefox acts weirdly without this */
     width: 100%;
-}
-.assignment-footer::before {
-    content: '';
-    position: absolute;
-    padding-left: 40px;
-    margin-left: -40px;
-    top: 0;
-    height: 40px;
-    background-color: white;
-    width: var(--horizontal-assignment-padding);
-    left: 100%;
 }
 .graph-container {
     border-radius: 12px;
