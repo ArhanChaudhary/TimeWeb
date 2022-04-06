@@ -944,6 +944,10 @@ utils = {
         },
         setAnimationSpeed: function() {
             $("main").prop("style").setProperty('--animation-speed', SETTINGS.animation_speed);
+            $(".assignment").each(function() {
+                this.style.setProperty('--scale-percent-x', '1', 'important');
+                this.style.setProperty('--scale-percent-y', '1', 'important');
+            });
         },
         insertTutorialMessages: function(first_available_assignment) {
             $("#tutorial-click-assignment-to-open").remove();
