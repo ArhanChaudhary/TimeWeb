@@ -390,15 +390,12 @@ class Crud {
             zIndex: dom_assignment.css("z-index")-2,
         });
         const assignment_container = dom_assignment.parents(".assignment-container");
-        // Animate height on assignment_container because it doesn't have a transition
-        const boxHeightMinusShortcuts = dom_assignment.outerHeight() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom"));
         dom_assignment.addClass("assignment-is-deleting");
         // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
-        assignment_container.animate({marginBottom: -boxHeightMinusShortcuts}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
+        assignment_container.animate({marginBottom: -assignment_container.outerHeight()}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             dat = dat.filter(_sa => sa.id !== _sa.id);
             // If a shorcut is in assignment_container, take it out so it doesn't get deleted
             assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
-            // Remove assignment from DOM
             assignment_container.remove();
             // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
             dom_assignment.removeClass("assignment-is-closing open-assignment");

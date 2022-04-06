@@ -363,17 +363,15 @@ class VisualAssignment extends Assignment {
         const screen = this.graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
         screen.clearRect(0, 0, this.width, this.height);
-        let move_info_down = 72,
-            goal_for_this_day = this.funct(Math.max(0, today_minus_assignment_date) + 1);
-        
+
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";
         screen.fillStyle = "black";
         screen.textBaseline = "top";
         screen.font = VisualAssignment.getCanvasFont(13.75);
         if (!this.sa.needs_more_info) {
-            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+move_info_down);
-            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+move_info_down);
+            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+72);
+            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+72);
         }
         let radius = this.wCon / 3;
         if (radius > 3) {
@@ -1129,7 +1127,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     // Sets event handlers only on the assignment's first click
     first_click && sa.setGraphButtonEventListeners();
     sa.resize();
-    if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
+    if (SETTINGS.enable_tutorial && !already_ran_tutorial && !DEBUG) {
         already_ran_tutorial = true;
         prevent_click = true;
         $("#tutorial-click-assignment-to-open").remove();
