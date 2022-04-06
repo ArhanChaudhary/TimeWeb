@@ -816,7 +816,8 @@ a[href="/settings"] {
     border: none;
     padding: 5px 10px;
     cursor: pointer;
-    background: rgba(219,219,219,0.9);
+    background-color: rgba(223, 223, 223);
+    z-index: 1;
 }
 .graph-footer :focus {
     outline: 0;
@@ -832,6 +833,7 @@ a[href="/settings"] {
 /* 2nd column */
 .work-input-textbox, .hide-assignment-button {
     position: relative;
+    z-index: unset;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -842,12 +844,12 @@ a[href="/settings"] {
 }
 /* 1st row */
 .delete-work-input-button, .work-input-textbox, .submit-work-button {
-    margin-top: 7px;
+    margin-top: 12px;
 }
 /* 2nd row */
 .skew-ratio-button, .hide-assignment-button, .fixed-mode-button {
     margin-top: 13px;
-    margin-bottom: 7px;
+    margin-bottom: 12px;
 }
 .work-input-textbox {
     width: 123px;
