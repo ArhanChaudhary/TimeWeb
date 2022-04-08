@@ -8,12 +8,10 @@ from django.utils import timezone
 from django.views import View
 from contact_form.views import ContactFormView as BaseContactFormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 
 # Allauth modules
-from allauth.account.adapter import DefaultAccountAdapter
-DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 from allauth import ratelimit
 def consume_or_message(request, message="You are submitting too many requests. Please wait a bit before trying again", *args, **kwargs):
     if not ratelimit.consume(request, *args, **kwargs):
@@ -29,7 +27,7 @@ from django.dispatch import receiver
 # Model modules
 import datetime
 from .models import TimewebModel, SettingsModel
-from .forms import TimewebForm, SettingsForm, UsernameResetForm
+from .forms import TimewebForm, SettingsForm
 from django.contrib.auth import get_user_model, logout, login
 from django.forms.models import model_to_dict
 from django.forms import ValidationError
@@ -925,40 +923,6 @@ class ContactFormView(BaseContactFormView):
         else:
             messages.error(request, "Your submission was not authentic. Please try again.")
             return super().get(request)
-
-class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
-    template_name = "account/username-reset.html"
-
-    def get(self, request):
-        initial = {
-            "username": request.user.username,
-        }
-        self.context['form'] = UsernameResetForm(initial=initial)
-        return super().get(request)
-
-    def post(self, request):
-        self.form = UsernameResetForm(data=request.POST)
-        form_is_valid = True
-        if not self.form.is_valid():
-            form_is_valid = False
-        elif request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
-            form_is_valid = False
-            self.form.add_error("username", ValidationError("You cannot modify the example account"))
-        if form_is_valid:
-            return self.valid_form(request)
-        else:
-            return self.invalid_form(request)  
-
-    def valid_form(self, request):
-        self.user_model = User.objects.get(email=request.user.email)
-        self.user_model.username = self.form.cleaned_data.get('username')
-        self.user_model.save()
-        logger.info(f'User \"{request.user}\" updated their username')
-        return redirect("home")
-
-    def invalid_form(self, request):
-        self.context['form'] = self.form
-        return super().get(request)
 
 class UserguideView(TimewebGenericView):
     template_name = "user-guide.html"

@@ -74,6 +74,7 @@ INSTALLED_APPS = [
 
     'django.contrib.sites',
 
+    'timewebauth',
     'timewebapp',
     'multiselectfield',
     'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
@@ -263,7 +264,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-AUTH_USER_MODEL = 'timewebapp.TimewebUser'
+AUTH_USER_MODEL = 'timewebauth.TimewebUser'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DEBUG else "https"
 SOCIALACCOUNT_AUTO_SIGNUP = False # Always prompt for username
 ACCOUNT_SESSION_REMEMBER = True
@@ -275,22 +276,22 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_VERIFICATION = True
 
-SOCIALACCOUNT_ADAPTER = 'timewebapp.adapter.ExampleAccountSocialLoginAdapter'
+SOCIALACCOUNT_ADAPTER = 'timewebauth.adapter.ExampleAccountSocialLoginAdapter'
 
 ACCOUNT_FORMS = {
-    'login': 'timewebapp.forms.LabeledLoginForm',
-    'signup': 'timewebapp.forms.LabeledSignupForm',
-    'add_email': 'timewebapp.forms.LabeledAddEmailForm',
-    'change_password': 'timewebapp.forms.LabeledChangePasswordForm',
-    'set_password': 'timewebapp.forms.LabeledTwoPasswordForm',
-    'reset_password': 'timewebapp.forms.LabeledResetPasswordForm',
-    'reset_password_from_key': 'timewebapp.forms.LabeledTwoPasswordForm',
+    'login': 'timewebauth.forms.LabeledLoginForm',
+    'signup': 'timewebauth.forms.LabeledSignupForm',
+    'add_email': 'timewebauth.forms.LabeledAddEmailForm',
+    'change_password': 'timewebauth.forms.LabeledChangePasswordForm',
+    'set_password': 'timewebauth.forms.LabeledTwoPasswordForm',
+    'reset_password': 'timewebauth.forms.LabeledResetPasswordForm',
+    'reset_password_from_key': 'timewebauth.forms.LabeledTwoPasswordForm',
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
 }
 
 SOCIALACCOUNT_FORMS = {
     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
-    'signup': 'timewebapp.forms.LabeledSocialaccountSignupForm',
+    'signup': 'timewebauth.forms.LabeledSocialaccountSignupForm',
 }
 
 ACCOUNT_RATE_LIMITS = {

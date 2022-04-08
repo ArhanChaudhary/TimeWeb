@@ -1,1 +1,1 @@
-print("Initialized")
+print("timewebapp initialized")

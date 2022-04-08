@@ -3,8 +3,6 @@ from . import views, forms
 from django.views.generic import RedirectView
 from django.http import HttpResponse
 from django.conf import settings
-from allauth.account.urls import urlpatterns as allauth_urls
-from django.views.defaults import page_not_found
 
 def get_static_url(url_path):
     return f"/static/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{url_path}'
@@ -50,8 +48,6 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('mstile-150x150.png', RedirectView.as_view(url=get_static_url('images/icons/mstile-150x150.png'))),
     path('safari-pinned-tab.svg', RedirectView.as_view(url=get_static_url('images/icons/safari-pinned-tab.svg'))),
 
-    path('accounts/logout', page_not_found),
-
     path('stackpile', views.StackpileView.as_view(), name='stackpile'),
     path('spooky', views.SpookyView.as_view(), name="spooky"),
     path('sus', views.SusView.as_view(), name="sus"),
@@ -71,7 +67,3 @@ if settings.DEBUG:
     #     response['Cache-Control'] = 'no-store' (?) or something else
     #     return response
     # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, view=custom_serve)
-
-allauth_urls += [
-    path('username/reset', views.UsernameResetView.as_view(), name='reset_username'),
-]
