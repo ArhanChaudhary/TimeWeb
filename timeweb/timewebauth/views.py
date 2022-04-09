@@ -1,20 +1,15 @@
-from webbrowser import get
 from django.conf import settings
-from timewebapp.views import TimewebGenericView
+from timewebapp.views import TimewebGenericView, logger
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from .forms import UsernameResetForm
-from logging import getLogger
 from django.forms import ValidationError
 
 from allauth.account.adapter import DefaultAccountAdapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 
 User = get_user_model()
-
-logger = getLogger("django")
-logger.propagate = False
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username-reset.html"
