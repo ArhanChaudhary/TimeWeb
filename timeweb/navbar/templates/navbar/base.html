@@ -3,12 +3,12 @@
 
 {% block css %}
     <link href="https://unpkg.com/@fontsource/roboto-slab@4.5.4/700.css" rel="stylesheet" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'navbar/css/base.css' %}">
     {% block navbar_css %}{% endblock navbar_css %}
 {% endblock css %}
 
 {% block js %}
-    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'navbar/js/base.js' %}"></script>
     {% block navbar_js %}{% endblock navbar_js %}
 {% endblock js %}
 
@@ -42,7 +42,7 @@
     </template>
     <template id="label-icon-template">
         <div class="label-icon-container">
-            <img class="label-icon" height="25" src="{% static 'images/question-mark.png' %}">
+            <img class="label-icon" height="25" src="{% static 'timewebapp/images/question-mark.png' %}">
         </div>
     </template>
 {% endblock content %}

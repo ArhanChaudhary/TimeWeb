@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block base_head_css %}
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'timewebapp/css/base.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/jquery-confirm@3.3.4/dist/jquery-confirm.min.css" crossorigin="anonymous">
     {% block css %}{% endblock %}
 {% endblock %}
@@ -10,9 +10,9 @@
 {% block base_head_js %}
     <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js" crossorigin="anonymous"></script>
-    <script src="{% static 'js/jquery-extensions.js' %}"></script>
-    <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
-    <script src="{% static 'js/base.js' %}"></script>
+    <script src="{% static 'timewebapp/js/jquery-extensions.js' %}"></script>
+    <script src="{% static 'timewebapp/vendor/jquery-confirm.min.js' %}"></script>
+    <script src="{% static 'timewebapp/js/base.js' %}"></script>
     {% block js %}{% endblock %}
 {% endblock %}
 
@@ -21,7 +21,7 @@
     {% url 'home' as home %}
     {% if user.is_authenticated and request.path == home %}
         <div id="image-new-container" tabindex="1">
-            <img width="60" height="60" src="{% static 'images/plus.png' %}" alt="new" draggable="false"/>
+            <img width="60" height="60" src="{% static 'timewebapp/images/plus.png' %}" alt="new" draggable="false"/>
             <div id="new-assignment-text">New Assignment</div>
         </div>
     {% endif %}
@@ -72,7 +72,7 @@
         </div>
     </nav>
     <a href="{% url 'home' %}" id="logo-container">
-        <img width="193.58" height="55" src="{% static 'images/timeweb.png' %}" border="0" draggable="false"/>
+        <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.png' %}" border="0" draggable="false"/>
         <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
     </a>

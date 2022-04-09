@@ -797,7 +797,6 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         pass
 
 class ExampleAccountView(TimewebView):
-    template_name = "index.html"
 
     def dispatch(self, *args, **kwargs):
         return super(TimewebGenericView, self).dispatch(*args, **kwargs)
