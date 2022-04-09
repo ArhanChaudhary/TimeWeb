@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'timewebauth',
     'timewebapp',
     'navbar',
+    'misc',
     'multiselectfield',
     'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'pwa',
@@ -101,7 +102,7 @@ MIDDLEWARE = [
     'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
     'timewebapp.middleware.AddSiteID.AddSiteID',
 ]
-CSRF_FAILURE_VIEW = 'timewebapp.views.custom_permission_denied_view'
+CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
 
 TEMPLATES = [

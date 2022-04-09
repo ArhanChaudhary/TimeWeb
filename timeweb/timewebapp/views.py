@@ -109,12 +109,6 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
                 instance.user_permissions.add(permission)
             instance.save()
 
-
-def custom_permission_denied_view(request, reason=""):
-    response = render(request, "403_csrf.html", {"request": request})
-    response.status_code = 403
-    return response
-
 logger = getLogger('django')
 logger.propagate = False
 def get_default_context():
@@ -813,21 +807,3 @@ class ExampleAccountView(TimewebView):
         login(request, User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL), 'allauth.account.auth_backends.AuthenticationBackend')
         # Must be a redirect so document.location is at home directory, which things using request.path need
         return redirect("home")
-
-
-class RickView(TimewebGenericView):
-    def get(self, request, _):
-        return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
-
-class StackpileView(TimewebGenericView):
-    def get(self, request):
-        return redirect("https://stackpile.me")
-
-class SpookyView(TimewebGenericView):
-    template_name = "spooky.html"
-    
-class SusView(TimewebGenericView):
-    template_name = "sus.html"
-
-class ChungusView(TimewebGenericView):
-    template_name = "chungus.html"
