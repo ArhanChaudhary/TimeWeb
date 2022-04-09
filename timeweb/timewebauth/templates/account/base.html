@@ -1,20 +1,20 @@
-{% extends "template-head.html" %}
+{% extends "base-head.html" %}
 {% load static %}
 
-{% block template_head_js %}
+{% block base_head_js %}
   <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
   <script src="{% static 'js/jquery-extensions.js' %}"></script>
-  <script src="{% static 'js/accounts-template.js' %}">
+  <script src="{% static 'js/account-base.js' %}">
   </script>
   {% block accounts_js %}{% endblock %}
 {% endblock %}
 
-{% block template_head_css %}
-  <link rel="stylesheet" href="{% static 'css/accounts-template.css' %}">
+{% block base_head_css %}
+  <link rel="stylesheet" href="{% static 'css/account-base.css' %}">
   {% block accounts_css %}{% endblock %}
 {% endblock %}
 
-{% block template_head_body %}
+{% block base_head_body %}
   <main>
     <div id="circles-background">
       {% for i in "x"|rjust:"100" %}

@@ -67,9 +67,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=1">
         <link href="https://unpkg.com/npm-font-open-sans@1.1.0/open-sans.css" rel="stylesheet" crossorigin="anonymous">
         <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css" crossorigin="anonymous" />
-        <link rel="stylesheet" href="{% static 'css/template-head.css' %}">
-        {% block template_head_css %}{% endblock %}
-        {% block template_head_js %}{% endblock %}
+        <link rel="stylesheet" href="{% static 'css/base-head.css' %}">
+        {% block base_head_css %}{% endblock %}
+        {% block base_head_js %}{% endblock %}
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
     <body tabindex="-1">
@@ -78,7 +78,7 @@
             remember to have a <main> on these blocks, many stylesheets and scripts rely on that being present 
             also remember to have #loading-container (for the below code)
             {% endcomment %}
-            {% block template_head_body %}{% endblock %}
+            {% block base_head_body %}{% endblock %}
             <script nonce="{{request.csp_nonce}}">
                 window.onbeforeunload = function() {
                     if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;

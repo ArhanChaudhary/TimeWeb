@@ -1,22 +1,22 @@
-{% extends "template-head.html" %}
+{% extends "base-head.html" %}
 {% load static %}
 
-{% block template_head_css %}
-    <link rel="stylesheet" href="{% static 'css/template.css' %}">
+{% block base_head_css %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/jquery-confirm@3.3.4/dist/jquery-confirm.min.css" crossorigin="anonymous">
     {% block css %}{% endblock %}
 {% endblock %}
 
-{% block template_head_js %}
+{% block base_head_js %}
     <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js" crossorigin="anonymous"></script>
     <script src="{% static 'js/jquery-extensions.js' %}"></script>
     <script src="{% static 'vendor/jquery-confirm.min.js' %}"></script>
-    <script src="{% static 'js/template.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
     {% block js %}{% endblock %}
 {% endblock %}
 
-{% block template_head_body %}
+{% block base_head_body %}
 <header>
     {% url 'home' as home %}
     {% if user.is_authenticated and request.path == home %}
