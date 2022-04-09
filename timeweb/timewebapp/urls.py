@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from django.conf import settings
 
 def get_static_url(url_path):
-    return f"/static/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{url_path}'
+    return f"static/timewebapp/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/timewebapp/{url_path}'
 
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),

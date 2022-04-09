@@ -452,7 +452,7 @@ class Priority {
                 )
             ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("src", (function() {
                 const tick_image = already_entered_work_input_for_today ? "slashed-tick" : "tick";
-                return DEBUG ? `/static/images/${tick_image}.svg` : `https://storage.googleapis.com/twstatic/images/${tick_image}.svg`;
+                return DEBUG ? `/static/timewebapp/images/${tick_image}.svg` : `https://storage.googleapis.com/twstatic/timewebapp/images/${tick_image}.svg`;
             })())
 
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
@@ -493,7 +493,7 @@ class Priority {
 
             if (status_image) {
                 dom_status_image.show();
-                dom_status_image.attr("src", DEBUG ? `static/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/images/${status_image}.png`);
+                dom_status_image.attr("src", DEBUG ? `static/timewebapp/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.png`);
             } else {
                 dom_status_image.hide();
                 dom_status_image.removeAttr("src");
