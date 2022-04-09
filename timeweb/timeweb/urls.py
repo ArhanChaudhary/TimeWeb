@@ -24,5 +24,6 @@ urlpatterns = [
     path('contact/', include('contact_form.urls')),
     path('', include('timewebapp.urls')),
     path('', include('timewebauth.urls')),
+    path('', include('navbar.urls')),
     path('', include('pwa.urls')),
 ]

@@ -76,6 +76,7 @@ INSTALLED_APPS = [
 
     'timewebauth',
     'timewebapp',
+    'navbar',
     'multiselectfield',
     'django.contrib.admin', # admin needs to be after 'timewebapp' for some reason I forgot but it needs to be here
     'pwa',
