@@ -1,6 +1,6 @@
-from timewebapp import TimewebGenericView
+from timewebapp.views import TimewebGenericView
 from django.http import HttpResponse
-from django.views import redirect, render
+from django.shortcuts import redirect, render
 
 def custom_permission_denied_view(request, reason=""):
     response = render(request, "misc/403_csrf.html", {"request": request})
