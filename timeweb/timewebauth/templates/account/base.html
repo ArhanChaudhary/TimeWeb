@@ -4,13 +4,13 @@
 {% block base_head_js %}
   <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
   <script src="{% static 'timewebapp/js/jquery-extensions.js' %}"></script>
-  <script src="{% static 'timewebauth/js/account-base.js' %}">
+  <script src="{% static 'timewebauth/js/base.js' %}">
   </script>
   {% block accounts_js %}{% endblock %}
 {% endblock %}
 
 {% block base_head_css %}
-  <link rel="stylesheet" href="{% static 'timewebauth/css/account-base.css' %}">
+  <link rel="stylesheet" href="{% static 'timewebauth/css/base.css' %}">
   {% block accounts_css %}{% endblock %}
 {% endblock %}
 
