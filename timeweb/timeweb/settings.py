@@ -118,6 +118,7 @@ TEMPLATES = [
         },
     },
 ]
+CONN_MAX_AGE = 15
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
