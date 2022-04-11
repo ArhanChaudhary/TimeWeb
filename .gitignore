@@ -78,18 +78,10 @@ example_assignment_load.py
 pre_changelogs.py
 update_seen_latest_changelog.py
 
-# GCP stuff
-cloud_sql_proxy
-gcloud_storages.py
-app.yaml
-nginx-app.conf
-main.py
-gcldeployment.md
-.gcloudignore
-
 # Google API requests
 sa-private-key.json
 gc-api-credentials.json
+gcloud_storages.py
 
 # Flask stuff:
 instance/

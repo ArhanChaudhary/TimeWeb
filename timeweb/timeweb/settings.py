@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
-PROXY = 0
-
 # SECURITY WARNING: don't run with debug turned on in production!
 try:
     DEBUG = os.environ['DEBUG'] == "True"
@@ -53,7 +51,7 @@ except KeyError:
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['timeweb.io', 'timeweb-308201.wl.r.appspot.com', 'www.timeweb.io', 'www.timeweb-308201.wl.r.appspot.com']
+    ALLOWED_HOSTS = ['timeweb.io']
 # Application definition
 
 CSRF_COOKIE_SECURE = not DEBUG
@@ -131,46 +129,25 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 1310720 # 10 MiB (max size for data sent by ajax b
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-if os.getenv('GAE_APPLICATION', None):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
+if os.environ.get('DATABASE_URL') is not None:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'timewebdb',
-            'USER': 'postgres',
-            'PASSWORD': os.environ['PASSWORD'],
-            'HOST': '/cloudsql/timeweb-308201:us-west2:timewebdbinstance',
-            'PORT': '5432',
+            'HOST': os.environ['PGHOST'],
+            'PORT': os.environ['PGPORT'],
+            'NAME': os.environ.get('PGDATABASE', 'timewebdb'),
+            'USER': os.environ.get('PGUSER', 'postgres'),
+            'PASSWORD': os.environ['PGPASSWORD'],
         }
     }
 else:
-    if PROXY:
-        # If running locally and connecting to server database, connect via the proxy.
-        #
-        #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
-        #
-        # See https://cloud.google.com/sql/docs/mysql-connect-proxy for more info
-        # 
-        # 
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'HOST': '127.0.0.1',
-                'PORT': '3306',
-                'NAME': 'timewebdb',
-                'USER': 'postgres',
-                'PASSWORD': os.environ['PASSWORD'],
-            }
+    # If running locally, use a sqlite database
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
-    else:
-        # If running locally, use a sqlite database
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
+    }
 DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
