@@ -107,7 +107,7 @@ class TimewebForm(forms.ModelForm):
             if complete_due_date <= assignment_date:
                 self.add_error("x",
                     forms.ValidationError(_("The due date can't be%(before)sthe assignment date"),code='invalid',params={
-                        'before': "" if complete_due_date == assignment_date else " before "
+                        'before': " " if complete_due_date == assignment_date else " before "
                     })
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
