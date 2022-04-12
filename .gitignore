@@ -81,7 +81,6 @@ update_seen_latest_changelog.py
 # Google API requests
 sa-private-key.json
 gc-api-credentials.json
-gcloud_storages.py
 
 # Flask stuff:
 instance/
