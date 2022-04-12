@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn -b 0.0.0.0:$PORT timeweb.wsgi
+web: python manage.py migrate && gunicorn -b 0.0.0.0:$PORT --max-requests 1000 --workers 11 --threads 2 timeweb.wsgi
