@@ -1,8 +1,9 @@
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
-from .views import User
 from allauth.account.forms import *
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model() # I can't import this from timewebauth.views because of circular imports
 
 class LabeledLoginForm(LoginForm):
     error_messages = {
