@@ -1,15 +1,26 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-from django.conf import settings
-from django.contrib import messages
+
+# Django abstractions
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext as _
-from django.utils import timezone
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
 from django.urls import reverse
+from django.http import HttpResponse
+from django.views import View
+from django.contrib.auth import logout, login
+from django.forms import ValidationError
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 
-# Allauth modules
+# App stuff
+from django.conf import settings
+from .models import TimewebModel, SettingsModel
+from .forms import TimewebForm
+from navbar.forms import SettingsForm
+from timewebauth.views import User
+
+# Signals
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from allauth import ratelimit
 def consume_or_message(request, message="You are submitting too many requests. Please wait a bit before trying again", *args, **kwargs):
     if not ratelimit.consume(request, *args, **kwargs):
@@ -17,47 +28,29 @@ def consume_or_message(request, message="You are submitting too many requests. P
         return redirect(request.META['HTTP_REFERER'])
 ratelimit.consume_or_429 = consume_or_message
 
-# Automatically creates settings model and example assignment when user is created
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-# Model modules
-import datetime
-from .models import TimewebModel, SettingsModel
-from .forms import TimewebForm
-from navbar.forms import SettingsForm
-from django.contrib.auth import get_user_model, logout, login
+# Formatting
 from django.forms.models import model_to_dict
-from django.forms import ValidationError
-
-# Formatting modules
 from django.utils.text import Truncator
-
-# JSON modules
 import json
 
-# Math modules
-from decimal import Decimal
-from math import ceil, floor
-
-# Google API modules
+# Google API
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-
-# Google API exceptions
 from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
 # Misc
+import datetime
+from math import ceil, floor
+from decimal import Decimal
+from django.contrib import messages
 from logging import getLogger
 from os import environ as os_environ
 
 with open("timewebapp/changelogs.json", "r") as f:
     CHANGELOGS = json.load(f)
-
-User = get_user_model()
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']

@@ -1,10 +1,7 @@
 from django import forms
 from .models import TimewebModel
-from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 import datetime
-
-User = get_user_model()
 
 class TimewebForm(forms.ModelForm):
     class Meta:

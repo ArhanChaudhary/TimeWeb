@@ -1,24 +1,24 @@
-# Contact form
-from contact_form.views import ContactFormView as BaseContactFormView
-from requests import get as requests_get
-
-# Misc
-from django.contrib import messages
-from django.utils.decorators import method_decorator
-from allauth.decorators import rate_limit
-from django.conf import settings
+# Django abstractions
+from django.forms import ValidationError
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
+from django.urls import reverse_lazy # source code uses this instead of reverse for some reason
+from django.shortcuts import redirect
 
-# App
+# App stuff
+from django.conf import settings
 from .forms import SettingsForm
+from contact_form.views import ContactFormView as BaseContactFormView
 from timewebapp.models import SettingsModel, TimewebModel
 from timewebapp.views import TimewebGenericView, CHANGELOGS, MAX_NUMBER_ASSIGNMENTS, logger
 
-# Django modules
-from django.forms import ValidationError
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy # source code uses this instead of reverse for some reason
-from django.shortcuts import redirect
+# Signals
+from django.utils.decorators import method_decorator
+from allauth.decorators import rate_limit
+
+# Misc
+from django.contrib import messages
+from requests import get as requests_get
 
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"

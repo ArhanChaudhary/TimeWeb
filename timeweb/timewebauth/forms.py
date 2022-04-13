@@ -1,10 +1,8 @@
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
-from django.contrib.auth import get_user_model
+from .views import User
 from allauth.account.forms import *
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-
-User = get_user_model()
 
 class LabeledLoginForm(LoginForm):
     error_messages = {
