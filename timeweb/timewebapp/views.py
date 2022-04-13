@@ -16,7 +16,8 @@ from django.conf import settings
 from .models import TimewebModel, SettingsModel
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
-from timewebauth.views import User
+from django.contrib.auth import get_user_model
+User = get_user_model() # I can't import this from timewebauth because of circular imports
 
 # Signals
 from django.db.models.signals import post_save
