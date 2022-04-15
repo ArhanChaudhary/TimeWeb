@@ -83,13 +83,13 @@ body {
 #circles-background .bubble-up {
     position: absolute;
     --animation-duration: calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay));
-    animation: bubbleUp var(--animation-duration) linear 0s infinite normal;
+    animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
 }
 #circles-background .bubble-up .bubble-right {
     width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
-    animation: bubbleRight var(--animation-duration) cubic-bezier(0.5, 0.0625, 0.5, 0.9375) 0s infinite normal;
+    animation: bubbleRight var(--animation-duration) cubic-bezier(0.5, 0.0625, 0.5, 0.9375) -5000s infinite normal;
 }
 @keyframes bubbleUp {
     from {
