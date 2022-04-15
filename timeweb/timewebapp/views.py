@@ -10,6 +10,9 @@ from django.contrib.auth import logout, login
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
+import datetime
+from math import ceil, floor
+from decimal import Decimal
 
 # App stuff
 from django.conf import settings
@@ -43,9 +46,6 @@ from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
 # Misc
-import datetime
-from math import ceil, floor
-from decimal import Decimal
 from django.contrib import messages
 from logging import getLogger
 from os import environ as os_environ
@@ -56,9 +56,9 @@ with open("timewebapp/changelogs.json", "r") as f:
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
 GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc-api-credentials.json"
+
 if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
-    os_environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
     GC_REDIRECT_URI = "https://timeweb.io/gc-api-auth-callback"
     
