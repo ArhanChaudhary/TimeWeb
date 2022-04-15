@@ -5,10 +5,6 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from .forms import UsernameResetForm
 from django.forms import ValidationError
-from django.contrib import messages
-
-from allauth.account.views import PasswordResetView
-from allauth.decorators import ratelimit
 
 from allauth.account.adapter import DefaultAccountAdapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
@@ -48,16 +44,3 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     def invalid_form(self, request):
         self.context['form'] = self.form
         return super().get(request)
-
-class MessagedPasswordResetView(PasswordResetView):
-    def form_valid(self, form):
-            r429 = ratelimit.consume_or_429(
-                self.request,
-                action="reset_password_email",
-                key=form.cleaned_data["email"],
-            )
-            if r429:
-                return r429
-            form.save(self.request)
-            messages.success(self.request, "Password reset e-mail has been sent.\n<p hidden>**Success**</p>")
-            return super(PasswordResetView, self).form_valid(form)

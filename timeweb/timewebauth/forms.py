@@ -3,6 +3,7 @@ from allauth.account.forms import *
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 User = get_user_model() # I can't import this from timewebauth.views because of circular imports
 
 class LabeledLoginForm(LoginForm):
@@ -116,6 +117,10 @@ class LabeledResetPasswordForm(ResetPasswordForm):
             }
         ),
     )
+
+    def _send_password_reset_mail(self, request, *args, **kwargs):
+        super()._send_password_reset_mail(request, *args, **kwargs)
+        messages.success(request, "Password reset e-mail has been sent.\n<p hidden>**Success**</p>")
 
 class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
     username = forms.CharField(
