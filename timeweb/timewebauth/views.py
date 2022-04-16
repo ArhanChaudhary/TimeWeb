@@ -12,7 +12,7 @@ DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique 
 User = get_user_model()
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
-    template_name = "account/username-reset.html"
+    template_name = "account/username_reset.html"
 
     def get(self, request):
         initial = {

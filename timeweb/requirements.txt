@@ -13,7 +13,7 @@ django-colorfield==0.4.3
 django-contact-form==1.9
 django-csp==3.7
 django-multiselectfield==0.1.12
-django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@34adecb5bb6a93fad7c3c9fd1ff05a80765f5634
+django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@16c0d555fefcec1f5d298f650cef9d0061c95343
 django-storages==1.12.3
 django-timezone-field==4.2.1
 google-api-core==2.0.1

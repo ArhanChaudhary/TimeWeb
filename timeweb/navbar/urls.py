@@ -6,7 +6,7 @@ from timewebapp.urls import get_static_url
 urlpatterns = [
     path('settings', views.SettingsView.as_view(), name='settings'),
     path('blog', views.BlogView.as_view(), name='blog'),
-    path('user-guide', views.UserguideView.as_view(), name='user-guide'),
+    path('user-guide', views.UserguideView.as_view(), name='user_guide'),
     path('changelog', views.ChangelogView.as_view(), name='changelog'),
     path('contact', views.ContactFormView.as_view(form_class=forms.ContactForm), name='contact_form'),
     path('policies', RedirectView.as_view(url=get_static_url('policies/policies.html')), name='policies'),

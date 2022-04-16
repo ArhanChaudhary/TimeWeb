@@ -140,7 +140,7 @@ class BlogView(TimewebGenericView):
     template_name = "navbar/blog.html"
 
 class UserguideView(TimewebGenericView):
-    template_name = "navbar/user-guide.html"
+    template_name = "navbar/user_guide.html"
     
     def get(self, request):
         self.context['add_faq'] = True

@@ -8,7 +8,7 @@
     width: 260px;
 }
 
-/* Make sure to change user-guide.css and others if this media query is modified */
+/* Make sure to change user_guide.css and others if this media query is modified */
 @media screen and (max-width: 790px) {
     #table-of-contents-container {
         position: absolute;

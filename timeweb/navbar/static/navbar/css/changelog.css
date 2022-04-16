@@ -10,7 +10,7 @@
 #table-of-contents-container, #table-of-contents-container-label {
     width: 225px;
 }
-/* Make sure to change user-guide.css and others if this media query is modified */
+/* Make sure to change user_guide.css and others if this media query is modified */
 @media screen and (max-width: 795px) {
     #table-of-contents-container {
         position: absolute;

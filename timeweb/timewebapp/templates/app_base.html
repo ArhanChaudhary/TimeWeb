@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block base_head_css %}
-    <link rel="stylesheet" href="{% static 'timewebapp/css/app-base.css' %}">
+    <link rel="stylesheet" href="{% static 'timewebapp/css/app_base.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/jquery-confirm@3.3.4/dist/jquery-confirm.min.css" crossorigin="anonymous">
     {% block css %}{% endblock %}
 {% endblock %}
@@ -10,9 +10,9 @@
 {% block base_head_js %}
     <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js" crossorigin="anonymous"></script>
-    <script src="{% static 'timewebapp/js/jquery-extensions.js' %}"></script>
-    <script src="{% static 'timewebapp/vendor/jquery-confirm.min.js' %}"></script>
-    <script src="{% static 'timewebapp/js/app-base.js' %}"></script>
+    <script src="{% static 'timewebapp/js/jquery_extensions.js' %}"></script>
+    <script src="{% static 'timewebapp/vendor/jquery_confirm.min.js' %}"></script>
+    <script src="{% static 'timewebapp/js/app_base.js' %}"></script>
     {% block js %}{% endblock %}
 {% endblock %}
 
@@ -60,7 +60,7 @@
             </svg>
         </div>
         <div id="nav-items">
-            <a href="{% url 'user-guide' %}">User Guide</a>
+            <a href="{% url 'user_guide' %}">User Guide</a>
             <a href="{% url 'changelog' %}">Changelog</a>
             <a href="{% url 'contact_form' %}">Contact</a>
             <div class="nav-hr"></div>
@@ -121,12 +121,12 @@
             <li>Stanley Ho and Kevin Chu for frequently suggesting many features and giving user interface advice</li>
         </ul>
         <!--
-        completely-finished.png: ascii character
+        completely_finished.png: ascii character
         finished.png: ascii character
         unfinished.png: ascii character
-        slashed-tick.svg: made myself and inspired by the check icon
-        open-all-assignments.png: made myself
-        close-all-assignments.png: made myself
+        slashed_tick.svg: made myself and inspired by the check icon
+        open_all_assignments.png: made myself
+        close_all_assignments.png: made myself
         settings.png: citation not needed (https://www.iconfinder.com/icons/326699/settings_icon)
         -->
     </template>

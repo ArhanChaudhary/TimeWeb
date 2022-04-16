@@ -1,4 +1,4 @@
-{% extends "app-base.html" %}
+{% extends "app_base.html" %}
 {% load static %}
 
 {% block css %}
@@ -98,9 +98,9 @@
         <span id="estimated-total-time-label">Estimated completion time:</span><span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <div id="hide-button" class="generic-button">Hide</div>
         <div id="icon-label-container">
-          <img id="close-assignments"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'timewebapp/images/close-all-assignments.png' %}">
-          <img id="previous-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'timewebapp/images/next-day.png' %}">
-          <img id="next-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'timewebapp/images/next-day.png' %}">
+          <img id="close-assignments"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'timewebapp/images/close_all_assignments.png' %}">
+          <img id="previous-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.png' %}">
+          <img id="next-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.png' %}">
           <a href="/settings">
             <img id="settings"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="27" src="{% static 'timewebapp/images/settings.png' %}">
           </a>
@@ -263,7 +263,7 @@
   {{self.settings_model.oauth_token}}
   <div id="toggle-gc-container" class="{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in self.settings_model.oauth_token %}enabled{% endif%}">
     <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% elif GC_API_INIT_FAILED %}Authentication failed. Please try again{% endif %}</span>
-    <img src="{% static 'timewebapp/images/gc-icon.png' %}" width="42" height="42">
+    <img src="{% static 'timewebapp/images/gc_icon.png' %}" width="42" height="42">
   </div>
   {% endspaceless %}
 {% endblock content %}

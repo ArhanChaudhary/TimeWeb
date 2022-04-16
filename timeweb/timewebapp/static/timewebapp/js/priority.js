@@ -227,7 +227,7 @@ class Priority {
             let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
             if (sa.sa.needs_more_info && !(sa.sa.is_google_classroom_assignment && due_date_passed && !sa.sa.soft)) {
-                status_image = 'question-mark';
+                status_image = 'question_mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
                     status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
@@ -241,7 +241,7 @@ class Priority {
                     height: 18,
                 }).css("margin-left", 2);            
             } else if (finished_work_inputs || due_date_passed && !sa.sa.soft) {
-                status_image = "completely-finished";
+                status_image = "completely_finished";
                 if (finished_work_inputs && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
                     status_message = 'You\'re Completely Finished with this Assignment';
                 } else {
@@ -330,7 +330,7 @@ class Priority {
                 // Don't mark as no working days when the end of the assignment has been reached
                 const no_working_days = sa.getWorkingDaysRemaining({ reference: "blue line end" }) === 0 && len_works + sa.sa.blue_line_start !== sa.sa.x;
                 if (incomplete_past_inputs || no_working_days) {
-                    status_image = 'question-mark';
+                    status_image = 'question_mark';
                     if (incomplete_past_inputs) {
                         status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
                         status_value = Priority.INCOMPLETE_WORKS;
@@ -451,7 +451,7 @@ class Priority {
                     || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
                 )
             ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("src", (function() {
-                const tick_image = already_entered_work_input_for_today ? "slashed-tick" : "tick";
+                const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
                 return DEBUG ? `/static/timewebapp/images/${tick_image}.svg` : `https://storage.googleapis.com/twstatic/timewebapp/images/${tick_image}.svg`;
             })())
 
