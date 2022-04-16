@@ -50,7 +50,7 @@ from django.contrib import messages
 from logging import getLogger
 from os import environ as os_environ
 
-with open("timewebapp/changelogs.json", "r") as f:
+with open("changelogs.json", "r") as f:
     CHANGELOGS = json.load(f)
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
