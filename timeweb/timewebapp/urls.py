@@ -3,8 +3,11 @@ from . import views
 from django.views.generic import RedirectView
 from django.conf import settings
 
-def get_static_url(url_path):
-    return f"static/timewebapp/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/timewebapp/{url_path}'
+def get_static_url(app_name, url_path):
+    return f"static/{app_name}/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{app_name}/{url_path}'
+
+def app_static(url_path):
+    return get_static_url(__package__, url_path)
 
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
@@ -13,16 +16,16 @@ urlpatterns = [
     path('gc-api-auth-init', views.GCOAuthView.as_view()),
     path('gc-api-auth-callback', views.GCOAuthView.as_view()),
 
-    path('android-chrome-192x192.png', RedirectView.as_view(url=get_static_url('images/icons/android_chrome_192x192.png'))),
-    path('android-chrome-512x512.png', RedirectView.as_view(url=get_static_url('images/icons/android_chrome_512x512.png'))),
-    path('apple-touch-icon-precomposed.png', RedirectView.as_view(url=get_static_url('images/icons/apple_touch_icon_precomposed.png'))),
-    path('apple-touch-icon.png', RedirectView.as_view(url=get_static_url('images/icons/apple_touch_icon.png'))),
-    path('browserconfig.xml', RedirectView.as_view(url=get_static_url('images/icons/browserconfig.xml'))),
-    path('favicon-16x16.png', RedirectView.as_view(url=get_static_url('images/icons/favicon_16x16.png'))),
-    path('favicon-32x32.png', RedirectView.as_view(url=get_static_url('images/icons/favicon_32x32.png'))),
-    path('favicon.ico', RedirectView.as_view(url=get_static_url('images/icons/favicon.ico'))),
-    path('mstile-150x150.png', RedirectView.as_view(url=get_static_url('images/icons/mstile_150x150.png'))),
-    path('safari-pinned-tab.svg', RedirectView.as_view(url=get_static_url('images/icons/safari_pinned_tab.svg'))),
+    path('android-chrome-192x192.png', RedirectView.as_view(url=app_static('images/icons/android_chrome_192x192.png'))),
+    path('android-chrome-512x512.png', RedirectView.as_view(url=app_static('images/icons/android_chrome_512x512.png'))),
+    path('apple-touch-icon-precomposed.png', RedirectView.as_view(url=app_static('images/icons/apple_touch_icon_precomposed.png'))),
+    path('apple-touch-icon.png', RedirectView.as_view(url=app_static('images/icons/apple_touch_icon.png'))),
+    path('browserconfig.xml', RedirectView.as_view(url=app_static('images/icons/browserconfig.xml'))),
+    path('favicon-16x16.png', RedirectView.as_view(url=app_static('images/icons/favicon_16x16.png'))),
+    path('favicon-32x32.png', RedirectView.as_view(url=app_static('images/icons/favicon_32x32.png'))),
+    path('favicon.ico', RedirectView.as_view(url=app_static('images/icons/favicon.ico'))),
+    path('mstile-150x150.png', RedirectView.as_view(url=app_static('images/icons/mstile_150x150.png'))),
+    path('safari-pinned-tab.svg', RedirectView.as_view(url=app_static('images/icons/safari_pinned_tab.svg'))),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static
