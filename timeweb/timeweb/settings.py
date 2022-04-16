@@ -306,3 +306,27 @@ EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
 EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
 
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
+
+
+
+# App constants
+
+# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
+GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
+GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
+if DEBUG:
+    GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
+else:
+    GC_REDIRECT_URI = "https://timeweb.io/gc-api-auth-callback"
+# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+# os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
+
+MAX_NUMBER_OF_TAGS = 5
+MAX_NUMBER_ASSIGNMENTS = 100
+EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
+EDITING_EXAMPLE_ACCOUNT = False
+
+# Changelog
+import json
+with open("changelogs.json", "r") as f:
+    CHANGELOGS = json.load(f)

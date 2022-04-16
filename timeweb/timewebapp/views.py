@@ -48,27 +48,6 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 # Misc
 from django.contrib import messages
 from logging import getLogger
-from os import environ as os_environ
-
-with open("changelogs.json", "r") as f:
-    CHANGELOGS = json.load(f)
-
-# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
-GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc_api_credentials.json"
-
-if settings.DEBUG:
-    GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
-else:
-    GC_REDIRECT_URI = "https://timeweb.io/gc-api-auth-callback"
-    
-# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
-os_environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-
-EDITING_EXAMPLE_ACCOUNT = False
-EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
-MAX_NUMBER_ASSIGNMENTS = 100
-MAX_NUMBER_OF_TAGS = 5
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -77,7 +56,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         TimewebModel.objects.create(**{
-            "name": EXAMPLE_ASSIGNMENT_NAME,
+            "name": settings.EXAMPLE_ASSIGNMENT_NAME,
             "assignment_date": date_now,
             "x": date_now + datetime.timedelta(30),
             "unit": "Page",
@@ -108,9 +87,9 @@ logger.propagate = False
 def get_default_context():
     return {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": EXAMPLE_ASSIGNMENT_NAME,
-        "MAX_NUMBER_OF_TAGS": MAX_NUMBER_OF_TAGS,
-        "EDITING_EXAMPLE_ACCOUNT": EDITING_EXAMPLE_ACCOUNT,
+        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_NAME,
+        "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
+        "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
     }
 
@@ -175,7 +154,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
         if not self.settings_model.seen_latest_changelog:
-            self.context['latest_changelog'] = CHANGELOGS[0]
+            self.context['latest_changelog'] = settings.CHANGELOGS[0]
 
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
             self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
@@ -225,7 +204,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model = SettingsModel.objects.get(user=request.user)
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
-        if self.isExampleAccount and not EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
+        if self.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
 
         action = request.POST['action']
         if action == 'delete_assignment':
@@ -262,11 +241,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         # Parts of the form that can only validate in views
         form_is_valid = True
-        if self.isExampleAccount and not EDITING_EXAMPLE_ACCOUNT:
+        if self.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
-        elif self.created_assignment and self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-            self.form.add_error("name", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+        elif self.created_assignment and self.assignment_models.count() > settings.MAX_NUMBER_ASSIGNMENTS:
+            self.form.add_error("name", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
             form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
@@ -322,7 +301,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             date_now = self.utc_to_local(request, timezone.now())
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-            if EDITING_EXAMPLE_ACCOUNT:
+            if settings.EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
                 original_date_now = date_now
                 date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
@@ -330,12 +309,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.x -= original_date_now - date_now
             if self.created_assignment or self.sm.needs_more_info:
                 self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
-                if self.sm.blue_line_start < 0 or EDITING_EXAMPLE_ACCOUNT:
+                if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
                 self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or EDITING_EXAMPLE_ACCOUNT:
+                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
                 removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
@@ -468,7 +447,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, GC_SCOPES)
+        credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, settings.GC_SCOPES)
         # If there are no valid credentials available, let the user log in.
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
@@ -478,8 +457,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.settings_model.save()
             else:
                 flow = Flow.from_client_secrets_file(
-                    GC_CREDENTIALS_PATH, scopes=GC_SCOPES)
-                flow.redirect_uri = GC_REDIRECT_URI
+                    settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
+                flow.redirect_uri = settings.GC_REDIRECT_URI
                 # Generate URL for request to Google's OAuth 2.0 server.
                 # Use kwargs to set optional request parameters.
                 authorization_url, state = flow.authorization_url(
@@ -664,7 +643,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         tag_names = request.POST.getlist('tag_names[]')
         if action == "tag_add":
             tag_names = [tag_name for tag_name in tag_names if tag_name not in self.sm.tags]
-            if len(self.sm.tags) + len(tag_names) > MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=405)
+            if len(self.sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=405)
             self.sm.tags.extend(tag_names)
 
         elif action == "tag_delete":
@@ -705,10 +684,10 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         state = request.GET.get('state', None)
 
         flow = Flow.from_client_secrets_file(
-            GC_CREDENTIALS_PATH,
-            scopes=GC_SCOPES,
+            settings.GC_CREDENTIALS_PATH,
+            scopes=settings.GC_SCOPES,
             state=state)
-        flow.redirect_uri = GC_REDIRECT_URI
+        flow.redirect_uri = settings.GC_REDIRECT_URI
 
         # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
         authorization_response = request.build_absolute_uri()        
@@ -747,8 +726,8 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
             logger.info(f"User {request.user} disabled google classroom API")
             return HttpResponse("Disabled gc api")
         flow = Flow.from_client_secrets_file(
-            GC_CREDENTIALS_PATH, scopes=GC_SCOPES)
-        flow.redirect_uri = GC_REDIRECT_URI
+            settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
+        flow.redirect_uri = settings.GC_REDIRECT_URI
         # Generate URL for request to Google's OAuth 2.0 server.
         # Use kwargs to set optional request parameters.
         authorization_url, state = flow.authorization_url(

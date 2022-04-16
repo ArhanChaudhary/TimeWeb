@@ -10,7 +10,7 @@ from django.conf import settings
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
 from timewebapp.models import SettingsModel, TimewebModel
-from timewebapp.views import TimewebGenericView, CHANGELOGS, MAX_NUMBER_ASSIGNMENTS, logger
+from timewebapp.views import TimewebGenericView, logger
 
 # Signals
 from django.utils.decorators import method_decorator
@@ -107,8 +107,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.settings_model.timezone = self.form.cleaned_data.get("timezone")
         self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         if self.form.cleaned_data.get("restore_gc_assignments"):
-            if self.assignment_models.count() > MAX_NUMBER_ASSIGNMENTS:
-                self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': MAX_NUMBER_ASSIGNMENTS}))
+            if self.assignment_models.count() > settings.MAX_NUMBER_ASSIGNMENTS:
+                self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
                 return self.invalid_form(request)
             else:
                 self.settings_model.added_gc_assignment_ids = []
@@ -150,5 +150,5 @@ class ChangelogView(TimewebGenericView):
     template_name = "navbar/changelog.html"
 
     def get(self, request):
-        self.context['changelogs'] = CHANGELOGS
+        self.context['changelogs'] = settings.CHANGELOGS
         return super().get(request)
