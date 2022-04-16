@@ -55,7 +55,7 @@ with open("timewebapp/changelogs.json", "r") as f:
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc-api-credentials.json"
+GC_CREDENTIALS_PATH = settings.BASE_DIR / "gc_api_credentials.json"
 
 if settings.DEBUG:
     GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
@@ -775,7 +775,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         creds.refresh(Request())
         #     else:
         #         flow = InstalledAppFlow.from_client_secrets_file(
-        #             'gc-api-credentials.json', SCOPES)
+        #             'gc_api_credentials.json', SCOPES)
         #         creds = flow.run_local_server(port=0)
         #     # Save the credentials for the next run
         #     with open('token.json', 'w') as token:

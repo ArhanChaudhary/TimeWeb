@@ -193,7 +193,7 @@ else:
     GS_PROJECT_ID = 'timeweb-308201'
     from google.oauth2 import service_account
     GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        BASE_DIR / "sa-private-key.json"
+        BASE_DIR / "sa_private_key.json"
     )
 # Django Logging config
 ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'WARNING'

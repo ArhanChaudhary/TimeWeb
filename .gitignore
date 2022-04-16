@@ -78,8 +78,8 @@ example_assignment_load.py
 pre_changelogs.py
 
 # Google API requests
-sa-private-key.json
-gc-api-credentials.json
+sa_private_key.json
+gc_api_credentials.json
 
 # Flask stuff:
 instance/
