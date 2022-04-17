@@ -142,7 +142,7 @@ class TimewebGenericView(View):
             return timezone.localtime(utctime)
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
-    template_name = 'index.html'
+    template_name = 'app.html'
 
     def add_user_models_to_context(self, request):
         self.context['assignment_models'] = self.assignment_models

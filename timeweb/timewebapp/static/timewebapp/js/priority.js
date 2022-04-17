@@ -851,7 +851,7 @@ class Priority {
                 });
             });
         }
-        // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in index.css
+        // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in app.css
         $(".finished").first().addClass("first-add-line-wrapper");
         $(".finished").last().addClass("last-add-line-wrapper");
         $(".incomplete-works").first().addClass("first-add-line-wrapper");
