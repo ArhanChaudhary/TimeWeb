@@ -98,7 +98,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
     'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
-    'timewebapp.middleware.AddSiteID.AddSiteID',
+    'misc.middleware.AddSiteID.AddSiteID',
 ]
 CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
