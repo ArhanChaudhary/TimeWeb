@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TimewebModel, SettingsModel
+from .models import TimewebModel
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
 
@@ -15,4 +15,3 @@ def staff_or_404(u):
 admin.site.login = user_passes_test(staff_or_404)(admin.site.login)
 
 admin.site.register(TimewebModel)
-admin.site.register(SettingsModel)

@@ -16,7 +16,8 @@ from decimal import Decimal
 
 # App stuff
 from django.conf import settings
-from .models import TimewebModel, SettingsModel
+from .models import TimewebModel
+from navbar.models import SettingsModel
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
 from django.contrib.auth import get_user_model

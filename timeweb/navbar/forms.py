@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 import datetime
 from colorfield.widgets import ColorWidget
-from timewebapp.models import SettingsModel
+from .models import SettingsModel
 
 class SettingsForm(forms.ModelForm):
     class Meta:

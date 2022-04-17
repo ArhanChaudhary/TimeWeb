@@ -9,7 +9,8 @@ from django.shortcuts import redirect
 from django.conf import settings
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
-from timewebapp.models import SettingsModel, TimewebModel
+from timewebapp.models import TimewebModel
+from navbar.models import SettingsModel
 from timewebapp.views import TimewebGenericView, logger
 
 # Signals
