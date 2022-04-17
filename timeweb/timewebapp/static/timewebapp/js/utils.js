@@ -549,7 +549,7 @@ utils = {
                     }
                     tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
 
-                    if (sa.tags.length + tag_names.size > settings.MAX_NUMBER_OF_TAGS) {
+                    if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
                         $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
                         $(this).find(".tag-add-input").val("Too Many Tags!");
                         tag_names = new Set();
@@ -955,7 +955,7 @@ utils = {
             $("#tutorial-click-assignment-to-open").remove();
             if (SETTINGS.enable_tutorial) {
                 const assignments_excluding_example = $(".assignment").filter(function() {
-                    return utils.loadAssignmentData($(this)).name !== settings.EXAMPLE_ASSIGNMENT_NAME;
+                    return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
                 });
                 if (assignments_excluding_example.length) {
                     first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>");
