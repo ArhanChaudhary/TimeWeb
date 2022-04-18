@@ -260,8 +260,7 @@
       </div>
     </div>
   </template>
-  {{self.settings_model.oauth_token}}
-  <div id="toggle-gc-container" class="{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in self.settings_model.oauth_token %}enabled{% endif%}">
+  <div id="toggle-gc-container" class="{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in settings_model.oauth_token %}enabled{% endif %}">
     <span id="toggle-gc-label">{% if creating_gc_assignments_from_frontend %}Adding Google Classroom Assignments...{% elif GC_API_INIT_FAILED %}Authentication failed. Please try again{% endif %}</span>
     <img src="{% static 'timewebapp/images/gc_icon.png' %}" width="42" height="42">
   </div>
