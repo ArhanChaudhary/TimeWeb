@@ -90,8 +90,6 @@ class TimewebGenericView(View):
         self.context = get_default_context()
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            self.isExampleAccount = request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
@@ -163,7 +161,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
-        if self.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
+        if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
 
         action = request.POST['action']
         if action == 'delete_assignment':
@@ -200,7 +198,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         # Parts of the form that can only validate in views
         form_is_valid = True
-        if self.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
+        if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
         elif self.created_assignment and self.assignment_models.count() > settings.MAX_NUMBER_ASSIGNMENTS:
@@ -634,7 +632,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
-        if self.isExampleAccount: return redirect("home")
+        if request.isExampleAccount: return redirect("home")
         # Callback URI
         state = request.GET.get('state', None)
 
@@ -669,7 +667,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         return redirect("home")
 
     def post(self, request):
-        if self.isExampleAccount: return HttpResponse(status=204)
+        if request.isExampleAccount: return HttpResponse(status=204)
         # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
         if 'token' in request.user.settingsmodel.oauth_token:
             request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}

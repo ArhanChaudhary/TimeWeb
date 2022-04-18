@@ -2,7 +2,7 @@ from django.core.exceptions import RequestDataTooBig
 from django.http.response import HttpResponse
 from django.urls import reverse
 
-class CatchRequestDataTooBig(object):
+class CatchRequestDataTooBig:
     def __init__(self, get_response):
         self.get_response = get_response
 

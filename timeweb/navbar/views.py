@@ -77,7 +77,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             
     
     def valid_form(self, request):
-        if self.isExampleAccount: return redirect("home")
+        if request.isExampleAccount: return redirect("home")
         request.user.settingsmodel.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
         request.user.settingsmodel.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         request.user.settingsmodel.def_break_days = self.form.cleaned_data.get("def_break_days")
