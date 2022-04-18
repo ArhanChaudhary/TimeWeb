@@ -89,9 +89,6 @@ class TimewebGenericView(View):
     def __init__(self):
         self.context = get_default_context()
 
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
     def get(self, request):
         return render(request, self.template_name, self.context)
 
