@@ -85,6 +85,12 @@ def get_default_context():
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 
+def utc_to_local(request, utctime):
+    if request.user.is_authenticated and request.user.settingsmodel.timezone:
+        return utctime.astimezone(request.user.settingsmodel.timezone)
+    else:
+        return timezone.localtime(utctime)
+
 class TimewebGenericView(View):
     def __init__(self):
         self.context = get_default_context()
@@ -92,11 +98,6 @@ class TimewebGenericView(View):
     def get(self, request):
         return render(request, self.template_name, self.context)
 
-    def utc_to_local(self, request, utctime):
-        if request.user.is_authenticated and request.user.settingsmodel.timezone:
-            return utctime.astimezone(request.user.settingsmodel.timezone)
-        else:
-            return timezone.localtime(utctime)
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
@@ -122,8 +123,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
         
         utc_now = timezone.now()
-        local_now = self.utc_to_local(request, utc_now)
-        local_last_login = self.utc_to_local(request, request.user.last_login)
+        local_now = utc_to_local(request, utc_now)
+        local_last_login = utc_to_local(request, request.user.last_login)
         if local_last_login.day != local_now.day:
             # Only notify if the date has changed until 4 AM the next day after the last login
             if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
@@ -252,12 +253,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.works = [str(first_work)]
             self.sm.needs_more_info = True
         else:
-            date_now = self.utc_to_local(request, timezone.now())
+            date_now = utc_to_local(request, timezone.now())
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if settings.EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
                 original_date_now = date_now
-                date_now = self.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
+                date_now = utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
                 self.sm.assignment_date -= original_date_now - date_now
                 self.sm.x -= original_date_now - date_now
             if self.created_assignment or self.sm.needs_more_info:
@@ -422,7 +423,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     include_granted_scopes='true')
                 return HttpResponse(authorization_url)
 
-        date_now = self.utc_to_local(request, timezone.now())
+        date_now = utc_to_local(request, timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         service = build('classroom', 'v1', credentials=credentials)
 
@@ -442,7 +443,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
                 except ValueError:
                     assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
-                assignment_date = self.utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
+                assignment_date = utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
                 assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
                 x = assignment.get('dueDate', None)
                 tags = []
@@ -451,7 +452,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                     if "minutes" in assignment['dueTime']:
                         assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                    x = self.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
+                    x = utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
                     if x < date_now:
                         continue
 
