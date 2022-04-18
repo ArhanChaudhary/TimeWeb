@@ -95,10 +95,7 @@ class TimewebGenericView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        return self.render_with_dynamic_context(request, self.template_name, self.context)
-
-    def render_with_dynamic_context(self, request, file, context):
-        return render(request, file, context)
+        return render(request, self.template_name, self.context)
 
     def utc_to_local(self, request, utctime):
         if request.user.is_authenticated and request.user.settingsmodel.timezone:
