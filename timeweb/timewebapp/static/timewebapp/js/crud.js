@@ -224,7 +224,7 @@ class Crud {
             if (sa.name === EXAMPLE_ASSIGNMENT_NAME) {
                 $.alert({
                     title: "You cannot modify the example assignment",
-                    content: "Don't worry, you can edit any other assignment you create"
+                    content: "Don't worry, you can modify everything else"
                 });
                 return;
             }
