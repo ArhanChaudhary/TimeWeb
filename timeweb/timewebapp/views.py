@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.http import HttpResponse
 from django.views import View
+from django.views.generic.base import TemplateResponseMixin
 from django.contrib.auth import logout, login
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -83,12 +84,12 @@ def utc_to_local(request, utctime):
     else:
         return timezone.localtime(utctime)
 
-class TimewebGenericView(View):
+class TimewebGenericView(TemplateResponseMixin, View):
     def __init__(self):
         self.context = {}
 
     def get(self, request):
-        return render(request, self.template_name, self.context)
+        return self.render_to_response(self.context)
 
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
