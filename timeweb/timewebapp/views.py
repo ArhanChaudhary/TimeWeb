@@ -98,30 +98,11 @@ class TimewebGenericView(View):
         return self.render_with_dynamic_context(request, self.template_name, self.context)
 
     def render_with_dynamic_context(self, request, file, context):
-        if not hasattr(self, "settings_model"):
-            if not request.user.is_authenticated:
-                return render(request, file, context)
-            self.settings_model = SettingsModel.objects.filter(user=request.user)
-            if not self.settings_model.exists():
-                return render(request, file, context)
-            self.settings_model = self.settings_model.first()
-
         return render(request, file, context)
 
     def utc_to_local(self, request, utctime):
-        use_settings_timezone = False
-        if hasattr(self, "settings_model"):
-            if self.settings_model.timezone:
-                use_settings_timezone = True
-        elif request.user.is_authenticated:
-            self.settings_model = SettingsModel.objects.filter(user=request.user)
-            if self.settings_model.exists():
-                self.settings_model = self.settings_model.first()
-                if self.settings_model.timezone:
-                    use_settings_timezone = True
-
-        if use_settings_timezone:
-            return utctime.astimezone(self.settings_model.timezone)
+        if request.user.is_authenticated and request.user.settingsmodel.timezone:
+            return utctime.astimezone(request.user.settingsmodel.timezone)
         else:
             return timezone.localtime(utctime)
 
@@ -130,23 +111,22 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def add_user_models_to_context(self, request):
         self.context['assignment_models'] = self.assignment_models
-        self.context['settings_model'] = self.settings_model
+        self.context['settings_model'] = request.user.settingsmodel
         self.context['assignment_models_as_json'] = list(self.assignment_models.values())
-        self.context['settings_model_as_json'] = model_to_dict(self.settings_model)
+        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel)
 
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
-        if not self.settings_model.seen_latest_changelog:
+        if not request.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = settings.CHANGELOGS[0]
 
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
-            self.context['creating_gc_assignments_from_frontend'] = 'token' in self.settings_model.oauth_token
+            self.context['creating_gc_assignments_from_frontend'] = 'token' in request.user.settingsmodel.oauth_token
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
 
     def get(self, request):
-        self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
         
         utc_now = timezone.now()
@@ -165,7 +145,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
         self.context['settings_form'] = SettingsForm({
-            'assignment_sorting': self.settings_model.assignment_sorting,
+            'assignment_sorting': request.user.settingsmodel.assignment_sorting,
         })
 
         # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
@@ -184,7 +164,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def post(self, request):
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
-        self.settings_model = SettingsModel.objects.get(user=request.user)
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
         if self.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
@@ -197,7 +176,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif action == 'change_setting':
             return self.change_setting(request)
         elif action == 'create_gc_assignments':
-            if 'token' in self.settings_model.oauth_token:
+            if 'token' in request.user.settingsmodel.oauth_token:
                 return self.create_gc_assignments(request)
             else:
                 return HttpResponse(status=401)
@@ -244,7 +223,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if not self.sm.unit:
                 self.sm.unit = "Minute"
             # Set defaults
-            self.sm.skew_ratio = self.settings_model.def_skew_ratio
+            self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
             # first_work is works[0]
             # Convert this to a decimal object because it can be a float
             first_work = Decimal(str(self.sm.works))
@@ -403,7 +382,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         #         old_data.blue_line_start != self.sm.blue_line_start or 
         #         old_data.dynamic_start != self.sm.dynamic_start
         # )):
-        #     self.sm.skew_ratio = self.settings_model.def_skew_ratio
+        #     self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
 
         self.sm.save()
         if self.created_assignment:
@@ -429,14 +408,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # The file token.json stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        credentials = Credentials.from_authorized_user_info(self.settings_model.oauth_token, settings.GC_SCOPES)
+        credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
         # If there are no valid credentials available, let the user log in.
         if not credentials.valid:
             if credentials.expired and credentials.refresh_token:
                 # Errors can happen in refresh because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
                 credentials.refresh(Request())
-                self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
-                self.settings_model.save()
+                request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
+                request.user.settingsmodel.save()
             else:
                 flow = Flow.from_client_secrets_file(
                     settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
@@ -516,9 +495,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     x=x,
                     due_time=due_time,
                     blue_line_start=blue_line_start,
-                    skew_ratio=self.settings_model.def_skew_ratio,
-                    min_work_time=self.settings_model.def_min_work_time,
-                    break_days=self.settings_model.def_break_days,
+                    skew_ratio=request.user.settingsmodel.def_skew_ratio,
+                    min_work_time=request.user.settingsmodel.def_min_work_time,
+                    break_days=request.user.settingsmodel.def_break_days,
                     dynamic_start=dynamic_start,
                     funct_round=1,
                     description=description,
@@ -542,15 +521,15 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             course_names[course['id']] = course['name']
             batch.add(coursework_lazy.list(courseId=course['id']))
         # Make "in" faster
-        set_added_gc_assignment_ids = set(self.settings_model.added_gc_assignment_ids)
+        set_added_gc_assignment_ids = set(request.user.settingsmodel.added_gc_assignment_ids)
         # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
         new_gc_assignment_ids = set()
         gc_models_to_create = []
         batch.execute()
         TimewebModel.objects.bulk_create(gc_models_to_create)
         if not gc_models_to_create: return HttpResponse(status=204) # or do new_gc_assignment_ids == set_added_gc_assignment_ids
-        self.settings_model.added_gc_assignment_ids = list(new_gc_assignment_ids)
-        self.settings_model.save()
+        request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
+        request.user.settingsmodel.save()
 
         request.session["already_created_gc_assignments_from_frontend"] = True
         return HttpResponse(status=205)
@@ -597,8 +576,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         setting = request.POST['setting']
         value = json.loads(request.POST['value'])
 
-        settings_model = self.settings_model # python for literally no reason at all doesn't allow self to be used in a list comprehension
-        model_fields = {i.name: getattr(settings_model, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
+        model_fields = {i.name: getattr(request.user.settingsmodel, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
         if setting not in model_fields:
             logger.warning(f"User \"{request.user}\" tried to change a setting that doesn't exist")
             return HttpResponse(f"The setting \"{setting}\" doesn't exist.", status=404)
@@ -609,8 +587,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             logger.warn(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
             return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
 
-        setattr(self.settings_model, setting, value)
-        self.settings_model.save()
+        setattr(request.user.settingsmodel, setting, value)
+        request.user.settingsmodel.save()
         return HttpResponse(status=204)
 
     def tag_add_or_delete(self, request, action):
@@ -660,7 +638,6 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
         if self.isExampleAccount: return redirect("home")
-        self.settings_model = SettingsModel.objects.get(user=request.user)
         # Callback URI
         state = request.GET.get('state', None)
 
@@ -689,21 +666,20 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
                 return redirect(reverse("home"))
         credentials = flow.credentials
         # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-        self.settings_model.oauth_token.update(json.loads(credentials.to_json()))
-        self.settings_model.save()
+        request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
+        request.user.settingsmodel.save()
         logger.info(f"User {request.user} enabled google classroom API")
         return redirect("home")
 
     def post(self, request):
-        self.settings_model = SettingsModel.objects.get(user=request.user)
         if self.isExampleAccount: return HttpResponse(status=204)
-        # self.settings_model.oauth_token stores the user's access and refresh tokens
-        if 'token' in self.settings_model.oauth_token:
-            self.settings_model.oauth_token = {"refresh_token": self.settings_model.oauth_token['refresh_token']}
+        # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
+        if 'token' in request.user.settingsmodel.oauth_token:
+            request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
             if settings.DEBUG:
                 # Re-add gc assignments in debug
-                self.settings_model.added_gc_assignment_ids = []
-            self.settings_model.save()
+                request.user.settingsmodel.added_gc_assignment_ids = []
+            request.user.settingsmodel.save()
             logger.info(f"User {request.user} disabled google classroom API")
             return HttpResponse("Disabled gc api")
         flow = Flow.from_client_secrets_file(

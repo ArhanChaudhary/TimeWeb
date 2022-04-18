@@ -25,38 +25,36 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
     def get(self,request):
-        self.settings_model = SettingsModel.objects.get(user=request.user)
         initial = {
-            'def_min_work_time': self.settings_model.def_min_work_time,
-            'def_skew_ratio': self.settings_model.def_skew_ratio,
-            'def_break_days': self.settings_model.def_break_days,
-            'def_due_time': self.settings_model.def_due_time,
-            'def_funct_round_minute': self.settings_model.def_funct_round_minute,
-            'ignore_ends': self.settings_model.ignore_ends,
-            'animation_speed': self.settings_model.animation_speed,
-            'show_priority': self.settings_model.show_priority,
-            'one_graph_at_a_time': self.settings_model.one_graph_at_a_time,
-            'close_graph_after_work_input': self.settings_model.close_graph_after_work_input,
-            'highest_priority_color': self.settings_model.highest_priority_color,
-            'lowest_priority_color': self.settings_model.lowest_priority_color,
-            'assignment_sorting': self.settings_model.assignment_sorting,
-            'default_dropdown_tags': self.settings_model.default_dropdown_tags,
-            'background_image': self.settings_model.background_image,
-            'enable_tutorial': self.settings_model.enable_tutorial,
-            'horizontal_tag_position': self.settings_model.horizontal_tag_position,
-            'vertical_tag_position': self.settings_model.vertical_tag_position,
-            'timezone': self.settings_model.timezone,
+            'def_min_work_time': request.user.settingsmodel.def_min_work_time,
+            'def_skew_ratio': request.user.settingsmodel.def_skew_ratio,
+            'def_break_days': request.user.settingsmodel.def_break_days,
+            'def_due_time': request.user.settingsmodel.def_due_time,
+            'def_funct_round_minute': request.user.settingsmodel.def_funct_round_minute,
+            'ignore_ends': request.user.settingsmodel.ignore_ends,
+            'animation_speed': request.user.settingsmodel.animation_speed,
+            'show_priority': request.user.settingsmodel.show_priority,
+            'one_graph_at_a_time': request.user.settingsmodel.one_graph_at_a_time,
+            'close_graph_after_work_input': request.user.settingsmodel.close_graph_after_work_input,
+            'highest_priority_color': request.user.settingsmodel.highest_priority_color,
+            'lowest_priority_color': request.user.settingsmodel.lowest_priority_color,
+            'assignment_sorting': request.user.settingsmodel.assignment_sorting,
+            'default_dropdown_tags': request.user.settingsmodel.default_dropdown_tags,
+            'background_image': request.user.settingsmodel.background_image,
+            'enable_tutorial': request.user.settingsmodel.enable_tutorial,
+            'horizontal_tag_position': request.user.settingsmodel.horizontal_tag_position,
+            'vertical_tag_position': request.user.settingsmodel.vertical_tag_position,
+            'timezone': request.user.settingsmodel.timezone,
             'restore_gc_assignments': False,
-            'dark_mode': self.settings_model.dark_mode,
+            'dark_mode': request.user.settingsmodel.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
 
-        self.context['settings_model'] = self.settings_model
+        self.context['settings_model'] = request.user.settingsmodel
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return super().get(request)
         
     def post(self, request):
-        self.settings_model = SettingsModel.objects.get(user=request.user)
         self.assignment_models = TimewebModel.objects.filter(user=request.user)
 
         # for parsing default due times in forms.py
@@ -80,41 +78,41 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def valid_form(self, request):
         if self.isExampleAccount: return redirect("home")
-        self.settings_model.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
-        self.settings_model.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
-        self.settings_model.def_break_days = self.form.cleaned_data.get("def_break_days")
-        self.settings_model.def_due_time = self.form.cleaned_data.get("def_due_time")
-        self.settings_model.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
+        request.user.settingsmodel.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
+        request.user.settingsmodel.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
+        request.user.settingsmodel.def_break_days = self.form.cleaned_data.get("def_break_days")
+        request.user.settingsmodel.def_due_time = self.form.cleaned_data.get("def_due_time")
+        request.user.settingsmodel.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
         # Automatically reflect rounding to multiples of 5 minutes
-        if self.settings_model.def_funct_round_minute:
+        if request.user.settingsmodel.def_funct_round_minute:
             for assignment in self.assignment_models:
                 if assignment.unit and assignment.unit.lower() in ('minute', 'minutes') and assignment.funct_round != 5:
                     assignment.funct_round = 5
             TimewebModel.objects.bulk_update(self.assignment_models, ['funct_round'])
-        self.settings_model.ignore_ends = self.form.cleaned_data.get("ignore_ends")
-        self.settings_model.animation_speed = self.form.cleaned_data.get("animation_speed")
-        self.settings_model.show_priority = self.form.cleaned_data.get("show_priority")
-        self.settings_model.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
-        self.settings_model.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")
-        self.settings_model.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
-        self.settings_model.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
+        request.user.settingsmodel.ignore_ends = self.form.cleaned_data.get("ignore_ends")
+        request.user.settingsmodel.animation_speed = self.form.cleaned_data.get("animation_speed")
+        request.user.settingsmodel.show_priority = self.form.cleaned_data.get("show_priority")
+        request.user.settingsmodel.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
+        request.user.settingsmodel.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")
+        request.user.settingsmodel.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
+        request.user.settingsmodel.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
         if self.checked_background_image_clear:
-            self.settings_model.background_image = None
+            request.user.settingsmodel.background_image = None
         elif self.form.cleaned_data.get("background_image"):
-            self.settings_model.background_image = self.form.cleaned_data.get("background_image")
-        self.settings_model.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
-        self.settings_model.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
-        self.settings_model.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
-        self.settings_model.timezone = self.form.cleaned_data.get("timezone")
-        self.settings_model.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
+            request.user.settingsmodel.background_image = self.form.cleaned_data.get("background_image")
+        request.user.settingsmodel.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
+        request.user.settingsmodel.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
+        request.user.settingsmodel.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
+        request.user.settingsmodel.timezone = self.form.cleaned_data.get("timezone")
+        request.user.settingsmodel.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         if self.form.cleaned_data.get("restore_gc_assignments"):
             if self.assignment_models.count() > settings.MAX_NUMBER_ASSIGNMENTS:
                 self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
                 return self.invalid_form(request)
             else:
-                self.settings_model.added_gc_assignment_ids = []
-        self.settings_model.dark_mode = self.form.cleaned_data.get("dark_mode")
-        self.settings_model.save()
+                request.user.settingsmodel.added_gc_assignment_ids = []
+        request.user.settingsmodel.dark_mode = self.form.cleaned_data.get("dark_mode")
+        request.user.settingsmodel.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
     
