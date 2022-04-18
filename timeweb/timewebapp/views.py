@@ -73,14 +73,6 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
 
 logger = getLogger('django')
 logger.propagate = False
-def get_default_context():
-    return {
-        "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_JSON["name"],
-        "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
-        "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
-        "DEBUG": settings.DEBUG,
-    }
 
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
@@ -93,7 +85,7 @@ def utc_to_local(request, utctime):
 
 class TimewebGenericView(View):
     def __init__(self):
-        self.context = get_default_context()
+        self.context = {}
 
     def get(self, request):
         return render(request, self.template_name, self.context)
