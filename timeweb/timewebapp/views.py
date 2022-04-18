@@ -56,21 +56,9 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         # The front end adjusts the assignment and due date, so we don't need to worry about using utc_to_local instead of localtime
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        TimewebModel.objects.create(**{
-            "name": settings.EXAMPLE_ASSIGNMENT_NAME,
+        TimewebModel.objects.create(**settings.EXAMPLE_ASSIGNMENT_JSON | {
             "assignment_date": date_now,
-            "x": date_now + datetime.timedelta(30),
-            "unit": "Page",
-            "y": "400.00",
-            "blue_line_start": 0,
-            "skew_ratio": "1.0000000000",
-            "time_per_unit": "3.00",
-            "funct_round": "1.00",
-            "min_work_time": "60.00",
-            "break_days": [],
-            "dynamic_start": 0,
-            "mark_as_done": False,
-            "description": "Example assignment description",
+            "x": date_now + datetime.timedelta(settings.EXAMPLE_ASSIGNMENT_JSON["x"]),
             "user": instance,
         })
         SettingsModel.objects.create(user=instance)
@@ -88,7 +76,7 @@ logger.propagate = False
 def get_default_context():
     return {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_NAME,
+        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_JSON["name"],
         "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,

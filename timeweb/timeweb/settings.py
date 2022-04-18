@@ -326,7 +326,21 @@ else:
 
 MAX_NUMBER_OF_TAGS = 5
 MAX_NUMBER_ASSIGNMENTS = 100
-EXAMPLE_ASSIGNMENT_NAME = "Reading a Book (EXAMPLE ASSIGNMENT)"
+EXAMPLE_ASSIGNMENT_JSON = {
+    "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
+    "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
+    "unit": "Page",
+    "y": "400.00",
+    "blue_line_start": 0,
+    "skew_ratio": "1.0000000000",
+    "time_per_unit": "3.00",
+    "funct_round": "1.00",
+    "min_work_time": "60.00",
+    "break_days": [],
+    "dynamic_start": 0,
+    "mark_as_done": False,
+    "description": "Example assignment description"
+}
 EDITING_EXAMPLE_ACCOUNT = False
 
 # Changelog
