@@ -106,7 +106,6 @@ class TimewebGenericView(View):
                 return render(request, file, context)
             self.settings_model = self.settings_model.first()
 
-        context['dark_mode'] = self.settings_model.dark_mode
         return render(request, file, context)
 
     def utc_to_local(self, request, utctime):
