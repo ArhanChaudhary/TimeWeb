@@ -35,9 +35,8 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
             return self.invalid_form(request)  
 
     def valid_form(self, request):
-        self.user_model = User.objects.get(email=request.user.email)
-        self.user_model.username = self.form.cleaned_data.get('username')
-        self.user_model.save()
+        request.user.username = self.form.cleaned_data.get('username')
+        request.user.save()
         logger.info(f'User \"{request.user}\" updated their username')
         return redirect("home")
 
