@@ -96,9 +96,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
     def add_user_models_to_context(self, request):
-        self.context['assignment_models'] = self.assignment_models
+        self.context['assignment_models'] = request.user.timewebmodel_set.all()
         self.context['settings_model'] = request.user.settingsmodel
-        self.context['assignment_models_as_json'] = list(self.assignment_models.values())
+        self.context['assignment_models_as_json'] = list(request.user.timewebmodel_set.all().values())
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel)
 
         del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
@@ -112,9 +112,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
 
-    def get(self, request):
-        self.assignment_models = TimewebModel.objects.filter(user=request.user)
-        
+    def get(self, request):        
         utc_now = timezone.now()
         local_now = utc_to_local(request, utc_now)
         local_last_login = utc_to_local(request, request.user.last_login)
@@ -122,10 +120,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # Only notify if the date has changed until 4 AM the next day after the last login
             if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
                 self.context['NOTIFY_DATE_CHANGED'] = True
-            for assignment in self.assignment_models:
+            for assignment in request.user.timewebmodel_set.all():
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
-            TimewebModel.objects.bulk_update(self.assignment_models, ['mark_as_done'])
+            TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
         request.user.last_login = utc_now
         request.user.save()
         self.add_user_models_to_context(request)
@@ -149,7 +147,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         return super().get(request)
 
     def post(self, request):
-        self.assignment_models = TimewebModel.objects.filter(user=request.user)
         if 'submit-button' in request.POST: return self.assignment_form_submitted(request)
         # AJAX requests
         if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=204)
@@ -192,7 +189,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
-        elif self.created_assignment and self.assignment_models.count() > settings.MAX_NUMBER_ASSIGNMENTS:
+        elif self.created_assignment and request.user.timewebmodel_set.all().count() > settings.MAX_NUMBER_ASSIGNMENTS:
             self.form.add_error("name", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
             form_is_valid = False
         if not self.form.is_valid():
@@ -607,7 +604,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     # def tag_update(self, request):
     #     old_tag_name = request.POST['old_tag_namestrip()
     #     new_tag_name = request.POST['new_tag_name'].strip()
-    #     assignment_models = TimewebModel.objects.filter(user__username=request.user)
+    #     assignment_models = request.user.timewebmodel_set.all()
     #     for assignment in assignment_models:
     #         if new_tag_name in (assignment.tags or []):
     #             return HttpResponse("alreadyExists")
