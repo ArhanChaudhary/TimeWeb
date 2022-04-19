@@ -1,12 +1,10 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 
 # Django abstractions
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.http import HttpResponse
-from django.views import View
-from django.views.generic.base import TemplateResponseMixin
 from django.contrib.auth import logout, login
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -17,22 +15,15 @@ from decimal import Decimal
 
 # App stuff
 from django.conf import settings
+from common.views import User, TimewebGenericView
 from .models import TimewebModel
 from navbar.models import SettingsModel
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
-from django.contrib.auth import get_user_model
-User = get_user_model() # I can't import this from timewebauth because of circular imports
 
 # Signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from allauth import ratelimit
-def consume_or_message(request, message="You are submitting too many requests. Please wait a bit before trying again", *args, **kwargs):
-    if not ratelimit.consume(request, *args, **kwargs):
-        messages.error(request, message)
-        return redirect(request.META['HTTP_REFERER'])
-ratelimit.consume_or_429 = consume_or_message
 
 # Formatting
 from django.forms.models import model_to_dict
@@ -48,8 +39,7 @@ from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
 # Misc
-from django.contrib import messages
-from logging import getLogger
+from common.utils import logger, days_between_two_dates, utc_to_local
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -71,26 +61,6 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
             for permission in permissions:
                 instance.user_permissions.add(permission)
             instance.save()
-
-logger = getLogger('django')
-logger.propagate = False
-
-def days_between_two_dates(day1, day2):
-    return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
-
-def utc_to_local(request, utctime):
-    if request.user.is_authenticated and request.user.settingsmodel.timezone:
-        return utctime.astimezone(request.user.settingsmodel.timezone)
-    else:
-        return timezone.localtime(utctime)
-
-class TimewebGenericView(TemplateResponseMixin, View):
-    def __init__(self):
-        self.context = {}
-
-    def get(self, request):
-        return self.render_to_response(self.context)
-
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'

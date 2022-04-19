@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 # App stuff
-from timewebapp.views import TimewebGenericView
+from common.views import TimewebGenericView
 
 def custom_permission_denied_view(request, reason=""):
     response = render(request, "misc/403_csrf.html", {"request": request})

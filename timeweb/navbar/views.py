@@ -10,8 +10,7 @@ from django.conf import settings
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
 from timewebapp.models import TimewebModel
-from navbar.models import SettingsModel
-from timewebapp.views import TimewebGenericView, logger
+from common.views import TimewebGenericView
 
 # Signals
 from django.utils.decorators import method_decorator
@@ -20,6 +19,7 @@ from allauth.decorators import rate_limit
 # Misc
 from django.contrib import messages
 from requests import get as requests_get
+from common.utils import logger
 
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
