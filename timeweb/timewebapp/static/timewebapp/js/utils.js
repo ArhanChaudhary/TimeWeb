@@ -224,7 +224,7 @@ utils = {
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
-                $("#current-date-text").text(`${NOTIFY_DATE_CHANGED ? "(The current date has changed) " : ""}Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+                $("#current-date-text").text(`Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
                 $("#next-day, #previous-day").click(function() {
                     let previous_day = false;
@@ -1071,7 +1071,7 @@ utils = {
             // Ensure fonts load for the graph
             document.fonts.ready.then(function() {
                 if (!SETTINGS.enable_tutorial) 
-                    // setTimeout so the assignments aren't clicked before the handler is set
+                    // setTimeout so the assignments are clicked after the click handlers are set
                     setTimeout(function() {
                         // Reopen closed assignments
                         if ("open_assignments" in sessionStorage) {
@@ -1088,6 +1088,12 @@ utils = {
                             localStorage.removeItem("scroll");
                         }
                     }, 0);
+                if (new Date().getDate() - new Date(+localStorage.getItem("last-visit")).getDate() === 1 && new Date().getHours() < 4) {
+                    // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
+                    // this alert is for fellow insomniacs who lose track of time
+                    $("#current-date-text").text(`(The current date has changed) ${$("#current-date-text").text()}`);
+                }
+                localStorage.setItem("last-visit", new Date().valueOf());
             });
         },
     },

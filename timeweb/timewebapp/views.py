@@ -88,15 +88,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         local_now = utc_to_local(request, utc_now)
         local_last_login = utc_to_local(request, request.user.last_login)
         if local_last_login.day != local_now.day:
-            # Only notify if the date has changed until 4 AM the next day after the last login
-            if local_now.hour < 4 and local_now.day - local_last_login.day == 1:
-                self.context['NOTIFY_DATE_CHANGED'] = True
             for assignment in request.user.timewebmodel_set.all():
                 if assignment.mark_as_done:
                     assignment.mark_as_done = False
             TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
-        request.user.last_login = utc_now
-        request.user.save()
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
         self.context['settings_form'] = SettingsForm({
