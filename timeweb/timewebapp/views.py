@@ -710,12 +710,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         pass
 
 class ExampleAccountView(TimewebView):
-
-    def dispatch(self, *args, **kwargs):
-        return super(TimewebGenericView, self).dispatch(*args, **kwargs)
-
     def get(self, request):
         logout(request)
         login(request, User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL), 'allauth.account.auth_backends.AuthenticationBackend')
-        # Must be a redirect so document.location is at home directory, which things using request.path need
-        return redirect("home")
+        return redirect("home") # PRG
