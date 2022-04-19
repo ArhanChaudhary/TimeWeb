@@ -390,7 +390,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         def add_gc_assignments_from_response(response_id, course_coursework, exception):
             if type(exception) is HttpError: # HttpError for permission denied (ex if you're the teacher of a class)
-                logger.warn(exception)
+                logger.warning(exception)
                 return
             if not course_coursework:
                 return
@@ -538,7 +538,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         model_fields[setting] = value
         validation_form = SettingsForm(model_fields)
         if not validation_form.is_valid(): 
-            logger.warn(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
+            logger.warning(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
             return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
 
         setattr(request.user.settingsmodel, setting, value)
