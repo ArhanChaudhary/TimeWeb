@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth import logout, login
 from django.forms import ValidationError
+from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 import datetime
@@ -680,7 +681,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #         pass
 
 EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
-class ExampleAccountView(TimewebView):
+class ExampleAccountView(View):
     def get(self, request):
         logout(request)
         login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
