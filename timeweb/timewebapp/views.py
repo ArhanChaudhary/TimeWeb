@@ -679,8 +679,9 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
         #     except HttpError:
         #         pass
 
+EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
 class ExampleAccountView(TimewebView):
     def get(self, request):
         logout(request)
-        login(request, User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL), 'allauth.account.auth_backends.AuthenticationBackend')
+        login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
         return redirect("home") # PRG
