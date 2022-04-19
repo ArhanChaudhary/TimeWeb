@@ -428,7 +428,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     if days_between_two_dates(date_now, assignment_date) > 60:
                         continue
                     due_time = None
-                name = Truncator(assignment['title']).chars(TimewebModel.name.field.max_length).strip()
+                name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
                 tags.insert(0, course_names[assignment['courseId']])
                 description = assignment.get('description', "")
 
