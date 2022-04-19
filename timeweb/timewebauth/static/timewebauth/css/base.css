@@ -67,6 +67,10 @@ body {
     justify-content: center;
     align-items: center;
 }
+#logo-container img {
+    max-height: 80px;
+    max-width: 100%;
+}
 #circles-background {
     filter: url("#goo");
     overflow: hidden;
