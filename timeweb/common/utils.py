@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.contrib.sites.models import Site
 from logging import getLogger
 from django.utils import timezone
 
@@ -12,4 +14,9 @@ def utc_to_local(request, utctime):
         return utctime.astimezone(request.user.settingsmodel.timezone)
     else:
         return timezone.localtime(utctime)
-    
+
+try:
+    current_site = Site.objects.get(domain="localhost" if settings.DEBUG else "timeweb.io")
+except Site.DoesNotExist:
+    current_site = Site.objects.get(domain="example.com")
+settings.SITE_ID = current_site.id
