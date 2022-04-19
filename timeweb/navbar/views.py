@@ -1,4 +1,4 @@
-# Django abstractions
+# Abstractions
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _

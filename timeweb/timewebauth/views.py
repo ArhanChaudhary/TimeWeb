@@ -1,9 +1,14 @@
-from django.conf import settings
+# Abstractions
 from common.views import TimewebGenericView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from .forms import UsernameResetForm
 from django.forms import ValidationError
+
+# App stuff
+from django.conf import settings
+from .forms import UsernameResetForm
+
+# Misc
 from common.utils import logger
 from allauth.account.adapter import DefaultAccountAdapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames

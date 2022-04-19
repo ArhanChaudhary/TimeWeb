@@ -1,6 +1,6 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 
-# Django abstractions
+# Abstractions
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.urls import reverse
