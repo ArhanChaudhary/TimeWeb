@@ -628,22 +628,32 @@ utils = {
                 $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
                 $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
                 const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
+
+                // This code handles the logic for determining which tags should be added to the tag add dropdown. Let's break this down:
+
                 // Push every tag from every assignment
                 let allTags = [];
                 dat.forEach(sa => allTags.push(...sa.tags));
-                // Remove duplicate tags
+                // Filter out duplicate tags
                 let unique_allTags = new Set(allTags);
-                // Remove "Important", "Not Important", and default_dropdown_tags
+                // Remove "Important" and "Not Important" so they can be added first
                 unique_allTags.delete("Important");
                 unique_allTags.delete("Not Important");
-                unique_allTags = Array.from(unique_allTags).filter(e => !SETTINGS.default_dropdown_tags.includes(e));
-                // Add back in "Important", "Not Important", and default_dropdown_tags
+                // Filter ouf default dropdown tags so is in a separate sorting group
+                // Also filter out tags that are already in the assignment
+                let current_assignment_tags = utils.loadAssignmentData(dom_assignment).tags;
+                unique_allTags = [...unique_allTags].filter(e => !(SETTINGS.default_dropdown_tags.includes(e) || current_assignment_tags.includes(e)));
+
                 const final_allTags = [];
+                // Add back in "Important", "Not Important"
                 final_allTags.push("Important");
                 final_allTags.push("Not Important");
+                // And default_dropdown_tags
                 final_allTags.push(...SETTINGS.default_dropdown_tags);
-                // Add sorted all tags
+                // Finally, add sorted unique_allTags
                 final_allTags.push(...unique_allTags.sort());
+
+
 
                 // The tag add box can be reopened while the transitionend from the transitionCloseTagBox function hasn't yet fired, causing all the tags to disppear
                 // Trigger the transitionend if this is the case, and since transitionCloseTagAddBox uses .one, it will be disabled after
