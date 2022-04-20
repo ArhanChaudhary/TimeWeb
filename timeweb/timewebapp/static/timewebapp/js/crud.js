@@ -173,7 +173,7 @@ class Crud {
         const val = $("#id_unit").val().trim();
         const plural = val ? pluralize(val) : "Minutes",
             singular = val ? pluralize(val, 1) : "Minute";
-        $("label[for='id_works']").onlyText(`Total number of ${plural} already Completed`);
+        $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
         $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (val) {
