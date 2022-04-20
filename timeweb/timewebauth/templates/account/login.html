@@ -23,14 +23,20 @@
   
   {% include "account/accounts_messages.html" %}
   {% for field in form %}
-    <span>
+    <div>
       <label for="{{ field.auto_id }}">{{ field.label }}</label>
-      {{ field }}
-    </span>
+      {% if field.name == "password" %}
+        <div class="field-container">
+          <img src="{% static 'timewebauth/images/hide.png' %}" class="password-image show-password-image" width="22">
+          <img src="{% static 'timewebauth/images/show.png' %}" class="password-image hide-password-image" width="22">
+          {{ field }}
+        </div>
+      {% else %}
+        {{ field }}
+      {% endif %}
+    </div>
   {% endfor %}
 
-  <img src="{% static 'timewebauth/images/hide.png' %}" class="password-image show-password-image" width="22">
-  <img src="{% static 'timewebauth/images/show.png' %}" class="password-image hide-password-image" width="22">
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
