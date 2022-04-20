@@ -267,7 +267,7 @@ class Crud {
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
             if (utils.in_simulation) {
-                this.setCustomValidity("You can't add or edit assignments in the simulation");
+                this.setCustomValidity("You can't add or edit assignments in the simulation; this functionality is not yet supported :(");
             } else {
                 this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
             }
