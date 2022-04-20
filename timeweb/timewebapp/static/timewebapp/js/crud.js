@@ -396,7 +396,6 @@ class Crud {
             zIndex: dom_assignment.css("z-index")-2,
         });
         const assignment_container = dom_assignment.parents(".assignment-container");
-        dom_assignment.addClass("assignment-is-deleting");
         // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
         assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             dat = dat.filter(_sa => sa.id !== _sa.id);
@@ -415,8 +414,8 @@ class Crud {
         // Unfocus to prevent pressing enter to click again
         $button.blur();
         const dom_assignment = $button.parents(".assignment");
-        // Deny updating or deleting again after queued
-        dom_assignment.css("pointer-events", "none");
+        if (dom_assignment.hasClass("assignment-is-deleting")) return;
+        dom_assignment.addClass("assignment-is-deleting");
         // Send data to backend and animates its deletion
         const success = function() {
             that.transitionDeleteAssignment(dom_assignment, {final_iteration: true});
@@ -436,8 +435,7 @@ class Crud {
             data: data,
             success: success,
             error: function() {
-                // If ajax failed, allow updating or deleting again
-                dom_assignment.css("pointer-events", "auto");
+                dom_assignment.removeClass("assignment-is-deleting");
                 ajaxUtils.error(...arguments);
             }
         });

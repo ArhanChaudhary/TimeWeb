@@ -339,6 +339,9 @@ a[href="/settings"] {
     margin-bottom: 2px;
     max-width: var(--left-side-of-header-width);
 }
+.assignment.assignment-is-deleting {
+    pointer-events: none;
+}
 .assignment.open-assignment, .assignment.assignment-is-closing {
     padding-bottom: unset;
 }
