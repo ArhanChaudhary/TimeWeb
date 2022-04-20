@@ -10,8 +10,9 @@
 
     <p>This page requires that you verify ownership of your e-mail address.</p>
 
-    <p>We have sent an e-mail to you with a verification link. Follow the link to finalize the verification process. Make sure to check your spam folder in case it was put there. Please
-    <a href="{% url 'contact_form' %}">contact us</a> if you don't receive it within a few minutes.</p>
+    <p>We have sent an e-mail to you with a verification link. Follow the link to finalize the verification process.</p>
+    
+    <p>Make sure to check your spam folder in case it was put there. Please <a href="{% url 'contact_form' %}">contact us</a> if you don't receive it within a few minutes.</p>
 
     <p>Note: you can still <a href="{{ email_url }}">change your e-mail address</a>.</p>
 {% endblock %}
