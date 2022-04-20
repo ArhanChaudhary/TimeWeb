@@ -207,6 +207,7 @@ hr {
 }
 #submit-button:active {
     transform: translateY(1px);
+    background: rgb(0, 109, 249);
 }
 
 #goo-svg {
