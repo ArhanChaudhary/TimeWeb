@@ -13,6 +13,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }).on('show.daterangepicker', function (e, picker) {
         picker.container.find(".calendar-table").hide();
+        // There's a random invisible datepicker, so only query the one that's visible
+        const minuteselect = picker.container.find(".minuteselect:visible");
+        minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
     });
     $("#reset-settings-button").click(function() {
         $.confirm({
