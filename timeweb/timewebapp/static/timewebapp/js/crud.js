@@ -400,7 +400,7 @@ class Crud {
         const assignment_container = dom_assignment.parents(".assignment-container");
         dom_assignment.addClass("assignment-is-deleting");
         // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
-        assignment_container.animate({marginBottom: -assignment_container.outerHeight()}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
+        assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             dat = dat.filter(_sa => sa.id !== _sa.id);
             // If a shorcut is in assignment_container, take it out so it doesn't get deleted
             assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
