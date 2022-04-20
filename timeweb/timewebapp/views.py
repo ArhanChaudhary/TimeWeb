@@ -678,6 +678,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
 EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
 class ExampleAccountView(View):
     def get(self, request):
-        logout(request)
+        if request.user.is_authenticated:
+            logout(request)
         login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
         return redirect("home") # PRG
