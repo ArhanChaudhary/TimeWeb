@@ -120,6 +120,12 @@ class LabeledResetPasswordForm(ResetPasswordForm):
     def _send_password_reset_mail(self, request, *args, **kwargs):
         super()._send_password_reset_mail(request, *args, **kwargs)
         messages.success(request, "Password reset e-mail has been sent.\n<p hidden>**Success**</p>")
+    
+    def clean_email(self, *args, **kwargs):
+        email = super().clean_email(*args, **kwargs)
+        if email == settings.EXAMPLE_ACCOUNT_EMAIL:
+            raise forms.ValidationError(_("You cannot request a password reset for the example account"))
+        return email
 
 class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
     username = forms.CharField(
