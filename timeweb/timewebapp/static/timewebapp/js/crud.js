@@ -178,19 +178,17 @@ class Crud {
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (val) {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
-            that.old_unit_value === "" && $("#id_time_per_unit").val("");
+            if (that.old_unit_value === "") {
+                $("#id_time_per_unit").val("");
+                $("#id_funct_round").val(1);
+            }
+            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
             $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
         } else {
             $("label[for='id_y']").text(`How Long will this Assignment take to Complete`);
             $("#id-time_per_unit-field-wrapper").addClass("hide-field");
             $("#id_time_per_unit").val(1);
-            if (SETTINGS.def_funct_round_minute && !val) {
-                $("#id_funct_round").val(5);
-            }
-        }
-        if (SETTINGS.def_funct_round_minute && val) {
-            that.old_unit_value === "" && $("#id_funct_round").val(1);
-            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
+            $("#id_funct_round").val(5);
         }
         that.old_unit_value = val;
         $("#fields-wrapper").attr("unscrolled-height", 

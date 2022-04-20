@@ -56,10 +56,6 @@ class SettingsModel(models.Model):
         default=get_midnight_time,
         verbose_name=_('Default Due Time'),
     )
-    def_funct_round_minute = models.BooleanField(
-        default=False,
-        verbose_name=_('Round to Multiples of 5 Minutes'),
-    )
 
     # Group "Assignment Graph"
     def_skew_ratio = models.DecimalField(

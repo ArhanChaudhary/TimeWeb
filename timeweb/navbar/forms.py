@@ -37,7 +37,6 @@ class SettingsForm(forms.ModelForm):
             }
         }
         help_texts = {
-            "def_funct_round_minute": "If your unit of work for any assignment is \"Minute\", meaning it's divided up into minutes, round each day's work to the nearest multiple of 5 minutes. Unrounded values look ugly (such as 17 minutes, 49 minutes).",
             "def_skew_ratio": "Set this value to 0 to make it linear.",
             "ignore_ends": "Ignores the minimum work time for the first and last working days of EVERY assignment with a minimum work time in exchange for making their work distributions smoother. Recommended to be enabled.",
             "show_priority": "Displays the priority percentage and color for every assignment.",

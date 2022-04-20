@@ -30,7 +30,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_skew_ratio': request.user.settingsmodel.def_skew_ratio,
             'def_break_days': request.user.settingsmodel.def_break_days,
             'def_due_time': request.user.settingsmodel.def_due_time,
-            'def_funct_round_minute': request.user.settingsmodel.def_funct_round_minute,
             'ignore_ends': request.user.settingsmodel.ignore_ends,
             'animation_speed': request.user.settingsmodel.animation_speed,
             'show_priority': request.user.settingsmodel.show_priority,
@@ -80,13 +79,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         request.user.settingsmodel.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
         request.user.settingsmodel.def_break_days = self.form.cleaned_data.get("def_break_days")
         request.user.settingsmodel.def_due_time = self.form.cleaned_data.get("def_due_time")
-        request.user.settingsmodel.def_funct_round_minute = self.form.cleaned_data.get("def_funct_round_minute")
-        # Automatically reflect rounding to multiples of 5 minutes
-        if request.user.settingsmodel.def_funct_round_minute:
-            for assignment in request.user.timewebmodel_set.all():
-                if assignment.unit and assignment.unit.lower() in ('minute', 'minutes') and assignment.funct_round != 5:
-                    assignment.funct_round = 5
-            TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['funct_round'])
         request.user.settingsmodel.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         request.user.settingsmodel.animation_speed = self.form.cleaned_data.get("animation_speed")
         request.user.settingsmodel.show_priority = self.form.cleaned_data.get("show_priority")

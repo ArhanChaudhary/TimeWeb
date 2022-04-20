@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_def_min_work_time").val("");
                         $("#id_def_skew_ratio").val(0);
                         $("#break-days-wrapper input").prop("checked", false);
-                        $("#id_def_funct_round_minute").prop("checked", false);
                         $("#id_ignore_ends").prop("checked", false);
                         $("#id_def_due_time").data("daterangepicker").setStartDate(moment(new Date().setHours(0, 0, 0, 0)));
                         $("#id_show_priority").prop("checked", true);
