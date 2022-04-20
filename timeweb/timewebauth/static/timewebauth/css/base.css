@@ -71,6 +71,19 @@ body {
     max-height: 80px;
     max-width: 100%;
 }
+.password-field-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-image {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+}
+.hide-password-image {
+    display: none;
+}
 #circles-background {
     filter: url("#goo");
     overflow: hidden;

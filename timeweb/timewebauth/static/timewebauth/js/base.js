@@ -1,3 +1,18 @@
+$(function() {
+    $("input[id*='password']").each(function() {
+        $(this).wrap("<div class=\"password-field-container\"></div>");
+        if ($(this).hasClass("add-input-margin")) {
+            $(this).parent().addClass("add-input-margin");
+            $(this).removeClass("add-input-margin");;
+        }
+        $(this).after($($("#password-widget-icons").html()));
+    });
+    $(".password-image").click(function() {
+        $(".password-image").toggle();
+        $("input[id*='password']").attr("type") === "text" ? $("input[id*='password']").attr("type", "password") : $("input[id*='password']").attr("type", "text");
+    });
+});
+
 $(window).one("load", function() {
     function shuffle(o) {
         for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);

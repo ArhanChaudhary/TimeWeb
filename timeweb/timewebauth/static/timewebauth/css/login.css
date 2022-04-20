@@ -5,19 +5,6 @@ label {
     white-space: nowrap;
     overflow: hidden;
 }
-.field-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.password-image {
-    position: absolute;
-    right: 10px;
-    cursor: pointer;
-}
-.hide-password-image {
-    display: none;
-}
 .socialaccount-button {
     padding: 10px 0;
     position: relative;
