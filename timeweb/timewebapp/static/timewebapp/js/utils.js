@@ -1059,6 +1059,14 @@ utils = {
             });
         },
         saveAndLoadStates: function() {
+
+
+
+            // IMPORTANT!
+            // Make sure to reset storages appropriately in timewebauth/static/js/timewebauth/login.js
+
+
+
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
             // Use beforeunload instead of unload or else the loading screen triggers and $("main").scrollTop() becomes 0
             $(window).on('beforeunload', function() {
@@ -1098,12 +1106,12 @@ utils = {
                             localStorage.removeItem("scroll");
                         }
                     }, 0);
-                if (new Date().getDate() - new Date(+localStorage.getItem("last-visit")).getDate() === 1 && new Date().getHours() < 4) {
+                if (new Date().getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && new Date().getHours() < 4) {
                     // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
                     // this alert is for fellow insomniacs who lose track of time
                     $("#current-date-text").text(`(The current date has changed) ${$("#current-date-text").text()}`);
                 }
-                localStorage.setItem("last-visit", new Date().valueOf());
+                localStorage.setItem("last_visit", new Date().valueOf());
             });
         },
     },

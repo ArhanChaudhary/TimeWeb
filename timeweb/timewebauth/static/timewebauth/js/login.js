@@ -1,8 +1,9 @@
 $(function() {
 
-    // Reset storages from index.js
+    // Reset storages from saveAndLoadStates from util.js
     sessionStorage.removeItem("open_assignments");
     localStorage.removeItem("scroll");
+    localStorage.removeItem("last_visit");
 
     $(".socialaccount-container").click(function() {
         document.location.href = $(this).find("a").attr("href");
