@@ -1,9 +1,6 @@
 label {
     display: block;
 }
-#id_password {
-    margin-bottom: 5px;
-}
 #under-password {
     white-space: nowrap;
     overflow: hidden;
