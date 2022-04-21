@@ -313,7 +313,6 @@ utils = {
                     $.ajax({
                         type: "POST",
                         url: "/api/gc-auth-init",
-                        data: {csrfmiddlewaretoken: csrf_token},
                         success: function(authentication_url) {
                             if (authentication_url === "Disabled gc api") {
                                 $("#toggle-gc-container").removeClass("enabled");
@@ -342,7 +341,6 @@ utils = {
                                         return _sa.id;
                                     }).toArray();
                                     const data = {
-                                        'csrfmiddlewaretoken': csrf_token,
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
@@ -438,7 +436,6 @@ utils = {
                                         return _sa.id;
                                     }).toArray();
                                     const data = {
-                                        'csrfmiddlewaretoken': csrf_token,
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
@@ -600,7 +597,6 @@ utils = {
                         return;
                     }
                     const data = {
-                        csrfmiddlewaretoken: csrf_token,
                         pk: sa.id,
                         tag_names: [...tag_names],
                     }
@@ -671,7 +667,6 @@ utils = {
                 
                 const sa = utils.loadAssignmentData($this);
                 const data = {
-                    csrfmiddlewaretoken: csrf_token,
                     pk: sa.id,
                     tag_names: [$this.attr("data-tag-deletion-name")],
                 }
@@ -1191,13 +1186,10 @@ ajaxUtils = {
     ajaxChangeSetting: function(kwargs={}) {
         if (ajaxUtils.disable_ajax) return;
         kwargs.value = JSON.stringify(kwargs.value);
-        const data = {...{
-                csrfmiddlewaretoken: csrf_token,
-            }, ...kwargs}
         $.ajax({
             type: "PATCH",
             url: '/api/change-setting',
-            data: data,
+            data: kwargs,
             error: ajaxUtils.error,
         });
     },
@@ -1206,7 +1198,6 @@ ajaxUtils = {
         $.ajax({
             type: "POST",
             url: '/api/create-gc-assignments',
-            data: {csrfmiddlewaretoken: csrf_token},
             error: ajaxUtils.error,
         }).done(function(authentication_url, textStatus, jqXHR) {
             switch (jqXHR.status) {
@@ -1263,10 +1254,7 @@ ajaxUtils = {
 
         if (ajaxUtils.disable_ajax) {
             // Reset data
-            ajaxUtils.attributeData = {
-                'csrfmiddlewaretoken': csrf_token,
-                'assignments': [],
-            }
+            ajaxUtils.attributeData.assignments = [];
             return;
         }
         clearTimeout(ajaxUtils.ajaxTimeout);
@@ -1289,19 +1277,14 @@ ajaxUtils = {
         // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
         // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
         // Plus, a pointless ajax of this sort won't happen frequently and will have a minimal impact on the server's performance
-        ajaxUtils.attributeData.assignments = JSON.stringify(ajaxUtils.attributeData.assignments);
         $.ajax({
             type: "PATCH",
             url: '/api/save-assignment',
-            data: ajaxUtils.attributeData,
+            data:  JSON.stringify(ajaxUtils.attributeData.assignments),
             success: success,
             error: ajaxUtils.error,
         });
-        // Reset data
-        ajaxUtils.attributeData = {
-            'csrfmiddlewaretoken': csrf_token,
-            'assignments': [],
-        }
+        ajaxUtils.attributeData.assignments = [];
     },
 }
 // Prevents submitting form on refresh
@@ -1443,10 +1426,14 @@ for (let sa of dat) {
 document.addEventListener("DOMContentLoaded", function() {
     // Define csrf token provided by backend
     csrf_token = $("input[name=\"csrfmiddlewaretoken\"]").first().val();
+    $.ajaxSetup({
+        headers: {
+            'X-CSRFToken': csrf_token
+        },
+    });
     // Initial ajax data for sendAttributeAjax
     ajaxUtils.attributeData = {
-        'csrfmiddlewaretoken': csrf_token,
-        'assignments': [],
+        assignments: [],
     },
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();

@@ -419,7 +419,6 @@ class Crud {
         }
         const sa = utils.loadAssignmentData($button);
         const data = {
-            'csrfmiddlewaretoken': csrf_token,
             'assignments': [sa.id],
         }
         $.ajax({

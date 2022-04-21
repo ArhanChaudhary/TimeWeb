@@ -5,8 +5,6 @@ from django.conf import settings
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
     path('example', views.ExampleAccountView.as_view(), name='example'),
-    path('gc-auth-init', views.GCOAuthView.as_view()),
-    path('gc-auth-callback', views.GCOAuthView.as_view()),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static

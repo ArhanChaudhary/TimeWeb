@@ -24,6 +24,7 @@ urlpatterns = [
     path('contact/', include('contact_form.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('', include('timewebapp.urls')),
+    path('api/', include('api.urls')),
     path('', include('timewebauth.urls')),
     path('', include('navbar.urls')),
     path('', include('misc.urls')),
