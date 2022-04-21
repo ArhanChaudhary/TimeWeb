@@ -19,7 +19,7 @@ from allauth.decorators import rate_limit
 # Misc
 from django.contrib import messages
 from requests import get as requests_get
-from common.utils import logger
+from common.views import logger
 
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"

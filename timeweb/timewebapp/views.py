@@ -40,7 +40,8 @@ from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
 # Misc
-from common.utils import logger, days_between_two_dates, utc_to_local
+from common.utils import days_between_two_dates, utc_to_local
+from common.views import logger
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):

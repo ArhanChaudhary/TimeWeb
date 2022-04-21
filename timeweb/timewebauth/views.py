@@ -9,7 +9,7 @@ from django.conf import settings
 from .forms import UsernameResetForm
 
 # Misc
-from common.utils import logger
+from common.views import logger
 from allauth.account.adapter import DefaultAccountAdapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 

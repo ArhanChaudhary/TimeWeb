@@ -1,10 +1,6 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from logging import getLogger
 from django.utils import timezone
-
-logger = getLogger('django')
-logger.propagate = False
 
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)

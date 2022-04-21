@@ -4,6 +4,10 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
+from logging import getLogger
+
+logger = getLogger('django')
+logger.propagate = False
 
 User = get_user_model()
 
