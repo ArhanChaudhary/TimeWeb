@@ -420,7 +420,7 @@ class Crud {
         const sa = utils.loadAssignmentData($button);
         $.ajax({
             type: "DELETE",
-            utl: "/api/delete-assignment",
+            url: "/api/delete-assignment",
             data: {assignments: [sa.id]},
             success: success,
             error: function() {

@@ -352,7 +352,7 @@ utils = {
                                     }
                                     $.ajax({
                                         type: "DELETE",
-                                        utl: "/api/delete-assignment",
+                                        url: "/api/delete-assignment",
                                         data: {assignments: assignment_ids_to_delete},
                                         success: success,
                                         error: ajaxUtils.error,
@@ -445,7 +445,7 @@ utils = {
                                     }
                                     $.ajax({
                                         type: "DELETE",
-                                        utl: "/api/delete-assignment",
+                                        url: "/api/delete-assignment",
                                         data: {assignments: assignment_ids_to_delete},
                                         success: success,
                                         error: ajaxUtils.error,
@@ -592,7 +592,7 @@ utils = {
                     }
                     $.ajax({
                         type: "POST",
-                        utl: "/api/tag-add",
+                        url: "/api/tag-add",
                         data: {
                             pk: sa.id,
                             tag_names: [...tag_names],
@@ -695,7 +695,7 @@ utils = {
                 }
                 $.ajax({
                     type: "DELETE",
-                    utl: "/api/tag-delete",
+                    url: "/api/tag-delete",
                     data: data,
                     success: success,
                     error: function() {
