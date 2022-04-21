@@ -340,9 +340,6 @@ utils = {
                                         const _sa = utils.loadAssignmentData(dom_assignment);
                                         return _sa.id;
                                     }).toArray();
-                                    const data = {
-                                        'assignments': assignment_ids_to_delete,
-                                    }
                                     const success = function() {
                                         const assignments_to_delete = $(".finished");
                                         assignments_to_delete.each(function(i) {
@@ -356,7 +353,7 @@ utils = {
                                     $.ajax({
                                         type: "DELETE",
                                         utl: "/api/delete-assignment",
-                                        data: data,
+                                        data: {assignments: assignment_ids_to_delete},
                                         success: success,
                                         error: ajaxUtils.error,
                                     });
@@ -435,9 +432,6 @@ utils = {
                                         const _sa = utils.loadAssignmentData(dom_assignment);
                                         return _sa.id;
                                     }).toArray();
-                                    const data = {
-                                        'assignments': assignment_ids_to_delete,
-                                    }
                                     const success = function() {
                                         $this.off("click");
                                         assignments_to_delete.each(function(i) {
@@ -452,7 +446,7 @@ utils = {
                                     $.ajax({
                                         type: "DELETE",
                                         utl: "/api/delete-assignment",
-                                        data: data,
+                                        data: {assignments: assignment_ids_to_delete},
                                         success: success,
                                         error: ajaxUtils.error,
                                     });
@@ -596,14 +590,13 @@ utils = {
                         success();
                         return;
                     }
-                    const data = {
-                        pk: sa.id,
-                        tag_names: [...tag_names],
-                    }
                     $.ajax({
                         type: "POST",
                         utl: "/api/tag-add",
-                        data: data,
+                        data: {
+                            pk: sa.id,
+                            tag_names: [...tag_names],
+                        },
                         success: success,
                         error: ajaxUtils.error,
                     });
@@ -1185,11 +1178,13 @@ ajaxUtils = {
     },
     ajaxChangeSetting: function(kwargs={}) {
         if (ajaxUtils.disable_ajax) return;
-        kwargs.value = JSON.stringify(kwargs.value);
         $.ajax({
             type: "PATCH",
             url: '/api/change-setting',
-            data: kwargs,
+            data: {
+                setting: kwargs.setting,
+                value: JSON.stringify(kwargs.value),
+            },
             error: ajaxUtils.error,
         });
     },

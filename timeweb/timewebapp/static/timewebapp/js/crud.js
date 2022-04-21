@@ -418,13 +418,10 @@ class Crud {
             return;
         }
         const sa = utils.loadAssignmentData($button);
-        const data = {
-            'assignments': [sa.id],
-        }
         $.ajax({
             type: "DELETE",
             utl: "/api/delete-assignment",
-            data: data,
+            data: {assignments: [sa.id]},
             success: success,
             error: function() {
                 dom_assignment.removeClass("assignment-is-deleting");
