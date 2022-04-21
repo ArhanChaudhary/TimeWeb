@@ -420,11 +420,11 @@ class Crud {
         const sa = utils.loadAssignmentData($button);
         const data = {
             'csrfmiddlewaretoken': csrf_token,
-            'action': 'delete_assignment',
             'assignments': [sa.id],
         }
         $.ajax({
-            type: "POST",
+            type: "DELETE",
+            utl: "/api/delete-assignment",
             data: data,
             success: success,
             error: function() {

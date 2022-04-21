@@ -312,7 +312,7 @@ utils = {
                     $this.addClass("clicked");
                     $.ajax({
                         type: "POST",
-                        url: "gc-auth-init",
+                        url: "/api/gc-auth-init",
                         data: {csrfmiddlewaretoken: csrf_token},
                         success: function(authentication_url) {
                             if (authentication_url === "Disabled gc api") {
@@ -343,7 +343,6 @@ utils = {
                                     }).toArray();
                                     const data = {
                                         'csrfmiddlewaretoken': csrf_token,
-                                        'action': 'delete_assignment',
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
@@ -357,7 +356,8 @@ utils = {
                                         return;
                                     }
                                     $.ajax({
-                                        type: "POST",
+                                        type: "DELETE",
+                                        utl: "/api/delete-assignment",
                                         data: data,
                                         success: success,
                                         error: ajaxUtils.error,
@@ -439,7 +439,6 @@ utils = {
                                     }).toArray();
                                     const data = {
                                         'csrfmiddlewaretoken': csrf_token,
-                                        'action': 'delete_assignment',
                                         'assignments': assignment_ids_to_delete,
                                     }
                                     const success = function() {
@@ -454,7 +453,8 @@ utils = {
                                         return;
                                     }
                                     $.ajax({
-                                        type: "POST",
+                                        type: "DELETE",
+                                        utl: "/api/delete-assignment",
                                         data: data,
                                         success: success,
                                         error: ajaxUtils.error,
@@ -603,10 +603,10 @@ utils = {
                         csrfmiddlewaretoken: csrf_token,
                         pk: sa.id,
                         tag_names: [...tag_names],
-                        action: "tag_add",
                     }
                     $.ajax({
                         type: "POST",
+                        utl: "/api/tag-add",
                         data: data,
                         success: success,
                         error: ajaxUtils.error,
@@ -674,7 +674,6 @@ utils = {
                     csrfmiddlewaretoken: csrf_token,
                     pk: sa.id,
                     tag_names: [$this.attr("data-tag-deletion-name")],
-                    action: "tag_delete",
                 }
                 const success = function() {
                     // Remove data locally from dat
@@ -707,7 +706,8 @@ utils = {
                     return;
                 }
                 $.ajax({
-                    type: "POST",
+                    type: "DELETE",
+                    utl: "/api/tag-delete",
                     data: data,
                     success: success,
                     error: function() {
@@ -1193,23 +1193,20 @@ ajaxUtils = {
         kwargs.value = JSON.stringify(kwargs.value);
         const data = {...{
                 csrfmiddlewaretoken: csrf_token,
-                action: 'change_setting',
             }, ...kwargs}
         $.ajax({
-            type: "POST",
+            type: "PATCH",
+            url: '/api/change-setting',
             data: data,
             error: ajaxUtils.error,
         });
     },
     createGCAssignments: function() {
         if (ajaxUtils.disable_ajax || !creating_gc_assignments_from_frontend) return;
-        const data = {
-            'csrfmiddlewaretoken': csrf_token,
-            'action': 'create_gc_assignments',
-        }
         $.ajax({
             type: "POST",
-            data: data,
+            url: '/api/create-gc-assignments',
+            data: {csrfmiddlewaretoken: csrf_token},
             error: ajaxUtils.error,
         }).done(function(authentication_url, textStatus, jqXHR) {
             switch (jqXHR.status) {
@@ -1268,7 +1265,6 @@ ajaxUtils = {
             // Reset data
             ajaxUtils.attributeData = {
                 'csrfmiddlewaretoken': csrf_token,
-                'action': 'save_assignment',
                 'assignments': [],
             }
             return;
@@ -1295,7 +1291,8 @@ ajaxUtils = {
         // Plus, a pointless ajax of this sort won't happen frequently and will have a minimal impact on the server's performance
         ajaxUtils.attributeData.assignments = JSON.stringify(ajaxUtils.attributeData.assignments);
         $.ajax({
-            type: "POST",
+            type: "PATCH",
+            url: '/api/save-assignment',
             data: ajaxUtils.attributeData,
             success: success,
             error: ajaxUtils.error,
@@ -1303,7 +1300,6 @@ ajaxUtils = {
         // Reset data
         ajaxUtils.attributeData = {
             'csrfmiddlewaretoken': csrf_token,
-            'action': 'save_assignment',
             'assignments': [],
         }
     },
@@ -1450,7 +1446,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initial ajax data for sendAttributeAjax
     ajaxUtils.attributeData = {
         'csrfmiddlewaretoken': csrf_token,
-        'action': 'save_assignment',
         'assignments': [],
     },
     utils.reloadAtMidnight();
