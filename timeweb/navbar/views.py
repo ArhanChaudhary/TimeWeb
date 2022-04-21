@@ -4,13 +4,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy # source code uses this instead of reverse for some reason
 from django.shortcuts import redirect
+from common.views import TimewebGenericView
 
 # App stuff
 from django.conf import settings
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
-from timewebapp.models import TimewebModel
-from common.views import TimewebGenericView
 
 # Signals
 from django.utils.decorators import method_decorator

@@ -10,13 +10,14 @@ from django.forms import ValidationError
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
+from common.views import TimewebGenericView
 import datetime
 from math import ceil, floor
 from decimal import Decimal
 
 # App stuff
 from django.conf import settings
-from common.views import User, TimewebGenericView
+from common.views import User
 from .models import TimewebModel
 from navbar.models import SettingsModel
 from .forms import TimewebForm
