@@ -11,8 +11,8 @@ def app_static(url_path):
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
     path('example', views.ExampleAccountView.as_view(), name='example'),
-    path('gc-api-auth-init', views.GCOAuthView.as_view()),
-    path('gc-api-auth-callback', views.GCOAuthView.as_view()),
+    path('gc-auth-init', views.GCOAuthView.as_view()),
+    path('gc-auth-callback', views.GCOAuthView.as_view()),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static

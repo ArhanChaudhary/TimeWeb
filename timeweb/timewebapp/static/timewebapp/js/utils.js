@@ -312,7 +312,7 @@ utils = {
                     $this.addClass("clicked");
                     $.ajax({
                         type: "POST",
-                        url: "gc-api-auth-init",
+                        url: "gc-auth-init",
                         data: {csrfmiddlewaretoken: csrf_token},
                         success: function(authentication_url) {
                             if (authentication_url === "Disabled gc api") {

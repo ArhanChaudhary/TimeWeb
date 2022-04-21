@@ -324,9 +324,9 @@ RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
 GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
 if DEBUG:
-    GC_REDIRECT_URI = "http://localhost:8000/gc-api-auth-callback"
+    GC_REDIRECT_URI = "http://localhost:8000/gc-auth-callback"
 else:
-    GC_REDIRECT_URI = "https://timeweb.io/gc-api-auth-callback"
+    GC_REDIRECT_URI = "https://timeweb.io/gc-auth-callback"
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 # os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 

@@ -106,8 +106,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['just_updated_assignment_id'] = request.session.get("just_updated_assignment_id")
             del request.session["just_updated_assignment_id"]
 
-        if request.session.get("gc-api-init-failed", False):
-            del request.session["gc-api-init-failed"]
+        if request.session.get("gc-init-failed", False):
+            del request.session["gc-init-failed"]
             self.context["GC_API_INIT_FAILED"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
@@ -611,7 +611,7 @@ class GCOAuthView(LoginRequiredMixin, TimewebGenericView):
             # If the error is an HttpError and the access code is 404, the init succeeded, as the course work execute line provides a dunder id so it can execute
             if not isinstance(e, HttpError) or e.resp.status == 403:
                 # In case users deny a permission or don't input a code in the url or cancel
-                request.session['gc-api-init-failed'] = True
+                request.session['gc-init-failed'] = True
                 return redirect(reverse("home"))
         credentials = flow.credentials
         # Use .update() (dict method) instead of = so the refresh token isnt overwritten
