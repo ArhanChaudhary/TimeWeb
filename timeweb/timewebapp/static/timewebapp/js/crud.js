@@ -88,9 +88,6 @@ class Crud {
             locale: {
                 format: 'MM/DD/YYYY'
             },
-            isInvalidDate: function(date) {
-                return date.toDate() > new Date($("#id_x").val());
-            },
         });
         $("#id_x").daterangepicker({
             ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
@@ -98,9 +95,6 @@ class Crud {
                 format: 'MM/DD/YYYY h:mm A'
             },
             timePicker: true,
-            isInvalidDate: function(date) {
-                return date.toDate() < new Date($("#id_assignment_date").val());
-            },
         });
         that.setCrudHandlers();
         that.addInfoButtons();
