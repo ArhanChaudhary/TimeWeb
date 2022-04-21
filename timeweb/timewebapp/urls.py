@@ -2,9 +2,6 @@ from django.urls import path
 from . import views
 from django.conf import settings
 
-def get_static_url(app_name, url_path):
-    return f"static/{app_name}/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{app_name}/{url_path}'
-
 urlpatterns = [
     path('', views.TimewebView.as_view(),name='home'),
     path('example', views.ExampleAccountView.as_view(), name='example'),

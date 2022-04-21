@@ -1,10 +1,9 @@
 from django.urls import path
 from django.views.generic import RedirectView
 from . import views, forms
-from timewebapp.urls import get_static_url
+from common.urls import app_static_factory
 
-def app_static(url_path):
-    return get_static_url(__package__, url_path)
+app_static = app_static_factory(__package__)
 
 urlpatterns = [
     path('settings', views.SettingsView.as_view(), name='settings'),
