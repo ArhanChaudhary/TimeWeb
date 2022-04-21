@@ -470,28 +470,19 @@ utils = {
             },
         },
         dimAssignmentsHeaderInfoOnIconHover: function() {
+            // Reminder: priority.js triggers this event handler
+            const info = $("#info");
+            const hide_button = info.find("#hide-button");
             $("#assignments-header #icon-label-container img").on("mouseover mouseout focusout", function(e) {
-                // If you mouseout while an icon is focused, dim is removed. This fixes that
-                if ($("#icon-label-container img").is(document.activeElement) ||
-                    // focusout doesn't update document.activeElement, use relatedTarget instead
-                    e.type === "focusout" && $("#icon-label-container img").is(e.relatedTarget)) return;
-
-                const hide_button = $(e.target).parents("#info").children("#hide-button");
                 const visible_icon_label = $(e.target).parents("#icon-label-container").children("div:visible");
-                if (e.type === "mouseover")
-                    $("#assignments-header").find("#info").toggleClass("dim", collision(hide_button, visible_icon_label));
+                let toggle_dim;
+                if (visible_icon_label.length && e.type === "mouseover")
+                    toggle_dim = collision(hide_button, visible_icon_label);
                 else
-                    $("#assignments-header").find("#info").removeClass("dim");
-            });
-            $(window).resize(function() {
-                const visible_icon_label = $("#assignments-header #icon-label-container div:visible");
-                const info = $("#info");
-
-                if (visible_icon_label.length) {
-                    info.toggleClass("dim", collision(info, visible_icon_label));
-                } else {
-                    info.removeClass("dim")
-                }
+                    toggle_dim = false;
+                // if you mouseout while an icon is focused, dim is removed. This fixes that
+                if (!toggle_dim && $("#icon-label-container img").is(document.activeElement) && e.type === "mouseout") return;
+                info.toggleClass("dim", toggle_dim);
             });
         },
         addTagHandlers: function() {

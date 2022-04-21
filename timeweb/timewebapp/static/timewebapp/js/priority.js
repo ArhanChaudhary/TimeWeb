@@ -533,6 +533,9 @@ class Priority {
                             }
                         }
                     }
+                },
+                onDestroy: function() {
+                    $("#assignments-header #icon-label-container img").first().trigger("mouseover");
                 }
             });
         }
@@ -562,6 +565,9 @@ class Priority {
                             }
                         }
                     }
+                },
+                onDestroy: function() {
+                    $("#assignments-header #icon-label-container img").first().trigger("mouseover");
                 }
             });
         }
@@ -859,6 +865,7 @@ class Priority {
 
 
         that.updateInfoHeader();
+        $("#assignments-header #icon-label-container img").first().trigger("mouseover");
         $("#assignments-container").css("opacity", "1");
         
     }
