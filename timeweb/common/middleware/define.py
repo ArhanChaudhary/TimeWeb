@@ -1,4 +1,3 @@
-import re
 from django.http import QueryDict
 class PopulatePost:
     request_body_http_methods = ('POST', 'PUT', 'PATCH', 'DELETE')
@@ -10,6 +9,8 @@ class PopulatePost:
         if request.method in self.request_body_http_methods:
             _mutable = request.POST._mutable
             request.POST._mutable = True
-            request.POST.update(QueryDict(request.body))
+            for key, value in dict(QueryDict(request.body)).items():
+                if key not in request.POST:
+                    request.POST[key] = value
             request.POST._mutable = _mutable
         return self.get_response(request)
