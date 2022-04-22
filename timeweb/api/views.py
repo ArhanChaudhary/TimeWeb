@@ -128,8 +128,9 @@ def tag_add(request):
     tag_names = request.POST.getlist('tag_names[]')
     tag_names = [tag_name for tag_name in tag_names if tag_name not in sm.tags]
     if len(sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=422)
-    sm.tags.extend(tag_names)
-    sm.save()
+    if tag_names:
+        sm.tags.extend(tag_names)
+        sm.save()
 
     logger.info(f"User \"{request.user}\" added tags \"{tag_names}\" to \"{sm.name}\"")
     return HttpResponse(status=204)
@@ -146,8 +147,11 @@ def tag_delete(request):
 
     tag_names = request.POST.getlist('tag_names[]')
     # Remove tag_names from sm.tags
+    old_len = len(sm.tags)
     sm.tags = [tag_name for tag_name in sm.tags if tag_name not in tag_names]
-    sm.save()
+    new_len = len(sm.tags)
+    if old_len != new_len:
+        sm.save()
 
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
