@@ -127,7 +127,7 @@ def tag_add(request):
 
     tag_names = request.POST.getlist('tag_names[]')
     tag_names = [tag_name for tag_name in tag_names if tag_name not in sm.tags]
-    if len(sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=405)
+    if len(sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=422)
     sm.tags.extend(tag_names)
     sm.save()
 
