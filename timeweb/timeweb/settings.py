@@ -102,9 +102,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
-    'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
-    'timewebapp.middleware.DefineIsExampleAccount.DefineIsExampleAccount',
-    'api.middleware.APIValidationMiddleware',
+    'timewebapp.middleware.validation.CatchRequestDataTooBig',
+    'timewebapp.middleware.define.DefineIsExampleAccount',
+    'api.middleware.validation.APIValidationMiddleware',
 ]
 CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
