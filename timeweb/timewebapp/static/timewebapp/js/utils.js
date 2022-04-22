@@ -1148,12 +1148,12 @@ ajaxUtils = {
             content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
         } else if (exception === 'timeout' || response.status == 502) {
             title = "Request timed out.";
-            content = "You're probably seeing this because something took too long while connecting with the server. Try refreshing or try again.";
+            content = "You're probably seeing this because something took too long while connecting with the server. Refresh or try again.";
         } else if (exception === 'abort') {
             title = "Request aborted.";
-            content = "Try refreshing or try again.";
+            content = "Refresh or try again.";
         } else {
-            title = `<p>Uncaught error while trying to connect with the server:</p>${response.responseText||response.statusText}`;
+            title = `<p>Whoops, we've encountered an error while trying to connect with the server:</p>${response.responseText||response.statusText}`;
         }
         $.alert({
             title: title,
