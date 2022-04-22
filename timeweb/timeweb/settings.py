@@ -104,7 +104,7 @@ MIDDLEWARE = [
 
     'csp.middleware.CSPMiddleware',
     'timewebapp.middleware.validation.CatchRequestDataTooBig',
-    'timewebapp.middleware.define.DefineIsExampleAccount',
+    'common.middleware.define.DefineIsExampleAccount',
     'common.middleware.define.PopulatePost',
     # Note: don't add APIValidationMiddleware here; that's only specific to its corresponding view functions
 ]
