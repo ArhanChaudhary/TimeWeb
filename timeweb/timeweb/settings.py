@@ -101,10 +101,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
     'csp.middleware.CSPMiddleware',
     'timewebapp.middleware.validation.CatchRequestDataTooBig',
     'timewebapp.middleware.define.DefineIsExampleAccount',
-    'api.middleware.validation.APIValidationMiddleware',
+    'common.middleware.define.PopulatePost',
+    # Note: don't add APIValidationMiddleware here; that's only specific to its corresponding view functions
 ]
 CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
