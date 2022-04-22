@@ -313,13 +313,17 @@ utils = {
                     $.ajax({
                         type: "POST",
                         url: "/api/gc-auth-init",
-                        success: function(authentication_url) {
-                            if (authentication_url === "Disabled gc api") {
-                                $("#toggle-gc-container").removeClass("enabled");
-                                $("#toggle-gc-label").text("Enable Google Classroom integration");
-                                $this.removeClass("clicked");
-                            } else {
-                                reloadWhenAppropriate({ href: authentication_url });
+                        success: function(authentication_url, textStatus, jqXHR) {
+                            switch (jqXHR.status) {
+                                case 204:
+                                    $("#toggle-gc-container").removeClass("enabled");
+                                    $("#toggle-gc-label").text("Enable Google Classroom integration");
+                                    $this.removeClass("clicked");
+                                    break;
+
+                                case 200:
+                                    reloadWhenAppropriate({ href: authentication_url });
+                                    break;
                             }
                         },
                     });

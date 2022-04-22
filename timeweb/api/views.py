@@ -42,7 +42,7 @@ from django.views.decorators.http import require_http_methods
 #     assignment_models = request.user.timewebmodel_set.all()
 #     for assignment in assignment_models:
 #         if new_tag_name in (assignment.tags or []):
-#             return HttpResponse("alreadyExists")
+#             return HttpResponse(status=)
 #     for assignment in assignment_models:
 #         for i, tag in enumerate(assignment.tags or []):
 #             if tag == old_tag_name:
@@ -127,7 +127,7 @@ def tag_add(request):
 
     tag_names = request.POST.getlist('tag_names[]')
     tag_names = [tag_name for tag_name in tag_names if tag_name not in sm.tags]
-    if len(sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse("Too Many Tags!", status=422)
+    if len(sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse(status=422)
     if tag_names:
         sm.tags.extend(tag_names)
         sm.save()
@@ -332,7 +332,7 @@ def gc_auth_init(request):
             request.user.settingsmodel.added_gc_assignment_ids = []
         request.user.settingsmodel.save()
         logger.info(f"User {request.user} disabled google classroom API")
-        return HttpResponse("Disabled gc api")
+        return HttpResponse(status=204)
     flow = Flow.from_client_secrets_file(
         settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
     flow.redirect_uri = settings.GC_REDIRECT_URI
