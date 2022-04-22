@@ -1275,7 +1275,7 @@ ajaxUtils = {
         $.ajax({
             type: "PATCH",
             url: '/api/save-assignment',
-            data:  JSON.stringify(ajaxUtils.attributeData.assignments),
+            data: {assignments: JSON.stringify(ajaxUtils.attributeData.assignments)},
             success: success,
             error: ajaxUtils.error,
         });
