@@ -104,6 +104,7 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'timewebapp.middleware.CatchRequestDataTooBig.CatchRequestDataTooBig',
     'timewebapp.middleware.DefineIsExampleAccount.DefineIsExampleAccount',
+    'api.middleware.APIValidationMiddleware',
 ]
 CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
