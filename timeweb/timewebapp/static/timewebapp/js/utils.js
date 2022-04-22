@@ -1060,7 +1060,7 @@ utils = {
                     localStorage.setItem("scroll", $("main").scrollTop());
                 }
                 // Send ajax before close if it's on timeout
-                if (ajaxUtils.attributeData.assignments.length) {
+                if (ajaxUtils.sendAttributeAjax.assignments.length) {
                     ajaxUtils.sendAttributeAjax();
                 }
             });
@@ -1240,16 +1240,16 @@ ajaxUtils = {
 
         // Add key and values to the data being sent
         // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-        let sa = ajaxUtils.attributeData.assignments.find(sa => sa.pk === pk);
+        let sa = ajaxUtils.sendAttributeAjax.assignments.find(sa => sa.pk === pk);
         if (!sa) {
             sa = {pk: pk};
-            ajaxUtils.attributeData.assignments.push(sa);
+            ajaxUtils.sendAttributeAjax.assignments.push(sa);
         }
         sa[key] = value;
 
         if (ajaxUtils.disable_ajax) {
             // Reset data
-            ajaxUtils.attributeData.assignments = [];
+            ajaxUtils.sendAttributeAjax.assignments = [];
             return;
         }
         clearTimeout(ajaxUtils.ajaxTimeout);
@@ -1275,13 +1275,15 @@ ajaxUtils = {
         $.ajax({
             type: "PATCH",
             url: '/api/save-assignment',
-            data: {assignments: JSON.stringify(ajaxUtils.attributeData.assignments)},
+            data: {assignments: JSON.stringify(ajaxUtils.sendAttributeAjax.assignments)},
             success: success,
             error: ajaxUtils.error,
         });
-        ajaxUtils.attributeData.assignments = [];
+        ajaxUtils.sendAttributeAjax.assignments = [];
     },
 }
+ajaxUtils.sendAttributeAjax.assignments = [];
+
 // Prevents submitting form on refresh
 // https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr
 if ( window.history.replaceState ) {
@@ -1426,10 +1428,6 @@ document.addEventListener("DOMContentLoaded", function() {
             'X-CSRFToken': csrf_token
         },
     });
-    // Initial ajax data for sendAttributeAjax
-    ajaxUtils.attributeData = {
-        assignments: [],
-    },
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.tickButtons();
