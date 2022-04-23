@@ -5,11 +5,7 @@
 <html lang="en-US"{% if settings_model.dark_mode %} id="dark-mode"{% endif %}>
     <head>
         <meta charset="UTF-8">
-        {% if not DEBUG %}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
-        {% endif %}
         <script nonce="{{request.csp_nonce}}">
-            window.dataLayer = window.dataLayer || [];
             const DEBUG = "{{ DEBUG }}" === "True";
             ACCOUNT_EMAIL = "{{ user.get_username }}";
             EXAMPLE_ACCOUNT_EMAIL = "{{ EXAMPLE_ACCOUNT_EMAIL }}";
@@ -19,10 +15,6 @@
             EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
 
-            function gtag() {if (!DEBUG) dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-3K1HRD42V7');
-            
             // Initialize the service worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/serviceworker.js', {

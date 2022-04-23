@@ -1,4 +1,3 @@
-gtag("event", "home");
 utils = {
     formatting: {
         stringifyDate: function(date) {
@@ -1269,7 +1268,6 @@ ajaxUtils = {
                 });
                 return;
             }
-            gtag("event","save_assignment");
         }
         // Send data along with the assignment's primary key
 
@@ -1323,7 +1321,6 @@ SETTINGS.def_due_time = {
     minute: +SETTINGS.def_due_time[1],
 }
 if (isExampleAccount) {
-    window.gtag = function(){};
     x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
 }
 // Load in assignment data

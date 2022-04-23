@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    gtag("event","settings_view");
     $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
     $("#id_def_due_time").daterangepicker({

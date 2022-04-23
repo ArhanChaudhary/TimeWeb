@@ -323,7 +323,6 @@ class Crud {
             // JSON fields are picky with their number inputs, convert them to standard form
             $("#id_works").val() && $("#id_works").val(+$("#id_works").val());
             $("#submit-assignment-button").text("Submitting...");
-            gtag("event","modify_assignment");
         });
     }
     addInfoButtons() {
@@ -400,7 +399,6 @@ class Crud {
             // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
             params.final_iteration && new Priority().sort();
         });
-        gtag("event","delete_assignment");
     }
     deleteAssignment($button) {
         const that = this;

@@ -1,6 +1,3 @@
-if (!window.gtag) {
-    function gtag() {};
-}
 // https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
 isMobile = (function() {
     if (navigator.userAgent) {
