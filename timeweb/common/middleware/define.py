@@ -20,7 +20,7 @@ class PopulatePost:
         if request.method in self.request_body_http_methods:
             _mutable = request.POST._mutable
             request.POST._mutable = True
-            for key, value in dict(QueryDict(request.body)).items():
+            for key, value in QueryDict(request.body).dict().items():
                 if key not in request.POST:
                     request.POST[key] = value
             request.POST._mutable = _mutable
