@@ -31,7 +31,7 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from common.utils import days_between_two_dates, utc_to_local
 from common.views import logger
 from django.utils.decorators import decorator_from_middleware
-from .middleware.validation import APIValidationMiddleware
+from .middleware.validation import APIValidationMiddleware, CatchRequestDataTooBig
 from django.views.decorators.http import require_http_methods
 
 # Unused but I'll keep it here just in case
@@ -62,6 +62,7 @@ def delete_assignment(request):
     
 @require_http_methods(["PATCH"])
 @decorator_from_middleware(APIValidationMiddleware)
+@decorator_from_middleware(CatchRequestDataTooBig)
 def save_assignment(request):
     assignments = json.loads(request.POST['assignments'])
     for assignment in assignments:
