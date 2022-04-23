@@ -370,8 +370,8 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "top";
         screen.font = VisualAssignment.getCanvasFont(13.75);
         if (!this.sa.needs_more_info) {
-            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-155+72);
-            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-138+72);
+            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-155+72);
+            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-138+72);
         }
         let radius = this.wCon / 3;
         if (radius > 3) {
