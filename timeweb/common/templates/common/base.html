@@ -5,6 +5,8 @@
 <html lang="en-US"{% if settings_model.dark_mode %} id="dark-mode"{% endif %}>
     <head>
         <meta charset="UTF-8">
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
         <script nonce="{{request.csp_nonce}}">
             const DEBUG = "{{ DEBUG }}" === "True";
             ACCOUNT_EMAIL = "{{ user.get_username }}";
@@ -14,6 +16,12 @@
             GC_API_INIT_FAILED = {% if GC_API_INIT_FAILED %}true{% else %}false{% endif %};
             EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
+
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-3K1HRD42V7');
 
             // Initialize the service worker
             if ('serviceWorker' in navigator) {
