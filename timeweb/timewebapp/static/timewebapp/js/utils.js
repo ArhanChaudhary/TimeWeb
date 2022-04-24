@@ -780,7 +780,11 @@ utils = {
                         if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                         let dom_assignment = assignment_container.children(".assignment");
                         if (assignment_container.length && 
-                            !dom_assignment.hasClass("assignment-is-closing"))
+                            !dom_assignment.hasClass("assignment-is-closing")) {
+                        if (!dom_assignment.hasClass("has-been-clicked")) {
+                            dom_assignment.addClass("has-been-clicked");
+                            new VisualAssignment(dom_assignment).setGraphButtonEventListeners();
+                        }
                         switch (e.key) {
                             case "e":
                                 // Fix typing on the assignment form itself
@@ -820,6 +824,7 @@ utils = {
                                 break;
                         }
                         break;
+                        }
                 }
                 break;
 

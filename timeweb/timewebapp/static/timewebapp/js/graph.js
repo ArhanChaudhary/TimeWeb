@@ -1085,9 +1085,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         dom_assignment.find(".update-button").parents(".assignment-header-button").focus();
         return;
     }
-   
-    const first_click = !dom_assignment.hasClass('has-been-clicked');
-    dom_assignment.addClass("has-been-clicked");
+
     const assignment_footer = dom_assignment.find(".assignment-footer");
     // Close assignment
     if (dom_assignment.hasClass("open-assignment")) {
@@ -1122,7 +1120,11 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     // Sets event handlers only on the assignment's first click
+    // make sure to also change util.js if this is modified
+    const first_click = !dom_assignment.hasClass('has-been-clicked');
+    dom_assignment.addClass("has-been-clicked");
     first_click && sa.setGraphButtonEventListeners();
+
     sa.resize();
     if (SETTINGS.enable_tutorial && !already_ran_tutorial && !DEBUG) {
         already_ran_tutorial = true;
