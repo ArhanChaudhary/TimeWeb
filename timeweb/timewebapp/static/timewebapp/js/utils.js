@@ -1131,23 +1131,21 @@ ajaxUtils = {
         if (ajaxUtils.silence_errors) return;
         let title;
         let content;
-        if (response.status == 0) {
-            title = "Failed to connect.";
-            content = "We can't establish a connection with the server. Check your connection and try again.";
-        } else if (response.status == 404) {
-            title = "Not found.";
-            content = "Refresh or try again.";
-        } else if (response.status == 500) {
-            title = "Internal server error.";
-            content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
-        } else if (exception === 'timeout' || response.status == 502) {
-            title = "Request timed out.";
-            content = "You're probably seeing this because something took too long while connecting with the server. Refresh or try again.";
-        } else if (exception === 'abort') {
-            title = "Request aborted.";
-            content = "Refresh or try again.";
-        } else {
-            title = `<p>Whoops, we've encountered an error while trying to connect with the server:</p>${response.responseText||response.statusText}`;
+        switch (response.status) {
+            case 0:
+                title = "Failed to connect.";
+                content = "We can't establish a connection with the server. Check your connection and try again.";
+                break;
+            case 404:
+                title = "Not found.";
+                content = "Refresh or try again.";
+                break;
+            case 500:
+                title = "Internal server error.";
+                content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
+                break;
+            default:
+                title = `<p>Whoops, we've encountered an error while trying to connect with the server:</p>${response.responseText||response.statusText}`;
         }
         $.alert({
             title: title,
