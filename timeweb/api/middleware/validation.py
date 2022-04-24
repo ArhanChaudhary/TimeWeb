@@ -11,6 +11,7 @@ class APIValidationMiddleware:
         if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT: return HttpResponse(status=403)
         return self.get_response(request)
 
+# CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 class CatchRequestDataTooBig:
     def __init__(self, get_response):
         self.get_response = get_response

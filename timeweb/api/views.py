@@ -62,7 +62,6 @@ def delete_assignment(request):
     
 @require_http_methods(["PATCH"])
 @decorator_from_middleware(APIValidationMiddleware)
-@decorator_from_middleware(CatchRequestDataTooBig)
 def save_assignment(request):
     assignments = json.loads(request.POST['assignments'])
     for assignment in assignments:
