@@ -778,8 +778,9 @@ utils = {
                     case "c":
                         let assignment_container = $(":hover").filter(".assignment-container");
                         if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
+                        let dom_assignment = assignment_container.children(".assignment");
                         if (assignment_container.length && 
-                            !assignment_container.children(".assignment").hasClass("assignment-is-closing"))
+                            !dom_assignment.hasClass("assignment-is-closing"))
                         switch (e.key) {
                             // Fix typing on the assignment form itself
                             case "e":
@@ -808,10 +809,8 @@ utils = {
                                 assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").focus().click();
                                 break;
                             case "o":
-                                assignment_container.children(".assignment").click();
-                                break;
                             case "c":
-                                assignment_container.children(".assignment").click();
+                                dom_assignment.click();
                                 break;
                         }
                         break;
