@@ -782,8 +782,8 @@ utils = {
                         if (assignment_container.length && 
                             !dom_assignment.hasClass("assignment-is-closing"))
                         switch (e.key) {
-                            // Fix typing on the assignment form itself
                             case "e":
+                                // Fix typing on the assignment form itself
                                 setTimeout(function() {
                                     assignment_container.find(".update-button").focus().click();
                                 }, 0);
@@ -796,21 +796,27 @@ utils = {
                                 click_delete_button.shiftKey = e.shiftKey;
                                 assignment_container.find(".delete-button").focus().trigger(click_delete_button);
                                 break;
-                            case "h":
-                                assignment_container.find(".hide-assignment-button").focus().click();
-                                break;
-                            case "Backspace":
-                                assignment_container.find(".delete-work-input-button").focus().click();
-                                break;
-                            case "s":
-                                assignment_container.find(".skew-ratio-button").focus().click();
-                                break;
                             case "f":
                                 assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").focus().click();
                                 break;
                             case "o":
                             case "c":
                                 dom_assignment.click();
+                                break;
+                            case "h":
+                                assignment_container.find(".hide-assignment-button").focus().click();
+                                break;
+                            case "Backspace":
+                            case "s":
+                                if (dom_assignment.hasClass("open-assignment"))
+                                switch (e.key) {
+                                    case "Backspace":
+                                        assignment_container.find(".delete-work-input-button").focus().click();
+                                        break;
+                                    case "s":
+                                        assignment_container.find(".skew-ratio-button").focus().click();
+                                        break;
+                                }
                                 break;
                         }
                         break;
