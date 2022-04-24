@@ -1267,7 +1267,7 @@ ajaxUtils = {
                     });
                     return;
                 }
-                ajaxUtils.error.bind(this)(arguments);
+                ajaxUtils.error.bind(this)(...arguments);
             },
         });
         ajaxUtils.sendAttributeAjax.assignments = [];
