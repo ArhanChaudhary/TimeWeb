@@ -778,7 +778,7 @@ utils = {
                                 case "c":
                                     let assignment_container = $(":hover").filter(".assignment-container");
                                     if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
-                                    if (assignment_container.length)
+                                    if (assignment_container.length && !assignment_container.children(".assignment").hasClass("assignment-is-closing"))
                                         switch (e.key) {
                                             // Fix typing on the assignment form itself
                                             case "e":
