@@ -20,5 +20,5 @@ class CatchRequestDataTooBig:
         try:
             request.body
         except RequestDataTooBig:
-            return HttpResponse("RequestDataTooBig")
+            return HttpResponse(status=413)
         return self.get_response(request)

@@ -1246,16 +1246,6 @@ ajaxUtils = {
         ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.sendAttributeAjax, 1000);
     },
     sendAttributeAjax: function() {
-        const success = function(responseText) {
-            if (responseText === "RequestDataTooBig") {
-                $.alert({
-                    title: "An assignment takes up too much space and can no longer be saved.",
-                    content: "An assignment has too many work inputs. Try changing its assignment date to today to lessen its work inputs.",
-                    backgroundDismiss: false,
-                });
-                return;
-            }
-        }
         // Send data along with the assignment's primary key
 
         // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
@@ -1265,8 +1255,17 @@ ajaxUtils = {
             type: "PATCH",
             url: '/api/save-assignment',
             data: {assignments: JSON.stringify(ajaxUtils.sendAttributeAjax.assignments)},
-            success: success,
-            error: ajaxUtils.error,
+            error: function(response) {
+                if (response.status === 413) {
+                    $.alert({
+                        title: "An assignment has too many work inputs and can no longer be saved.",
+                        content: "Change its assignment date to today to truncate its work inputs and continue using it.",
+                        backgroundDismiss: false,
+                    });
+                    return;
+                }
+                ajaxUtils.error(arguments);
+            },
         });
         ajaxUtils.sendAttributeAjax.assignments = [];
     },
