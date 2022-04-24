@@ -1130,7 +1130,7 @@ utils = {
 isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
 ajaxUtils = {
     disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
-    error: function(response, exception) {
+    error: function(response, textStatus) {
         if (ajaxUtils.silence_errors) return;
         let title;
         let content;
@@ -1148,7 +1148,7 @@ ajaxUtils = {
                 content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
                 break;
             default:
-                title = `<p>Whoops, we've encountered an error while trying to connect with the server:</p>${response.responseText||response.statusText}`;
+                title = `<p>Whoops, we've encountered an error of type "${textStatus}" while trying to connect with the server:</p>${response.responseText||response.statusText}`;
         }
         $.alert({
             title: title,
