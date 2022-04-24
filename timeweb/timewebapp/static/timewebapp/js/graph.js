@@ -740,7 +740,7 @@ class VisualAssignment extends Assignment {
         hide_assignment_button.click(() => {
             this.sa.mark_as_done = !this.sa.mark_as_done;
             hide_assignment_button.text(hide_assignment_button.attr(`data-${this.sa.mark_as_done ? "show" : "hide"}-label`));
-            ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.a.id);
+            ajaxUtils.sendAttributeAjaxWithTimeout('mark_as_done', this.sa.mark_as_done, this.sa.id);
             new Priority().sort();
         }).text(hide_assignment_button.attr(`data-${this.sa.mark_as_done ? "show" : "hide"}-label`));
         // END Hide assignment button
