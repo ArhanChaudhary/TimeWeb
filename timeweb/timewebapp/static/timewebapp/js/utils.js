@@ -742,10 +742,31 @@ utils = {
             });
         },
         setKeybinds: function() {
-            $(document).keydown(function(e) {
-                if (e.ctrlKey || e.metaKey) return;
+        $(document).keydown(function(e) {
+        if (e.ctrlKey || e.metaKey) return;
+        switch (e.key) {
+            case "n":
+            case "e":
+            case "d":
+            case "D":
+            case "h":
+            case "Backspace":
+            case "s":
+            case "f":
+            case "o":
+            case "c":
+            case "t":
+                if ($(document.activeElement).prop("tagName").toLowerCase() !== "input")
                 switch (e.key) {
                     case "n":
+                        // Fix typing on the assignment form itself
+                        setTimeout(function() {
+                            !$("#overlay").is(":visible") && $("#image-new-container").click();
+                        }, 0);
+                        break;
+                    case "t":
+                        $("main").scrollTop(0);
+                        break;
                     case "e":
                     case "d":
                     case "D":
@@ -755,139 +776,119 @@ utils = {
                     case "f":
                     case "o":
                     case "c":
-                    case "t":
-                        if ($(document.activeElement).prop("tagName").toLowerCase() !== "input")
-                            switch (e.key) {
-                                case "n":
-                                    // Fix typing on the assignment form itself
-                                    setTimeout(function() {
-                                        !$("#overlay").is(":visible") && $("#image-new-container").click();
-                                    }, 0);
-                                    break;
-                                case "t":
-                                    $("main").scrollTop(0);
-                                    break;
-                                case "e":
-                                case "d":
-                                case "D":
-                                case "h":
-                                case "Backspace":
-                                case "s":
-                                case "f":
-                                case "o":
-                                case "c":
-                                    let assignment_container = $(":hover").filter(".assignment-container");
-                                    if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
-                                    if (assignment_container.length && !assignment_container.children(".assignment").hasClass("assignment-is-closing"))
-                                        switch (e.key) {
-                                            // Fix typing on the assignment form itself
-                                            case "e":
-                                                setTimeout(function() {
-                                                    assignment_container.find(".update-button").focus().click();
-                                                }, 0);
-                                                break;
-                                            case "d":
-                                                assignment_container.find(".delete-button").focus().click();
-                                                break;
-                                            case "D":
-                                                const click_delete_button = $.Event("click");
-                                                click_delete_button.shiftKey = e.shiftKey;
-                                                assignment_container.find(".delete-button").focus().trigger(click_delete_button);
-                                                break;
-                                            case "h":
-                                                assignment_container.find(".hide-assignment-button").focus().click();
-                                                break;
-                                            case "Backspace":
-                                                assignment_container.find(".delete-work-input-button").focus().click();
-                                                break;
-                                            case "s":
-                                                assignment_container.find(".skew-ratio-button").focus().click();
-                                                break;
-                                            case "f":
-                                                assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").focus().click();
-                                                break;
-                                            case "o":
-                                                assignment_container.children(".assignment").click();
-                                                break;
-                                            case "c":
-                                                assignment_container.children(".assignment").click();
-                                                break;
-                                        }
-                                    break;
-                            }
-                        break;
-
-                    case "Tab":
-                        // Prevent tabbing dispositioning screen
-                        setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
-                        break;
-                    case "Escape":
-                        new Crud().hideForm();
-                        break;
-                    case "ArrowDown":
-                    case "ArrowUp":
-                        const open_assignmens_on_screen = $(".open-assignment").filter(function() {
-                            return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
-                        });
-                        if (e.shiftKey) {
-                            if (e.key === "ArrowDown") {
-                                // If there is an open assignment in view, select that one and 
-                                const first_open_assignment = $(".assignment.open-assignment").first();
-                                if (first_open_assignment.length) {
-                                    var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
-                                    first_open_assignment[0].scrollIntoView({
-                                        behavior: 'smooth',
-                                        block: 'start',
-                                    });
-                                } else {
-                                    var assignment_to_be_opened = $(".assignment").first();
-                                    assignment_to_be_opened[0].scrollIntoView({
-                                        behavior: 'smooth',
-                                        block: 'start',
-                                    });
-                                }
-                                first_open_assignment.click();
-                                if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                                    assignment_to_be_opened.click();
-                                }
-                            } else if (e.key === "ArrowUp") {
-                                // If there is an open assignment in view, select that one and 
-                                const last_open_assignment = $(".assignment.open-assignment").last();
-                                if (last_open_assignment.length) {
-                                    var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
-                                    if (assignment_to_be_opened.length) {
-                                        assignment_to_be_opened[0].scrollIntoView({
-                                            behavior: 'smooth',
-                                            block: 'start',
-                                        });
-                                    }
-                                } else {
-                                    var assignment_to_be_opened = $(".assignment").last();
-                                }
-                                last_open_assignment.click();
-                                if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                                    assignment_to_be_opened.click();
-                                }
-                                if (!last_open_assignment.length) {
-                                    assignment_to_be_opened[0].scrollIntoView({
-                                        behavior: 'smooth',
-                                        block: 'end',
-                                    });        
-                                }
-                            }
-                        } else if (open_assignmens_on_screen.length !== 0) {
-                            // Prevent arrow scroll
-                            e.preventDefault();
+                        let assignment_container = $(":hover").filter(".assignment-container");
+                        if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
+                        if (assignment_container.length && 
+                            !assignment_container.children(".assignment").hasClass("assignment-is-closing"))
+                        switch (e.key) {
+                            // Fix typing on the assignment form itself
+                            case "e":
+                                setTimeout(function() {
+                                    assignment_container.find(".update-button").focus().click();
+                                }, 0);
+                                break;
+                            case "d":
+                                assignment_container.find(".delete-button").focus().click();
+                                break;
+                            case "D":
+                                const click_delete_button = $.Event("click");
+                                click_delete_button.shiftKey = e.shiftKey;
+                                assignment_container.find(".delete-button").focus().trigger(click_delete_button);
+                                break;
+                            case "h":
+                                assignment_container.find(".hide-assignment-button").focus().click();
+                                break;
+                            case "Backspace":
+                                assignment_container.find(".delete-work-input-button").focus().click();
+                                break;
+                            case "s":
+                                assignment_container.find(".skew-ratio-button").focus().click();
+                                break;
+                            case "f":
+                                assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").focus().click();
+                                break;
+                            case "o":
+                                assignment_container.children(".assignment").click();
+                                break;
+                            case "c":
+                                assignment_container.children(".assignment").click();
+                                break;
                         }
                         break;
                 }
-            });
-            $(".tag-add-input").keydown(function(e) {
-                if (e.key === "Enter") {
-                    utils.ui.close_on_success = true;
-                    $(this).parents(".tags").find(".tag-add-button").click();
+                break;
+
+            case "Tab":
+                // Prevent tabbing dispositioning screen
+                setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
+                break;
+            case "Escape":
+                new Crud().hideForm();
+                break;
+            case "ArrowDown":
+            case "ArrowUp":
+                const open_assignmens_on_screen = $(".open-assignment").filter(function() {
+                    return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
+                });
+                if (e.shiftKey) {
+                    if (e.key === "ArrowDown") {
+                        // If there is an open assignment in view, select that one and 
+                        const first_open_assignment = $(".assignment.open-assignment").first();
+                        if (first_open_assignment.length) {
+                            var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
+                            first_open_assignment[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                            });
+                        } else {
+                            var assignment_to_be_opened = $(".assignment").first();
+                            assignment_to_be_opened[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start',
+                            });
+                        }
+                        first_open_assignment.click();
+                        if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                            assignment_to_be_opened.click();
+                        }
+                    } else if (e.key === "ArrowUp") {
+                        // If there is an open assignment in view, select that one and 
+                        const last_open_assignment = $(".assignment.open-assignment").last();
+                        if (last_open_assignment.length) {
+                            var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
+                            if (assignment_to_be_opened.length) {
+                                assignment_to_be_opened[0].scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start',
+                                });
+                            }
+                        } else {
+                            var assignment_to_be_opened = $(".assignment").last();
+                        }
+                        last_open_assignment.click();
+                        if (!assignment_to_be_opened.hasClass("open-assignment")) {
+                            assignment_to_be_opened.click();
+                        }
+                        if (!last_open_assignment.length) {
+                            assignment_to_be_opened[0].scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'end',
+                            });        
+                        }
+                    }
+                } else if (open_assignmens_on_screen.length !== 0) {
+                    // Prevent arrow scroll
+                    e.preventDefault();
                 }
-            });
+                break;
+        }
+        });
+        $(".tag-add-input").keydown(function(e) {
+            if (e.key === "Enter") {
+                utils.ui.close_on_success = true;
+                $(this).parents(".tags").find(".tag-add-button").click();
+            }
+        });
         },
         displayFullDueDateOnHover: function() {
             $(".title").on("mouseover mousemove click", function(e) {
