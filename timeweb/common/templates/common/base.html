@@ -9,13 +9,13 @@
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K1HRD42V7"></script>
         <script nonce="{{request.csp_nonce}}">
             const DEBUG = "{{ DEBUG }}" === "True";
-            ACCOUNT_EMAIL = "{{ user.get_username }}";
-            EXAMPLE_ACCOUNT_EMAIL = "{{ EXAMPLE_ACCOUNT_EMAIL }}";
-            EXAMPLE_ASSIGNMENT_NAME = "{{ EXAMPLE_ASSIGNMENT_NAME }}";
-            MAX_NUMBER_OF_TAGS = {{ MAX_NUMBER_OF_TAGS }};
-            GC_API_INIT_FAILED = {% if GC_API_INIT_FAILED %}true{% else %}false{% endif %};
-            EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
-            creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
+            const ACCOUNT_EMAIL = "{{ user.get_username }}";
+            const EXAMPLE_ACCOUNT_EMAIL = "{{ EXAMPLE_ACCOUNT_EMAIL }}";
+            const EXAMPLE_ASSIGNMENT_NAME = "{{ EXAMPLE_ASSIGNMENT_NAME }}";
+            const MAX_NUMBER_OF_TAGS = {{ MAX_NUMBER_OF_TAGS }};
+            const GC_API_INIT_FAILED = {% if GC_API_INIT_FAILED %}true{% else %}false{% endif %};
+            const EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
+            const CREATING_GC_ASSIGNMENTS_FROM_FRONTEND = {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}true{% else %}false{% endif %};
 
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

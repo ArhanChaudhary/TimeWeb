@@ -1183,7 +1183,7 @@ ajaxUtils = {
         });
     },
     createGCAssignments: function() {
-        if (ajaxUtils.disable_ajax || !creating_gc_assignments_from_frontend) return;
+        if (ajaxUtils.disable_ajax || !CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
         $.ajax({
             type: "POST",
             url: '/api/create-gc-assignments',

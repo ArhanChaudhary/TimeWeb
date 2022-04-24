@@ -260,9 +260,9 @@
       </div>
     </div>
   </template>
-  <div id="toggle-gc-container" class="{% if creating_gc_assignments_from_frontend %}clicked {% endif %}{% if creating_gc_assignments_from_frontend or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in settings_model.oauth_token %}enabled{% endif %}">
+  <div id="toggle-gc-container" class="{% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}clicked {% endif %}{% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in settings_model.oauth_token %}enabled{% endif %}">
     <span id="toggle-gc-label">
-      {% if creating_gc_assignments_from_frontend %}
+      {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}
         Adding Google Classroom Assignments...
       {% elif GC_API_INIT_FAILED %}
         Authentication failed. Please try again

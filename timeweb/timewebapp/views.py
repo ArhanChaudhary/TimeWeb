@@ -71,7 +71,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['latest_changelog'] = settings.CHANGELOGS[0]
 
         if not request.session.get("already_created_gc_assignments_from_frontend", False):
-            self.context['creating_gc_assignments_from_frontend'] = 'token' in request.user.settingsmodel.oauth_token
+            self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
         else:
             del request.session["already_created_gc_assignments_from_frontend"]
 
