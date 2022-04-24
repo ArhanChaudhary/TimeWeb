@@ -18,10 +18,14 @@ class PopulatePost:
 
     def __call__(self, request):
         if request.method in self.request_body_http_methods:
-            _mutable = request.POST._mutable
-            request.POST._mutable = True
-            for key, value in QueryDict(request.body).dict().items():
-                if key not in request.POST:
-                    request.POST[key] = value
-            request.POST._mutable = _mutable
+            # For a strange error; I can't call request.body or request.POST more than once in middleware
+            a = request.body
+            b = request.POST
+
+            _mutable = b._mutable
+            b._mutable = True
+            for key, value in QueryDict(a).dict().items():
+                if key not in b:
+                    b[key] = value
+            b._mutable = _mutable
         return self.get_response(request)
