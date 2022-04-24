@@ -298,7 +298,6 @@ utils = {
                         });
                         return;
                     }
-                    if (creating_gc_assignments_from_frontend) return;
                     const $this = $(this);
                     if ($this.hasClass("clicked")) return;
                     $this.addClass("clicked");
@@ -308,9 +307,8 @@ utils = {
                         success: function(authentication_url, textStatus, jqXHR) {
                             switch (jqXHR.status) {
                                 case 204:
-                                    $("#toggle-gc-container").removeClass("enabled");
                                     $("#toggle-gc-label").text("Enable Google Classroom integration");
-                                    $this.removeClass("clicked");
+                                    $this.removeClass("enabled clicked");
                                     break;
 
                                 case 200:
@@ -1192,10 +1190,8 @@ ajaxUtils = {
             error: ajaxUtils.error,
         }).done(function(authentication_url, textStatus, jqXHR) {
             switch (jqXHR.status) {
-
                 case 204:
-                    creating_gc_assignments_from_frontend = false;
-                    $("#toggle-gc-container").removeClass("open");
+                    $("#toggle-gc-container").removeClass("open clicked");
                     if (SETTINGS.oauth_token.token) {
                         $("#toggle-gc-label").text("Disable Google Classroom integration");
                     } else {
@@ -1204,7 +1200,7 @@ ajaxUtils = {
                     break;
 
                 case 200:
-                    creating_gc_assignments_from_frontend = false;
+                    $("#toggle-gc-container").removeClass("clicked");
                     $.alert({
                         title: "Invalid credentials",
                         content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
