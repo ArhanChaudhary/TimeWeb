@@ -22,7 +22,6 @@ urlpatterns = [
     path(admin_url, admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('contact/', include('contact_form.urls')),
-    path('__debug__/', include('debug_toolbar.urls')),
     path('', include('timewebapp.urls')),
     path('api/', include('api.urls')),
     path('', include('timewebauth.urls')),
