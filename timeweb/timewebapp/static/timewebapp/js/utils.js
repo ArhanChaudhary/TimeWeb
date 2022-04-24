@@ -290,13 +290,6 @@ utils = {
             },
 
             googleClassroomAPI: function() {
-                if (!creating_gc_assignments_from_frontend && !GC_API_INIT_FAILED) {
-                    if (SETTINGS.oauth_token.token) {
-                        $("#toggle-gc-label").text("Disable Google Classroom integration");
-                    } else {
-                        $("#toggle-gc-label").text("Enable Google Classroom integration");
-                    }
-                }
                 $("#toggle-gc-container").click(function() {
                     if (isExampleAccount) {
                         $.alert({

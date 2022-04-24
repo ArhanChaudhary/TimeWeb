@@ -12,7 +12,7 @@
             ACCOUNT_EMAIL = "{{ user.get_username }}";
             EXAMPLE_ACCOUNT_EMAIL = "{{ EXAMPLE_ACCOUNT_EMAIL }}";
             EXAMPLE_ASSIGNMENT_NAME = "{{ EXAMPLE_ASSIGNMENT_NAME }}";
-            {% if MAX_NUMBER_OF_TAGS %}MAX_NUMBER_OF_TAGS = {{ MAX_NUMBER_OF_TAGS }};{% endif %}
+            MAX_NUMBER_OF_TAGS = {{ MAX_NUMBER_OF_TAGS }};
             GC_API_INIT_FAILED = {% if GC_API_INIT_FAILED %}true{% else %}false{% endif %};
             EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
             creating_gc_assignments_from_frontend = {% if creating_gc_assignments_from_frontend %}true{% else %}false{% endif %};
