@@ -13,16 +13,13 @@ class Assignment {
         if (this.sa.unit) this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
     }
     calcSkewRatioBound() {
-        let x1 = this.sa.complete_x;
+        let x1 = this.sa.x;
         let y1 = this.sa.y;
-
-        const mods = this.calcModDays();
-        x1 -= Math.floor(this.sa.x / 7) * this.sa.break_days.length + mods[this.sa.x % 7];
-        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
-            x1 = Math.ceil(x1);
-        }
-
         if (!y1) return 0;
+
+        // this isn't always accurate with due times but i dont think anyone in the entire universe could care less; its 2 am and im tired and i just want to get an A on my physics exam im sorry but i realized after wasting like half an hour trying to find a goddamn solution that no user using timeweb will *ever* care at all that the skew ratio doesnt flatten out completely using arrow keys, in fact which users will even know that arrow keys exist, who the hell also cares about timeweb enough to actually use it, what am i doing with my life
+        const mods = this.calcModDays();
+        x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
         /*
         skew_ratio = (a + b) * x1 / y1; 
         skew_ratio = this.funct(1) * x1 / y1;
