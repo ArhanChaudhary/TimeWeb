@@ -764,6 +764,9 @@ utils = {
                                         !$("#overlay").is(":visible") && $("#image-new-container").click();
                                     }, 0);
                                     break;
+                                case "t":
+                                    $("main").scrollTop(0);
+                                    break;
                                 case "e":
                                 case "d":
                                 case "D":
@@ -773,7 +776,6 @@ utils = {
                                 case "f":
                                 case "o":
                                 case "c":
-                                case "t":
                                     let assignment_container = $(":hover").filter(".assignment-container");
                                     if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                                     if (assignment_container.length)
@@ -811,11 +813,6 @@ utils = {
                                                 assignment_container.children(".assignment").click();
                                                 break;
                                         }
-                                    switch (e.key) {
-                                        case "t":
-                                            $("main").scrollTop(0);
-                                            break;
-                                    }
                                     break;
                             }
                         break;
