@@ -90,16 +90,22 @@ class Assignment {
     }
     getWorkingDaysRemaining(params={reference: null, floor_due_time: false}) {
         const original_red_line_start_x = this.red_line_start_x;
-        if (params.reference === "today") {
-            let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
-            this.red_line_start_x = today_minus_assignment_date;
-        } else if (params.reference === "blue line end") {
-            let len_works = this.sa.works.length - 1;
-            this.red_line_start_x = this.sa.blue_line_start + len_works;
-        } else if (params.reference === "visual red line start") {
-            let len_works = this.sa.works.length - 1;
-            // First point the red line is drawn on, taken from draw()
-            this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.blue_line_start + len_works;
+        switch (params.reference) {
+            case "today":
+                let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+                this.red_line_start_x = today_minus_assignment_date;
+                break;
+            case "blue line end": {
+                let len_works = this.sa.works.length - 1;
+                this.red_line_start_x = this.sa.blue_line_start + len_works;
+                break;
+            }
+            case "visual red line start": {
+                let len_works = this.sa.works.length - 1;
+                // First point the red line is drawn on, taken from draw()
+                this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.blue_line_start + len_works;
+                break;
+            }
         }
         if (params.floor_due_time) {
             var x1 = Math.floor(this.sa.complete_x) - this.red_line_start_x;
