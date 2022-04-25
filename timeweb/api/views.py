@@ -261,8 +261,10 @@ def create_gc_assignments(request):
                 is_google_classroom_assignment=True,
                 user=user,
 
-                unit="Minute"
-                # y, time_per_unit, and unit are missing
+                # Assumptions
+                unit="Minute",
+                time_per_unit=1,
+                # y is missing
             ))
     # .execute() rarely leads to 503s which I expect may have been from a temporary outage
     courses = service.courses().list().execute().get('courses', [])
