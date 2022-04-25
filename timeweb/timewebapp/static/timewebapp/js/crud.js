@@ -8,7 +8,10 @@ class Crud {
             due_time.setMinutes(SETTINGS.def_due_time.hour * 60 + SETTINGS.def_due_time.minute);
             return moment(due_time);
         })(),
-        "#id_x": '',
+        "#id_x": (function() {
+            $("#due-date-empty").click();
+            return "";
+        })(),
         "#id_soft": false,
         "#id_unit": '',
         "#id_y": '',
@@ -89,12 +92,28 @@ class Crud {
                 format: 'MM/DD/YYYY'
             },
         });
+        let old_due_date_val;
         $("#id_x").daterangepicker({
             ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
             locale: {
                 format: 'MM/DD/YYYY h:mm A'
             },
             timePicker: true,
+        }).on('show.daterangepicker', function(e, picker) {
+            old_due_date_val = $(this).val();
+        }).on('hide.daterangepicker', function(e, picker) {
+            setTimeout(() => {
+                if (!$(this).val()) return;
+
+                $("#form-wrapper #due-date-text-measurer").text($(this).val());
+                $(this).parents("#due-date-input-container").prop("style").setProperty("--due-date-text-width", $("#form-wrapper #due-date-text-measurer").width() + "px");
+            }, 0);
+        }).on('cancel.daterangepicker', function(e, picker) {
+            $(this).val(old_due_date_val);
+        });
+        $("#due-date-empty").click(function() {
+            $("#id_x").val("");
+            $(this).parents("#due-date-input-container").prop("style").removeProperty("--due-date-text-width");
         });
         that.setCrudHandlers();
         that.addInfoButtons();

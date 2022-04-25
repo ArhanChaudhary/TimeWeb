@@ -857,6 +857,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper label::after {
     position: absolute;
+    z-index: 1;
     display: block;
     color: rgb(117, 117, 117); /* Default chrome placeholder color */
     font-size: 12px;
@@ -885,6 +886,8 @@ input[type=number]::-webkit-inner-spin-button {
     border-radius: 15px;
     padding: 5px 5px 25px;
     position: relative;
+    --horizontal-form-padding: 3px;
+    --form-field-margin-left: 10px;
 }
 #form-wrapper #cancel-button {
     position: absolute;
@@ -948,7 +951,7 @@ input[type=number]::-webkit-inner-spin-button {
 #form-wrapper input, #form-wrapper textarea {
     box-sizing: border-box; 
     display: block;
-    margin-left: 10px;
+    margin-left: var(--form-field-margin-left);
     width: calc(100% - 20px);
     border: 1px solid black;
     border-radius: 3px;
@@ -970,12 +973,58 @@ input[type=number]::-webkit-inner-spin-button {
     margin: unset;
 }
 #form-wrapper #id_x {
-    min-width: calc(100% - 30px - var(--soft-label-width));
     width: calc(100% - 20px - var(--soft-label-width));
 }
-#form-wrapper #id_x, #form-wrapper #id_assignment_date {
+
+
+
+
+#form-wrapper #due-date-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+#form-wrapper #due-date-input-container #due-date-empty {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: black;
+    cursor: pointer;
+    margin-left: 5px;
+    transform: translateX(var(--form-field-margin-left)) translateX(var(--horizontal-form-padding)) translateX(var(--due-date-text-width, -100vw));
+}
+#form-wrapper #due-date-input-container #due-date-empty::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: scale(4);
+}
+#form-wrapper #due-date-input-container .due-date-empty-icon-slash {
+    width: 2px;
+    height: 8px;
+    position: absolute;
+    background-color: white;
+}
+#form-wrapper #due-date-text-measurer {
+    visibility: hidden;
+    font-size: 0.83em;
+    position: absolute;
+}
+#form-wrapper #id_x, #form-wrapper, #due-date-text-measurer, #form-wrapper #id_assignment_date {
     letter-spacing: 0.5px;
 }
+
+
+
+
+
 #form-wrapper #fields-wrapper .hide-field {
     z-index: -1;
     position: relative;
@@ -996,7 +1045,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 #form-wrapper input, #form-wrapper textarea {
     margin-top: 1px;
-    padding: 3px 1px;
+    padding: var(--horizontal-form-padding) 1px;
 }
 #submit-assignment-button {
     width: calc(100% - 140px);

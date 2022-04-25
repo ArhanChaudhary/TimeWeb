@@ -48,7 +48,18 @@
                 </div>
               {% else %}
                 {{ field.label_tag }}
-                {{ field }}
+                {% if field.name == "x" %}
+                  <div id="due-date-text-measurer"></div>
+                  <span id="due-date-input-container">
+                    {{ field }}
+                    <div id="due-date-empty">
+                      <span class="due-date-empty-icon-slash x-icon-first-slash"></span>
+                      <span class="due-date-empty-icon-slash x-icon-second-slash"></span>
+                    </div>
+                  </span>
+                {% else %}
+                  {{ field }}
+                {% endif %}
               {% endif %}
               {% for error in field.errors %}
                 {% comment %} Only adds form errors to the name field in the example account {% endcomment %}
