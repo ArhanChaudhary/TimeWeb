@@ -24,7 +24,7 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('mstile-150x150.png', RedirectView.as_view(url=app_static('icons/mstile_150x150.png'))),
     path('safari-pinned-tab.svg', RedirectView.as_view(url=app_static('icons/safari_pinned_tab.svg'))),
 
-    path('stackpile', views.StackpileView.as_view(), name='stackpile'),
+    path('stackpile', RedirectView.as_view(url="https://stackpile.me"), name='stackpile'),
     path('spooky', views.SpookyView.as_view(), name="spooky"),
     path('sus', views.SusView.as_view(), name="sus"),
     path('mc.blogcraft.dev', lambda x: HttpResponse(status=418), name="bithub"),

@@ -12,10 +12,6 @@ class RickView(TimewebGenericView):
     def get(self, request, _):
         return HttpResponse(f"<script nonce=\"{request.csp_nonce}\">a=\"https:/\";window.location.href=a+\"/www.youtube.com/watch?v=dQw4w9WgXcQ\"</script>")
 
-class StackpileView(TimewebGenericView):
-    def get(self, request):
-        return redirect("https://stackpile.me")
-
 class SpookyView(TimewebGenericView):
     template_name = "misc/spooky.html"
     
