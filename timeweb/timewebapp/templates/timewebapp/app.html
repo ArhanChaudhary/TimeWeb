@@ -271,6 +271,12 @@
       </div>
     </div>
   </template>
+  <template id="tutorial-click-assignment-to-open-template">
+    <span id="tutorial-click-assignment-to-open"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
+      Click your assignment to open it
+      <br>
+    </span>
+  </template>
   <div id="toggle-gc-container" class="{% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}clicked {% endif %}{% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in settings_model.oauth_token %}enabled{% endif %}">
     <span id="toggle-gc-label">
       {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}

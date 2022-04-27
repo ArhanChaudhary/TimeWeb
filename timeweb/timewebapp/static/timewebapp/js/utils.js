@@ -953,7 +953,7 @@ utils = {
                     return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
                 });
                 if (assignments_excluding_example.length) {
-                    first_available_assignment.after("<span id=\"tutorial-click-assignment-to-open\" class=\"grey-highlight\">Click your assignment to open it<br></span>");
+                    first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
                     if (!utils.ui.alreadyScrolled) {
                         // setTimeout needed because this runs before domSort
                         setTimeout(function() {
