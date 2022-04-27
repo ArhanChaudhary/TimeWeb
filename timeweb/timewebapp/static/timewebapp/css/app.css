@@ -1,7 +1,4 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
-body {
-    background: rgb(234, 234, 234);
-}
 #assignments-container {
     position: relative;
     /* Ensure things dont get cutoff when crud.js puts overflow: hidden on this when an assignment is being deleted */
@@ -150,7 +147,7 @@ a[href="/settings"] {
     transition: none !important;
 }
 .assignment {
-    box-shadow: 0 0 0 black;
+    box-shadow: 0 0 12px -11px black;
     background: var(--app-color); /* Set white so it doesnt transition background initially if added by priority.js */
     border-radius: 5px;
     position: relative;
