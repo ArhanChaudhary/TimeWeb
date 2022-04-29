@@ -613,12 +613,11 @@ utils = {
                 // Remove "Important" and "Not Important" so they can be added first
                 unique_allTags.delete("Important");
                 unique_allTags.delete("Not Important");
-                // Filter ouf default dropdown tags so is in a separate sorting group
-                // Also filter out tags that are already in the assignment
+                // Filter out default dropdown tags so is in a separate sorting group
                 let current_assignment_tags = utils.loadAssignmentData(dom_assignment).tags;
-                unique_allTags = [...unique_allTags].filter(e => !(SETTINGS.default_dropdown_tags.includes(e) || current_assignment_tags.includes(e)));
+                unique_allTags = [...unique_allTags].filter(e => !SETTINGS.default_dropdown_tags.includes(e));
 
-                const final_allTags = [];
+                let final_allTags = [];
                 // Add back in "Important", "Not Important"
                 final_allTags.push("Important");
                 final_allTags.push("Not Important");
@@ -626,6 +625,8 @@ utils = {
                 final_allTags.push(...SETTINGS.default_dropdown_tags);
                 // Finally, add sorted unique_allTags
                 final_allTags.push(...unique_allTags.sort());
+                // Filter out tags that are already in the assignment
+                final_allTags = final_allTags.filter(e => !current_assignment_tags.includes(e));
 
 
 
