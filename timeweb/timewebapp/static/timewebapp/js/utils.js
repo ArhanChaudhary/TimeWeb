@@ -106,29 +106,27 @@ utils = {
         }
     },
     ui: {
-        tickClock: function(params={force_update: false}) {
-            if (params.force_update) utils.ui.old_minute_value = undefined; // Without this, it may not update and display (Invalid Date)
+        tickClock: function() {
             const now = utils.getRawDateNow();
             const estimated_completion_time = new Date(now.valueOf());
             const minute_value = estimated_completion_time.getMinutes();
-            if (minute_value !== utils.ui.old_minute_value) {
-                estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
-                if (isNaN(estimated_completion_time.getMinutes())) {
-                    estimated_completion_time.setTime(8640000000000000);
-                }
-                let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
-                str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
-                $("#current-time").text(` (${str})`);
-                utils.ui.old_minute_value = minute_value;
 
-                const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-                if (midnight.valueOf() !== date_now.valueOf()) {
-                    if (utils.in_simulation || isExampleAccount) return;
-                    reloadWhenAppropriate();
-                }
-                $(window).resize();
+            estimated_completion_time.setMinutes(minute_value + +$("#estimated-total-time").attr("data-minutes"));
+            if (isNaN(estimated_completion_time.getMinutes())) {
+                estimated_completion_time.setTime(8640000000000000);
             }
+            let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
+            str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
+            $("#current-time").text(` (${str})`);
+            utils.ui.old_minute_value = minute_value;
+
+            const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+            if (midnight.valueOf() !== date_now.valueOf()) {
+                if (utils.in_simulation || isExampleAccount) return;
+                reloadWhenAppropriate();
+            }
+            $(window).resize();
         },
         setClickHandlers: {
             tickButtons: function() {
@@ -1446,4 +1444,10 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setAssignmentScaleUtils();
     utils.ui.setAnimationSpeed();
     utils.ui.saveAndLoadStates();
+    // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute
+    let secondsRemaining = (60 - new Date().getSeconds()) * 1000;
+    setTimeout(function() {
+        utils.ui.tickClock();
+        setInterval(utils.ui.tickClock, 60000);
+    }, secondsRemaining);
 });

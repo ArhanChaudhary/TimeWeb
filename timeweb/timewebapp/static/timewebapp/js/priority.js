@@ -706,10 +706,7 @@ class Priority {
             }
             $("#tomorrow-time").text(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
         }
-        utils.ui.tickClock({ force_update: true });
-        if (that.params.first_sort) {
-            setInterval(utils.ui.tickClock, 1000);
-        }
+        utils.ui.tickClock();
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false}) {
         const that = this;
