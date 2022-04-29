@@ -112,8 +112,8 @@
           <img id="close-assignments"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'timewebapp/images/close_all_assignments.png' %}">
           <img id="previous-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.png' %}">
           <img id="next-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.png' %}">
-          <a href="/settings">
-            <img id="settings"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Settings" height="27" src="{% static 'timewebapp/images/settings.png' %}">
+          <a href="{% url 'settings' %}">
+            <img id="settings"{% if settings_model.background_image %} class="grey-highlight"{% endif %} alt="Settings" height="27" src="{% static 'timewebapp/images/settings.png' %}">
           </a>
           <div id="settings-icon-label"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>Settings</div>
           <div id="previous-day-icon-label"><span {% if settings_model.background_image %} class="grey-highlight"{% endif %}>Go to Previous Day</span></div>
