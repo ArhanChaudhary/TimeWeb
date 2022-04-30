@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="640"><path d="M640 0 256 384 128 256 0 384 256 640 768 128 640 0Z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg">
+    <g id="g" fill="currentColor">
+        <path d="M640 0 256 384 128 256 0 384 256 640 768 128 640 0Z"/>
+    </g>
+</svg>

@@ -397,6 +397,7 @@ a[href="/settings"] {
     float: left;
     margin-left: var(--arrow-margin-left);
     overflow: visible;
+    fill: currentColor;
 }
 .right-side-of-header {
     font-size: min(16.76px,calc(11px + 0.4vw));
@@ -409,6 +410,7 @@ a[href="/settings"] {
 }
 .status-image {
     position: absolute;
+    color: var(--color);
 }
 .align-to-status-message-container {
     margin-right: 6px;

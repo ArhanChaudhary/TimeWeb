@@ -195,26 +195,34 @@
               {% endif %}
             </div>
             <svg width="30px" height="20px" class="arrow-container">
-              <polygon points="5,0 5,20 15,10">
+              <polygon points="5,0 5,20 15,10" fill="currentColor">
                 <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
                 <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
               </polygon>
             </svg>
             <div class="right-side-of-header">
-              <img class="status-image">
+              <svg class="status-image" preserveAspectRatio="none">
+                <use></use>
+              </svg>
               <div class="align-to-status-message-container">
                 <span class="status-message"></span>
               </div>
               <span class="completion-time"></span>
             </div>
             <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <img class="tick-button" width="25" src="{% static 'timewebapp/images/tick.svg' %}" draggable="false"/>
+              <svg class="tick-button" width="25" preserveAspectRatio="none">
+                <use href="{% static 'timewebapp/images/tick.svg' %}#g"></use>
+              </svg>
             </div>
             <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <img class="update-button" width="22" height="22" src="{% static 'timewebapp/images/edit.png' %}" draggable="false"/>
+              <svg class="update-button" width="22" height="22" preserveAspectRatio="none">
+                <use href="{% static 'timewebapp/images/edit.svg' %}#g"></use>
+              </svg>
             </div>
             <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <img class="delete-button" height="25" src="{% static 'timewebapp/images/delete.png' %}" draggable="false"/>
+              <svg class="delete-button" height="25" preserveAspectRatio="none">
+                <use href="{% static 'timewebapp/images/delete.svg' %}#g"></use>
+              </svg>
             </div>
           </div>
           <div class="assignment-footer">

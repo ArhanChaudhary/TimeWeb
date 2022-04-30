@@ -452,7 +452,7 @@ class Priority {
                 )
             ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("src", (function() {
                 const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
-                return DEBUG ? `/static/timewebapp/images/${tick_image}.svg` : `https://storage.googleapis.com/twstatic/timewebapp/images/${tick_image}.svg`;
+                return DEBUG ? `/static/timewebapp/images/${tick_image}.svg#g` : `https://storage.googleapis.com/twstatic/timewebapp/images/${tick_image}.svg#g`;
             })())
 
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
@@ -493,10 +493,14 @@ class Priority {
 
             if (status_image) {
                 dom_status_image.show();
-                dom_status_image.attr("src", DEBUG ? `static/timewebapp/images/${status_image}.png`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.png`);
+                dom_status_image.find("use").attr("href", DEBUG ? `/static/timewebapp/images/${status_image}.svg#g`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.svg#g`);
+                dom_status_image.find("use").one("load", function() {
+                    let bbox = dom_status_image[0].getBBox();
+                    dom_status_image.attr("viewBox", `0 0 ${bbox.width} ${bbox.height}`);
+                });
             } else {
                 dom_status_image.hide();
-                dom_status_image.removeAttr("src");
+                dom_status_image.find("use").removeAttr("href");
             }
             dom_status_message.html(status_message); // use .html() instead of .text() so that .unfinished-message is parsed as an HTML element
             dom_title.attr("data-daysleft", str_daysleft);
