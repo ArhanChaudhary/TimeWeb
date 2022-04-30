@@ -485,6 +485,8 @@ a[href="/settings"] {
     opacity: 0;
     transition: opacity calc(0.1s * var(--animation-speed)) linear, transform calc(0.1s * var(--animation-speed)) cubic-bezier(0.55, 0.09, 0.68, 0.53) 0.05s;
 }
+.tag-delete > .icon-slash {
+    background-color: white;
 }
 /* Don't do :hover::after because the ::after doesnt then become pointless */
 .tag-delete::after {
@@ -612,12 +614,9 @@ a[href="/settings"] {
     box-shadow: 0 0 4px 1px rgb(170, 0, 0);
 }
 
-.tag-add-plus {
+.tag-add-button > .icon-slash {
     background-color: rgb(65,65,65) !important;
     height: 15px !important;
-}
-.tag-add-plus-second-slash {
-    transform: rotate(90deg);
 }
 .tag-add-input {
     width: 100%;
@@ -684,25 +683,20 @@ a[href="/settings"] {
     height: 6px;
     width: 1px;
     position: absolute;
-    background-color: white;
 }
-.x-icon-first-slash {
+.tag-add > .icon-slash {
+    right: unset;
+    left: 6px;
+    height: 9px;
+    background-color: var(--color);
+}
+.x-first-slash {
     transform: rotate(45deg);
 }
-.x-icon-second-slash {
+.x-second-slash {
     transform: rotate(-45deg);
 }
-.plus-first-slash {
-    right: unset;
-    left: 6px;
-    height: 9px;
-    background-color: black;
-}
 .plus-second-slash {
-    right: unset;
-    left: 6px;
-    height: 9px;
-    background-color: black;
     transform: rotate(90deg);
 }
 .completion-time {
