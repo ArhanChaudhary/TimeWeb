@@ -102,9 +102,6 @@ $(function() {
     $("#nav-credits").click(() => $.alert({
         title: $("#credits-template").html(),
     }));
-    $("#nav-socials").click(() => $.alert({
-        title: $("#socials-template").html(),
-    }));
 });
 
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
