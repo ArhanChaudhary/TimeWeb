@@ -494,10 +494,19 @@ class Priority {
             if (status_image) {
                 dom_status_image.show();
                 dom_status_image.find("use").attr("href", DEBUG ? `/static/timewebapp/images/${status_image}.svg#g`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.svg#g`);
-                dom_status_image.find("use").one("load", function() {
-                    let bbox = dom_status_image[0].getBBox();
-                    dom_status_image.attr("viewBox", `0 0 ${bbox.width} ${bbox.height}`);
-                });
+
+                // Don't poll on the first sort because the "load" event in utils.js covers this
+                if (!that.params.first_sort) {
+                    let iwishloadeventfiredtwice;
+                    function poll() {
+                        let bbox = dom_status_image[0].getBBox();
+                        if (bbox.width === 0) return;
+                        dom_status_image.attr("viewBox", `0 0 ${bbox.width} ${bbox.height}`);
+                        clearInterval(b);
+                    }
+                    iwishloadeventfiredtwice = setInterval(poll, 250);
+                    setTimeout(poll, 0);
+                }
             } else {
                 dom_status_image.hide();
                 dom_status_image.find("use").removeAttr("href");

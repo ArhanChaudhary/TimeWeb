@@ -937,7 +937,7 @@ utils = {
             });
         },
         dynamicallySetSVGViewBox: function() {
-            $("svg:not(.status-image) > use").each(function() {
+            $("svg > use").each(function() {
                 $(this).one("load", function() {
                     let bbox = this.getBBox();
                     $(this).parent().attr("viewBox", `0 0 ${bbox.width} ${bbox.height}`);
