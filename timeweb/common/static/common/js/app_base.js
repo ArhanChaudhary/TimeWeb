@@ -102,6 +102,8 @@ $(function() {
     $("#nav-credits").click(() => $.alert({
         title: $("#credits-template").html(),
     }));
+});
+document.addEventListener("DOMContentLoaded", function() {
     $("svg > use").each(function() {
         $(this).one("load", function() {
             let bbox = this.getBBox();
