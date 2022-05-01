@@ -500,7 +500,7 @@ utils = {
                     return;
                 }
                 // Plus button was clicked
-                if ($(e.target).is(".tag-add-button, .tag-add-plus")) {
+                if ($(e.target).is(".tag-add-button, .tag-add-button > .icon-slash")) {
                     const sa = utils.loadAssignmentData($this);
 
                     const checked_tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
