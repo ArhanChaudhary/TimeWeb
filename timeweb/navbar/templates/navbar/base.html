@@ -42,7 +42,9 @@
     </template>
     <template id="label-icon-template">
         <div class="label-icon-container">
-            <img class="label-icon" height="25" src="{% static 'timewebapp/images/question_mark.svg' %}">
+            <svg class="label-icon" height="25" width="16.45" preserveAspectRatio="none">
+                <use href="{% static 'timewebapp/images/question_mark.svg' %}#g"></use>
+            </svg>
         </div>
     </template>
 {% endblock content %}

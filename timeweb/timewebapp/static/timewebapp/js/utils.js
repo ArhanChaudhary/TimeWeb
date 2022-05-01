@@ -936,14 +936,6 @@ utils = {
                 }, 0);
             });
         },
-        dynamicallySetSVGViewBox: function() {
-            $("svg > use").each(function() {
-                $(this).one("load", function() {
-                    let bbox = this.getBBox();
-                    $(this).parent().attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-                });
-            });
-        },
         setAnimationSpeed: function() {
             $("main").prop("style").setProperty('--animation-speed', SETTINGS.animation_speed);
             if (SETTINGS.animation_speed !== 0) return;
@@ -1450,7 +1442,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();
     utils.ui.setAssignmentScaleUtils();
-    utils.ui.dynamicallySetSVGViewBox();
     utils.ui.setAnimationSpeed();
     utils.ui.saveAndLoadStates();
     // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute
