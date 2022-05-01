@@ -501,8 +501,7 @@ class Priority {
                     function poll() {
                         let bbox = dom_status_image[0].getBBox();
                         if (bbox.width === 0) return;
-                        dom_status_image.attr("viewBox", `0 0 ${bbox.width} ${bbox.height}`);
-                        clearInterval(b);
+                        clearInterval(iwishloadeventfiredtwice);
                     }
                     iwishloadeventfiredtwice = setInterval(poll, 250);
                     setTimeout(poll, 0);
