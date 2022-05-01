@@ -194,11 +194,11 @@ details > .img-ignore-padding-container img {
 }
 
 #assignment-graph-image {
-    content: url(https://storage.googleapis.com/twstatic/navbar/images/wide_assignment_graph.png);
+    content: url(https://storage.googleapis.com/twstatic/navbar/images/wide_assignment_graph.webp);
 }
 @media screen and (max-width: 790px) {
     #assignment-graph-image {
-        content: url(https://storage.googleapis.com/twstatic/navbar/images/narrow_assignment_graph.png);
+        content: url(https://storage.googleapis.com/twstatic/navbar/images/narrow_assignment_graph.webp);
     }
 }
 .minor-category {

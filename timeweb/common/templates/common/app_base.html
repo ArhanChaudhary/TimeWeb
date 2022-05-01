@@ -21,7 +21,7 @@
     {% url 'home' as home %}
     {% if user.is_authenticated and request.path == home %}
         <div id="image-new-container" tabindex="1">
-            <img width="60" height="60" src="{% static 'timewebapp/images/plus.png' %}" alt="new" draggable="false"/>
+            <img width="60" height="60" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
             <div id="new-assignment-text">New Assignment</div>
         </div>
     {% endif %}
@@ -71,7 +71,7 @@
         </div>
     </nav>
     <a href="{% url 'home' %}" id="logo-container">
-        <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.png' %}" border="0" draggable="false"/>
+        <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" border="0" draggable="false"/>
         <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
     </a>
@@ -124,9 +124,9 @@
         finished.svg: ascii character
         unfinished.svg: ascii character
         slashed_tick.svg: made myself and inspired by the check icon
-        open_all_assignments.png: made myself
-        close_all_assignments.png: made myself
-        settings.png: citation not needed (https://www.iconfinder.com/icons/326699/settings_icon)
+        open_all_assignments.webp: made myself
+        close_all_assignments.webp: made myself
+        settings.webp: citation not needed (https://www.iconfinder.com/icons/326699/settings_icon)
         -->
     </template>
 </main>
