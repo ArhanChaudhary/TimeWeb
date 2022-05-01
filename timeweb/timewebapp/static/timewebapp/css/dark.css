@@ -1,0 +1,67 @@
+body {
+    --body-background: rgb(33, 33, 33);
+    --primary-c: 48;
+    --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
+    --c: 213;
+}
+#id_assignment_sorting {
+    color: rgb(var(--c), var(--c), var(--c));
+    background-color: black;
+}
+.generic-button:hover {
+    --bg-c: calc(var(--primary-c) + 12);
+}
+.tag-wrapper, .tag-add {
+    --background-color: unset !important;
+}
+.tag-delete > .icon-slash {
+    background-color: black;
+}
+#assignments-header #icon-label-container {
+    filter: invert(calc(var(--c) / 255)) hue-rotate(180deg);
+}
+.fixed-graph {
+    filter: invert(1) hue-rotate(180deg);
+}
+#toggle-gc-container {
+    --background-color: var(--body-background);
+    --box-shadow-color: rgb(103, 103, 103);
+}
+
+
+
+
+#dark-mode .assignment-container::after,
+#dark-mode .assignment-container::before,
+#dark-mode .shortcut-line-right,
+#dark-mode .shortcut-line-left,
+
+#dark-mode #assignments-container > :not(.assignment-container):not(#assignments-header),
+#dark-mode #assignments-container > #assignments-header > :not(#icon-label-container),
+
+#dark-mode #assignments-header #icon-label-container img ~ div,
+
+#dark-mode .shortcut-text,
+
+#dark-mode .shortcut .info-button,
+#dark-mode #assignments-header #icon-label-container img ~ div > .info-button,
+
+#dark-mode .tags,
+
+/* Undo filter already applied by #dark-mode .assignment-footer */
+#dark-mode .assignment-footer,
+
+#dark-mode #assignments-container .info-button-text:not(.tag-add-box),
+
+#dark-mode #tutorial-click-assignment-to-open {
+    --filter-invert: 1;
+    filter: drop-shadow(0 1px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 -1px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(1px 0 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(-1px 0 0 var(--filter-drop-shadow-color, transparent))
+            invert(var(--filter-invert, 0));
+}
+#dark-mode #overlay {
+    filter: brightness(0.8);
+    background-color: rgba(0,0,0,0.55);
+}
