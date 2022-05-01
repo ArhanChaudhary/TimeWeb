@@ -273,7 +273,10 @@ utils = {
                             cancel: function() {
                                 
                             }
-                        }
+                        },
+                        onDestroy: function() {
+                            $(document.activeElement).blur();
+                        },
                     });
 
                 });
