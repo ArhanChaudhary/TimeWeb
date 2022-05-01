@@ -548,6 +548,7 @@ a[href="/settings"] {
 }
 .tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
+    transform: scale(1.2);
 }
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
     width: 57px;
