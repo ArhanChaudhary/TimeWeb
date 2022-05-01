@@ -58,7 +58,7 @@ class Priority {
                     params.dom_assignment.addClass("transition-instantly");
                 }
                 if (isNaN(params.priority_percentage)) {
-                    params.dom_assignment.prop("style").setProperty("--priority-color", "rgba(0, 0, 0, 0)");
+                    params.dom_assignment.prop("style").removeProperty("--priority-color");
                 } else {
                     const priority_color = that.percentageToColor(params.priority_percentage);
                     params.dom_assignment.prop("style").setProperty("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
