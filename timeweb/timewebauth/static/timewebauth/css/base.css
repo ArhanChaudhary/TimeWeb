@@ -172,7 +172,7 @@ input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea 
     padding-left: 15px;
 }
 input:not([type="submit"]):focus, textarea:focus {
-    box-shadow: inset 0 0 0 2px rgb(0, 109, 249) !important;;
+    box-shadow: inset 0 0 0 2px rgb(0, 109, 249) !important;
     outline: 0;
 }
 .error-note, .success-note {

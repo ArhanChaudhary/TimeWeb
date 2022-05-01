@@ -3,7 +3,7 @@ $(function() {
         $(this).wrap("<div class=\"password-field-container\"></div>");
         if ($(this).hasClass("add-input-margin")) {
             $(this).parent().addClass("add-input-margin");
-            $(this).removeClass("add-input-margin");;
+            $(this).removeClass("add-input-margin");
         }
         $(this).after($($("#password-widget-icons").html()));
     });

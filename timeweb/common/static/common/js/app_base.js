@@ -129,8 +129,8 @@ function collision($div1, $div2, params={ margin: 0}) {
 
     var left2 = $div2.offset().left;
     var top2 = $div2.offset().top;
-    var bottom2 = top2 + $div2.outerHeight(true);;
-    var right2 = left2 + $div2.outerWidth(true);;
+    var bottom2 = top2 + $div2.outerHeight(true);
+    var right2 = left2 + $div2.outerWidth(true);
 
     hide_$div1 && $div1.hide();
     hide_$div2 && $div2.hide();
