@@ -488,6 +488,7 @@ a[href="/settings"] {
     background-color: var(--color);
     cursor: pointer;
     opacity: 0;
+    transform: scale(0.8);
     transition: opacity calc(0.1s * var(--animation-speed)) linear, transform calc(0.1s * var(--animation-speed)) cubic-bezier(0.55, 0.09, 0.68, 0.53) 0.05s;
 }
 .tag-delete > .icon-slash {
