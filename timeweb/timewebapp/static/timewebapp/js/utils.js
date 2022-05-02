@@ -459,8 +459,9 @@ utils = {
             // Reminder: priority.js triggers this event handler
             const info = $("#info");
             const hide_button = info.find("#hide-button");
+            const icon_label_container = $("#icon-label-container");
             $("#assignments-header #icon-label-container img").on("mouseover mouseout focusout", function(e) {
-                const visible_icon_label = $(e.target).parents("#icon-label-container").children("div:visible");
+                const visible_icon_label = icon_label_container.children("div:visible");
                 let toggle_dim;
                 if (visible_icon_label.length && e.type === "mouseover")
                     toggle_dim = collision(hide_button, visible_icon_label);
@@ -469,6 +470,11 @@ utils = {
                 // if you mouseout while an icon is focused, dim is removed. This fixes that
                 if (!toggle_dim && $("#icon-label-container img").is(document.activeElement) && e.type === "mouseout") return;
                 info.toggleClass("dim", toggle_dim);
+            });
+            $(window).on("resize", function() {
+                const visible_icon_label = icon_label_container.children("div:visible");
+                if (!visible_icon_label.length) return;
+                info.toggleClass("dim", collision(hide_button, visible_icon_label));
             });
         },
         addTagHandlers: function() {
