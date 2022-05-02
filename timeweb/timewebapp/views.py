@@ -10,14 +10,14 @@ from django.forms import ValidationError
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
-from common.views import TimewebGenericView
+from views import TimewebGenericView
 import datetime
 from math import ceil, floor
 from decimal import Decimal
 
 # App stuff
 from django.conf import settings
-from common.views import User
+from views import User
 from .models import TimewebModel
 from navbar.models import SettingsModel
 from .forms import TimewebForm
@@ -31,8 +31,8 @@ from django.dispatch import receiver
 from django.forms.models import model_to_dict
 
 # Misc
-from common.utils import days_between_two_dates, utc_to_local
-from common.views import logger
+from utils import days_between_two_dates, utc_to_local
+from views import logger
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):

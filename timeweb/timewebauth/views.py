@@ -1,5 +1,5 @@
 # Abstractions
-from common.views import TimewebGenericView
+from views import TimewebGenericView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.forms import ValidationError
@@ -9,7 +9,7 @@ from django.conf import settings
 from .forms import UsernameResetForm
 
 # Misc
-from common.views import logger
+from views import logger
 from allauth.account.adapter import DefaultAccountAdapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 

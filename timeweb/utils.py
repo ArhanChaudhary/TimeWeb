@@ -16,6 +16,7 @@ def app_static_factory(app_name):
         return f"/static/{app_name}/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{app_name}/{url_path}'
     return app_static
 
+
 try:
     current_site = Site.objects.get(domain="localhost" if settings.DEBUG else "timeweb.io")
 except Site.DoesNotExist:

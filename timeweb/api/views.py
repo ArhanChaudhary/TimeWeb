@@ -28,8 +28,8 @@ from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 
 # Misc
-from common.utils import days_between_two_dates, utc_to_local
-from common.views import logger
+from utils import days_between_two_dates, utc_to_local
+from views import logger
 from django.utils.decorators import decorator_from_middleware
 from .middleware.validation import APIValidationMiddleware, CatchRequestDataTooBig
 from django.views.decorators.http import require_http_methods

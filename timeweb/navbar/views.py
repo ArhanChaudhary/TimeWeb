@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy # source code uses this instead of reverse for some reason
 from django.shortcuts import redirect
-from common.views import TimewebGenericView
+from views import TimewebGenericView
 
 # App stuff
 from django.conf import settings
@@ -18,7 +18,7 @@ from allauth.decorators import rate_limit
 # Misc
 from django.contrib import messages
 from requests import get as requests_get
-from common.views import logger
+from views import logger
 
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
