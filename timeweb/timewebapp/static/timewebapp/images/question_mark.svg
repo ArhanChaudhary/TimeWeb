@@ -1,5 +1,5 @@
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg">
-    <g id="g" transform="translate(0,112) scale(0.1,-0.1)" fill="currentColor">
+    <g id="g" transform="scale(1,-1)" fill="currentColor">
         <path d="M224 1110 c-117 -38 -191 -131 -215 -269 -14 -76 3 -120 55 -145 71
         -33 137 12 151 101 15 103 68 153 162 153 87 0 143 -57 143 -145 0 -54 -23
         -88 -105 -159 -42 -35 -84 -74 -94 -87 -25 -32 -41 -92 -41 -156 l0 -53 94 0
