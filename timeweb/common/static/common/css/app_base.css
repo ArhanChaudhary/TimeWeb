@@ -313,7 +313,7 @@ nav:focus-within {
 }
 .info-button:hover .info-button-text {
     height: unset;
-    border: 2px solid black;
+    border: 2px solid var(--color);
     overflow: visible;
     padding: 5px 5px !important;
     transition: padding .1s ease-in-out, opacity .15s linear;
@@ -323,17 +323,15 @@ nav:focus-within {
     position: absolute;
     width: 265px;
     z-index: 1000;
-    background: rgb(245,245,245) !important;
-    box-shadow: 0 0 5px rgba(0,0,0,0.75);
+    background: var(--body-background) !important;
+    color: var(--color);
     border-radius: 5px !important;
-    box-shadow: none !important;
     border: none;
     height: 0;
     overflow: hidden;
     display: block;
     text-align: left;
     padding: 0 !important;
-    color: black;
     font-size: 13px;
     line-height: 14px;
     font-style: normal;
@@ -366,28 +364,28 @@ nav:focus-within {
     right: calc(100% + 1px);
     top: 50%;
     transform: translateY(-50%);
-    border-color: transparent black transparent transparent;
+    border-color: transparent var(--color) transparent transparent;
 }
 .info-button-text.info-left::after {
     content: "";
     left: calc(100% + 1px);
     top: 50%;
     transform: translateY(-50%);
-    border-color: transparent transparent transparent black;
+    border-color: transparent transparent transparent var(--color);
 }
 .info-button-text.info-top::after {
     content: "";
     top: calc(100% + 1px);
     right: 50%;
     transform: translateX(50%);
-    border-color: black transparent transparent transparent;
+    border-color: var(--color) transparent transparent transparent;
 }
 .info-button-text.info-bottom::after {
     content: "";
     bottom: calc(100% + 1px);
     right: 50%;
     transform: translateX(50%);
-    border-color: transparent transparent black transparent;
+    border-color: transparent transparent var(--color) transparent;
 }
 /* Don't know why this is here but it is here */
 .info-button:hover .info-button-text.info-right {
@@ -425,6 +423,7 @@ nav:focus-within {
 }
 .jconfirm .jconfirm-box {
     width: min(70%, 800px) !important;
+    background-color: var(--body-background) !important;
 }
 .jconfirm .jconfirm-box div.jconfirm-content-pane .jconfirm-content {
     opacity: 0.55 !important;
