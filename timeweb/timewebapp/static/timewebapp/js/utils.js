@@ -1107,6 +1107,11 @@ utils = {
                 localStorage.setItem("last_visit", new Date().valueOf());
             });
         },
+        fixBrowserInconsistencies: function() {
+            $(window).one("load", function() {
+                $("#assignments-container").css("margin-right", $("#assignments-container").width() - $("main").width());
+            });
+        },
     },
     reloadAtMidnight: function() {
         // Reloads the page after midnight hour to update the graph
@@ -1453,6 +1458,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setAssignmentScaleUtils();
     utils.ui.setAnimationSpeed();
     utils.ui.saveAndLoadStates();
+    utils.ui.fixBrowserInconsistencies();
     // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute
     let secondsRemaining = (60 - new Date().getSeconds()) * 1000;
     setTimeout(function() {
