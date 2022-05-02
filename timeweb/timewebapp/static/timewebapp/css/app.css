@@ -70,7 +70,6 @@ header.animate::after {
 }
 #current-date {
     position: relative;
-    font-size: 17px;
     order: 1;
 }
 #sort-assignments-container {
@@ -89,13 +88,15 @@ header.animate::after {
     overflow: hidden;
     position: absolute;
 }
-#assignments-header img:not(:first-of-type), #assignments-header a {
-    position: relative;
-    z-index: 1;
-    margin-left: 10px;
-}
 #assignments-header img {
+    position: relative;
     cursor: pointer;
+    z-index: 1;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+#assignments-header a[href="/settings"] img {
+    margin-right: -5px;
 }
 #settings {
     /* Remove weird extra space */
@@ -117,13 +118,12 @@ a[href="/settings"] {
 #assignments-header #icon-label-container img ~ div {
     position: absolute;
     order: 1;
-    padding-right: 15px;
+    padding-right: 10px;
     padding-left: 20px;
     right: 100%;
     white-space: nowrap;
     text-align: right;
     display: none;
-    font-size: 17px;
 }
 #assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
 #assignments-header img#previous-day:hover ~ div#previous-day-icon-label,
