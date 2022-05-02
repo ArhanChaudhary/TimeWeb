@@ -522,19 +522,16 @@ class Priority {
     alertDueDates() {
         const that = this;
         let due_date_passed_notice_title;
-        let due_date_passed_notice_content;
         if (that.due_date_passed_notices.length === 1) {
             due_date_passed_notice_title = `Notice: "${that.due_date_passed_notices[0].name}" has been marked as completely finished because its due date has passed.`;
-            due_date_passed_notice_content = "You can also enable soft due dates in the assignment form if you want the assignment's due date to automatically increment if you haven't finished it by then.";
         } else if (that.due_date_passed_notices.length > 1) {
             due_date_passed_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_passed_notices.map(i => i.name))} have been marked as completely finished because their due dates have passed.`;
-            due_date_passed_notice_content = "You can also enable soft due dates in the assignment form if you want the assignments' due dates to automatically increment if you haven't finished them by then.";       
         }
         if (due_date_passed_notice_title && !Priority.due_date_passed_notice_on_screen) {
             Priority.due_date_passed_notice_on_screen = true;
             $.alert({
                 title: due_date_passed_notice_title,
-                content: due_date_passed_notice_content,
+                content: "You can also enable soft due dates in the assignment form if you want your assignments' due dates to automatically increment if you haven't finished them by then.",
                 backgroundDismiss: false,
                 buttons: {
                     ok: {
