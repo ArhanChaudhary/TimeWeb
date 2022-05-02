@@ -188,6 +188,9 @@ a[href="/settings"] {
     border-radius: 5px 0 0 5px;
     transition: background-color calc(2s * var(--animation-speed));
 }
+#tutorial-click-assignment-to-open {
+    font-size: 17px;
+}
 .shortcut {
     position: relative;
     display: flex;
