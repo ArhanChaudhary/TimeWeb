@@ -9,4 +9,4 @@ Take a look at TimeWeb's example [account](https://timeweb.io/example) to get an
 Sign up today for free to try out TimeWeb at **[timeweb.io](https://timeweb.io/)**! An app made for students, by a student.
 <hr>
 
-You can join TimeWeb's (Discord server)[https://discord.gg/fQgPXX5qpD] to get help, interact with its community, or directly get in touch with me.
+You can join TimeWeb's [Discord server](https://discord.gg/fQgPXX5qpD) to get help, interact with its community, or directly get in touch with me.
