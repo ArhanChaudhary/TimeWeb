@@ -317,7 +317,7 @@ a[href="/settings"] {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(12px + 13vw);
+    --left-side-of-header-width: calc(26px + 13vw);
 }
 .description {
     position: relative;
@@ -421,7 +421,7 @@ a[href="/settings"] {
     margin-right: 6px;
     margin-left: 18px;
 }
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 721px) {
     .unfinished-message {
         display: none;
     }
