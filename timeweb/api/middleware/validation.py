@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponse
 from django.core.exceptions import RequestDataTooBig
+from django.urls import reverse
 
 class APIValidationMiddleware:
     def __init__(self, get_response):
@@ -17,8 +18,9 @@ class CatchRequestDataTooBig:
         self.get_response = get_response
 
     def __call__(self, request):
-        try:
-            request.body
-        except RequestDataTooBig:
-            return HttpResponse(status=413)
+        if request.path != reverse("settings"):
+            try:
+                request.body
+            except RequestDataTooBig:
+                return HttpResponse(status=413)
         return self.get_response(request)
