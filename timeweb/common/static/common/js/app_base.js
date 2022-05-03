@@ -103,15 +103,6 @@ $(function() {
         title: $("#credits-template").html(),
     }));
 });
-document.addEventListener("DOMContentLoaded", function() {
-    $("svg > use").each(function() {
-        $(this).one("load", function() {
-            let bbox = this.getBBox();
-            $(this).parent().attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-        });
-    });
-});
-
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
 function collision($div1, $div2, params={ margin: 0}) {
     if ($div1.css("display") == "none") {

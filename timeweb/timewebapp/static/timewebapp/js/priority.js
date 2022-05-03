@@ -18,6 +18,33 @@ class Priority {
     static NOT_YET_ASSIGNED = 2;
     static COMPLETELY_FINISHED = 1;
 
+    static STATUS_IMAGE_SIZES = {
+        "question_mark": {
+            x: 4.30,
+            y: -1127.89,
+            width: 734.94,
+            height: 1117.89
+        },
+        "completely_finished": {
+            x: -106.30,
+            y: -68.77,
+            width: 496.95,
+            height: 472.97
+        },
+        "finished": {
+            x: 1.36,
+            y: -1218.08,
+            width: 1318.64,
+            height: 1214.13
+        },
+        "unfinished": {
+            x: 12.46,
+            y: -1240.00,
+            width: 1038.62,
+            height: 1240.00
+        },
+    }
+
     constructor() {
         const that = this;
         that.due_date_passed_notices = [];
@@ -494,19 +521,8 @@ class Priority {
             if (status_image) {
                 dom_status_image.show();
                 dom_status_image.find("use").attr("href", DEBUG ? `/static/timewebapp/images/${status_image}.svg#g`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.svg#g`);
-
-                // Don't poll on the first sort because the "load" event in utils.js covers this
-                if (!that.params.first_sort) {
-                    let iwishloadeventfiredtwice;
-                    function poll() {
-                        let bbox = dom_status_image[0].getBBox();
-                        if (bbox.width === 0) return;
-                        dom_status_image.attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-                        clearInterval(iwishloadeventfiredtwice);
-                    }
-                    iwishloadeventfiredtwice = setInterval(poll, 250);
-                    setTimeout(poll, 0);
-                }
+                let bbox = Priority.STATUS_IMAGE_SIZES[status_image];
+                dom_status_image.attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
             } else {
                 dom_status_image.hide();
                 dom_status_image.find("use").removeAttr("href");
