@@ -4,7 +4,7 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.urls import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.utils import timezone
 import datetime
 
@@ -55,7 +55,9 @@ from django.views.decorators.http import require_http_methods
 @require_http_methods(["DELETE"])
 @decorator_from_middleware(APIValidationMiddleware)
 def delete_assignment(request):
-    assignments = request.POST.getlist('assignments[]')
+    data = QueryDict(request.body)
+
+    assignments = data.getlist('assignments[]')
     TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
     logger.info(f'User \"{request.user}\" deleted {len(assignments)} assignments')
     return HttpResponse(status=204)
@@ -63,7 +65,9 @@ def delete_assignment(request):
 @require_http_methods(["PATCH"])
 @decorator_from_middleware(APIValidationMiddleware)
 def save_assignment(request):
-    assignments = json.loads(request.POST['assignments'])
+    data = QueryDict(request.body)
+
+    assignments = json.loads(data['assignments'])
     for assignment in assignments:
         sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
         del assignment['pk']
@@ -97,8 +101,10 @@ def save_assignment(request):
 @require_http_methods(["PATCH"])
 @decorator_from_middleware(APIValidationMiddleware)
 def change_setting(request):
-    setting = request.POST['setting']
-    value = json.loads(request.POST['value'])
+    data = QueryDict(request.body)
+
+    setting = data['setting']
+    value = json.loads(data['value'])
 
     model_fields = {i.name: getattr(request.user.settingsmodel, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
     if setting not in model_fields:
@@ -138,14 +144,16 @@ def tag_add(request):
 @require_http_methods(["DELETE"])
 @decorator_from_middleware(APIValidationMiddleware)
 def tag_delete(request):
-    pk = request.POST['pk']
+    data = QueryDict(request.body)
+
+    pk = data['pk']
     sm = get_object_or_404(TimewebModel, pk=pk)
 
     if request.user != sm.user:
         logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
         return HttpResponse(status=404)
 
-    tag_names = request.POST.getlist('tag_names[]')
+    tag_names = data.getlist('tag_names[]')
     # Remove tag_names from sm.tags
     old_len = len(sm.tags)
     sm.tags = [tag_name for tag_name in sm.tags if tag_name not in tag_names]

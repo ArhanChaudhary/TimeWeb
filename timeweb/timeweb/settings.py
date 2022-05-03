@@ -103,7 +103,6 @@ MIDDLEWARE = [
     'api.middleware.validation.CatchRequestDataTooBig',
 
     'common.middleware.define.DefineIsExampleAccount',
-    'common.middleware.define.PopulatePost',
     # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 ]
