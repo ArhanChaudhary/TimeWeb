@@ -167,7 +167,7 @@ a[href="/settings"] {
     transition: all .2s ease-in-out, opacity .375s ease-in-out, left 0s, padding 0s;
 }
 .assignment.mark-as-done {
-    opacity: 0.5;
+    opacity: 0.65;
 }
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly::before {
     transition: none;
