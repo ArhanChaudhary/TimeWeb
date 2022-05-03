@@ -100,9 +100,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
-    'api.middleware.validation.CatchRequestDataTooBig',
+    'api.middleware.CatchRequestDataTooBig',
 
-    'common.middleware.define.DefineIsExampleAccount',
+    'common.middleware.DefineIsExampleAccount',
     # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 ]
