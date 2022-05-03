@@ -1099,12 +1099,13 @@ utils = {
                             localStorage.removeItem("scroll");
                         }
                     }, 0);
-                if (new Date().getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && new Date().getHours() < 4) {
+                let date_now = new Date();
+                if (date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && date_now.getHours() < 4) {
                     // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
                     // this alert is for fellow insomniacs who lose track of time
                     $("#current-date-text").text(`(The current date has changed) ${$("#current-date-text").text()}`);
                 }
-                localStorage.setItem("last_visit", new Date().valueOf());
+                localStorage.setItem("last_visit", date_now.valueOf());
             });
         },
         fixBrowserInconsistencies: function() {
