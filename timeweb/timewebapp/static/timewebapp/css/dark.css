@@ -11,11 +11,45 @@ body {
 .generic-button:hover {
     --bg-c: calc(var(--primary-c) + 12);
 }
+.assignment {
+    box-shadow: none;
+}
+.assignment-header-button:focus, .assignment-header-button:hover {
+    --background-color: rgb(86, 116, 129);
+}
+.tag-add-box {
+    --background-color: rgb(37, 37, 37);
+    --box-shadow-color: rgba(81, 81, 81, 0.65);
+    --input-background-color: rgb(27, 27, 27);
+}
+.tag-add-button {
+    --background-color: rgb(50, 50, 50);
+}
+.tag-add-button::after {
+    --box-shadow-color1: rgb(171, 171, 171);
+    --box-shadow-color2: rgb(211, 211, 211);
+    --box-shadow-color3: rgb(187, 53, 53);
+}
+.tag-add-button:focus:not(:hover)::after {
+    box-shadow: 0 0 3px 2px var(--box-shadow-color2);
+}
+.tag-add-button.tag-add-red-box-shadow::after {
+    box-shadow: 0 0 5px 2px var(--box-shadow-color3);
+}
+.tag-add-button > .icon-slash {
+    --background-color: rgb(192, 192, 192);
+}
+.tag-add-selection-item::after {
+    --background-color: rgb(49, 49, 49);
+}
+.tag-add-selection-item.checked::after {
+    --background-color: rgb(34, 83, 99);
+}
 .tag-wrapper, .tag-add {
     --background-color: unset !important;
 }
 .tag-delete > .icon-slash {
-    background-color: black;
+    --background-color: black;
 }
 #assignments-header #icon-label-container {
     filter: invert(calc(var(--c) / 255)) hue-rotate(180deg);
@@ -23,45 +57,17 @@ body {
 .fixed-graph {
     filter: invert(1) hue-rotate(180deg);
 }
+.graph-footer > * {
+    --background-color: rgb(68, 68, 68);
+}
+.graph-footer ::placeholder {
+    color: rgb(163, 163, 163);
+}
 #toggle-gc-container {
     --background-color: var(--body-background);
     --box-shadow-color: rgb(103, 103, 103);
 }
-
-
-
-
-#dark-mode .assignment-container::after,
-#dark-mode .assignment-container::before,
-#dark-mode .shortcut-line-right,
-#dark-mode .shortcut-line-left,
-
-#dark-mode #assignments-container > :not(.assignment-container):not(#assignments-header),
-#dark-mode #assignments-container > #assignments-header > :not(#icon-label-container),
-
-#dark-mode #assignments-header #icon-label-container img ~ div,
-
-#dark-mode .shortcut-text,
-
-#dark-mode .shortcut .info-button,
-#dark-mode #assignments-header #icon-label-container img ~ div > .info-button,
-
-#dark-mode .tags,
-
-/* Undo filter already applied by #dark-mode .assignment-footer */
-#dark-mode .assignment-footer,
-
-#dark-mode #assignments-container .info-button-text:not(.tag-add-box),
-
-#dark-mode #tutorial-click-assignment-to-open {
-    --filter-invert: 1;
-    filter: drop-shadow(0 1px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 -1px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(1px 0 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(-1px 0 0 var(--filter-drop-shadow-color, transparent))
-            invert(var(--filter-invert, 0));
-}
-#dark-mode #overlay {
-    filter: brightness(0.8);
-    background-color: rgba(0,0,0,0.55);
+.jconfirm.jconfirm-light .jconfirm-box {
+    box-shadow: none !important;
+    border: 1px solid rgb(123, 123, 123);
 }

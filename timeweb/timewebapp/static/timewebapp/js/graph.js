@@ -369,7 +369,7 @@ class VisualAssignment extends Assignment {
 
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";
-        screen.fillStyle = "black";
+        screen.fillStyle = SETTINGS.dark_mode ? "white" : "black";
         screen.textBaseline = "top";
         screen.font = VisualAssignment.getCanvasFont(13.75);
         if (!this.sa.needs_more_info) {

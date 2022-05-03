@@ -1,4 +1,7 @@
 /* THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED */
+html {
+    color-scheme: light dark;
+}
 body {
     --primary: white;
     --c: 0;
@@ -413,7 +416,6 @@ a[href="/settings"] {
 }
 .status-image {
     position: absolute;
-    color: var(--color);
 }
 .align-to-status-message-container {
     margin-right: 6px;
@@ -492,7 +494,8 @@ a[href="/settings"] {
     transition: opacity calc(0.1s * var(--animation-speed)) linear, transform calc(0.1s * var(--animation-speed)) cubic-bezier(0.55, 0.09, 0.68, 0.53) 0.05s;
 }
 .tag-delete > .icon-slash {
-    background-color: white;
+    --background-color: white;
+    background-color: var(--background-color);
 }
 /* Don't do :hover::after because the ::after doesnt then become pointless */
 .tag-delete::after {
@@ -563,15 +566,19 @@ a[href="/settings"] {
 .tag-add-box {
     white-space: normal;
     width: 152px;
-    box-shadow: 0 2px 5px 1px rgba(170,170,170,0.65) !important;
-    background: var(--body-background) !important;
+    --box-shadow-color: rgba(170,170,170,0.65);
+    --input-background-color: rgb(220,220,220);
+    --background-color: var(--body-background);
+
+    box-shadow: 0 2px 5px 1px var(--box-shadow-color) !important;
+    background: var(--background-color) !important;
     transform-origin: top;
     transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
     transition: transform calc(0.15s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
                 opacity calc(0.1s * var(--animation-speed)) ease-out;
 }
 .tag-add-box::after {
-    border-color: transparent transparent rgb(220,220,220) transparent !important;
+    border-color: transparent transparent var(--input-background-color) transparent !important;
     pointer-events: none;
     bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
 }
@@ -596,15 +603,20 @@ a[href="/settings"] {
     right: 4px;
     top: 4px;
     border-radius: 50%;
-    background-color: rgb(195,195,195);
+    --background-color: rgb(195,195,195);
+    background-color: var(--background-color);
 }
 .tag-add-button::after {
+    --box-shadow-color1: rgb(60, 60, 60);
+    --box-shadow-color2: rgb(30, 30, 30);
+    --box-shadow-color3: rgb(170, 0, 0);
+
     content: '';
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    box-shadow: 0 0 4px 1px rgb(60, 60, 60);
+    box-shadow: 0 0 4px 1px var(--box-shadow-color1);
     opacity: 0;
     transition: opacity 0.15s ease-out;
 }
@@ -612,24 +624,24 @@ a[href="/settings"] {
     opacity: 0.35;
 }
 .tag-add-button:focus:not(:hover)::after {
-    box-shadow: 0 0 4px 2px rgb(30, 30, 30);
+    box-shadow: 0 0 4px 2px var(--box-shadow-color2);
 }
 .tag-add-button:hover::after {
     opacity: 0.75;
 }
 .tag-add-button.tag-add-red-box-shadow::after {
-    box-shadow: 0 0 4px 1px rgb(170, 0, 0);
+    box-shadow: 0 0 4px 1px var(--box-shadow-color3);
 }
-
 .tag-add-button > .icon-slash {
-    background-color: rgb(65,65,65) !important;
-    height: 15px !important;
+    --background-color: rgb(65,65,65);
+    background-color: var(--background-color);
+    height: 15px;
 }
 .tag-add-input {
     width: 100%;
     box-sizing: border-box;
     border: none;
-    background-color: rgb(220,220,220);
+    background-color: var(--input-background-color);
     padding: 10px 12px;
     padding-right: 38px;
 }
@@ -648,7 +660,8 @@ a[href="/settings"] {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background-color: rgb(240, 240, 240);
+    --background-color: rgb(240, 240, 240);
+    background-color: var(--background-color);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.4s cubic-bezier(.29,.81,.37,.99);
@@ -657,7 +670,8 @@ a[href="/settings"] {
     transform: none;
 }
 .tag-add-selection-item.checked::after {
-    background-color: lightblue;
+    --background-color: rgb(173, 216, 230);
+    background-color: var(--background-color);
     transform: none;
 }
 .tag-add-selection-item:nth-child(n+4)::before {
@@ -670,7 +684,7 @@ a[href="/settings"] {
     margin-left: auto;
     width: calc(100% - 10px);
     height: 1px;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: gray;
 }
 .tag-add-selection-item-name {
     word-break: break-word;
