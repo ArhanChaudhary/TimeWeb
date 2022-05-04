@@ -50,7 +50,10 @@ body {
 .tag-delete > .icon-slash {
     --background-color: black;
 }
-#assignments-header #icon-label-container {
+.grey-highlight, .grey-highlight::before, .grey-highlight::after {
+    --filter-drop-shadow-color: black !important;
+}
+#assignments-header #icon-label-container img {
     filter: invert(calc(var(--c) / 255)) hue-rotate(180deg);
 }
 .fixed-graph {
