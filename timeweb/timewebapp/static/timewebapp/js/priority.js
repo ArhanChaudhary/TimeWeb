@@ -17,7 +17,7 @@ class Priority {
     static NOT_YET_ASSIGNED = 2;
     static COMPLETELY_FINISHED = 1;
 
-    static STATUS_IMAGE_SIZES = {
+    static SVG_IMAGE_SIZES = {
         "question_mark": {
             x: 4.30,
             y: -1127.89,
@@ -41,6 +41,18 @@ class Priority {
             y: -1240.00,
             width: 1038.62,
             height: 1240.00
+        },
+        "tick": {
+            x: 0.00,
+            y: 0.00,
+            width: 768.00,
+            height: 640.00
+        },
+        "slashed_tick": {
+            x: -0.60,
+            y: 0.39,
+            width: 497.55,
+            height: 465.60
         },
     }
 
@@ -476,11 +488,15 @@ class Priority {
                     [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
                     || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
                 )
-            ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("src", (function() {
+            ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("viewBox", (function() {
+                const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
+                let bbox = Priority.SVG_IMAGE_SIZES[tick_image];
+                return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+            })()).children("use").attr("href", (function() {
                 const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
                 return DEBUG ? `/static/timewebapp/images/${tick_image}.svg#g` : `https://storage.googleapis.com/twstatic/timewebapp/images/${tick_image}.svg#g`;
-            })())
-
+            }));
+            
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
@@ -520,7 +536,7 @@ class Priority {
             if (status_image) {
                 dom_status_image.show();
                 dom_status_image.find("use").attr("href", DEBUG ? `/static/timewebapp/images/${status_image}.svg#g`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.svg#g`);
-                let bbox = Priority.STATUS_IMAGE_SIZES[status_image];
+                let bbox = Priority.SVG_IMAGE_SIZES[status_image];
                 dom_status_image.attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
             } else {
                 dom_status_image.hide();
