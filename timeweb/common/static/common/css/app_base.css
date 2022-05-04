@@ -78,7 +78,7 @@ main.finished-header-transition {
 }
 .generic-button {
     cursor: pointer;
-    --bg-c: var(--primary);
+    --bg-c: var(--primary-c);
     background-color: rgb(var(--bg-c), var(--bg-c), var(--bg-c));
     border: 1px solid rgb(147, 147, 147);
     border-radius: 4px;
