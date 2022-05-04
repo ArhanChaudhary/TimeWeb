@@ -806,19 +806,19 @@ utils = {
                                     case "e":
                                         // Fix typing on the assignment form itself
                                         setTimeout(function() {
-                                            assignment_container.find(".update-button").focus().click();
+                                            assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
                                         }, 0);
                                         break;
                                     case "d":
-                                        assignment_container.find(".delete-button").focus().click();
+                                        assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
                                         break;
                                     case "D":
                                         const click_delete_button = $.Event("click");
                                         click_delete_button.shiftKey = e.shiftKey;
-                                        assignment_container.find(".delete-button").focus().trigger(click_delete_button);
+                                        assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
                                         break;
                                     case "f":
-                                        assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").focus().click();
+                                        assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
                                         break;
                                     case "h":
                                         assignment_container.find(".hide-assignment-button").focus().click();
