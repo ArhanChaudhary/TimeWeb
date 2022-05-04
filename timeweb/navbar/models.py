@@ -35,6 +35,14 @@ ANIMATION_SPEED = (
 )
 MAX_ANIMATION_SPEED_LENGTH = len(max([i[1] for i in ANIMATION_SPEED], key=len))
 
+APPEARANCES = (
+    ("automatic", "Automatic"),
+    ("light", "Light Mode"),
+    ("dark", "Dark Mode"),
+    ("fancy dark", "𝐹𝒶𝓃𝒸𝓎 Dark Mode"),
+)
+MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
+
 class SettingsModel(models.Model):
     # Group "Assignment Form"
     def_break_days = MultiSelectField(
@@ -123,9 +131,11 @@ class SettingsModel(models.Model):
         blank=True,
         verbose_name=_('Background Image'),
     )
-    dark_mode = models.BooleanField(
-        default=False,
-        verbose_name=_('Dark Mode'),
+    appearance = models.CharField(
+        max_length=MAX_APPEARANCES_LENGTH,
+        choices=APPEARANCES,
+        default=_("automatic"),
+        verbose_name=_('Appearance'),
     )
     animation_speed = models.CharField(
         max_length=MAX_ANIMATION_SPEED_LENGTH,

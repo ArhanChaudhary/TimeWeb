@@ -4,7 +4,11 @@
 {% block css %}
   <link rel="stylesheet" href="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.css" crossorigin="anonymous"/>
   <link rel="stylesheet" href="{% static 'timewebapp/css/app.css' %}">
-  <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
+  {% if settings_model.appearance == "automatic" %}
+    <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
+  {% elif settings_model.appearance == "dark" or settings_model.appearance == "fancy dark" %}
+    <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
+  {% endif %}
 {% endblock css %}
 
 {% block js %}
@@ -189,7 +193,7 @@
                 <div class="tag-add-text">Add Tag</div>
               </div>
             </div>
-            <div class="relative-positioning-wrapper">
+            <div class="relative-positioning-wrapper{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
               <span class="title">{{ assignment.name }}</span>
               {% if assignment.description %}
                 <div class="description">{{ assignment.description|linebreaks }}</div>

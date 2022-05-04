@@ -31,6 +31,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'def_due_time': request.user.settingsmodel.def_due_time,
             'ignore_ends': request.user.settingsmodel.ignore_ends,
             'animation_speed': request.user.settingsmodel.animation_speed,
+            'appearance': request.user.settingsmodel.appearance,
             'show_priority': request.user.settingsmodel.show_priority,
             'one_graph_at_a_time': request.user.settingsmodel.one_graph_at_a_time,
             'close_graph_after_work_input': request.user.settingsmodel.close_graph_after_work_input,
@@ -44,7 +45,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'vertical_tag_position': request.user.settingsmodel.vertical_tag_position,
             'timezone': request.user.settingsmodel.timezone,
             'restore_gc_assignments': False,
-            'dark_mode': request.user.settingsmodel.dark_mode,
         }
         self.context['form'] = SettingsForm(initial=initial)
 
@@ -80,6 +80,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         request.user.settingsmodel.def_due_time = self.form.cleaned_data.get("def_due_time")
         request.user.settingsmodel.ignore_ends = self.form.cleaned_data.get("ignore_ends")
         request.user.settingsmodel.animation_speed = self.form.cleaned_data.get("animation_speed")
+        request.user.settingsmodel.appearance = self.form.cleaned_data.get("appearance")
         request.user.settingsmodel.show_priority = self.form.cleaned_data.get("show_priority")
         request.user.settingsmodel.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
         request.user.settingsmodel.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")
@@ -100,7 +101,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 return self.invalid_form(request)
             else:
                 request.user.settingsmodel.added_gc_assignment_ids = []
-        request.user.settingsmodel.dark_mode = self.form.cleaned_data.get("dark_mode")
         request.user.settingsmodel.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")

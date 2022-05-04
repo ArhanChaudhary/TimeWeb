@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         $("#id_background_image").val("");
                         $("#id_horizontal_tag_position").val("Middle");
                         $("#id_animation_speed").val("1");
+                        $("#id_appearance").val("Automatic");
                         $("#id_vertical_tag_position").val("Top");
                         $("#id_timezone").val("");
                         $("#id_default_dropdown_tags").val("").trigger("input");
