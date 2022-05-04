@@ -162,6 +162,7 @@ a[href="/settings"] {
     box-shadow: 0 0 12px -11px black;
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
     --priority-color: var(--color);
+    --priority-color-transition-speed: 2s;
     border-radius: 5px;
     position: relative;
     scroll-margin: 20px;
@@ -170,7 +171,8 @@ a[href="/settings"] {
 .assignment.mark-as-done {
     opacity: 0.65;
 }
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly::before {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly::before,
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .relative-positioning-wrapper {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
@@ -319,6 +321,10 @@ a[href="/settings"] {
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
     --left-side-of-header-width: calc(35px + 13vw);
+}
+.fancy-coloring {
+    color: var(--priority-color);
+    transition: color calc(var(--priority-color-transition-speed) * var(--animation-speed));
 }
 .description {
     position: relative;
