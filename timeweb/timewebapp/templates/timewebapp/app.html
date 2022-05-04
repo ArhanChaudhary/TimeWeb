@@ -110,16 +110,16 @@
         <span id="estimated-total-time-label">Estimated completion time:</span><span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
         <div id="hide-button" class="generic-button">Hide</div>
         <div id="icon-label-container">
-          <img id="close-assignments"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Close all Assignments" height="27" src="{% static 'timewebapp/images/close_all_assignments.webp' %}">
-          <img id="previous-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.webp' %}">
-          <img id="next-day"{% if settings_model.background_image %} class="grey-highlight"{% endif %} tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.webp' %}">
+          <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="27" src="{% static 'timewebapp/images/close_all_assignments.webp' %}">
+          <img id="previous-day" tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.webp' %}">
+          <img id="next-day" tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.webp' %}">
           <a href="{% url 'settings' %}">
-            <img id="settings"{% if settings_model.background_image %} class="grey-highlight"{% endif %} alt="Settings" height="27" src="{% static 'timewebapp/images/settings.webp' %}">
+            <img id="settings" alt="Settings" height="27" src="{% static 'timewebapp/images/settings.webp' %}">
           </a>
-          <div id="settings-icon-label"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>Settings</div>
-          <div id="previous-day-icon-label"><span {% if settings_model.background_image %} class="grey-highlight"{% endif %}>Go to Previous Day</span></div>
-          <div id="next-day-icon-label"><span {% if settings_model.background_image %} class="grey-highlight"{% endif %}>Go to Next Day</span></div>
-          <div id="close-assignments-icon-label"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>Close all Assignments</div>
+          <div id="settings-icon-label">Settings</div>
+          <div id="previous-day-icon-label">Go to Previous Day</div>
+          <div id="next-day-icon-label">Go to Next Day</div>
+          <div id="close-assignments-icon-label">Close all Assignments</div>
         </div>
       </div>
       {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
