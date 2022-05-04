@@ -166,7 +166,7 @@ a[href="/settings"] {
     border-radius: 5px;
     position: relative;
     scroll-margin: 20px;
-    transition: all .2s ease-in-out, opacity .375s ease-in-out, left 0s, padding 0s;
+    transition: all .2s ease-in-out, opacity calc(.375s * var(--animation-speed)) ease-in-out, left 0s, padding 0s;
 }
 .assignment.mark-as-done {
     opacity: 0.65;
@@ -192,7 +192,7 @@ a[href="/settings"] {
     background-color: var(--priority-color);
     width: 7px;
     border-radius: 5px 0 0 5px;
-    transition: background-color calc(2s * var(--animation-speed));
+    transition: background-color calc(var(--priority-color-transition-speed) * var(--animation-speed));
 }
 #tutorial-click-assignment-to-open {
     font-size: 17px;
@@ -498,7 +498,7 @@ a[href="/settings"] {
     cursor: pointer;
     opacity: 0;
     transform: scale(0.8);
-    transition: opacity calc(0.1s * var(--animation-speed)) linear, transform calc(0.1s * var(--animation-speed)) cubic-bezier(0.55, 0.09, 0.68, 0.53) 0.05s;
+    transition: opacity calc(0.1s * var(--animation-speed)) linear, transform calc(0.1s * var(--animation-speed)) cubic-bezier(0.55, 0.09, 0.68, 0.53) calc(0.05s * var(--animation-speed));
 }
 .tag-delete > .icon-slash {
     --background-color: white;
