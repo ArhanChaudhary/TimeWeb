@@ -91,7 +91,7 @@ main.finished-header-transition {
     position: relative;
 }
 .generic-button:hover {
-    --bg-c: calc(var(--primary) - 19);
+    --bg-c: calc(var(--primary-c) - 19);
 }
 .generic-button:active {
     transform: translateY(1px);

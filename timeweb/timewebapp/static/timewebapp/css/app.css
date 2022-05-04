@@ -3,8 +3,9 @@ html {
     color-scheme: light dark;
 }
 body {
-    --primary: white;
+    --primary-c: 255;
     --c: 0;
+    --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
 }

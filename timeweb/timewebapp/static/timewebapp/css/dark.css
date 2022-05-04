@@ -1,7 +1,6 @@
 body {
     --body-background: rgb(33, 33, 33);
     --primary-c: 48;
-    --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
     --c: 213;
 }
 #id_assignment_sorting {
