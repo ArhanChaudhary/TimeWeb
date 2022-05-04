@@ -157,7 +157,7 @@ utils = {
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
                             setTimeout(function() {
-                                if ($this.hasClass("slashed"))
+                                if ($this.hasClass("slashed") && !SETTINGS.close_graph_after_work_input)
                                     dom_assignment.click();
                             }, Priority.SORT_TIMEOUT_DURATION);
                         } else {
@@ -166,7 +166,9 @@ utils = {
                             dom_assignment.click();
                             dom_assignment.find(".work-input-textbox").val("fin");
                             dom_assignment.find(".submit-work-button").click();
-                            dom_assignment.click();
+                            if (!SETTINGS.close_graph_after_work_input) {
+                                dom_assignment.click();
+                            }
                             VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     }
