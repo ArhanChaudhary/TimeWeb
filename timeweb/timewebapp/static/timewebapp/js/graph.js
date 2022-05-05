@@ -156,6 +156,12 @@ class VisualAssignment extends Assignment {
         }
         this.scale = window.devicePixelRatio || 2;
     }
+    initUI() {
+        const first_click = !this.sa.dom_assignment.hasClass('has-been-clicked');
+        this.sa.dom_assignment.addClass("has-been-clicked");
+        first_click && this.sa.setGraphButtonEventListeners();
+        this.sa.resize();
+    }
     resize() {
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
@@ -1122,13 +1128,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     sa.displayTruncateWarning();
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
-    // Sets event handlers only on the assignment's first click
-    // make sure to also change util.js if this is modified
-    const first_click = !dom_assignment.hasClass('has-been-clicked');
-    dom_assignment.addClass("has-been-clicked");
-    first_click && sa.setGraphButtonEventListeners();
-
-    sa.resize();
+    sa.initUI();
     if (SETTINGS.enable_tutorial && !already_ran_tutorial && !DEBUG) {
         already_ran_tutorial = true;
         prevent_click = true;

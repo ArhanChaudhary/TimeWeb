@@ -137,35 +137,18 @@ utils = {
                     // .sort is already called in the controls' click handlers
                     const old_enable_tutoral = SETTINGS.enable_tutorial;
                     SETTINGS.enable_tutorial = false;
+
+                    if (!dom_assignment.hasClass("has-been-clicked")) {
+                        new VisualAssignment(dom_assignment).initUI();
+                    }
+
                     if ($this.hasClass("slashed")) {
-                        if (dom_assignment.hasClass('open-assignment')) {
-                            dom_assignment.find(".delete-work-input-button").click();
-                        } else {
-                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
-                            dom_assignment.click();
-                            dom_assignment.find(".delete-work-input-button").click();
-                            dom_assignment.click();
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
-                        }
+                        dom_assignment.find(".delete-work-input-button").click();
                     } else {
-                        if (dom_assignment.hasClass('open-assignment')) {
-                            dom_assignment.find(".work-input-textbox").val("fin");
-                            dom_assignment.find(".submit-work-button").click();
-                            setTimeout(function() {
-                                if ($this.hasClass("slashed") && !SETTINGS.close_graph_after_work_input)
-                                    dom_assignment.click();
-                            }, Priority.SORT_TIMEOUT_DURATION);
-                        } else {
-                            const temp = VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION;
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = 0;
+                        dom_assignment.find(".work-input-textbox").val("fin");
+                        dom_assignment.find(".submit-work-button").click();
+                        if (dom_assignment.hasClass('open-assignment') && $this.hasClass("slashed")) {
                             dom_assignment.click();
-                            dom_assignment.find(".work-input-textbox").val("fin");
-                            dom_assignment.find(".submit-work-button").click();
-                            if (!SETTINGS.close_graph_after_work_input) {
-                                dom_assignment.click();
-                            }
-                            VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION = temp;
                         }
                     }
                     SETTINGS.enable_tutorial = old_enable_tutoral;
@@ -792,8 +775,7 @@ utils = {
                                 }
                             else {
                                 if (!dom_assignment.hasClass("has-been-clicked")) {
-                                    dom_assignment.addClass("has-been-clicked");
-                                    new VisualAssignment(dom_assignment).setGraphButtonEventListeners();
+                                    new VisualAssignment(dom_assignment).initUI();
                                 }
                                 switch (e.key) {
                                     case "e":
