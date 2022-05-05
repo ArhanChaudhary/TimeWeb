@@ -318,7 +318,7 @@ class VisualAssignment extends Assignment {
 
         this.setDynamicStartIfInDynamicMode();
         ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-        new Priority().sort({ timeout: true });
+        new Priority().sort();
         this.draw();
     }
     static getCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
@@ -764,7 +764,7 @@ class VisualAssignment extends Assignment {
             }
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
-            new Priority().sort({ timeout: true });
+            new Priority().sort();
             this.draw();
         });
         }
@@ -927,7 +927,7 @@ class VisualAssignment extends Assignment {
             
             if (SETTINGS.close_graph_after_work_input && this.dom_assignment.hasClass("open-assignment") && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1)
                 this.dom_assignment.click();
-            new Priority().sort({ timeout: true });
+            new Priority().sort();
             this.draw();
         });
         }
@@ -1099,7 +1099,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
             marginBottom: -assignment_footer.height(),
         }, VisualAssignment.CLOSE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             // Hide graph when transition ends
-            dom_assignment.css("overflow", "").removeClass("assignment-is-closing")
+            dom_assignment.css("overflow", "").removeClass("assignment-is-closing");
             assignment_footer.find(".graph-footer *").removeAttr("tabindex");
             assignment_footer.css({
                 display: "",

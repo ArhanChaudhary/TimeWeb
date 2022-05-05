@@ -2,7 +2,6 @@
 class Priority {
     static ANIMATE_IN_DURATION = 1500 * SETTINGS.animation_speed;
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
-    static SORT_TIMEOUT_DURATION = 35;
     static ANIMATE_IN_START_MARGIN = 100; // Moves #animate-in a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 7500;
     
@@ -749,14 +748,20 @@ class Priority {
         }
         utils.ui.tickClock();
     }
-    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, timeout: false}) {
-        const that = this;
-        that.params = params;
-        clearTimeout(that.sort_timeout);
-        if (that.params.timeout) {
-            that.sort_timeout = setTimeout(() => that.sortWithoutTimeout(), Priority.SORT_TIMEOUT_DURATION);
+    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false}) {
+        this.params = params;
+        if (Priority.IS_CURRENTLY_SORTING) {
+            Priority.RECURSE_PARAMS = this.params;
         } else {
-            that.sortWithoutTimeout();
+            Priority.IS_CURRENTLY_SORTING = true;
+            this.sortWithoutTimeout();
+            if (Priority.RECURSE_PARAMS) {
+                Priority.RECURSE_PARAMS = undefined;
+                Priority.IS_CURRENTLY_SORTING = false;
+                this.sort(Priority.RECURSE_PARAMS);
+            } else {
+                Priority.IS_CURRENTLY_SORTING = false;
+            }
         }
     }
     sortWithoutTimeout() {

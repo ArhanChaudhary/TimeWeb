@@ -130,11 +130,7 @@ utils = {
         },
         setClickHandlers: {
             tickButtons: function() {
-                let runningCount = 0;
                 $(".tick-button").parent().click(function() {
-                    if (runningCount) return; // The user can spam click this while a separate dispatched handler is simultaneously running, causing invalid ticks
-                    runningCount++;
-                    
                     const $this = $(this);
                     const dom_assignment = $this.parents(".assignment");
 
@@ -173,9 +169,6 @@ utils = {
                         }
                     }
                     SETTINGS.enable_tutorial = old_enable_tutoral;
-                    setTimeout(function() {
-                        runningCount--;
-                    }, Priority.SORT_TIMEOUT_DURATION);
                 });
             },
 
