@@ -1,3 +1,6 @@
+html {
+    color-scheme: dark;
+}
 body {
     --body-background: rgb(33, 33, 33);
     --primary-c: 48;
