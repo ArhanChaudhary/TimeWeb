@@ -2,13 +2,6 @@
 html {
     color-scheme: light;
 }
-body {
-    --primary-c: 255;
-    --c: 0;
-    --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
-    --color: rgb(var(--c), var(--c), var(--c));
-    color: var(--color);
-}
 #assignments-container {
     position: relative;
     /* Ensure things dont get cutoff when crud.js puts overflow: hidden on this when an assignment is being deleted */
