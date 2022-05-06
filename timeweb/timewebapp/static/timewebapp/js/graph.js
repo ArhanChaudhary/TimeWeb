@@ -157,10 +157,10 @@ class VisualAssignment extends Assignment {
         this.scale = window.devicePixelRatio || 2;
     }
     initUI() {
-        const first_click = !this.sa.dom_assignment.hasClass('has-been-clicked');
-        this.sa.dom_assignment.addClass("has-been-clicked");
-        first_click && this.sa.setGraphButtonEventListeners();
-        this.sa.resize();
+        const first_click = !this.dom_assignment.hasClass('has-been-clicked');
+        this.dom_assignment.addClass("has-been-clicked");
+        first_click && this.setGraphButtonEventListeners();
+        this.resize();
     }
     resize() {
         if (!this.sa.fixed_mode) {
