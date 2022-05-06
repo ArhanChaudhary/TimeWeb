@@ -766,53 +766,48 @@ utils = {
                         if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
                         let dom_assignment = assignment_container.children(".assignment");
                         if (assignment_container.length) {
-                            if (dom_assignment.hasClass("assignment-is-closing"))
-                                switch (e.key) {
-                                    case "o":
-                                    case "c":
-                                        dom_assignment.click();
-                                        break;
-                                }
-                            else {
-                                if (!dom_assignment.hasClass("has-been-clicked")) {
-                                    new VisualAssignment(dom_assignment).initUI();
-                                }
-                                switch (e.key) {
-                                    case "e":
-                                        // Fix typing on the assignment form itself
-                                        setTimeout(function() {
-                                            assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                                        }, 0);
-                                        break;
-                                    case "d":
-                                        assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
-                                        break;
-                                    case "D":
-                                        const click_delete_button = $.Event("click");
-                                        click_delete_button.shiftKey = e.shiftKey;
-                                        assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
-                                        break;
-                                    case "f":
-                                        assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
-                                        break;
-                                    case "h":
-                                        assignment_container.find(".hide-assignment-button").focus().click();
-                                        break;
-                                    case "Backspace":
-                                    case "s":
-                                        if (dom_assignment.hasClass("open-assignment"))
-                                        switch (e.key) {
-                                            case "Backspace":
-                                                assignment_container.find(".delete-work-input-button").focus().click();
-                                                break;
-                                            case "s":
-                                                assignment_container.find(".skew-ratio-button").focus().click();
-                                                break;
-                                        }
-                                        break;
-                                }
-                                break;
+                            if (!dom_assignment.hasClass("has-been-clicked")) {
+                                new VisualAssignment(dom_assignment).initUI();
                             }
+                            switch (e.key) {
+                                case "o":
+                                case "c":
+                                    dom_assignment.click();
+                                    break;
+                                case "e":
+                                    // Fix typing on the assignment form itself
+                                    setTimeout(function() {
+                                        assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
+                                    }, 0);
+                                    break;
+                                case "d":
+                                    assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
+                                    break;
+                                case "D":
+                                    const click_delete_button = $.Event("click");
+                                    click_delete_button.shiftKey = e.shiftKey;
+                                    assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
+                                    break;
+                                case "f":
+                                    assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
+                                    break;
+                                case "h":
+                                    assignment_container.find(".hide-assignment-button").focus().click();
+                                    break;
+                                case "Backspace":
+                                case "s":
+                                    if (dom_assignment.hasClass("open-assignment"))
+                                    switch (e.key) {
+                                        case "Backspace":
+                                            assignment_container.find(".delete-work-input-button").focus().click();
+                                            break;
+                                        case "s":
+                                            assignment_container.find(".skew-ratio-button").focus().click();
+                                            break;
+                                    }
+                                    break;
+                            }
+                            break;
                         }
                 }
                 break;
