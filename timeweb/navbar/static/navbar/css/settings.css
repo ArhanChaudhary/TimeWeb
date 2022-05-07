@@ -7,6 +7,15 @@ main form {
 main form select {
     display: block;
 }
+.right-side-of-field:not([type="file"]) > * {
+    border: 1px solid black;
+    margin: unset;
+    box-sizing: border-box;
+    width: 157px;
+}
+.right-side-of-field > :not(#break-days-wrapper) {
+    display: block;
+}
 .button-container {
     display: flex;
     justify-content: flex-end;
@@ -74,11 +83,6 @@ form img {
 .field-description {
     font-size: 0.8em;
     opacity: 0.7;
-}
-#id_default_dropdown_tags {
-    box-sizing: border-box; 
-    display: block;
-    width: 100%;
 }
 @media screen and (max-width: 750px) {
     .field-container {
