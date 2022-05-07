@@ -393,7 +393,7 @@ class Crud {
         }
     }
     // Delete assignment
-    transitionDeleteAssignment(dom_assignment, params={final_iteration: false}) {
+    transitionDeleteAssignment(dom_assignment) {
         const that = this;
         const sa = utils.loadAssignmentData(dom_assignment);
 
@@ -416,7 +416,7 @@ class Crud {
             // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
             dom_assignment.removeClass("assignment-is-closing open-assignment");
             // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-            params.final_iteration && new Priority().sort();
+            new Priority().sort();
         });
     }
     deleteAssignment($button) {
@@ -428,7 +428,7 @@ class Crud {
         dom_assignment.addClass("assignment-is-deleting");
         // Send data to backend and animates its deletion
         const success = function() {
-            that.transitionDeleteAssignment(dom_assignment, {final_iteration: true});
+            that.transitionDeleteAssignment(dom_assignment);
         }
         if (ajaxUtils.disable_ajax) {
             success();
