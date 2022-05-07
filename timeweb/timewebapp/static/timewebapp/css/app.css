@@ -743,8 +743,10 @@ a[href="/settings"] {
     outline: 0;
     --background-color: rgb(173, 216, 230);
 }
-.assignment-header-button:active * {
+.assignment-header-button:active svg {
     transform: scale(0.95);
+    /* I can't apply this to just "svg" for some odd reason */
+    transform-origin: center;
 }
 .assignment-header-button * {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
