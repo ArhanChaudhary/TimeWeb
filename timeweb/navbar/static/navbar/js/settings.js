@@ -63,10 +63,6 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
 
-    $("form legend").click(function() {
-        $(this).parents("fieldset").toggleClass("closed");
-    });
-
     let alreadyHasSubmitted = false;
     $("form").submit(function() {
         if (alreadyHasSubmitted) return;

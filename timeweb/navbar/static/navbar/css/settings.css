@@ -1,7 +1,8 @@
 main form {
-    width: calc(100% - 30px);
+    padding: 0 1em;
+    margin: 0 auto;
     font-size: 17px;
-    transform: translate(15px, 15px);
+    max-width: 1000px;
 }
 main form select {
     display: block;
@@ -26,40 +27,35 @@ main form select {
 #submit-settings-button {
     margin-left: 10px;
 }
-main form fieldset {
-    transition: height 0.4s cubic-bezier(0.46, 0.03, 0.4, 1);
-    overflow: hidden;
-    position: relative;
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: none;
-    border-right: none;
+.field-group {
+    margin: 40px 0 19px;
 }
-main form fieldset.closed {
-    height: 21px !important;
+.field-container {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-main form fieldset.closed legend {
-    list-style-type: disclosure-closed;
+.field-container > * {
+    max-width: 50ch;
 }
-main form fieldset::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    border-top: threedface 2px groove;
-    width: 30px;
+.left-side-of-field {
+    display: flex;
+    flex-wrap: wrap;
+    flex-flow: column;
 }
-main form legend {
-    display: list-item;
-    cursor: pointer;
-    list-style: inside disclosure-open;
+.field-group-label {
+    font-weight: 700;
+    font-size: 20px;
+    margin-left: -0.5em;
+    color: rgb(62, 109, 126);
 }
 table {
     width: 100%;
     -webkit-border-horizontal-spacing: 5px;
     -webkit-border-vertical-spacing: 5px;
 }
-td img {
+form img {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -75,39 +71,23 @@ td img {
     width: 100%;
     height: 100%;
 }
-td {
-    position: relative;
-    text-align: left;
-    width: 250px;
-}
 input[type="file"] {
     width: 100%;
 }
-th {
-    text-align: left;
-}
-tr.even {
-    background: rgb(215, 215, 215);
-}
-tr.odd {
-    background: rgb(238, 238, 238);
-}
-.setting-description {
+.field-description {
     font-size: 0.8em;
     opacity: 0.7;
-}
-@media screen and (max-width: 950px) {
-    tr, td {
-        display: block;
-    }
-    td {
-        width: unset;
-    }
 }
 #id_default_dropdown_tags {
     box-sizing: border-box; 
     display: block;
     width: 100%;
+}
+@media screen and (max-width: 750px) {
+    .field-container {
+        align-items: unset;
+        flex-flow: column;
+    }
 }
 #dark-mode body {
     --body-background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
