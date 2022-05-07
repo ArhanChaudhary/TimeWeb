@@ -6,6 +6,12 @@ from django import forms
 import datetime
 from colorfield.widgets import ColorWidget
 from .models import SettingsModel
+from django.forms.widgets import ClearableFileInput
+
+class CustomImageFieldWidget(ClearableFileInput):
+    clear_checkbox_label = _('Clear image')
+    input_text = _('Change image')
+    template_name = 'navbar/widgets/clearable_file_input.html'
 
 class SettingsForm(forms.ModelForm):
     class Meta:
@@ -21,6 +27,7 @@ class SettingsForm(forms.ModelForm):
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'added_gc_assignment_ids': forms.HiddenInput(),
             'seen_latest_changelog': forms.HiddenInput(),
+            'background_image': CustomImageFieldWidget(),
         }
         error_messages = {
             'def_min_work_time': {

@@ -53,9 +53,6 @@ document.addEventListener("DOMContentLoaded", function() {
         $("<label class=\"hitbox-label\"></label>").insertAfter($(this)).attr("for", $(this).attr("id"));
     });
 
-    const background_image_link = $("#id_background_image").siblings("a");
-    background_image_link.replaceWith($("#background-image-template").html());
-
     JSONToTextarea($("#id_default_dropdown_tags"));
     $("#id_default_dropdown_tags").expandableTextareaHeight();
     setTimeout(function() {
