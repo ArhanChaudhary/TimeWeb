@@ -392,7 +392,7 @@ class VisualAssignment extends Assignment {
         let circle_x,
             circle_y,
             line_end = this.sa.complete_x + Math.ceil(1 / this.wCon);
-        screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+        screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR);
         screen.lineWidth = radius;
         screen.beginPath();
         for (let point_x = (this.sa.fixed_mode || DEBUG) ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
@@ -410,7 +410,7 @@ class VisualAssignment extends Assignment {
         screen.beginPath();
         radius *= 0.75;
         line_end = Math.min(line_end, len_works + Math.ceil(1 / this.wCon));
-        screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+        screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.BLUE_LINE_COLOR);
         screen.lineWidth = radius;
         for (let point_x = 0; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.sa.works[Math.min(len_works, point_x)];
@@ -455,9 +455,9 @@ class VisualAssignment extends Assignment {
             screen.beginPath();
 
             if (this.sa.works[mouse_x - this.sa.blue_line_start] === funct_mouse_x) {
-                screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.BLUE_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+                screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.BLUE_LINE_COLOR);
             } else if (this.funct(mouse_x) === funct_mouse_x) {
-                screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR, { invert: $("html").is("#dark-mode") });
+                screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR);
             }
             
             screen.fillStyle = "white";

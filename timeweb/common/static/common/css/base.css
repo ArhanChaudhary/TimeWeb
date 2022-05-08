@@ -121,6 +121,3 @@ textarea
         background: inherit;
     }
 }
-#dark-mode #loading-container {
-    filter: invert(1);
-}

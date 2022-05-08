@@ -261,11 +261,3 @@ details > .img-ignore-padding-container img {
 .label-icon {
     position: absolute;
 }
-#dark-mode body {
-    --body-background: black;
-}
-#dark-mode main,
-#dark-mode #doc-container a,
-#dark-mode main img:not(.label-icon) {
-    filter: invert(1);
-}
