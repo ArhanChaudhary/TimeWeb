@@ -65,6 +65,8 @@ main {
     box-sizing: border-box;
     /* Firefox doesnt support "overlay" */
     overflow-y: scroll;
+    /* some js focuses on the main, causing it to get an outline even with tabindex -1; hide it */
+    outline: 0 !important;
 }
 /* Position content such that the scrollbar doesn't clip into the header */
 main.finished-header-transition {
