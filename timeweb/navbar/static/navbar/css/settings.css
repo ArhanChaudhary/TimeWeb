@@ -78,6 +78,7 @@ main form {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    height: 33px;
     /* position "Clear image" text */
     z-index: 1;
 }
