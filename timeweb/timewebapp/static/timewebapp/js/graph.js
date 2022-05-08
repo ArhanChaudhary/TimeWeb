@@ -465,7 +465,7 @@ class VisualAssignment extends Assignment {
             screen.fill();
             screen.lineWidth = 2;
             screen.stroke();
-            screen.fillStyle = "black";
+            this.fixed_graph.css("filter") ? "white" : "black";
         }
         
         screen.textAlign = "center";
