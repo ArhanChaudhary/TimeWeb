@@ -17,6 +17,9 @@
     {{ form.media }}
     <form method="POST" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
+        {% for error in form.non_field_errors %}
+            <div class="error-note">{{ error|escape }}</div>
+        {% endfor %}
         {% for field in form.visible_fields %}
             {% if field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "timezone" %}
                 {% if field.name != "def_min_work_time" %}
@@ -76,11 +79,9 @@
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
-        {% spaceless %}
         <div class="button-container">
             <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
             <input type="submit" value="Save" id="submit-settings-button" class="generic-button">
         </div>
-        {% endspaceless %}
     </form>
 {% endblock content %}
