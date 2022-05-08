@@ -62,12 +62,17 @@
                                     <h3 class="error-note">{{ error|escape }}</h3>
                                 {% endfor %}
                                 {{ field }}
+                                {% if field.widget_type == "checkbox" %}
+                                    <label for={{ field.auto_id }}>
+                                        <span class="toggle-text">Off</span>
+                                        <span class="toggle-text">On</span>
+                                    </label>
+                                {% endif %}
                             {% endif %}
                         </span>
                     {% endif %}
                 </div>
         {% endfor %}
-        {% comment %} Needs to be here to form.is_valid() isnt false {% endcomment %}
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}

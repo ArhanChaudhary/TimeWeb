@@ -4,17 +4,92 @@ main form {
     font-size: 17px;
     max-width: 1000px;
 }
-main form select {
-    display: block;
+.field-group {
+    margin: 40px 0 19px;
 }
-.right-side-of-field:not([type="file"]) > * {
-    border: 1px solid black;
+.field-group-label {
+    font-weight: 700;
+    font-size: 20px;
+    margin-left: -0.5em;
+    color: rgb(62, 109, 126);
+}
+.field-container {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.field-container > * {
+    max-width: 50ch;
+}
+@media screen and (max-width: 750px) {
+    .field-container {
+        align-items: unset;
+        flex-flow: column;
+    }
+}
+.left-side-of-field {
+    display: flex;
+    flex-wrap: wrap;
+    flex-flow: column;
+}
+.right-side-of-field > * {
     margin: unset;
     box-sizing: border-box;
     width: 157px;
 }
+.right-side-of-field > :not(label):not([type="file"]) {
+    border: 1px solid black;
+}
 .right-side-of-field > :not(#break-days-wrapper) {
     display: block;
+}
+::-webkit-file-upload-button {
+    display: block;
+    width: 100%;
+    border-radius: unset;
+}
+[type="checkbox"] {
+    position: absolute;
+    right: 100vw;
+}
+.toggle-text {
+    flex: 1;
+    text-align: center;
+}
+[type="checkbox"] ~ label {
+    position: relative;
+    border: 2px solid rgb(92, 195, 199);
+    background-color: white;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+[type="checkbox"] ~ label:hover {
+    filter: brightness(0.91);
+}
+[type="checkbox"] ~ label:hover:active {
+    box-shadow: 0 0 11px -1px rgb(187, 187, 187);
+    filter: none;
+}
+[type="checkbox"] ~ label::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-color: rgb(92, 195, 199);
+    transition: transform 0.25s ease-in-out;
+    transform-origin: left;
+}
+[type="checkbox"]:checked ~ label::after {
+    transform: translateX(77px);
+}
+.field-description {
+    font-size: 0.8em;
+    opacity: 0.7;
 }
 .button-container {
     display: flex;
@@ -35,68 +110,4 @@ main form select {
 }
 #submit-settings-button {
     margin-left: 10px;
-}
-.field-group {
-    margin: 40px 0 19px;
-}
-.field-container {
-    margin: 10px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.field-container > * {
-    max-width: 50ch;
-}
-.left-side-of-field {
-    display: flex;
-    flex-wrap: wrap;
-    flex-flow: column;
-}
-.field-group-label {
-    font-weight: 700;
-    font-size: 20px;
-    margin-left: -0.5em;
-    color: rgb(62, 109, 126);
-}
-table {
-    width: 100%;
-    -webkit-border-horizontal-spacing: 5px;
-    -webkit-border-vertical-spacing: 5px;
-}
-form img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 5px;
-    box-sizing: border-box;
-    width: min(100%, 500px);
-    box-shadow: 0 0 3px 1px gray;
-}
-.hitbox-label {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-.field-description {
-    font-size: 0.8em;
-    opacity: 0.7;
-}
-@media screen and (max-width: 750px) {
-    .field-container {
-        align-items: unset;
-        flex-flow: column;
-    }
-}
-#dark-mode body {
-    --body-background: radial-gradient(circle, rgb(10,10,10) 0, rgb(58,58,58) 100%);
-}
-#dark-mode #break-days-wrapper,
-#dark-mode main,
-#dark-mode .jscolor,
-#dark-mode td img,
-#dark-mode input[type="checkbox"] {
-    filter: invert(1);
 }
