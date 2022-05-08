@@ -103,6 +103,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 return self.invalid_form(request)
             else:
                 request.user.settingsmodel.added_gc_assignment_ids = []
+                request.session.pop("already_created_gc_assignments_from_frontend", None)
         request.user.settingsmodel.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
         return redirect("home")
