@@ -45,12 +45,6 @@ MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
 
 class SettingsModel(models.Model):
     # Group "Assignment Form"
-    def_break_days = MultiSelectField(
-        choices=WEEKDAYS,
-        blank=True,
-        null=True,
-        verbose_name=_('Default Work Days'),
-    )
     def_min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -63,6 +57,12 @@ class SettingsModel(models.Model):
     def_due_time = models.TimeField(
         default=get_midnight_time,
         verbose_name=_('Default Due Time'),
+    )
+    def_break_days = MultiSelectField(
+        choices=WEEKDAYS,
+        blank=True,
+        null=True,
+        verbose_name=_('Default Work Days'),
     )
 
     # Group "Assignment Graph"
