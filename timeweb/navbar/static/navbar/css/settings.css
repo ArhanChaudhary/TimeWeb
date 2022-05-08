@@ -10,11 +10,10 @@ main form {
 .field-group-label {
     font-weight: 700;
     font-size: 20px;
-    margin-left: -0.5em;
     color: rgb(62, 109, 126);
 }
 .field-container {
-    margin: 10px 0;
+    margin: 10px 0 10px 0.5em;
     display: flex;
     justify-content: space-between;
     align-items: center;
