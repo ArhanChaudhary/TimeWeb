@@ -38,7 +38,7 @@ main form {
     box-sizing: border-box;
     width: 157px;
 }
-.right-side-of-field > :not(label):not([type="file"]) {
+.right-side-of-field > input:not([type="file"]) {
     border: 1px solid black;
 }
 .right-side-of-field > :not(#break-days-wrapper) {
@@ -86,6 +86,10 @@ main form {
 }
 [type="checkbox"]:checked ~ label::after {
     transform: translateX(77px);
+}
+.center-or {
+    margin: 5px 0;
+    text-align: center;
 }
 .field-description {
     font-size: 0.8em;
