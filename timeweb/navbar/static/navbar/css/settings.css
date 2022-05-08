@@ -44,6 +44,19 @@ main form {
 .right-side-of-field > :not(#break-days-wrapper) {
     display: block;
 }
+[type="checkbox"] ~ label[for*="-clear_"]::before {
+    width: 100%;
+}
+[type="checkbox"]:not(:checked) ~ label[for*="-clear_"]::before {
+    transform: unset;
+    transform: scaleX(0);
+}
+[type="checkbox"]:checked ~ label[for*="-clear_"]::before {
+    transform: none;
+}
+[type="checkbox"]:checked ~ label[for*="-clear_"] {
+    color: white;
+}
 ::-webkit-file-upload-button {
     display: block;
     width: 100%;
@@ -65,6 +78,8 @@ main form {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    /* position "Clear image" text */
+    z-index: 1;
 }
 [type="checkbox"] ~ label:hover {
     filter: brightness(0.91);
@@ -73,9 +88,10 @@ main form {
     box-shadow: 0 0 11px -1px rgb(187, 187, 187);
     filter: none;
 }
-[type="checkbox"] ~ label::after {
+[type="checkbox"] ~ label::before {
     content: '';
     position: absolute;
+    z-index: -1;
     top: 0;
     left: 0;
     width: 50%;
@@ -84,7 +100,7 @@ main form {
     transition: transform 0.25s ease-in-out;
     transform-origin: left;
 }
-[type="checkbox"]:checked ~ label::after {
+[type="checkbox"]:checked ~ label::before {
     transform: translateX(77px);
 }
 .center-or {
