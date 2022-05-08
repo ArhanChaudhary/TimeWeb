@@ -50,7 +50,10 @@ document.addEventListener("DOMContentLoaded", function() {
     JSONToTextarea($("#id_default_dropdown_tags"));
     $("#id_default_dropdown_tags").expandableTextareaHeight();
     setTimeout(function() {
-        $(".error-note").length && $(".error-note").first()[0].scrollIntoView();
+        $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+        });
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
 
