@@ -125,17 +125,17 @@ class SettingsModel(models.Model):
     )
 
     # Group "Personalize"
-    background_image = models.ImageField(
-        upload_to=create_image_path,
-        null=True,
-        blank=True,
-        verbose_name=_('Background Image'),
-    )
     appearance = models.CharField(
         max_length=MAX_APPEARANCES_LENGTH,
         choices=APPEARANCES,
         default=_("automatic"),
         verbose_name=_('Appearance'),
+    )
+    background_image = models.ImageField(
+        upload_to=create_image_path,
+        null=True,
+        blank=True,
+        verbose_name=_('Background Image'),
     )
     animation_speed = models.CharField(
         max_length=MAX_ANIMATION_SPEED_LENGTH,

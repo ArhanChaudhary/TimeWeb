@@ -18,7 +18,7 @@
     <form method="POST" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form.visible_fields %}
-            {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "background_image" or field.name == "restore_gc_assignments" %}
+            {% if field.name == "def_break_days" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "restore_gc_assignments" %}
                 {% if field.name != "def_break_days" %}
                     </div>
                 {% endif %}
@@ -32,7 +32,7 @@
                             Assignment Priority
                         {% elif field.name == "default_dropdown_tags" %}
                             Assignment Header
-                        {% elif field.name == "background_image" %}
+                        {% elif field.name == "appearance" %}
                             Personalize
                         {% elif field.name == "restore_gc_assignments" %}
                             Miscellaneous
