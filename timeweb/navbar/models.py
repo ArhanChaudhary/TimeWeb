@@ -36,7 +36,7 @@ ANIMATION_SPEED = (
 MAX_ANIMATION_SPEED_LENGTH = len(max([i[1] for i in ANIMATION_SPEED], key=len))
 
 APPEARANCES = (
-    ("automatic", "Automatic"),
+    ("automatic", "Sync with device"),
     ("light", "Light Mode"),
     ("dark", "Dark Mode"),
     ("fancy dark", "𝐹𝒶𝓃𝒸𝓎 Dark Mode"),
