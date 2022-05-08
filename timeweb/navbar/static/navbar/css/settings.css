@@ -103,6 +103,9 @@ main form {
 [type="checkbox"]:checked ~ label::before {
     transform: translateX(77px);
 }
+[type="file"] {
+    border: none;
+}
 .center-or {
     margin: 5px 0;
     text-align: center;

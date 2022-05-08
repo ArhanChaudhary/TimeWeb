@@ -824,8 +824,8 @@ a[href="/settings"] {
 .graph-footer * {
     font-size: 15px;
     border-radius: 20px;
-    border: none !important;
-    padding: 5px 10px !important;
+    border: none;
+    padding: 5px 10px;
     cursor: pointer;
     --background-color: rgb(223, 223, 223);
     background-color: var(--background-color);

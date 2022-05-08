@@ -8,7 +8,7 @@ html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
 }
-input:not([type="file"]), textarea {
+input, textarea {
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
