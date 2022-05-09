@@ -55,6 +55,7 @@ textarea
     padding: 16px 10px;
     width: 100%;
     margin-bottom: 15px;
+    scroll-margin: 10px;
     box-sizing: border-box;
 }
 .error-note {
