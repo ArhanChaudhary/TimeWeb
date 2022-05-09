@@ -23,6 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 CSP_CONNECT_SRC = ("'self'", 'https://www.google-analytics.com', 'https://www.googletagmanager.com', 'https://accounts.google.com', "https://storage.googleapis.com", "https://www.google.com")
 CSP_DEFAULT_SRC = ("'self'", 'https://www.googletagmanager.com', "https://storage.googleapis.com", "https://www.google.com", "https://unpkg.com")
+if DEBUG:
+    CSP_DEFAULT_SRC += ("http://127.0.0.1:35729", )
+    CSP_CONNECT_SRC += ("ws://127.0.0.1:35729", )
 CSP_SCRIPT_SRC = CSP_DEFAULT_SRC # Needs to be set so nonce can be added
 CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
@@ -106,6 +109,10 @@ MIDDLEWARE = [
     # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 ]
+if DEBUG:
+    INSTALLED_APPS.append('livereload')
+    MIDDLEWARE.append('livereload.middleware.LiveReloadScript')
+    
 CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
 ROOT_URLCONF = 'timeweb.urls'
 
