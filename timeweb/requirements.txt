@@ -14,6 +14,7 @@ django-colorfield==0.4.3
 django-contact-form==1.9
 django-csp==3.7
 django-livereload-server==0.4
+django-minify-html==1.2.0
 django-multiselectfield==0.1.12
 django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@31494345a97fb38c1cd1f98a52256ff8a5fdbeb2
 django-storages==1.12.3
@@ -32,6 +33,7 @@ gunicorn==20.1.0
 html5lib==1.1
 httplib2==0.19.1
 idna==3.2
+minify_html==0.8.0
 oauthlib==3.1.1
 packaging==21.0
 Pillow==9.0.1

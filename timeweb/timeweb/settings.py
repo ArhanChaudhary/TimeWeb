@@ -89,6 +89,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    "django_minify_html",
 ]
 
 INTERNAL_IPS = [
@@ -108,6 +110,10 @@ MIDDLEWARE = [
     'common.middleware.DefineIsExampleAccount',
     # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
+
+    # Even though cloudflare has an html minfier, let's instead use our own so the debug and non debug versions' html stays consistent
+    # It's also more efficient than cf's html minifier
+    "django_minify_html.middleware.MinifyHtmlMiddleware",
 ]
 if DEBUG:
     INSTALLED_APPS.append('livereload')
