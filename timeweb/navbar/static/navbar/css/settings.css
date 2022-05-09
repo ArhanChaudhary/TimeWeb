@@ -36,9 +36,11 @@ main form > :not(.field-group) + .field-group {
     flex-flow: column;
 }
 .right-side-of-field > * {
-    margin: unset;
     box-sizing: border-box;
     width: 157px;
+}
+.right-side-of-field > :not(.error-note) {
+    margin: unset;
 }
 .right-side-of-field > input:not([type="file"]) {
     border: 1px solid black;
@@ -84,8 +86,11 @@ main form > :not(.field-group) + .field-group {
     /* position "Clear image" text */
     z-index: 1;
 }
-[type="checkbox"] ~ label:hover {
+[type="checkbox"] ~ label:not([for*="-clear_"]):hover {
     filter: brightness(0.91);
+}
+[type="checkbox"] ~ label[for*="-clear_"]:hover::before {
+    background-color: rgb(84, 177, 181);
 }
 [type="checkbox"] ~ label:hover:active {
     box-shadow: 0 0 11px -1px rgb(187, 187, 187);
