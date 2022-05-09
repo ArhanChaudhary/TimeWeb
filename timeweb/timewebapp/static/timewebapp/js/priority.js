@@ -140,10 +140,9 @@ class Priority {
 
     transitionSwap(assignment_container) {
         const initial_height = assignment_container.attr("data-initial-top-offset");
-        const current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned matrix
+        const final_height = assignment_container.offset().top;
         // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
-        const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
-        const transform_value = initial_height - final_height;
+        let transform_value = initial_height - final_height;
         assignment_container.removeAttr("data-initial-top-offset");
         assignment_container.addClass("transform-instantly")
                 .css("transform", `translateY(${transform_value}px)`)
