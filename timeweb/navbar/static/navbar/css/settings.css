@@ -65,8 +65,7 @@ main form > :not(.field-group) + .field-group {
     border-radius: unset;
 }
 [type="checkbox"] {
-    position: absolute;
-    right: 100vw;
+    display: none !important;
 }
 .toggle-text {
     flex: 1;
