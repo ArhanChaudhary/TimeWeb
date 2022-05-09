@@ -4,6 +4,9 @@ main form {
     font-size: 17px;
     max-width: 1000px;
 }
+main form > :not(.field-group) + .field-group {
+    margin-top: unset;
+}
 .field-group {
     margin: 40px 0 19px;
 }
