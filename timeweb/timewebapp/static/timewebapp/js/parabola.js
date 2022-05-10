@@ -228,6 +228,8 @@ Assignment.prototype.setParabolaValues = function() {
     }
 }
 Assignment.prototype.funct = function(x, params={translateX: true}) {
+    if (!Number.isInteger(x))
+        throw new Error("The parabola function must take in an integer\ncontact me if you see this error");
     if (params.translateX !== false) {
         // Translate x coordinate and break days
         x -= this.red_line_start_x;

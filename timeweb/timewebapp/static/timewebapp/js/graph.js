@@ -426,17 +426,18 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.getCanvasFont(VisualAssignment.font_size);
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y) && !this.sa.needs_more_info) {
             let str_mouse_x;
+            let graph_mouse_x;
             if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 str_mouse_x = new Date(this.complete_due_date.valueOf());
                 str_mouse_x = str_mouse_x.toLocaleDateString("en-US", {...this.date_string_options_no_weekday, hour: "numeric", minute: "numeric"});
-                // mouse_x as a variable isnt needed anymore. Set it to complete_x if at x to position the point
-                mouse_x = this.sa.complete_x;
+                graph_mouse_x = this.sa.complete_x;
             } else {
                 str_mouse_x = new Date(this.sa.assignment_date.valueOf());
                 str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
                 str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
+                graph_mouse_x = mouse_x;
             }
-            const point_x = mouse_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
+            const point_x = graph_mouse_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             const point_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - funct_mouse_x * this.hCon - 50);
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
             const hover_point_label = this.dom_assignment.find(".hover-point-label");
