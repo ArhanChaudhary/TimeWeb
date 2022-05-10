@@ -162,7 +162,7 @@ class VisualAssignment extends Assignment {
         first_click && this.setGraphButtonEventListeners();
         this.resize();
     }
-    resize() {
+    resize(e={}) {
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
             this.red_line_start_x = this.sa.dynamic_start;
@@ -195,8 +195,10 @@ class VisualAssignment extends Assignment {
         if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
             this.drawFixed();
             this.draw();
-            const hover_point_label = this.dom_assignment.find(".hover-point-label");
-            hover_point_label.addClass("hide-label");
+            if (!e.isTrigger) {
+                const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                hover_point_label.addClass("hide-label");
+            }
         }
     }
     mousemove(e, iteration_number=1) {
