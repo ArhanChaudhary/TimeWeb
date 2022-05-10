@@ -186,7 +186,7 @@ class VisualAssignment extends Assignment {
         } else {
             VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
         }
-        this.wCon = (this.width - 55) / this.sa.complete_x;
+        this.wCon = (this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / this.sa.complete_x;
         this.hCon = (this.height - 55) / this.sa.y;
         this.graph[0].width = this.width * this.scale;
         this.graph[0].height = this.height * this.scale;
@@ -215,7 +215,7 @@ class VisualAssignment extends Assignment {
 
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
-            let x2 = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon - this.red_line_start_x;
+            let x2 = (raw_x - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon - this.red_line_start_x;
             let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y - (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
 
             // i don't think ceiling logic is needed here because it seems to work as intended without it
@@ -336,7 +336,7 @@ class VisualAssignment extends Assignment {
         const assignment_container = this.dom_assignment.parents(".assignment-container");
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
-            var mouse_x = (raw_x - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
+            var mouse_x = (raw_x - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
                 mouse_y = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon;
             if (mouse_x >= (Math.round(mouse_x) + this.sa.complete_x) / 2)
                 mouse_x = this.sa.x;
@@ -397,7 +397,7 @@ class VisualAssignment extends Assignment {
         screen.beginPath();
         for (let point_x = (this.sa.fixed_mode || DEBUG) ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.funct(point_x);
-            circle_x = point_x * this.wCon + 50;
+            circle_x = point_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             if (circle_x > this.width - 5) {
                 circle_x = this.width - 5;
             }
@@ -414,7 +414,7 @@ class VisualAssignment extends Assignment {
         screen.lineWidth = radius;
         for (let point_x = 0; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.sa.works[Math.min(len_works, point_x)];
-            circle_x = Math.min(this.sa.complete_x, point_x + this.sa.blue_line_start) * this.wCon + 50;
+            circle_x = Math.min(this.sa.complete_x, point_x + this.sa.blue_line_start) * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             circle_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - point_y * this.hCon - 50);
             
             screen.lineTo(circle_x - (point_x === 0) * radius / 2, circle_y);
@@ -436,7 +436,7 @@ class VisualAssignment extends Assignment {
                 str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
                 str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
             }
-            const point_x = mouse_x * this.wCon + 50;
+            const point_x = mouse_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             const point_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - funct_mouse_x * this.hCon - 50);
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
             const hover_point_label = this.dom_assignment.find(".hover-point-label");
@@ -472,7 +472,7 @@ class VisualAssignment extends Assignment {
         screen.textBaseline = "bottom";
         screen.font = VisualAssignment.getCanvasFont(VisualAssignment.font_size);
         const row_height = screen.measureText(0).width * 2;
-        const center = (str, y_pos) => screen.fillText(str, 50+(this.width-50)/2, row_height*y_pos);
+        const center = (str, y_pos) => screen.fillText(str, (VisualAssignment.GRAPH_Y_AXIS_MARGIN+10+this.width)/2, row_height*y_pos);
         if (!assignment_container.hasClass("finished") && !this.sa.needs_more_info) {
             let displayed_day;
             let str_day;
@@ -509,6 +509,7 @@ class VisualAssignment extends Assignment {
         }
         screen.scale(1 / this.scale, 1 / this.scale);
     }
+    static GRAPH_Y_AXIS_MARGIN = 55;
     //hard (the entire function)
     drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
@@ -521,7 +522,7 @@ class VisualAssignment extends Assignment {
 
         // x and y axis rectangles
         screen.fillStyle = "rgb(185,185,185)";
-        screen.fillRect(40, 0, 10, this.height);
+        screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN, 0, 10, this.height);
         screen.fillRect(0, this.height - 50, this.width, 10);
 
         // x axis label
@@ -549,7 +550,7 @@ class VisualAssignment extends Assignment {
 
         screen.font = VisualAssignment.getCanvasFont(13.75);
         screen.textBaseline = "top";
-        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - 100) / 100));
+        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - VisualAssignment.GRAPH_Y_AXIS_MARGIN + 60) / 100));
         if (this.sa.complete_x >= 10) {
             gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
             gradient.addColorStop(0, "gainsboro");
@@ -560,11 +561,11 @@ class VisualAssignment extends Assignment {
                 if (smaller_index % 5) {
                     const displayed_number = smaller_index * small_x_axis_scale;
                     screen.fillStyle = gradient; // Line color
-                    screen.fillRect(displayed_number * this.wCon + 48.5, 0, 2, this.height - 50); // Draws line index
+                    screen.fillRect(displayed_number * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 8.5, 0, 2, this.height - 50); // Draws line index
                     screen.fillStyle = "rgb(80,80,80)"; // Number color
                     if (label_index) {
                         const numberwidth = screen.measureText(displayed_number).width;
-                        let number_x_pos = displayed_number * this.wCon + 50;
+                        let number_x_pos = displayed_number * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
                         if (number_x_pos + numberwidth / 2 > this.width - 1) {
                             number_x_pos = this.width - numberwidth / 2 - 1;
                         }
@@ -573,86 +574,68 @@ class VisualAssignment extends Assignment {
                 }
             }
         }
-
+        screen.font = VisualAssignment.getCanvasFont(12);
         screen.textBaseline = "alphabetic";
         screen.textAlign = "right";
         if (!this.sa.needs_more_info) {
             const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
-            let font_size2 = 16.90625 - Math.ceil(this.sa.y - this.sa.y % y_axis_scale).toString().length * 1.71875;
             if (this.sa.y >= 10) {
                 const small_y_axis_scale = y_axis_scale / 5;
-                if (font_size2 < 8.5) {
-                    font_size2 = 8.5;
-                }
-                screen.font = VisualAssignment.getCanvasFont(font_size2);
                 const text_height = screen.measureText(0).width * 2,
-                    label_index = text_height < small_y_axis_scale * this.hCon;
+                    label_index = text_height * 1.3 < small_y_axis_scale * this.hCon;
                 for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
                     const displayed_number = smaller_index * small_y_axis_scale;
                     if (smaller_index % 5) {
                         const gradient_percent = 1 - (displayed_number * this.hCon) / (this.height - 50);
                         screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
-                        screen.fillRect(50, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
+                        screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
                         screen.fillStyle = "rgb(80,80,80)";
                         if (label_index) {
                             let number_y_pos = this.height - displayed_number * this.hCon - 54 + text_height / 2;
                             if (number_y_pos < 4 + text_height / 2) {
                                 number_y_pos = 4 + text_height / 2;
                             }
-                            if (38.5 - screen.measureText(displayed_number).width < 13) {
-                                screen.textAlign = "left";
-                                screen.fillText(displayed_number, 13, number_y_pos);
-                                screen.textAlign = "right";
-                            } else {
-                                screen.fillText(displayed_number, 38.5, number_y_pos);
-                            }
+                            screen.fillText(displayed_number, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 1.5, number_y_pos);
                         }
                     }
                 }
             }
-            font_size2 *= 1.2;
-            screen.font = VisualAssignment.getCanvasFont(font_size2);
+            screen.font = VisualAssignment.getCanvasFont(15);
             const text_height = screen.measureText(0).width * 2;
             for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
                 if (bigger_index * 2 < y_axis_scale) {
                     break;
                 }
                 screen.fillStyle = "rgb(205,205,205)";
-                screen.fillRect(50, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
                 screen.fillStyle = "black";
                 let number_y_pos = this.height - bigger_index * this.hCon - 54 + text_height / 2;
                 if (number_y_pos < 4 + text_height / 2) {
                     number_y_pos = 4 + text_height / 2;
                 }
-                if (38.5 - screen.measureText(bigger_index).width < 13) {
-                    screen.textAlign = "left";
-                    screen.fillText(bigger_index, 13, number_y_pos);
-                    screen.textAlign = "right";
-                } else {
-                    screen.fillText(bigger_index, 38.5, number_y_pos);
-                }
+                screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 1.5, number_y_pos);
             }
         }
-        screen.fillText(0, 39, this.height - 52);
+        screen.fillText(0, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 1, this.height - 52);
 
         screen.textBaseline = "top";
         screen.textAlign = "center";
         screen.font = VisualAssignment.getCanvasFont(16.5);
         for (let bigger_index = Math.ceil(this.sa.complete_x - this.sa.complete_x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
             screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(bigger_index * this.wCon + 47.5, 0, 5, this.height - 50);
+            screen.fillRect(bigger_index * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5), 0, 5, this.height - 50);
             screen.fillStyle = "black";
             const numberwidth = screen.measureText(bigger_index).width;
-            let number_x_pos = bigger_index * this.wCon + 50;
+            let number_x_pos = bigger_index * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10);
             if (number_x_pos + numberwidth / 2 > this.width - 1) {
                 number_x_pos = this.width - numberwidth / 2 - 1;
             }
             screen.fillText(bigger_index, number_x_pos, this.height - 39);
         }
-        screen.fillText(0, 55.5, this.height - 38.5);
+        screen.fillText(0, VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15.5, this.height - 38.5);
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(utils.getRawDateNow(), this.sa.assignment_date, {round: false});
         if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.complete_x) {
-            let today_x = today_minus_assignment_date * this.wCon + 47.5;
+            let today_x = today_minus_assignment_date * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5);
             screen.fillStyle = "rgb(150,150,150)";
             screen.fillRect(today_x, 0, 5, this.height - 50);
             screen.fillStyle = "black";
