@@ -4,6 +4,7 @@
 {% block css %}
   <link rel="stylesheet" href="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.css" crossorigin="anonymous"/>
   <link rel="stylesheet" href="{% static 'timewebapp/css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
   {% if settings_model.appearance == "automatic" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
   {% elif settings_model.appearance == "dark" or settings_model.appearance == "fancy dark" %}
