@@ -327,7 +327,6 @@ class VisualAssignment extends Assignment {
         this.setDynamicStartIfInDynamicMode();
         ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
         new Priority().sort();
-        this.draw();
     }
     static getCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
     //hard (this entire function)
@@ -757,7 +756,6 @@ class VisualAssignment extends Assignment {
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
             new Priority().sort();
-            this.draw();
         });
         }
         // END Delete work input button
@@ -920,7 +918,6 @@ class VisualAssignment extends Assignment {
             if (SETTINGS.close_graph_after_work_input && this.dom_assignment.hasClass("open-assignment") && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1)
                 this.dom_assignment.click();
             new Priority().sort();
-            this.draw();
         });
         }
         // END Submit work button
@@ -962,7 +959,6 @@ class VisualAssignment extends Assignment {
                     this.graph.off("mousemove");
                 }
                 new Priority().sort();
-                this.draw();
             } else if (this.draw_mouse_point) {
                 // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
                 // Disable draw point
@@ -1008,7 +1004,6 @@ class VisualAssignment extends Assignment {
             // However, we still need to call setDynamicStartIfInDynamicMode() to compensate if the skew ratio in fixed mode was modified
             this.setDynamicStartIfInDynamicMode();
             new Priority().sort();
-            this.draw();
         }).text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
         }
         // END Fixed/dynamic mode button        
