@@ -545,7 +545,7 @@ class VisualAssignment extends Assignment {
                 text = pluralize(this.sa.unit);
             }
             screen.textBaseline = "hanging";
-            screen.fillText(text, -(this.height - 50) / 2, 0);
+            screen.fillText(text, -(this.height - 50) / 2, 1);
             screen.rotate(Math.PI / 2);
         }
 
