@@ -3,8 +3,7 @@
     display: none;
 }
 #form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {
-    outline: 0;
-    box-shadow: 0 0 4px rgba(0,95,204,0.4), inset 0 0 0 1px rgb(0,95,204) !important; 
+    border-color: var(--input-focus-color);
 }
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
@@ -40,7 +39,7 @@
     border-radius: 15px;
     padding: 5px 5px 25px;
     position: relative;
-    --horizontal-form-padding: 3px;
+    --vertical-form-padding: 5px;
     --form-field-margin-left: 10px;
 }
 #form-wrapper #cancel-button {
@@ -107,7 +106,7 @@
     display: block;
     margin-left: var(--form-field-margin-left);
     width: calc(100% - 20px);
-    border: 1px solid black;
+    border: 2px solid var(--color);
     border-radius: 3px;
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
@@ -149,7 +148,7 @@
     background-color: black;
     cursor: pointer;
     margin-left: 5px;
-    transform: translateX(var(--form-field-margin-left)) translateX(var(--horizontal-form-padding)) translateX(var(--due-date-text-width, -100vw));
+    transform: translateX(var(--form-field-margin-left)) translateX(var(--vertical-form-padding)) translateX(var(--due-date-text-width, -100vw));
 }
 #form-wrapper #due-date-input-container #due-date-empty::after {
     content: '';
@@ -184,9 +183,6 @@
     position: relative;
     opacity: 0;
 }
-#form-wrapper #fields-wrapper :not(.hide-field) {
-    margin-top: 0 !important;
-}
 #form-wrapper .field-wrapper label[for='id_x']::after {
     right: calc(var(--soft-label-width) - 10px);
 }
@@ -198,10 +194,10 @@
     margin: 25px auto 0;
 }
 #form-wrapper input, #form-wrapper textarea {
-    margin-top: 1px;
-    padding: var(--horizontal-form-padding) 1px;
+    margin-top: 2px;
+    padding: var(--vertical-form-padding) 4px;
 }
-#submit-assignment-button {
+#form-wrapper #submit-assignment-button {
     width: calc(100% - 140px);
     margin: 10px auto 0;
     display: block;
@@ -209,20 +205,20 @@
     font-size: 19px;
     background: rgb(238, 238, 238);
 }
-#submit-assignment-button:hover {
+#form-wrapper #submit-assignment-button:hover {
     background: rgb(229, 229, 229);
 }
-#submit-assignment-button:active {
+#form-wrapper #submit-assignment-button:active {
     background: rgb(245, 245, 245);
     transform: translateY(1px);
 }
 #form-wrapper .invalid {
-    border: 2px solid rgb(226,30,54);
+    border-color: rgb(226, 30, 54);
 }
 #form-wrapper .error-note {
     text-align: center;
     font-size: 13px;
-    color: rgb(226,30,54);
+    color: rgb(226, 30, 54);
 }
 #overlay {
     overflow: auto;

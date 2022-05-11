@@ -6,6 +6,7 @@ body {
     --primary-c: 255;
     --c: 0;
     --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
+    --input-focus-color: rgb(0, 95, 204);
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
 }
