@@ -172,28 +172,6 @@ utils = {
                     $("#hide-button").click();
                 }
             },
-
-            advancedInputs: function() {
-                // Advanced inputs for form, don't add to works because
-
-                $("#form-wrapper #advanced-inputs").click(function() {
-                    new Crud().replaceUnit();
-                    let run_interval = true;
-                    if ($(this).parents("#fields-wrapper").isFullyScrolled({ leeway: 10 })) {
-                        $("#fields-wrapper > div:first-of-type")[0].scrollIntoView({
-                            behavior: "smooth",
-                            block: "end",
-                        });
-                    } else {
-                        $("#fields-wrapper > div:last")[0].scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                        });
-                    }
-
-                });
-            },
-
             headerIcons: function() {
                 // Assignments header icons
                 $("#close-assignments").click(function() {
@@ -1417,7 +1395,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.tickButtons();
     utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
-    utils.ui.setClickHandlers.advancedInputs();
     utils.ui.setClickHandlers.headerIcons();
     utils.ui.setClickHandlers.assignmentSorting();
     utils.ui.setClickHandlers.googleClassroomAPI();
