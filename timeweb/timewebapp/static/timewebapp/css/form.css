@@ -1,4 +1,8 @@
+#form-wrapper form {
+    display: flex;
+    flex-flow: column;
 
+}
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
@@ -8,15 +12,15 @@
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
 }
+#form-wrapper ::placeholder {
+    color: var(--form-placeholder-color);
+}
 #form-wrapper label::after {
     position: absolute;
-    z-index: 1;
-    display: block;
-    color: rgb(117, 117, 117); /* Default chrome placeholder color */
+    color: var(--form-placeholder-color);
     font-size: 12px;
-    right: -10px;
-    bottom: -4px;
-    transform: translateY(100%);
+    right: var(--horizontal-form-padding);
+    bottom: -25px;
 }
 #form-wrapper input::-webkit-datetime-edit {
     display: contents;
@@ -37,48 +41,40 @@
     box-shadow: 0 0 100px -23px black;
     margin: 5px auto 35px;
     border-radius: 15px;
-    padding: 5px 5px 25px;
+    padding: 5px 15px 25px;
     position: relative;
     --vertical-form-padding: 5px;
-    --form-field-margin-left: 10px;
+    --horizontal-form-padding: 4px;
 }
 #form-wrapper #cancel-button {
     position: absolute;
     cursor: pointer;
     right: 7px;
     top: 9px;
-    border: 7px solid white;
+    padding: 7px;
     z-index: 1;
     min-height: unset;
     min-width: unset;
-    background-color: white;
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
 }
 #form-wrapper #cancel-button:active {
     transform: scale(0.95);
 }
 #form-wrapper #new-title-line {
-    width: calc(100% - 20px);
-    position: absolute;
-    margin-top: 1.25em;
-    left: 10px;
-    border: 1px solid lightgray;
+    width: calc(100% - 30px);
+    margin-top: 20px;
+    margin-bottom: -21px;
+    border: 1px solid var(--color);
 }
 #form-wrapper #new-title {
-    display: inline-block;
+    align-self: center;
+    background-color: var(--primary);
     font-size: 27px;
     margin-bottom: -0.25em;
-    position: relative;
-    z-index: 1;
-    background: white;
     padding: 0 4px;
-    left: 50%;
-    transform: translateX(-50%);
 }
 #form-wrapper #fields-wrapper {
-    overflow-y: scroll;
-    overflow-y: overlay;
-    --soft-label-width: 78px;
+    --soft-label-width: 64px;
     position: relative;
 }
 #form-wrapper .field-wrapper {
@@ -98,27 +94,22 @@
     display: block;
     position: relative;
 }
-#form-wrapper label:not(.break-days-label) {
-    margin: 0 25px;
-}
 #form-wrapper input, #form-wrapper textarea {
     box-sizing: border-box; 
     display: block;
-    margin-left: var(--form-field-margin-left);
-    width: calc(100% - 20px);
+    width: 100%;
     border: 2px solid var(--color);
     border-radius: 3px;
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
-    transform: translateY(-49px);
+    transform: translateY(-54px);
     right: 10px;
 }
 #form-wrapper #id_soft {
     width: unset;
     display: inline;
-    margin-right: 3px;
-    margin-left: 0;
+    margin: 0 3px;
     transform: translateY(1px);
 }
 #form-wrapper label[for='id_soft'] {
@@ -133,7 +124,6 @@
 
 
 #form-wrapper #due-date-input-container {
-    position: relative;
     display: flex;
     align-items: center;
 }
@@ -142,13 +132,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 12px;
-    height: 12px;
+    width: 15px;
+    aspect-ratio: 1/1;
     border-radius: 50%;
-    background-color: black;
+    background-color: var(--color);
     cursor: pointer;
     margin-left: 5px;
-    transform: translateX(var(--form-field-margin-left)) translateX(var(--vertical-form-padding)) translateX(var(--due-date-text-width, -100vw));
+    transform: translateX(var(--vertical-form-padding)) translateX(var(--due-date-text-width, -100vw));
 }
 #form-wrapper #due-date-input-container #due-date-empty::after {
     content: '';
@@ -161,9 +151,9 @@
 }
 #form-wrapper #due-date-input-container .due-date-empty-icon-slash {
     width: 2px;
-    height: 8px;
+    height: 10px;
     position: absolute;
-    background-color: white;
+    background-color: var(--body-background);
 }
 #form-wrapper #due-date-text-measurer {
     visibility: hidden;
@@ -184,18 +174,11 @@
     opacity: 0;
 }
 #form-wrapper .field-wrapper label[for='id_x']::after {
-    right: calc(var(--soft-label-width) - 10px);
-}
-#form-wrapper #advanced-inputs {
-    border-bottom: 1px solid;
-    padding-top: 20px;
-    cursor: pointer;
-    width: 149px;
-    margin: 25px auto 0;
+    right: calc(var(--soft-label-width) + 24px);
 }
 #form-wrapper input, #form-wrapper textarea {
     margin-top: 2px;
-    padding: var(--vertical-form-padding) 4px;
+    padding: var(--vertical-form-padding) var(--horizontal-form-padding);
 }
 #form-wrapper #submit-assignment-button {
     width: calc(100% - 140px);

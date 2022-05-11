@@ -377,9 +377,7 @@ class Crud {
         });
         $("#id_soft").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
-        "after").css({
-            marginRight: 9,
-        })
+        "after");
     }
     styleErrors() {
         const that = this;

@@ -57,11 +57,11 @@
                 {% if field.name == "x" %}
                   <div id="due-date-text-measurer"></div>
                   <span id="due-date-input-container">
-                    {{ field }}
                     <div id="due-date-empty">
                       <span class="due-date-empty-icon-slash x-first-slash"></span>
                       <span class="due-date-empty-icon-slash x-second-slash"></span>
                     </div>
+                    {{ field }}
                   </span>
                 {% else %}
                   {{ field }}
@@ -74,15 +74,6 @@
                 {% endif %}
               {% endfor %}
             </div>
-            {% if field.name == "y" %}
-              <div id="advanced-inputs" tabindex="0">
-                Advanced Inputs
-                <svg width="15px" height="10px">
-                  <polygon points="10,2.5 0,2.5 5,7.5">
-                  </polygon>
-                </svg>
-              </div>
-            {% endif %}
           {% endfor %}
         </div>
         <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
