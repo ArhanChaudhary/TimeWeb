@@ -79,6 +79,7 @@ main form > :not(.field-group) + .field-group {
     user-select: none;
     /* position "Clear image" text */
     z-index: 1;
+    transition: all 0.1s ease-in-out;
 }
 [type="checkbox"] ~ label:not([for*="-clear_"]):hover {
     filter: brightness(0.91);
