@@ -78,6 +78,7 @@ header.animate::after {
 }
 #hide-button {
     margin-right: 5px;
+    margin-left: 5px;
 }
 .hide-info {
     height: 0;
