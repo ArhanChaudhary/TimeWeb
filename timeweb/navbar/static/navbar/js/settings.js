@@ -50,10 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
     JSONToTextarea($("#id_default_dropdown_tags"));
     $("#id_default_dropdown_tags").expandableTextareaHeight();
     setTimeout(function() {
-        $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-        });
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
 
@@ -65,6 +61,9 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#submit-settings-button").val("Submitting...");
         alreadyHasSubmitted = true;
     });
+
+    // https://github.com/wilsonzlin/minify-html/issues/71
+    $("option:not([value])").attr("value", "");
 });
 $(window).resize(function() {
     $("main form fieldset").each(function() {
@@ -72,7 +71,13 @@ $(window).resize(function() {
         $(this).css("transition-duration", $(this).height()/600 + "s");
         $(this).css("height", $(this).height());
     });
-}).one("load", () => $(window).trigger("resize"));
+}).one("load", function() {
+    $(window).trigger("resize");
+    $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+    });
+});
 function textareaToJSON($textarea) {
     let $textareaVal = $textarea.val();
     if ($textareaVal) {
