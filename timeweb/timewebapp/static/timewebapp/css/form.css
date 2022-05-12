@@ -1,13 +1,16 @@
 #form-wrapper form {
     display: flex;
     flex-flow: column;
-
+    --vertical-form-padding: 5px;
+    --horizontal-form-padding: 4px;
+    --error-note-color: hsl(353deg, 77%, 50%);
 }
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
 #form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {
     border-color: var(--input-focus-color);
+    outline: 0;
 }
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
@@ -19,7 +22,7 @@
     position: absolute;
     color: var(--form-placeholder-color);
     font-size: 12px;
-    right: var(--horizontal-form-padding);
+    right: calc(var(--horizontal-form-padding) + 2px);
     bottom: -25px;
 }
 #form-wrapper input::-webkit-datetime-edit {
@@ -43,8 +46,6 @@
     border-radius: 15px;
     padding: 5px 15px 25px;
     position: relative;
-    --vertical-form-padding: 5px;
-    --horizontal-form-padding: 4px;
 }
 #form-wrapper #cancel-button {
     position: absolute;
@@ -180,13 +181,15 @@
     margin-top: 2px;
     padding: var(--vertical-form-padding) var(--horizontal-form-padding);
 }
+#form-wrapper .info-button::after {
+    transform: scale(2);
+}
 #form-wrapper #submit-assignment-button {
-    width: calc(100% - 140px);
-    margin: 10px auto 0;
-    display: block;
-    padding: 20px 45px;
+    align-self: center;
+    padding: 20px 72px;
     font-size: 19px;
-    background: rgb(238, 238, 238);
+    --background-color: rgb(238, 238, 238); 
+    background-color: var(--background-color);
 }
 #form-wrapper #submit-assignment-button:hover {
     background: rgb(229, 229, 229);
@@ -196,12 +199,12 @@
     transform: translateY(1px);
 }
 #form-wrapper .invalid {
-    border-color: rgb(226, 30, 54);
+    border-color: var(--error-note-color);
 }
-#form-wrapper .error-note {
+#form-wrapper .assignment-form-error-note {
     text-align: center;
     font-size: 13px;
-    color: rgb(226, 30, 54);
+    color: var(--error-note-color);
 }
 #overlay {
     overflow: auto;

@@ -5,8 +5,11 @@ body {
     --body-background: rgb(33, 33, 33);
     --primary-c: 48;
     --c: 213;
-    --input-focus-color: rgb(35, 116, 215);
+    --input-focus-color: hsl(213, 77%, 50%);
     --form-placeholder-color: rgb(168, 168, 168);
+}
+#form-wrapper #submit-assignment-button {
+    --background-color: rgb(40, 40, 40);
 }
 #id_assignment_sorting {
     color: rgb(var(--c), var(--c), var(--c));

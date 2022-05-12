@@ -352,10 +352,9 @@ class Crud {
 
             If you're unsure how to split up your assignment, divide it up into units of time instead by entering "Minute" or "Hour"`, 
         "after").css({
-            marginBottom: -14,
             float: 'right',
             left: -15,
-            bottom: 20,
+            bottom: 23,
         });
         $("#id_works").info('left',
             `The following is only relevant if you're re-entering this field
@@ -365,7 +364,7 @@ class Crud {
             marginBottom: -14,
             float: 'right',
             left: -15,
-            bottom: 20,
+            bottom: 23,
         });
         $("#id_funct_round").info('left',
             "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)",
@@ -373,7 +372,7 @@ class Crud {
             marginBottom: -14,
             float: 'right',
             left: -15,
-            bottom: 20,
+            bottom: 23,
         });
         $("#id_soft").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,

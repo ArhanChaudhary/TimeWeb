@@ -413,10 +413,11 @@ nav:focus-within {
 }
 #break-days-wrapper .break-days-label {
     cursor: pointer;
-    background: white;
+    font-size: 13px;
+    background: var(--body-background);
     display: inline-block;
     flex-grow: 1;
-    border: 1px solid black;
+    border-left: 1px solid black;
     padding: 4px;
     -webkit-user-select: none;
        -moz-user-select: none;
