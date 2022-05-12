@@ -55,7 +55,6 @@
               {% else %}
                 {{ field.label_tag }}
                 {% if field.name == "x" %}
-                  <div id="due-date-text-measurer"></div>
                   <span id="due-date-input-container">
                     <div id="due-date-empty">
                       <span class="due-date-empty-icon-slash x-first-slash"></span>
@@ -63,6 +62,7 @@
                     </div>
                     {{ field }}
                   </span>
+                  <div id="due-date-text-measurer"></div>
                 {% else %}
                   {{ field }}
                 {% endif %}

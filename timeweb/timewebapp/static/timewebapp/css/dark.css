@@ -5,11 +5,16 @@ body {
     --body-background: rgb(33, 33, 33);
     --primary-c: 48;
     --c: 213;
-    --input-focus-color: hsl(213, 77%, 50%);
+    --input-focus-color: hsl(210deg, 71%, 57%);
     --form-placeholder-color: rgb(168, 168, 168);
 }
 #form-wrapper #submit-assignment-button {
-    --background-color: rgb(40, 40, 40);
+    --background-color-default: rgb(40, 40, 40);
+    --background-color-hover: rgb(43, 43, 43);
+    --background-color-active: rgb(37, 37, 37);
+}
+#form-wrapper #submit-assignment-button {
+    border-color: black;
 }
 #id_assignment_sorting {
     color: rgb(var(--c), var(--c), var(--c));
@@ -33,15 +38,15 @@ body {
     --background-color: rgb(50, 50, 50);
 }
 .tag-add-button::after {
-    --box-shadow-color1: rgb(171, 171, 171);
-    --box-shadow-color2: rgb(211, 211, 211);
-    --box-shadow-color3: rgb(187, 53, 53);
+    --box-shadow-color-default: rgb(171, 171, 171);
+    --box-shadow-color-focus: rgb(211, 211, 211);
+    --box-shadow-color-invalid: rgb(187, 53, 53);
 }
 .tag-add-button:focus:not(:hover)::after {
-    box-shadow: 0 0 3px 2px var(--box-shadow-color2);
+    box-shadow: 0 0 3px 2px var(--box-shadow-color-focus);
 }
 .tag-add-button.tag-add-red-box-shadow::after {
-    box-shadow: 0 0 5px 2px var(--box-shadow-color3);
+    box-shadow: 0 0 5px 2px var(--box-shadow-color-invalid);
 }
 .tag-add-button > .icon-slash {
     --background-color: rgb(192, 192, 192);
@@ -78,6 +83,17 @@ body {
     --background-color: var(--body-background);
     --box-shadow-color: rgb(103, 103, 103);
 }
+
+/* .available for higher priority */
+.daterangepicker td:not(.active).available:hover,
+.daterangepicker th.available:hover {
+    background-color: rgb(77, 77, 77);
+}
+.daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect {
+    background: revert;
+    border: revert;
+}
+
 .jconfirm.jconfirm-light .jconfirm-box {
     box-shadow: none !important;
     border: 1px solid rgb(123, 123, 123);
