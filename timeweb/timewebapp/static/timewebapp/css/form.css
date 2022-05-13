@@ -173,15 +173,18 @@
 #form-wrapper .field-wrapper label[for='id_x']::after {
     right: calc(var(--soft-label-width) + 18px);
 }
-#form-wrapper input, #form-wrapper textarea {
+#form-wrapper input,
+#form-wrapper textarea {
     padding: var(--vertical-form-padding) var(--horizontal-form-padding);
     /* Style meant to be overwritten */
     border: none;
 }
-/* Positioning is a little weird here for forwards compatibility with the due date field */
-#form-wrapper .field-wrapper > label + * {
+#form-wrapper .field-wrapper > input,
+#form-wrapper .field-wrapper > textarea,
+#break-days-wrapper,
+#due-date-input-container {
     margin-top: 2px;
-
+    
     --background-color: white;
     background-color: var(--background-color);
     box-sizing: border-box; 
