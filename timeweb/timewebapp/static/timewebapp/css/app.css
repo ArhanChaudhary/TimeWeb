@@ -591,7 +591,7 @@ a[href="/settings"] {
     opacity: 1;
     height: unset;
     overflow: visible;
-    border: 1px solid gray;
+    border: 1px solid hsl(0, 0%, 50%);
 }
 .tag-add-overflow-hidden-container {
     overflow: hidden;
@@ -685,7 +685,7 @@ a[href="/settings"] {
     margin-left: auto;
     width: calc(100% - 10px);
     height: 1px;
-    background-color: gray;
+    background-color: hsl(0, 0%, 50%);
 }
 .tag-add-selection-item-name {
     word-break: break-word;

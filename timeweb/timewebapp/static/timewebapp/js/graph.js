@@ -518,7 +518,7 @@ class VisualAssignment extends Assignment {
         screen.scale(this.scale, this.scale);
         let gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
         gradient.addColorStop(0, "white");
-        gradient.addColorStop(1, "lightgray");
+        gradient.addColorStop(1, "hsl(0, 0%, 83%)");
         screen.fillStyle = gradient;
         screen.fillRect(0, 0, this.width, this.height * 4 / 3);
 

@@ -255,7 +255,7 @@ nav {
     background: var(--background-color);
     position: relative;
     z-index: 1;
-    box-shadow: -5px 0 5px -5px gray;
+    box-shadow: -5px 0 5px -5px hsl(0, 0%, 50%);
 }
 rect {
     fill: white;
@@ -409,7 +409,7 @@ nav:focus-within {
     display: none !important;
 }
 #break-days-wrapper input:checked + .break-days-label {
-    background: grey;
+    background: hsl(0, 0%, 50%);
 }
 #break-days-wrapper .break-days-label {
     cursor: pointer;

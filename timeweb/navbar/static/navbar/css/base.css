@@ -37,7 +37,7 @@ body {
 }
 #table-of-contents-container {
     height: 100%;
-    box-shadow: 0 0 6px 2px gray;
+    box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
     overflow-y: scroll;
     overflow-y: overlay;
@@ -45,7 +45,7 @@ body {
 #table-of-contents-container-label {
     display: none;
     bottom: 5px;
-    box-shadow: 6px 2px 6px -4px gray;
+    box-shadow: 6px 2px 6px -4px hsl(0, 0%, 50%);
 }
 #table-of-contents-container, #table-of-contents-container-label {
     width: 300px;
@@ -185,7 +185,7 @@ details > .img-ignore-padding-container {
     margin-bottom: 2em;
 }
 details > .img-ignore-padding-container img {
-    filter: drop-shadow(0 9px 10px gray);
+    filter: drop-shadow(0 9px 10px hsl(0, 0%, 50%));
     --image-margin: 20px;
     max-height: 600px;
     max-width: calc(100% + var(--container-padding-left) + var(--container-padding-right) - 2 * var(--image-margin));

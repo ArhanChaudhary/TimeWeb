@@ -127,7 +127,7 @@ textarea
 }
 @-webkit-keyframes animateLoading {
     from {
-        background: gray;
+        background: hsl(0, 0%, 50%);
     }
     to {
         background: inherit;
@@ -135,7 +135,7 @@ textarea
 }
 @keyframes animateLoading {
     from {
-        background: gray;
+        background: hsl(0, 0%, 50%);
     }
     to {
         background: inherit;
