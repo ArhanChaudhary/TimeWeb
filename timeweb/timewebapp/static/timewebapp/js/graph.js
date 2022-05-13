@@ -329,6 +329,9 @@ class VisualAssignment extends Assignment {
         new Priority().sort();
     }
     static getCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
+    getDefaultFontColor() {
+        return this.fixed_graph.css("filter") === "none" ? "black" : "white";
+    }
     //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
@@ -376,7 +379,7 @@ class VisualAssignment extends Assignment {
 
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";
-        screen.fillStyle = this.fixed_graph.css("filter") ? "white" : "black";
+        screen.fillStyle = this.getDefaultFontColor();
         screen.textBaseline = "top";
         screen.font = VisualAssignment.getCanvasFont(13.75);
         if (!this.sa.needs_more_info) {
@@ -467,7 +470,7 @@ class VisualAssignment extends Assignment {
             screen.fill();
             screen.lineWidth = 2;
             screen.stroke();
-            screen.fillStyle = this.fixed_graph.css("filter") ? "white" : "black";
+            screen.fillStyle = this.getDefaultFontColor();
         }
         
         screen.textAlign = "center";
