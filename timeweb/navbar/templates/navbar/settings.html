@@ -54,12 +54,9 @@
                         </span>
                         <span class="right-side-of-field">
                             {% if field.name == "def_break_days" %}
-                                <span id="break-days-wrapper">
-                                    {% for value, text in field.field.choices %}
-                                        <input id="id_def_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in form.initial|get_def_break_days %}checked="checked"{% endif %}>
-                                        <label tabindex="0" class="break-days-label" for="id_def_break_days_{{ forloop.counter0 }}">{{ text }}</label>
-                                    {% endfor %}
-                                </span>
+                                {% with "Tue Fri" as br_days %}
+                                    {% include 'timewebapp/widgets/work_days.html' with br_days=br_days.split %}
+                                {% endwith %}
                             {% else %}
                                 {% for error in field.errors %}
                                     <h3 class="error-note">{{ error|escape }}</h3>

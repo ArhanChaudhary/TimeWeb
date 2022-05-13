@@ -1,0 +1,11 @@
+<span id="break-days-wrapper">
+    {% for value, text in field.field.choices %}
+        <input id="id_def_break_days_{{ forloop.counter0 }}" name="{{ field.name }}" type="checkbox" value="{{ value }}" {% if value in form.initial|get_def_break_days %}checked="checked"{% endif %}>
+        <label tabindex="0" class="break-days-label" for="id_def_break_days_{{ forloop.counter0 }}">
+            <span class="weekday-text">{{ text }}</span>
+        </label>
+        {% if text in br_days %}
+            <div class="br"></div>
+        {% endif %}
+    {% endfor %}
+</span>
