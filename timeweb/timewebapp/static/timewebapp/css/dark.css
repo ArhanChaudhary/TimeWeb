@@ -16,6 +16,9 @@ body {
 #form-wrapper #submit-assignment-button {
     border-color: black;
 }
+#form-wrapper #due-date-input-container {
+    background: hsl(0deg, 0%, 19%);
+}
 #id_assignment_sorting {
     color: rgb(var(--c), var(--c), var(--c));
     background-color: black;

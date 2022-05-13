@@ -75,7 +75,7 @@
     padding: 0 4px;
 }
 #form-wrapper #fields-wrapper {
-    --soft-label-width: 64px;
+    --soft-label-width: 68px;
     position: relative;
 }
 #form-wrapper .field-wrapper {
@@ -95,17 +95,10 @@
     display: block;
     position: relative;
 }
-#form-wrapper input, #form-wrapper textarea {
-    box-sizing: border-box; 
-    display: block;
-    width: 100%;
-    border: 2px solid var(--color);
-    border-radius: 3px;
-}
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
     transform: translateY(-54px);
-    right: 10px;
+    right: 11px;
 }
 #form-wrapper #id_soft {
     width: unset;
@@ -119,6 +112,7 @@
 }
 #form-wrapper #id_x {
     width: calc(100% - 20px - var(--soft-label-width));
+    border-right: 1px solid black;
 }
 
 
@@ -175,14 +169,23 @@
     opacity: 0;
 }
 #form-wrapper .field-wrapper label[for='id_x']::after {
-    right: calc(var(--soft-label-width) + 26px);
+    right: calc(var(--soft-label-width) + 18px);
 }
 #form-wrapper input, #form-wrapper textarea {
     padding: var(--vertical-form-padding) var(--horizontal-form-padding);
+    /* Style meant to be overwritten */
+    border: none;
 }
 /* Positioning is a little weird here for forwards compatibility with the due date field */
 #form-wrapper .field-wrapper > label + * {
     margin-top: 2px;
+
+    --background-color: white;
+    background-color: var(--background-color);
+    box-sizing: border-box; 
+    width: 100%;
+    border: 2px solid var(--color);
+    border-radius: 3px;
 }
 #form-wrapper .info-button::after {
     transform: scale(2);
@@ -191,6 +194,7 @@
     align-self: center;
     padding: 20px 72px;
     color: var(--color);
+    margin-top: 10px;
     font-size: 19px;
     --background-color-default: rgb(238, 238, 238);
     --background-color-hover: rgb(229, 229, 229);
