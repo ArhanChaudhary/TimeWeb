@@ -409,24 +409,28 @@ nav:focus-within {
     display: none !important;
 }
 #break-days-wrapper input:checked + .break-days-label {
-    background: hsl(0, 0%, 50%);
+    background-color: hsl(0, 0%, 91%);
+    text-decoration: line-through;
+    color: hsl(0, 0%, 60%);
+}
+#break-days-wrapper input + .break-days-label:hover {
+    backdrop-filter: brightness(0.95);
+}
+#break-days-wrapper .break-days-label:first-of-type {
+    border-left: unset;
 }
 #break-days-wrapper .break-days-label {
     cursor: pointer;
     font-size: 13px;
-    background: var(--body-background);
-    display: inline-block;
     flex-grow: 1;
-    border-left: 1px solid black;
-    padding: 4px;
+    border-left: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
-    transition: transform .3s cubic-bezier(.23,.77,.11,1.94);
-}
-#break-days-wrapper .break-days-label:active {
-    transform: translateY(1px);
 }
 #changelog-container {
     padding: 0 10px;

@@ -353,7 +353,7 @@ class Crud {
             If you're unsure how to split up your assignment, divide it up into units of time instead by entering "Minute" or "Hour"`, 
         "after").css({
             float: 'right',
-            left: -15,
+            left: -7,
             bottom: 23,
         });
         $("#id_works").info('left',
@@ -363,7 +363,7 @@ class Crud {
         "after").css({
             marginBottom: -14,
             float: 'right',
-            left: -15,
+            left: -7,
             bottom: 23,
         });
         $("#id_funct_round").info('left',
@@ -371,7 +371,7 @@ class Crud {
         "after").css({
             marginBottom: -14,
             float: 'right',
-            left: -15,
+            left: -7,
             bottom: 23,
         });
         $("#id_soft").info('left',

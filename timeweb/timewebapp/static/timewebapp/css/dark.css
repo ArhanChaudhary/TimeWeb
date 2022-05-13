@@ -19,6 +19,16 @@ body {
 #form-wrapper #due-date-input-container {
     background: hsl(0deg, 0%, 19%);
 }
+#form-wrapper .field-wrapper > label + * {
+    --background-color: hsl(0, 0%, 24%);
+}
+#break-days-wrapper input:checked + .break-days-label {
+    background-color: hsl(0, 0%, 8%);
+    color: hsl(0, 0%, 40%);
+}
+#break-days-wrapper input + .break-days-label:hover {
+    backdrop-filter: brightness(1.4);
+}
 #id_assignment_sorting {
     color: rgb(var(--c), var(--c), var(--c));
     background-color: black;

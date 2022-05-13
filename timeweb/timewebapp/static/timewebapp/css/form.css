@@ -8,7 +8,9 @@
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
-#form-wrapper input:focus, #form-wrapper label:focus, #form-wrapper textarea:focus {
+#form-wrapper input:focus,
+#form-wrapper label:not(.break-days-label):focus,
+#form-wrapper textarea:focus {
     border-color: var(--input-focus-color);
     outline: 0;
 }
@@ -112,7 +114,7 @@
 }
 #form-wrapper #id_x {
     width: calc(100% - 20px - var(--soft-label-width));
-    border-right: 1px solid black;
+    border-right: inherit;
 }
 
 
@@ -232,5 +234,5 @@
 #break-days-wrapper {
     display: flex;
     justify-content: space-between;
-    margin: 0 10px;
+    height: 32px;
 }
