@@ -28,7 +28,8 @@
     $.fn.expandableTextareaHeight = function() {
         $(this).on("input", function() {
             $(this).css("height", "auto"); // Needed for expanding with text
-            $(this).css("height", $(this).prop("scrollHeight") + parseFloat($(this).css("padding-top")));
+            // Dunno where +2 comes from but it works
+            $(this).css("height", $(this).prop("scrollHeight") + 2);
         });
         return $(this);
     }

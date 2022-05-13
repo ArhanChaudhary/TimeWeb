@@ -238,7 +238,7 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    height: 32px;
+    height: 30px;
 }
 #break-days-wrapper input {
     display: none !important;
