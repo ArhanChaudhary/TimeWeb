@@ -548,8 +548,8 @@ class VisualAssignment extends Assignment {
             if (screen.measureText(text).width > this.height - 50) {
                 text = pluralize(this.sa.unit);
             }
-            screen.textBaseline = "hanging";
-            screen.fillText(text, -(this.height - 50) / 2, 1);
+            // screen.textBaseline = "hanging" is EVIL (it really messes up positioning on different browsers)
+            screen.fillText(text, -(this.height - 50) / 2, 15);
             screen.rotate(Math.PI / 2);
         }
 
