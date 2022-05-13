@@ -54,15 +54,15 @@ class SettingsModel(models.Model):
         null=True,
         verbose_name=_('Default Minimum Daily Work Time'),
     )
-    def_due_time = models.TimeField(
-        default=get_midnight_time,
-        verbose_name=_('Default Due Time'),
-    )
     def_break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True,
         verbose_name=_('Default Work Days'),
+    )
+    def_due_time = models.TimeField(
+        default=get_midnight_time,
+        verbose_name=_('Default Due Time'),
     )
 
     # Group "Assignment Graph"
