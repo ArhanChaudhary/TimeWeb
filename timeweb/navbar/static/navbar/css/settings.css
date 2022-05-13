@@ -67,7 +67,7 @@ main form > :not(.field-group) + .field-group {
     flex: 1;
     text-align: center;
 }
-[type="checkbox"] ~ label {
+[type="checkbox"] ~ label:not(.break-days-label) {
     position: relative;
     border: 2px solid rgb(92, 195, 199);
     background-color: white;
@@ -81,17 +81,17 @@ main form > :not(.field-group) + .field-group {
     z-index: 1;
     transition: all 0.1s ease-in-out;
 }
-[type="checkbox"] ~ label:not([for*="-clear_"]):hover {
+[type="checkbox"] ~ label:not(.break-days-label):not([for*="-clear_"]):hover {
     filter: brightness(0.91);
 }
 [type="checkbox"] ~ label[for*="-clear_"]:hover::before {
     background-color: rgb(84, 177, 181);
 }
-[type="checkbox"] ~ label:hover:active {
+[type="checkbox"] ~ label:not(.break-days-label):hover:active {
     box-shadow: 0 0 11px -1px rgb(187, 187, 187);
     filter: none;
 }
-[type="checkbox"] ~ label::before {
+[type="checkbox"] ~ label:not(.break-days-label)::before {
     content: '';
     position: absolute;
     z-index: -1;
@@ -121,6 +121,27 @@ main form > :not(.field-group) + .field-group {
     display: flex;
     gap: 10px;
     flex-flow: row-reverse;
+}
+#break-days-wrapper {
+    flex-wrap: wrap;
+    height: revert;
+    border-radius: 0;
+    border-color: inherit;
+}
+#break-days-wrapper .br + input + .break-days-label {
+    border-left: unset;
+}
+#break-days-wrapper > .br {
+    flex-basis: 100%;
+    height: 0;
+}
+#break-days-wrapper > .br ~ :not(.br) {
+    border-top: inherit;
+}
+#break-days-wrapper .break-days-label {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 14px;
 }
 #reset-settings-button, #submit-settings-button {
     font-size: 20px;

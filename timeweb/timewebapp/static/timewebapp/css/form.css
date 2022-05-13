@@ -99,7 +99,7 @@
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
-    transform: translateY(-54px);
+    transform: translateY(-52px);
     right: 11px;
 }
 #form-wrapper #id_soft {
@@ -176,6 +176,7 @@
 #form-wrapper input,
 #form-wrapper textarea {
     padding: var(--vertical-form-padding) var(--horizontal-form-padding);
+    width: 100%;
     /* Style meant to be overwritten */
     border: none;
 }
@@ -188,8 +189,7 @@
     --background-color: white;
     background-color: var(--background-color);
     box-sizing: border-box; 
-    width: 100%;
-    border: 2px solid var(--color);
+    border: 1px solid var(--color);
     border-radius: 3px;
 }
 #form-wrapper .info-button::after {
@@ -237,5 +237,36 @@
 #break-days-wrapper {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
     height: 32px;
+}
+#break-days-wrapper input {
+    display: none !important;
+}
+#break-days-wrapper input:checked + .break-days-label {
+    background-color: hsl(0, 0%, 91%);
+    text-decoration: line-through hsl(0, 0%, 35%);
+    color: hsl(0, 0%, 40%);
+}
+#break-days-wrapper input:not(:checked) + .break-days-label:hover {
+    backdrop-filter: brightness(0.97);
+}
+#break-days-wrapper input:first-of-type + .break-days-label {
+    border-left: unset;
+}
+#break-days-wrapper .break-days-label {
+    cursor: pointer;
+    font-size: 13px;
+    flex-grow: 1;
+    border-left: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+#break-days-wrapper .break-days-label:active .weekday-text {
+    transform: translateY(1px);
 }

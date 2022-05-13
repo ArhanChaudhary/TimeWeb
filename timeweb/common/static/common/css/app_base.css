@@ -404,34 +404,6 @@ nav:focus-within {
     left: calc(100% + 12px);
 }
 
-
-#break-days-wrapper input {
-    display: none !important;
-}
-#break-days-wrapper input:checked + .break-days-label {
-    background-color: hsl(0, 0%, 91%);
-    text-decoration: line-through;
-    color: hsl(0, 0%, 60%);
-}
-#break-days-wrapper input + .break-days-label:hover {
-    backdrop-filter: brightness(0.95);
-}
-#break-days-wrapper .break-days-label:first-of-type {
-    border-left: unset;
-}
-#break-days-wrapper .break-days-label {
-    cursor: pointer;
-    font-size: 13px;
-    flex-grow: 1;
-    border-left: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
-}
 #changelog-container {
     padding: 0 10px;
 }

@@ -3,6 +3,8 @@
 
 {% block css %}
     <link rel="stylesheet" href="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.css" crossorigin="anonymous"/>
+    {% comment %} Order of these stylesheets matters {% endcomment %}
+    <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
     <link rel="stylesheet" href="{% static 'navbar/css/settings.css' %}">
 {% endblock css %}
 
