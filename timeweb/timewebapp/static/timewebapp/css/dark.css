@@ -2,16 +2,16 @@ html {
     color-scheme: dark;
 }
 body {
-    --body-background: rgb(33, 33, 33);
+    --body-background: hsl(0, 0%, 13%);
     --primary-c: 48;
     --c: 213;
     --input-focus-color: hsl(210deg, 71%, 57%);
     --form-placeholder-color: rgb(168, 168, 168);
 }
 #form-wrapper #submit-assignment-button {
-    --background-color-default: rgb(40, 40, 40);
-    --background-color-hover: rgb(43, 43, 43);
-    --background-color-active: rgb(37, 37, 37);
+    --background-color-default: hsl(0, 0%, 16%);
+    --background-color-hover: hsl(0, 0%, 17%);
+    --background-color-active: hsl(0, 0%, 15%);
 }
 #form-wrapper #submit-assignment-button {
     border-color: black;
@@ -30,12 +30,12 @@ body {
     --background-color: rgb(86, 116, 129);
 }
 .tag-add-box {
-    --background-color: rgb(37, 37, 37);
-    --box-shadow-color: rgba(81, 81, 81, 0.65);
-    --input-background-color: rgb(27, 27, 27);
+    --background-color: hsl(0, 0%, 15%);
+    --box-shadow-color: hsla(0, 0%, 32%, 0.65);
+    --input-background-color: hsl(0, 0%, 11%);
 }
 .tag-add-button {
-    --background-color: rgb(50, 50, 50);
+    --background-color: hsl(0, 0%, 20%);
 }
 .tag-add-button::after {
     --box-shadow-color-default: rgb(171, 171, 171);
@@ -52,7 +52,7 @@ body {
     --background-color: rgb(192, 192, 192);
 }
 .tag-add-selection-item::after {
-    --background-color: rgb(49, 49, 49);
+    --background-color: hsl(0, 0%, 19%);
 }
 .tag-add-selection-item.checked::after {
     --background-color: rgb(34, 83, 99);
@@ -74,7 +74,7 @@ body {
     filter: invert(1) hue-rotate(180deg);
 }
 .graph-footer > * {
-    --background-color: rgb(68, 68, 68);
+    --background-color: hsl(0, 0%, 27%);
 }
 .graph-footer ::placeholder {
     color: rgb(163, 163, 163);
@@ -87,7 +87,7 @@ body {
 /* .available for higher priority */
 .daterangepicker td:not(.active).available:hover,
 .daterangepicker th.available:hover {
-    background-color: rgb(77, 77, 77);
+    background-color: hsl(0, 0%, 30%);
 }
 .daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect {
     background: revert;

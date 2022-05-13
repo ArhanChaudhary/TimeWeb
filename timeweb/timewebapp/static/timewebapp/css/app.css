@@ -608,8 +608,8 @@ a[href="/settings"] {
     background-color: var(--background-color);
 }
 .tag-add-button::after {
-    --box-shadow-color-default: rgb(60, 60, 60);
-    --box-shadow-color-focus: rgb(30, 30, 30);
+    --box-shadow-color-default: hsl(0, 0%, 24%);
+    --box-shadow-color-focus: hsl(0, 0%, 12%);
     --box-shadow-color-invalid: rgb(170, 0, 0);
 
     content: '';
