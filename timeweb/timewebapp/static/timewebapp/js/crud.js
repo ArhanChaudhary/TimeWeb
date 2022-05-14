@@ -380,10 +380,6 @@ class Crud {
     }
     styleErrors() {
         const that = this;
-        // Style errors if form is invalid
-        $("#form-wrapper .error-note").each(function() {
-            $(this).siblings("input, textarea").addClass("invalid");
-        });
         if ($("#id_x.invalid").length) {
             // Subtract one more px for minor positioning issues
             $(".field-wrapper#id-soft-field-wrapper").css("margin-top", `-=${$("#error_id_x").height()+1}`);

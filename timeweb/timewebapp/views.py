@@ -323,6 +323,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form
         self.add_user_models_to_context(request)
+        for field in self.form.errors:
+            self.form[field].field.widget.attrs['class'] = self.form[field].field.widget.attrs.get('class', "") + 'invalid'
         return super().get(request)
 
 EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)

@@ -215,7 +215,8 @@
     --background-color: var(--background-color-active);
     transform: translateY(1px);
 }
-#form-wrapper .invalid {
+/* .field-wrapper for specificity */
+#form-wrapper .field-wrapper .invalid {
     border-color: var(--error-note-color);
 }
 #form-wrapper .assignment-form-error-note {
