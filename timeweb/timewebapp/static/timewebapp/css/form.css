@@ -81,8 +81,9 @@
     position: relative;
 }
 #form-wrapper .field-wrapper {
-    padding-top: 13px;
-    padding-bottom: 13px;
+    --vertical-field-padding: 13px;
+    padding-top: var(--vertical-field-padding);
+    padding-bottom: var(--vertical-field-padding);
 }
 #form-wrapper .field-wrapper.hide-field {
     transition: margin-top 0.4s ease-in-out, opacity 0.6s ease-in-out 0.1s;
@@ -101,7 +102,9 @@
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
     position: absolute;
-    transform: translateY(-52px);
+    padding: 0;
+    margin-top: var(--vertical-field-padding);
+    transform: translateY(100%) translateY(var(--vertical-form-padding)) translateY(1px); /* the widget is literally 1px off when it in theory should align perfectly for some reason */
     right: 11px;
 }
 #form-wrapper #id_soft {

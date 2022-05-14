@@ -40,6 +40,10 @@ class TimewebModel(models.Model):
         blank=True,
         verbose_name=_('Date Assigned'),
     )
+    # Soft must be before in the assignment form for positioning
+    soft = models.BooleanField(
+        default=False,
+    )
     x = models.DateTimeField(
         null=True,
         blank=True,
@@ -48,9 +52,6 @@ class TimewebModel(models.Model):
     due_time = models.TimeField(
         null=True,
         blank=True,
-    )
-    soft = models.BooleanField(
-        default=False,
     )
     y = models.DecimalField(
         null=True,

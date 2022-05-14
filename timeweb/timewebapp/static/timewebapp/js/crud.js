@@ -117,7 +117,6 @@ class Crud {
         });
         that.setCrudHandlers();
         that.addInfoButtons();
-        setTimeout(that.styleErrors, 0);
 
         if ($(".assignment-form-error-note").length) {
             that.showForm({ show_instantly: true })
@@ -344,13 +343,6 @@ class Crud {
         $("#id_soft").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
         "after");
-    }
-    styleErrors() {
-        const that = this;
-        if ($("#id_x.invalid").length) {
-            // Subtract one more px for minor positioning issues
-            $(".field-wrapper#id-soft-field-wrapper").css("margin-top", `-=${$("#error_id_x").height()+1}`);
-        }
     }
     // Delete assignment
     transitionDeleteAssignment(dom_assignment) {
