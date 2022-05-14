@@ -134,7 +134,7 @@ class Crud {
             $("#fields-wrapper").css("height", unscrolled_height + (scrolled_height - unscrolled_height) * scroll_percentage);
         });
 
-        if ($(".error-note").length) {
+        if ($(".assignment-form-error-note").length) {
             that.showForm({ show_instantly: true })
         } else {
             that.hideForm({ hide_instantly: true });
@@ -168,12 +168,12 @@ class Crud {
         const that = this;
         if (params.hide_instantly) {
             $("#overlay").hide().children("#form-wrapper");
-            $(".error-note, .invalid").remove(); // Remove all error notes when form is exited
+            $(".assignment-form-error-note").remove(); // Remove all error notes when form is exited
         } else {
             $("#overlay").fadeOut(Crud.FORM_ANIMATION_DURATION, function() {
                 // Remove all error notes when form is exited
                 $(".invalid").removeClass("invalid");
-                $(".error-note").remove();
+                $(".assignment-form-error-note").remove();
             }).children("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
         // Fallback if "overlay" doesn't exist
