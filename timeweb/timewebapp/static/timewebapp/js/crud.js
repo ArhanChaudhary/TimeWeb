@@ -117,22 +117,7 @@ class Crud {
         });
         that.setCrudHandlers();
         that.addInfoButtons();
-        setTimeout(() => {
-            that.styleErrors();
-            // For when you enter more total units already completed than there are in the assignment
-            if (that.invalidOnlyInAdvanced() || !!$("#id_y.invalid").length && !!$("#id_works.invalid").length) {
-                $("#form-wrapper #advanced-inputs").click();
-            }
-        }, 0);
-
-        // Place the handler before showForm so the .trigger("scroll") inside of it works
-        $("#fields-wrapper").scroll(function() {
-            let scroll_percentage = this.scrollTop / (this.scrollHeight - this.clientHeight) || 0;
-
-            const unscrolled_height = +$(this).attr("unscrolled-height");
-            const scrolled_height = +$(this).attr("scrolled-height");
-            $("#fields-wrapper").css("height", unscrolled_height + (scrolled_height - unscrolled_height) * scroll_percentage);
-        });
+        setTimeout(that.styleErrors, 0);
 
         if ($(".assignment-form-error-note").length) {
             that.showForm({ show_instantly: true })
@@ -159,10 +144,6 @@ class Crud {
         that.old_unit_value = undefined;
         $("#id-time_per_unit-field-wrapper").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight());
         that.replaceUnit();    
-
-        if (that.invalidOnlyInAdvanced()) {
-            $("#form-wrapper #advanced-inputs").click();
-        }
     }
     hideForm(params={hide_instantly: false}) {
         const that = this;
@@ -203,20 +184,6 @@ class Crud {
             $("#id_funct_round").val(5);
         }
         that.old_unit_value = val;
-        $("#fields-wrapper").attr("unscrolled-height", 
-            Math.ceil(
-                $("#advanced-inputs").position().top +
-                $("#advanced-inputs").outerHeight() + 
-                $("#fields-wrapper").scrollTop() + 1 + 3 // +1 to show the line under "Advanced Inputs"
-            )
-        );
-        $("#fields-wrapper").attr("scrolled-height", 
-            $("#fields-wrapper > .field-wrapper:last").position().top + 
-            $("#fields-wrapper > .field-wrapper:last").outerHeight() - 
-            $("#form-wrapper #advanced-inputs").position().top -
-            parseFloat($("#fields-wrapper > .field-wrapper:last").css("padding-top"))
-        );
-        $("#fields-wrapper").trigger("scroll");
     }
     setCrudHandlers() {
         const that = this;
@@ -242,7 +209,7 @@ class Crud {
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
-                $.merge($("#form-wrapper #advanced-inputs").prevAll(), $("#form-wrapper #id-funct_round-field-wrapper")).each(function() {
+                $("#form-wrapper .field-wrapper").each(function() {
                     const input = $(this).children("input");
                     input.toggleClass("invalid", !input.val());
                 });
@@ -354,7 +321,7 @@ class Crud {
         "after").css({
             float: 'right',
             left: -7,
-            bottom: 23,
+            bottom: 22,
         });
         $("#id_works").info('left',
             `The following is only relevant if you're re-entering this field
@@ -364,7 +331,7 @@ class Crud {
             marginBottom: -14,
             float: 'right',
             left: -7,
-            bottom: 23,
+            bottom: 22,
         });
         $("#id_funct_round").info('left',
             "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)",
@@ -372,7 +339,7 @@ class Crud {
             marginBottom: -14,
             float: 'right',
             left: -7,
-            bottom: 23,
+            bottom: 22,
         });
         $("#id_soft").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
@@ -438,12 +405,6 @@ class Crud {
                 ajaxUtils.error(...arguments);
             }
         });
-    }
-    invalidOnlyInAdvanced() {
-        const that = this;
-        return !!$("#form-wrapper .invalid").first().parents(".field-wrapper").prevAll().filter(function() {
-            return $(this).is("#form-wrapper #advanced-inputs");
-        }).length;
     }
 }
 $(window).one("load", function() {
