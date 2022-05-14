@@ -133,7 +133,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'timewebapp.context_processors.append_default_context'
+                'timewebapp.views.append_default_context'
             ],
         },
     },

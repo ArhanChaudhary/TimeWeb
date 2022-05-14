@@ -54,6 +54,15 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
                 instance.user_permissions.add(permission)
             instance.save()
 
+def append_default_context(request):
+    return {
+        "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
+        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_JSON["name"],
+        "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
+        "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
+        "DEBUG": settings.DEBUG,
+    }
+
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
