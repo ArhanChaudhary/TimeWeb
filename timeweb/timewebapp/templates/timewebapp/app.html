@@ -42,8 +42,9 @@
         <div id="new-title">{{submit}}</div>
         <div id="fields-wrapper">
           {% csrf_token %}
+          {% with add_widgets="y min_work_time" %}
           {% for field in form.visible_fields %}
-            <div class="field-wrapper" id="id-{{ field.name }}-field-wrapper">
+              <div class="field-wrapper {% if field.name in add_widgets.split %} has-widget {% endif %}" id="id-{{ field.name }}-field-wrapper">
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Work Days</label>
                 {% include 'timewebapp/widgets/work_days.html' %}
@@ -62,6 +63,9 @@
                   {{ field }}
                 {% endif %}
               {% endif %}
+              {% if field.name in add_widgets.split %}
+                  <div class="field-widget">Minutes</div>
+              {% endif %}
               {% for error in field.errors %}
                 {% comment %} Only adds form errors to the name field in the example account {% endcomment %}
                 {% if user.email != EXAMPLE_ACCOUNT_EMAIL or field.name == "name" %}
@@ -70,6 +74,7 @@
               {% endfor %}
             </div>
           {% endfor %}
+          {% endwith %}
         </div>
         <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
       </form>

@@ -286,8 +286,8 @@ class Crud {
             );
 
             $.alert({
-                title: `Your step size has been automatically changed from ${original_funct_round} to ${$("#id_funct_round").val()}`,
-                content: "This is to prevent you from unnecessarily working longer than your minimum work time to ensure a smoother work schedule. The step size can be edited and overridden in the advanced inputs.",
+                title: `This assignment's step size has been automatically changed from ${original_funct_round} to ${$("#id_funct_round").val()}`,
+                content: "This helps prevent you from unnecessarily working longer than your minimum work time and ensures a smoother work schedule. The step size can be edited and overridden in the advanced inputs.",
                 onClose: function() {
                     alert_already_shown = true;
                 }
@@ -314,9 +314,7 @@ class Crud {
         $("#id_unit").info('left',
             `This is how your assignment will be split and divided up
             
-            e.g: If this assignment is reading a book, enter "Page" or "Chapter"
-
-            If you're unsure how to split up your assignment, divide it up into units of time instead by entering "Minute" or "Hour"`, 
+            e.g: If this assignment is reading a book, enter "Page" or "Chapter"`, 
         "after").css({
             float: 'right',
             left: -7,

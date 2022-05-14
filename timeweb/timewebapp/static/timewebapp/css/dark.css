@@ -8,6 +8,9 @@ body {
     --input-focus-color: hsl(210deg, 71%, 57%);
     --form-placeholder-color: rgb(168, 168, 168);
 }
+#form-wrapper form {
+    --field-widget-background-color: hsl(0deg, 0%, 19%);
+}
 #form-wrapper #submit-assignment-button {
     --background-color-default: hsl(0, 0%, 16%);
     --background-color-hover: hsl(0, 0%, 17%);
@@ -15,9 +18,6 @@ body {
 }
 #form-wrapper #submit-assignment-button {
     border-color: black;
-}
-#form-wrapper #due-date-input-container {
-    background: hsl(0deg, 0%, 19%);
 }
 #form-wrapper .field-wrapper > label + * {
     --background-color: hsl(0, 0%, 24%);
