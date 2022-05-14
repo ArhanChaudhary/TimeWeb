@@ -83,6 +83,8 @@
 #form-wrapper .field-wrapper {
     padding-top: 13px;
     padding-bottom: 13px;
+}
+#form-wrapper .field-wrapper.hide-field {
     transition: margin-top 0.4s ease-in-out, opacity 0.6s ease-in-out 0.1s;
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
