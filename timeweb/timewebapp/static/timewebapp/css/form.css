@@ -101,6 +101,7 @@
     position: relative;
 }
 #form-wrapper .field-wrapper#id-soft-field-wrapper {
+    z-index: 1;
     position: absolute;
     padding: 0;
     margin-top: var(--vertical-field-padding);
