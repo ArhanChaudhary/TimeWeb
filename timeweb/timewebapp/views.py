@@ -152,8 +152,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     def valid_form(self, request):
         if self.created_assignment:
             self.sm = self.form.save(commit=False)
-            if not self.sm.unit:
-                self.sm.unit = "Minute"
+
             # Set defaults
             self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
             # first_work is works[0]
@@ -178,7 +177,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.due_time = self.form.cleaned_data.get("due_time")
             self.sm.soft = self.form.cleaned_data.get("soft")
-            self.sm.unit = self.form.cleaned_data.get("unit") or "Minute"
+            self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
             if isinstance(self.sm.y, (int, float)) and self.sm.y < 1:
                 # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
@@ -189,11 +188,19 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
+        if not self.sm.unit:
+            if self.form.cleaned_data.get(f"y{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}"):
+                self.sm.unit = "Hour"
+            else:
+                self.sm.unit = "Minute"
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
-            print(field, self.form.cleaned_data.get(f"{field}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}"))
-            setattr(self.sm, field, getattr(self.sm, field) * (
-                60 if self.form.cleaned_data.get(f"{field}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}") else 1
-            ))
+            if field == "y": continue
+            try:
+                setattr(self.sm, field, getattr(self.sm, field) * (
+                    60 if self.form.cleaned_data.get(f"{field}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}") else 1
+                ))
+            except TypeError:
+                pass
         if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit or not self.sm.funct_round:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list

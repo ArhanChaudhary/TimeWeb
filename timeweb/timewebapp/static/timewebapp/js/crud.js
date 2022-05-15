@@ -141,8 +141,7 @@ class Crud {
         }
         $("main").css("overflow-y", "hidden");
         that.old_unit_value = undefined;
-        $("#id-time_per_unit-field-wrapper").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight());
-        that.replaceUnit();    
+        that.replaceUnit();
     }
     hideForm(params={hide_instantly: false}) {
         const that = this;
@@ -162,27 +161,38 @@ class Crud {
     }
     replaceUnit() {
         const that = this;
-        const val = $("#id_unit").val().trim();
-        const plural = val ? pluralize(val) : "Minutes",
-            singular = val ? pluralize(val, 1) : "Minute";
-        $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
-        $("label[for='id_time_per_unit']").text(`Estimated number of Minutes to complete each ${singular}`);
+        const val = $("#id_unit").val().trim() || window.getComputedStyle($("#id_y ~ .field-widget")[0], "::after").content.slice(1, -1);
+        const plural = pluralize(val),
+            singular = pluralize(val, 1);
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
-        if (val) {
+        if (["minute", "hour"].includes(singular.toLowerCase())) {
+            $("label[for='id_y']").text(`How Long will this Assignment take to Complete`);
+            $("label[for='id_works']").text(`How Long have you Already Worked`);
+            
+            $("#id-time_per_unit-field-wrapper").addClass("hide-field");
+            $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
+
+            if (singular.toLowerCase() === "minute") {
+                $("#id_time_per_unit").val(1);
+                $("#id_funct_round").val(5);
+            } else if (singular.toLowerCase() === "hour") {
+                $("#id_time_per_unit").val(60);
+                $("#id_funct_round").val(1);
+            }
+        } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
-            if (that.old_unit_value === "") {
+            $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
+            $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
+            
+            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
+            $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
+
+            if (["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id_time_per_unit").val("");
                 $("#id_funct_round").val(1);
             }
-            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
-            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
-        } else {
-            $("label[for='id_y']").text(`How Long will this Assignment take to Complete`);
-            $("#id-time_per_unit-field-wrapper").addClass("hide-field");
-            $("#id_time_per_unit").val(1);
-            $("#id_funct_round").val(5);
         }
-        that.old_unit_value = val;
+        that.old_unit_value = singular.toLowerCase();
     }
     setCrudHandlers() {
         const that = this;
@@ -244,7 +254,18 @@ class Crud {
 
         // Arrow function to preserve this
         $("#form-wrapper #cancel-button").click(() => that.hideForm());
-        $("#id_unit").on('input', () => that.replaceUnit());
+        $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
+        $(".field-widget-checkbox").on('input', function() {
+            let widget_input = $(this).prevAll("input:first");
+            if (!widget_input.val()) return;
+            if ($(this).is(":checked")) {
+                widget_input.val(Math.round(
+                    widget_input.val() / 60
+                * 100) / 100);
+            } else {
+                widget_input.val(Math.round(widget_input.val() * 60));
+            }
+        });
         $("#id_description").expandableTextareaHeight();
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
@@ -316,16 +337,6 @@ class Crud {
             
             e.g: If this assignment is reading a book, enter "Page" or "Chapter"`, 
         "after").css({
-            float: 'right',
-            left: -7,
-            bottom: 22,
-        });
-        $("#id_works").info('left',
-            `The following is only relevant if you're re-entering this field
-
-            This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`,
-        "after").css({
-            marginBottom: -14,
             float: 'right',
             left: -7,
             bottom: 22,
