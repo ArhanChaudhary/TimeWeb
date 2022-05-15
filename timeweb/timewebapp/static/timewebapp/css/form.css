@@ -112,7 +112,9 @@
     flex-wrap: wrap;
     justify-content: center;
 }
-#form-wrapper .field-wrapper.has-widget > label:not(.field-widget) {
+/* For ensuring flexbox line breaks */
+#form-wrapper .field-wrapper.has-widget > label:not(.field-widget),
+#form-wrapper .assignment-form-error-note {
     width: 100%;
 }
 #form-wrapper .field-wrapper.has-widget > input {
