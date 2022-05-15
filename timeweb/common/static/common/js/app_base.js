@@ -48,7 +48,8 @@ $(function() {
         if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
             activeElement.click();
         }
-    }).on("show.daterangepicker", function(e, picker) {
+    });
+    $("input").on("show.daterangepicker", function(e, picker) {
         // There's a random invisible datepicker, so only query the one that's visible
         const minuteselect = picker.container.find(".minuteselect:visible");
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
