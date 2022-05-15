@@ -19,7 +19,9 @@ body {
 #form-wrapper #submit-assignment-button {
     border-color: black;
 }
-#form-wrapper .field-wrapper > label + * {
+#form-wrapper .field-wrapper > input,
+#form-wrapper .field-wrapper > textarea,
+#break-days-wrapper {
     --background-color: hsl(0, 0%, 24%);
 }
 #break-days-wrapper input:checked + .break-days-label {

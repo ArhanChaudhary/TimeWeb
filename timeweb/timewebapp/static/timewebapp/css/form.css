@@ -36,6 +36,7 @@
 }
 #form-wrapper label[for='id_x']::after {
     content: '(Predicted if left empty)';
+    right: 89px;
 }
 #form-wrapper label[for='id_assignment_date']::after {
     content: "(Enter today if you don't remember)";
@@ -78,10 +79,13 @@
     padding: 0 4px;
 }
 #form-wrapper #fields-wrapper {
-    --soft-label-width: 70px;
     position: relative;
 }
 #form-wrapper .field-wrapper {
+    /* for positioning */
+    width: 100%;
+    position: relative;
+
     --vertical-field-padding: 13px;
     padding-top: var(--vertical-field-padding);
     padding-bottom: var(--vertical-field-padding);
@@ -101,28 +105,6 @@
     display: block;
     position: relative;
 }
-#form-wrapper .field-wrapper#id-soft-field-wrapper {
-    z-index: 1;
-    position: absolute;
-    padding: 0;
-    margin-top: var(--vertical-field-padding);
-    transform: translateY(100%) translateY(var(--vertical-form-padding)) translateY(1px); /* the widget is literally 1px off when it in theory should align perfectly for some reason */
-    right: 11px;
-}
-#form-wrapper #id_soft {
-    width: unset;
-    display: inline;
-    margin: 0 3px;
-    transform: translateY(1px);
-}
-#form-wrapper label[for='id_soft'] {
-    display: inline;
-    margin: unset;
-}
-#form-wrapper #id_x {
-    width: calc(100% - 20px - var(--soft-label-width));
-    border-right: inherit;
-}
 
 
 #form-wrapper .field-wrapper.has-widget {
@@ -139,7 +121,7 @@
     border-top-right-radius: unset;
     border-bottom-right-radius: unset;
 }
-#form-wrapper .field-widget-checkbox {
+#form-wrapper .field-widget-checkbox:not(#id_soft) {
     position: absolute;
     left: -100vw;
 }
@@ -162,7 +144,7 @@
 #form-wrapper .field-widget-checkbox:checked ~ .field-widget::after {
     content: "Hours";
 }
-#form-wrapper .field-widget::before {
+#form-wrapper .field-widget:not([for="id_soft"])::before {
     content: "in: ";
     position: absolute;
     right: 100%;
@@ -224,10 +206,7 @@
     position: relative;
     opacity: 0;
 }
-#form-wrapper .field-wrapper label[for='id_x']::after {
-    right: calc(var(--soft-label-width) + 18px);
-}
-#form-wrapper input,
+#form-wrapper input:not(.field-widget-checkbox),
 #form-wrapper textarea {
     padding: var(--vertical-form-padding) var(--horizontal-form-padding);
     width: 100%;

@@ -293,8 +293,6 @@ nav:focus-within {
     display: inline-block;
     cursor: default !important;
     position: relative;
-    bottom: 1px;
-    left: 4px;
     width: 14px;
     height: 14px;
     border-radius: 50%;

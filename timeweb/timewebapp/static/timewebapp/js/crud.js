@@ -338,9 +338,11 @@ class Crud {
             left: -7,
             bottom: 22,
         });
-        $("#id_soft").info('left',
+        $("label[for=\"id_soft\"]").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
-        "after");
+        "append").css({
+            marginLeft: 4,
+        });
     }
     // Delete assignment
     transitionDeleteAssignment(dom_assignment) {
