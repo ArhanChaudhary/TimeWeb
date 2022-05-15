@@ -174,13 +174,10 @@
 
 
 
-#form-wrapper #due-date-input-container {
-    display: flex;
-    align-items: center;
-    background-color: var(--field-widget-background-color);
-}
-#form-wrapper #due-date-input-container #due-date-empty {
+#form-wrapper #due-date-empty {
     position: absolute;
+    left: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -190,9 +187,11 @@
     background-color: var(--color);
     cursor: pointer;
     margin-left: 5px;
-    transform: translateX(var(--vertical-form-padding)) translateX(var(--due-date-text-width, -100vw));
+    transform: translateX(var(--vertical-form-padding))
+                translateX(var(--due-date-text-width, -100vw))
+                translateY(-22px);
 }
-#form-wrapper #due-date-input-container #due-date-empty::after {
+#form-wrapper #due-date-empty::after {
     content: '';
     position: absolute;
     top: 0;
@@ -201,7 +200,7 @@
     height: 100%;
     transform: scale(4);
 }
-#form-wrapper #due-date-input-container .due-date-empty-icon-slash {
+#form-wrapper .due-date-empty-icon-slash {
     width: 2px;
     height: 8px;
     position: absolute;
@@ -238,8 +237,7 @@
 #form-wrapper .field-wrapper > input,
 #form-wrapper .field-wrapper > .field-widget,
 #form-wrapper .field-wrapper > textarea,
-#break-days-wrapper,
-#due-date-input-container {
+#break-days-wrapper {
     margin-top: 2px;
     border: 1px solid var(--color);
     box-sizing: border-box; 
