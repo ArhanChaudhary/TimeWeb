@@ -9,9 +9,9 @@
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
-#form-wrapper input:focus,
-#form-wrapper label:not(.break-days-label):focus,
-#form-wrapper textarea:focus {
+/* Needed for s */
+#form-wrapper .field-wrapper > input:focus,
+#form-wrapper .field-wrapper > textarea:focus {
     border-color: var(--input-focus-color);
     outline: 0;
 }
