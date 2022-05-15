@@ -141,7 +141,7 @@
 }
 #form-wrapper .field-widget-checkbox {
     position: absolute;
-    visibility: hidden;
+    left: -100vw;
 }
 #form-wrapper .field-widget {
     cursor: pointer;

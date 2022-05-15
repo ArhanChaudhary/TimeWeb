@@ -63,7 +63,7 @@
                 {% endif %}
               {% endif %}
               {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %}
-                <input type="checkbox" class="field-widget-checkbox" id="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}" 
+                <input type="checkbox" class="field-widget-checkbox" id="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}" tabindex="-1"
                       name="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}" {% if form|get_widget_field_status:field.name %}checked="checked"{% endif %}>
                 <label class="field-widget" for="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}"></label>
               {% endif %}
