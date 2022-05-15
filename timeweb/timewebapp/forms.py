@@ -3,10 +3,14 @@ from .models import TimewebModel
 from django.utils.translation import ugettext_lazy as _
 import datetime
 
+
 class TimewebForm(forms.ModelForm):
+
     class Meta:
         model = TimewebModel
         fields = "__all__"
+        ADD_CHECKBOX_WIDGET_FIELDS = ["y", "min_work_time"]
+        CHECKBOX_WIDGET_FIELD_NAME_EXTENSION = "-widget-checkbox"
         widgets = {
             'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'due_time': forms.HiddenInput(),
@@ -81,6 +85,8 @@ class TimewebForm(forms.ModelForm):
             kwargs['data']['x'] = kwargs['data']['x'].split(" ", 1)[0]
 
         super().__init__(*args, **kwargs)
+        for field_name in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
+            self.fields[f"{field_name}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}"] = forms.BooleanField(widget=forms.HiddenInput(), required=False)
         self.label_suffix = ""
 
     def clean(self):

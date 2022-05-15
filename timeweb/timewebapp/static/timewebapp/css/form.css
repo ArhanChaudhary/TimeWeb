@@ -21,7 +21,7 @@
 #form-wrapper ::placeholder {
     color: var(--form-placeholder-color);
 }
-#form-wrapper label::after {
+#form-wrapper label:not(.field-widget)::after {
     position: absolute;
     color: var(--form-placeholder-color);
     font-size: 12px;
@@ -130,7 +130,7 @@
     flex-wrap: wrap;
     justify-content: center;
 }
-#form-wrapper .field-wrapper.has-widget > label {
+#form-wrapper .field-wrapper.has-widget > label:not(.field-widget) {
     width: 100%;
 }
 #form-wrapper .field-wrapper.has-widget > input {
@@ -138,6 +138,10 @@
     flex-grow: 1;
     border-top-right-radius: unset;
     border-bottom-right-radius: unset;
+}
+#form-wrapper .field-widget-checkbox {
+    position: absolute;
+    visibility: hidden;
 }
 #form-wrapper .field-widget {
     cursor: pointer;
@@ -151,6 +155,12 @@
     border-top-left-radius: unset !important;
     border-bottom-left-radius: unset !important;
     --background-color: var(--field-widget-background-color) !important;
+}
+#form-wrapper .field-widget-checkbox:not(:checked) ~ .field-widget::after {
+    content: "Minutes";
+}
+#form-wrapper .field-widget-checkbox:checked ~ .field-widget::after {
+    content: "Hours";
 }
 #form-wrapper .field-widget::before {
     content: "in: ";

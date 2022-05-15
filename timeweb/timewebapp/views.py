@@ -61,6 +61,8 @@ def append_default_context(request):
         "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
+        "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
+        "CHECKBOX_WIDGET_FIELD_NAME_EXTENSION": TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION,
     }
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
@@ -184,6 +186,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
+        for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
+            print(field, self.form.cleaned_data.get(f"{field}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}"))
+            setattr(self.sm, field, getattr(self.sm, field) * (
+                60 if self.form.cleaned_data.get(f"{field}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}") else 1
+            ))
         if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit or not self.sm.funct_round:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
