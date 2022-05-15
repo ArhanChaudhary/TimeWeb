@@ -95,7 +95,7 @@ class Priority {
                     params.dom_assignment.addClass("transition-instantly");
                 }
                 if (isNaN(params.priority_percentage)) {
-                    params.dom_assignment.prop("style").removeProperty("--priority-color");
+                    params.dom_assignment.prop("style").setProperty("--priority-color", "var(--color)");
                 } else {
                     const priority_color = that.percentageToColor(params.priority_percentage);
                     params.dom_assignment.prop("style").setProperty("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
@@ -851,7 +851,7 @@ class Priority {
                 that.colorOrAnimateInAssignment({
                     dom_assignment,
                     mark_as_done: priority_data.mark_as_done,
-                    is_element_submitted: true,
+                    is_element_submitted: false,
                     priority_percentage,
                     first_sort: that.params.first_sort,
                 });
