@@ -58,7 +58,7 @@ class TimewebModel(models.Model):
         blank=True,
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(1,_("This field's value can't be less than %(limit_value)s"))],
+        validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
     )
     blue_line_start = models.IntegerField(
         blank=True,

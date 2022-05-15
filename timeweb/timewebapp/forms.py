@@ -25,7 +25,7 @@ class TimewebForm(forms.ModelForm):
             'user': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
-            'y': forms.NumberInput(attrs={"min":"1"}),
+            'y': forms.NumberInput(attrs={"min":"0"}),
             'time_per_unit': forms.NumberInput(attrs={"min":"0"}),
             'description': forms.Textarea(attrs={"rows": "1"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),

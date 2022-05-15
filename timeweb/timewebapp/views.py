@@ -180,6 +180,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit") or "Minute"
             self.sm.y = self.form.cleaned_data.get("y")
+            if isinstance(self.sm.y, (int, float)) and self.sm.y < 1:
+                # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
+                self.sm.y = 1
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
