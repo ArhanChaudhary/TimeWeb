@@ -30,7 +30,10 @@ body {
     color: hsl(0, 0%, 40%);
 }
 #break-days-wrapper input:not(:checked) + .break-days-label:hover {
-    backdrop-filter: brightness(1.3);
+    background-color: hsl(0, 0%, 31%);
+}
+#form-wrapper .field-widget:hover {
+    --field-widget-background-color: hsl(0, 0%, 27%);
 }
 #id_assignment_sorting {
     color: rgb(var(--c), var(--c), var(--c));

@@ -133,6 +133,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
     padding-right: 6px;
     padding-left: 6px;
     border-left: none !important;
@@ -284,7 +285,10 @@
     color: hsl(0, 0%, 40%);
 }
 #break-days-wrapper input:not(:checked) + .break-days-label:hover {
-    backdrop-filter: brightness(0.97);
+    background-color: hsl(0, 0%, 97%);
+}
+#form-wrapper .field-widget:hover {
+    --field-widget-background-color: hsl(0, 0%, 93%);
 }
 #break-days-wrapper input:first-of-type + .break-days-label {
     border-left: unset;
