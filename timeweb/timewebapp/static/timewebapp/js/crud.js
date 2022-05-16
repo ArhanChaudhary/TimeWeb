@@ -351,17 +351,16 @@ class Crud {
             
             e.g: If this assignment is reading a book, enter "Page" or "Chapter"`, 
         "after").css({
-            float: 'right',
-            left: -7,
-            bottom: 22,
+            marginTop: -22,
+            marginLeft: "auto",
+            marginRight: 7,
         });
         $("#id_funct_round").info('left',
             "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)",
         "after").css({
-            marginBottom: -14,
-            float: 'right',
-            left: -7,
-            bottom: 22,
+            marginTop: -22,
+            marginLeft: "auto",
+            marginRight: 7,
         });
         $("label[for=\"id_soft\"]").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,

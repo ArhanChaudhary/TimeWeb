@@ -87,6 +87,9 @@
     width: 100%;
     position: relative;
 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     --vertical-field-padding: 13px;
     padding-top: var(--vertical-field-padding);
     padding-bottom: var(--vertical-field-padding);
@@ -107,14 +110,8 @@
     position: relative;
 }
 
-
-#form-wrapper .field-wrapper.has-widget {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
 /* For ensuring flexbox line breaks */
-#form-wrapper .field-wrapper.has-widget > label:not(.field-widget),
+#form-wrapper .field-wrapper > label:not(.field-widget),
 #form-wrapper .assignment-form-error-note {
     width: 100%;
 }
@@ -272,6 +269,7 @@
     display: none;
 }
 #break-days-wrapper {
+    flex-grow: 1;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
