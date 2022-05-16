@@ -43,10 +43,9 @@ main form > :not(.field-group) + .field-group {
     display: block;
 }
 [type="checkbox"] ~ label[for*="-clear_"]::before {
-    width: 100%;
+    width: 100% !important;
 }
 [type="checkbox"]:not(:checked) ~ label[for*="-clear_"]::before {
-    transform: unset;
     transform: scaleX(0);
 }
 [type="checkbox"]:checked ~ label[for*="-clear_"]::before {
