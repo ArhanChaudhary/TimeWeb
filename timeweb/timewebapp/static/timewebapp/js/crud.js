@@ -169,7 +169,7 @@ class Crud {
             $("label[for='id_y']").text(`How Long will this Assignment take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
             
-            $("#id-time_per_unit-field-wrapper").addClass("hide-field");
+            $("#id-time_per_unit-field-wrapper, #id-funct_round-field-wrapper").addClass("hide-field");
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
 
             if (singular.toLowerCase() === "minute") {
@@ -184,7 +184,7 @@ class Crud {
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
-            $("#id-time_per_unit-field-wrapper").removeClass("hide-field");
+            $("#id-time_per_unit-field-wrapper, #id-funct_round-field-wrapper").removeClass("hide-field");
             $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
 
             if (["minute", "hour"].includes(that.old_unit_value)) {
