@@ -79,8 +79,33 @@
     margin-bottom: -0.25em;
     padding: 0 4px;
 }
+#form-wrapper #field-group-picker {
+    display: flex;
+    margin-top: 10px;
+}
+#form-wrapper #field-group-picker .field-group-picker-label {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 #form-wrapper #fields-wrapper {
     position: relative;
+    overflow: hidden;
+    display: flex;
+    --field-group-gap: 20px;
+    gap: var(--field-group-gap);
+}
+#form-wrapper .field-group {
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transition: margin 0.5s ease-in-out;
+}
+#form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
+    margin-left: calc(-100% - var(--field-group-gap));
+}
+#form-wrapper #fields-wrapper.show-standard #second-field-group {
 }
 #form-wrapper .field-wrapper {
     /* for positioning */

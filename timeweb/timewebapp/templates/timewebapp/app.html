@@ -40,10 +40,23 @@
         <img id="cancel-button" width="20" height="20" src="{% static 'timewebapp/images/x.webp' %}" alt="cancel" draggable="false" tabindex="0">
         <div id="new-title-line"></div>
         <div id="new-title">{{submit}}</div>
+        <input id="field-group-picker-checkbox" type="checkbox" hidden>
+        <label id="field-group-picker" for="field-group-picker-checkbox">
+          <span class="field-group-picker-label" id="standard-field-group-label">Standard</span>
+          <span class="field-group-picker-label" id="advanced-field-group-label">Advanced</span>
+        </label>
         <div id="fields-wrapper">
           {% csrf_token %}
           {% for field in form.visible_fields %}
-              <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}" id="id-{{ field.name }}-field-wrapper">
+
+            {% if field.name == "name" %}
+              <div class="field-group" id="first-field-group">
+            {% elif field.name == "unit" %}
+              </div>
+              <div class="field-group" id="second-field-group">
+            {% endif %}
+
+            <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}" id="id-{{ field.name }}-field-wrapper">
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Work Days</label>
                 {% include 'timewebapp/widgets/work_days.html' %}
@@ -81,6 +94,7 @@
               {% endfor %}
             </div>
           {% endfor %}
+          </div>
         </div>
         <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
       </form>
