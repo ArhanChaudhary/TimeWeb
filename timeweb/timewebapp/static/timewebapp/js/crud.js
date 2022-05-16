@@ -166,26 +166,28 @@ class Crud {
             singular = pluralize(val, 1);
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
-            $("label[for='id_y']").text(`How Long will this Assignment take to Complete`);
+            $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
             
-            $("#id-time_per_unit-field-wrapper, #id-funct_round-field-wrapper").addClass("hide-field");
+            $("#id-time_per_unit-field-wrapper").addClass("hide-field");
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
 
             if (singular.toLowerCase() === "minute") {
-                $("#id_time_per_unit").val(1);
-                $("#id_funct_round").val(5);
+                $("#id-funct_round-field-wrapper").addClass("hide-field");
+                // $("#id_time_per_unit").val(1);
+                // $("#id_funct_round").val(5);
             } else if (singular.toLowerCase() === "hour") {
-                $("#id_time_per_unit").val(60);
-                $("#id_funct_round").val(1);
+                $("#id-funct_round-field-wrapper").removeClass("hide-field");
+                // $("#id_time_per_unit").val(60);
+                // $("#id_funct_round").val(1);
             }
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
-            $("#id-time_per_unit-field-wrapper, #id-funct_round-field-wrapper").removeClass("hide-field");
-            $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
+            $(".hide-field").removeClass("hide-field");
+            $(".has-widget").removeClass("has-widget");
 
             if (["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id_time_per_unit").val("");
