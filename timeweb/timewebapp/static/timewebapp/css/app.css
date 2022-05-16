@@ -167,7 +167,8 @@ a[href="/settings"] {
     opacity: 0.65;
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly::before {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly::before,
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .relative-positioning-wrapper {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
