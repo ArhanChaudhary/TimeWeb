@@ -157,7 +157,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
             # first_work is works[0]
             # Convert this to a decimal object because it can be a float
-            first_work = Decimal(str(self.sm.works))
+            first_work = Decimal(str(self.sm.works) or 0)
             self.sm.user = request.user
         elif self.updated_assignment:
             self.sm = get_object_or_404(TimewebModel, pk=self.pk)
