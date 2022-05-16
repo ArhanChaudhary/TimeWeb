@@ -4,11 +4,18 @@ main form {
     font-size: 17px;
     max-width: 1000px;
 }
-main form > :not(.field-group) + .field-group {
-    margin-top: unset;
+body {
+    --body-background: hsl(0, 0%, 93%);
 }
 .field-group {
     margin: 40px 0 19px;
+    border: 1px solid var(--color);
+    background-color: hsl(0, 0%, 96%);
+    padding: 15px;
+    border-radius: 15px;
+}
+.field-group .field-container:last-child {
+    margin-bottom: initial;
 }
 .field-group-label {
     font-weight: 700;

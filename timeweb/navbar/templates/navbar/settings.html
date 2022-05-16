@@ -44,10 +44,8 @@
                         {% endif %}
                     </span>
                 {% endif %}
-                <div class="field-container">
-                    {% if field.name == "assignment_sorting" %}
-                        {{ field.as_hidden }}
-                    {% else %}
+                {% if field.name != "assignment_sorting" %}
+                    <div class="field-container">
                         <span class="left-side-of-field">
                             {{ field.label }}
                             {% if field.help_text %}
@@ -72,10 +70,11 @@
                                 {% endif %}
                             {% endif %}
                         </span>
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
         {% endfor %}
         </div>
+        {{ form.assignment_sorting.as_hidden }}
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
