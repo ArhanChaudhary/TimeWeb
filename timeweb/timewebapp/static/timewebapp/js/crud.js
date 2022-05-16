@@ -138,6 +138,7 @@ class Crud {
         const that = this;
         setTimeout(function() {
             $("#id_description").trigger("input");
+            $("#id_x").trigger("hide.daterangepicker");
         }, 0);
         if (params.show_instantly) {
             $('#overlay').show().children("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
