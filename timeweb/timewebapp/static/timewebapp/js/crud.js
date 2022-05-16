@@ -187,7 +187,7 @@ class Crud {
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
             $(".hide-field").removeClass("hide-field");
-            $(".has-widget").removeClass("has-widget");
+            $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
 
             if (["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id_time_per_unit").val("");
