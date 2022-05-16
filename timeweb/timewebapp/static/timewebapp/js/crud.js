@@ -172,14 +172,15 @@ class Crud {
             $("#id-time_per_unit-field-wrapper").addClass("hide-field");
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
 
+            // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
+            // This is to make the form more smooth and less unpredictable (i.e. if you set a step size to some value with 
+            // some unit of work, clear the unit of work, and re-enter the same thing, the step size would have changed to
+            // 1 or 5 instead of what was originally entered)
+
             if (singular.toLowerCase() === "minute") {
                 $("#id-funct_round-field-wrapper").addClass("hide-field");
-                // $("#id_time_per_unit").val(1);
-                // $("#id_funct_round").val(5);
             } else if (singular.toLowerCase() === "hour") {
                 $("#id-funct_round-field-wrapper").removeClass("hide-field");
-                // $("#id_time_per_unit").val(60);
-                // $("#id_funct_round").val(1);
             }
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
