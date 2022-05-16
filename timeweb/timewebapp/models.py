@@ -88,10 +88,6 @@ class TimewebModel(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
     )
-    works = models.JSONField(
-        default=list_with_zero,
-        blank=True,
-    )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -99,6 +95,10 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
         verbose_name=_('Step Size'),
+    )
+    works = models.JSONField(
+        default=list_with_zero,
+        blank=True,
     )
     min_work_time = models.DecimalField(
         max_digits=15,
