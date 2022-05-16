@@ -62,7 +62,6 @@ def append_default_context(request):
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
-        "CHECKBOX_WIDGET_FIELD_NAME_EXTENSION": TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION,
     }
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
@@ -189,7 +188,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
         if not self.sm.unit:
-            if self.form.cleaned_data.get(f"y{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}"):
+            if self.form.cleaned_data.get(f"y-widget-checkbox"):
                 self.sm.unit = "Hour"
             else:
                 self.sm.unit = "Minute"
@@ -204,7 +203,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if field == "y": continue
             try:
                 setattr(self.sm, field, getattr(self.sm, field) * (
-                    60 if self.form.cleaned_data.get(f"{field}{TimewebForm.Meta.CHECKBOX_WIDGET_FIELD_NAME_EXTENSION}") else 1
+                    60 if self.form.cleaned_data.get(f"{field}-widget-checkbox") else 1
                 ))
             except TypeError:
                 pass

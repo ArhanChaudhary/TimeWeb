@@ -68,9 +68,9 @@
                       name="{{ form.soft.name }}" {% if form.soft.value %}checked="checked"{% endif %}>
                   </label>
                 {% else %}
-                  <input type="checkbox" class="field-widget-checkbox" id="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}" tabindex="-1"
-                        name="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}" {% if form|get_widget_field_status:field.name %}checked="checked"{% endif %}>
-                  <label class="field-widget" for="{{ field.name }}{{ CHECKBOX_WIDGET_FIELD_NAME_EXTENSION }}"></label>
+                  <input type="checkbox" class="field-widget-checkbox" id="{{ field.name }}-widget-checkbox" tabindex="-1"
+                        name="{{ field.name }}-widget-checkbox" {% if form|get_widget_field_status:field.name %}checked="checked"{% endif %}>
+                  <label class="field-widget" for="{{ field.name }}-widget-checkbox"></label>
                 {% endif %}
               {% endif %}
               {% for error in field.errors %}
