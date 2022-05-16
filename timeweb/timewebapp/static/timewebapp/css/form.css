@@ -163,7 +163,6 @@
 #form-wrapper #due-date-empty {
     position: absolute;
     left: 0;
-    bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -175,7 +174,7 @@
     margin-left: 5px;
     transform: translateX(var(--vertical-form-padding))
                 translateX(var(--due-date-text-width, -100vw))
-                translateY(-22px);
+                translateY(32px);
 }
 #form-wrapper #due-date-empty::after {
     content: '';
