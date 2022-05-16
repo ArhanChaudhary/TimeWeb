@@ -231,7 +231,7 @@ class Crud {
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
-                $("#form-wrapper .field-wrapper").each(function() {
+                $("#form-wrapper .field-wrapper:not(#id-x-field-wrapper)").each(function() {
                     const input = $(this).children("input");
                     input.toggleClass("invalid", !input.val());
                 });
