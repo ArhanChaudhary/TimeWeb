@@ -45,7 +45,9 @@ $(function() {
     $(window).on("focus", () => $(window).trigger("resize"));
     $(document).keypress(function(e) {
         const activeElement = $(document.activeElement);
-        if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */) {
+        if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */
+            // Prevent focused field widgets from toggling on enter form submission
+            && activeElement.attr("tabindex") !== "-1") {
             activeElement.click();
         }
     });
