@@ -9,10 +9,11 @@
 #form-wrapper input[type=number]::-webkit-inner-spin-button {
     display: none;
 }
-/* Needed for s */
+/* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
 #form-wrapper .field-wrapper > textarea:focus {
-    border-color: var(--input-focus-color);
+    border-color: var(--input-focus-color);;
+    box-shadow: inset 0 0 0 1px var(--input-focus-color);
     outline: 0;
 }
 #form-wrapper input:required {
@@ -253,6 +254,7 @@
 /* .field-wrapper for specificity */
 #form-wrapper .field-wrapper .invalid {
     border-color: var(--error-note-color);
+    box-shadow: inset 0 0 0 1px var(--error-note-color);
 }
 #form-wrapper .assignment-form-error-note {
     text-align: center;

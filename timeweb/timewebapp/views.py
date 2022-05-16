@@ -185,7 +185,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
-            self.sm.funct_round = self.form.cleaned_data.get("funct_round")
+            self.sm.funct_round = self.form.cleaned_data.get("funct_round") or Decimal("1")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
         if not self.sm.unit:
@@ -201,7 +201,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 ))
             except TypeError:
                 pass
-        if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit or not self.sm.funct_round:
+        if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
             self.sm.works = [str(first_work)]
