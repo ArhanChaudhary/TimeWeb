@@ -36,14 +36,23 @@ main form > :not(.field-group) + .field-group {
 .right-side-of-field > :not(.error-note) {
     margin: unset;
 }
+.right-side-of-field > input,
+.right-side-of-field > textarea,
+.right-side-of-field > select {
+    font-size: 14px;
+}
 .right-side-of-field > input:not([type="file"]) {
     border: 1px solid black;
 }
 .right-side-of-field > :not(#break-days-wrapper) {
     display: block;
 }
+.right-side-of-field > label[for="background_image-clear_id"] {
+    height: initial !important;
+}
 [type="checkbox"] ~ label[for*="-clear_"]::before {
     width: 100% !important;
+    font-size: 14px;
 }
 [type="checkbox"]:not(:checked) ~ label[for*="-clear_"]::before {
     transform: scaleX(0);
