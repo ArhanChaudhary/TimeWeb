@@ -54,6 +54,16 @@ class Crud {
     static setAssignmentFormFields(formDict) {
         for (let [field, value] of Object.entries(formDict)) {
             if (field === "#id_break_days") continue;
+            if (field === "#id_unit") {
+                const normalized_value = pluralize(value, 1).toLowerCase();
+                if (normalized_value === "minute") {
+                    $("#y-widget-checkbox").prop("checked", false);
+                    continue;
+                } else if (normalized_value === "hour") {
+                    $("#y-widget-checkbox").prop("checked", true);
+                    continue;
+                }
+            }
             
             const field_is_daterangepicker = field.endsWith("_daterangepicker");
             if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
