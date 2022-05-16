@@ -180,7 +180,7 @@ class Crud {
             $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
             
-            $("#id-time_per_unit-field-wrapper").addClass("hide-field");
+            $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight());
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
 
             // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
@@ -189,16 +189,16 @@ class Crud {
             // 1 or 5 instead of what was originally entered)
 
             if (singular.toLowerCase() === "minute") {
-                $("#id-funct_round-field-wrapper").addClass("hide-field");
+                $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight());
             } else if (singular.toLowerCase() === "hour") {
-                $("#id-funct_round-field-wrapper").removeClass("hide-field");
+                $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "");
             }
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
-            $(".hide-field").removeClass("hide-field");
+            $(".hide-field").removeClass("hide-field").css("margin-top", "");
             $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
 
             if (["minute", "hour"].includes(that.old_unit_value)) {
