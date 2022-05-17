@@ -46,6 +46,11 @@ textarea
     line-height: normal;
     margin: revert;
 }
+/* normalize.css uses ::-webkit-file-upload-button instead of ::file-selector-button for some reason */
+::file-selector-button {
+    font: inherit;
+    -webkit-appearance: button;
+}
 
 
 .error-note, .success-note {
