@@ -1,5 +1,4 @@
 class Crud {
-    static FORM_ANIMATION_DURATION = 300
     static getDefaultAssignmentFormFields = _ => ({
         "#id_name": '',
         "#id_assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
@@ -89,6 +88,7 @@ class Crud {
         showDropdowns: true,
         singleDatePicker: true,
     }
+    static FORM_ANIMATION_DURATION = 300
     static FORM_POSITION_TOP = 15
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
@@ -151,7 +151,7 @@ class Crud {
         that.addInfoButtons();
 
         if ($(".assignment-form-error-note").length) {
-            that.showForm({ show_instantly: true })
+            that.showForm({ show_instantly: true });
         } else {
             that.hideForm({ hide_instantly: true });
         }

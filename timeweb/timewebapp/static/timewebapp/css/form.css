@@ -66,12 +66,6 @@
 #form-wrapper #cancel-button:active {
     transform: scale(0.95);
 }
-#form-wrapper #new-title-line {
-    width: calc(100% - 30px);
-    margin-top: 20px;
-    margin-bottom: -21px;
-    border: 1px solid var(--color);
-}
 #form-wrapper #new-title {
     align-self: center;
     background-color: var(--primary);

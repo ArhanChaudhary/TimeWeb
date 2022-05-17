@@ -723,8 +723,7 @@ utils = {
                 if ($(document.activeElement).prop("tagName").toLowerCase() !== "input")
                 switch (e.key) {
                     case "n":
-                        // Fix typing on the assignment form itself
-                        setTimeout(function() {
+                        setTimeout(() => { // Fix typing on the assignment form itself
                             !$("#overlay").is(":visible") && $("#image-new-container").click();
                         }, 0);
                         break;
