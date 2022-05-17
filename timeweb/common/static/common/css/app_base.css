@@ -88,7 +88,7 @@ main.finished-header-transition {
     -o-object-fit: cover;
        object-fit: cover;
 }
-.generic-button, ::-webkit-file-upload-button {
+.generic-button, ::file-selector-button {
     cursor: pointer;
     --bg-c: var(--primary-c);
     background-color: rgb(var(--bg-c), var(--bg-c), var(--bg-c));
@@ -102,10 +102,10 @@ main.finished-header-transition {
     padding: 1px 6px;
     position: relative;
 }
-.generic-button:hover, ::-webkit-file-upload-button:hover {
+.generic-button:hover, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) - 19);
 }
-.generic-button:active, ::-webkit-file-upload-button:active {
+.generic-button:active, ::file-selector-button:active {
     transform: translateY(1px);
     box-shadow: none;
 }

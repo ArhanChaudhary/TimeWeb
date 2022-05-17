@@ -29,12 +29,6 @@
     right: calc(var(--horizontal-form-padding) + 2px);
     bottom: -25px;
 }
-#form-wrapper input::-webkit-datetime-edit {
-    display: contents;
-}
-#form-wrapper input::-webkit-calendar-picker-indicator {
-    margin-left: unset;
-}
 #form-wrapper label[for='id_x']::after {
     content: '(Predicted if left empty)';
     right: 89px;
