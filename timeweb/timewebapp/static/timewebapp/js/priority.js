@@ -102,6 +102,7 @@ class Priority {
                 }
                 params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
                 if (params.first_sort) {
+                    // Which element specifically is overflowed seems to have minimal effect on performance
                     params.dom_assignment[0].offsetHeight;
                     params.dom_assignment.removeClass("transition-instantly");
                 }
