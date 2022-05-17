@@ -261,9 +261,8 @@ class Crud {
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
-                $("#form-wrapper .field-wrapper:not(.not-invalid-if-empty)").each(function() {
-                    const input = $(this).children("input");
-                    input.toggleClass("invalid", !input.val());
+                $("#form-wrapper .field-wrapper > :not(label):not(.dont-mark-invalid-if-empty):not(.info-button)").each(function() {
+                    $(this).toggleClass("invalid", !$(this).val());
                 });
             }
 
