@@ -9,7 +9,7 @@ body {
 }
 .field-group {
     margin: 40px 0 19px;
-    border: 1px solid var(--color);
+    box-shadow: 0 0 13px -11px black;
     background-color: hsl(0, 0%, 96%);
     padding: 15px;
     border-radius: 15px;
