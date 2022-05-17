@@ -289,6 +289,7 @@ class Crud {
         });
 
         // Arrow function to preserve this
+        $("#form-wrapper #cancel-button").click(() => that.hideForm());
         $("#form-wrapper #field-group-picker").click(Crud.RESET_FORM_GROUP_MARGINS);
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
         $("#id_unit").on('input', Crud.RESET_FORM_GROUP_MARGINS);
