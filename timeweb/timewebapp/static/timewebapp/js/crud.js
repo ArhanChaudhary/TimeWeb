@@ -93,6 +93,28 @@ class Crud {
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
 
+    static RESET_FORM_GROUP_MARGINS = () => {
+        $("#form-wrapper #fields-wrapper").prop("style").setProperty("--first-field-group-height", 
+            // Let's not apply any of the weird margin logic to the first field group; its height will remain static when tabbed into this field
+            $("#form-wrapper #first-field-group").outerHeight()
+        + "px");
+        $("#form-wrapper #fields-wrapper").prop("style").setProperty("--second-field-group-height",
+            $("#form-wrapper #second-field-group").outerHeight() +
+            $("#form-wrapper #second-field-group .field-wrapper").toArray().map(function(field_wrapper_dom) {
+                if ($(field_wrapper_dom).css("margin-top") === field_wrapper_dom.style.marginTop) return 0;
+                return parseFloat(field_wrapper_dom.style.marginTop) || 0;
+            }).reduce((a, b) => a + b, 0)
+        + "px");
+    }
+
+    static GO_TO_FIELD_GROUP = params => {
+        if (params.standard) {   
+            $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
+        } else if (params.advanced) {
+            $("#form-wrapper #field-group-picker-checkbox").prop("checked", true);
+        }
+        Crud.RESET_FORM_GROUP_MARGINS();
+    }
     init() {
         const that = this;
         $("#id_assignment_date").daterangepicker({
@@ -267,8 +289,9 @@ class Crud {
         });
 
         // Arrow function to preserve this
-        $("#form-wrapper #cancel-button").click(() => that.hideForm());
+        $("#form-wrapper #field-group-picker").click(Crud.RESET_FORM_GROUP_MARGINS);
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
+        $("#id_unit").on('input', Crud.RESET_FORM_GROUP_MARGINS);
         $(".field-widget-checkbox").on('input', function() {
             let widget_input = $(this).prevAll("input:first");
             if (!widget_input.val()) return;
@@ -286,6 +309,7 @@ class Crud {
             if (utils.in_simulation) {
                 this.setCustomValidity("You can't add or edit assignments in the simulation; this functionality is not yet supported :(");
             } else {
+                Crud.GO_TO_FIELD_GROUP({standard: true})
                 this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
             }
         });

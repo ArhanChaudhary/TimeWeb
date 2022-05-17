@@ -99,13 +99,22 @@
 #form-wrapper .field-group {
     flex-shrink: 0;
     width: 100%;
+    /* Min-content over fit-content because it has more browser support */
+    height: min-content;
     box-sizing: border-box;
     transition: margin 0.5s ease-in-out;
 }
+/* Really really ugly code that animates the form height on field group change */
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
     margin-left: calc(-100% - var(--field-group-gap));
+    margin-bottom: min(0px, calc(var(--second-field-group-height) - var(--first-field-group-height)));
 }
-#form-wrapper #fields-wrapper.show-standard #second-field-group {
+#form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #second-field-group,
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #first-field-group {
+    margin-bottom: 0;
+}
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #second-field-group {
+    margin-bottom: min(0px, calc(var(--first-field-group-height) - var(--second-field-group-height)));
 }
 #form-wrapper .field-wrapper {
     /* for positioning */
