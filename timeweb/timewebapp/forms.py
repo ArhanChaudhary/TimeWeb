@@ -68,7 +68,7 @@ class TimewebForm(forms.ModelForm):
                 'max_digits': _("This field can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": TimewebModel.funct_round.field.max_digits - TimewebModel.funct_round.field.decimal_places, "n2": TimewebModel.funct_round.field.decimal_places},
                 'max_decimal_places': _("This field's value has too many digits after its decimal point (>%(n)d digits)") % {"n": TimewebModel.funct_round.field.decimal_places},
                 'max_whole_digits': _("This field's value has too many digits before its decimal point (>%(n)d digits)") % {"n": TimewebModel.funct_round.field.max_digits - TimewebModel.funct_round.field.decimal_places},
-                'invalid': _("This field's value is invalid"),
+                'invalid': _("The step size is invalid"),
             },
             'min_work_time': {
                 'max_digits': _("This field can only have %(n)d digits before and %(n2)d digits after its decimal point") % {"n": TimewebModel.min_work_time.field.max_digits - TimewebModel.min_work_time.field.decimal_places, "n2": TimewebModel.min_work_time.field.decimal_places},
@@ -99,7 +99,7 @@ class TimewebForm(forms.ModelForm):
         y = cleaned_data.get("y")
         if not isinstance(works, list) and works != None and y != None and works >= y >= 1:
             self.add_error("works",
-                forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the above field's value of %(y)g"),code='invalid',params={
+                forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the previous field's value of %(y)g"),code='invalid',params={
                     'value': works,
                     'y': y,
                     'equal_to_or_greater_than': "equal to" if works == y else "greater than",
