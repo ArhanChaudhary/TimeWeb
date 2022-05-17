@@ -175,8 +175,6 @@
         <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
           <div class="assignment-header">
             <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
-              {% comment %} Remove whitespace so inline-block doesnt have a gap {% endcomment %}
-              {% spaceless %}
               <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
                 {% for tag in assignment.tags %}
                   <div class="tag-wrapper">
@@ -189,7 +187,6 @@
                 {% endfor %}
               </span>
               <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
-              {% endspaceless %}
                 <span class="icon-slash plus-first-slash"></span>
                 <span class="icon-slash plus-second-slash"></span>
                 <span class="info-button-text info-bottom tag-add-box">
@@ -286,7 +283,6 @@
       </table>
     </div>
   </template>
-  {% spaceless %}
   <template id="tag-template">
     <div class="tag-wrapper">
       <div class="tag-name"></div>
@@ -316,5 +312,4 @@
     </span>
     <img src="{% static 'timewebapp/images/gc_icon.webp' %}" width="42" height="42">
   </div>
-  {% endspaceless %}
 {% endblock content %}
