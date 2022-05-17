@@ -360,7 +360,7 @@ a[href="/settings"] {
 .assignment.open-assignment, .assignment.assignment-is-closing {
     padding-bottom: unset;
 }
-.assignment:not(.open-assignment):not(.needs-more-info) .title {
+.assignment:not(.open-assignment, .needs-more-info) .title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -929,7 +929,7 @@ input[type=number]::-webkit-inner-spin-button {
     background-color: var(--primary);
     transform: translateX(-5px);
 }
-.daterangepicker td:not(.active):not(:hover) {
+.daterangepicker td:not(.active, :hover) {
     background-color: unset !important;
 }
 .daterangepicker .calendar-table .available span {

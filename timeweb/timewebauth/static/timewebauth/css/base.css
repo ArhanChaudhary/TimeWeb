@@ -159,7 +159,7 @@ a {
 .add-input-margin {
     margin-bottom: 2em !important;
 }
-input:not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea {
+input:not([type="submit"], [type="checkbox"], [type="radio"]), textarea {
     width: 100%;
     margin-top: 5px;
     margin-bottom: 5px;
