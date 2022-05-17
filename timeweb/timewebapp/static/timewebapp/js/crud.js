@@ -175,6 +175,12 @@ class Crud {
         $("main").css("overflow-y", "hidden");
         that.old_unit_value = undefined;
         that.replaceUnit();
+
+        setTimeout(function() {
+            if ($("#form-wrapper #second-field-group .invalid").length) {
+                Crud.GO_TO_FIELD_GROUP({advanced: true});
+            }
+        }, 0);
     }
     hideForm(params={hide_instantly: false}) {
         const that = this;
@@ -186,6 +192,7 @@ class Crud {
                 // Remove all error notes when form is exited
                 $(".invalid").removeClass("invalid");
                 $(".assignment-form-error-note").remove();
+                Crud.GO_TO_FIELD_GROUP({standard: true});
             }).children("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
         // Fallback if "overlay" doesn't exist
