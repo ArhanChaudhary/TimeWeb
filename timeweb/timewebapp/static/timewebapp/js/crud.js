@@ -294,7 +294,7 @@ class Crud {
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
         $("#id_unit").on('input', Crud.RESET_FORM_GROUP_MARGINS);
         $(".field-widget-checkbox").on('input', function() {
-            let widget_input = $(this).prevAll("input:first");
+            let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
             if (!widget_input.val()) return;
             if ($(this).is(":checked")) {
                 widget_input.val(Math.round(
