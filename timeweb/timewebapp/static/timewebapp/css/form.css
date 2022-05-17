@@ -114,7 +114,8 @@
     margin-bottom: 0;
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #second-field-group {
-    margin-bottom: min(0px, calc(var(--first-field-group-height) - var(--second-field-group-height)));
+    /* 100vh thingies to ensure second-field-group doesn't bloat the height of #fields-wrapper when the form is first shown */
+    margin-bottom: min(0px, calc(var(--first-field-group-height, 0px) - var(--second-field-group-height, 100vh)));
 }
 #form-wrapper .field-wrapper {
     /* for positioning */
