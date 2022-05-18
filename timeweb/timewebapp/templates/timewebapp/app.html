@@ -43,6 +43,11 @@
         <label id="field-group-picker" for="field-group-picker-checkbox">
           <span class="field-group-picker-label" id="standard-field-group-label">Standard</span>
           <span class="field-group-picker-label" id="advanced-field-group-label">Advanced</span>
+          <div id="field-group-picker-styling">
+            <div id="first-tab-line" class="selected-form-tab-styling-line"></div>
+            <div id="selected-form-tab-styling"></div>
+            <div id="second-tab-line" class="selected-form-tab-styling-line"></div>
+          </div>
         </label>
         <div id="fields-wrapper">
           {% csrf_token %}

@@ -69,13 +69,14 @@
 }
 #form-wrapper #field-group-picker {
     display: flex;
-    margin-top: 10px;
-}
-#form-wrapper #field-group-picker .field-group-picker-label {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
+
+    --horizontal-field-group-tab-padding: 5%;
+    padding: 0 var(--horizontal-field-group-tab-padding);
+    height: 30px;
+    margin-top: 10px;
+    --border-radius: 5px;
 }
 #form-wrapper #fields-wrapper {
     position: relative;
@@ -90,7 +91,50 @@
     /* Min-content over fit-content because it has more browser support */
     height: min-content;
     box-sizing: border-box;
-    transition: margin 0.5s ease-in-out;
+    transition: margin 0.3s ease-in-out;
+}
+#form-wrapper #field-group-picker-styling {
+    position: absolute;
+    display: flex;
+    overflow: hidden;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+}
+#form-wrapper #selected-form-tab-styling,
+#form-wrapper .selected-form-tab-styling-line {
+    display: inline-block;
+    flex-shrink: 0;
+    height: 50%;
+    box-sizing: border-box;
+}
+#form-wrapper #selected-form-tab-styling {
+    border-top: 1px solid var(--color);
+    border-left: 1px solid var(--color);
+    border-right: 1px solid var(--color);
+    width: calc(50% - var(--horizontal-field-group-tab-padding));
+    margin: 0 -1px;
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+}
+#form-wrapper .selected-form-tab-styling-line {
+    border-bottom: 1px solid var(--color);
+    align-self: flex-end;
+    width: calc(50% + 1px);
+}
+#form-wrapper #first-tab-line {
+    border-bottom-right-radius: var(--border-radius);
+    border-right: 1px solid var(--color);
+}
+#form-wrapper #second-tab-line {
+    border-bottom-left-radius: var(--border-radius);
+    border-left: 1px solid var(--color);
+}
+#form-wrapper #first-tab-line {
+    transition: margin-left 0.2s ease-in-out 0.05s;
+}
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #first-tab-line {
+    margin-left: calc(-50% + var(--horizontal-field-group-tab-padding));
 }
 /* Really really ugly code that animates the form height on field group change */
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
