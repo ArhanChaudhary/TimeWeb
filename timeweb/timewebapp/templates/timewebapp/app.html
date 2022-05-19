@@ -178,6 +178,8 @@
       {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
       <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
         <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+          {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
+          <div class="priority-color-strip"></div>
           <div class="assignment-header">
             <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
               <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
@@ -206,7 +208,6 @@
                 <div class="tag-add-text">Add Tag</div>
               </div>
             </div>
-            <div class="priority-color-strip"></div>
             <div class="relative-positioning-wrapper{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
               <span class="title">{{ assignment.name }}</span>
               {% if assignment.description %}
