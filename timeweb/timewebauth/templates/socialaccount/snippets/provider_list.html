@@ -18,10 +18,13 @@
   {% endif %}
 
   <div class="socialaccount-container">
-    <button class="socialaccount-button">
-      <img class="socialaccount-image" src="{% static 'timewebauth/images/'|add:provider.id|add:'.webp' %}">
-      <a title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
-          href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">Log in with {{provider.name}}</a>
-    </button>
+    <form method="POST" action="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
+      {% csrf_token %}
+      <button class="socialaccount-button" type="submit">
+        <img class="socialaccount-image" src="{% static 'timewebauth/images/'|add:provider.id|add:'.webp' %}">
+        <span title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
+            href="">Log in with {{provider.name}}</span>
+      </button>
+    </form>
   </div>
 {% endfor %}
