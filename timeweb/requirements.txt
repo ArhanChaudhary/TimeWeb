@@ -16,7 +16,7 @@ django-csp==3.7
 django-livereload-server==0.4
 django-minify-html==1.2.0
 django-multiselectfield==0.1.12
-django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@31494345a97fb38c1cd1f98a52256ff8a5fdbeb2
+django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@1dcaeee2c7b3c820fdaf3a14a871c11a83829290
 django-storages==1.12.3
 django-timezone-field==4.2.1
 google-api-core==2.0.1
