@@ -88,6 +88,12 @@ class Crud {
         showDropdowns: true,
         singleDatePicker: true,
     }
+    static ALL_FOCUSABLE_FORM_INPUTS = (function() {
+        $(function() {
+            // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
+            Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]");
+        });
+    })()
     static FORM_ANIMATION_DURATION = 300
     static FORM_POSITION_TOP = 15
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
@@ -209,7 +215,7 @@ class Crud {
             $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
             
-            $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight());
+            $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight()).find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
 
             // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
@@ -218,16 +224,16 @@ class Crud {
             // 1 or 5 instead of what was originally entered)
 
             if (singular.toLowerCase() === "minute") {
-                $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight());
+                $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight()).find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             } else if (singular.toLowerCase() === "hour") {
-                $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "");
+                $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             }
         } else {
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
-            $(".hide-field").removeClass("hide-field").css("margin-top", "");
+            $(".hide-field").removeClass("hide-field").css("margin-top", "").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
 
             if (["minute", "hour"].includes(that.old_unit_value)) {
@@ -299,6 +305,14 @@ class Crud {
         $("#form-wrapper #field-group-picker").click(Crud.RESET_FORM_GROUP_MARGINS);
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
         $("#id_unit").on('input', Crud.RESET_FORM_GROUP_MARGINS);
+        
+        $("#fields-wrapper #first-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).last().on('focus', () => {
+            Crud.GO_TO_FIELD_GROUP({ standard: true });
+        });
+        $("#fields-wrapper #second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().on('focus', () => {
+            Crud.GO_TO_FIELD_GROUP({ advanced: true });
+        })
+
         $(".field-widget-checkbox").on('input', function() {
             let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
             if (!widget_input.val()) return;
