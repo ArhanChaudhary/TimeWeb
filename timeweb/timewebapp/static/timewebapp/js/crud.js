@@ -91,7 +91,10 @@ class Crud {
     static ALL_FOCUSABLE_FORM_INPUTS = (function() {
         $(function() {
             // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
-            Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]");
+            Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]")
+                .filter(function() {
+                    return !$(this).attr("name")?.endsWith("-widget-checkbox");
+                });
         });
     })()
     static FORM_ANIMATION_DURATION = 300
@@ -118,6 +121,8 @@ class Crud {
             $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
         } else if (params.advanced) {
             $("#form-wrapper #field-group-picker-checkbox").prop("checked", true);
+        } else if (params.toggle) {
+            $("#form-wrapper #field-group-picker-checkbox").click();
         }
         Crud.RESET_FORM_GROUP_MARGINS();
     }
@@ -306,12 +311,12 @@ class Crud {
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
         $("#id_unit").on('input', Crud.RESET_FORM_GROUP_MARGINS);
         
-        $("#fields-wrapper #first-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).last().on('focus', () => {
-            Crud.GO_TO_FIELD_GROUP({ standard: true });
+        $("#fields-wrapper").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).on('focus', e => {
+            const new_parent = $(e.target).parents(".field-group");
+            const old_parent = $(e.relatedTarget).parents(".field-group");
+            if (!new_parent.is(old_parent) && old_parent.length && new_parent.length)
+                Crud.GO_TO_FIELD_GROUP({ toggle: true });
         });
-        $("#fields-wrapper #second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().on('focus', () => {
-            Crud.GO_TO_FIELD_GROUP({ advanced: true });
-        })
 
         $(".field-widget-checkbox").on('input', function() {
             let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
