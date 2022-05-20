@@ -33,6 +33,7 @@ class TimewebForm(forms.ModelForm):
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'has_alerted_due_date_passed_notice': forms.HiddenInput(),
+            'google_classroom_assignment_link': forms.HiddenInput(),
             'alert_due_date_incremented': forms.HiddenInput(),
         }
         error_messages = {

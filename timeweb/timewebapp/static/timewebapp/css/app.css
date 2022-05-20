@@ -337,7 +337,7 @@ a[href="/settings"] {
 .description p:last-of-type {
     margin-bottom: 0;
 }
-.description a {
+.relative-positioning-wrapper a {
     color: var(--input-focus-color);
 }
 /* Add to truncate warning if the below style is changed */
