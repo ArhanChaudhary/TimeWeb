@@ -272,7 +272,7 @@ class Crud {
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
-                $("#form-wrapper .field-wrapper:not(.hide-field) > :not(label, .dont-mark-invalid-if-empty, .info-button)").each(function() {
+                $("#form-wrapper .field-wrapper:not(.hide-field) > :not(label, #due-date-empty, .dont-mark-invalid-if-empty, .info-button)").each(function() {
                     $(this).toggleClass("invalid", !$(this).val());
                 });
             }
