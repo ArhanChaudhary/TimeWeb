@@ -772,7 +772,10 @@ class Priority {
                     resolve();
                 }
             }).then(function() {
-                new VisualAssignment(dom_assignment).positionTags();
+                // Assignment can be removed from dom when being deleted
+                // Ensure it exists or else positionTags crashes trying to read a non-existent element
+                if (document.contains(dom_assignment[0]))
+                    new VisualAssignment(dom_assignment).positionTags();
             });
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
