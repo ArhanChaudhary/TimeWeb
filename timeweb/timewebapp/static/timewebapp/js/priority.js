@@ -449,7 +449,7 @@ class Priority {
             const assignment_header_tick_svg = assignment_header_button.children(".tick-button");
             const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
 
-            assignment_container.filter(function() {
+            assignment_header_button.filter(function() {
                 return !!$(this).children(".tick-button").length;
             }).toggle(
                 !(
