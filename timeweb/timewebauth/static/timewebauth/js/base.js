@@ -59,7 +59,7 @@ $(window).one("load", function() {
         $("#circles-background .bubble-right").first().on("animationstart", function() {
             var get_frames = true;
             var judgement_time = 250;
-            var framerate_threshold = 45;
+            var framerate_threshold = 55;
             var frames = 0;
 
             function requestNextFrame() {
