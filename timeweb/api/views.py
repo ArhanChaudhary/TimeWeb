@@ -240,6 +240,8 @@ def create_gc_assignments(request):
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
             tags.insert(0, course_names[assignment['courseId']])
             description = assignment.get('description', "")
+            if assignment.get("alternateLink", None):
+                description += f"\n\n<a href=\"{assignment['alternateLink']}\" target=\"_blank\">Assignment link</a>"
 
             # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
             new_gc_assignment_ids.add(assignment_id)

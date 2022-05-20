@@ -324,7 +324,7 @@ a[href="/settings"] {
 .description {
     position: relative;
     display: none;
-    opacity: var(--description-opacity);
+    color: rgba(var(--c), var(--c), var(--c), var(--description-opacity));
     transform: translateY(-2px);
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
@@ -337,6 +337,9 @@ a[href="/settings"] {
 .description p:last-of-type {
     margin-bottom: 0;
 }
+.description a {
+    color: var(--input-focus-color);
+}
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description {
     display: -webkit-box;
@@ -346,7 +349,7 @@ a[href="/settings"] {
 }
 .assignment.open-assignment .relative-positioning-wrapper.display-truncate-warning::after {
     content: "[Description shortened]";
-    opacity: var(--description-opacity);
+    color: rgba(var(--c), var(--c), var(--c), var(--description-opacity));
     font-size: var(--description-font-size);
     white-space: nowrap;
     margin-top: 1em;

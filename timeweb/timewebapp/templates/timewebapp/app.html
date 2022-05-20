@@ -210,9 +210,11 @@
             </div>
             <div class="relative-positioning-wrapper{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
               <span class="title">{{ assignment.name }}</span>
+              {% autoescape off %}
               {% if assignment.description %}
                 <div class="description">{{ assignment.description|linebreaks }}</div>
               {% endif %}
+              {% endautoescape %}
             </div>
             <svg width="30px" height="20px" class="arrow-container">
               <polygon points="5,0 5,20 15,10" fill="currentColor">
