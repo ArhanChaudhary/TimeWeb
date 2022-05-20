@@ -1,0 +1,21 @@
+* {
+    font-family: futura, sans-serif;
+    font-weight: initial;
+}
+.section-block {
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    padding: 0 5vw;
+    font-size: 40px;
+}
+.section-block#first {
+    box-shadow: inset 0 -80px 80px -50px rgb(143, 143, 143);
+}
+.section-block#second {
+    background-color: rgb(241, 241, 241);
+}
+@font-face {
+    font-family: futura-pt;
+    src: url(".fonts/Futura PT Heavy.ttf");
+}

@@ -1,3 +1,26 @@
 {% extends 'common/base.html' %}
+{% load static %}
 
-{% block base_head_body %}Hello World!{% endblock %}
+{% block base_head_css %}
+    <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
+{% endblock %}
+
+{% block base_head_body %}
+    <div class="section-block" id="first">
+        Introducing TimeWeb
+        <br>
+        The new way to manage your time
+    </div>
+    <div class="section-block" id="second">
+        <a href="{% url 'account_login' %}">log in</a>
+    </div>
+    <div class="section-block" id="third">
+        
+    </div>
+    <div class="section-block" id="fourth">
+        
+    </div>
+    <div class="section-block" id="fifth">
+        
+    </div>
+{% endblock %}
