@@ -3,7 +3,7 @@ from . import views
 from django.conf import settings
 
 urlpatterns = [
-    path('', views.TimewebView.as_view(),name='home'),
+    # Root urlpattern is handled in home_page app
     path('example', views.ExampleAccountView.as_view(), name='example'),
 ]
 if settings.DEBUG:
