@@ -146,7 +146,10 @@ class Crud {
             old_due_date_val = $(this).val();
         }).on('hide.daterangepicker', function(e, picker) {
             setTimeout(() => {
-                if (!$(this).val()) return;
+                if (!$(this).val()) {
+                    $("#due-date-empty").click();
+                    return;
+                }
 
                 $("#form-wrapper #due-date-text-measurer").text($(this).val());
                 $(this).parents(".field-wrapper").prop("style").setProperty("--due-date-text-width", $("#form-wrapper #due-date-text-measurer").width() + "px");
