@@ -457,11 +457,11 @@ class Priority {
                     || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
                 )
             ).toggleClass("slashed", already_entered_work_input_for_today);
+            assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
             assignment_header_tick_svg.attr("viewBox", (function() {
                 let bbox = assignment_header_tick_svg[0].getBBox()
                 return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
             })());
-            assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
             
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
