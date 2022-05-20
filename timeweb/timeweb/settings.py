@@ -125,7 +125,10 @@ ROOT_URLCONF = 'timeweb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'common' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'common' / 'templates',
+            BASE_DIR / 'timewebapp' / 'static' / 'timewebapp' / 'svg'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

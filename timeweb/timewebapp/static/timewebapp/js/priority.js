@@ -16,45 +16,6 @@ class Priority {
     static NOT_YET_ASSIGNED = 2;
     static COMPLETELY_FINISHED = 1;
 
-    static SVG_IMAGE_SIZES = {
-        "question_mark": {
-            x: 4.30,
-            y: -1127.89,
-            width: 734.94,
-            height: 1117.89
-        },
-        "completely_finished": {
-            x: -106.30,
-            y: -68.77,
-            width: 496.95,
-            height: 472.97
-        },
-        "finished": {
-            x: 1.36,
-            y: -1218.08,
-            width: 1318.64,
-            height: 1214.13
-        },
-        "unfinished": {
-            x: 12.46,
-            y: -1240.00,
-            width: 1038.62,
-            height: 1240.00
-        },
-        "tick": {
-            x: 0.00,
-            y: 0.00,
-            width: 768.00,
-            height: 640.00
-        },
-        "slashed_tick": {
-            x: -0.60,
-            y: 0.39,
-            width: 497.55,
-            height: 465.60
-        },
-    }
-
     constructor() {
         const that = this;
         that.due_date_passed_notices = [];
@@ -484,21 +445,23 @@ class Priority {
             }
             // Can't just define this once because len_works changes
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
-            assignment_container.find(".assignment-header-button").filter(function() {
+            const assignment_header_button = assignment_container.find(".assignment-header-button");
+            const assignment_header_tick_svg = assignment_header_button.children(".tick-button");
+            const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
+
+            assignment_container.filter(function() {
                 return !!$(this).children(".tick-button").length;
             }).toggle(
                 !(
                     [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
                     || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
                 )
-            ).toggleClass("slashed", already_entered_work_input_for_today).children(".tick-button").attr("viewBox", (function() {
-                const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
-                let bbox = Priority.SVG_IMAGE_SIZES[tick_image];
+            ).toggleClass("slashed", already_entered_work_input_for_today);
+            assignment_header_tick_svg.attr("viewBox", (function() {
+                let bbox = assignment_header_tick_svg[0].getBBox()
                 return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
-            })()).children("use").attr("href", (function() {
-                const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
-                return DEBUG ? `/static/timewebapp/images/${tick_image}.svg#g` : `https://storage.googleapis.com/twstatic/timewebapp/images/${tick_image}.svg#g`;
-            }));
+            })());
+            assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
             
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
@@ -538,8 +501,8 @@ class Priority {
 
             if (status_image) {
                 dom_status_image.show();
-                dom_status_image.find("use").attr("href", DEBUG ? `/static/timewebapp/images/${status_image}.svg#g`: `https://storage.googleapis.com/twstatic/timewebapp/images/${status_image}.svg#g`);
-                let bbox = Priority.SVG_IMAGE_SIZES[status_image];
+                dom_status_image.find("use").attr("href", `#${status_image}-svg`);
+                let bbox = dom_status_image[0].getBBox();
                 dom_status_image.attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
             } else {
                 dom_status_image.hide();

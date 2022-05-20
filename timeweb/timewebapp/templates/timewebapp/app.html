@@ -231,17 +231,17 @@
             </div>
             <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <svg class="tick-button" width="25" preserveAspectRatio="none">
-                <use href="{% static 'timewebapp/images/tick.svg' %}#g"></use>
+                <use href="#tick-svg"></use>
               </svg>
             </div>
             <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
-                <use href="{% static 'timewebapp/images/edit.svg' %}#g"></use>
+                <use href="#edit-svg"></use>
               </svg>
             </div>
             <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
-                <use href="{% static 'timewebapp/images/delete.svg' %}#g"></use>
+                <use href="#delete-svg"></use>
               </svg>
             </div>
           </div>
@@ -318,4 +318,16 @@
     </span>
     <img src="{% static 'timewebapp/images/gc_icon.webp' %}" width="42" height="42">
   </div>
+  <svg>
+    <defs>
+      {% include "question_mark.svg" %}
+      {% include "delete.svg" %}
+      {% include "edit.svg" %}
+      {% include "finished.svg" %}
+      {% include "question_mark.svg" %}
+      {% include "slashed_tick.svg" %}
+      {% include "tick.svg" %}
+      {% include "unfinished.svg" %}
+    </defs>
+  </svg>
 {% endblock content %}

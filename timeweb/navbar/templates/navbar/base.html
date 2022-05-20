@@ -43,8 +43,13 @@
     <template id="label-icon-template">
         <div class="label-icon-container">
             <svg viewBox="4.30 -1127.89 734.94 1117.89" class="label-icon" height="25" width="16.45" preserveAspectRatio="none">
-                <use href="{% static 'timewebapp/images/question_mark.svg' %}#g"></use>
+                <use height="25" width="16.45" href="#question_mark-svg"></use>
             </svg>
         </div>
     </template>
+    <svg>
+        <defs>
+          {% include "question_mark.svg" %}
+        </defs>
+    </svg>
 {% endblock content %}
