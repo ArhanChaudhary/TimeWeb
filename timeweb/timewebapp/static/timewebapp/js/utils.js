@@ -864,7 +864,7 @@ utils = {
         displayFullDueDateOnHover: function() {
             $(".title").on("mouseover mousemove click", function(e) {
                 $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
-                if (isTouchDevice) return false;
+                if (isTouchDevice && e.offsetY > $(this).height()) return false;
             }).on("mouseout", function() {
                 $(this).removeClass("show-long-daysleft");
             });
