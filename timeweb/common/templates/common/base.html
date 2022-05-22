@@ -33,6 +33,9 @@
                     
                 });
 
+                // Let's not try automatically fixing very legacy bad service worker request and rely on the user refreshing
+                // Refreshing on controllerchange trigger a LOT of false positives
+                /*
                 // https://redfin.engineering/how-to-fix-the-refresh-button-when-using-service-workers-a8e27af6df68
                 let refreshing;
                 navigator.serviceWorker.addEventListener('controllerchange', function() {
@@ -40,6 +43,7 @@
                     refreshing = true;
                     window.location.reload();
                 });
+                */
             }
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
