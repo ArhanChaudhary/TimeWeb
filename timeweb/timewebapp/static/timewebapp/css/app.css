@@ -434,11 +434,6 @@ a[href="/settings"] {
     margin-right: 6px;
     margin-left: 18px;
 }
-@media screen and (max-width: 721px) {
-    .unfinished-message {
-        display: none;
-    }
-}
 .tags {
     position: absolute;
     z-index: 1;
@@ -763,6 +758,7 @@ a[href="/settings"] {
 }
 .assignment-header-button * {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
+    color: var(--color);
 }
 .assignment-footer {
     padding-right: var(--horizontal-assignment-padding);
