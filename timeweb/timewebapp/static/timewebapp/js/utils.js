@@ -1221,6 +1221,8 @@ ajaxUtils = {
         ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.sendAttributeAjax, 1000);
     },
     sendAttributeAjax: function() {
+        if (!ajaxUtils.sendAttributeAjax.assignments.length) return;
+
         // Send data along with the assignment's primary key
 
         // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
