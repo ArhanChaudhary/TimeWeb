@@ -385,6 +385,7 @@ a[href="/settings"] {
 }
 .title::after, .title::before {
     position: absolute;
+    white-space: nowrap;
     font-size: 0.75em;
 }
 /* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
@@ -401,7 +402,6 @@ a[href="/settings"] {
 .title[data-daysleft]::after {
     content: attr(data-daysleft) !important;
     transform: translateY(100%) translateY(calc(-1 * var(--smush-daysleft)));
-    white-space: nowrap;
     width: calc(100% + var(--arrow-margin-left));
     padding-bottom: 20px; /* hover padding */
     left: 0;
