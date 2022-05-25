@@ -317,7 +317,7 @@ a[href="/settings"] {
     align-items: center;
     --arrow-margin-left: max(5px,calc(-5px + 2vw));
 }
-.relative-positioning-wrapper {
+.left-side-of-header {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
     flex-direction: column; /* put description below name */
     position: relative;
@@ -345,7 +345,7 @@ a[href="/settings"] {
 .description p:last-of-type {
     margin-bottom: 0;
 }
-.relative-positioning-wrapper a {
+.left-side-of-header a {
     color: var(--input-focus-color);
 }
 /* Add to truncate warning if the below style is changed */
@@ -355,7 +355,7 @@ a[href="/settings"] {
     -webkit-line-clamp: 8;
     overflow: hidden;
 }
-.assignment.open-assignment .relative-positioning-wrapper.display-truncate-warning::after {
+.assignment.open-assignment .left-side-of-header.display-truncate-warning::after {
     content: "[Description shortened]";
     color: rgba(var(--c), var(--c), var(--c), var(--description-opacity));
     font-size: var(--description-font-size);
