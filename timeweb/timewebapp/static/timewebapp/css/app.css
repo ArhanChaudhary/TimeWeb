@@ -144,6 +144,7 @@ a[href="/settings"] {
     transition: transform 2s ease-in-out;
     position: relative;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
+    --shortcut-border-radius: 6px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
@@ -197,7 +198,7 @@ a[href="/settings"] {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    --margin-top-and-bottom: 3px; 
+    --margin-top-and-bottom: var(--outer-assignment-vertical-padding);
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
 }
@@ -238,48 +239,57 @@ a[href="/settings"] {
 }
 .shortcut-line-left, .shortcut-line-right {
     flex-grow: 1;
+    --negative-horizontal-margin: -15px;
+    
+    position: relative;
+    height: 20px;
+    margin-bottom: -20px;
+    border-top: 2px solid var(--color);
 }
 .shortcut-line-left {
-    --left: -14px;
-    left: var(--left);
-    margin-right: var(--left);
-    border-top: 2px solid var(--color);
-    position: relative;
+    border-top-left-radius: var(--shortcut-border-radius);
+    left: var(--negative-horizontal-margin);
+    margin-right: var(--negative-horizontal-margin);
+    border-left: 2px solid var(--color);
 }
 .shortcut-line-right {
-    float: right;
-    border-top: 2px solid var(--color);
+    border-top-right-radius: var(--shortcut-border-radius);
+    right: var(--negative-horizontal-margin);
+    margin-left: var(--negative-horizontal-margin);
+    border-right: 2px solid var(--color);
 }
-
-.shortcut-line-left::after {
+.assignment-container.add-line-wrapper::before,
+.assignment-container.add-line-wrapper::after {
     content: '';
     position: absolute;
-    border-left: 2px solid var(--color);
-    top: -2px;
-    left: -1px;
-    height: 20px;
+    height: 100%;
+    --horizontal-margin: 10px;
+    margin: 0 var(--horizontal-margin);
+    width: 36px;
+    bottom: -1px;
+    box-sizing: border-box;
 }
 .assignment-container.add-line-wrapper::before {
-    content: '';
-    position: absolute;
-    /* Put the before wrapper in front of the after wrapper, which are both visible with grey-highlight */
-    z-index: 1;
-    height: 100%;
-    left: 10px;
-    bottom: -1px;
+    left: 0;
     border-left: 2px solid var(--color);
 }
-.assignment-container.first-add-line-wrapper::before {
-    height: calc(100% - 20px);
+.assignment-container.add-line-wrapper::after {
+    right: 0;
+    border-right: 2px solid var(--color);
+}
+.assignment-container.first-add-line-wrapper::before,
+.assignment-container.first-add-line-wrapper::after {
+    height: calc(100% - 30px);
+}
+.assignment-container.last-add-line-wrapper::before,
+.assignment-container.last-add-line-wrapper::after {
+    border-bottom: 2px solid var(--color);
+}
+.assignment-container.last-add-line-wrapper::before {
+    border-bottom-left-radius: var(--shortcut-border-radius);
 }
 .assignment-container.last-add-line-wrapper::after {
-    content: '';
-    position: absolute;
-    width: 32px;
-    /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after. So, make this left slightly inside the wrapper */
-    left: 11px;
-    bottom: -1px;
-    border-bottom: 2px solid var(--color);
+    border-bottom-right-radius: var(--shortcut-border-radius);
 }
 
 @media screen and (max-width: 900px) {
@@ -287,15 +297,12 @@ a[href="/settings"] {
         --outer-assignment-horizontal-padding: 10px;
         --outer-assignment-vertical-padding: 5px;
     }
-    .assignment-container.add-line-wrapper::before {
-        left: 3px;
-    }
+    .assignment-container.add-line-wrapper::before,
     .assignment-container.add-line-wrapper::after {
-        width: 23px;
-        left: 4px;
+        --horizontal-margin: 4px;
     }
-    .shortcut-line-left {
-        --left: -6px;
+    .shortcut-line-left, .shortcut-line-right {
+        --negative-horizontal-margin: -6px;
     }
     .shortcut-text {
         font-size: 15px;
@@ -383,7 +390,6 @@ a[href="/settings"] {
 /* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
 .assignment-container:nth-last-child(1) .title::before {
     content: "Least Important";
-    
 }
 #assignments-container > :not(.assignment-container) + .assignment-container .title::before {
     content: "Most Important";
