@@ -661,27 +661,35 @@ class Priority {
         // The current looped assignment's tag is compared with the previous looped assignment's tag
         // If they are different, the previous assignment is the last assignment with its tag and the current assignment is the first assignment with its tag
         const sa = utils.loadAssignmentData(dom_assignment);
+        const assignment_container = dom_assignment.parents(".assignment-container");
 
         if (!["Not Important", "Important"].includes(sa.tags[0]))
             var current_tag = sa.tags[0];
         if (sa.is_google_classroom_assignment && sa.needs_more_info && !dom_assignment.parents(".assignment-container").hasClass("finished") && current_tag) {
-            const assignment_container = dom_assignment.parents(".assignment-container");
             assignment_container.addClass("add-line-wrapper");
             if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
-                if (that.prev_assignment_container) that.prev_assignment_container.addClass("last-add-line-wrapper");
+                if (that.prev_gc_assignment) that.prev_gc_assignment.addClass("last-add-line-wrapper");
                 assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-from-class-template").html());
             }
             that.prev_tag = current_tag;
-            that.prev_assignment_container = assignment_container;
+            that.prev_gc_assignment = assignment_container;
         }
 
-        if (priority_data.status_value === Priority.INCOMPLETE_WORKS && !that.already_found_first_incomplete_works) {
-            $("#autofill-work-done").show().insertBefore(dom_assignment);
-            that.already_found_first_incomplete_works = true;
+        if (priority_data.status_value === Priority.INCOMPLETE_WORKS) {
+            if (!that.already_found_first_incomplete_works) {
+                assignment_container.addClass("first-add-line-wrapper");
+                $("#autofill-work-done").insertBefore(dom_assignment);
+                that.already_found_first_incomplete_works = true;
+            }
+            that.prev_incomplete_works_assignment = assignment_container;
         }
-        if (priority_data.status_value === Priority.COMPLETELY_FINISHED && !that.already_found_first_finished) {
-            $("#delete-starred-assignments").show().insertBefore(dom_assignment);
-            that.already_found_first_finished = true;
+        if (priority_data.status_value === Priority.COMPLETELY_FINISHED) {
+            if (!that.already_found_first_finished) {
+                assignment_container.addClass("first-add-line-wrapper");
+                $("#delete-starred-assignments").insertBefore(dom_assignment);
+                that.already_found_first_finished = true;
+            }
+            that.prev_finished_assignment = assignment_container;
         }
     }
     updateInfoHeader() {
@@ -821,9 +829,9 @@ class Priority {
             }
         }
         // End part of addAssignmentShortcut
-        if (that.prev_assignment_container) {
-            that.prev_assignment_container.addClass("last-add-line-wrapper");
-        }
+        that.prev_gc_assignment?.addClass("last-add-line-wrapper");
+        that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
+        that.prev_finished_assignment?.addClass("last-add-line-wrapper");
 
         if (!first_available_tutorial_assignment) {
             first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
@@ -862,12 +870,6 @@ class Priority {
                 });
             });
         }
-        // Replicates first-of-class and last-of-class to draw the shortcut line wrapper in app.css
-        $(".finished").first().addClass("first-add-line-wrapper");
-        $(".finished").last().addClass("last-add-line-wrapper");
-        $(".incomplete-works").first().addClass("first-add-line-wrapper");
-        $(".incomplete-works").last().addClass("last-add-line-wrapper");
-
 
         that.updateInfoHeader();
         $("#assignments-header #icon-label-container img").first().trigger("mouseover");
