@@ -749,7 +749,10 @@ class Priority {
         }));
         let first_available_tutorial_assignment_fallback;
         let first_available_tutorial_assignment;
-        $("#autofill-work-done, #delete-starred-assignments").hide();
+        $("#autofill-work-done, #delete-starred-assignments").each(function() {
+            if ($(this).parent().is(".assignment-container"))
+                $(this).insertBefore($(this).parent());
+        });
         $(".delete-gc-assignments-from-class").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
@@ -832,6 +835,15 @@ class Priority {
         that.prev_gc_assignment?.addClass("last-add-line-wrapper");
         that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
         that.prev_finished_assignment?.addClass("last-add-line-wrapper");
+
+        $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
+            // If there's only one assignment for #auto-fill-work-done specifically, don't remove the wrapper
+            if ($(this).children("#autofill-work-done").length) return;
+
+            $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
+            $(this).children("#delete-starred-assignments").insertBefore($(this));
+            $(this).children(".shortcut").remove();
+        });
 
         if (!first_available_tutorial_assignment) {
             first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;

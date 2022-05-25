@@ -196,12 +196,15 @@ a[href="/settings"] {
 }
 .shortcut {
     position: relative;
-    display: flex;
+    display: none;
     justify-content: space-evenly;
     align-items: center;
     --margin-top-and-bottom: var(--outer-assignment-vertical-padding);
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
+}
+.assignment-container .shortcut {
+    display: flex;
 }
 .shortcut-text {
     white-space: nowrap;
