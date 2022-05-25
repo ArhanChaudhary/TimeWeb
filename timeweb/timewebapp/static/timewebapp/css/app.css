@@ -370,7 +370,7 @@ a[href="/settings"] {
 .assignment.open-assignment, .assignment.assignment-is-closing {
     padding-bottom: unset;
 }
-.assignment:not(.open-assignment, .needs-more-info) .title {
+.assignment:not(.open-assignment) .title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
