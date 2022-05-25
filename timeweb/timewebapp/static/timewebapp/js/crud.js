@@ -215,7 +215,7 @@ class Crud {
     }
     replaceUnit() {
         const that = this;
-        const val = $("#id_unit").val().trim() || window.getComputedStyle($("#id_y ~ .field-widget")[0], "::after").content.slice(1, -1);
+        const val = $("#id_unit").val().trim() || $("#id_y ~ .field-widget").getPseudoStyle("::after", "content").slice(1, -1);
         const plural = pluralize(val),
             singular = pluralize(val, 1);
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)

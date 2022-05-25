@@ -1030,17 +1030,18 @@ class VisualAssignment extends Assignment {
                 }
                 
                 const dom_title = this.dom_assignment.find(".title");
-                const dom_title_and_description_container = this.dom_assignment.find(".relative-positioning-wrapper");
+                const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
 
                 this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", "unset");
                 // use offsetTop to ignore the transform scale
                 let tag_top = dom_tags[0].offsetTop;
-                let title_top = dom_title_and_description_container[0].offsetTop;
-                let title_height = dom_title_and_description_container.height() + parseFloat(window.getComputedStyle(dom_title[0], "::after").height) - parseFloat(window.getComputedStyle(dom_title[0]).getPropertyValue("--smush-daysleft"));
+                let title_top = dom_left_side_of_header[0].offsetTop;
+                let title_height = dom_left_side_of_header.height() + dom_title.getPseudoStyle("::after", "height") - dom_title.getCSSProperty("--smush-daysleft");
 
                 // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
-                const padding_to_add = title_top + title_height - tag_top + parseFloat(window.getComputedStyle(dom_tags[0]).getPropertyValue("--tags-left--margin-top"));
-                this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", `${Math.max(0, padding_to_add + parseFloat(window.getComputedStyle($("#assignments-container")[0]).getPropertyValue("--vertical-assignment-padding")))}px`);
+                const padding_to_add = title_top + title_height - tag_top + dom_tags.getCSSProperty("--tags-left--margin-top");
+                let original_padding = $("#assignments-container").getCSSProperty("--vertical-assignment-padding");
+                this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", `${Math.max(0, padding_to_add) + original_padding}px`);
 
                 if (SETTINGS.vertical_tag_position === "Top") {
                     dom_tags.addClass("tags-top");
@@ -1056,8 +1057,8 @@ class VisualAssignment extends Assignment {
         }
     }
     displayTruncateWarning() {
-        const relative_positioning_wrapper = this.dom_assignment.find(".relative-positioning-wrapper");
-        relative_positioning_wrapper.toggleClass("display-truncate-warning", relative_positioning_wrapper.find(".description").hasOverflown());
+        const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
+        dom_left_side_of_header.toggleClass("display-truncate-warning", dom_left_side_of_header.find(".description").hasOverflown());
     }
 }
 let already_ran_tutorial = false;
