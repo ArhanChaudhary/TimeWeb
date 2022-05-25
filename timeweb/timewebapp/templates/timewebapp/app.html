@@ -209,13 +209,7 @@
               </div>
             </div>
             <div class="left-side-of-header{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
-              <span class="title">
-                {{ assignment.name }}
-                {% if assignment.google_classroom_assignment_link %}
-                  <br>
-                  <a target="_blank" href="{{ assignment.google_classroom_assignment_link }}">Assignment link</a>
-                {% endif %}
-              </span>
+              <span class="title">{{ assignment.name }}</span>
               {% if assignment.description %}
                 <div class="description">{{ assignment.description|linebreaks }}</div>
               {% endif %}
@@ -235,6 +229,13 @@
               </div>
               <span class="completion-time"></span>
             </div>
+            {% if assignment.google_classroom_assignment_link %}
+              <a target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="0" class="assignment-header-button">
+                <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                  <use href="#external_link-svg"></use>
+                </svg>
+              </a>
+            {% endif %}            
             <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <svg class="tick-button" width="25" preserveAspectRatio="none">
                 <use href="#tick-svg"></use>
@@ -334,6 +335,7 @@
       {% include "question_mark.svg" %}
       {% include "slashed_tick.svg" %}
       {% include "tick.svg" %}
+      {% include "external_link.svg" %}
       {% include "unfinished.svg" %}
     </defs>
   </svg>
