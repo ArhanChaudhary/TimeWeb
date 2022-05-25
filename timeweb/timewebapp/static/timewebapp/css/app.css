@@ -208,8 +208,8 @@ a[href="/settings"] {
 }
 .shortcut-text {
     white-space: nowrap;
-    margin-right: 3px;
-    margin-left: 3px;
+    margin-right: 6px;
+    margin-left: 5px;
 
     flex-grow: 0;
     display: flex;
