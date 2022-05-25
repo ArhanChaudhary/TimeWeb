@@ -230,10 +230,11 @@ class Priority {
             let status_value, status_message, status_image, due_date_minus_today;
             if (sa.sa.needs_more_info && !(sa.sa.is_google_classroom_assignment && due_date_passed && !sa.sa.soft)) {
                 status_image = 'question_mark';
-                status_message = "This assignment needs more info";
                 if (sa.sa.is_google_classroom_assignment) {
+                    status_message = "This Google Classroom assignment needs more info";
                     status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
                 } else {
+                    status_message = "This assignment needs more info";
                     status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
                 }
                 //hard
