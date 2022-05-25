@@ -230,11 +230,10 @@ class Priority {
             let status_value, status_message, status_image, due_date_minus_today;
             if (sa.sa.needs_more_info && !(sa.sa.is_google_classroom_assignment && due_date_passed && !sa.sa.soft)) {
                 status_image = 'question_mark';
+                status_message = "This assignment needs more info";
                 if (sa.sa.is_google_classroom_assignment) {
-                    status_message = "This Google Classroom Assignment needs more Info!<br>Please Edit this Assignment";
                     status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
                 } else {
-                    status_message = "This Assignment needs more Info!<br>Please Edit this Assignment";
                     status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
                 }
                 //hard
@@ -245,17 +244,14 @@ class Priority {
             } else if (finished_work_inputs || due_date_passed && !sa.sa.soft) {
                 status_image = "completely_finished";
                 if (finished_work_inputs && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
-                    status_message = 'You\'re Completely Finished with this Assignment';
+                    status_message = 'You\'re completely finished with this assignment';
                 } else {
                     alert_due_date_passed_cond = true;
                     if (!sa.sa.has_alerted_due_date_passed_notice) {
                         // sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
                         that.due_date_passed_notices.push(sa.sa);
                     }
-                    status_message = 'This Assignment\'s Due Date has Passed';
-                    if (sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info) {
-                        status_message = "This Google Classroom Assignment needs more Info!<br>" + status_message;
-                    }
+                    status_message = 'This assignment\'s due date has passed';
                 }
                 //hard
                 dom_status_image.attr({
@@ -264,7 +260,7 @@ class Priority {
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
             } else if (not_yet_assigned) {
-                status_message = 'This Assignment hasn\'t Yet been Assigned';
+                status_message = 'This assignment hasn\'t yet been assigned';
                 status_value = Priority.NOT_YET_ASSIGNED;
             } else {
                 let has_autofilled = false;
@@ -334,10 +330,10 @@ class Priority {
                 if (incomplete_past_inputs || no_working_days) {
                     status_image = 'question_mark';
                     if (incomplete_past_inputs) {
-                        status_message = "You haven't Entered your past Work Inputs!<br>Please Enter your Progress to Continue";
+                        status_message = "Please enter your past work inputs to continue";
                         status_value = Priority.INCOMPLETE_WORKS;
                     } else {
-                        status_message = 'This Assignment has no Working Days!<br>Please Edit this Assignment\'s Work Days';
+                        status_message = 'This assignment has no more working days';
                         status_value = Priority.NO_WORKING_DAYS;
                     }
                     //hard
@@ -348,9 +344,9 @@ class Priority {
                 } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
                     status_image = 'finished';
                     if (current_work_input_is_break_day) {
-                        status_message = 'Today isn\'t a Working Day for this Assignment';
+                        status_message = 'Today isn\'t a working day for this assignment';
                     } else {
-                        status_message = 'Nice Job! You\'re Finished with this Assignment\'s Work for Today';
+                        status_message = 'You\'re finished with this assignment\'s work for today';
                     }
                     //hard
                     dom_status_image.attr({
@@ -362,17 +358,12 @@ class Priority {
                     status_value = Priority.UNFINISHED_FOR_TODAY;
                     display_format_minutes = true;
                     status_image = 'unfinished';
-                    status_message = "<span class=\"unfinished-message\">This Assignment's Daily Work is Unfinished<br></span>";
                     //hard
                     dom_status_image.attr({
                         width: 15,
                         height: 15,
                     }).css("margin-left", -2);
-                    if (sa.unit_is_of_time) {
-                        status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} of Work Today`;
-                    } else {
-                        status_message += `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo)} Today`;
-                    }
+                    status_message = `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}today`;
                     that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
                 }
 
