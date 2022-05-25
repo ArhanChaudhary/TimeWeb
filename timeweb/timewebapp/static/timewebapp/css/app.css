@@ -142,6 +142,7 @@ a[href="/settings"] {
 .assignment-container {
     /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
+    font-size: 11.5pt;
     position: relative;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
@@ -378,7 +379,6 @@ a[href="/settings"] {
 .title {
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
-    font-size: clamp(13px, calc(11px + 0.4vw), 17px);
     --smush-daysleft: 2px;
     --smush-priority: 3px;
     overflow-wrap: break-word;
@@ -417,7 +417,6 @@ a[href="/settings"] {
     fill: currentColor;
 }
 .right-side-of-header {
-    font-size: min(16.76px,calc(11px + 0.4vw));
     margin: 0;
     margin-right: 7px;
     white-space: initial;
@@ -441,7 +440,7 @@ a[href="/settings"] {
     position: absolute;
     z-index: 1;
     white-space: nowrap;
-    font-size: min(10.25px, 0.87em);
+    font-size: 0.75em;
     --tags-left--margin-top: 7px;
     --tags-bottom--margin-bottom: 2px;
     --tags-right--margin-right: 2px;
