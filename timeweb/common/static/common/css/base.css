@@ -32,6 +32,9 @@ img {
         -ms-user-select: none;
             user-select: none;
 }
+svg[height="0"], svg[width="0"] {
+    position: absolute;
+}
 /* Override normalize.css */
 html {
     line-height: unset !important;
