@@ -154,6 +154,9 @@ a[href="/settings"] {
 .assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
     transition: none !important;
 }
+#assignments-container > :last-child {
+    margin-bottom: 60px;
+}
 .assignment {
     box-shadow: 0 0 12px -11px black;
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
