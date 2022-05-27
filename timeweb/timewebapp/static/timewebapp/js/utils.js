@@ -417,7 +417,7 @@ utils = {
             const hide_button = info.find("#hide-button");
             const icon_label_container = $("#icon-label-container");
             $("#assignments-header #icon-label-container img").on("mouseover mouseout focusout", function(e) {
-                const visible_icon_label = icon_label_container.children("div:visible");
+                const visible_icon_label = icon_label_container.find("div:visible");
                 let toggle_dim;
                 if (visible_icon_label.length && e.type === "mouseover")
                     toggle_dim = collision(hide_button, visible_icon_label);
@@ -428,7 +428,7 @@ utils = {
                 info.toggleClass("dim", toggle_dim);
             });
             $(window).on("resize", function() {
-                const visible_icon_label = icon_label_container.children("div:visible");
+                const visible_icon_label = icon_label_container.find("div:visible");
                 if (!visible_icon_label.length) return;
                 info.toggleClass("dim", collision(hide_button, visible_icon_label));
             });
@@ -692,7 +692,7 @@ utils = {
                         // Also remove z-index if it wasnt reset back to none from dragging the tag around
                         return !$(this).css("z-index","").hasClass("tag-is-deleting");
                     }).map(function() {
-                        return $(this).children(".tag-name").text();
+                        return $(this).find(".tag-name").text();
                     }).toArray();
 
                     // There are too many conditions on whether to sort or not, so just sort every time

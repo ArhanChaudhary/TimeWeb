@@ -46,7 +46,7 @@ $(window).one("load", function() {
 
     $("#circles-background .bubble-up").each(function(i) {
         let background_gradient_factor = 1 - i / (number_of_circles - 1);
-        $(this).children(".bubble-right").css("background", `rgb(${front_color.r + background_gradient_factor * (back_color.r - front_color.r)}, ${front_color.g + background_gradient_factor * (back_color.g - front_color.g)}, ${front_color.b + background_gradient_factor * (back_color.b - front_color.b)})`);
+        $(this).find(".bubble-right").css("background", `rgb(${front_color.r + background_gradient_factor * (back_color.r - front_color.r)}, ${front_color.g + background_gradient_factor * (back_color.g - front_color.g)}, ${front_color.b + background_gradient_factor * (back_color.b - front_color.b)})`);
         this.style.setProperty("--circle-number", i);
         this.style.setProperty("--random-delay", `${Math.floor(Math.random()*11-5)}s`);
         this.style.setProperty("--random-x", `${Math.random()*6+5}vw`);

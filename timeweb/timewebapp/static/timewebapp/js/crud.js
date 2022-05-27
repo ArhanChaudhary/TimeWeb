@@ -177,9 +177,9 @@ class Crud {
             $("#id_x").trigger("hide.daterangepicker");
         }, 0);
         if (params.show_instantly) {
-            $('#overlay').show().children("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
+            $('#overlay').show().find("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
         } else {
-            $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).children("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
+            $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
             if (!isMobile) {
                 $("form input:visible").first().focus();
             } else {
@@ -199,7 +199,7 @@ class Crud {
     hideForm(params={hide_instantly: false}) {
         const that = this;
         if (params.hide_instantly) {
-            $("#overlay").hide().children("#form-wrapper");
+            $("#overlay").hide().find("#form-wrapper");
             $(".assignment-form-error-note").remove(); // Remove all error notes when form is exited
         } else {
             $("#overlay").fadeOut(Crud.FORM_ANIMATION_DURATION, function() {
@@ -207,7 +207,7 @@ class Crud {
                 $(".invalid").removeClass("invalid");
                 $(".assignment-form-error-note").remove();
                 Crud.GO_TO_FIELD_GROUP({standard: true});
-            }).children("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
+            }).find("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
         // Fallback if "overlay" doesn't exist
         $("main").css("overflow-y", "scroll");
@@ -440,7 +440,7 @@ class Crud {
         assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
             dat = dat.filter(_sa => sa.id !== _sa.id);
             // If a shorcut is in assignment_container, take it out so it doesn't get deleted
-            assignment_container.children("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
+            assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
             assignment_container.remove();
             // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
             dom_assignment.removeClass("assignment-is-closing open-assignment");

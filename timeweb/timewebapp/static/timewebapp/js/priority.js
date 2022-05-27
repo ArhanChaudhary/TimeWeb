@@ -438,11 +438,11 @@ class Priority {
             // Can't just define this once because len_works changes
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
             const assignment_header_button = assignment_container.find(".assignment-header-button");
-            const assignment_header_tick_svg = assignment_header_button.children(".tick-button");
+            const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
             const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
 
             assignment_header_button.filter(function() {
-                return !!$(this).children(".tick-button").length;
+                return !!$(this).find(".tick-button").length;
             }).toggle(
                 !(
                     [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
@@ -838,11 +838,11 @@ class Priority {
 
         $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
             // If there's only one assignment for #auto-fill-work-done specifically, don't remove the wrapper
-            if ($(this).children("#autofill-work-done").length) return;
+            if ($(this).find("#autofill-work-done").length) return;
 
             $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
-            $(this).children("#delete-starred-assignments").insertBefore($(this));
-            $(this).children(".shortcut").remove();
+            $(this).find("#delete-starred-assignments").insertBefore($(this));
+            $(this).find(".shortcut").remove();
         });
 
         if (!first_available_tutorial_assignment) {
