@@ -50,25 +50,23 @@ class Priority {
             }, Priority.ANIMATE_IN_DURATION, "easeOutCubic");
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-        if (SETTINGS.show_priority) {
-            setTimeout(() => {
-                if (params.first_sort) {
-                    params.dom_assignment.addClass("transition-instantly");
-                }
-                if (isNaN(params.priority_percentage)) {
-                    params.dom_assignment.prop("style").setProperty("--priority-color", "var(--color)");
-                } else {
-                    const priority_color = that.percentageToColor(params.priority_percentage);
-                    params.dom_assignment.prop("style").setProperty("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
-                }
-                params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
-                if (params.first_sort) {
-                    // Which element specifically is overflowed seems to have minimal effect on performance
-                    params.dom_assignment[0].offsetHeight;
-                    params.dom_assignment.removeClass("transition-instantly");
-                }
-            }, 0);
-        }
+        setTimeout(() => {
+            if (params.first_sort) {
+                params.dom_assignment.addClass("transition-instantly");
+            }
+            if (isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
+                params.dom_assignment.prop("style").setProperty("--priority-color", "var(--color)");
+            } else {
+                const priority_color = that.percentageToColor(params.priority_percentage);
+                params.dom_assignment.prop("style").setProperty("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
+            }
+            params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
+            if (params.first_sort) {
+                // Which element specifically is overflowed seems to have minimal effect on performance
+                params.dom_assignment[0].offsetHeight;
+                params.dom_assignment.removeClass("transition-instantly");
+            }
+        }, 0);
     }
     setInitialAssignmentTopOffset($assignment_container) {
         const that = this;
