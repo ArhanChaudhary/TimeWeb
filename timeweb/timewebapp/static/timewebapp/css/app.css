@@ -442,7 +442,7 @@ a[href="/settings"] {
     z-index: 1;
     white-space: nowrap;
     font-size: 0.75em;
-    --tags-left--margin-top: 7px;
+    --tags-left--margin-bottom: 7px;
     --tags-bottom--margin-bottom: 2px;
     --tags-right--margin-right: 2px;
     --tags-top--margin-top: 2px;
