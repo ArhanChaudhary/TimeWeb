@@ -774,6 +774,8 @@ class VisualAssignment extends Assignment {
         })
         // an alert can sometimes cause the enter to be fired on another element, instead listen to the event's propagation to the root
         $(document).keyup(e => {
+            if (!$(e.target).is(work_input_textbox)) return;
+
             if (e.key === "Enter") enter_fired = false;
 
             if (this.sa.needs_more_info) {
