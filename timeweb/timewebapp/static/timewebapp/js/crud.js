@@ -198,6 +198,10 @@ class Crud {
     }
     hideForm(params={hide_instantly: false}) {
         const that = this;
+
+        // Needed because this still runs when the form is already hidden,
+        // calling RESET_FORM_FIELD_MARGINS prematurely and iffing up some animation stuffs
+        if (!$("#overlay").is(":visible")) return;
         if (params.hide_instantly) {
             $("#overlay").hide().find("#form-wrapper");
             $(".assignment-form-error-note").remove(); // Remove all error notes when form is exited
