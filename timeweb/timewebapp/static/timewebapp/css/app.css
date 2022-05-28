@@ -39,12 +39,6 @@ header.animate::after {
 #tutorial-message {
     padding: 0 10px;
 }
-#icon-label-container {
-    display: inline-flex;
-    align-items: center;
-    float: right;
-    position: relative;
-}
 #assignments-header {
     position: relative;
     font-size: 17px;
@@ -85,59 +79,6 @@ header.animate::after {
     width: 0;
     overflow: hidden;
     position: absolute;
-}
-#assignments-header img {
-    position: relative;
-    cursor: pointer;
-    z-index: 1;
-    padding-right: 5px;
-    padding-left: 5px;
-}
-#assignments-header a[href="/settings"] img {
-    margin-right: -5px;
-}
-#settings {
-    /* Remove weird extra space */
-    display: block;
-}
-#close-assignments {
-    order: 2;
-}
-#previous-day {
-    order: 3;
-    transform: scaleX(-1);
-}
-#next-day {
-    order: 4;
-}
-a[href="/settings"] {
-    order: 5;
-}
-#assignments-header #icon-label-container img ~ div {
-    position: absolute;
-    order: 1;
-    padding-right: 10px;
-    padding-left: 20px;
-    right: 100%;
-    white-space: nowrap;
-    text-align: right;
-    display: none;
-}
-#assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
-#assignments-header img#previous-day:hover ~ div#previous-day-icon-label,
-#assignments-header img#next-day:hover ~ div#next-day-icon-label,
-#assignments-header a[href="/settings"]:hover ~ div#settings-icon-label,
-#assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
-#assignments-header img#previous-day:focus ~ div#previous-day-icon-label,
-#assignments-header img#next-day:focus ~ div#next-day-icon-label,
-#assignments-header a[href="/settings"]:focus ~ div#settings-icon-label {
-    display: block;
-}
-#assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
-#assignments-header img#previous-day:hover ~ div:not(#previous-day-icon-label),
-#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
-#assignments-header a[href="/settings"]:hover ~ div:not(#settings-icon-label) {
-    display: none !important;
 }
 .assignment-container {
     /* I remember the 2s was here for an important reason but i have no clue what */

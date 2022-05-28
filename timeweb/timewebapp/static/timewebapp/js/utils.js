@@ -179,7 +179,8 @@ utils = {
                 });
                 $("#current-date-text").text(`Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
-                $("#next-day, #previous-day").click(function() {
+                // Legacy previous-day logic I'll still keep
+                $("#next-day"/*, #previous-day"*/).click(function() {
                     let previous_day = false;
                     let next_day = false;
                     let confirm_title_name;
@@ -229,9 +230,6 @@ utils = {
                             cancel: function() {
                                 
                             }
-                        },
-                        onDestroy: function() {
-                            $(document.activeElement).blur();
                         },
                     });
 
@@ -410,28 +408,6 @@ utils = {
                     });
                 });
             },
-        },
-        dimAssignmentsHeaderInfoOnIconHover: function() {
-            // Reminder: priority.js triggers this event handler
-            const info = $("#info");
-            const hide_button = info.find("#hide-button");
-            const icon_label_container = $("#icon-label-container");
-            $("#assignments-header #icon-label-container img").on("mouseover mouseout focusout", function(e) {
-                const visible_icon_label = icon_label_container.find("div:visible");
-                let toggle_dim;
-                if (visible_icon_label.length && e.type === "mouseover")
-                    toggle_dim = collision(hide_button, visible_icon_label);
-                else
-                    toggle_dim = false;
-                // if you mouseout while an icon is focused, dim is removed. This fixes that
-                if (!toggle_dim && $("#icon-label-container img").is(document.activeElement) && e.type === "mouseout") return;
-                info.toggleClass("dim", toggle_dim);
-            });
-            $(window).on("resize", function() {
-                const visible_icon_label = icon_label_container.find("div:visible");
-                if (!visible_icon_label.length) return;
-                info.toggleClass("dim", collision(hide_button, visible_icon_label));
-            });
         },
         addTagHandlers: function() {
             function transitionCloseTagBox($tag_add) {
@@ -1397,7 +1373,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();
-    utils.ui.dimAssignmentsHeaderInfoOnIconHover();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();

@@ -19,6 +19,12 @@
 {% block base_head_body %}
 <header>
     {% url 'home' as home %}
+    {% url 'settings' as settings %}
+    {% url 'user_guide' as user_guide %}
+    {% url 'changelog' as changelog %}
+    {% url 'contact' as contact %}
+    {% url 'blog' as blog %}
+    {% url 'policies' as policies %}
     {% if user.is_authenticated and request.path == home %}
         <div id="image-new-container" tabindex="1">
             <img width="60" height="60" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
@@ -60,17 +66,34 @@
             </svg>
         </div>
         <div id="nav-items">
-            <a href="{% url 'user_guide' %}">User Guide</a>
-            <a href="{% url 'changelog' %}">Changelog</a>
-            <a href="{% url 'contact_form' %}">Contact</a>
+            {% if request.path != home %}
+                <a href={{ home }}>Home</a>
+            {% endif %}
+            {% if request.path != settings %}
+                <a href="{{ settings }}">Settings</a>
+            {% endif %}
+            {% if request.path == home %}
+                <div id="next-day" tabindex="0">Go to<br>Next Day</div>
+                <div id="close-assignments" tabindex="0">Close all Assign-<br>ments</div>
+            {% endif %}
             <div class="nav-hr"></div>
-            <span id="nav-a2hs" tabindex="0">Install on Home Screen</span>
-            <a href="{% url 'blog' %}" id="nav-blog">Blog</a>
-            <span id="nav-credits" tabindex="0">Credits</span>
-            <a href="{% url 'policies' %}">Policies</a>
+            {% if request.path != user_guide %}
+                <a href="{{ user_guide }}">User Guide</a>
+            {% endif %}
+            {% if request.path != changelog %}
+                <a href="{{ changelog }}">Changelog</a>
+            {% endif %}
+            {% if request.path != contact %}
+                <a href="{{ contact_form }}">Contact</a>
+            {% endif %}
+            <div class="nav-hr"></div>
+            <div id="nav-a2hs" tabindex="0">Install on Home Screen</div>
+            <a href="{{ blog }}" id="nav-blog">Blog</a>
+            <div id="nav-credits" tabindex="0">Credits</div>
+            <a href="{{ policies }}">Policies</a>
         </div>
     </nav>
-    <a href="{% url 'home' %}" id="logo-container">
+    <a href="{{ home }}" id="logo-container">
         <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" border="0" draggable="false"/>
         <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
