@@ -9,9 +9,9 @@ html {
     padding-top: 10px;
     opacity: 0;
     --scale-percent-y: 1.05;
-    --vertical-assignment-padding: 25px;
+    --vertical-assignment-padding: 33px;
     --horizontal-assignment-padding: 15px;
-    --outer-assignment-vertical-padding: 7px;
+    --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
 }
 main:not(.animate) {
@@ -301,15 +301,15 @@ a[href="/settings"] {
 
 @media screen and (max-width: 900px) {
     #assignments-container {
-        --outer-assignment-horizontal-padding: 10px;
-        --outer-assignment-vertical-padding: 5px;
+        --outer-assignment-horizontal-padding: 13px;
+        --outer-assignment-vertical-padding: 7px;
     }
     .assignment-container.add-line-wrapper::before,
     .assignment-container.add-line-wrapper::after {
         --horizontal-margin: 4px;
     }
     .shortcut-line-left, .shortcut-line-right {
-        --negative-horizontal-margin: -6px;
+        --negative-horizontal-margin: -9px;
     }
     .shortcut-text {
         font-size: 15px;
@@ -329,7 +329,7 @@ a[href="/settings"] {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(35px + 13vw);
+    --left-side-of-header-width: calc(95px + 8vw);
 }
 .fancy-coloring {
     color: var(--priority-color);
@@ -443,9 +443,9 @@ a[href="/settings"] {
     white-space: nowrap;
     font-size: 0.75em;
     --tags-left--margin-bottom: 7px;
-    --tags-bottom--margin-bottom: 2px;
+    --tags-bottom--margin-bottom: 3px;
     --tags-right--margin-right: 2px;
-    --tags-top--margin-top: 2px;
+    --tags-top--margin-top: 3px;
 }
 .tags [tabindex]:focus, .tags input:focus {
     outline: 0;
