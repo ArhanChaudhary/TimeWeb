@@ -172,15 +172,14 @@
           <div class="assignment-header">
             <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
               <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
-                {% for tag in assignment.tags %}
-                  <div class="tag-wrapper">
+                {% comment %} Remove whitespace to remove inline-black gap (minify-html does not fix this) {% endcomment %}
+                {% for tag in assignment.tags %}<div class="tag-wrapper">
                     <div class="tag-name">{{ tag }}</div>
                     <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
                       <span class="icon-slash x-first-slash"></span>
                       <span class="icon-slash x-second-slash"></span>
                     </div>
-                  </div>
-                {% endfor %}
+                  </div>{% endfor %}
               </span>
               <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
                 <span class="icon-slash plus-first-slash"></span>
