@@ -130,11 +130,11 @@
     border-bottom-left-radius: var(--border-radius);
     border-left: 1px solid var(--color);
 }
-#form-wrapper #first-tab-line {
-    transition: margin-left 0.2s ease-in-out 0.05s;
+#field-group-picker-styling * {
+    transition: transform 0.2s ease-in-out 0.05s;
 }
-#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #first-tab-line {
-    margin-left: calc(-50% + var(--horizontal-field-group-tab-padding));
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
+    transform: translateX(-207px);
 }
 /* Really really ugly code that animates the form height on field group change */
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
