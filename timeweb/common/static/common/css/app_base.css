@@ -275,9 +275,6 @@ rect {
     font-family: "Open Sans";
     font-size: 12.5px;
 }
-#nav-items #nav-close-assignments {
-    display: none;
-}
 #nav-items .nav-hr {
     width: calc(100% - 6px);
 }
