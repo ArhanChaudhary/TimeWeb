@@ -103,7 +103,8 @@ utils = {
         },
         arrayToEnglish: function(array) {
             return `<ul><li>${array.join("</li><li>")}</li></ul>`;
-        }
+        },
+        getReversibilityStatus: () => utils.in_simulation ? "This action can be reversed by refreshing this page." : "This action is irreversible.",
     },
     ui: {
         tickClock: function() {
@@ -212,6 +213,7 @@ utils = {
                             top: -9999,
                         });
                         $("#current-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                        $("#next-day").hide();
                         new Priority().sort();
                     }
 
@@ -221,7 +223,7 @@ utils = {
                     }
                     $.confirm({
                         title: `Are you sure you want to go to the ${confirm_title_name} day?`,
-                        content: `This action simulates every assignments' work on the ${confirm_title_name} day.<br><br>NONE of the changes you make in the simulation are saved. Your assignments can be restored by refreshing this page (i.e. every action, including irreversible actions, will be undone)`,
+                        content: `This action simulates every assignments' work on the ${confirm_title_name} day.<br><br>NONE of the changes you make in the simulation are saved. Your assignments can be restored by refreshing this page.`,
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -279,7 +281,7 @@ utils = {
                 $("#delete-starred-assignments .generic-button").click(function() {
                     $.confirm({
                         title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
-                        content: 'This action is irreversible',
+                        content: utils.formatting.getReversibilityStatus(),
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -320,7 +322,7 @@ utils = {
                 $("#autofill-work-done .generic-button").click(function(e) {
                     $.confirm({
                         title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
-                        content: "This action is irreversible.",
+                        content: utils.formatting.getReversibilityStatus(),
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
@@ -371,7 +373,7 @@ utils = {
                     }
                     $.confirm({
                         title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
-                        content: 'This action is irreversible.',
+                        content: utils.formatting.getReversibilityStatus(),
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
