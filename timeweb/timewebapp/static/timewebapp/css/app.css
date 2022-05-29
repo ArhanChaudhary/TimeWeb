@@ -217,6 +217,7 @@ header.animate::after {
 .assignment-container.add-line-wrapper::after {
     right: 0;
     border-right: 2px solid var(--color);
+    z-index: -1;
 }
 .assignment-container.first-add-line-wrapper::before,
 .assignment-container.first-add-line-wrapper::after {
