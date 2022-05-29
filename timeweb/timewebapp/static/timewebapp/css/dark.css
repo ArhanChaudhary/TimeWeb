@@ -6,7 +6,7 @@ body {
     --primary-c: 48;
     --c: 213;
     --input-focus-color: hsl(210deg, 71%, 57%);
-    --form-placeholder-color: rgb(168, 168, 168);
+    --form-placeholder-color: hsl(0, 0%, 66%);
 }
 #form-wrapper form {
     --field-widget-background-color: hsl(0deg, 0%, 19%);
@@ -53,8 +53,8 @@ body {
     --background-color: hsl(0, 0%, 20%);
 }
 .tag-add-button::after {
-    --box-shadow-color-default: rgb(171, 171, 171);
-    --box-shadow-color-focus: rgb(211, 211, 211);
+    --box-shadow-color-default: hsl(0, 0%, 67%);
+    --box-shadow-color-focus: hsl(0, 0%, 83%);
     --box-shadow-color-invalid: rgb(187, 53, 53);
 }
 .tag-add-button:focus:not(:hover)::after {
@@ -64,7 +64,7 @@ body {
     box-shadow: 0 0 5px 2px var(--box-shadow-color-invalid);
 }
 .tag-add-button > .icon-slash {
-    --background-color: rgb(192, 192, 192);
+    --background-color: hsl(0, 0%, 75%);
 }
 .tag-add-selection-item::after {
     --background-color: hsl(0, 0%, 19%);
@@ -91,11 +91,11 @@ body {
     --background-color: hsl(0, 0%, 27%);
 }
 .graph-footer ::placeholder {
-    color: rgb(163, 163, 163);
+    color: hsl(0, 0%, 64%);
 }
 #toggle-gc-container {
     --background-color: var(--body-background);
-    --box-shadow-color: rgb(103, 103, 103);
+    --box-shadow-color: hsl(0, 0%, 40%);
 }
 
 /* .available for higher priority */
@@ -110,5 +110,5 @@ body {
 
 .jconfirm.jconfirm-light .jconfirm-box {
     box-shadow: none !important;
-    border: 1px solid rgb(123, 123, 123);
+    border: 1px solid hsl(0, 0%, 48%);
 }
