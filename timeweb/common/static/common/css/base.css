@@ -35,6 +35,9 @@ img {
 svg[height="0"], svg[width="0"] {
     position: absolute;
 }
+hr {
+    border-color: hsl(0, 0%, 93%);
+}
 /* Override normalize.css */
 html {
     line-height: unset !important;
