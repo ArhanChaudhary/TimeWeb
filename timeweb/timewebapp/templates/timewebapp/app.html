@@ -126,6 +126,7 @@
       })();
     </script>
     <div id="assignments-header">
+      <span id="todo-wrapper">
         <span id="estimated-total-time-label">Todo:</span>
         <span id="estimated-total-time"></span>
         <span id="estimated-completion-time"></span>
@@ -133,9 +134,7 @@
         <div id="hide-button" class="generic-button">Hide</div>
       </span>
       {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
-      <div id="current-date"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
-        <span id="current-date-text"></span>
-      </div>
+      <div id="current-date"{% if settings_model.background_image %} class="grey-highlight"{% endif %}></div>
       <div id="sort-assignments-container">
         <label for="{{ settings_form.assignment_sorting.auto_id }}"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
           {{ settings_form.assignment_sorting.label }}

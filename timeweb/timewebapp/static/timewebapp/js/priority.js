@@ -687,12 +687,12 @@ class Priority {
     updateInfoHeader() {
         const that = this;
         if (!that.total_completion_time) {
-            $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
-            $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
+            $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").removeClass("hide-info");
+            $("#estimated-completion-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
             $("#estimated-total-time").text(dat.length ? 'You have finished everything for today' : 'You don\'t have any assignments');
         } else {
-            $("#hide-button").text() === "Show" && $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
-            $("#current-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
+            $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").addClass("hide-info");
+            $("#estimated-completion-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
             $("#estimated-total-time").text(` ${utils.formatting.formatMinutes(that.total_completion_time)}`).attr("data-minutes", that.total_completion_time);
 
             let relative_today_and_tomorrow_date;

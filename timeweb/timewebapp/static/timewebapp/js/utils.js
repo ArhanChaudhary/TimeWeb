@@ -118,7 +118,7 @@ utils = {
             let str = estimated_completion_time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
             str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
-            $("#current-time").text(` (${str})`);
+            $("#estimated-completion-time").text(` (${str})`);
             utils.ui.old_minute_value = minute_value;
 
             const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -160,11 +160,11 @@ utils = {
                 $("#hide-button").click(function() {
                     if ($(this).text() === "Hide") {
                         $(this).text("Show");
-                        $("#estimated-total-time, #current-time, #tomorrow-time").addClass("hide-info");
+                        $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").addClass("hide-info");
                         localStorage.setItem("hide-button", true);
                     } else {
                         $(this).text("Hide");
-                        $("#estimated-total-time, #current-time, #tomorrow-time").removeClass("hide-info");
+                        $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").removeClass("hide-info");
                         localStorage.removeItem("hide-button");
                     }
                 });
@@ -177,7 +177,7 @@ utils = {
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
-                $("#current-date-text").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+                $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
                 // Legacy previous-day logic I'll still keep
                 $("#next-day"/*, #previous-day"*/).click(function() {
@@ -207,10 +207,11 @@ utils = {
                             $(this).find(".hide-assignment-button").click();
                         });
                         // Hide current time without using display none, as that can be affected by .toggle
-                        $("#current-time").css({
+                        $("#estimated-completion-time").css({
                             position: "absolute",
                             top: -9999,
-                        $("#current-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                        });
+                        $("#current-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                         new Priority().sort();
                     }
 
@@ -1027,7 +1028,7 @@ utils = {
                 if (date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && date_now.getHours() < 4) {
                     // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
                     // this alert is for fellow insomniacs who lose track of time
-                    $("#current-date-text").text(`(The current date has changed) ${$("#current-date-text").text()}`);
+                    $("#current-date").text(`(The current date has changed) ${$("#current-date").text()}`);
                 }
                 localStorage.setItem("last_visit", date_now.valueOf());
             });
