@@ -428,8 +428,8 @@ header.animate::after {
 }
 .tag-delete {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     top: 3px;
     right: 3px;
     border-radius: 50%;
@@ -459,8 +459,8 @@ header.animate::after {
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 10px;
     --background-color: rgb(231, 231, 231);
     background-color: var(--background-color);
@@ -497,14 +497,14 @@ header.animate::after {
     transition: margin-right calc(0.15s * var(--animation-speed)) ease-in-out;
 }
 .tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
-    margin-right: 9px;
+    margin-right: 11px;
 }
 .tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
     transform: scale(1.2);
 }
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
-    width: 57px;
+    width: 68px;
 }
 .tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
@@ -653,8 +653,8 @@ header.animate::after {
 }
 .tag-add > .icon-slash {
     right: unset;
-    left: 6px;
-    height: 9px;
+    left: 7.5px;
+    height: 10px;
     background-color: var(--color);
 }
 .x-first-slash {
