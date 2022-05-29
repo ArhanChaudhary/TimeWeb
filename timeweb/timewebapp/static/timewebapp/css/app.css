@@ -466,8 +466,8 @@ header.animate::after {
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 16px;
-    height: 16px;
+    width: 16.8px;
+    height: 16.8px;
     border-radius: 10px;
     --background-color: rgb(231, 231, 231);
     background-color: var(--background-color);
@@ -660,7 +660,7 @@ header.animate::after {
 }
 .tag-add > .icon-slash {
     right: unset;
-    left: 7.5px;
+    left: 7.75px;
     height: 10px;
     background-color: var(--color);
 }
