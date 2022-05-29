@@ -1095,7 +1095,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         dom_assignment.addClass("assignment-is-closing").removeClass("open-assignment").css("overflow", "hidden");
         if (!$(".assignment.open-assignment").length)
-            $("#close-assignments").hide();
+            $("#nav-close-assignments").hide();
         assignment_footer.find(".graph-footer *").attr("tabindex", -1);
         assignment_footer.animate({
             marginBottom: -assignment_footer.height(),
@@ -1115,12 +1115,12 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         return;
     }
-    SETTINGS.one_graph_at_a_time && $("#close-assignments").click();
+    SETTINGS.one_graph_at_a_time && $("#nav-close-assignments").click();
     
     // If the assignment was clicked while it was closing, stop the closing animation and open it
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
-    $("#close-assignments").show();
+    $("#nav-close-assignments").show();
     sa.positionTags();
     sa.displayTruncateWarning();
     assignment_footer.css("display", "block");

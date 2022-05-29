@@ -175,18 +175,18 @@ utils = {
             },
             headerIcons: function() {
                 // Assignments header icons
-                $("#close-assignments").click(function() {
+                $("#nav-close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
                 $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
                 // Legacy previous-day logic I'll still keep
-                $("#next-day"/*, #previous-day"*/).click(function() {
+                $("#nav-next-day"/*, #previous-day"*/).click(function() {
                     let previous_day = false;
                     let next_day = false;
                     let confirm_title_name;
                     switch ($(this).attr("id")) {
-                        case "next-day":
+                        case "nav-next-day":
                             next_day = true;
                             confirm_title_name = "next";
                             break;
@@ -213,7 +213,7 @@ utils = {
                             top: -9999,
                         });
                         $("#current-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                        $("#next-day").hide();
+                        $("#nav-next-day").hide();
                         new Priority().sort();
                     }
 

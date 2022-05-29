@@ -275,7 +275,7 @@ rect {
     font-family: "Open Sans";
     font-size: 12.5px;
 }
-#nav-items #close-assignments {
+#nav-items #nav-close-assignments {
     display: none;
 }
 #nav-items .nav-hr {
