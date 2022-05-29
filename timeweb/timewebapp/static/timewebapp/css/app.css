@@ -48,31 +48,24 @@ header.animate::after {
     align-items: center;
     flex-wrap: wrap;
 }
-#info {
-    width: 100%;
-}
-#info.dim > :not(#icon-label-container) {
-    opacity: 0;
-}
-#assignments-header::after {
-    content: "";
+#todo-wrapper {
+    white-space: nowrap;
     width: 100%;
     margin-bottom: 4px;
 }
 #current-date {
     position: relative;
+    white-space: nowrap;
     order: 1;
 }
 #sort-assignments-container {
     display: flex;
     align-items: center;
-    gap: 3px;
-    margin-left: auto;
     order: 1;
-}
-#hide-button {
-    margin-right: 5px;
-    margin-left: 5px;
+    gap: 3px;
+    white-space: nowrap;
+    margin-left: auto;
+    padding-left: 15px;
 }
 .hide-info {
     height: 0;
@@ -270,7 +263,7 @@ header.animate::after {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(95px + 8vw);
+    --left-side-of-header-width: calc(15px + 13vw);
 }
 .fancy-coloring {
     color: var(--priority-color);

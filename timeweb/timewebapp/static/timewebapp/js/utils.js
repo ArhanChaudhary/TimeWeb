@@ -177,7 +177,7 @@ utils = {
                 $("#close-assignments").click(function() {
                     $(".assignment.open-assignment").click();
                 });
-                $("#current-date-text").text(`Current date: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+                $("#current-date-text").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
                 // Legacy previous-day logic I'll still keep
                 $("#next-day"/*, #previous-day"*/).click(function() {
@@ -210,8 +210,7 @@ utils = {
                         $("#current-time").css({
                             position: "absolute",
                             top: -9999,
-                        })
-                        $("#current-date-text").text("(No changes are saved in this state) Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                        $("#current-date-text").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                         new Priority().sort();
                     }
 
