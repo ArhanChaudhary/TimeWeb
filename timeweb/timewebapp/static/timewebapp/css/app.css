@@ -750,21 +750,7 @@ header.animate::after {
     display: block;
     position: relative;
 }
-.graph-footer .info-button {
-    /* Prevent graph buttons from oversizing */
-    margin-bottom: -1px;
-    width: 22px;
-    height: 17px;
-    font-size: 15px;
-    padding: 0 !important;
-    line-height: 17px;
-    cursor: pointer;
-}
-.graph-footer .info-button:hover {
-    box-shadow: none;
-}
 .graph-footer {
-    font-size: 15px;
     padding: 0 13px;
     position: relative;
 }
