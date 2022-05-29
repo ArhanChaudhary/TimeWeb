@@ -102,7 +102,7 @@ main.finished-header-transition {
     padding: 1px 6px;
     position: relative;
 }
-.generic-button:hover, ::file-selector-button:hover {
+.generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) - 19);
 }
 .generic-button:active, ::file-selector-button:active {

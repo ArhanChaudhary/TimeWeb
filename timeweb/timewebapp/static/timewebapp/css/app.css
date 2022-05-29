@@ -67,6 +67,13 @@ header.animate::after {
     margin-left: auto;
     padding-left: 15px;
 }
+#id_assignment_sorting {
+    padding: 0;
+    text-align: initial;
+}
+#id_assignment_sorting:focus {
+    outline: 0;
+}
 .hide-info {
     height: 0;
     width: 0;

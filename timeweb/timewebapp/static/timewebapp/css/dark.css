@@ -35,11 +35,7 @@ body {
 #form-wrapper .field-widget:hover {
     --field-widget-background-color: hsl(0, 0%, 24%);
 }
-#id_assignment_sorting {
-    color: rgb(var(--c), var(--c), var(--c));
-    background-color: black;
-}
-.generic-button:hover {
+.generic-button:hover, .generic-button:focus {
     --bg-c: calc(var(--primary-c) + 12);
 }
 .assignment {
