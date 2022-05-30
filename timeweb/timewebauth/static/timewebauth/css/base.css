@@ -1,7 +1,7 @@
 body {
     /* "Sweet airan" gradient from https://www.eggradients.com/category/white-gradient */
-    background-color: #ffffff;
     background-image: linear-gradient(315deg, #ffffff 0%, #d7e1ec 74%);
+    background-attachment: fixed;
 }
 #accounts-container {
     border-radius: 10px;
@@ -9,6 +9,7 @@ body {
     position: relative;
     width: clamp(290px, calc(100vw - 100px), 600px);
     background: white;
+    /* Ensures this doesnt overflow at the top */
     margin: auto;
     box-sizing: border-box;
     padding: 15px 40px 25px;
@@ -87,7 +88,7 @@ body {
 #circles-background {
     filter: url("#goo");
     overflow: hidden;
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     right: 0;
