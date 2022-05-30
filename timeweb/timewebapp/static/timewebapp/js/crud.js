@@ -215,8 +215,11 @@ class Crud {
     }
     replaceUnit() {
         const that = this;
-        const val = $("#id_unit").val().trim() || $("#id_y ~ .field-widget").getPseudoStyle("::after", "content").slice(1, -1);
-        const plural = pluralize(val),
+        // Can't directly juse .slice() it because safari returns the psuedo's content without quotes
+        let val = $("#id_unit").val().trim() || $("#id_y ~ .field-widget").getPseudoStyle("::after", "content");
+        if (val.substring(0, 1) === "\"" && val.substring(val.length - 1) === "\"")
+            val = val.slice(1, -1);
+        let plural = pluralize(val),
             singular = pluralize(val, 1);
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
