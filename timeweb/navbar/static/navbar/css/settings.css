@@ -40,6 +40,7 @@ body {
 .right-side-of-field > * {
     box-sizing: border-box;
     width: 157px;
+    border-color: black;
 }
 .right-side-of-field > :not(.error-note) {
     margin: unset;
@@ -111,10 +112,11 @@ body {
     content: '';
     position: absolute;
     z-index: -1;
-    top: 0;
+    /* height: 100% on lower zoom percentages doesn't take up the entire container */
+    top: -1;
+    height: calc(100% + 1px); 
     left: 0;
     width: 50%;
-    height: 100%;
     background-color: rgb(92, 195, 199);
     transition: transform 0.25s ease-in-out;
     transform-origin: left;
@@ -124,6 +126,8 @@ body {
 }
 [type="file"] {
     border: none;
+    /* Two <input>s (second from shadow dom) double down on padding */
+    padding: 0;
 }
 .center-or {
     margin: 5px 0;
