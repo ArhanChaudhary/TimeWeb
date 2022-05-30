@@ -1079,7 +1079,8 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const targetInHeader = !!target.parents(".assignment-header").length || target.is(".assignment-header, .assignment");
     const targetInTags = !!target.parents(".tags").length || target.is(".tags");
     const targetInButton = !!target.parents(".assignment-header-button").length || target.is(".assignment-header-button");
-    const dontFire = targetInTags || targetInButton;
+    const targetInAnchor = !!target.parents(".title-link-anchor").length || target.is(".title-link-anchor");
+    const dontFire = targetInTags || targetInButton || targetInAnchor;
     if (!targetInHeader || dontFire || prevent_click) return;
     const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
