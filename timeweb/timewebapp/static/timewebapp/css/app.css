@@ -242,7 +242,7 @@ header.animate::after {
     border-bottom-right-radius: var(--shortcut-border-radius);
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 850px) {
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
         --outer-assignment-vertical-padding: 7px;
@@ -256,6 +256,13 @@ header.animate::after {
     }
     .shortcut-text {
         font-size: 15px;
+    }
+    main {
+        box-shadow: none;
+    }
+    main.finished-header-transition {
+        padding-left: 0;
+        padding-right: 0;
     }
 }
 
@@ -272,7 +279,7 @@ header.animate::after {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(15px + 13vw);
+    --left-side-of-header-width: calc(40px + 11vw);
 }
 .fancy-coloring {
     color: var(--priority-color);
@@ -382,7 +389,7 @@ header.animate::after {
     position: absolute;
 }
 .align-to-status-message-container {
-    margin-right: 6px;
+    margin-right: 10px;
     margin-left: 18px;
 }
 .tags {
