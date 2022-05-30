@@ -180,11 +180,7 @@ class Crud {
             $('#overlay').show().find("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
         } else {
             $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
-            if (!isMobile) {
-                $("form input:visible").first().focus();
-            } else {
-                $(document.activeElement).blur();
-            }
+            $("form input:visible").first().focus();
         }
         $("main").css("overflow-y", "hidden");
         that.old_unit_value = undefined;
