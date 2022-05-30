@@ -241,38 +241,6 @@ header.animate::after {
 .assignment-container.last-add-line-wrapper::after {
     border-bottom-right-radius: var(--shortcut-border-radius);
 }
-
-@media screen and (max-width: 850px) {
-    #assignments-container {
-        --outer-assignment-horizontal-padding: 13px;
-        --outer-assignment-vertical-padding: 7px;
-    }
-    .assignment-container.add-line-wrapper::before,
-    .assignment-container.add-line-wrapper::after {
-        --horizontal-margin: 4px;
-    }
-    .shortcut-line-left, .shortcut-line-right {
-        --negative-horizontal-margin: -9px;
-    }
-    .shortcut-text {
-        font-size: 15px;
-    }
-    .assignment-header-button.gc-link-header-button,
-    .left-side-of-header .title .title-hider {
-        display: none;
-    }
-    .left-side-of-header .title .title-link-anchor {
-        display: initial;
-    }
-    main {
-        box-shadow: none;
-    }
-    main.finished-header-transition {
-        padding-left: 0;
-        padding-right: 0;
-    }
-}
-
 .assignment-header {
     display: flex;
     position: relative;
@@ -912,4 +880,37 @@ input[type=number]::-webkit-inner-spin-button {
 }
 .grey-highlight.shortcut-text {
     font-size: unset !important;
+}
+
+
+/* Mobile view */
+@media screen and (max-width: 850px) {
+    #assignments-container {
+        --outer-assignment-horizontal-padding: 13px;
+        --outer-assignment-vertical-padding: 7px;
+    }
+    .assignment-container.add-line-wrapper::before,
+    .assignment-container.add-line-wrapper::after {
+        --horizontal-margin: 4px;
+    }
+    .shortcut-line-left, .shortcut-line-right {
+        --negative-horizontal-margin: -9px;
+    }
+    .shortcut-text {
+        font-size: 15px;
+    }
+    .assignment-header-button.gc-link-header-button,
+    .left-side-of-header .title .title-hider {
+        display: none;
+    }
+    .left-side-of-header .title .title-link-anchor {
+        display: initial;
+    }
+    main {
+        box-shadow: none;
+    }
+    main.finished-header-transition {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
