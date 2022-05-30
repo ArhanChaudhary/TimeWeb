@@ -908,9 +908,7 @@ input[type=number]::-webkit-inner-spin-button {
     }
     main {
         box-shadow: none;
-    }
-    main.finished-header-transition {
-        padding-left: 0;
-        padding-right: 0;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 }

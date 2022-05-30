@@ -1037,7 +1037,7 @@ utils = {
         },
         fixBrowserInconsistencies: function() {
             $(window).one("load", function() {
-                $("#assignments-container").css("margin-right", Math.max(0, $("#assignments-container").width() - $("main").width()));
+                $("#assignments-container").css("margin-right", $("#assignments-container").width() - $("main").width());
             });
         },
     },
