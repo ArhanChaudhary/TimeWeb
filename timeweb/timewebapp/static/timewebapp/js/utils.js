@@ -1037,7 +1037,8 @@ utils = {
         },
         fixBrowserInconsistencies: function() {
             $(window).one("load", function() {
-                $("#assignments-container").css("margin-right", $("#assignments-container").width() - $("main").width());
+                // Still really inconsistent, I'll keep as legacy
+                // $("#assignments-container").css("margin-right", $("#assignments-container").width() - $("main").width());
             });
         },
     },
