@@ -72,6 +72,9 @@ body {
 .tag-add-selection-item.checked::after {
     --background-color: rgb(34, 83, 99);
 }
+.tag-wrapper {
+    --ghost-opacity: 0.65;
+}
 .tag-wrapper, .tag-add {
     --background-color: unset !important;
 }

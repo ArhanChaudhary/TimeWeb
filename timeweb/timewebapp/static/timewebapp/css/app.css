@@ -439,12 +439,18 @@ header.animate::after {
     --background-color: linear-gradient(135deg, rgb(255,255,255) 0%, rgb(222,222,222) 100%);
     background: var(--background-color);
     transform-origin: right;
+    --ghost-opacity: 0.4;
     transition: margin-left calc(0.75s * var(--animation-speed)) ease-in-out,
                 opacity calc(0.7s * var(--animation-speed)) linear,
                 transform calc(0.5s * var(--animation-speed)) linear calc(0.2s * var(--animation-speed));
 }
 .tag-wrapper.ghost {
-    visibility: hidden;
+    --ghost-color: rgba(var(--c), var(--c), var(--c), var(--ghost-opacity));
+    border-color: var(--ghost-color);
+    color: var(--ghost-color)
+}
+.tag-wrapper.ghost .tag-delete {
+    background-color: var(--ghost-color);
 }
 .tag-delete {
     position: absolute;
