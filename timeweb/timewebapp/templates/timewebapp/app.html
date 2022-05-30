@@ -196,7 +196,19 @@
               </div>
             </div>
             <div class="left-side-of-header{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
-              <span class="title">{{ assignment.name }}</span>
+              <span class="title">
+                {% if assignment.google_classroom_assignment_link %}
+                  {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
+                  <a class="title-link-anchor" target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="0">
+                    {{ assignment.name }}
+                    <svg class="title-link-icon" width="12" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                      <use href="#external_link-svg"></use>
+                    </svg>
+                  </a>
+                {% else %}
+                  {{ assignment.name }}
+                {% endif %}
+              </span>
               {% if assignment.description %}
                 <div class="description">{{ assignment.description|linebreaks }}</div>
               {% endif %}
@@ -215,14 +227,7 @@
                 <span class="status-message"></span>
               </div>
               <span class="completion-time"></span>
-            </div>
-            {% if assignment.google_classroom_assignment_link %}
-              <a target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="0" class="assignment-header-button">
-                <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
-                  <use href="#external_link-svg"></use>
-                </svg>
-              </a>
-            {% endif %}            
+            </div>         
             <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               <svg class="tick-button" width="25" preserveAspectRatio="none">
                 <use href="#tick-svg"></use>

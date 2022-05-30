@@ -293,8 +293,13 @@ header.animate::after {
 .description p:last-of-type {
     margin-bottom: 0;
 }
-.left-side-of-header a {
-    color: var(--input-focus-color);
+.left-side-of-header .title .title-link-anchor {
+    color: var(--color);
+}
+.left-side-of-header .title .title-link-icon {
+    margin-bottom: -2.25px;
+    border-bottom: 1.5px solid var(--color);
+    padding-bottom: 3px;
 }
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description {
