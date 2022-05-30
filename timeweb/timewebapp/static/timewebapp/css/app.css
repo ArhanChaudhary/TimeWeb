@@ -257,6 +257,13 @@ header.animate::after {
     .shortcut-text {
         font-size: 15px;
     }
+    .assignment-header-button.gc-link-header-button,
+    .left-side-of-header .title .title-hider {
+        display: none;
+    }
+    .left-side-of-header .title .title-link-anchor {
+        display: initial;
+    }
     main {
         box-shadow: none;
     }
@@ -303,6 +310,7 @@ header.animate::after {
 }
 .left-side-of-header .title .title-link-anchor {
     color: var(--color);
+    display: none;
 }
 .left-side-of-header .title .title-link-icon {
     margin-bottom: -2.25px;
