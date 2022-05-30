@@ -965,6 +965,7 @@ class VisualAssignment extends Assignment {
                 }
                 new Priority().sort();
             } else if (this.draw_mouse_point) {
+                if (isMobile) return;
                 // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
                 // Disable draw point
                 this.graph.off("mousemove");
