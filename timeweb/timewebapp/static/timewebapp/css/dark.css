@@ -98,6 +98,10 @@ body {
     --box-shadow-color: hsl(0, 0%, 40%);
 }
 
+.generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
+    /* !important so assignment_sorting color changes */
+    color: white !important;
+}
 /* .available for higher priority */
 .daterangepicker td:not(.active).available:hover,
 .daterangepicker th.available:hover {
