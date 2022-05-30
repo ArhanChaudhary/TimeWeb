@@ -900,7 +900,7 @@ input[type=number]::-webkit-inner-spin-button {
         font-size: 15px;
     }
     .assignment-header-button.gc-link-header-button,
-    .left-side-of-header .title .title-hider {
+    .left-side-of-header .title .title-link-anchor ~ .title-hider {
         display: none;
     }
     .left-side-of-header .title .title-link-anchor {
