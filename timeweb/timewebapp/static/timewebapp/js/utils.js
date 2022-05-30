@@ -222,8 +222,8 @@ utils = {
                         return;
                     }
                     $.confirm({
-                        title: `Are you sure you want to go to the ${confirm_title_name} day?`,
-                        content: `This action simulates every assignments' work on the ${confirm_title_name} day.<br><br>NONE of the changes you make in the simulation are saved. Your assignments can be restored by refreshing this page.`,
+                        title: `Are you sure you want to simulate every assignments' work for tomorrow?`,
+                        content: `NONE of the changes you make in the simulation are saved, and your assignments can be restored by refreshing this page.`,
                         buttons: {
                             confirm: {
                                 keys: ['Enter'],
