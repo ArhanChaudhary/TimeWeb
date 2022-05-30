@@ -19,6 +19,10 @@
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
 }
+#form-wrapper :-ms-input-placeholder,
+#form-wrapper ::-moz-placeholder {
+    color: var(--form-placeholder-color);
+}
 #form-wrapper ::placeholder {
     color: var(--form-placeholder-color);
 }
@@ -89,6 +93,8 @@
     flex-shrink: 0;
     width: 100%;
     /* Min-content over fit-content because it has more browser support */
+    height: -webkit-min-content;
+    height: -moz-min-content;
     height: min-content;
     box-sizing: border-box;
     transition: margin 0.3s ease-in-out;
@@ -198,7 +204,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
     padding-right: 6px;
     padding-left: 6px;
     border-left: none !important;
@@ -350,7 +359,8 @@
 }
 #break-days-wrapper input:checked + .break-days-label {
     background-color: hsl(0, 0%, 91%);
-    text-decoration: line-through hsl(0, 0%, 35%);
+    -webkit-text-decoration: line-through hsl(0, 0%, 35%);
+            text-decoration: line-through hsl(0, 0%, 35%);
     color: hsl(0, 0%, 40%);
 }
 #break-days-wrapper input:not(:checked) + .break-days-label:hover {

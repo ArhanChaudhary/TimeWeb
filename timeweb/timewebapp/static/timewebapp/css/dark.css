@@ -26,7 +26,8 @@ body {
 }
 #break-days-wrapper input:checked + .break-days-label {
     background-color: hsl(0, 0%, 16%);
-    text-decoration-color: hsl(0, 0%, 49%);
+    -webkit-text-decoration-color: hsl(0, 0%, 49%);
+            text-decoration-color: hsl(0, 0%, 49%);
     color: hsl(0, 0%, 40%);
 }
 #break-days-wrapper input:not(:checked) + .break-days-label:hover {
@@ -93,7 +94,9 @@ body {
 .graph-footer > * {
     --background-color: hsl(0, 0%, 27%);
 }
-.graph-footer ::placeholder {
+.graph-footer ::placeholder,
+.graph-footer :-ms-input-placeholder,
+.graph-footer ::-moz-placeholder {
     color: hsl(0, 0%, 64%);
 }
 #toggle-gc-container {
