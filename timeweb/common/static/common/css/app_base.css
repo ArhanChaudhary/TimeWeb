@@ -92,7 +92,7 @@ main.finished-header-transition {
     cursor: pointer;
     --bg-c: var(--primary-c);
     background-color: rgb(var(--bg-c), var(--bg-c), var(--bg-c));
-    border: 1px solid hsl(0, 0%, 58%);
+    border: 1px solid;
     border-radius: 4px;
     display: inline-block;
     font-size: 13px;
@@ -101,6 +101,12 @@ main.finished-header-transition {
     box-sizing: border-box;
     padding: 1px 6px;
     position: relative;
+}
+.generic-button {
+    border-color: hsl(0, 0%, 58%);
+}
+::file-selector-button {
+    border-color: black;
 }
 .generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) - 19);
@@ -274,6 +280,9 @@ rect {
     cursor: pointer;
     font-family: "Open Sans";
     font-size: 12.5px;
+}
+#nav-close-all-assignments {
+    display: none;
 }
 #nav-items .nav-hr {
     width: calc(100% - 6px);
