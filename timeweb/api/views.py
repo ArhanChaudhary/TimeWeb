@@ -82,6 +82,8 @@ def save_assignment(request):
                 assignment[key] = datetime.datetime.fromtimestamp(value, timezone.utc)
             elif key == "due_time":
                 assignment[key] = datetime.time(**value)
+            if isinstance(value, float):
+                assignment[key] = round(value, getattr(TimewebModel, key).field.decimal_places)
         
         model_fields = {i.name: getattr(sm, i.name) for i in TimewebModel._meta.get_fields() if not i.unique}
         model_fields.update(assignment)
