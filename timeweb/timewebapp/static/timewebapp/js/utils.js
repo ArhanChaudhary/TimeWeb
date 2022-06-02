@@ -148,9 +148,10 @@ utils = {
                     } else {
                         dom_assignment.find(".work-input-textbox").val("fin");
                         dom_assignment.find(".submit-work-button").click();
-                        if (dom_assignment.hasClass('open-assignment') && $this.hasClass("slashed")) {
-                            dom_assignment.click();
-                        }
+                        // THe "Close graph after work input" setting handles all of this ux for us
+                        // if (dom_assignment.hasClass('open-assignment') && $this.hasClass("slashed")) {
+                        //     dom_assignment.click();
+                        // }
                     }
                     SETTINGS.enable_tutorial = old_enable_tutoral;
                 });
