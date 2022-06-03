@@ -78,8 +78,8 @@ class Crud {
         }
         for (let break_day of Array(7).keys()) {
             // (break_day+6)%7) is for an ordering issue, ignore that
-            // Treat this as $("#id_break_days_"+break_day)
-            $(`#id_break_days_${(break_day+6) % 7}`).prop("checked", formDict["#id_break_days"].includes(break_day));
+            // Treat this as $("#id_def_break_days_"+break_day)
+            $(`#id_def_break_days_${(break_day+6) % 7}`).prop("checked", formDict["#id_break_days"].includes(break_day));
         }
     }
     static DEFAULT_DATERANGEPICKER_OPTIONS = {
