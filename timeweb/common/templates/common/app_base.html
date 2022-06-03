@@ -22,7 +22,7 @@
     {% url 'settings' as settings %}
     {% url 'user_guide' as user_guide %}
     {% url 'changelog' as changelog %}
-    {% url 'contact' as contact %}
+    {% url 'contact_form' as contact_form %}
     {% url 'blog' as blog %}
     {% url 'policies' as policies %}
     {% if user.is_authenticated and request.path == home %}
@@ -83,7 +83,7 @@
             {% if request.path != changelog %}
                 <a href="{{ changelog }}">Changelog</a>
             {% endif %}
-            {% if request.path != contact %}
+            {% if request.path != contact_form %}
                 <a href="{{ contact_form }}">Contact</a>
             {% endif %}
             <div class="nav-hr"></div>
