@@ -371,7 +371,7 @@ header.animate::after {
     position: absolute;
 }
 .align-to-status-message-container {
-    margin-right: 10px;
+    margin-right: 28px;
     margin-left: 18px;
 }
 .tags {
