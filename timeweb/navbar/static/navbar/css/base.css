@@ -120,7 +120,7 @@ a:visited {
 }
 #doc-container {
     --container-padding-right: 50px;
-    --container-padding-left: 100px;
+    --container-padding-left: 70px;
     padding-left: var(--container-padding-left);
     padding-right: var(--container-padding-right);
     padding-bottom: 150px;
@@ -147,7 +147,7 @@ code {
 }
 .major-category {
     margin-top: 2em;
-    margin-left: -50px;
+    margin-left: -15px;
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 40px;
