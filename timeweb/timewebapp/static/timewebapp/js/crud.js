@@ -211,7 +211,6 @@ class Crud {
         }
         // Fallback if "overlay" doesn't exist
         $("main").css("overflow-y", "scroll");
-        $("main").css("overflow-y", "overlay");
     }
     replaceUnit() {
         const that = this;

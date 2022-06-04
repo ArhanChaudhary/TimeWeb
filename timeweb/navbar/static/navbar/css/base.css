@@ -39,8 +39,7 @@ body {
     height: 100%;
     box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
-    overflow-y: scroll;
-    overflow-y: overlay;
+    overflow-y: auto;
 }
 #table-of-contents-container-label {
     display: none;
@@ -127,7 +126,7 @@ a:visited {
     padding-bottom: 150px;
     flex: 1;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     max-width: 90ch;
     position: relative;
 }

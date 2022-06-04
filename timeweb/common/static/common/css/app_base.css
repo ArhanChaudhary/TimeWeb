@@ -66,8 +66,6 @@ main {
     padding: 80px 20px 0 20px;
     box-shadow: inset 20px 0 0 0 var(--primary), inset -20px 0 0 0 var(--primary);
     box-sizing: border-box;
-    /* Firefox doesnt support "overlay" */
-    overflow-y: scroll;
     /* some js focuses on the main, causing it to get an outline even with tabindex -1; hide it */
     outline: 0 !important;
 }
