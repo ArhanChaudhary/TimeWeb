@@ -206,7 +206,7 @@
                     </svg>
                   </a>
                 {% endif %}
-                <span class="title-hider">{{ assignment.name }}</span>
+                <span {% if assignment.google_classroom_assignment_link %} class="hide-on-mobile" {% endif %}>{{ assignment.name }}</span>
               </span>
               {% if assignment.description %}
                 <div class="description">{{ assignment.description|linebreaks }}</div>
@@ -228,7 +228,7 @@
               <span class="completion-time"></span>
             </div>         
             {% if assignment.google_classroom_assignment_link %}
-              <a target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="0" class="assignment-header-button gc-link-header-button">
+              <a target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="0" class="assignment-header-button hide-on-mobile">
                 <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
                   <use href="#external_link-svg"></use>
                 </svg>
