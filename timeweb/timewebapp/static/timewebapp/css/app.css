@@ -170,8 +170,9 @@ header.animate::after {
     left: unset;
 }
 #autofill-selection {
+    padding: 0 1px;
     vertical-align: top;
-    font-size: 12px;
+    font-size: 10pt;
 }
 .shortcut .generic-button {
     margin-top: 1px;
