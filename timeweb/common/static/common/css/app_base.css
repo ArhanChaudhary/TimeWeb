@@ -63,18 +63,12 @@ header > * {
 main {
     position: relative; /* Needed for positioning the background image */
     height: 100vh;
-    padding: 80px 20px 0 20px;
+    padding: 0 20px;
+    padding-top: 70px;
     box-shadow: inset 20px 0 0 0 var(--primary), inset -20px 0 0 0 var(--primary);
     box-sizing: border-box;
     /* some js focuses on the main, causing it to get an outline even with tabindex -1; hide it */
     outline: 0 !important;
-}
-/* Position content such that the scrollbar doesn't clip into the header */
-main.finished-header-transition {
-    overflow-y: overlay !important;
-    height: calc(100vh - 70px);
-    padding: 10px 20px;
-    margin-top: 70px !important;
 }
 #background-image {
     bottom: 0;

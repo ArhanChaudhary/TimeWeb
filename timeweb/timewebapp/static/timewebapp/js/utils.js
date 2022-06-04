@@ -697,7 +697,7 @@ utils = {
                         }, 0);
                         break;
                     case "t":
-                        $("main").scrollTop(0);
+                        $("#assignments-container").scrollTop(0);
                         break;
                     case "e":
                     case "d":
@@ -979,7 +979,7 @@ utils = {
 
 
             // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
-            // Use beforeunload instead of unload or else the loading screen triggers and $("main").scrollTop() becomes 0
+            // Use beforeunload instead of unload or else the loading screen triggers and $("#assignments-container").scrollTop() becomes 0
             $(window).on('beforeunload', function() {
                 if (!SETTINGS.enable_tutorial) {
                     // Save current open assignments
@@ -989,7 +989,7 @@ utils = {
                         }).toArray()
                     ));
                     // Save scroll position
-                    localStorage.setItem("scroll", $("main").scrollTop());
+                    localStorage.setItem("scroll", $("#assignments-container").scrollTop());
                 }
                 // Send ajax before close if it's on timeout
                 if (ajaxUtils.sendAttributeAjax.assignments.length) {
@@ -1013,7 +1013,7 @@ utils = {
                         // Scroll to original position
                         // Needs to scroll after assignments are opened
                         if ("scroll" in localStorage) {
-                            $("main").scrollTop(localStorage.getItem("scroll"));
+                            $("#assignments-container").scrollTop(localStorage.getItem("scroll"));
                             localStorage.removeItem("scroll");
                         }
                     }, 0);

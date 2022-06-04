@@ -4,15 +4,17 @@ html {
 }
 #assignments-container {
     position: relative;
-    /* Ensure things dont get cutoff when crud.js puts overflow: hidden on this when an assignment is being deleted */
-    top: -10px;
-    padding-top: 10px;
+    overflow-y: auto;
     opacity: 0;
     --scale-percent-y: 1.05;
     --vertical-assignment-padding: 33px;
     --horizontal-assignment-padding: 15px;
     --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
+}
+main.finished-header-transition #assignments-container {
+    /* ensure the initial transition visual doesnt break */
+    height: 100%;
 }
 main:not(.animate) {
     transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
@@ -43,6 +45,7 @@ header.animate::after {
     position: relative;
     font-size: 17px;
     z-index: 1001;
+    margin-top: 10px;
     padding: 0 var(--outer-assignment-horizontal-padding);
     display: flex;
     align-items: center;

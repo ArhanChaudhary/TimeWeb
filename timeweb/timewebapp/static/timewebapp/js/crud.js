@@ -182,7 +182,6 @@ class Crud {
             $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
             $("form input:visible").first().focus();
         }
-        $("main").css("overflow-y", "hidden");
         that.old_unit_value = undefined;
         that.replaceUnit();
 
@@ -209,8 +208,6 @@ class Crud {
                 Crud.GO_TO_FIELD_GROUP({standard: true});
             }).find("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
-        // Fallback if "overlay" doesn't exist
-        $("main").css("overflow-y", "scroll");
     }
     replaceUnit() {
         const that = this;

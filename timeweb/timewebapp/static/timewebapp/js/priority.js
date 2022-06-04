@@ -795,13 +795,13 @@ class Priority {
                         }, 0);
 
                         let scrollTimeout = setTimeout(resolve, 200);
-                        $("main").scroll(() => {
+                        $("#assignments-container").scroll(() => {
                             clearTimeout(scrollTimeout);
                             scrollTimeout = setTimeout(resolve, 200);
                         });
                     });
                 }).then(function() {
-                    $("main").off('scroll');
+                    $("#assignments-container").off('scroll');
                     that.colorOrAnimateInAssignment({
                         dom_assignment,
                         mark_as_done: priority_data.mark_as_done,
