@@ -267,9 +267,12 @@ header.animate::after {
 .description {
     position: relative;
     display: none;
-    color: rgba(var(--c), var(--c), var(--c), var(--description-opacity));
-    z-index: 1; /* A new stacking context is apparantly needed for the line clamping to work
+    /* IMPORTANT TO REMEMBER: A new stacking context is apparantly needed for the line clamping to work
+    opacity achieves this
     reference: https://stackoverflow.com/questions/16148007/which-css-properties-create-a-stacking-context */
+
+    /* Opacity should also be used to ensure fancy dark mode appearance works */
+    opacity: var(--description-opacity);
     transform: translateY(-2px);
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
@@ -300,7 +303,7 @@ header.animate::after {
 }
 .assignment.open-assignment .left-side-of-header.display-truncate-warning::after {
     content: "[Description shortened]";
-    color: rgba(var(--c), var(--c), var(--c), var(--description-opacity));
+    opacity: var(--description-opacity);
     font-size: var(--description-font-size);
     white-space: nowrap;
     margin-top: 1em;
