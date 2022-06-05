@@ -63,6 +63,10 @@ textarea
     border-color: black;
 }
 
+.oudated-serviceworker-registration-bugfix {
+    display: none;
+}
+
 
 .error-note, .success-note {
     display: flex;
