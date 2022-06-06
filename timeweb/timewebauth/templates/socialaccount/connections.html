@@ -29,6 +29,12 @@
     
     {% get_providers as socialaccount_providers %}
     {% with socialaccount_providers|first as provider %}
-        <p><a href="{% provider_login_url provider.id process="connect" scope=scope auth_params=auth_params %}">Connect a new Google account</a></p>
+        <form method="POST" action="{% provider_login_url provider.id process="connect" scope=scope auth_params=auth_params %}">
+            {% csrf_token %}
+            <button class="submit-button" type="submit">
+                <span title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
+                    href="">Connect a new {{provider.name}} account</span>
+            </button>
+        </form>
     {% endwith %}
 {% endblock %}
