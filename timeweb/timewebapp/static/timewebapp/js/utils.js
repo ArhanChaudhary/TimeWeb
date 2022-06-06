@@ -842,7 +842,7 @@ utils = {
             // width * percentx = width+10
             // percentx = 1 + 10/width
             $(window).resize(function() {
-                $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
+                $("#assignments-container").css('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                 $(".assignment").each(function() {
                     const $this = $(this);
                     const sa = new VisualAssignment($this);
@@ -855,16 +855,16 @@ utils = {
                 setTimeout(function() {
                     // height * percenty = height+5
                     // percenty = 1 + 5/height
-                    $("#assignments-container").prop("style").setProperty('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
+                    $("#assignments-container").css('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
                     $(".assignment").each(function() {
                         if (1 + 10/$(this).height() > 1.05) return;
-                        $(this).prop("style").setProperty('--scale-percent-y',`${1 + 10/$(this).height()}`);
+                        $(this).css('--scale-percent-y',`${1 + 10/$(this).height()}`);
                     });
                 }, 0);
             });
         },
         setAnimationSpeed: function() {
-            $("main").prop("style").setProperty('--animation-speed', SETTINGS.animation_speed);
+            $("main").css('--animation-speed', SETTINGS.animation_speed);
             if (SETTINGS.animation_speed !== 0) return;
 
             $(".assignment").each(function() {

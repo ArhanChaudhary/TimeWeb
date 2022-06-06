@@ -24,7 +24,7 @@ $(window).one("load", function() {
     });
 
     let number_of_circles = $("#circles-background .bubble-up").length;
-    $("#circles-background").prop("style").setProperty("--highest-circle-number", number_of_circles - 1);
+    $("#circles-background").css("--highest-circle-number", number_of_circles - 1);
 
     let vws = new Array(number_of_circles);
     for (let i = 0; i < number_of_circles; i++) {

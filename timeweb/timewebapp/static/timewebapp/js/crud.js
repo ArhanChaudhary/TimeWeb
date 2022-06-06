@@ -103,11 +103,11 @@ class Crud {
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
 
     static RESET_FORM_GROUP_MARGINS = () => {
-        $("#form-wrapper #fields-wrapper").prop("style").setProperty("--first-field-group-height", 
+        $("#form-wrapper #fields-wrapper").css("--first-field-group-height", 
             // Let's not apply any of the weird margin logic to the first field group; its height will remain static when tabbed into this field
             $("#form-wrapper #first-field-group").outerHeight()
         + "px");
-        $("#form-wrapper #fields-wrapper").prop("style").setProperty("--second-field-group-height",
+        $("#form-wrapper #fields-wrapper").css("--second-field-group-height",
             $("#form-wrapper #second-field-group").outerHeight() +
             $("#form-wrapper #second-field-group .field-wrapper").toArray().map(function(field_wrapper_dom) {
                 if ($(field_wrapper_dom).css("margin-top") === field_wrapper_dom.style.marginTop) return 0;
@@ -152,7 +152,7 @@ class Crud {
                 }
 
                 $("#form-wrapper #due-date-text-measurer").text($(this).val());
-                $(this).parents(".field-wrapper").prop("style").setProperty("--due-date-text-width", $("#form-wrapper #due-date-text-measurer").width() + "px");
+                $(this).parents(".field-wrapper").css("--due-date-text-width", $("#form-wrapper #due-date-text-measurer").width() + "px");
             }, 0);
         }).on('cancel.daterangepicker', function(e, picker) {
             $(this).val(old_due_date_val);

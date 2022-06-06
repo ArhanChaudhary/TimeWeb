@@ -55,10 +55,10 @@ class Priority {
                 params.dom_assignment.addClass("transition-instantly");
             }
             if (isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
-                params.dom_assignment.prop("style").setProperty("--priority-color", "var(--color)");
+                params.dom_assignment.css("--priority-color", "var(--color)");
             } else {
                 const priority_color = that.percentageToColor(params.priority_percentage);
-                params.dom_assignment.prop("style").setProperty("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
+                params.dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
             }
             params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
             if (params.first_sort) {

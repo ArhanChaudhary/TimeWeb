@@ -40,9 +40,6 @@
         }).first()[0].nodeValue = text;
         return $(this);
     }
-    $.fn.getCSSProperty = function(property) {
-        return parseFloat(window.getComputedStyle(this[0]).getPropertyValue(property));
-    }
     $.fn.getPseudoStyle = function(pseudo, style) {
         const ret = window.getComputedStyle(this[0], pseudo)[style];
         if (Number.isFinite(parseFloat(ret))) return parseFloat(ret);

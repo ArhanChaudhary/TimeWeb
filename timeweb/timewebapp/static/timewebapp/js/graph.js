@@ -449,8 +449,8 @@ class VisualAssignment extends Assignment {
                 hover_point_label.addClass("disable-hover-point-label-transition");
             }
             hover_point_label.removeClass("hide-label");
-            hover_point_label.prop("style").setProperty("--x", point_x);
-            hover_point_label.prop("style").setProperty("--y", point_y);
+            hover_point_label.css("--x", point_x);
+            hover_point_label.css("--y", point_y);
             hover_point_label.text(point_str);
             hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width > this.width - 5);
             if (hover_point_label.hasClass("initial-position")) {
@@ -1035,23 +1035,23 @@ class VisualAssignment extends Assignment {
                 const dom_title = this.dom_assignment.find(".title");
                 const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
 
-                this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", "unset");
+                this.dom_assignment.css("--vertical-assignment-padding", "unset");
                 // use offsetTop to ignore the transform scale
                 let tag_top = dom_tags[0].offsetTop;
                 let title_top = dom_left_side_of_header[0].offsetTop;
                 let title_height = dom_left_side_of_header.height();
                 if (SETTINGS.vertical_tag_position === "Bottom") {
                     // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
-                    title_height += Math.max(0, dom_title.getPseudoStyle("::after", "height") - dom_title.getCSSProperty("--smush-daysleft"));
+                    title_height += Math.max(0, dom_title.getPseudoStyle("::after", "height") - parseFloat(dom_title.css("--smush-daysleft")));
                 } else if (SETTINGS.vertical_tag_position === "Top") {
                     // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
-                    title_height += Math.max(0, dom_title.getPseudoStyle("::before", "height") - dom_title.getCSSProperty("--smush-priority"));
+                    title_height += Math.max(0, dom_title.getPseudoStyle("::before", "height") - parseFloat(dom_title.css("--smush-priority")));
                 }
 
                 // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
-                const padding_to_add = title_top + title_height - tag_top + dom_tags.getCSSProperty("--tags-left--margin-bottom");
-                let original_padding = $("#assignments-container").getCSSProperty("--vertical-assignment-padding");
-                this.dom_assignment.prop("style").setProperty("--vertical-assignment-padding", `${Math.max(0, padding_to_add) + original_padding}px`);
+                const padding_to_add = title_top + title_height - tag_top + parseFloat(dom_tags.css("--tags-left--margin-bottom"));
+                let original_padding = parseFloat($("#assignments-container").css("--vertical-assignment-padding"));
+                this.dom_assignment.css("--vertical-assignment-padding", `${Math.max(0, padding_to_add) + original_padding}px`);
 
                 if (SETTINGS.vertical_tag_position === "Top") {
                     dom_tags.addClass("tags-top");
