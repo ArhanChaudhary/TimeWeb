@@ -6,6 +6,8 @@ html {
     position: relative;
     overflow-y: auto;
     opacity: 0;
+    margin-top: -10px;
+    padding-top: 10px;
     --scale-percent-y: 1.05;
     --vertical-assignment-padding: 33px;
     --horizontal-assignment-padding: 15px;
