@@ -1,6 +1,7 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 class Priority {
     static ANIMATE_IN_DURATION = 1500 * SETTINGS.animation_speed;
+    static ASSIGNMENT_ANIMATION_THRESHOLD = 15;
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
     static ANIMATE_IN_START_MARGIN = 100; // Moves #animate-in a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 7500;
@@ -846,13 +847,13 @@ class Priority {
         }
         utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
-        if (!that.params.first_sort)
+        if (!that.params.first_sort && $(".assignment-container").length <= Priority.ASSIGNMENT_ANIMATION_THRESHOLD)
             $(".assignment-container").each(function() {
                 that.setInitialAssignmentTopOffset($(this));
             });
         that.domSortAssignments(that.priority_data_list);
 
-        if (!that.params.first_sort)
+        if (!that.params.first_sort && $(".assignment-container").length <= Priority.ASSIGNMENT_ANIMATION_THRESHOLD)
             $(".assignment-container").each(function() {
                 const assignment_container = $(this);
                 that.transitionSwap(assignment_container);
