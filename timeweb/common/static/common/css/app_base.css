@@ -62,14 +62,18 @@ header > * {
 }
 main {
     position: relative; /* Needed for positioning the background image */
-    height: calc(100vh - 70px);
-    padding: 10px 20px 0;
-    margin-top: 70px;
+    height: 100vh;
+    padding: calc(10px + 70px) 20px 0;
     overflow-y: auto;
     box-shadow: inset 20px 0 0 0 var(--primary), inset -20px 0 0 0 var(--primary);
     box-sizing: border-box;
     /* some js focuses on the main, causing it to get an outline even with tabindex -1; hide it */
     outline: 0 !important;
+}
+main.finished-header-transition {
+    padding: 10px 20px 0;
+    height: calc(100vh - 70px);
+    margin-top: 70px;
 }
 #background-image {
     bottom: 0;

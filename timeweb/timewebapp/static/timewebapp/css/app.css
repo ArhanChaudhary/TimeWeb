@@ -14,6 +14,9 @@ html {
     --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
 }
+main {
+    overflow-y: hidden;
+}
 main.finished-header-transition #assignments-container {
     /* ensure the initial transition visual doesnt break */
     height: 100%;
