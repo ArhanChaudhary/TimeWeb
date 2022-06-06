@@ -215,7 +215,6 @@ utils = {
                         $("#current-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
                         $("#nav-next-day").hide();
                         new Priority().sort();
-                        $(window).trigger("resize");
                     }
 
                     if (utils.in_simulation) {
@@ -1281,7 +1280,6 @@ for (let sa of dat) {
                 $(window).one("load", function() {
                     setTimeout(function() {
                         new Priority().sort();
-                        $(window).trgger("resize");
                     // Hardcoded delay if setTimeout isn't accurate
                     }, time_diff + utils.SCHEDULED_TIMEOUT_DELAY);
                 });

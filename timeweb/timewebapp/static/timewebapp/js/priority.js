@@ -728,7 +728,12 @@ class Priority {
         const that = this;
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         that.alertDueDates();
-
+        
+        // Updates open graphs' today line and other graph text
+        // ALTHOUGH triggering this resize is very redundant at times, it is good for forward compatibility
+        // Instead of trying to update everything and keeping track of what's changed, just update everything
+        // Performance impact is minimal compared to the bugs and development time saved by this
+        $(window).trigger("resize");
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
