@@ -34,7 +34,7 @@ main.animate {
     box-shadow: none;
 }
 header.animate {
-    transform: translateY(-70px);
+    transform: translateY(calc(-1 * var(--header-height)));
 }
 header.animate::after {
     transform: none;
