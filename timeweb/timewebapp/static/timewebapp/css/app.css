@@ -19,7 +19,7 @@ main.finished-header-transition #assignments-container {
     height: 100%;
 }
 main:not(.animate) {
-    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
+    transition: box-shadow 1.4s cubic-bezier(.32,1.01,.53,1.15);
 }
 header:not(.animate), header:not(.animate)::after {
     transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
