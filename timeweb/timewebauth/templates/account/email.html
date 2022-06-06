@@ -31,9 +31,9 @@
     {% endfor %}
 
     <div class="buttonHolder">
-      <button class="secondaryAction" id="submit-button" type="submit" name="action_primary" >Make primary</button>
-      <button class="secondaryAction" id="submit-button" type="submit" name="action_send" >Re-send verification</button>
-      <button class="primaryAction" id="submit-button" type="submit" name="action_remove" >Remove</button>
+      <button class="secondaryAction" class="submit-button" type="submit" name="action_primary" >Make primary</button>
+      <button class="secondaryAction" class="submit-button" type="submit" name="action_send" >Re-send verification</button>
+      <button class="primaryAction" class="submit-button" type="submit" name="action_remove" >Remove</button>
     </div>
   </form>
 
@@ -48,7 +48,7 @@
           {{ field }}
         </span>
       {% endfor %}
-      <button name="action_add" id="submit-button" type="submit">Add e-mail</button>
+      <button name="action_add" class="submit-button" type="submit">Add e-mail</button>
     </form>
   {% endif %}
 

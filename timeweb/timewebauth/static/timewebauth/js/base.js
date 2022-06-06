@@ -20,7 +20,7 @@ $(window).one("load", function() {
     };
 
     $("#form-wrapper form").submit(function() {
-        $("#submit-button").attr("disabled", true);
+        $(".submit-button").attr("disabled", true);
     });
 
     let number_of_circles = $("#circles-background .bubble-up").length;

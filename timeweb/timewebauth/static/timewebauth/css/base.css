@@ -187,7 +187,7 @@ hr {
     transform: translate(-50%, -34px);
     background-color: white;
 }
-#submit-button {
+.submit-button {
     width: 100%;
     background: rgb(0, 109, 249);
     color: white;
@@ -197,11 +197,11 @@ hr {
     cursor: pointer;
     font: inherit;
 }
-#submit-button:focus, #submit-button:hover {
+.submit-button:focus, .submit-button:hover {
     background: rgba(0, 109, 249, 0.9);
     outline: 0;
 }
-#submit-button:active {
+.submit-button:active {
     transform: translateY(1px);
     background: rgb(0, 109, 249);
 }
