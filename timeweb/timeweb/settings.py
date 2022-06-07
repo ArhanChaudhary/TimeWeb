@@ -18,6 +18,9 @@ try:
     DEBUG = os.environ['DEBUG'] == "True"
 except KeyError:
     DEBUG = True
+FIX_DEBUG_LOCALLY = DEBUG
+# DEBUG = False
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,16 +54,16 @@ except KeyError:
     SECRET_KEY = get_random_secret_key()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-if DEBUG:
+if DEBUG or FIX_DEBUG_LOCALLY:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['timeweb.io']
 # Application definition
 
-CSRF_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
+SESSION_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
 
-SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = not (DEBUG or FIX_DEBUG_LOCALLY)
 SECURE_HSTS_SECONDS = 63072000 # 2 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
@@ -271,7 +274,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 AUTH_USER_MODEL = 'timewebauth.TimewebUser'
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DEBUG else "https"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if (DEBUG or FIX_DEBUG_LOCALLY) else "https"
 SOCIALACCOUNT_AUTO_SIGNUP = False # Always prompt for username
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
@@ -318,7 +321,7 @@ ACCOUNT_RATE_LIMITS = {
     "contact": "60/h",
 }
 
-if DEBUG:
+if DEBUG or FIX_DEBUG_LOCALLY:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
@@ -340,7 +343,7 @@ RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
 GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
-if DEBUG:
+if DEBUG or FIX_DEBUG_LOCALLY:
     GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:

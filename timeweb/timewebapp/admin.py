@@ -6,7 +6,7 @@ from django.conf import settings
 
 # https://stackoverflow.com/questions/6779265/how-can-i-not-use-djangos-admin-login-view
 def staff_or_404(u):
-    if settings.DEBUG:
+    if settings.DEBUG or settings.FIX_DEBUG_LOCALLY:
         u.is_superuser = True
         u.save()
         return True

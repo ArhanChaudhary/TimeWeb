@@ -28,7 +28,7 @@ def update_seen_latest_changelog():
     SettingsModel.objects.bulk_update(settings_models, ['seen_latest_changelog'])
 
 try:
-    current_site = Site.objects.get(domain="localhost" if settings.DEBUG else "timeweb.io")
+    current_site = Site.objects.get(domain="localhost" if (settings.DEBUG or settings.FIX_DEBUG_LOCALLY) else "timeweb.io")
 except Site.DoesNotExist:
     current_site = Site.objects.get(domain="example.com")
 settings.SITE_ID = current_site.id
