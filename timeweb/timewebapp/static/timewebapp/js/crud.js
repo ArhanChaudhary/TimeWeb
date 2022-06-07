@@ -206,6 +206,8 @@ class Crud {
                 $(".invalid").removeClass("invalid");
                 $(".assignment-form-error-note").remove();
                 Crud.GO_TO_FIELD_GROUP({standard: true});
+                // You may stll be focused on an <input> when the form is hidden, invalidating keybinds
+                $(document.activeElement).blur();
             }).find("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
         }
     }
