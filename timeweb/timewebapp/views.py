@@ -39,9 +39,9 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         # The front end adjusts the assignment and due date, so we don't need to worry about using utc_to_local instead of localtime
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        TimewebModel.objects.create(**settings.EXAMPLE_ASSIGNMENT_JSON | {
+        TimewebModel.objects.create(**settings.EXAMPLE_ASSIGNMENT | {
             "assignment_date": date_now,
-            "x": date_now + datetime.timedelta(settings.EXAMPLE_ASSIGNMENT_JSON["x"]),
+            "x": date_now + datetime.timedelta(settings.EXAMPLE_ASSIGNMENT["x"]),
             "user": instance,
         })
         SettingsModel.objects.create(user=instance)
@@ -50,7 +50,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
 def append_default_context(request):
     return {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_JSON["name"],
+        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT["name"],
         "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
