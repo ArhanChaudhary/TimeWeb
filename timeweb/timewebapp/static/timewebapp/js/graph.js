@@ -561,7 +561,7 @@ class VisualAssignment extends Assignment {
             gradient.addColorStop(0, "gainsboro");
             gradient.addColorStop(1, "silver");
             const small_x_axis_scale = x_axis_scale / 5,
-                label_index = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.25 < small_x_axis_scale * this.wCon;
+                label_index = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.9 < small_x_axis_scale * this.wCon;
             for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.complete_x / small_x_axis_scale); smaller_index++) {
                 if (smaller_index % 5) {
                     const displayed_number = smaller_index * small_x_axis_scale;
@@ -587,7 +587,7 @@ class VisualAssignment extends Assignment {
             if (this.sa.y >= 10) {
                 const small_y_axis_scale = y_axis_scale / 5;
                 const text_height = screen.measureText(0).width * 2,
-                    label_index = text_height * 1.3 < small_y_axis_scale * this.hCon;
+                    label_index = text_height * 1.8 < small_y_axis_scale * this.hCon;
                 for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
                     const displayed_number = smaller_index * small_y_axis_scale;
                     if (smaller_index % 5) {
