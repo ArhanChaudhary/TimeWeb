@@ -94,11 +94,24 @@ body {
 .graph-footer > * {
     --background-color: hsl(0, 0%, 27%);
 }
-.graph-footer ::placeholder,
-.graph-footer :-ms-input-placeholder,
+
+
+/* vendor prefixed pseudo styles are mega sus
+https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas-in-css */
+.graph-footer ::placeholder {
+    color: hsl(0, 0%, 64%);
+    opacity: 1;
+}
+.graph-footer :-ms-input-placeholder {
+    color: hsl(0, 0%, 64%);
+    opacity: 1;
+}
 .graph-footer ::-moz-placeholder {
     color: hsl(0, 0%, 64%);
+    opacity: 1;
 }
+
+
 #toggle-gc-container {
     --background-color: var(--body-background);
     --box-shadow-color: hsl(0, 0%, 40%);

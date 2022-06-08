@@ -19,13 +19,25 @@
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
 }
-#form-wrapper :-ms-input-placeholder,
-#form-wrapper ::-moz-placeholder {
-    color: var(--form-placeholder-color);
-}
+
+
+/* vendor prefixed pseudo styles are mega sus
+https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas-in-css */
 #form-wrapper ::placeholder {
     color: var(--form-placeholder-color);
+    opacity: 1;
 }
+#form-wrapper :-ms-input-placeholder {
+    color: var(--form-placeholder-color);
+    opacity: 1;
+}
+#form-wrapper ::-moz-placeholder {
+    color: var(--form-placeholder-color);
+    opacity: 1;
+}
+
+
+
 #form-wrapper label:not(.field-widget)::after {
     position: absolute;
     color: var(--form-placeholder-color);
