@@ -641,16 +641,15 @@ class VisualAssignment extends Assignment {
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(utils.getRawDateNow(), this.sa.assignment_date, {round: false});
         if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.complete_x) {
             let today_x = today_minus_assignment_date * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5);
+            if (today_x > this.width - 12.5) {
+                today_x = this.width - 12.5;
+            }
             screen.fillStyle = "rgb(150,150,150)";
             screen.fillRect(today_x, 0, 5, this.height - 50);
             screen.fillStyle = "black";
             screen.rotate(Math.PI / 2);
             screen.textAlign = "center";
-            screen.textBaseline = "middle";
             screen.font = VisualAssignment.getCanvasFont(17.1875);
-            if (today_x > this.width - 12.5) {
-                today_x = this.width - 12.5;
-            }
             screen.fillText("Today Line", (this.height - 50)/2, -today_x - 2.5);
             screen.rotate(-Math.PI / 2);
         }
