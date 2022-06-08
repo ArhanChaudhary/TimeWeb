@@ -1125,10 +1125,12 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     sa.initUI();
-    if (SETTINGS.enable_tutorial && !already_ran_tutorial && !DEBUG) {
+    if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
         already_ran_tutorial = true;
-        prevent_click = true;
         $("#tutorial-click-assignment-to-open").remove();
+        if (DEBUG) return;
+        
+        prevent_click = true;
         setTimeout(function() {
             const days_until_due = Math.floor(sa.sa.complete_x) - sa.sa.blue_line_start;
             utils.ui.graphAlertTutorial(days_until_due);
