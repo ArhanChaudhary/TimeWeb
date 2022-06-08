@@ -98,7 +98,7 @@ body {
 
 /* vendor prefixed pseudo styles are mega sus
 https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas-in-css */
-.graph-footer ::placeholder {
+.graph-footer ::-moz-placeholder {
     color: hsl(0, 0%, 64%);
     opacity: 1;
 }
@@ -106,7 +106,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     color: hsl(0, 0%, 64%);
     opacity: 1;
 }
-.graph-footer ::-moz-placeholder {
+.graph-footer ::placeholder {
     color: hsl(0, 0%, 64%);
     opacity: 1;
 }

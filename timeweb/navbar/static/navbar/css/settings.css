@@ -93,7 +93,10 @@ body {
     justify-content: center;
     cursor: pointer;
     height: 33px;
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
     /* position "Clear image" text */
     z-index: 1;
     transition: all 0.1s ease-in-out;
