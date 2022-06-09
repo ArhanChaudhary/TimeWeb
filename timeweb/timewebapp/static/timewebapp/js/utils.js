@@ -176,30 +176,11 @@ utils = {
             headerIcons: function() {
                 $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
-                // Legacy previous-day logic I'll still keep
-                $("#nav-next-day"/*, #previous-day"*/).click(function() {
-                    let previous_day = false;
-                    let next_day = false;
-                    let confirm_title_name;
-                    switch ($(this).attr("id")) {
-                        case "nav-next-day":
-                            next_day = true;
-                            confirm_title_name = "next";
-                            break;
-                        case "previous-day":
-                            previous_day = true;
-                            confirm_title_name = "previous";
-                            break;
-                    }
-
+                $("#nav-next-day").click(function() {
                     function changeDay() {
                         utils.in_simulation = true;
                         ajaxUtils.disable_ajax = true;
-                        if (next_day) {
-                            date_now.setDate(date_now.getDate() + 1);
-                        } else if (previous_day) {
-                            date_now.setDate(date_now.getDate() - 1);
-                        }
+                        date_now.setDate(date_now.getDate() + 1);
                         $(".assignment.mark-as-done").each(function() {
                             $(this).find(".hide-assignment-button").click();
                         });
