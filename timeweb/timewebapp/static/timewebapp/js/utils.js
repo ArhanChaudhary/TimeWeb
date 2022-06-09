@@ -213,7 +213,6 @@ utils = {
                             top: -9999,
                         });
                         $("#current-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
-                        $("#nav-next-day").hide();
                         new Priority().sort();
                     }
 
