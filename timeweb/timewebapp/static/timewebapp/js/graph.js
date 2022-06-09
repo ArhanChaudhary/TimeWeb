@@ -1108,7 +1108,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         dom_assignment.find(".falling-arrow-animation")[0].beginElement();
         return;
     }
-    SETTINGS.one_graph_at_a_time && $("#nav-close-assignments").click();
+    SETTINGS.one_graph_at_a_time && $(".assignment.open-assignment").click();
     
     // If the assignment was clicked while it was closing, stop the closing animation and open it
     assignment_footer.stop(false, true);

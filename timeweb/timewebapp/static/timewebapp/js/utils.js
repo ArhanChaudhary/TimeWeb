@@ -174,10 +174,6 @@ utils = {
                 }
             },
             headerIcons: function() {
-                // Assignments header icons
-                $("#nav-close-assignments").click(function() {
-                    $(".assignment.open-assignment").click();
-                });
                 $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
                 // Legacy previous-day logic I'll still keep
