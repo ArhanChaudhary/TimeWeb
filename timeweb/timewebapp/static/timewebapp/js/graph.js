@@ -29,48 +29,45 @@ class Assignment {
         return skew_ratio_bound;
     }
     setDynamicStartIfInDynamicMode(params={ ajax: true }) {
-        if (!this.sa.fixed_mode) {
-            const old_dynamic_start = this.sa.dynamic_start;
-            const len_works = this.sa.works.length - 1;
+        if (this.sa.fixed_mode) return;
 
-            let low = this.sa.blue_line_start;
-            let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
-            while (low < high) {
-                const mid = Math.floor((low + high) / 2);
-                this.red_line_start_x = mid;
-                this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-                this.setParabolaValues();
+        const old_dynamic_start = this.sa.dynamic_start;
+        const len_works = this.sa.works.length - 1;
 
-                let valid_red_line_start_x = true;
-                // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
-                let next_funct = this.funct(this.red_line_start_x),
-                    next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-                for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
-                    const this_funct = next_funct,
-                        this_work = next_work;
-                    next_funct = this.funct(i + 1),
-                    next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-                    if (next_funct - this_funct !== next_work - this_work) {
-                        valid_red_line_start_x = false;
-                        break;
-                    }
-                }
-                if (valid_red_line_start_x) {
-                    high = mid;
-                } else {
-                    low = mid + 1;
+        let low = this.sa.blue_line_start;
+        let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
+        while (low < high) {
+            const mid = Math.floor((low + high) / 2);
+            this.red_line_start_x = mid;
+            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+            this.setParabolaValues();
+
+            let valid_red_line_start_x = true;
+            // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+            let next_funct = this.funct(this.red_line_start_x),
+                next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+            for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
+                const this_funct = next_funct,
+                    this_work = next_work;
+                next_funct = this.funct(i + 1),
+                next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+                if (next_funct - this_funct !== next_work - this_work) {
+                    valid_red_line_start_x = false;
+                    break;
                 }
             }
-            this.red_line_start_x = low;
-            this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-            this.sa.dynamic_start = this.red_line_start_x;
-
-            // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
-            params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+            if (valid_red_line_start_x) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
         }
-        // We still need to setParabolaValues() in fixed mode
-        // some functions (such as mousemove()) assume the parabola is reset when this is called, which does not happen in fixed mode if i were to simply use a guard clause
-        this.setParabolaValues();
+        this.red_line_start_x = low;
+        this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        this.sa.dynamic_start = this.red_line_start_x;
+
+        // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
+        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
@@ -167,7 +164,6 @@ class VisualAssignment extends Assignment {
             // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
             this.red_line_start_x = this.sa.dynamic_start;
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-            this.setParabolaValues();
         }
         this.scale = window.devicePixelRatio || 2; // Zoom in/out
         const assignment_footer = this.dom_assignment.find(".assignment-footer");
@@ -338,6 +334,10 @@ class VisualAssignment extends Assignment {
         const last_work_input = this.sa.works[len_works];
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         const assignment_container = this.dom_assignment.parents(".assignment-container");
+
+        // draw() always runs setParabolaValues but I'll leave it like this because it's easier to maintain and for forward compatibility
+        this.setParabolaValues();
+
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             var mouse_x = (raw_x - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
@@ -370,9 +370,6 @@ class VisualAssignment extends Assignment {
             this.last_mouse_x = mouse_x;
             this.last_mouse_y = mouse_y;
         }
-        // draw() always runs setParabolaValues but I'll leave it like this because it'll require a lot of maintence
-        
-        this.setParabolaValues();
         const screen = this.graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
         screen.clearRect(0, 0, this.width, this.height);
