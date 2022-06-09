@@ -26,7 +26,6 @@ class TimewebForm(forms.ModelForm):
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question", "class": "dont-mark-invalid-if-empty"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
             # break_days also has dont-mark-invalid-if-empty just not here
-            'x': forms.DateTimeInput(attrs={"class": "dont-mark-invalid-if-empty"}),
             'y': forms.NumberInput(attrs={"min":"0"}),
             'time_per_unit': forms.NumberInput(attrs={"min":"0"}),
             'description': forms.Textarea(attrs={"rows": "1", "class": "dont-mark-invalid-if-empty"}),
