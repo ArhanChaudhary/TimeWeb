@@ -1007,14 +1007,6 @@ class VisualAssignment extends Assignment {
         }
         // END Fixed/dynamic mode button        
     }
-    shake() {
-        const that = this;
-        that.dom_assignment.animate({left: -5}, 75, "easeOutCubic", function() {
-            that.dom_assignment.animate({left: 5}, 75, "easeOutCubic", function() {
-                that.dom_assignment.animate({left: 0}, 75, "easeOutCubic");
-            });
-        });
-    }
 
     positionTags() {
         const dom_tags = this.dom_assignment.find(".tags");
@@ -1079,8 +1071,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const sa = new VisualAssignment(dom_assignment);
     
     if (sa.sa.needs_more_info && !Number.isFinite(sa.sa.x)) {
-        sa.shake();
-        dom_assignment.find(".update-button").parents(".assignment-header-button").focus();
+        dom_assignment.find(".update-button").click();
         return;
     }
 
