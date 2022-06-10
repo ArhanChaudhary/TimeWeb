@@ -104,6 +104,8 @@ header.animate::after {
     transition: transform 2s ease-in-out;
     font-size: 12pt;
     position: relative;
+    /* Ensures this stacks above .assignment-container::after */
+    z-index: 1;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
     -webkit-user-select: none;
@@ -244,7 +246,6 @@ header.animate::after {
 .assignment-container.add-line-wrapper::after {
     right: 0;
     border-right: 2px solid var(--color);
-    z-index: -1;
 }
 .assignment-container.first-add-line-wrapper::before,
 .assignment-container.first-add-line-wrapper::after {
@@ -896,10 +897,10 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight.assignment-container::before {
     --filter-drop-shadow-color: white;
     font-size: 19px !important;
-    filter: drop-shadow(0 0.5px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 -0.5px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0.5px 0 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(-0.5px 0 0 var(--filter-drop-shadow-color, transparent));
+    filter: drop-shadow(0 0.75px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 -0.75px 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0.75px 0 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(-0.75px 0 0 var(--filter-drop-shadow-color, transparent));
 }
 .grey-highlight.shortcut-text {
     font-size: unset !important;
