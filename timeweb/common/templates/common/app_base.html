@@ -72,9 +72,7 @@
             {% if request.path != settings %}
                 <a href="{{ settings }}">Settings</a>
             {% endif %}
-            {% if request.path != home or request.path != settings %}
-                <div class="nav-hr"></div>
-            {% endif %}
+            <div class="nav-hr"></div>
             {% if request.path != user_guide %}
                 <a href="{{ user_guide }}">User Guide</a>
             {% endif %}

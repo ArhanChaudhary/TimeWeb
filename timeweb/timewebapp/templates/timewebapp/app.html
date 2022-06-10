@@ -125,7 +125,7 @@
         });
       })();
     </script>
-    <div id="assignments-header">
+    <div id="assignments-header" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
       <span id="todo-wrapper">
         <span id="estimated-total-time-label">Todo:</span>
         <span id="estimated-total-time"></span>
@@ -134,21 +134,21 @@
         <div id="hide-button" class="generic-button">Hide</div>
       </span>
       <span id="current-date-container">
-        <span id="current-date"{% if settings_model.background_image %} class="grey-highlight"{% endif %}></span>
+        <span id="current-date"></span>
         <svg id="go-to-next-day" width="21" height="16" preserveAspectRatio="none" viewBox="40 40 176 176">
           <use href="#go_to_next_day-svg"></use>
         </svg>
       </span>
       <div id="sort-assignments-container">
-        <label for="{{ settings_form.assignment_sorting.auto_id }}"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
+        <label for="{{ settings_form.assignment_sorting.auto_id }}">
           {{ settings_form.assignment_sorting.label }}
         </label>
         {{ settings_form.assignment_sorting }}
       </div>
     </div>
-    <div id="autofill-work-done" class="shortcut">
-      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
+    <div id="autofill-work-done" class="shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+      <div class="shortcut-line-left"></div>
+      <span class="shortcut-text">
         Autofill
         <select class="generic-button" id="autofill-selection">
           <option>No</option>
@@ -157,15 +157,15 @@
         Work Done
         <div class="generic-button" tabindex="0">Go</div>
       </span>
-      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right"></div>
     </div>
-    <div id="delete-starred-assignments" class="shortcut">
-      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
+    <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
+      <div class="shortcut-line-left"></div>
+      <span class="shortcut-text">
         Delete all Starred Assignments
         <div class="generic-button" tabindex="0">Go</div>
       </span>
-      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right"></div>
     </div>
     {% for assignment in assignment_models %}
       {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
@@ -275,13 +275,13 @@
     {% endfor %}
   </div>
   <template id="delete-gc-assignments-from-class-template">
-    <div class="delete-gc-assignments-from-class shortcut">
-      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
+    <div class="delete-gc-assignments-from-class shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+      <div class="shortcut-line-left"></div>
+      <span class="shortcut-text">
         Delete all Assignments from this Class
         <div class="generic-button" tabindex="0">Go</div>
       </span>
-      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right"></div>
     </div>
   </template>
   <template id="tag-add-selection-item-template">
