@@ -60,6 +60,10 @@ header.animate::after {
     width: 100%;
     margin-bottom: 4px;
 }
+#todo-wrapper .generic-button {
+    /* is 1px too tall and messes up the height */
+    margin-bottom: -1px;
+}
 #current-date {
     position: relative;
     white-space: nowrap;
