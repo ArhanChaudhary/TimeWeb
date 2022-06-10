@@ -994,7 +994,7 @@ utils = {
                 if (date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && date_now.getHours() < 4) {
                     // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
                     // this alert is for fellow insomniacs who lose track of time
-                    $("#current-date").text(`(The current date has changed) ${$("#current-date").text()}`);
+                    $("#current-date-container").append("<span id=\"currently-has-changed-notice\">(has changed)</span>");
                 }
                 localStorage.setItem("last_visit", date_now.valueOf());
             });
