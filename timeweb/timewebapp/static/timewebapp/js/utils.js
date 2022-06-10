@@ -1037,6 +1037,15 @@ utils = {
 }
 
 isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
+
+
+// It's important to remember to NOT use .done() or any other callback method on a jquery ajax
+// This is to allow ajaxUtils.error to redo the ajax with the appropriate callbacks
+// The only way to properly configure such an ajax is to define their callbacks inline
+// I'm not really sure how to ensure I do this for forward compatibility so I just hope I'll stumble upon this text again or
+// Somehow remember this in the future /shrug
+
+
 ajaxUtils = {
     disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, textStatus) {
@@ -1098,44 +1107,45 @@ ajaxUtils = {
             type: "POST",
             url: '/api/create-gc-assignments',
             error: ajaxUtils.error,
-        }).done(function(authentication_url, textStatus, jqXHR) {
-            switch (jqXHR.status) {
-                case 204:
-                    $("#toggle-gc-container").removeClass("open clicked");
-                    if (SETTINGS.oauth_token.token) {
-                        $("#toggle-gc-label").text("Disable Google Classroom integration");
-                    } else {
-                        $("#toggle-gc-label").text("Enable Google Classroom integration");
-                    }
-                    break;
-
-                case 200:
-                    $("#toggle-gc-container").removeClass("clicked");
-                    $.alert({
-                        title: "Invalid credentials",
-                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
-                        buttons: {
-                            "disable integration": {
-                                action: function() {
-                                    $("#toggle-gc-container").click();
-                                }
+            success: function(authentication_url, textStatus, jqXHR) {
+                switch (jqXHR.status) {
+                    case 204:
+                        $("#toggle-gc-container").removeClass("open clicked");
+                        if (SETTINGS.oauth_token.token) {
+                            $("#toggle-gc-label").text("Disable Google Classroom integration");
+                        } else {
+                            $("#toggle-gc-label").text("Enable Google Classroom integration");
+                        }
+                        break;
+    
+                    case 200:
+                        $("#toggle-gc-container").removeClass("clicked");
+                        $.alert({
+                            title: "Invalid credentials",
+                            content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
+                            buttons: {
+                                "disable integration": {
+                                    action: function() {
+                                        $("#toggle-gc-container").click();
+                                    }
+                                },
+                                "authenticate again": {
+                                    action: function() {
+                                        reloadWhenAppropriate({href: authentication_url});
+                                    }
+                                },
                             },
-                            "authenticate again": {
-                                action: function() {
-                                    reloadWhenAppropriate({href: authentication_url});
-                                }
-                            },  
-                        },
-                        onClose: function() {
-                            $("#toggle-gc-container").removeClass("open");
-                        },
-                    });
-                    break;
-
-                case 205:
-                    reloadWhenAppropriate();
-                    break;
-            }
+                            onClose: function() {
+                                $("#toggle-gc-container").removeClass("open");
+                            },
+                        });
+                        break;
+    
+                    case 205:
+                        reloadWhenAppropriate();
+                        break;
+                }
+            },
         });
     },
     sendAttributeAjaxWithTimeout: function(key, value, pk) {
