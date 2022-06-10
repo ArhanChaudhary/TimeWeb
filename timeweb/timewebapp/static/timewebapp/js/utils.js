@@ -174,7 +174,7 @@ utils = {
                     $("#hide-button").click();
                 }
 
-                $("#nav-next-day").click(function() {
+                $("#go-to-next-day").click(function() {
                     function changeDay() {
                         utils.in_simulation = true;
                         ajaxUtils.disable_ajax = true;
@@ -862,7 +862,7 @@ utils = {
                     }
                 } else {
                     $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
-                    $(".assignment-container, #current-date").hide();
+                    $(".assignment-container, #current-date-container").hide();
                 }
             }
         },
@@ -1337,7 +1337,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.tickButtons();
-    utils.ui.setClickHandlers.headerIcons();
+    utils.ui.setClickHandlers.assignmentsHeaderUI();
     utils.ui.setClickHandlers.assignmentSorting();
     utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();

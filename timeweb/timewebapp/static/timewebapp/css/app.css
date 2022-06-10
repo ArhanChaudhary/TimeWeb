@@ -55,8 +55,10 @@ header.animate::after {
     align-items: center;
     flex-wrap: wrap;
 }
-#todo-wrapper {
+#assignments-header > * {
     white-space: nowrap;
+}
+#todo-wrapper {
     width: 100%;
     margin-bottom: 4px;
 }
@@ -64,17 +66,21 @@ header.animate::after {
     /* is 1px too tall and messes up the height */
     margin-bottom: -1px;
 }
-#current-date {
+#current-date-container {
     position: relative;
-    white-space: nowrap;
     order: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#go-to-next-day {
+    cursor: pointer;
 }
 #sort-assignments-container {
     display: flex;
     align-items: center;
     order: 1;
     gap: 3px;
-    white-space: nowrap;
     margin-left: auto;
     padding-left: 15px;
 }
