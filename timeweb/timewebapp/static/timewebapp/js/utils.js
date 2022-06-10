@@ -155,8 +155,9 @@ utils = {
                     SETTINGS.enable_tutorial = old_enable_tutoral;
                 });
             },
-
-            toggleEstimatedCompletionTime: function() {
+            assignmentsHeaderUI: function() {
+                $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+                
                 // Hide and show estimated completion time
                 $("#hide-button").click(function() {
                     if ($(this).text() === "Hide") {
@@ -172,9 +173,6 @@ utils = {
                 if ("hide-button" in localStorage) {
                     $("#hide-button").click();
                 }
-            },
-            headerIcons: function() {
-                $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
 
                 $("#nav-next-day").click(function() {
                     function changeDay() {
@@ -1329,7 +1327,6 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.tickButtons();
-    utils.ui.setClickHandlers.toggleEstimatedCompletionTime();
     utils.ui.setClickHandlers.headerIcons();
     utils.ui.setClickHandlers.assignmentSorting();
     utils.ui.setClickHandlers.googleClassroomAPI();
