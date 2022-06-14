@@ -377,10 +377,10 @@ class VisualAssignment extends Assignment {
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";
         screen.fillStyle = this.getDefaultFontColor();
-        screen.font = VisualAssignment.getCanvasFont(13.75);
+        screen.font = VisualAssignment.getCanvasFont(15);
         if (!this.sa.needs_more_info) {
-            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-144+72);
-            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-127+72);
+            screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-148+72);
+            screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-129+72);
         }
         let radius = this.wCon / 3;
         if (radius > 3) {
