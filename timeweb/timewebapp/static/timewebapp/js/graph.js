@@ -324,10 +324,13 @@ class VisualAssignment extends Assignment {
         ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
         new Priority().sort();
     }
-    static getCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
-    getDefaultFontColor() {
-        return this.fixed_graph.css("filter") === "none" ? "black" : "white";
+    static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
+    static getTextHeight = screen => screen.measureText("0") * 2;
+    static setCanvasFont(screen, font_size) {
+        screen.font = VisualAssignment.generateCanvasFont(font_size);
+        screen.text_height = VisualAssignment.getTextHeight(screen);
     }
+    getDefaultFontColor() { return this.fixed_graph.css("filter") === "none" ? "black" : "white"; }
     //hard (this entire function)
     draw(raw_x, raw_y) {
         const len_works = this.sa.works.length - 1;
@@ -377,7 +380,7 @@ class VisualAssignment extends Assignment {
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
         screen.textAlign = "end";
         screen.fillStyle = this.getDefaultFontColor();
-        screen.font = VisualAssignment.getCanvasFont(15);
+        VisualAssignment.setCanvasFont(screen, 15);
         if (!this.sa.needs_more_info) {
             screen.fillText(`Curvature: ${rounded_skew_ratio}${rounded_skew_ratio ? "" : " (Linear)"}`, this.width-2, this.height-148+72);
             screen.fillText(this.sa.fixed_mode ? "Fixed Mode" : "Dynamic Mode", this.width-2, this.height-129+72);
@@ -423,7 +426,7 @@ class VisualAssignment extends Assignment {
         }
         radius /= 0.75;
         screen.stroke();
-        screen.font = VisualAssignment.getCanvasFont(VisualAssignment.font_size);
+        VisualAssignment.setCanvasFont(screen, VisualAssignment.font_size);
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y) && !this.sa.needs_more_info) {
             let str_mouse_x;
             let graph_mouse_x;
@@ -470,9 +473,8 @@ class VisualAssignment extends Assignment {
         }
         
         screen.textAlign = "center";
-        screen.font = VisualAssignment.getCanvasFont(VisualAssignment.font_size);
-        const row_height = screen.measureText(0).width * 2;
-        const center = (str, y_pos) => screen.fillText(str, (VisualAssignment.GRAPH_Y_AXIS_MARGIN+10+this.width)/2, row_height*y_pos-2);
+        VisualAssignment.setCanvasFont(screen, VisualAssignment.font_size);
+        const center = (str, y_pos) => screen.fillText(str, (VisualAssignment.GRAPH_Y_AXIS_MARGIN+10+this.width)/2, screen.text_height * y_pos - 2);
         if (!assignment_container.hasClass("finished") && !this.sa.needs_more_info) {
             let displayed_day;
             let str_day;
@@ -528,7 +530,7 @@ class VisualAssignment extends Assignment {
         // x axis label
         screen.fillStyle = "black";
         screen.textAlign = "center";
-        screen.font = VisualAssignment.getCanvasFont(17.1875);
+        VisualAssignment.setCanvasFont(screen, 17.1875);
         screen.fillText("Days", this.width / 2, this.height - 5);
 
         // y axis label
@@ -547,7 +549,7 @@ class VisualAssignment extends Assignment {
             screen.rotate(Math.PI / 2);
         }
 
-        screen.font = VisualAssignment.getCanvasFont(13.75);
+        VisualAssignment.setCanvasFont(screen, 13.75);
         const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - VisualAssignment.GRAPH_Y_AXIS_MARGIN + 60) / 100));
         if (this.sa.complete_x >= 10) {
             gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
@@ -572,14 +574,13 @@ class VisualAssignment extends Assignment {
                 }
             }
         }
-        screen.font = VisualAssignment.getCanvasFont(12);
+        VisualAssignment.setCanvasFont(screen, 12);
         screen.textAlign = "right";
         if (!this.sa.needs_more_info) {
             const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
             if (this.sa.y >= 10) {
                 const small_y_axis_scale = y_axis_scale / 5;
-                const text_height = screen.measureText(0).width * 2,
-                    label_index = text_height * 1.8 < small_y_axis_scale * this.hCon;
+                const label_index = screen.text_height * 1.8 < small_y_axis_scale * this.hCon;
                 for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
                     const displayed_number = smaller_index * small_y_axis_scale;
                     if (smaller_index % 5) {
@@ -588,17 +589,16 @@ class VisualAssignment extends Assignment {
                         screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
                         screen.fillStyle = "rgb(80,80,80)";
                         if (label_index) {
-                            let number_y_pos = this.height - displayed_number * this.hCon - 54 + text_height / 2;
-                            if (number_y_pos < 4 + text_height / 2) {
-                                number_y_pos = 4 + text_height / 2;
+                            let number_y_pos = this.height - displayed_number * this.hCon - 54 + screen.text_height / 2;
+                            if (number_y_pos < 4 + screen.text_height / 2) {
+                                number_y_pos = 4 + screen.text_height / 2;
                             }
                             screen.fillText(displayed_number, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos);
                         }
                     }
                 }
             }
-            screen.font = VisualAssignment.getCanvasFont(15);
-            const text_height = screen.measureText(0).width * 2;
+            VisualAssignment.setCanvasFont(screen, 15); // make font bigger when there is no smaller index
             for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
                 if (bigger_index * 2 < y_axis_scale) {
                     break;
@@ -606,9 +606,9 @@ class VisualAssignment extends Assignment {
                 screen.fillStyle = "rgb(205,205,205)";
                 screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
                 screen.fillStyle = "black";
-                let number_y_pos = this.height - bigger_index * this.hCon - 54 + text_height / 2;
-                if (number_y_pos < 5 + text_height / 2) {
-                    number_y_pos = 5 + text_height / 2;
+                let number_y_pos = this.height - bigger_index * this.hCon - 54 + screen.text_height / 2;
+                if (number_y_pos < 5 + screen.text_height / 2) {
+                    number_y_pos = 5 + screen.text_height / 2;
                 }
                 screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos);
             }
@@ -616,7 +616,7 @@ class VisualAssignment extends Assignment {
         screen.fillText("0", VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, this.height - 53.5);
 
         screen.textAlign = "center";
-        screen.font = VisualAssignment.getCanvasFont(16.5);
+        VisualAssignment.setCanvasFont(screen, 16.5);
         for (let bigger_index = Math.ceil(this.sa.complete_x - this.sa.complete_x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
             screen.fillStyle = "rgb(205,205,205)";
             screen.fillRect(bigger_index * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5), 0, 5, this.height - 50);
@@ -640,7 +640,7 @@ class VisualAssignment extends Assignment {
             screen.fillStyle = "black";
             screen.rotate(Math.PI / 2);
             screen.textAlign = "center";
-            screen.font = VisualAssignment.getCanvasFont(17.1875);
+            VisualAssignment.setCanvasFont(screen, 17.1875);
             screen.fillText("Today Line", (this.height - 50)/2, -today_x + 2);
             screen.rotate(-Math.PI / 2);
         }
