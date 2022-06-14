@@ -1,9 +1,5 @@
-{% if widget.is_initial %}
-    {% if not widget.required %}
-        <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>
-        <label for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
-        <span class="center-or">Or</span>
-    {% endif %}
-    {{ widget.input_text }}:
-{% endif %}
+{{ widget.input_text }}:
 <input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+<span class="center-or">Or</span>
+<input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>
+<label for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
