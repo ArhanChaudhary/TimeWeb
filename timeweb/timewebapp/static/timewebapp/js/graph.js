@@ -630,7 +630,7 @@ class VisualAssignment extends Assignment {
         }
         screen.fillText("0", VisualAssignment.GRAPH_Y_AXIS_MARGIN + 16.5, this.height - 40 + 15);
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(utils.getRawDateNow(), this.sa.assignment_date, {round: false});
-        if (today_minus_assignment_date > -1 && today_minus_assignment_date <= this.sa.complete_x) {
+        if (today_minus_assignment_date >= 0 && today_minus_assignment_date <= this.sa.complete_x) {
             let today_x = today_minus_assignment_date * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5);
             if (today_x > this.width - 12.5) {
                 today_x = this.width - 12.5;
