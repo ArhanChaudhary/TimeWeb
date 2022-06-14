@@ -221,7 +221,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
                 self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
+                if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
                 removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
