@@ -242,6 +242,8 @@ utils = {
                                     $this.removeClass("enabled clicked");
                                     break;
 
+                                // Although a 302 is more semantic, jquery considers this code an error
+                                // Let's configure this to be a 200 for simplicity
                                 case 200:
                                     reloadWhenAppropriate({ href: authentication_url });
                                     break;
@@ -1117,7 +1119,9 @@ ajaxUtils = {
                             $("#toggle-gc-label").text("Enable Google Classroom integration");
                         }
                         break;
-    
+
+                    // Although a 302 is more semantic, jquery considers this code an error
+                    // Let's configure this to be a 200 for simplicity
                     case 200:
                         $("#toggle-gc-container").removeClass("clicked");
                         $.alert({
