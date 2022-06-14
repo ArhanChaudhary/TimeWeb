@@ -158,6 +158,29 @@ Assignment.prototype.setParabolaValues = function() {
             this.return_y_cutoff = upper_return_y_cutoff;
         }
     }
+
+
+    if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
+        // With early due times, return_y_cutoff may be on the last day, resulting in situations where you would have to work past midnight until the due time
+        // To help prevent this, we need to see if working on the last day would result in a slope that violates the minimum work time (NOT min_work_time_funct_round because the user only cares about 
+        // their inputted minimum work time. Another reason to use this is because the last day of an assignment doesn't really care about the step size)
+        // If it does, simply decrement the cutoff
+
+        // Another possible way of going about this issue is to do a similar sort of check before return_y_cutoff is set
+        // This check, if activated, would simulate a work schedule without a due time to ensure work isnt assigned to the last day with the due time
+        // However, this would be much harder to code. I may implement this in the future as this could possibly be more accurate, but see no reason to as my current implementation is accurate enough
+        this.return_0_cutoff = NaN; // ensure funct never returns early for this cutoff
+        let dy = this.sa.y - this.funct(Math.floor(this.sa.complete_x));
+        let dx = this.sa.complete_x - Math.floor(this.sa.complete_x);
+        let last_day_min_work_time = dy/dx;
+        if (last_day_min_work_time > this.sa.min_work_time
+            // Ensure the assignment date doesn't return y
+            && this.return_y_cutoff > 1) {
+            this.return_y_cutoff--;
+        }
+    }
+
+
     if (SETTINGS.ignore_ends && this.sa.min_work_time) {
         var y_value_to_cutoff = 0;
     } else if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (funct_zero < this.cutoff_to_use_round))) {
