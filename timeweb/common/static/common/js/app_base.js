@@ -41,7 +41,6 @@ function resetHeaderLayout() {
     }
 }
 $(function() {
-    $(document.body).on("focus", () => $("main").focus()); // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
     $(window).on("focus", () => $(window).trigger("resize"));
     $(document).keypress(function(e) {
         const activeElement = $(document.activeElement);

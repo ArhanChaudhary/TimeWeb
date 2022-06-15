@@ -794,6 +794,10 @@ utils = {
                 } else if (open_assignmens_on_screen.length !== 0) {
                     // Prevent arrow scroll
                     e.preventDefault();
+                } else {
+                    // Allow arrow scroll
+                    // Relies on the fact that #assignments-container is the scrolling element
+                    $("#assignments-container").focus();
                 }
                 break;
         }

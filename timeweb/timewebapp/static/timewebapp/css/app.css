@@ -14,6 +14,10 @@ html {
     --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
 }
+#assignments-container:focus {
+    /* Arrow scroll manually focuses */
+    outline: none;
+}
 main {
     overflow-y: hidden;
 }
