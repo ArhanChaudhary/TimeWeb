@@ -200,6 +200,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 ))
             except TypeError:
                 pass
+
         if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
@@ -240,12 +241,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 elif self.updated_assignment:
                     new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
                 x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
-                if self.sm.blue_line_start >= x_num:
-                    self.sm.blue_line_start = 0
-                    # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
-                    # might rewrite
-                    if self.created_assignment or self.sm.needs_more_info:
-                        self.sm.dynamic_start = 0
+
                 if not x_num or len(self.sm.break_days) == 7:
                     x_num = 1
                 elif self.sm.break_days:
@@ -286,10 +282,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
                 if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                     x_num += 1
-                if self.sm.blue_line_start >= x_num:
-                    self.sm.blue_line_start = 0
-                    if self.created_assignment or self.sm.needs_more_info:
-                        self.sm.dynamic_start = 0
+
+            if self.sm.blue_line_start >= x_num:
+                self.sm.blue_line_start = 0
+                # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
+                # might rewrite
+                if self.created_assignment or self.sm.needs_more_info:
+                    self.sm.dynamic_start = 0
+
             if self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
