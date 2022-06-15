@@ -334,16 +334,6 @@ class Crud {
             }
         });
         $("#id_description").expandableTextareaHeight();
-        // Sets custom error message
-        $("#id_name").on("input invalid",function(e) {
-            if (utils.in_simulation) {
-                Crud.GO_TO_FIELD_GROUP({standard: true});
-                this.setCustomValidity("You can't add or edit assignments in the simulation; this functionality is not yet supported :(");
-            } else {
-                Crud.GO_TO_FIELD_GROUP({standard: true});
-                this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
-            }
-        });
         let alert_already_shown = false;
         $("#id_min_work_time, #id_time_per_unit").on("focusout", () => {
             
@@ -382,6 +372,26 @@ class Crud {
                     alert_already_shown = true;
                 }
             })
+        });
+
+        $("#submit-assignment-button").click(function(e) {
+            // Custom error messages
+            if (utils.in_simulation) {
+                Crud.GO_TO_FIELD_GROUP({standard: true});
+                $("#form-wrapper form #first-field-group input:visible:first")[0].setCustomValidity("You can't add or edit assignments in the simulation. This functionality is not yet supported :(");
+                return;
+            }
+            if ($("#id_name").is(":invalid")) {
+                Crud.GO_TO_FIELD_GROUP({standard: true});
+                $("#id_name")[0].setCustomValidity("Please enter an assignment name");
+                return;
+            }
+        });
+        $("#form-wrapper form input").on("input invalid", function(e) {
+            // Clear the custom validation message and don't make it show up again for every input
+            if (e.type === "input") {
+                this.setCustomValidity("");
+            }
         });
 
         let submitted = false;
