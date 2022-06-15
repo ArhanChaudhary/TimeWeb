@@ -337,9 +337,10 @@ class Crud {
         // Sets custom error message
         $("#id_name").on("input invalid",function(e) {
             if (utils.in_simulation) {
+                Crud.GO_TO_FIELD_GROUP({standard: true});
                 this.setCustomValidity("You can't add or edit assignments in the simulation; this functionality is not yet supported :(");
             } else {
-                Crud.GO_TO_FIELD_GROUP({standard: true})
+                Crud.GO_TO_FIELD_GROUP({standard: true});
                 this.setCustomValidity(e.type === "invalid" ? 'Please enter an assignment name' : '');
             }
         });
