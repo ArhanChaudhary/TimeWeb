@@ -539,7 +539,8 @@ class VisualAssignment extends Assignment {
         } else {
             var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`;
         }
-        if (screen.measureText(text).width > this.height - 50) {
+        let margin = 20;
+        if (screen.measureText(text).width + margin * 2 > this.height - 50) {
             text = pluralize(this.sa.unit);
         }
         screen.fillText(text, -(this.height - 50) / 2, 17);
