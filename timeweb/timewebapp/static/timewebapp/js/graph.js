@@ -325,7 +325,7 @@ class VisualAssignment extends Assignment {
         new Priority().sort();
     }
     static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
-    static getTextHeight = screen => screen.measureText("0") * 2;
+    static getTextHeight = screen => screen.measureText("0").width * 2;
     static setCanvasFont(screen, font_size) {
         screen.font = VisualAssignment.generateCanvasFont(font_size);
         screen.text_height = VisualAssignment.getTextHeight(screen);
@@ -547,19 +547,19 @@ class VisualAssignment extends Assignment {
 
         VisualAssignment.setCanvasFont(screen, 13.75);
         const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - VisualAssignment.GRAPH_Y_AXIS_MARGIN + 60) / 100));
+        const small_x_axis_scale = x_axis_scale / 5;
+        const label_smaller_x_indicies = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.9 < small_x_axis_scale * this.wCon;
         if (this.sa.complete_x >= 10) {
             gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
             gradient.addColorStop(0, "gainsboro");
             gradient.addColorStop(1, "silver");
-            const small_x_axis_scale = x_axis_scale / 5,
-                label_index = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.9 < small_x_axis_scale * this.wCon;
             for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.complete_x / small_x_axis_scale); smaller_index++) {
                 if (smaller_index % 5) {
                     const displayed_number = smaller_index * small_x_axis_scale;
                     screen.fillStyle = gradient; // Line color
                     screen.fillRect(displayed_number * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 8.5, 0, 2, this.height - 50); // Draws line index
                     screen.fillStyle = "rgb(80,80,80)"; // Number color
-                    if (label_index) {
+                    if (label_smaller_x_indicies) {
                         const numberwidth = screen.measureText(displayed_number).width;
                         let number_x_pos = displayed_number * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
                         if (number_x_pos + numberwidth / 2 > this.width - 2.5) {
@@ -573,9 +573,9 @@ class VisualAssignment extends Assignment {
         VisualAssignment.setCanvasFont(screen, 12);
         screen.textAlign = "right";
         const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
+        const small_y_axis_scale = y_axis_scale / 5;
+        const label_smaller_y_indicies = screen.text_height * 1.8 < small_y_axis_scale * this.hCon;
         if (this.sa.y >= 10) {
-            const small_y_axis_scale = y_axis_scale / 5;
-            const label_index = screen.text_height * 1.8 < small_y_axis_scale * this.hCon;
             for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
                 const displayed_number = smaller_index * small_y_axis_scale;
                 if (smaller_index % 5) {
@@ -583,7 +583,7 @@ class VisualAssignment extends Assignment {
                     screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
                     screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
                     screen.fillStyle = "rgb(80,80,80)";
-                    if (label_index) {
+                    if (label_smaller_y_indicies) {
                         let number_y_pos = this.height - displayed_number * this.hCon - 54 + screen.text_height / 2;
                         if (number_y_pos < 4 + screen.text_height / 2) {
                             number_y_pos = 4 + screen.text_height / 2;
@@ -593,7 +593,7 @@ class VisualAssignment extends Assignment {
                 }
             }
         }
-        VisualAssignment.setCanvasFont(screen, 15); // make font bigger when there is no smaller index
+        VisualAssignment.setCanvasFont(screen, label_smaller_y_indicies ? 15 : 16.5);
         for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
             if (bigger_index * 2 < y_axis_scale) {
                 break;
