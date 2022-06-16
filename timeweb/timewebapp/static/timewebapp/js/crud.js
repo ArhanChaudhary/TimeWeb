@@ -52,22 +52,24 @@ class Crud {
     }
     static setAssignmentFormFields(formDict) {
         for (let [field, value] of Object.entries(formDict)) {
+            const field_is_daterangepicker = field.endsWith("_daterangepicker");
+            if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
+            const $field = $(field);
+
             if (field === "#id_break_days") continue;
             if (field === "#id_unit") {
                 const normalized_value = pluralize(value, 1).toLowerCase();
                 if (normalized_value === "minute") {
                     $("#y-widget-checkbox").prop("checked", false);
+                    $field.val("");
                     continue;
                 } else if (normalized_value === "hour") {
                     $("#y-widget-checkbox").prop("checked", true);
+                    $field.val("");
                     continue;
                 }
             }
-            
-            const field_is_daterangepicker = field.endsWith("_daterangepicker");
-            if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
 
-            const $field = $(field);
             if ($field.attr("type") === "checkbox")
                 $field.prop("checked", value);
             else if (field_is_daterangepicker) {
