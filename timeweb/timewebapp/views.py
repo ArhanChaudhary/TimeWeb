@@ -222,22 +222,35 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
                 self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
+                removed_works_start = -self.sm.blue_line_start # translates x position 0 so that it can be used to accessing works
+                removed_works_end = len(old_data.works) - 1
                 if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
-                removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
                     removed_works_start = 0
 
             if self.sm.x == None:
+                min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
+                
+                # The purpose of this part of the code is to take into account the adjusted assignment date
+                # and make it look like the graph smoothly "chops off" previous work inputs
+                # some mathy legacy reference:
+
                 # ctime * (y - new_first_work) = min_work_time_funct_round * x
                 # x = ctime * (y - new_first_work) / min_work_time_funct_round
                 # Solve for new_first_work:
-                # reference: works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
                 # new_first_work is when n = removed_works_start
                 # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
-                min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
-                if self.created_assignment or self.sm.needs_more_info:
+
+                # There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
+                # This is a condition from the below code that redefines works
+                # However it does not take into account capping removed_works_end at end_of_works
+                # However, end_of_works is dependent on x, creating a deadlock
+                # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
+                if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
                     new_first_work = first_work
+                    breakpoint()
                 elif self.updated_assignment:
                     new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
                 x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
@@ -276,12 +289,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 except OverflowError:
                     self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
                     self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
-                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
-                    x_num += 1
             else:
                 x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
-                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
-                    x_num += 1
+            if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
+                x_num += 1
 
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
@@ -293,8 +304,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
-                # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
-                removed_works_end = len(old_data.works) - 1
                 old_x_num = days_between_two_dates(self.sm.x, old_data.assignment_date)
                 if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                     old_x_num += 1
@@ -304,6 +313,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if removed_works_end > end_of_works:
                     removed_works_end = end_of_works
                 if removed_works_start <= removed_works_end:
+                    # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                     works_displacement = Decimal(old_data.works[0]) - first_work
                     self.sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start,removed_works_end+1)]
                 else:
