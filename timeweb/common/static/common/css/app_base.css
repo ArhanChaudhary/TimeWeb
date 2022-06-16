@@ -268,7 +268,8 @@ rect {
     fill: white;
 }
 #nav-items {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     max-height: calc(100vh - 65px);
     background: rgb(43, 56, 68);
 }
@@ -276,7 +277,7 @@ rect {
     text-decoration: none;
     text-align: center;
     display: block;
-    padding: 15px 10px;
+    padding: 15px 3px;
     color: white;
     cursor: pointer;
     font-family: "Open Sans";
