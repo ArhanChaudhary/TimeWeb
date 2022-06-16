@@ -221,7 +221,7 @@ utils = {
             },
 
             googleClassroomAPI: function() {
-                $("#toggle-gc-container").click(function() {
+                $("#toggle-gc-api").click(function() {
                     if (isExampleAccount) {
                         $.alert({
                             title: "You can't enable the Google Classroom integration on the example account.",
@@ -238,8 +238,8 @@ utils = {
                         success: function(authentication_url, textStatus, jqXHR) {
                             switch (jqXHR.status) {
                                 case 204:
-                                    $("#toggle-gc-label").text("Enable Google Classroom integration");
-                                    $this.removeClass("enabled clicked");
+                                    $("#toggle-gc-api").text("Enable Google Classroom integration");
+                                    $this.removeClass("clicked");
                                     break;
 
                                 // Although a 302 is more semantic, jquery considers this code an error
@@ -247,10 +247,27 @@ utils = {
                                 case 200:
                                     reloadWhenAppropriate({ href: authentication_url });
                                     break;
-                            }
+                                }
                         },
                     });
                 });
+                if (GC_API_INIT_FAILED) {
+                    $.alert({
+                        title: "Could not enable the Google Classroom integration.",
+                        content: "Authentication failed. Please try again.",
+                        backgroundDismiss: false,
+                        buttons: {
+                            ok: {
+    
+                            },
+                            "try again": {
+                                action: () => {
+                                    $("#toggle-gc-api").click();
+                                },
+                            },
+                        },
+                    });  
+                }
             },
 
             deleteAllStarredAssignments: function() {
@@ -1116,25 +1133,25 @@ ajaxUtils = {
             success: function(authentication_url, textStatus, jqXHR) {
                 switch (jqXHR.status) {
                     case 204:
-                        $("#toggle-gc-container").removeClass("open clicked");
+                        $("#toggle-gc-api").removeClass("clicked");
                         if (SETTINGS.oauth_token.token) {
-                            $("#toggle-gc-label").text("Disable Google Classroom integration");
+                            $("#toggle-gc-api").text("Disable Google Classroom integration");
                         } else {
-                            $("#toggle-gc-label").text("Enable Google Classroom integration");
+                            $("#toggle-gc-api").text("Enable Google Classroom integration");
                         }
                         break;
 
                     // Although a 302 is more semantic, jquery considers this code an error
                     // Let's configure this to be a 200 for simplicity
                     case 200:
-                        $("#toggle-gc-container").removeClass("clicked");
+                        $("#toggle-gc-api").removeClass("clicked");
                         $.alert({
-                            title: "Invalid credentials",
+                            title: "Invalid credentials.",
                             content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
                             buttons: {
                                 "disable integration": {
                                     action: function() {
-                                        $("#toggle-gc-container").click();
+                                        $("#toggle-gc-api").click();
                                     }
                                 },
                                 "authenticate again": {
@@ -1142,10 +1159,7 @@ ajaxUtils = {
                                         reloadWhenAppropriate({href: authentication_url});
                                     }
                                 },
-                            },
-                            onClose: function() {
-                                $("#toggle-gc-container").removeClass("open");
-                            },
+                            }
                         });
                         break;
     

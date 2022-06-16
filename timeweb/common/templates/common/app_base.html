@@ -66,8 +66,18 @@
             </svg>
         </div>
         <div id="nav-items">
-            {% if request.path != home %}
-                <a href={{ home }}>Home</a>
+            {% if request.path == home %}
+                <div id="toggle-gc-api" tabindex="0">
+                    {% if GC_API_INIT_FAILED %}
+                        Enable Google Classroom integration
+                    {% elif "token" in settings_model.oauth_token %}
+                        Disable Google Classroom integration
+                    {% else %}
+                        Enable Google Classroom integration
+                    {% endif %}
+                </div>
+            {% else %}
+                <a href="{{ home }}">Home</a>
             {% endif %}
             {% if request.path != settings %}
                 <a href="{{ settings }}">Settings</a>

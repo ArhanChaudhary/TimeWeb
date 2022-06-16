@@ -112,10 +112,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 
 
-#toggle-gc-container {
-    --background-color: var(--body-background);
-    --box-shadow-color: hsl(0, 0%, 40%);
-}
 
 .generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     /* !important so assignment_sorting color changes */
