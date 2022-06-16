@@ -250,7 +250,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
                 if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
                     new_first_work = first_work
-                    breakpoint()
                 elif self.updated_assignment:
                     new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
                 x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
