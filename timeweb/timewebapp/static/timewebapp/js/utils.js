@@ -235,6 +235,7 @@ utils = {
                     $.ajax({
                         type: "POST",
                         url: "/api/gc-auth-init",
+                        error: ajaxUtils.error,
                         success: function(authentication_url, textStatus, jqXHR) {
                             switch (jqXHR.status) {
                                 case 204:
