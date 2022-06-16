@@ -1062,7 +1062,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
     
-    if (sa.sa.needs_more_info && !Number.isFinite(sa.sa.x)) {
+    if (sa.sa.needs_more_info) {
         dom_assignment.find(".update-button").click();
         return;
     }
