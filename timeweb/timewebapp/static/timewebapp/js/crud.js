@@ -126,6 +126,7 @@ class Crud {
         } else if (params.toggle) {
             $("#form-wrapper #field-group-picker-checkbox").click();
         } else if (params.$dom_group) {
+            assert(params.$dom_group.hasClass("field-group"));
             switch (params.$dom_group.attr("id")) {
                 case "first-field-group":
                     $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
