@@ -125,6 +125,16 @@ class Crud {
             $("#form-wrapper #field-group-picker-checkbox").prop("checked", true);
         } else if (params.toggle) {
             $("#form-wrapper #field-group-picker-checkbox").click();
+        } else if (params.$dom_group) {
+            switch (params.$dom_group.attr("id")) {
+                case "first-field-group":
+                    $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
+                    break;
+
+                case "second-field-group":
+                    $("#form-wrapper #field-group-picker-checkbox").prop("checked", true);
+                    break;
+            }
         }
         Crud.RESET_FORM_GROUP_MARGINS();
     }
@@ -321,7 +331,7 @@ class Crud {
             const new_parent = $(e.target).parents(".field-group");
             const old_parent = $(e.relatedTarget).parents(".field-group");
             if (!new_parent.is(old_parent) && old_parent.length && new_parent.length)
-                Crud.GO_TO_FIELD_GROUP({ toggle: true });
+                Crud.GO_TO_FIELD_GROUP({ $dom_group: new_parent });
         });
 
         $(".field-widget-checkbox").on('input', function() {
