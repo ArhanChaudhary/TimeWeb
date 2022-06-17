@@ -324,7 +324,7 @@ def create_gc_assignments(request):
 
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
-def gc_auth_init(request):
+def gc_auth_enable(request):
     # For reference:
     # If modifying these scopes, delete the file token.json.
     # SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
@@ -355,17 +355,6 @@ def gc_auth_init(request):
     #         course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
     #     except HttpError:
     #         pass
-
-
-    # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
-    if 'token' in request.user.settingsmodel.oauth_token:
-        request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
-        if settings.DEBUG:
-            # Re-add gc assignments in debug
-            request.user.settingsmodel.added_gc_assignment_ids = []
-        request.user.settingsmodel.save()
-        logger.info(f"User {request.user} disabled google classroom API")
-        return HttpResponse(status=204)
     flow = Flow.from_client_secrets_file(
         settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
     flow.redirect_uri = settings.GC_REDIRECT_URI
@@ -379,6 +368,19 @@ def gc_auth_init(request):
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
     return HttpResponse(reauthorization_url, status=302)
+
+@require_http_methods(["POST"])
+@decorator_from_middleware(APIValidationMiddleware)
+def gc_auth_disable(request):
+    # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
+    if 'token' in request.user.settingsmodel.oauth_token:
+        request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
+        if settings.DEBUG:
+            # Re-add gc assignments in debug
+            request.user.settingsmodel.added_gc_assignment_ids = []
+        request.user.settingsmodel.save()
+        logger.info(f"User {request.user} disabled google classroom API")
+    return HttpResponse(status=204)
 
 @require_http_methods(["GET"])
 @decorator_from_middleware(APIValidationMiddleware)

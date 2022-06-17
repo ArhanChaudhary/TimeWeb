@@ -232,30 +232,37 @@ utils = {
                     const $this = $(this);
                     if ($this.hasClass("clicked")) return;
                     $this.addClass("clicked");
-                    $.ajax({
-                        type: "POST",
-                        url: "/api/gc-auth-init",
-                        error: function(jqXHR) {
-                            switch (jqXHR.status) {
-                                case 302:
-                                    var reauthorization_url = jqXHR.responseText;
-                                    reloadWhenAppropriate({ href: reauthorization_url });
-                                    break;
+                    if ($("#toggle-gc-api").text() === "Enable Google Classroom integration") {
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/gc-auth-enable",
+                            error: function(jqXHR) {
+                                switch (jqXHR.status) {
+                                    case 302:
+                                        var reauthorization_url = jqXHR.responseText;
+                                        reloadWhenAppropriate({ href: reauthorization_url });
+                                        break;
 
-                                default:
-                                    ajaxUtils.error.bind(this)(...arguments);
-                            }
-                        },
-                        success: function(reauthorization_url, textStatus, jqXHR) {
-                            console.log(reauthorization_url)
-                            switch (jqXHR.status) {
-                                case 204:
-                                    $("#toggle-gc-api").text("Enable Google Classroom integration");
-                                    $this.removeClass("clicked");
-                                    break;
-                            }
-                        },
-                    });
+                                    default:
+                                        ajaxUtils.error.bind(this)(...arguments);
+                                }
+                            },
+                        });
+                    } else if ($("#toggle-gc-api").text() === "Disable Google Classroom integration") {
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/gc-auth-disable",
+                            error: ajaxUtils.error,
+                            success: function(response, textStatus, jqXHR) {
+                                switch (jqXHR.status) {
+                                    case 204:
+                                        $("#toggle-gc-api").text("Enable Google Classroom integration");
+                                        $this.removeClass("clicked");
+                                        break;
+                                }
+                            },
+                        });
+                    }
                 });
                 if (GC_API_INIT_FAILED) {
                     $.alert({
