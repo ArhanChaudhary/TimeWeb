@@ -23,6 +23,7 @@ import json
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
+from google.auth.exceptions import RefreshError
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
@@ -166,6 +167,20 @@ def tag_delete(request):
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
 
+def get_gc_reauthorization_url():
+    flow = Flow.from_client_secrets_file(
+        settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
+    flow.redirect_uri = settings.GC_REDIRECT_URI
+    # Generate URL for request to Google's OAuth 2.0 server.
+    # Use kwargs to set optional request parameters.
+    reauthorization_url, state = flow.authorization_url(
+        # Enable offline access so that you can refresh an access token without
+        # re-prompting the user for permission. Recommended for web server apps.
+        access_type='offline',
+        # Enable incremental authorization. Recommended as a best practice.
+        include_granted_scopes='true')
+    return reauthorization_url
+
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
 def create_gc_assignments(request):
@@ -177,23 +192,18 @@ def create_gc_assignments(request):
     # If there are no valid credentials available, let the user log in.
     if not credentials.valid:
         if credentials.expired and credentials.refresh_token:
-            # Errors can happen in refresh because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
-            credentials.refresh(Request())
-            request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-            request.user.settingsmodel.save()
-        else:
-            flow = Flow.from_client_secrets_file(
-                settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
-            flow.redirect_uri = settings.GC_REDIRECT_URI
-            # Generate URL for request to Google's OAuth 2.0 server.
-            # Use kwargs to set optional request parameters.
-            authorization_url, state = flow.authorization_url(
-                # Enable offline access so that you can refresh an access token without
-                # re-prompting the user for permission. Recommended for web server apps.
-                access_type='offline',
-                # Enable incremental authorization. Recommended as a best practice.
-                include_granted_scopes='true')
-            return HttpResponse(authorization_url, status=302)
+            try:
+                # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
+                credentials.refresh(Request())
+            except RefreshError:
+                # In case users manually revoke access to their oauth scopes after authorizing
+                if reauthorization_url := get_gc_reauthorization_url():
+                    return HttpResponse(reauthorization_url, status=302)
+            else:
+                request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
+                request.user.settingsmodel.save()
+        elif reauthorization_url := get_gc_reauthorization_url():
+            return HttpResponse(reauthorization_url, status=302)
 
     date_now = utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -278,8 +288,13 @@ def create_gc_assignments(request):
                 time_per_unit=1,
                 # y is missing
             ))
-    # .execute() rarely leads to 503s which I expect may have been from a temporary outage
-    courses = service.courses().list().execute().get('courses', [])
+    try:
+        # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
+        courses = service.courses().list().execute()
+    except RefreshError:
+        if reauthorization_url := get_gc_reauthorization_url():
+            return HttpResponse(reauthorization_url, status=302)
+    courses = courses.get('courses', [])
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
 
@@ -294,7 +309,11 @@ def create_gc_assignments(request):
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
     new_gc_assignment_ids = set()
     gc_models_to_create = []
-    batch.execute()
+    try:
+        batch.execute()
+    except RefreshError:
+        if reauthorization_url := get_gc_reauthorization_url():
+            return HttpResponse(reauthorization_url, status=302)
     TimewebModel.objects.bulk_create(gc_models_to_create)
     if not gc_models_to_create: return HttpResponse(status=204) # or do new_gc_assignment_ids == set_added_gc_assignment_ids
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
@@ -352,18 +371,22 @@ def gc_auth_init(request):
     flow.redirect_uri = settings.GC_REDIRECT_URI
     # Generate URL for request to Google's OAuth 2.0 server.
     # Use kwargs to set optional request parameters.
-    authorization_url, state = flow.authorization_url(
+    reauthorization_url, state = flow.authorization_url(
         approval_prompt='force',
         # Enable offline access so that you can refresh an access token without
         # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
-    return HttpResponse(authorization_url, status=302)
+    return HttpResponse(reauthorization_url, status=302)
 
 @require_http_methods(["GET"])
 @decorator_from_middleware(APIValidationMiddleware)
 def gc_auth_callback(request):
+    # Fail it early (for debugging
+    # request.session['gc-init-failed'] = True
+    # return redirect(reverse("home"))
+
     # Callback URI
     state = request.GET.get('state', None)
 
@@ -374,7 +397,7 @@ def gc_auth_callback(request):
     flow.redirect_uri = settings.GC_REDIRECT_URI
 
     # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
-    authorization_response = request.build_absolute_uri()        
+    authorization_response = request.build_absolute_uri()
     try:
         # turn those parameters into a token
         flow.fetch_token(authorization_response=authorization_response)
@@ -386,6 +409,8 @@ def gc_auth_callback(request):
         # If the error is an OAuth2Error, the init failed
         # If the error is an HttpError and the access code is 403, the init failed
         # If the error is an HttpError and the access code is 404, the init succeeded, as the course work execute line provides a dunder id so it can execute
+
+        # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
         if isinstance(e, OAuth2Error) or isinstance(e, HttpError) and e.resp.status == 403:
             # In case users deny a permission or don't input a code in the url or cancel
             request.session['gc-init-failed'] = True
