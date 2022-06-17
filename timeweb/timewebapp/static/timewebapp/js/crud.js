@@ -496,7 +496,7 @@ class Crud {
             success: success,
             error: function() {
                 dom_assignment.removeClass("assignment-is-deleting");
-                ajaxUtils.error(...arguments);
+                ajaxUtils.error.bind(this)(...arguments);
             }
         });
     }

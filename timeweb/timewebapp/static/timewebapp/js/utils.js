@@ -620,7 +620,7 @@ utils = {
                     success: success,
                     error: function() {
                         tag_wrapper.removeClass("keep-delete-open");
-                        ajaxUtils.error(...arguments);
+                        ajaxUtils.error.bind(this)(...arguments);
                     }
                 });
             }
@@ -1074,6 +1074,7 @@ ajaxUtils = {
     disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
     error: function(response, textStatus) {
         if (ajaxUtils.silence_errors) return;
+        assert(this.xhr); // Ensure "this" refers to a jquery ajax
         let title;
         let content;
         switch (response.status) {
