@@ -235,20 +235,25 @@ utils = {
                     $.ajax({
                         type: "POST",
                         url: "/api/gc-auth-init",
-                        error: ajaxUtils.error,
-                        success: function(authentication_url, textStatus, jqXHR) {
+                        error: function(jqXHR) {
+                            switch (jqXHR.status) {
+                                case 302:
+                                    var reauthorization_url = jqXHR.responseText;
+                                    reloadWhenAppropriate({ href: reauthorization_url });
+                                    break;
+
+                                default:
+                                    ajaxUtils.error.bind(this)(...arguments);
+                            }
+                        },
+                        success: function(reauthorization_url, textStatus, jqXHR) {
+                            console.log(reauthorization_url)
                             switch (jqXHR.status) {
                                 case 204:
                                     $("#toggle-gc-api").text("Enable Google Classroom integration");
                                     $this.removeClass("clicked");
                                     break;
-
-                                // Although a 302 is more semantic, jquery considers this code an error
-                                // Let's configure this to be a 200 for simplicity
-                                case 200:
-                                    reloadWhenAppropriate({ href: authentication_url });
-                                    break;
-                                }
+                            }
                         },
                     });
                 });
@@ -1131,21 +1136,10 @@ ajaxUtils = {
         $.ajax({
             type: "POST",
             url: '/api/create-gc-assignments',
-            error: ajaxUtils.error,
-            success: function(authentication_url, textStatus, jqXHR) {
+            error: function(jqXHR) {
                 switch (jqXHR.status) {
-                    case 204:
-                        $("#toggle-gc-api").removeClass("clicked");
-                        if (SETTINGS.oauth_token.token) {
-                            $("#toggle-gc-api").text("Disable Google Classroom integration");
-                        } else {
-                            $("#toggle-gc-api").text("Enable Google Classroom integration");
-                        }
-                        break;
-
-                    // Although a 302 is more semantic, jquery considers this code an error
-                    // Let's configure this to be a 200 for simplicity
-                    case 200:
+                    case 302:
+                        var reauthorization_url = jqXHR.responseText;
                         $("#toggle-gc-api").removeClass("clicked");
                         $.alert({
                             title: "Invalid credentials.",
@@ -1158,11 +1152,26 @@ ajaxUtils = {
                                 },
                                 "authenticate again": {
                                     action: function() {
-                                        reloadWhenAppropriate({href: authentication_url});
+                                        reloadWhenAppropriate({href: reauthorization_url});
                                     }
                                 },
                             }
                         });
+                        break;
+
+                    default:
+                        ajaxUtils.error.bind(this)(...arguments);
+                }
+            },
+            success: function(response, textStatus, jqXHR) {
+                switch (jqXHR.status) {
+                    case 204:
+                        $("#toggle-gc-api").removeClass("clicked");
+                        if (SETTINGS.oauth_token.token) {
+                            $("#toggle-gc-api").text("Disable Google Classroom integration");
+                        } else {
+                            $("#toggle-gc-api").text("Enable Google Classroom integration");
+                        }
                         break;
     
                     case 205:

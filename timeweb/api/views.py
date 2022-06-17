@@ -193,7 +193,7 @@ def create_gc_assignments(request):
                 access_type='offline',
                 # Enable incremental authorization. Recommended as a best practice.
                 include_granted_scopes='true')
-            return HttpResponse(authorization_url)
+            return HttpResponse(authorization_url, status=302)
 
     date_now = utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -359,7 +359,7 @@ def gc_auth_init(request):
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
-    return HttpResponse(authorization_url)
+    return HttpResponse(authorization_url, status=302)
 
 @require_http_methods(["GET"])
 @decorator_from_middleware(APIValidationMiddleware)
