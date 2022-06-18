@@ -15,7 +15,7 @@
             const EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
             const CREATING_GC_ASSIGNMENTS_FROM_FRONTEND = {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}true{% else %}false{% endif %};
 
-            // Initialize the service worker
+            // Initialize the service worker (as soon as possible)
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/serviceworker.js', {
                     scope: '/'
@@ -46,6 +46,7 @@
         <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css" crossorigin="anonymous" />
         <link rel="stylesheet" href="{% static 'common/css/base.css' %}">
         {% block base_head_css %}{% endblock %}
+        <script src="{% static 'common/js/base.js' %}"></script>
         {% block base_head_js %}{% endblock %}
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
@@ -63,26 +64,6 @@
             also remember to have #loading-container (for the below code)
             {% endcomment %}
             {% block base_head_body %}{% endblock %}
-            <script nonce="{{request.csp_nonce}}">
-                window.onbeforeunload = function() {
-                    if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
-                    if (window.disable_loading) return;
-                    // setTimeout to ensure .scrollTop to record the scroll position is run before this
-                    setTimeout(function() {
-                        document.querySelectorAll("main > *").forEach(e => {
-                            e.style.display = "none";
-                        });
-                        document.getElementsByTagName("main")[0].style.display = "flex";
-                        document.getElementsByTagName("main")[0].style.justifyContent = "center";
-                        document.getElementsByTagName("main")[0].style.alignItems = "center";
-                        if (document.getElementById("background-image")) document.getElementById("background-image").style.display = "block";
-                        if (document.getElementById("circles-background"))
-                            document.getElementById("circles-background").style.display = "block";
-                        else 
-                            document.getElementById("loading-container").style.display = "contents";
-                    }, 0);
-                };
-            </script>
         </div>
     </body>
 </html>
