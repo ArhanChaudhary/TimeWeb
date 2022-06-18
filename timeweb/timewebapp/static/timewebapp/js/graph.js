@@ -68,6 +68,7 @@ class Assignment {
 
         // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
         params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+        this.setParabolaValues();
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
