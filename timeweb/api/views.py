@@ -264,7 +264,6 @@ def create_gc_assignments(request):
             if blue_line_start < 0:
                 blue_line_start = 0
             dynamic_start = blue_line_start
-            user = request.user
             gc_models_to_create.append(TimewebModel(
                 name=name,
                 assignment_date=assignment_date,
@@ -275,17 +274,17 @@ def create_gc_assignments(request):
                 min_work_time=request.user.settingsmodel.def_min_work_time,
                 break_days=request.user.settingsmodel.def_break_days,
                 dynamic_start=dynamic_start,
-                funct_round=1,
                 description=description,
                 google_classroom_assignment_link=google_classroom_assignment_link,
                 tags=tags,
                 needs_more_info=True,
                 is_google_classroom_assignment=True,
-                user=user,
+                user=request.user,
 
                 # Assumptions
                 unit="Minute",
                 time_per_unit=1,
+                funct_round=5,
                 # y is missing
             ))
     try:
