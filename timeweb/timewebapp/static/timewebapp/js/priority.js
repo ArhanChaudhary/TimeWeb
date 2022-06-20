@@ -712,17 +712,17 @@ class Priority {
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false}) {
         this.params = params;
-        if (Priority.IS_CURRENTLY_SORTING) {
-            Priority.RECURSE_PARAMS = this.params;
+        if (Priority.is_currently_sorting) {
+            Priority.recurse_params = this.params;
         } else {
-            Priority.IS_CURRENTLY_SORTING = true;
+            Priority.is_currently_sorting = true;
             this.sortWithoutTimeout();
-            if (Priority.RECURSE_PARAMS) {
-                Priority.RECURSE_PARAMS = undefined;
-                Priority.IS_CURRENTLY_SORTING = false;
-                this.sort(Priority.RECURSE_PARAMS);
+            if (Priority.recurse_params) {
+                Priority.recurse_params = undefined;
+                Priority.is_currently_sorting = false;
+                this.sort(Priority.recurse_params);
             } else {
-                Priority.IS_CURRENTLY_SORTING = false;
+                Priority.is_currently_sorting = false;
             }
         }
     }
