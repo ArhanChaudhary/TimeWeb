@@ -256,10 +256,10 @@ def create_gc_assignments(request):
 
             # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
             new_gc_assignment_ids.add(assignment_id)
-            if assignment_id in set_added_gc_assignment_ids:
+            if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
                 continue
 
-            # Create assignment
+            # From create assignment
             blue_line_start = days_between_two_dates(date_now, assignment_date)
             if blue_line_start < 0:
                 blue_line_start = 0
@@ -304,8 +304,6 @@ def create_gc_assignments(request):
             continue
         course_names[course['id']] = course['name']
         batch.add(coursework_lazy.list(courseId=course['id']))
-    # Make "in" faster
-    set_added_gc_assignment_ids = set(request.user.settingsmodel.added_gc_assignment_ids)
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
     new_gc_assignment_ids = set()
     gc_models_to_create = []
@@ -315,7 +313,7 @@ def create_gc_assignments(request):
         if reauthorization_url := get_gc_reauthorization_url():
             return HttpResponse(reauthorization_url, status=302)
     TimewebModel.objects.bulk_create(gc_models_to_create)
-    if not gc_models_to_create: return HttpResponse(status=204) # or do new_gc_assignment_ids == set_added_gc_assignment_ids
+    if not gc_models_to_create: return HttpResponse(status=204)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
     request.user.settingsmodel.save()
 
