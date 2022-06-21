@@ -12,7 +12,7 @@
     {% if confirmation %}
         {% user_display confirmation.email_address.user as user_display %}
 
-        <p>Please confirm that <a href="mailto:{{ confirmation.email_address.email }}">{{ confirmation.email_address.email }}</a> is an e-mail address for user {{ user_display }}.</p>
+        <p>Please confirm that {{ confirmation.email_address.email }} is an e-mail address for user {{ user_display }}.</p>
 
         <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
             {% csrf_token %}
