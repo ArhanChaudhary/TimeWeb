@@ -1,16 +1,20 @@
 # Abstractions
 from views import TimewebGenericView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.forms import ValidationError
 
 # App stuff
 from django.conf import settings
 from .forms import UsernameResetForm
+from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
 
 # Misc
 from views import logger
 from allauth.account.adapter import DefaultAccountAdapter
+from django.contrib import messages
+from allauth.account.adapter import get_adapter as get_account_adapter
 DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
@@ -45,3 +49,19 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     def invalid_form(self, request):
         self.context['form'] = self.form
         return super().get(request)
+
+class LabeledSocialaccountConnectionsView(SocialaccountConnectionsView):
+    def form_valid(self, form):
+        get_account_adapter().add_message(
+            self.request,
+            messages.INFO,
+            "socialaccount/messages/account_disconnected.txt",
+            message_context={
+                "sociallogout": form.cleaned_data["account"],
+            }
+        )
+        form.save()
+        return super(SocialaccountConnectionsView, self).form_valid(form)
+    
+    
+connections = login_required(LabeledSocialaccountConnectionsView.as_view()) # from its source code
