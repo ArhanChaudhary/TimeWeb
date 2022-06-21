@@ -10,6 +10,9 @@
 #table-of-contents-container, #table-of-contents-container-label {
     width: 225px;
 }
+.table-of-contents-item {
+    white-space: nowrap;
+}
 /* Make sure to change user_guide.css and others if this media query is modified */
 @media screen and (max-width: 795px) {
     #table-of-contents-container {
