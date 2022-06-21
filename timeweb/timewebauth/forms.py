@@ -127,6 +127,14 @@ class LabeledResetPasswordForm(ResetPasswordForm):
             raise forms.ValidationError(_("You cannot request a password reset for the example account"))
         return email
 
+class LabeledSocialaccountDisconnectForm(SocialaccountDisconnectForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['account'].error_messages = {
+            'required': _('Please select a Google account to remove'),
+            'invalid_choice': _('The selected Google account is invalid'),
+        }
+
 class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
     username = forms.CharField(
         label=_("Username"),

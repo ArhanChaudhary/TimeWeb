@@ -298,7 +298,7 @@ ACCOUNT_FORMS = {
 }
 
 SOCIALACCOUNT_FORMS = {
-    'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
+    'disconnect': 'timewebauth.forms.LabeledSocialaccountDisconnectForm',
     'signup': 'timewebauth.forms.LabeledSocialaccountSignupForm',
 }
 
