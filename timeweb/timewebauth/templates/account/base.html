@@ -30,8 +30,8 @@
             <div id="accounts-arrow-horizontal"></div>
           </div>
         </a>
-        <a href="{% url 'home' %}">
-          <img src="{% static 'timewebapp/images/timeweb.webp' %}" border="0" draggable="false"/>
+        <a id="logo-anchor" href="{% url 'home' %}">
+          <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         </a>
       </div>
       {% block accounts_content %}{% endblock %}

@@ -14,6 +14,10 @@ body {
     box-sizing: border-box;
     padding: 15px 40px 25px;
 }
+#accounts-container :focus {
+    outline: 2px solid rgb(0, 109, 249);
+    border-radius: 2px;
+}
 #accounts-container > a:first-of-type img {
     display: block;
     margin: auto;
@@ -23,6 +27,7 @@ body {
     margin-top: 0;
 }
 #accounts-arrow-anchor {
+    display: none; /* unused css for now, put this on #accounts-anchor so it doesn't get focused */
     position: absolute;
     left: 0;
 }
@@ -30,7 +35,6 @@ body {
     width: 50px;
     height: 50px;
     display: flex;
-    display: none; /* unused css for now */
     align-items: center;
 }
 #accounts-arrow-horizontal {
@@ -71,6 +75,10 @@ body {
 #logo-container img {
     max-height: 80px;
     max-width: 100%;
+    display: block; /* prevent the random 5px padding gap beneath the image */
+}
+#logo-anchor {
+    margin-bottom: 5px;
 }
 .password-field-container {
     position: relative;
@@ -174,7 +182,9 @@ input:not([type="submit"], [type="checkbox"], [type="radio"]), textarea {
 }
 input:not([type="submit"]):focus, textarea:focus {
     box-shadow: inset 0 0 0 2px rgb(0, 109, 249) !important;
-    outline: 0;
+    /* Override #accounts-container :focus */
+    outline: 0 !important;
+    border-radius: 4px !important;
 }
 hr {
     margin-top: 20px;
@@ -199,7 +209,6 @@ hr {
 }
 .submit-button:focus, .submit-button:hover {
     background: rgba(0, 109, 249, 0.9);
-    outline: 0;
 }
 .submit-button:active {
     transform: translateY(1px);

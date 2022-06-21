@@ -1,10 +1,6 @@
 label {
     display: block;
 }
-#under-password {
-    white-space: nowrap;
-    overflow: hidden;
-}
 .socialaccount-button {
     padding: 10px 0;
     position: relative;
@@ -19,12 +15,17 @@ label {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.5s cubic-bezier(.5,-1,.5,2), margin 0s;
+    transition: all 0.5s cubic-bezier(.5,-1,.5,2), margin 0s, border-color 0s, outline 0s;
 }
-.socialaccount-button:hover {
+.socialaccount-button:hover, .socialaccount-button:focus {
     transform: scale(1.05, 1.02);
     box-shadow: 0 0 4px 1px rgba(13, 106, 255, 0.5);
     background: white;
+}
+.socialaccount-button:focus {
+    /* Override #assignments-container :focus */
+    border-color: transparent !important;
+    border-radius: initial !important;
 }
 .socialaccount-button:active {
     margin-top: 1px;
