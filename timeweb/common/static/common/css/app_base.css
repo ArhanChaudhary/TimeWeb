@@ -293,7 +293,8 @@ rect {
     display: block;
 }
 #menu:focus ~ nav, 
-nav:focus-within {
+nav:focus-within,
+.open-nav-in-jconfirm nav {
     transform: translateX(calc(-100% - 3px));
 }
 
