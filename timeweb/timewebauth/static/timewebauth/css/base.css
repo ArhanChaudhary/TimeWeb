@@ -217,6 +217,15 @@ hr {
 .submit-button:focus, .submit-button:hover {
     background: rgba(0, 109, 249, 0.9);
 }
+.submit-button:focus {
+    /* Override #accounts-container :focus */
+    border-radius: initial !important;
+    outline-width: 1px !important;
+}
+.submit-button:focus:hover {
+    /* Override #accounts-container :focus */
+    outline: none !important;
+}
 .submit-button:active {
     transform: translateY(1px);
     background: rgb(0, 109, 249);
