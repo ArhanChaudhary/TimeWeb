@@ -206,6 +206,10 @@ hr {
     margin-top: 30px;
     cursor: pointer;
     font: inherit;
+    /* Normalize other styles (i.e from anchor tags) */
+    text-decoration: none;
+    display: block;
+    text-align: center;
 }
 .submit-button:focus, .submit-button:hover {
     background: rgba(0, 109, 249, 0.9);
