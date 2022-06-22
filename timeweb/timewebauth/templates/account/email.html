@@ -11,7 +11,7 @@
   <h1>E-mail Addresses</h1>
   {% include "account/accounts_messages.html" %}
 
-  <p>The following e-mail addresses are associated with your account:</p>
+  <p>The following e-mail addresses are associated with your account: (Your primary e-mail address is used for password resets)</p>
   <form action="{% url 'account_email' %}" class="email_list" method="post">
     {% csrf_token %}
 

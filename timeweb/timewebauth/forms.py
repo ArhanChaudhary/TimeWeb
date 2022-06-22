@@ -67,14 +67,40 @@ class LabeledAddEmailForm(AddEmailForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.instance_email = str(kwargs['user'])
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
 
     def clean_email(self):
-        if self.instance_email == settings.EXAMPLE_ACCOUNT_EMAIL:
-            raise forms.ValidationError(_("You cannot modify the example account"))
-        return super(LabeledAddEmailForm, self).clean_email()
+        # source is from super(LabeledAddEmailForm, self).clean_email()
+        # This has been copied to modify the errors and add the example account validation
+        value = self.cleaned_data["email"]
+        value = get_adapter().clean_email(value)
+        errors = {
+            "this_account": _(
+                "This e-mail address is already associated with your account"
+            ),
+            "different_account": _(
+                "This e-mail address is already associated with another account"
+            ),
+            "max_email_addresses": _("You cannot add more than %d e-mail addresses"),
+            "example_account": _("You cannot modify the example account")
+        }
+        users = filter_users_by_email(value)
+        on_this_account = [u for u in users if u.pk == self.user.pk]
+        on_diff_account = [u for u in users if u.pk != self.user.pk]
+        on_example_account = value == settings.EXAMPLE_ACCOUNT_EMAIL
+
+        if on_example_account:
+            raise forms.ValidationError(errors["example_account"])
+        if on_this_account:
+            raise forms.ValidationError(errors["this_account"])
+        if on_diff_account and app_settings.UNIQUE_EMAIL:
+            raise forms.ValidationError(errors["different_account"])
+        if not EmailAddress.objects.can_add_email(self.user):
+            raise forms.ValidationError(
+                errors["max_email_addresses"] % app_settings.MAX_EMAIL_ADDRESSES
+            )
+        return value
 
 class LabeledChangePasswordForm(ChangePasswordForm):
     def __init__(self, *args, **kwargs):
