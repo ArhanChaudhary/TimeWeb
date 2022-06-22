@@ -28,8 +28,7 @@ label {
     border-radius: initial !important;
 }
 .socialaccount-button:active {
-    margin-top: 1px;
-    margin-bottom: -1px;
+    top: 1px;
 }
 .socialaccount-image {
     height: calc(100% - 8px);
