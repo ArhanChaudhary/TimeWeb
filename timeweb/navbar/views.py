@@ -1,3 +1,5 @@
+# In the future I should probably switch all my view classes to FormView
+
 # Abstractions
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin

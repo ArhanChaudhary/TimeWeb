@@ -1,3 +1,5 @@
+# In the future I should probably switch all my view classes to FormView
+
 # Abstractions
 from django.http import HttpResponse
 from django.shortcuts import redirect, render

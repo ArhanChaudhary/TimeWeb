@@ -1,5 +1,7 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 
+# In the future I should probably switch all my view classes to FormView
+
 # Abstractions
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
