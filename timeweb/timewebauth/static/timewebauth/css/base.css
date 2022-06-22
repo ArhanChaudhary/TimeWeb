@@ -197,6 +197,9 @@ hr {
     transform: translate(-50%, -34px);
     background-color: white;
 }
+.submit-button[no-top-margin] {
+    margin-top: initial; /* for connections.html */
+}
 .submit-button {
     width: 100%;
     background: rgb(0, 109, 249);

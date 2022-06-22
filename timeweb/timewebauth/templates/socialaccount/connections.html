@@ -23,6 +23,8 @@
             {% endfor %}
             <button type="submit" class="submit-button">Remove Google account</button>
         </form>
+        <hr>
+        <span class="hr-interrupt">or</span>
     {% else %}
         <p>You currently have no Google accounts connected to your TimeWeb account.</p>
     {% endif %}
@@ -31,7 +33,7 @@
     {% with socialaccount_providers|first as provider %}
         <form method="POST" action="{% provider_login_url provider.id process="connect" scope=scope auth_params=auth_params %}">
             {% csrf_token %}
-            <button class="submit-button" type="submit">
+            <button class="submit-button" type="submit" no-top-margin>
                 <span title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
                     href="">Connect a new {{provider.name}} account</span>
             </button>

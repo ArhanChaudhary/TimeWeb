@@ -5,6 +5,7 @@ label {
     padding: 10px 0;
     position: relative;
     background: rgb(238, 245, 255);
+    /* Don't make the box-sizing border-box or else the top and bottom paddings wont work */
     width: calc(100% - 2px);
     box-sizing: unset;
     height: 30px;
