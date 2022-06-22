@@ -11,19 +11,21 @@ label {
     cursor: pointer;
 
     border: 1px solid rgb(13, 106, 255);
-    box-shadow: 0 0 3px 1px rgba(13, 106, 255, 0.25);
+    /* https://stackoverflow.com/questions/22446148/css-box-shadow-transition */
+    box-shadow: inset 0 0 0 0 white, 0 0 3px 1px rgba(13, 106, 255, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.5s cubic-bezier(.5,-1,.5,2), margin 0s, border-color 0s, outline 0s;
+    transition: 0.5s cubic-bezier(.5,-1,.5,2);
+    transition-property: transform, box-shadow, background;
 }
 .socialaccount-button:hover, .socialaccount-button:focus {
     transform: scale(1.05, 1.02);
-    box-shadow: 0 0 4px 1px rgba(13, 106, 255, 0.5);
+    box-shadow: inset 0 0 0 0 white, 0 0 4px 1px rgba(13, 106, 255, 0.5);
     background: white;
 }
 .socialaccount-button:focus {
-    box-shadow: inset 0 0 0 1px rgb(0, 109, 249);
+    box-shadow: inset 0 0 0 1px rgb(0, 109, 249), 0 0 0 white;
     border-color: rgb(0, 109, 249);
     /* Override #assignments-container :focus */
     outline: none !important;
