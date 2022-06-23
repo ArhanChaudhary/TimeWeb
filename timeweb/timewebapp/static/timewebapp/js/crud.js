@@ -234,10 +234,13 @@ class Crud {
             singular = pluralize(val, 1);
         $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
+            $("#id-y-field-wrapper").insertAfter($("#id-x-field-wrapper"));
+
             $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
             
-            $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight()).find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
+            $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight())
+                .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
 
             // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
@@ -246,16 +249,21 @@ class Crud {
             // 1 or 5 instead of what was originally entered)
 
             if (singular.toLowerCase() === "minute") {
-                $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight()).find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
+                $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight())
+                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             } else if (singular.toLowerCase() === "hour") {
-                $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "")
+                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             }
         } else {
+            $("#id-y-field-wrapper").insertAfter($("#id-unit-field-wrapper"));
+
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
-            $(".hide-field").removeClass("hide-field").css("margin-top", "").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+            $(".hide-field").removeClass("hide-field").css("margin-top", "")
+                .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
 
             if (["minute", "hour"].includes(that.old_unit_value)) {
