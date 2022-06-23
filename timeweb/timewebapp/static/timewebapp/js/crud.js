@@ -158,7 +158,7 @@ class Crud {
         }).on('show.daterangepicker', function(e, picker) {
             old_due_date_val = $(this).val();
         }).on('hide.daterangepicker', function(e, picker) {
-            setTimeout(() => {
+            setTimeout(() => { // So cancel.daterangepicker runs first
                 if (!$(this).val()) {
                     $("#due-date-empty").click();
                     return;

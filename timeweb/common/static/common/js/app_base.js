@@ -41,6 +41,10 @@ $(function() {
         // There's a random invisible datepicker, so only query the one that's visible
         const minuteselect = picker.container.find(".minuteselect:visible");
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
+    // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
+    }).on('blur', function(e) {
+        if (!$(e.relatedTarget).parents(".daterangepicker").length)
+            $(this).data("daterangepicker")?.hide();
     });
 
     if ($("#user-greeting").length) {
