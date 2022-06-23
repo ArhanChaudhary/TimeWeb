@@ -320,7 +320,7 @@ ACCOUNT_RATE_LIMITS = {
     "contact": "60/h",
 }
 
-if DEBUG or FIX_DEBUG_LOCALLY:
+if (DEBUG or FIX_DEBUG_LOCALLY):# and 0:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

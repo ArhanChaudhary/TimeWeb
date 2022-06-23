@@ -31,6 +31,8 @@
     {% endfor %}
 
     <div class="buttonHolder">
+      {% comment %} dont use a db query on whether to have this so the user is aware of all the functionalities
+      also so there are never no buttons making the radio select redundant {% endcomment %}
       <button class="secondaryAction" class="submit-button" type="submit" name="action_primary" >Make primary</button>
       <button class="secondaryAction" class="submit-button" type="submit" name="action_send" >Re-send verification</button>
       <button class="primaryAction" class="submit-button" type="submit" name="action_remove" >Remove</button>
