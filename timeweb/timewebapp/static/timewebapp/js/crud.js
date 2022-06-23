@@ -232,7 +232,9 @@ class Crud {
             val = val.slice(1, -1);
         let plural = pluralize(val),
             singular = pluralize(val, 1);
-        $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time. e.g: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
+        $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time
+        
+        i.e: if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
             $("#id-y-field-wrapper").insertAfter($("#id-x-field-wrapper"));
 
@@ -435,14 +437,14 @@ class Crud {
         $("#id_unit").info('left',
             `This is how your assignment will be split and divided up
             
-            e.g: If this assignment is reading a book, enter "Page" or "Chapter"`, 
+            i.e: If this assignment is reading a book, enter "Page" or "Chapter"`, 
         "after").css({
             marginTop: -22,
             marginLeft: "auto",
             marginRight: 7,
         });
         $("#id_funct_round").info('left',
-            "e.g: if you enter 3, you will only work in multiples of 3 (6 units, 9 units, 15 units, etc)",
+            "", // overridden in replaceUnit
         "after").css({
             marginTop: -22,
             marginLeft: "auto",
