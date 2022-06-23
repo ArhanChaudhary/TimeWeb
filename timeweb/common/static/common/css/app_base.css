@@ -12,6 +12,9 @@ body {
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
 }
+select {
+    color: var(--color); /* doesn't inherit properly */
+}
 header {
     --background-color: rgb(13, 26, 38);
     width: 100%;

@@ -91,7 +91,6 @@ header.animate::after {
 #id_assignment_sorting {
     padding: 0;
     text-align: initial;
-    color: var(--color);
     height: 22px;
 }
 #id_assignment_sorting:focus {
