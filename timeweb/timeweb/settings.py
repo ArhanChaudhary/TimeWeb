@@ -285,6 +285,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 SOCIALACCOUNT_ADAPTER = 'timewebauth.adapter.ExampleAccountSocialLoginAdapter'
+ACCOUNT_ADAPTER = 'timewebauth.adapter.NonUniqueUsernameAccountAdapter'
 
 ACCOUNT_FORMS = {
     'login': 'timewebauth.forms.LabeledLoginForm',

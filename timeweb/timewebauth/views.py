@@ -14,10 +14,8 @@ from allauth.socialaccount.views import ConnectionsView as SocialaccountConnecti
 
 # Misc
 from views import logger
-from allauth.account.adapter import DefaultAccountAdapter
 from django.contrib import messages
 from allauth.account.adapter import get_adapter as get_account_adapter
-DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username_reset.html"
