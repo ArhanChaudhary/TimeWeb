@@ -292,10 +292,16 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper #fields-wrapper .hide-field {
     /* no clue why this makes this work but it does */
     width: initial;
-
-    z-index: -1;
-    position: relative;
+    /* We can't set the z-index to -1 for .hide-field or else the opacity transition breaks 
+    Instead give a z-index of one to #id-unit-field-wrapper */
     opacity: 0;
+
+    transition: margin-top 0.4s ease-in-out, opacity 0.3s ease-in-out;
+}
+#id-unit-field-wrapper {
+    /* So .hide-field isnt over this when it has a lot of negative margin 
+    We can't set the z-index to -1 for .hide-field or else the opacity transition breaks */
+    z-index: 1;
 }
 #form-wrapper input:not(.field-widget-checkbox),
 #form-wrapper textarea {
