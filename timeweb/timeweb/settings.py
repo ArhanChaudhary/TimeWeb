@@ -30,7 +30,8 @@ if DEBUG:
     CSP_DEFAULT_SRC += ("http://127.0.0.1:35729", )
     CSP_CONNECT_SRC += ("ws://127.0.0.1:35729", )
 CSP_SCRIPT_SRC = CSP_DEFAULT_SRC # Needs to be set so nonce can be added
-CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
+# CSP_STYLE_SRC = CSP_DEFAULT_SRC
+CSP_INCLUDE_NONCE_IN = ('script-src', )# 'style-src')
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
 CSP_IMG_SRC = ("'self'", "data:", "https://storage.googleapis.com")
