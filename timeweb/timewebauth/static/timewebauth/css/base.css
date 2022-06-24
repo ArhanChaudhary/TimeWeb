@@ -197,6 +197,9 @@ hr {
     transform: translate(-50%, -34px);
     background-color: white;
 }
+
+
+/* MAKE SURE TO UPDATE INLINE EMAIL STYLES IF THESE STYLES ARE CHANGED */
 .submit-button[no-top-margin] {
     margin-top: initial; /* for connections.html */
 }
@@ -230,6 +233,8 @@ hr {
     transform: translateY(1px);
     background: rgb(0, 109, 249);
 }
+/* MAKE SURE TO UPDATE INLINE EMAIL STYLES IF THESE STYLES ARE CHANGED */
+
 
 #goo-svg {
     position: absolute;

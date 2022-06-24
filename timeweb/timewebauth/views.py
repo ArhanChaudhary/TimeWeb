@@ -65,3 +65,6 @@ class LabeledSocialaccountConnectionsView(SocialaccountConnectionsView):
     
     
 connections = login_required(LabeledSocialaccountConnectionsView.as_view()) # from its source code
+
+class EmailMessageView(TimewebGenericView):
+    template_name = "account/email/password_reset_key_message.html"

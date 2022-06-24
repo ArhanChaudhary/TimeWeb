@@ -1,6 +1,7 @@
 from django.views.defaults import page_not_found
 from django.urls import path
 import allauth.account.views as allauth_views
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -15,3 +16,5 @@ urlpatterns = [
     # Own view
     path('username/reset', views.UsernameResetView.as_view(), name='reset_username'),
 ]
+if settings.DEBUG:
+    urlpatterns.append(path('view-email-message', views.EmailMessageView.as_view(), name="view_email_message"))
