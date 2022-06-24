@@ -24,5 +24,5 @@ class ExampleAccountSocialLoginAdapter(DefaultSocialAccountAdapter):
 
 class NonUniqueUsernameAccountAdapter(DefaultAccountAdapter):
     def clean_username(self, *args, **kwargs):
-        kwargs |= {"shallow": True}
+        kwargs.update({"shallow": True})
         return super().clean_username(*args, **kwargs)
