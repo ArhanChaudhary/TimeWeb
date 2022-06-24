@@ -344,6 +344,13 @@ class Crud {
             const old_parent = $(e.relatedTarget).parents(".field-group");
             if (!new_parent.is(old_parent) && old_parent.length && new_parent.length)
                 Crud.GO_TO_FIELD_GROUP({ $dom_group: new_parent });
+            // If the user goes to the advanced tab and presses tab after currently being focused on the element before the first
+            // input in the standard tab, it will instead focus on that and give focus to a completely invisible element
+            // This checks for when that happens and appropriately gives focus to the correct element
+            else if (new_parent.length && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")
+                // Prevent infinite recursion
+                && e.relatedTarget !== undefined)
+                $("#second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().focus();
         });
 
         $(".field-widget-checkbox").on('input', function() {
