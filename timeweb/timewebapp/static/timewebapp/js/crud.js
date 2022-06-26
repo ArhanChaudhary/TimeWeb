@@ -251,12 +251,16 @@ class Crud {
                 
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .one("transitionend", function() {
-                        $(this).removeClass("hide-field").css("margin-top", "")
-                            .insertAfter($("#id-x-field-wrapper"))
-                            .addClass("has-widget")
-                            .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
-                        // Don't immediately change text back to how #id_y initially looks like to make it seemless
-                        $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+                        // No clue why but the transitions are a bit jumpy without this setTimeout.
+                        // The queueing system eliminates any worry of the function being called again while this hasn't yet ran
+                        setTimeout(function() {
+                            $(this).removeClass("hide-field").css("margin-top", "")
+                                .insertAfter($("#id-x-field-wrapper"))
+                                .addClass("has-widget")
+                                .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                            // Don't immediately change text back to how #id_y initially looks like to make it seemless
+                            $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+                        }, 0);
                     })
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             } else {
