@@ -390,7 +390,7 @@ class Crud {
             // This checks for when that happens and appropriately gives focus to the correct element
             else if (new_parent.length && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")
                 // Prevent infinite recursion
-                && e.relatedTarget !== undefined)
+                && e.relatedTarget !== undefined && e.relatedTarget !== null)
                 $("#second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().focus();
         });
 
