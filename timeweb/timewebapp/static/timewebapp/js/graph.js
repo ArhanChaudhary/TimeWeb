@@ -757,7 +757,14 @@ class VisualAssignment extends Assignment {
                 enter_fired = true;
                 submit_work_button.click();
             }
-        })
+        // If you enter a number and press enter and the assignments sort, focus is removed from work_input_textbox and the keyup returns early
+        // because e.target is now instead body
+        // This can cause enter_fired to remain true and using enter to not work
+
+        // THis ensures that enter_fired is appropriately changed if the assignments re sort
+        }).on("blur", function() {
+            enter_fired = false;
+        });
         // an alert can sometimes cause the enter to be fired on another element, instead listen to the event's propagation to the root
         $(document).keyup(e => {
             if (!$(e.target).is(work_input_textbox)) return;
