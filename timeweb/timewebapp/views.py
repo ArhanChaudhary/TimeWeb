@@ -188,11 +188,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             else:
                 self.sm.unit = "Minute"
 
-        if self.sm.unit in ("Minute", "Minutes", "minute", "minutes"):
+        if self.sm.unit.lower() in ("minute", "minutes"):
             self.sm.time_per_unit = Decimal("1")
             self.sm.funct_round = Decimal("5")
-        elif self.sm.unit in ("Hour", "Hours", "hour", "hours"):
-            self.sm.time_per_unit = Decimal("60");
+        elif self.sm.unit.lower() in ("hour", "hours"):
+            self.sm.time_per_unit = Decimal("60")
+            if old_data.unit.lower() in ("minute", "minutes"):
+                self.sm.funct_round = Decimal("1")
 
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             if field == "y": continue
