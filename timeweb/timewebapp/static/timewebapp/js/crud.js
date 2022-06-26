@@ -390,8 +390,13 @@ class Crud {
             // This checks for when that happens and appropriately gives focus to the correct element
             else if (new_parent.length && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")
                 // Prevent infinite recursion
-                && e.relatedTarget !== undefined && e.relatedTarget !== null)
-                $("#second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().focus();
+                && e.relatedTarget !== undefined && e.relatedTarget !== null) {
+                
+                // Doesn't work because #id_y is first in Crud.ALL_FOCUSABLE_FORM_INPUTS and can cause that to be focused instead
+                // $("#second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().focus();
+
+                $("#second-field-group .field-wrapper").first().find(Crud.ALL_FOCUSABLE_FORM_INPUTS).focus();
+            }
         });
 
         $(".field-widget-checkbox").on('input', function() {
