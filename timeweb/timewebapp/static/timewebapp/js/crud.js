@@ -208,6 +208,31 @@ class Crud {
     }
     replaceUnit() {
         const that = this;
+
+        if (that.replaceUnit.is_currently_running) {
+            that.replaceUnit.recurse = true;
+        } else {
+            that.replaceUnit.is_currently_running = true;
+            that.replaceUnitWithoutTimeout();
+            // If replaceUnitWithoutTimeout is run very quickly, it is possible for it to run the unit is of time branch
+            // while the setTimeout underneath still hasn't ran
+            // Queue up a recursion if that happens
+
+            // setTimout to run after the setTimeout in replaceUnitWithoutTimeout is done
+            setTimeout(function() {
+                if (that.replaceUnit.recurse) {
+                    that.replaceUnit.recurse = false;
+                    that.replaceUnit.is_currently_running = false;
+                    that.replaceUnit();
+                } else {
+                    that.replaceUnit.is_currently_running = false;
+                }
+            }, 0);
+        }
+    }
+    replaceUnitWithoutTimeout() {
+        const that = this;
+
         // Can't directly juse .slice() it because safari returns the psuedo's content without quotes
         let val = $("#id_unit").val().trim() || $("#id_y ~ .field-widget").getPseudoStyle("::after", "content");
         if (val.substring(0, 1) === "\"" && val.substring(val.length - 1) === "\"")
@@ -218,12 +243,21 @@ class Crud {
         
         i.e. if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
-            if (!["minute", "hour"].includes(that.old_unit_value))
-                $("#id-y-field-wrapper").insertAfter($("#id-x-field-wrapper"));
-
             $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
-            
+
+            if (!["minute", "hour"].includes(that.old_unit_value) &&
+                // Ensure this isn't ran on the very first call of replaceUnit
+                $("#id-y-field-wrapper").parents("#second-field-group").length) {
+                
+                $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
+                    .one("transitionend", function() {
+                        $(this).removeClass("hide-field").css("margin-top", "")
+                            .insertAfter($("#id-x-field-wrapper"))
+                            .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                    })
+                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
+            }            
             $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight())
                 .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
@@ -241,11 +275,12 @@ class Crud {
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             }
         } else {
-
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
             
+            $("#id-y-field-wrapper").trigger("transitionend");
+
             setTimeout(function() {
                 $(".hide-field").removeClass("hide-field").css("margin-top", "")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
