@@ -1,7 +1,7 @@
 {% extends "account/base.html" %}
 {% load static %}
 
-{% block accounts_js %}
+{% block _js %}
     <script nonce="{{request.csp_nonce}}">
         $(window).one("load", function() {
             $("#id_body").expandableTextareaHeight().trigger("input");
