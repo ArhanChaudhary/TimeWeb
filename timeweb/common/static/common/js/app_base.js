@@ -42,8 +42,9 @@ $(function() {
         const minuteselect = picker.container.find(".minuteselect:visible");
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
     // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
-    }).on('blur', function(e) {
-        if (!$(e.relatedTarget).parents(".daterangepicker").length)
+}).on('blur', function(e) {
+        // Can't use relatedTarget because it needs to be on an element with a tabindex, which the daterangepicker doesn't have
+        if (!$(":hover").filter(".daterangepicker").length)
             $(this).data("daterangepicker")?.hide();
     });
 
