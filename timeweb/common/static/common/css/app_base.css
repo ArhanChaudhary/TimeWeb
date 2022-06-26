@@ -284,7 +284,7 @@ rect {
     color: white;
     cursor: pointer;
     font-family: "Open Sans";
-    font-size: 12.5px;
+    font-size: 13px;
 }
 #nav-items .nav-hr {
     width: calc(100% - 6px);
