@@ -1352,7 +1352,11 @@ for (let sa of dat) {
     
     // Caps and adjusts min_work_time and funct_round; needed in parabola.js i think
     let y1 = sa.y - red_line_start_y;
-    if (Number.isFinite(sa.funct_round) && Number.isFinite(y1) && sa.funct_round > y1 && y1) { // && y1 to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
+    if (Number.isFinite(sa.funct_round) && Number.isFinite(y1) && sa.funct_round > y1
+        // to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
+        // also make sure y1 isn't negative which make funct_round negative and makes some quadratic formulas in parabola.js NaN
+        // (y1 can be negative if you enter work inputs and then edit the assignment to have a lower number of units of work)
+        && y1 > 0) {
         sa.funct_round = y1;
     }
     if (Number.isFinite(sa.min_work_time) && Number.isFinite(y1) && sa.min_work_time > y1) {
