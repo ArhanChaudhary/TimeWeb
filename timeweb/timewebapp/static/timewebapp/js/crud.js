@@ -243,7 +243,6 @@ class Crud {
         
         i.e. if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
-            $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
             $("label[for='id_works']").text(`How Long have you Already Worked`);
 
             if (!["minute", "hour"].includes(that.old_unit_value) &&
@@ -254,13 +253,20 @@ class Crud {
                     .one("transitionend", function() {
                         $(this).removeClass("hide-field").css("margin-top", "")
                             .insertAfter($("#id-x-field-wrapper"))
+                            .addClass("has-widget")
                             .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                        // Don't immediately change text back to how #id_y initially looks like to make it seemless
+                        $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
                     })
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
-            }            
+            } else {
+                // Normal text change if there's nothing to do with #id_y
+                $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+                $("#id-y-field-wrapper").addClass("has-widget");
+            }
             $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight())
                 .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
-            $("#id-y-field-wrapper, #id-works-field-wrapper").addClass("has-widget");
+            $("#id-works-field-wrapper").addClass("has-widget");
 
             // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
             // This is to make the form more smooth and less unpredictable (i.e. if you set a step size to some value with 
@@ -275,11 +281,12 @@ class Crud {
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             }
         } else {
+            // Make sure this is ran before the .text because this can affect #id_y's text
+            $("#id-y-field-wrapper").trigger("transitionend");
+
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
             $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
-            
-            $("#id-y-field-wrapper").trigger("transitionend");
 
             setTimeout(function() {
                 $(".hide-field").removeClass("hide-field").css("margin-top", "")
