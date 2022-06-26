@@ -104,20 +104,6 @@ class Crud {
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
 
-    static RESET_FORM_GROUP_MARGINS = () => {
-        $("#form-wrapper #fields-wrapper").css("--first-field-group-height", 
-            // Let's not apply any of the weird margin logic to the first field group; its height will remain static when tabbed into this field
-            $("#form-wrapper #first-field-group").outerHeight()
-        + "px");
-        $("#form-wrapper #fields-wrapper").css("--second-field-group-height",
-            $("#form-wrapper #second-field-group").outerHeight() +
-            $("#form-wrapper #second-field-group .field-wrapper").toArray().map(function(field_wrapper_dom) {
-                if ($(field_wrapper_dom).css("margin-top") === field_wrapper_dom.style.marginTop) return 0;
-                return parseFloat(field_wrapper_dom.style.marginTop) || 0;
-            }).reduce((a, b) => a + b, 0)
-        + "px");
-    }
-
     static GO_TO_FIELD_GROUP = params => {
         if (params.standard) {   
             $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
@@ -137,7 +123,6 @@ class Crud {
                     break;
             }
         }
-        Crud.RESET_FORM_GROUP_MARGINS();
     }
     init() {
         const that = this;
@@ -207,9 +192,6 @@ class Crud {
     hideForm(params={hide_instantly: false}) {
         const that = this;
 
-        // Needed because this still runs when the form is already hidden,
-        // calling RESET_FORM_FIELD_MARGINS prematurely and iffing up some animation stuffs
-        if (!$("#overlay").is(":visible")) return;
         if (params.hide_instantly) {
             $("#overlay").hide().find("#form-wrapper");
             $(".assignment-form-error-note").remove(); // Remove all error notes when form is exited
@@ -338,9 +320,30 @@ class Crud {
 
         // Arrow function to preserve this
         $("#form-wrapper #cancel-button").click(() => that.hideForm());
-        $("#form-wrapper #field-group-picker").click(Crud.RESET_FORM_GROUP_MARGINS);
+        $("#form-wrapper #field-group-picker").click(() => {
+            $("#first-field-group, #second-field-group").trigger("transitionend");
+            let second_minus_first = $("#form-wrapper #second-field-group .instant-margin-transition")[0].scrollHeight - $("#form-wrapper #first-field-group .instant-margin-transition")[0].scrollHeight;
+            if ($("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+                $("#first-field-group").css("margin-bottom", -second_minus_first).one("transitionend", function() {
+                    $("#first-field-group").addClass("notransition");
+                    $("#first-field-group").css("margin-bottom", "");
+                    $("#first-field-group")[0].offsetHeight;
+                    $("#first-field-group").removeClass("notransition");
+                    $("#first-field-group .instant-margin-transition").css("margin-bottom", "");
+                });
+                $("#first-field-group .instant-margin-transition").css("margin-bottom", second_minus_first);
+            } else {
+                $("#second-field-group").css("margin-bottom", second_minus_first).one("transitionend", function() {
+                    $("#second-field-group").addClass("notransition");
+                    $("#second-field-group").css("margin-bottom", "");
+                    $("#second-field-group")[0].offsetHeight;
+                    $("#second-field-group").removeClass("notransition");
+                    $("#second-field-group .instant-margin-transition").css("margin-bottom", "");
+                });
+                $("#second-field-group .instant-margin-transition").css("margin-bottom", -second_minus_first);
+            }
+        });
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
-        $("#id_unit").on('input', Crud.RESET_FORM_GROUP_MARGINS);
         
         $("#fields-wrapper").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).on('focus', e => {
             const new_parent = $(e.target).parents(".field-group");

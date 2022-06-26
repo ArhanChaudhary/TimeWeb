@@ -55,9 +55,12 @@
 
             {% if field.name == "name" %}
               <div class="field-group" id="first-field-group">
+                <div class="instant-margin-transition">
             {% elif field.name == "unit" %}
+                </div>
               </div>
               <div class="field-group" id="second-field-group">
+                <div class="instant-margin-transition">
             {% endif %}
 
             <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}" id="id-{{ field.name }}-field-wrapper">
@@ -98,6 +101,7 @@
               {% endfor %}
             </div>
           {% endfor %}
+            </div>
           </div>
         </div>
         <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
