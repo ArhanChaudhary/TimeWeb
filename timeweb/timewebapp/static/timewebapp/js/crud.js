@@ -399,7 +399,10 @@ class Crud {
             // If the user goes to the advanced tab and presses tab after currently being focused on the element before the first
             // input in the standard tab, it will instead focus on that and give focus to a completely invisible element
             // This checks for when that happens and appropriately gives focus to the correct element
-            else if (new_parent.length && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")
+
+            // new_parent.is("#first-field-group") instead of new_parent.length because a click event is too similar to a tabbing event
+            // this detects a tabbing event only
+            else if (new_parent.is("#first-field-group") && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")
                 // Prevent infinite recursion
                 && e.relatedTarget !== undefined && e.relatedTarget !== null) {
                 
