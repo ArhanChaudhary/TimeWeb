@@ -12,7 +12,7 @@
   <script src="{% static 'timewebauth/js/login.js' %}"></script>
 {% endblock %}
 
-{% block accounts_content %}
+{% block content %}
 {% get_providers as socialaccount_providers %}
 
 {% include "socialaccount/snippets/provider_list.html" with process="login" %}

@@ -1,7 +1,7 @@
 {% extends "account/base.html" %}
 {% load static %}
 
-{% block _js %}
+{% block js %}
     <script nonce="{{request.csp_nonce}}">
         $(window).one("load", function() {
             $("#id_body").expandableTextareaHeight().trigger("input");
@@ -15,7 +15,7 @@
 
 {% block head_title %}Contact{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
     <h1>Contact</h1>
 
     <form method="POST" action="{% url 'contact_form' %}" id="contact-form">

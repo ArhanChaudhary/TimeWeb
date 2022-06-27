@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'navbar/css/changelog.css' %}">
 {% endblock %}
 
-{% block doc_content %}
+{% block _content %}
     {% autoescape off %}
         {% for changelog in changelogs %}
             <span>
@@ -16,4 +16,4 @@
             </span>
         {% endfor %}
     {% endautoescape %}
-{% endblock doc_content %}
+{% endblock %}

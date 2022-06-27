@@ -10,7 +10,7 @@
   {% elif settings_model.appearance == "dark" or settings_model.appearance == "fancy dark" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
   {% endif %}
-{% endblock css %}
+{% endblock %}
 
 {% block js %}
   {{ assignment_models_as_json|json_script:"assignment-models" }}
@@ -28,7 +28,7 @@
   <script src="{% static 'timewebapp/js/graph.js' %}"></script>
   <script src="{% static 'timewebapp/js/parabola.js' %}"></script>
   <script src="{% static 'timewebapp/js/crud.js' %}"></script>
-{% endblock js %}
+{% endblock %}
 
 {% block content %}
   {% if settings_model.background_image %}
@@ -332,4 +332,4 @@
       {% include "unfinished.svg" %}
     </defs>
   </svg>
-{% endblock content %}
+{% endblock %}

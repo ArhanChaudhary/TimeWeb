@@ -6,13 +6,13 @@
     {% comment %} Order of these stylesheets matters {% endcomment %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
     <link rel="stylesheet" href="{% static 'navbar/css/settings.css' %}">
-{% endblock css %}
+{% endblock %}
 
 {% block js %}
     <script src="https://unpkg.com/moment@2.29.1/moment.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.js" crossorigin="anonymous"></script>
     <script src="{% static 'navbar/js/settings.js' %}"></script>
-{% endblock js %}
+{% endblock %}
 
 {% block content %}
     {% comment %} Injects libraries for the color picker {% endcomment %}
@@ -83,4 +83,4 @@
             <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
         </div>
     </form>
-{% endblock content %}
+{% endblock %}
