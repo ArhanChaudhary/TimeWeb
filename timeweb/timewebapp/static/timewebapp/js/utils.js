@@ -1350,17 +1350,31 @@ for (let sa of dat) {
 
    
     
-    // Caps and adjusts min_work_time and funct_round; needed in parabola.js i think
     let y1 = sa.y - red_line_start_y;
-    if (Number.isFinite(sa.funct_round) && Number.isFinite(y1) && sa.funct_round > y1
-        // to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
-        // also make sure y1 isn't negative which make funct_round negative and makes some quadratic formulas in parabola.js NaN
+    if (y1 >= 0 && Number.isFinite(y1)) {
+        // Caps and adjusts min_work_time and funct_round; needed in parabola.js i think
+        // Let's individually justify the y1 > 0 and the y1 != 0 requesites for these cases:
+
+        // y1 > 0:
+        // makes sure y1 isn't negative which makes funct_round negative and makes some quadratic formulas in parabola.js NaN
         // (y1 can be negative if you enter work inputs and then edit the assignment to have a lower number of units of work)
-        && y1 > 0) {
-        sa.funct_round = y1;
-    }
-    if (Number.isFinite(sa.min_work_time) && Number.isFinite(y1) && sa.min_work_time > y1) {
-        sa.min_work_time = y1;
+
+        // y1 != 0:
+        // to ensure funct_round isn't 0, which causes Assignment.funct to return NaN
+        if (Number.isFinite(sa.funct_round) && sa.funct_round > y1 && y1 !== 0) {
+            sa.funct_round = y1;
+        }
+
+        // y1 > 0:
+        // I haven't ran into a specific issue with this (but im sure one exists) but 
+        // it is completely nonsensical to have a negative minimum work time
+
+        // Don't make y1 != 0 a condition
+        // The goal of this if statement is the cap the minimum work time at the number of units of work remaining
+        // So, if there are 0 units of work remaining, the minimum work time should be capped at 0
+        if (Number.isFinite(sa.min_work_time) && sa.min_work_time > y1) {
+            sa.min_work_time = y1;
+        }
     }
 
     // If funct_round is greater than min_work_time, every increase in work already fulfills the minimum work time
