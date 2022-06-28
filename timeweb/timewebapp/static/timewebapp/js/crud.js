@@ -250,17 +250,16 @@ class Crud {
                 $("#id-y-field-wrapper").parents("#second-field-group").length) {
                 
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
-                    .one("transitionend", function() {
-                        // No clue why but the transitions are a bit jumpy without this setTimeout.
-                        // The queueing system eliminates any worry of the function being called again while this hasn't yet ran
-                        setTimeout(function() {
-                            $(this).removeClass("hide-field").css("margin-top", "")
-                                .insertAfter($("#id-x-field-wrapper"))
-                                .addClass("has-widget")
-                                .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
-                            // Don't immediately change text back to how #id_y initially looks like to make it seemless
-                            $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
-                        }, 0);
+                    .on("transitionend", function(e) {
+                        if (e.originalEvent.propertyName !== "margin-top") return;
+
+                        $(this).off("transitionend")
+                            .removeClass("hide-field").css("margin-top", "")
+                            .insertAfter($("#id-x-field-wrapper"))
+                            .addClass("has-widget")
+                            .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                        // Don't immediately change text back to how #id_y initially looks like to make it seemless
+                        $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
                     })
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             } else {
@@ -286,7 +285,7 @@ class Crud {
             }
         } else {
             // Make sure this is ran before the .text because this can affect #id_y's text
-            $("#id-y-field-wrapper").trigger("transitionend");
+            $("#id-y-field-wrapper").trigger("transitionend").off("transitionend");
 
             $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
             $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
