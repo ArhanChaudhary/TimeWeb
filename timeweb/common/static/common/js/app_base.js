@@ -29,12 +29,20 @@ function resetHeaderLayout() {
 }
 $(function() {
     $(window).on("focus", () => $(window).trigger("resize"));
-    $(document).keypress(function(e) {
-        const activeElement = $(document.activeElement);
-        if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */
-            // Prevent focused field widgets from toggling on enter form submission
-            && activeElement.attr("tabindex") !== "-1") {
-            activeElement.click();
+    $(document).keydown(function(e) {
+        switch (e.key) {
+            case "Enter": {
+                const activeElement = $(document.activeElement);
+                if (activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */
+                // Prevent focused field widgets from toggling on enter form submission
+                && activeElement.attr("tabindex") !== "-1") {
+                    activeElement.click();
+                }
+            }
+            case "Tab":
+                // Prevent tabbing dispositioning screen from tabbing on nav
+                setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
+                break;
         }
     });
     $("input").on("show.daterangepicker", function(e, picker) {

@@ -143,6 +143,9 @@ main.finished-header-transition {
     left: 50%;
     transform: translateX(-50%);
 }
+#logo-container img {
+    display: block;
+}
 body {
     margin: 0;
     --body-background: rgb(247, 247, 247);
@@ -216,7 +219,9 @@ body {
     transform: translateX(-50%);
     position: absolute;
 }
-#account-dropdown :hover {
+#account-dropdown :hover,
+/* tabbing */
+#account-dropdown :focus {
     background: rgb(82,107,130);
 }
 .nav-hr {

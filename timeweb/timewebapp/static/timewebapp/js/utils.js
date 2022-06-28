@@ -766,11 +766,6 @@ switch (e.key) {
                 }
         }
         break;
-
-    case "Tab":
-        // Prevent tabbing dispositioning screen
-        setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
-        break;
     case "Escape":
         new Crud().hideForm();
         break;

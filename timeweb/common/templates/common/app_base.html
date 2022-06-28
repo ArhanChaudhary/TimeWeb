@@ -46,7 +46,7 @@
                 <div id="account-dropdown">
                     <form method="post" action="{% url 'account_logout' %}">
                         {% csrf_token %}
-                        <button type="submit">Log out</button>
+                        <button type="submit" tabindex="1">Log out</button>
                     </form>
                     <div class="nav-hr"></div>
                     <a href="{% url 'account_change_password' %}">Change Password</a>
