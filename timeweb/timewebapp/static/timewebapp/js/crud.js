@@ -104,22 +104,34 @@ class Crud {
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
 
+    // it is important to use .click instead of .prop("checked", true/false) so the animation click handler fires
+    static STANDARD_FIELD_GROUP = () => {
+        if ($("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+            $("#form-wrapper #field-group-picker").click();
+        }
+    }
+    static ADVANCED_FIELD_GROUP = () => {
+        if (!$("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+            $("#form-wrapper #field-group-picker").click();
+        }
+    }
+    static TOGGLE_FIELD_GROUP = () => $("#form-wrapper #field-group-picker").click()
     static GO_TO_FIELD_GROUP = params => {
-        if (params.standard) {   
-            $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
+        if (params.standard) {
+            Crud.STANDARD_FIELD_GROUP();
         } else if (params.advanced) {
-            $("#form-wrapper #field-group-picker-checkbox").prop("checked", true);
+            Crud.TOGGLE_FIELD_GROUP();
         } else if (params.toggle) {
-            $("#form-wrapper #field-group-picker-checkbox").click();
+            Crud.TOGGLE_FIELD_GROUP();
         } else if (params.$dom_group) {
             assert(params.$dom_group.hasClass("field-group"));
             switch (params.$dom_group.attr("id")) {
                 case "first-field-group":
-                    $("#form-wrapper #field-group-picker-checkbox").prop("checked", false);
+                    Crud.STANDARD_FIELD_GROUP();
                     break;
 
                 case "second-field-group":
-                    $("#form-wrapper #field-group-picker-checkbox").prop("checked", true);
+                    Crud.ADVANCED_FIELD_GROUP();
                     break;
             }
         }
