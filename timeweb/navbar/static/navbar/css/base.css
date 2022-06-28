@@ -44,6 +44,7 @@ body {
 #table-of-contents-container-label {
     display: none;
     bottom: 5px;
+    cursor: pointer;
     box-shadow: 6px 2px 6px -4px hsl(0, 0%, 50%);
 }
 #table-of-contents-container, #table-of-contents-container-label {

@@ -696,6 +696,8 @@ class VisualAssignment extends Assignment {
         let graphtimeout,
             arrow_key_fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
             graphinterval;
+
+        // looking back i probably could have used e.originalEvent.repeat but uhhh it works ig
         $(document).keydown(e => {
             if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.assignmentGraphIsOnScreen() && !arrow_key_fired) {
                 // "arrow_key_fired" makes .keydown fire only when a key is pressed, not repeatedly

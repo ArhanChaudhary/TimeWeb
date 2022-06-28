@@ -14,7 +14,7 @@
 
 {% block content %}
     <div id="flex-container">
-        <div id="table-of-contents-container-label" tabindex="0">
+        <div id="table-of-contents-container-label" tabindex="-1">
             <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
         </div>
         <div id="table-of-contents-container" tabindex="-1">
@@ -22,8 +22,8 @@
             {% if add_faq %}<span class="table-of-contents-header" id="category-important-labels">FAQs</span>{% endif %}
             <ul id="category-doc-labels"></ul>
         </div>
-        {% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
-        <div id="doc-container">
+        {% comment %} no clue why but #doc-container recieves focus {% endcomment %}
+        <div id="doc-container" tabindex="-1">
             {% block _content %}{% endblock %}
         </div>
     </div>
