@@ -22,3 +22,6 @@ class SusView(TimewebGenericView):
 
 class ChungusView(TimewebGenericView):
     template_name = "misc/chungus.html"
+
+class ShantanuView(TimewebGenericView):
+    template_name = "misc/shantanu.html"
