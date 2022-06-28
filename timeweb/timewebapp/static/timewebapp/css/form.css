@@ -264,12 +264,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper .field-widget-checkbox:checked ~ .field-widget::after {
     content: "Hours";
 }
-#form-wrapper .field-widget:not([for="id_soft"])::before {
-    content: "in: ";
-    position: absolute;
-    right: 100%;
-    padding-right: inherit;
-}
 #form-wrapper .field-wrapper:not(.has-widget) .field-widget {
     display: none;
 }
