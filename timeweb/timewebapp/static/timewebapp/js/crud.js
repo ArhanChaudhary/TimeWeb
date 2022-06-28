@@ -170,10 +170,6 @@ class Crud {
     }
     showForm(params={show_instantly: false}) {
         const that = this;
-        setTimeout(function() {
-            $("#id_description").trigger("input");
-            $("#id_x").trigger("hide.daterangepicker");
-        }, 0);
         if (params.show_instantly) {
             $('#overlay').show().find("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
         } else {
@@ -184,6 +180,8 @@ class Crud {
         that.replaceUnit();
 
         setTimeout(function() {
+            $("#id_description").trigger("input");
+            $("#id_x").trigger("hide.daterangepicker");
             if ($("#form-wrapper #second-field-group .invalid").length) {
                 Crud.GO_TO_FIELD_GROUP({advanced: true});
             }
@@ -245,10 +243,16 @@ class Crud {
         if (["minute", "hour"].includes(singular.toLowerCase())) {
             $("label[for='id_works']").text(`How Long have you Already Worked`);
 
-            if (!["minute", "hour"].includes(that.old_unit_value) &&
-                // Ensure this isn't ran on the very first call of replaceUnit
-                $("#id-y-field-wrapper").parents("#second-field-group").length) {
-                
+            if (that.old_unit_value === undefined) {
+                // Appropiately place #id_y when the form is initially loaded and shown
+                // Simulates the state of #id-y-field-wrapper after transitionend
+                $("#id-y-field-wrapper")
+                    .insertAfter($("#id-x-field-wrapper"))
+                    .removeClass("hide-field").css("margin-top", "")
+                    .addClass("has-widget")
+                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+            } else if (!["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .on("transitionend", function(e) {
                         if (e.originalEvent.propertyName !== "margin-top") return;
@@ -297,7 +301,13 @@ class Crud {
             }, 0);
             $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
 
-            if (["minute", "hour"].includes(that.old_unit_value)) {
+            if (that.old_unit_value === undefined) {
+                // Appropiately place #id_y when the form is initially loaded and shown
+                // Simulates the state of #id-y-field-wrapper after the .hide-field setTimeout
+                $("#id-y-field-wrapper")
+                    .insertAfter($("#id-unit-field-wrapper"))
+                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+            } else if (["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .insertAfter($("#id-unit-field-wrapper"));
                 $("#id_time_per_unit").val("");
