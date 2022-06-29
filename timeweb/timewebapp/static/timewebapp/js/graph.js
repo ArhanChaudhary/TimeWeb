@@ -58,6 +58,7 @@ class Assignment {
     }
     redLineStartXIsValid() {
         // checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+        const len_works = this.sa.works.length - 1;
         let next_funct = this.funct(this.red_line_start_x),
             next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
         for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
