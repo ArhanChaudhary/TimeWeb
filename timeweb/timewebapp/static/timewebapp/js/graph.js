@@ -42,21 +42,7 @@ class Assignment {
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             this.setParabolaValues();
 
-            let valid_red_line_start_x = true;
-            // The inner for loop checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
-            let next_funct = this.funct(this.red_line_start_x),
-                next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-            for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
-                const this_funct = next_funct,
-                    this_work = next_work;
-                next_funct = this.funct(i + 1),
-                next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-                if (next_funct - this_funct !== next_work - this_work) {
-                    valid_red_line_start_x = false;
-                    break;
-                }
-            }
-            if (valid_red_line_start_x) {
+            if (this.redLineStartXIsValid()) {
                 high = mid;
             } else {
                 low = mid + 1;
@@ -69,6 +55,21 @@ class Assignment {
         // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
         params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
         this.setParabolaValues();
+    }
+    redLineStartXIsValid() {
+        // checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
+        let next_funct = this.funct(this.red_line_start_x),
+            next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
+            const this_funct = next_funct,
+                this_work = next_work;
+            next_funct = this.funct(i + 1),
+            next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+            if (next_funct - this_funct !== next_work - this_work) {
+                return false;
+            }
+        }
+        return true;
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
