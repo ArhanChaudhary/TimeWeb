@@ -365,27 +365,27 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
             Math.pow(Math.min(work_input_index, x1_from_blue_line_start), 2)
         ]
     );
-    const y_matrix = works_without_break_days.map(work_input => work_input - this.sa.works[0]);
+    const y_matrix = works_without_break_days.map(work_input => [work_input - this.sa.works[0]]);
 
     // Add the last point if it wasn't already added (to ensure the next statement doesn't yield a false positive)
     if (len_works_without_break_days !== Math.ceil(x1_from_blue_line_start)) {
         x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
-        y_matrix.push(y1_from_blue_line_start);
+        y_matrix.push([y1_from_blue_line_start]);
     }
 
     let autotuned_skew_ratio;
     if (y_matrix.length >= 3) {
-        const transposed = math.clone(x_matrix);
-        transposed[transposed.length-1][0] *= Assignment.MATRIX_ENDS_WEIGHT;
-        transposed[transposed.length-1][1] *= Assignment.MATRIX_ENDS_WEIGHT;
+        const X = new mlMatrix.Matrix(x_matrix);
+        const Y = new mlMatrix.Matrix(y_matrix);
 
-        const X = math.matrix(x_matrix);
-        const Y = math.matrix(y_matrix);
-        const T = math.transpose(math.matrix(transposed));
+        let T = X.clone();
+        T.data[T.data.length-1][0] *= Assignment.MATRIX_ENDS_WEIGHT;
+        T.data[T.data.length-1][1] *= Assignment.MATRIX_ENDS_WEIGHT;
+        T = T.transpose();
 
-        result = math.multiply(math.multiply(math.inv(math.multiply(T,X)),T),Y);
-        let a = result._data[1];
-        let b = result._data[0];
+        result = mlMatrix.inverse(T.mmul(X)).mmul(T).mmul(Y)
+        let a = result.data[1][0];
+        let b = result.data[0][0];
 
         // The second part's goal is to now "transfer" the skew ratio value from x1_from_blue_line_start to x1
         // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
