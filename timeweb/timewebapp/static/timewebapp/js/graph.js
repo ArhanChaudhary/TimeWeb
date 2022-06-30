@@ -336,6 +336,13 @@ class VisualAssignment extends Assignment {
     getDefaultFontColor() { return this.fixed_graph.css("filter") === "none" ? "black" : "white"; }
     //hard (this entire function)
     draw(raw_x, raw_y) {
+        // #assignments-container scrollbar may take up width when assignment is opened
+        // Not sure exactly when this happens but for the time it did happen I confirmed that
+        // this fixed the issue
+        if (this.width !== this.fixed_graph.width()) {
+            this.resize();
+            return;
+        }
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
