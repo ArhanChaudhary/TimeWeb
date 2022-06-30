@@ -37,7 +37,7 @@ $(function() {
                     // Prevent double dipping
                     // I *could* use e.preventDefault instead for forward compatibility, but is risky and prevents some functioanlities
                     // (such as pressing enter to submit a form)
-                    !['button', 'summary'].includes(activeElement.prop("tagName").toLowerCase())
+                    !activeElement.is('button, summary, input[type="file"]')
                     // Prevent focused field widgets from toggling on enter form submission
                     && activeElement.attr("tabindex") !== "-1"
                     // keydown fires constantly while enter is being held down, limit it to the first fire

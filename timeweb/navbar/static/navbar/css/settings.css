@@ -176,11 +176,19 @@ body {
     color: white;
     border: none;
 }
-#submit-settings-button:hover {
+#submit-settings-button:hover, #submit-settings-button:focus {
     background-color: rgb(84, 177, 181);
+}
+#submit-settings-button:focus {
+    box-shadow: 0 0 0 1px rgb(84, 177, 181);
+    outline: 0;
 }
 #reset-settings-button {
     margin-bottom: 50px;
+}
+#reset-settings-button:focus {
+    outline: 0;
+    box-shadow: 0 0 0 1px hsl(0, 0%, 58%);
 }
 @media screen and (max-width: 750px) {
     .field-container {
