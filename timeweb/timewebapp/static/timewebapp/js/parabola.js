@@ -315,10 +315,14 @@ Assignment.MAX_WORK_INPUTS_AUTOTUNE = 10000;
 Assignment.THIRD_POINT_STEP = 0.01;
 Assignment.MATRIX_ENDS_WEIGHT = 100000;
 
-// There is a deadlock netween autotuneSkewRatio and setDynamicStartInDynamicMode:
+// There is a deadlock netween autotuneSkewRatioIfInDynamicMode and setDynamicStartInDynamicMode:
 // When dynamic start is set, skew ratio needs to be re-autotuned
 // But when skew ratio is re-autotuned, it may mess up dynamic start
-// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
+// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatioIfInDynamicMode should be run
+
+// There's a chance this might not even be needed but it seems to provide a more accurate skew ratio
+// Resetting the dynamic mode start still might produce different autotuned_skew_ratio values because the dynamic start is changing,
+// compared to only autotuning is once which completely ignores if dynamic start changing has a significant impact on the skew ratio
 Assignment.AUTOTUNE_ITERATIONS = 4;
 
 Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ inverse: true }) {
@@ -431,13 +435,17 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
         // Way too much to say about this, will explain later
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
 
+        // Autotune in the inverse direction 
+        // the order of this and autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor; doesn't matter because,
+        // remember, 2 - autotuned_skew_ratio reflects the curvat y = x and (1 - autotuned_skew_ratio) * autotune_factor skews it towards linear
+        // If you think about it, the order of this and the below statement doesn't matter (confirmed and tested with many test cases)
+        autotuned_skew_ratio = 2 - autotuned_skew_ratio;
+
         // A slight problem with this is the autotune factor doesn't really work when there are few days in the assignment
         // For example, if the user entes one work input on an assignment with three or four days, the autotune factor will be 1/3 or 1/4 or 33% or 25%, which is a very high percent for only one work input as a data point
         // So, put a higher weight on a linear skew ratio as there are less days in the assignment
         autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
 
-        // Autotune in the inverse direction
-        autotuned_skew_ratio = 2 - autotuned_skew_ratio;
     } else {
         // TODO: improve non inverse algorithm; this one currently works but not as well as I want
         var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);

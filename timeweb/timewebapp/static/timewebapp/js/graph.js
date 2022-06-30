@@ -57,6 +57,9 @@ class Assignment {
         this.setParabolaValues();
     }
     redLineStartXIsValid() {
+        // i MIGHT look into checking whether or not only the beginning of the blue line matches the red line
+        // But I don't currently have any motive to do so (maybe performance if that becomes an issue or something)
+
         // checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
         const len_works = this.sa.works.length - 1;
         let next_funct = this.funct(this.red_line_start_x),
