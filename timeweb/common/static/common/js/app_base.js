@@ -68,46 +68,6 @@ $(function() {
         resetHeaderLayout();
     }
     $("header > *").css("visibility", "visible");
-    // https://web.dev/customize-install/
-    let prompt;
-    window.addEventListener('beforeinstallprompt', function(e) {
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        prompt = e;
-    });
-    // https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
-    function isPwa() {
-        var displayModes = ["fullscreen", "standalone", "minimal-ui"];
-        return displayModes.some((displayMode) => window.matchMedia('(display-mode: ' + displayMode + ')').matches); 
-    }
-    if (isPwa()) {
-        $("#nav-a2hs").hide();
-    } else {
-        $("#nav-a2hs").click(function() {
-            if (prompt) {
-                // Show the install prompt
-                prompt.prompt();
-                // Wait for the user to respond to the prompt
-                prompt.userChoice.then(choiceResult => {
-                    if (choiceResult.outcome === 'accepted') {
-                        $.alert({
-                            title: "Thanks for installing TimeWeb on your home screen.",
-                        });
-                    }
-                });
-            } else if (isMobile)
-                $.alert({
-                    title: "Please use Safari to install TimeWeb on your home screen.",
-                    content: "Once you're there, click the share icon on your screen (the up arrow in a square icon) and scroll to \"Add to Home Screen\". Ignore this if you already have TimeWeb installed.",
-                });
-            else
-                $.alert({
-                    title: "Progressive web apps are not supported on your web browser.",
-                    content: "Please use Google Chrome or Microsoft Edge. Ignore this if you already have TimeWeb installed.",
-                });
-        });
-    }
     $("#nav-credits").click(() => $.alert({
         title: $("#credits-template").html(),
     }));
