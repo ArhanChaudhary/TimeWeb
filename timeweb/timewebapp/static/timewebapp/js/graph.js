@@ -744,7 +744,7 @@ class VisualAssignment extends Assignment {
             len_works--;
             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                 this.setDynamicStartIfInDynamicMode();
-                this.autotuneSkewRatio({ inverse: false });
+                this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
             }
             this.setDynamicStartIfInDynamicMode();
             ajaxUtils.sendAttributeAjaxWithTimeout("works", this.sa.works.map(String), this.sa.id);
@@ -869,7 +869,7 @@ class VisualAssignment extends Assignment {
                 // Note that the invsering of the autotune algorithm is still not perfect, but usable
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
-                    this.autotuneSkewRatio({ inverse: false });
+                    this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
                 }
                 this.setDynamicStartIfInDynamicMode();
             }
@@ -910,7 +910,7 @@ class VisualAssignment extends Assignment {
             // if (input_done !== todo_for_blue_line_end) {
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
-                    this.autotuneSkewRatio();
+                    this.autotuneSkewRatioIfInDynamicMode();
                 }
                 this.setDynamicStartIfInDynamicMode();
             // }
@@ -1003,7 +1003,7 @@ class VisualAssignment extends Assignment {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             }
-            // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+            // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
             // However, we still need to call setDynamicStartIfInDynamicMode() to compensate if the skew ratio in fixed mode was modified
             this.setDynamicStartIfInDynamicMode();
             new Priority().sort();

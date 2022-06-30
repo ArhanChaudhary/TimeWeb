@@ -142,7 +142,7 @@ class Priority {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
 
-                // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
                 sa.setDynamicStartIfInDynamicMode();
             
             let display_format_minutes = false;
@@ -204,7 +204,7 @@ class Priority {
                     if (number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                             sa.setDynamicStartIfInDynamicMode();
-                            sa.autotuneSkewRatio();
+                            sa.autotuneSkewRatioIfInDynamicMode();
                         }
                         sa.setDynamicStartIfInDynamicMode();
                     }
@@ -212,7 +212,7 @@ class Priority {
                 if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                         sa.setDynamicStartIfInDynamicMode();
-                        sa.autotuneSkewRatio();
+                        sa.autotuneSkewRatioIfInDynamicMode();
                     }
                     sa.setDynamicStartIfInDynamicMode();
                 }
@@ -276,7 +276,7 @@ class Priority {
                         if (number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                                 sa.setDynamicStartIfInDynamicMode();
-                                sa.autotuneSkewRatio();
+                                sa.autotuneSkewRatioIfInDynamicMode();
                             }
                             sa.setDynamicStartIfInDynamicMode();
                         }
@@ -305,7 +305,7 @@ class Priority {
                 if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                         sa.setDynamicStartIfInDynamicMode();
-                        sa.autotuneSkewRatio();
+                        sa.autotuneSkewRatioIfInDynamicMode();
                     }
                     sa.setDynamicStartIfInDynamicMode();
                 }

@@ -321,7 +321,7 @@ Assignment.MATRIX_ENDS_WEIGHT = 100000;
 // This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatio should be run
 Assignment.AUTOTUNE_ITERATIONS = 4;
 
-Assignment.prototype.autotuneSkewRatio = function(params={ inverse: true }) {
+Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ inverse: true }) {
     if (this.sa.fixed_mode) return;
     const old_skew_ratio = this.sa.skew_ratio;
 
