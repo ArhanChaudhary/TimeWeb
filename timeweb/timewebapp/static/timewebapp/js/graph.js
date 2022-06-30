@@ -54,6 +54,7 @@ class Assignment {
 
         // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
         params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.sendAttributeAjaxWithTimeout("dynamic_start", this.sa.dynamic_start, this.sa.id);
+        // If we don't call this again then the a and b values will be stuck at the binary search from when it was called in the earlier loop
         this.setParabolaValues();
     }
     redLineStartXIsValid() {

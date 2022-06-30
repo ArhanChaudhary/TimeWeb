@@ -311,9 +311,9 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
         return {a: 0, b: y1 / x1};
     return {a, b};
 }
-Assignment.MAX_WORK_INPUTS_AUTOTUNE = 10000;
+Assignment.MAX_WORK_INPUTS_AUTOTUNE = 1000;
 Assignment.THIRD_POINT_STEP = 0.01;
-Assignment.MATRIX_ENDS_WEIGHT = 100000;
+Assignment.MATRIX_ENDS_WEIGHT = 10000;
 
 // There is a deadlock netween autotuneSkewRatioIfInDynamicMode and setDynamicStartInDynamicMode:
 // When dynamic start is set, skew ratio needs to be re-autotuned
