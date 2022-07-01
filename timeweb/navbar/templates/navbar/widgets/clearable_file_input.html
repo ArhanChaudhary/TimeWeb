@@ -5,5 +5,5 @@
 {% if widget.is_initial %}
     <span class="center-or">Or</span>
     <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>
-    <label for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
+    <label tabindex="0" for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
 {% endif %}
