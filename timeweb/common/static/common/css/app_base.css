@@ -75,17 +75,6 @@ main.finished-header-transition {
     height: calc(100vh - var(--header-height));
     margin-top: var(--header-height);
 }
-#background-image {
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: calc(100% - var(--header-height));
-    position: fixed;
-    /* Don't change the z-index to -1 because it will go behind <main>, showing its side box shadows */
-    pointer-events: none;
-    -o-object-fit: cover;
-       object-fit: cover;
-}
 .generic-button, ::file-selector-button {
     cursor: pointer;
     --bg-c: var(--primary-c);

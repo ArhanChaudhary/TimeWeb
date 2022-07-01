@@ -43,6 +43,17 @@ header.animate {
 header.animate::after {
     transform: none;
 }
+#background-image {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--header-height));
+    position: fixed;
+    /* Don't change the z-index to -1 because it will go behind <main>, showing its side box shadows */
+    pointer-events: none;
+    -o-object-fit: cover;
+       object-fit: cover;
+}
 #assignments-container.animate {
     transform: translateY(max(-400px, calc(-100% - 20px)));
     /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
