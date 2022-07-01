@@ -104,7 +104,7 @@
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
     </a>
 </header>
-<main tabindex="-1">
+<main tabindex="-1" id="{% if settings_model.background_image %}background-image-exists{% endif %}">
     {% comment %} Use an inline script so .animate is added as EARLY as possible, otherwise the unanimated frames can show up {% endcomment %}
     <script nonce="{{request.csp_nonce}}">
         if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
