@@ -16,6 +16,7 @@ class CustomImageFieldWidget(ClearableFileInput):
 class SettingsForm(forms.ModelForm):
     restore_gc_assignments = forms.BooleanField(
         label="Restore Deleted Google Classroom Assignments",
+        required=False,
     )
 
     class Meta:
