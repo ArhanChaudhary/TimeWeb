@@ -12,7 +12,7 @@ function resetHeaderLayout() {
     });
     logo.find("img").css("width", "");
     welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-    newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+    newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
 
     if (!collision(username, logo, { margin: 30 })) return;
     logo.css({
