@@ -47,21 +47,15 @@ header > * {
     position: absolute;
 }
 #image-new-container img {
-    float: left;
     transform: scale(0.7);
     filter: hue-rotate(92deg);
 }
 #new-assignment-text {
     margin-left: 4px;
-    float: left;
     color: white;
     font-size: 20px;
 
     line-height: 60px;
-    
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 #site {
     --header-height: 70px;

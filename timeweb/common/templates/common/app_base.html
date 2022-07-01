@@ -28,7 +28,7 @@
     {% if user.is_authenticated and request.path == home %}
         <div id="image-new-container" tabindex="1">
             <img width="60" height="60" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
-            <div id="new-assignment-text">New Assignment</div>
+            <span id="new-assignment-text">New Assignment</span>
         </div>
     {% endif %}
     <div id="menu" tabindex="2">

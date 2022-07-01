@@ -11,21 +11,19 @@ function resetHeaderLayout() {
         transform: '',
     });
     logo.find("img").css("width", "");
-    welcome.toggle(!collision(welcome, logo, { margin: 10 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-    if (collision(username, logo, { margin: 10 })) {
-        logo.css({
-            left: 5 + plus_button_width,
-            transform: "none",
-        });
-        welcome.toggle(!collision(welcome, logo, { margin: 10 }));
-        newassignmenttext.css("max-width", 0);
-        if (collision(username, logo, { margin: 10 })) {
-            // compress the logo
-            logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
-        }
-    } else {
-        newassignmenttext.css("max-width",window.innerWidth/2-184);
-    }
+    welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+    newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+
+    if (!collision(username, logo, { margin: 30 })) return;
+    logo.css({
+        left: 5 + plus_button_width,
+        transform: "none",
+    });
+    welcome.toggle(!collision(welcome, logo, { margin: 30 }));
+
+    if (!collision(username, logo, { margin: 10 })) return;
+    // compress the logo
+    logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
 }
 $(function() {
     $(window).on("focus", () => $(window).trigger("resize"));
