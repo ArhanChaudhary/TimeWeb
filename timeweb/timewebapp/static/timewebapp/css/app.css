@@ -43,6 +43,14 @@ header.animate {
 header.animate::after {
     transform: none;
 }
+main#background-image-exists {
+    padding: 0;
+}
+main#background-image-exists #assignments-container {
+    /* fixes floating scrollbar caused by <main> padding */
+    padding-right: 20px;
+    padding-left: 20px;
+}
 #background-image {
     bottom: 0;
     left: 0;
