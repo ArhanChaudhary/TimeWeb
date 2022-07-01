@@ -116,8 +116,9 @@ def change_setting(request):
         
     model_fields[setting] = value
     validation_form = SettingsForm(model_fields)
-    if not validation_form.is_valid(): 
+    if not validation_form.is_valid():
         logger.warning(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
+        logger.warning(f"{validation_form.errors}")
         return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
 
     setattr(request.user.settingsmodel, setting, value)
