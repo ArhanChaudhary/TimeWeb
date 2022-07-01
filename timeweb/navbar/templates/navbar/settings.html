@@ -63,9 +63,13 @@
                                 {% endfor %}
                                 {{ field }}
                                 {% if field.widget_type == "checkbox" %}
-                                    <label tabindex="0" for={{ field.auto_id }}>
-                                        <span class="toggle-text">Off</span>
-                                        <span class="toggle-text">On</span>
+                                    <label {% if field.name == "restore_gc_assignments" %}class="single-action-label"{% endif %} tabindex="0" for={{ field.auto_id }}>
+                                        {% if field.name == "restore_gc_assignments" %}
+                                            Restore
+                                        {% else %}
+                                            <span class="toggle-text">Off</span>
+                                            <span class="toggle-text">On</span>
+                                        {% endif %}
                                     </label>
                                 {% endif %}
                             {% endif %}

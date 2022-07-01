@@ -56,21 +56,21 @@ body {
 .right-side-of-field > :not(#break-days-wrapper) {
     display: block;
 }
-.right-side-of-field > label[for="background_image-clear_id"] {
+.right-side-of-field > .single-action-label {
     height: initial !important;
 }
-[type="checkbox"] ~ label[for*="-clear_"]::before {
+[type="checkbox"] ~ .single-action-label::before {
     width: 100% !important;
     left: 0 !important;
     font-size: 14px;
 }
-[type="checkbox"]:not(:checked) ~ label[for*="-clear_"]::before {
+[type="checkbox"]:not(:checked) ~ .single-action-label::before {
     transform: scaleX(0);
 }
-[type="checkbox"]:checked ~ label[for*="-clear_"]::before {
+[type="checkbox"]:checked ~ .single-action-label::before {
     transform: none;
 }
-[type="checkbox"]:checked ~ label[for*="-clear_"] {
+[type="checkbox"]:checked ~ .single-action-label {
     color: white;
 }
 ::file-selector-button {
@@ -102,10 +102,10 @@ body {
     z-index: 1;
     transition: all 0.1s ease-in-out;
 }
-[type="checkbox"] ~ label:not(.break-days-label, [for*="-clear_"]):hover {
+[type="checkbox"] ~ label:not(.break-days-label, .single-action-label):hover {
     filter: brightness(0.91);
 }
-[type="checkbox"] ~ label[for*="-clear_"]:hover::before {
+[type="checkbox"] ~ .single-action-label:hover::before {
     background-color: rgb(84, 177, 181);
 }
 [type="checkbox"] ~ label:not(.break-days-label):hover:active {
