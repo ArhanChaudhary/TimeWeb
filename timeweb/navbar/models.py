@@ -149,10 +149,6 @@ class SettingsModel(models.Model):
         null=True,
         blank=True,
     )
-    restore_gc_assignments = models.BooleanField(
-        default=False,
-        verbose_name=_('Restore Deleted Google Classroom Assignments'),
-    )
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Tutorial'),
