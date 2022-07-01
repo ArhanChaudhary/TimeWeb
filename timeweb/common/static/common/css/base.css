@@ -81,7 +81,7 @@ textarea
 .error-note {
     background: rgba(255, 68, 12, 0.05);
     color: rgb(237 28 36);
-    border: 1px solid rgb(237 28 36);
+    border: 1px solid rgb(237 28 36) !important;
 }
 .success-note {
     background: rgba(68, 255, 12, 0.05);
