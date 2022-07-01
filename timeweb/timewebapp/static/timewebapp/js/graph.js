@@ -611,6 +611,7 @@ class VisualAssignment extends Assignment {
         VisualAssignment.setCanvasFont(screen, label_smaller_y_indicies ? 15 : 16.5);
         for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
             if (bigger_index * 2 < y_axis_scale) {
+                // roundoff errors
                 break;
             }
             screen.fillStyle = "rgb(205,205,205)";
@@ -641,6 +642,18 @@ class VisualAssignment extends Assignment {
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(utils.getRawDateNow(), this.sa.assignment_date, {round: false});
         if (today_minus_assignment_date >= 0 && today_minus_assignment_date <= this.sa.complete_x) {
             let today_x = today_minus_assignment_date * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5);
+            // Ensures the today line doesn't get too close to a red point so it's easier to figure out which day it is
+            let today_x_line_left_offset = today_minus_assignment_date * this.wCon + 9;
+            let nearest_x_step = Math.ceil(today_minus_assignment_date) * this.wCon
+            if (nearest_x_step < today_x_line_left_offset) {
+                // Subtract by how much it exeeds nearest_x_step
+                today_x -= today_x_line_left_offset - nearest_x_step;
+                // Ensure the today line doesn't go before today's date to yesterday
+                if (today_x < Math.floor(today_minus_assignment_date) * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5)) {
+                    today_x = Math.floor(today_minus_assignment_date) * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5);
+                }
+            }
+            // check isn't needed due to the above code but let's put this here for forward compatibility
             if (today_x > this.width - 12.5) {
                 today_x = this.width - 12.5;
             }
