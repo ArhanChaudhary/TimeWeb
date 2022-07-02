@@ -168,21 +168,6 @@ def tag_delete(request):
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
 
-def generate_gc_authorization_url():
-    flow = Flow.from_client_secrets_file(
-        settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
-    flow.redirect_uri = settings.GC_REDIRECT_URI
-    # Generate URL for request to Google's OAuth 2.0 server.
-    # Use kwargs to set optional request parameters.
-    authorization_url, state = flow.authorization_url(
-        prompt='consent',
-        # Enable offline access so that you can refresh an access token without
-        # re-prompting the user for permission. Recommended for web server apps.
-        access_type='offline',
-        # Enable incremental authorization. Recommended as a best practice.
-        include_granted_scopes='true')
-    return authorization_url
-
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
 def create_gc_assignments(request):
@@ -317,6 +302,21 @@ def create_gc_assignments(request):
 
     request.session["already_created_gc_assignments_from_frontend"] = True
     return HttpResponse(status=205)
+
+def generate_gc_authorization_url():
+    flow = Flow.from_client_secrets_file(
+        settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
+    flow.redirect_uri = settings.GC_REDIRECT_URI
+    # Generate URL for request to Google's OAuth 2.0 server.
+    # Use kwargs to set optional request parameters.
+    authorization_url, state = flow.authorization_url(
+        prompt='consent',
+        # Enable offline access so that you can refresh an access token without
+        # re-prompting the user for permission. Recommended for web server apps.
+        access_type='offline',
+        # Enable incremental authorization. Recommended as a best practice.
+        include_granted_scopes='true')
+    return authorization_url
 
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
