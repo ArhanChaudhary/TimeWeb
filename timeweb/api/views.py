@@ -168,7 +168,7 @@ def tag_delete(request):
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
 
-def get_gc_reauthorization_url():
+def generate_gc_authorization_url():
     flow = Flow.from_client_secrets_file(
         settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
     flow.redirect_uri = settings.GC_REDIRECT_URI
@@ -198,12 +198,12 @@ def create_gc_assignments(request):
                 credentials.refresh(Request())
             except RefreshError:
                 # In case users manually revoke access to their oauth scopes after authorizing
-                return HttpResponse(get_gc_reauthorization_url(), status=302)
+                return HttpResponse(generate_gc_authorization_url(), status=302)
             else:
                 request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
                 request.user.settingsmodel.save()
         else:
-            return HttpResponse(get_gc_reauthorization_url(), status=302)
+            return HttpResponse(generate_gc_authorization_url(), status=302)
 
     date_now = utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -291,7 +291,7 @@ def create_gc_assignments(request):
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute()
     except RefreshError:
-        return HttpResponse(get_gc_reauthorization_url(), status=302)
+        return HttpResponse(generate_gc_authorization_url(), status=302)
     courses = courses.get('courses', [])
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
@@ -308,7 +308,7 @@ def create_gc_assignments(request):
     try:
         batch.execute()
     except RefreshError:
-        return HttpResponse(get_gc_reauthorization_url(), status=302)
+        return HttpResponse(generate_gc_authorization_url(), status=302)
     TimewebModel.objects.bulk_create(gc_models_to_create)
     if not gc_models_to_create: return HttpResponse(status=204)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
