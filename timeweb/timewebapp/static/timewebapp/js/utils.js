@@ -829,14 +829,14 @@ switch (e.key) {
             $("#assignments-container").focus();
         }
         break;
-}
-});
-$(".tag-add-input").keydown(function(e) {
-    if (e.key === "Enter") {
-        utils.ui.close_on_success = true;
-        $(this).parents(".tags").find(".tag-add-button").click();
     }
-});
+    });
+    $(".tag-add-input").keydown(function(e) {
+        if (e.key === "Enter") {
+            utils.ui.close_on_success = true;
+            $(this).parents(".tags").find(".tag-add-button").click();
+        }
+    });
 },
 displayFullDueDateOnHover: function() {
     $(".title").on("mouseover mousemove click", function(e) {

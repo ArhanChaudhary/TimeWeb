@@ -74,10 +74,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if not request.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = settings.CHANGELOGS[0]
 
-        if not request.session.get("already_created_gc_assignments_from_frontend", False):
+        if not request.session.pop("already_created_gc_assignments_from_frontend", None):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
-        else:
-            del request.session["already_created_gc_assignments_from_frontend"]
 
     def get(self, request):        
         utc_now = timezone.now()
@@ -96,19 +94,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
         if request.session.get("just_created_assignment_id"):
-            self.context['just_created_assignment_id'] = request.session.get("just_created_assignment_id")
-            del request.session["just_created_assignment_id"]
+            self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
         elif request.session.get("just_updated_assignment_id"):
-            self.context['just_updated_assignment_id'] = request.session.get("just_updated_assignment_id")
-            del request.session["just_updated_assignment_id"]
+            self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
 
-        if request.session.get("gc-init-failed", False):
-            del request.session["gc-init-failed"]
-            self.context["GC_API_INIT_FAILED"] = True
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
-
-    
 
     def post(self, request):
         # The frontend adds the assignment's pk as the "value" attribute to the submit button
