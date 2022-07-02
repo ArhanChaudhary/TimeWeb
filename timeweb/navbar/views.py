@@ -10,6 +10,7 @@ from views import TimewebGenericView
 
 # App stuff
 from django.conf import settings
+import api.views as api
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
 
@@ -46,6 +47,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'horizontal_tag_position': request.user.settingsmodel.horizontal_tag_position,
             'vertical_tag_position': request.user.settingsmodel.vertical_tag_position,
             'timezone': request.user.settingsmodel.timezone,
+            'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
             'restore_gc_assignments': False,
         }
         self.context['form'] = SettingsForm(initial=initial)
@@ -106,8 +108,12 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             else:
                 request.user.settingsmodel.added_gc_assignment_ids = []
                 request.session.pop("already_created_gc_assignments_from_frontend", None)
+        if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
+            api.gc_auth_disable(request, save=False)
         request.user.settingsmodel.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
+        if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in request.user.settingsmodel.oauth_token:
+            return redirect(api.gc_auth_enable(request, next_url="home", current_url="settings"))
         return redirect("home")
     
     def invalid_form(self, request):

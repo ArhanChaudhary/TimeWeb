@@ -50,7 +50,7 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         logger.info(f'Created settings model for user "{instance.username}"')
 
 def append_default_context(request):
-    return {
+    context = {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
         "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT["name"],
         "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
@@ -58,6 +58,9 @@ def append_default_context(request):
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
     }
+    if request.session.pop("gc-init-failed", None):
+        context["GC_API_INIT_FAILED"] = True
+    return context
 
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'

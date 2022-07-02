@@ -220,73 +220,6 @@ setClickHandlers: {
         });
     },
 
-    googleClassroomAPI: function() {
-        $("#toggle-gc-api").click(function() {
-            if (isExampleAccount) {
-                $.alert({
-                    title: "You can't enable the Google Classroom integration on the example account.",
-                    content: "Please create your own account and try again.",
-                });
-                return;
-            }
-            const $this = $(this);
-            if ($this.hasClass("clicked")) return;
-            $this.addClass("clicked");
-            switch ($("#toggle-gc-api").text()) {
-                case "Enable Google Classroom integration":
-                    $.ajax({
-                        type: "POST",
-                        url: "/api/gc-auth-enable",
-                        error: function(jqXHR) {
-                            switch (jqXHR.status) {
-                                case 302:
-                                    var reauthorization_url = jqXHR.responseText;
-                                    reloadWhenAppropriate({ href: reauthorization_url });
-                                    break;
-
-                                default:
-                                    ajaxUtils.error.bind(this)(...arguments);
-                            }
-                        },
-                    });
-                    break;
-                
-                case "Disable Google Classroom integration":
-                    $.ajax({
-                        type: "POST",
-                        url: "/api/gc-auth-disable",
-                        error: ajaxUtils.error,
-                        success: function(response, textStatus, jqXHR) {
-                            switch (jqXHR.status) {
-                                case 204:
-                                    $("#toggle-gc-api").text("Enable Google Classroom integration");
-                                    $this.removeClass("clicked");
-                                    break;
-                            }
-                        },
-                    });
-                    break;
-            }
-        });
-        if (GC_API_INIT_FAILED) {
-            $.alert({
-                title: "Could not enable the Google Classroom integration.",
-                content: "Authentication failed. Please try again.",
-                backgroundDismiss: false,
-                buttons: {
-                    ok: {
-
-                    },
-                    "try again": {
-                        action: () => {
-                            $("#toggle-gc-api").click();
-                        },
-                    },
-                },
-            });  
-        }
-    },
-
     deleteAllStarredAssignments: function() {
         $("#delete-starred-assignments .generic-button").click(function() {
             $.confirm({
@@ -1220,19 +1153,11 @@ for (let sa of dat) {
 };
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
-    // Define csrf token provided by backend
-    csrf_token = $("input[name=\"csrfmiddlewaretoken\"]").first().val();
-    $.ajaxSetup({
-        headers: {
-            'X-CSRFToken': csrf_token
-        },
-    });
     utils.reloadAtMidnight();
     if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.tickButtons();
     utils.ui.setClickHandlers.assignmentsHeaderUI();
     utils.ui.setClickHandlers.assignmentSorting();
-    utils.ui.setClickHandlers.googleClassroomAPI();
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.setClickHandlers.autofillWorkDone();

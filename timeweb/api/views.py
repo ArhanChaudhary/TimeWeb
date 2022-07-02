@@ -121,7 +121,13 @@ def change_setting(request):
         logger.warning(f"{validation_form.errors}")
         return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
 
-    setattr(request.user.settingsmodel, setting, value)
+    if setting == "oauth_token":
+        if value:
+            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="settings"), status=302)
+        else:
+            gc_auth_disable(request, save=False)
+    else:
+        setattr(request.user.settingsmodel, setting, value)
     request.user.settingsmodel.save()
     return HttpResponse(status=204)
 
@@ -184,12 +190,12 @@ def create_gc_assignments(request):
                 credentials.refresh(Request())
             except RefreshError:
                 # In case users manually revoke access to their oauth scopes after authorizing
-                return HttpResponse(generate_gc_authorization_url(), status=302)
+                return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
             else:
                 request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
                 request.user.settingsmodel.save()
         else:
-            return HttpResponse(generate_gc_authorization_url(), status=302)
+            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
 
     date_now = utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -277,7 +283,7 @@ def create_gc_assignments(request):
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute()
     except RefreshError:
-        return HttpResponse(generate_gc_authorization_url(), status=302)
+        return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     courses = courses.get('courses', [])
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
@@ -294,7 +300,7 @@ def create_gc_assignments(request):
     try:
         batch.execute()
     except RefreshError:
-        return HttpResponse(generate_gc_authorization_url(), status=302)
+        return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     TimewebModel.objects.bulk_create(gc_models_to_create)
     if not gc_models_to_create: return HttpResponse(status=204)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
@@ -303,7 +309,7 @@ def create_gc_assignments(request):
     request.session["already_created_gc_assignments_from_frontend"] = True
     return HttpResponse(status=205)
 
-def generate_gc_authorization_url():
+def generate_gc_authorization_url(request, *, next_url, current_url):
     flow = Flow.from_client_secrets_file(
         settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
     flow.redirect_uri = settings.GC_REDIRECT_URI
@@ -316,25 +322,22 @@ def generate_gc_authorization_url():
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
+
+    request.session["gc-callback-next-url"] = next_url
+    request.session["gc-callback-current-url"] = current_url
     return authorization_url
 
-@require_http_methods(["POST"])
-@decorator_from_middleware(APIValidationMiddleware)
-def gc_auth_enable(request):
-    return HttpResponse(generate_gc_authorization_url(), status=302)
+def gc_auth_enable(request, *args, **kwargs):
+    return generate_gc_authorization_url(request, *args, **kwargs)
 
-@require_http_methods(["POST"])
-@decorator_from_middleware(APIValidationMiddleware)
-def gc_auth_disable(request):
+def gc_auth_disable(request, *, save=True):
     # request.user.settingsmodel.oauth_token stores the user's access and refresh tokens
-    if 'token' in request.user.settingsmodel.oauth_token:
-        request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
-        if settings.DEBUG:
-            # Re-add gc assignments in debug
-            request.user.settingsmodel.added_gc_assignment_ids = []
+    request.user.settingsmodel.oauth_token = {"refresh_token": request.user.settingsmodel.oauth_token['refresh_token']}
+    if settings.DEBUG:
+        # Re-add gc assignments in debug
+        request.user.settingsmodel.added_gc_assignment_ids = []
+    if save:
         request.user.settingsmodel.save()
-        logger.info(f"User {request.user} disabled google classroom API")
-    return HttpResponse(status=204)
 
 @require_http_methods(["GET"])
 @decorator_from_middleware(APIValidationMiddleware)
@@ -370,10 +373,9 @@ def gc_auth_callback(request):
         if isinstance(e, OAuth2Error) or isinstance(e, HttpError) and e.resp.status == 403:
             # In case users deny a permission or don't input a code in the url or cancel
             request.session['gc-init-failed'] = True
-            return redirect(reverse("home"))
-    credentials = flow.credentials
+            return redirect(request.session.pop("gc-callback-current-url"))
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-    request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
+    request.user.settingsmodel.oauth_token.update(json.loads(flow.credentials.to_json()))
     request.user.settingsmodel.save()
     logger.info(f"User {request.user} enabled google classroom API")
-    return redirect("home")
+    return redirect(request.session.pop("gc-callback-next-url"))

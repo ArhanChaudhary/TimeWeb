@@ -14,14 +14,19 @@ class CustomImageFieldWidget(ClearableFileInput):
     template_name = 'navbar/widgets/clearable_file_input.html'
 
 class SettingsForm(forms.ModelForm):
-    restore_gc_assignments = forms.BooleanField(
-        label="Restore Deleted Google Classroom Assignments",
-        required=False,
-    )
-
     class Meta:
         model = SettingsModel
         fields = "__all__"
+        extra_fields = {
+            "enable_gc_integration": forms.BooleanField(
+                label="Google Classroom Integration",
+                required=False
+            ),
+            "restore_gc_assignments": forms.BooleanField(
+                label="Restore Deleted Google Classroom Assignments",
+                required=False,
+            ),
+        }
         widgets = {
             "user": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min": "0"}),
@@ -66,6 +71,7 @@ class SettingsForm(forms.ModelForm):
             kwargs['data']['def_due_time'] = kwargs['data']['def_due_time'].strftime('%H:%M')
 
         super().__init__(*args, **kwargs)
+        self.fields = {**SettingsForm.Meta.extra_fields, **self.fields}
         self.label_suffix = ""
 
 

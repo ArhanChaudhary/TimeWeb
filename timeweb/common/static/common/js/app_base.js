@@ -1,3 +1,10 @@
+document.addEventListener("DOMContentLoaded", function() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRFToken': $("input[name=\"csrfmiddlewaretoken\"]").first().val()
+        },
+    });
+});
 $(function() {
     $(window).on("focus", () => $(window).trigger("resize"));
     $(document).keydown(function(e) {
@@ -98,12 +105,22 @@ ajaxChangeSetting: function(kwargs={}) {
     if (ajaxUtils.disable_ajax) return;
     $.ajax({
         type: "PATCH",
-        url: '/api/change-setting',
+        url: "/api/change-setting",
         data: {
             setting: kwargs.setting,
             value: JSON.stringify(kwargs.value),
         },
-        error: ajaxUtils.error,
+        error: function(jqXHR) {
+            switch (jqXHR.status) {
+                case 302:
+                    var reauthorization_url = jqXHR.responseText;
+                    reloadWhenAppropriate({ href: reauthorization_url });
+                    break;
+
+                default:
+                    ajaxUtils.error.bind(this)(...arguments);
+            }
+        },
     });
 },
 createGCAssignments: function() {
@@ -115,14 +132,13 @@ createGCAssignments: function() {
             switch (jqXHR.status) {
                 case 302:
                     var reauthorization_url = jqXHR.responseText;
-                    $("#toggle-gc-api").removeClass("clicked");
                     $.alert({
                         title: "Invalid credentials.",
                         content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
                         buttons: {
                             "disable integration": {
                                 action: function() {
-                                    $("#toggle-gc-api").click();
+                                    ajaxUtils.ajaxChangeSetting({setting: "oauth_token", value: false});
                                 }
                             },
                             "authenticate again": {
@@ -141,12 +157,6 @@ createGCAssignments: function() {
         success: function(response, textStatus, jqXHR) {
             switch (jqXHR.status) {
                 case 204:
-                    $("#toggle-gc-api").removeClass("clicked");
-                    if (SETTINGS.oauth_token.token) {
-                        $("#toggle-gc-api").text("Disable Google Classroom integration");
-                    } else {
-                        $("#toggle-gc-api").text("Enable Google Classroom integration");
-                    }
                     break;
 
                 case 205:

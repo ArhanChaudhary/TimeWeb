@@ -64,6 +64,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // https://github.com/wilsonzlin/minify-html/issues/71
     $("option:not([value])").attr("value", "");
+
+
+    if (GC_API_INIT_FAILED) {
+        $.alert({
+            title: "Could not enable the Google Classroom integration.",
+            content: "Authentication failed. Please try again.",
+            backgroundDismiss: false,
+            buttons: {
+                ok: {
+
+                },
+                "try again": {
+                    action: () => {
+                        ajaxUtils.ajaxChangeSetting({setting: "oauth_token", value: true});
+                    },
+                },
+            },
+        });
+    }
 });
 $(window).one("load", function() {
     $(".error-note").length && $(".error-note").first()[0].scrollIntoView({

@@ -23,13 +23,15 @@
             <div class="error-note">{{ error|escape }}</div>
         {% endfor %}
         {% for field in form.visible_fields %}
-            {% if field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "timezone" %}
-                {% if field.name != "def_min_work_time" %}
+            {% if field.name == "enable_gc_integration" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "timezone" %}
+                {% if field.name != "enable_gc_integration" %}
                     </div>
                 {% endif %}
                 <div class="field-group">
                     <span class="field-group-label">
-                        {% if field.name == "def_min_work_time" %}
+                        {% if field.name == "enable_gc_integration" %}
+                            Google Classroom
+                        {% elif field.name == "def_min_work_time" %}
                             Assignment Form
                         {% elif field.name == "def_skew_ratio" %}
                             Assignment Graph
@@ -67,8 +69,20 @@
                                         {% if field.name == "restore_gc_assignments" %}
                                             Restore
                                         {% else %}
-                                            <span class="toggle-text">Off</span>
-                                            <span class="toggle-text">On</span>
+                                            <span class="toggle-text">
+                                                {% if field.name == "enable_gc_integration" %}
+                                                    Disable
+                                                {% else %}
+                                                    Off
+                                                {% endif %}
+                                            </span>
+                                            <span class="toggle-text">
+                                                {% if field.name == "enable_gc_integration" %}
+                                                    Enable
+                                                {% else %}
+                                                    On
+                                                {% endif %}
+                                            </span>
                                         {% endif %}
                                     </label>
                                 {% endif %}
