@@ -321,49 +321,7 @@ def create_gc_assignments(request):
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
 def gc_auth_enable(request):
-    # For reference:
-    # If modifying these scopes, delete the file token.json.
-    # SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-
-    # creds = None
-    # # The file token.json stores the user's access and refresh tokens, and is
-    # # created automatically when the authorization flow completes for the first
-    # # time.
-    # if os.path.exists('token.json'):
-    #     creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    # # If there are no (valid) credentials available, let the user log in.
-    # if not creds or not creds.valid:
-    #     if creds and creds.expired and creds.refresh_token:
-    #         creds.refresh(Request())
-    #     else:
-    #         flow = InstalledAppFlow.from_client_secrets_file(
-    #             'gc_api_credentials.json', SCOPES)
-    #         creds = flow.run_local_server(port=0)
-    #     # Save the credentials for the next run
-    #     with open('token.json', 'w') as token:
-    #         token.write(creds.to_json())
-
-    # service = build('classroom', 'v1', credentials=creds)
-    # courses = service.courses().list().execute().get('courses', [])
-    # coursework = service.courses().courseWork()
-    # for course in courses:
-    #     try:
-    #         course_coursework = coursework.list(courseId=course['id']).execute()['courseWork']
-    #     except HttpError:
-    #         pass
-    flow = Flow.from_client_secrets_file(
-        settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
-    flow.redirect_uri = settings.GC_REDIRECT_URI
-    # Generate URL for request to Google's OAuth 2.0 server.
-    # Use kwargs to set optional request parameters.
-    authorization_url, state = flow.authorization_url(
-        prompt='consent',
-        # Enable offline access so that you can refresh an access token without
-        # re-prompting the user for permission. Recommended for web server apps.
-        access_type='offline',
-        # Enable incremental authorization. Recommended as a best practice.
-        include_granted_scopes='true')
-    return HttpResponse(authorization_url, status=302)
+    return HttpResponse(generate_gc_authorization_url(), status=302)
 
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
