@@ -65,14 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // https://github.com/wilsonzlin/minify-html/issues/71
     $("option:not([value])").attr("value", "");
 });
-$(window).resize(function() {
-    $("main form fieldset").each(function() {
-        this.style.setProperty("height", "auto", "important");
-        $(this).css("transition-duration", $(this).height()/600 + "s");
-        $(this).css("height", $(this).height());
-    });
-}).one("load", function() {
-    $(window).trigger("resize");
+$(window).one("load", function() {
     $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
         behavior: "smooth",
         block: "nearest",
