@@ -174,13 +174,14 @@ def generate_gc_authorization_url():
     flow.redirect_uri = settings.GC_REDIRECT_URI
     # Generate URL for request to Google's OAuth 2.0 server.
     # Use kwargs to set optional request parameters.
-    reauthorization_url, state = flow.authorization_url(
+    authorization_url, state = flow.authorization_url(
+        prompt='consent',
         # Enable offline access so that you can refresh an access token without
         # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
-    return reauthorization_url
+    return authorization_url
 
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
@@ -355,14 +356,14 @@ def gc_auth_enable(request):
     flow.redirect_uri = settings.GC_REDIRECT_URI
     # Generate URL for request to Google's OAuth 2.0 server.
     # Use kwargs to set optional request parameters.
-    reauthorization_url, state = flow.authorization_url(
-        approval_prompt='force',
+    authorization_url, state = flow.authorization_url(
+        prompt='consent',
         # Enable offline access so that you can refresh an access token without
         # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
         include_granted_scopes='true')
-    return HttpResponse(reauthorization_url, status=302)
+    return HttpResponse(authorization_url, status=302)
 
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
