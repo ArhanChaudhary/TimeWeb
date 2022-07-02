@@ -182,6 +182,7 @@ body {
     display: none;
     right: 50%;
     width: 100px;
+    cursor: initial;
     position: absolute;
     background: rgb(43, 56, 68);
     color: white;
