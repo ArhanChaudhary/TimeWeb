@@ -46,10 +46,12 @@ header.animate::after {
 main#background-image-exists {
     padding: 0;
 }
-main#background-image-exists #assignments-container {
-    /* fixes floating scrollbar caused by <main> padding */
-    padding-right: 20px;
-    padding-left: 20px;
+@media not screen and (max-width: 850px) {
+    main#background-image-exists #assignments-container {
+        /* fixes floating scrollbar caused by <main> padding */
+        padding-right: 20px;
+        padding-left: 20px;
+    }
 }
 #background-image {
     bottom: 0;
@@ -886,6 +888,9 @@ input[type=number]::-webkit-inner-spin-button {
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
         --outer-assignment-vertical-padding: 7px;
+    }
+    main#background-image-exists #assignments-container {
+        padding-left: revert;
     }
     .assignment-container.add-line-wrapper::before,
     .assignment-container.add-line-wrapper::after {
