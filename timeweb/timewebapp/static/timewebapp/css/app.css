@@ -53,6 +53,11 @@ main#background-image-exists {
         padding-left: 20px;
     }
 }
+#extra-navs-positioner {
+    box-sizing: border-box;
+    min-height: calc(100vh - var(--header-height) - 10px);
+    position: relative;
+}
 #background-image {
     bottom: 0;
     left: 0;
@@ -140,8 +145,8 @@ main#background-image-exists {
 .assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
     transition: none !important;
 }
-#assignments-container > :last-child {
-    margin-bottom: 60px;
+#extra-navs-positioner {
+    padding-bottom: 40px;
 }
 .assignment {
     box-shadow: 0 0 12px -11px black;
@@ -849,6 +854,31 @@ input[type=number]::-webkit-inner-spin-button {
     border-left: 1px solid #d8d8d8;
     height: 20px;
 }
+
+#extra-navs {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-right: 45px;
+    margin-left: 45px;
+    gap: 7px;
+    filter: invert(0.4);
+    --font-size: 14px;
+    font-size: var(--font-size);
+    line-height: calc(3 * var(--font-size));
+}
+#extra-navs a {
+    color: var(--color);
+}
+#extra-navs * {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .daterangepicker,
 .daterangepicker .calendar-table {
     background-color: var(--primary);

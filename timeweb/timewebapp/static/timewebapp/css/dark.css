@@ -110,7 +110,9 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     color: hsl(0, 0%, 64%);
     opacity: 1;
 }
-
+#extra-navs {
+    filter: brightness(0.6);
+}
 
 
 .generic-button:hover, .generic-button:focus, ::file-selector-button:hover {

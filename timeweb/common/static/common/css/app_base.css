@@ -146,7 +146,7 @@ body {
     display: flex;
     align-items: center;
     position: absolute;
-    right: 104px;
+    right: 32px;
     height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
 }
 #user-greeting #username {
@@ -172,7 +172,8 @@ body {
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
 }
-#user-greeting #username:focus {
+#user-greeting #username:focus,
+#user-greeting #username :focus {
     outline: 0;
 }
 #user-greeting #username:focus::after {
@@ -213,7 +214,7 @@ body {
 #account-dropdown :focus {
     background: rgb(82,107,130);
 }
-.nav-hr {
+.dropdown-hr {
     width: 100%;
     margin: 4px auto;
     height: 1px;
@@ -227,6 +228,10 @@ body {
     padding: 6px;
     text-align: center;
 }
+#account-dropdown .one-line {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 #account-dropdown button {
     display: block;
     text-align: center;
@@ -239,61 +244,6 @@ body {
 	cursor: pointer;
 	outline: inherit;
 }
-#menu {
-    float: right;
-    margin: -5px;
-    margin-left: 10px;
-}
-#menu svg {
-    display: block;
-}
-nav {
-    left: 0;
-    top: 0;
-    position: absolute;
-    margin-left: calc(100vw + 3px);
-    transition: transform .2s ease-in-out;
-    width: 89px;
-}
-#nav-menu {
-    background: var(--background-color);
-    position: relative;
-    z-index: 1;
-    box-shadow: -5px 0 5px -5px hsl(0, 0%, 50%);
-}
-rect {
-    fill: white;
-}
-#nav-items {
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: calc(100vh - 65px);
-    background: rgb(43, 56, 68);
-}
-#nav-items :not(.nav-hr) {
-    text-decoration: none;
-    text-align: center;
-    display: block;
-    padding: 15px 5px;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-}
-#nav-items .nav-hr {
-    width: calc(100% - 6px);
-}
-#nav-items :hover, #nav-items :focus {
-    background: rgb(82,107,130);
-}
-#nav-menu svg {
-    display: block;
-}
-#menu:focus ~ nav, 
-nav:focus-within,
-.open-nav-in-jconfirm nav {
-    transform: translateX(calc(-100% - 3px));
-}
-
 .info-button {
     display: inline-block;
     cursor: default !important;
