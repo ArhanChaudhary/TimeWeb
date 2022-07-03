@@ -28,29 +28,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self,request):
         initial = {
-            'def_min_work_time': request.user.settingsmodel.def_min_work_time,
-            'def_skew_ratio': request.user.settingsmodel.def_skew_ratio,
-            'def_break_days': request.user.settingsmodel.def_break_days,
-            'def_due_time': request.user.settingsmodel.def_due_time,
-            'ignore_ends': request.user.settingsmodel.ignore_ends,
-            'animation_speed': request.user.settingsmodel.animation_speed,
-            'appearance': request.user.settingsmodel.appearance,
-            'show_priority': request.user.settingsmodel.show_priority,
-            'one_graph_at_a_time': request.user.settingsmodel.one_graph_at_a_time,
-            'close_graph_after_work_input': request.user.settingsmodel.close_graph_after_work_input,
-            'highest_priority_color': request.user.settingsmodel.highest_priority_color,
-            'lowest_priority_color': request.user.settingsmodel.lowest_priority_color,
-            'assignment_sorting': request.user.settingsmodel.assignment_sorting,
-            'default_dropdown_tags': request.user.settingsmodel.default_dropdown_tags,
-            'background_image': request.user.settingsmodel.background_image,
-            'enable_tutorial': request.user.settingsmodel.enable_tutorial,
-            'horizontal_tag_position': request.user.settingsmodel.horizontal_tag_position,
-            'vertical_tag_position': request.user.settingsmodel.vertical_tag_position,
-            'timezone': request.user.settingsmodel.timezone,
             'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
             'restore_gc_assignments': False,
         }
-        self.context['form'] = SettingsForm(initial=initial)
+        self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
 
         self.context['settings_model'] = request.user.settingsmodel
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
