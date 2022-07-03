@@ -20,8 +20,14 @@ header {
     width: 100%;
     background: var(--background-color);
     height: var(--header-height);
-    padding: 5px;
+    --header-top-and-bottom-padding: 5px;
+    padding-top: var(--header-top-and-bottom-padding);
+    padding-bottom: var(--header-top-and-bottom-padding);
+    padding-right: 5px;
+    padding-left: 5px;
     position: absolute;
+    color: white;
+    font-size: 20px;
     z-index: 1002;
     box-sizing: border-box;
 }
@@ -44,7 +50,7 @@ header > * {
     cursor: pointer;
     display: flex;
     align-items: center;
-    height: 60px;
+    height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
     position: absolute;
 }
 #image-new-container img {
@@ -54,7 +60,6 @@ header > * {
 #new-assignment-text {
     margin-left: 4px;
     color: white;
-    font-size: 20px;
 }
 #site {
     --header-height: 70px;
@@ -138,16 +143,16 @@ body {
     overflow: hidden;
 }
 #user-greeting {
+    display: flex;
+    align-items: center;
     position: absolute;
     right: 104px;
-    font-size: 20px;
-    color: white;
-    padding-top: 13.4px;
+    height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
 }
 #user-greeting #username {
     text-decoration: none;
     display: inline-block;
-    padding: 2px 2px 0 6px;
+    padding: 2px 6px;
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -162,6 +167,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
     border: 2px solid rgb(22, 177, 185);
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
