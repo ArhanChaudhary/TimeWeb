@@ -374,13 +374,6 @@ main#background-image-exists {
     white-space: nowrap;
     font-size: 0.75em;
 }
-/* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
-.assignment-container:nth-last-child(1) .title::before {
-    content: "Least Important";
-}
-#assignments-container > :not(.assignment-container) + .assignment-container .title::before {
-    content: "Most Important";
-}
 .title[data-priority]::before {
     content: attr(data-priority) !important;
     transform: translateY(-100%) translateY(var(--smush-priority));
