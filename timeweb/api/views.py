@@ -23,10 +23,11 @@ import json
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
-from google.auth.exceptions import RefreshError
+from google.auth.exceptions import RefreshError, TransportError
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
+from httplib2.error import ServerNotFoundError
 
 # Misc
 from utils import days_between_two_dates, utc_to_local
@@ -191,6 +192,9 @@ def create_gc_assignments(request):
             except RefreshError:
                 # In case users manually revoke access to their oauth scopes after authorizing
                 return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+            # If connection to the server randomly dies (could happen locally when wifi is off)
+            except TransportError:
+                return HttpResponse(status=204)
             else:
                 request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
                 request.user.settingsmodel.save()
@@ -284,6 +288,9 @@ def create_gc_assignments(request):
         courses = service.courses().list().execute()
     except RefreshError:
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+    # If connection to the server randomly dies (could happen locally when wifi is off)
+    except ServerNotFoundError:
+        return HttpResponse(status=204)
     courses = courses.get('courses', [])
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
@@ -301,6 +308,9 @@ def create_gc_assignments(request):
         batch.execute()
     except RefreshError:
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+    # If connection to the server randomly dies (could happen locally when wifi is off)
+    except ServerNotFoundError:
+        return HttpResponse(status=204)
     TimewebModel.objects.bulk_create(gc_models_to_create)
     if not gc_models_to_create: return HttpResponse(status=204)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
