@@ -153,6 +153,8 @@ body {
     text-decoration: none;
     display: inline-block;
     padding: 2px 6px;
+    padding-bottom: 4px;
+    margin-top: 2px;
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
