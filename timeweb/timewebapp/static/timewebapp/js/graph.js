@@ -1089,12 +1089,12 @@ let prevent_click = false;
 $(function() {
 $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const target = $(e.target);
-    const targetInHeader = !!target.parents(".assignment-header").length || target.is(".assignment-header, .assignment");
+    const targetInFooter = !!target.parents(".assignment-footer").length; // only check the children not the actual element so the sides of an assignment can be clicked
     const targetInTags = !!target.parents(".tags").length || target.is(".tags");
     const targetInButton = !!target.parents(".assignment-header-button").length || target.is(".assignment-header-button");
     const targetInAnchor = !!target.parents(".title-link-anchor").length || target.is(".title-link-anchor");
-    const dontFire = targetInTags || targetInButton || targetInAnchor;
-    if (!targetInHeader || dontFire || prevent_click) return;
+    const dontFire = targetInTags || targetInButton || targetInAnchor || targetInFooter;
+    if (dontFire || prevent_click) return;
     const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
     
