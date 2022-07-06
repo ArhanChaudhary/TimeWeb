@@ -382,25 +382,26 @@ class VisualAssignment extends Assignment {
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             var {mouse_x, mouse_y} = this.convertRawCoordsToGraphCoords(raw_x, raw_y);
             mouse_x = this.boundMouseXInDrawPoint(mouse_x);
+            let draw_at_works;
             if (this.sa.blue_line_start <= mouse_x && mouse_x <= len_works + this.sa.blue_line_start) {
                 if (Math.ceil(mouse_x) < this.red_line_start_x) {
-                    mouse_y = true;
+                    draw_at_works = true;
                 } else {
-                    mouse_y = Math.abs(mouse_y - this.funct(mouse_x)) > Math.abs(mouse_y - this.sa.works[mouse_x - this.sa.blue_line_start]);
+                    draw_at_works = Math.abs(mouse_y - this.funct(mouse_x)) > Math.abs(mouse_y - this.sa.works[mouse_x - this.sa.blue_line_start]);
                 }
             } else {
-                mouse_y = false;
+                draw_at_works = false;
             }
-            if (!this.set_skew_ratio_using_graph && this.last_mouse_x === mouse_x && this.last_mouse_y === mouse_y) {
+            if (!this.set_skew_ratio_using_graph && this.last_mouse_x === mouse_x && this.last_draw_at_works === draw_at_works) {
                 return;
             }
-            if (mouse_y) {
+            if (draw_at_works) {
                 var funct_mouse_x = this.sa.works[mouse_x - this.sa.blue_line_start];
             } else {
                 var funct_mouse_x = this.funct(mouse_x);
             }
             this.last_mouse_x = mouse_x;
-            this.last_mouse_y = mouse_y;
+            this.last_draw_at_works = draw_at_works;
         }
         const screen = this.graph[0].getContext("2d");
         screen.scale(this.scale, this.scale);
