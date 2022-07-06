@@ -83,6 +83,7 @@ body {
     --background-color: black;
 }
 .grey-highlight, .grey-highlight::before, .grey-highlight::after {
+    --filter-drop-shadow-width: 0.75px;
     --filter-drop-shadow-color: black !important;
 }
 #form-wrapper #cancel-button {
