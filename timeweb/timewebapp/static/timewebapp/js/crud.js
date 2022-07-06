@@ -72,7 +72,9 @@ class Crud {
 
             if ($field.attr("type") === "checkbox")
                 $field.prop("checked", value);
-            else if (field_is_daterangepicker) {
+            else if (field_is_daterangepicker && 
+                // ensure it doesn't display "Invalid date"
+                value !== "") {
                 $field.data("daterangepicker").setStartDate(value);
                 $field.data("daterangepicker").setEndDate(value);
             } else

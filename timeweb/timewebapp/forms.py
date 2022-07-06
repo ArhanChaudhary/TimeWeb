@@ -107,7 +107,8 @@ class TimewebForm(forms.ModelForm):
                 })
             )
             self.add_error("y", forms.ValidationError(""))
-        if x != None:
+        # if x or assignment date is none, the assignment needs more info
+        if x != None and assignment_date != None:
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
             if complete_due_date <= assignment_date:
                 self.add_error("x",
