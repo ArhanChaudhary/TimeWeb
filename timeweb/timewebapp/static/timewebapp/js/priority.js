@@ -246,7 +246,7 @@ class Priority {
                 }).css("margin-left", 2);            
             } else if (finished_work_inputs || due_date_passed && !sa.sa.soft) {
                 status_image = "completely_finished";
-                if (finished_work_inputs && !(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
+                if (finished_work_inputs) {
                     status_message = 'You\'re completely finished with this assignment';
                 } else {
                     alert_due_date_passed_cond = true;
