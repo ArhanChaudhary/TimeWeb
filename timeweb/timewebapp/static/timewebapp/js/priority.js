@@ -259,6 +259,11 @@ class Priority {
                         that.due_date_passed_notices.push(sa.sa);
                     }
                     status_message = 'This assignment\'s due date has passed';
+                    if (sa.sa.needs_more_info)
+                        if (sa.sa.is_google_classroom_assignment)
+                            status_message = "This Google Classroom assignment needs more info but passed its due date";
+                        else
+                            status_message = "This assignment needs more info but passed its due date";
                 }
                 //hard
                 dom_status_image.attr({
