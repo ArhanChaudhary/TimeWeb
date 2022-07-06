@@ -43,11 +43,11 @@ header.animate {
 header.animate::after {
     transform: none;
 }
-main#background-image-exists {
+main.background-image-exists {
     padding: 0;
 }
 @media not screen and (max-width: 850px) {
-    main#background-image-exists #assignments-container {
+    main.background-image-exists #assignments-container {
         /* fixes floating scrollbar caused by <main> padding */
         padding-right: 20px;
         padding-left: 20px;
