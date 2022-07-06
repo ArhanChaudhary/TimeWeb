@@ -220,8 +220,10 @@ class VisualAssignment extends Assignment {
 
             // (x2,y2) are the raw coordinates of the graoh
             // This converts the raw coordinates to graph coordinates, which match the steps on the x and y axes
-            let x2 = (raw_x - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon - this.red_line_start_x;
-            let y2 = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon - this.red_line_start_y - (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
+            let x2 = this.convertRawCoordsToGraphCoords(raw_x, raw_y).mouse_x;
+            let y2 = this.convertRawCoordsToGraphCoords(raw_x, raw_y).mouse_y;
+            x2 -= this.red_line_start_x;
+            y2 -= this.red_line_start_y + (this.sa.y - this.red_line_start_y) % this.sa.funct_round;
 
             // i don't think ceiling logic is needed here because it seems to work as intended without it
             const floorx2 = Math.floor(x2);
@@ -253,8 +255,12 @@ class VisualAssignment extends Assignment {
             this.setDynamicStartIfInDynamicMode({ ajax: false });
             this.mousemove(e, iteration_number + 1);
         } else {
-            // Passes mouse x and y coords so mouse point can be drawn
-            this.draw(raw_x, raw_y);
+            // ensure .click is run after .mousemove so this.last_mouse_x is still the old value
+            // Needed in this.graph.click where clicking the same x coordinate removes the hover point label
+            // but clicking a different x coordinate doesn't remove the hover point label (for mobile)
+            setTimeout(() => {
+                this.draw(raw_x, raw_y);
+            }, 0);
         }
     }
     arrowSkewRatio() {
@@ -337,6 +343,23 @@ class VisualAssignment extends Assignment {
         screen.font = VisualAssignment.generateCanvasFont(font_size);
         screen.text_height = VisualAssignment.getTextHeight(screen);
     }
+    convertRawCoordsToGraphCoords(raw_x, raw_y) {
+        return {
+            mouse_x: (raw_x - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
+            mouse_y: (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon,
+        }
+    }
+    boundMouseXInDrawPoint(mouse_x) {
+        if (mouse_x >= (Math.round(mouse_x) + this.sa.complete_x) / 2)
+            mouse_x = this.sa.x;
+        else
+            mouse_x = Math.round(mouse_x);
+        if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start))
+            mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
+        else if (mouse_x > this.sa.x)
+            mouse_x = this.sa.x;
+        return mouse_x;
+    }
     getDefaultFontColor() { return this.fixed_graph.css("filter") === "none" ? "black" : "white"; }
     //hard (this entire function)
     draw(raw_x, raw_y) {
@@ -357,16 +380,8 @@ class VisualAssignment extends Assignment {
 
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
-            var mouse_x = (raw_x - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10 + VisualAssignment.MOUSE_POSITION_TRANSFORM.x)) / this.wCon,
-                mouse_y = (this.height - raw_y - (50 + VisualAssignment.MOUSE_POSITION_TRANSFORM.y)) / this.hCon;
-            if (mouse_x >= (Math.round(mouse_x) + this.sa.complete_x) / 2)
-                mouse_x = this.sa.x;
-            else
-                mouse_x = Math.round(mouse_x);
-            if (mouse_x < Math.min(this.red_line_start_x, this.sa.blue_line_start))
-                mouse_x = Math.min(this.red_line_start_x, this.sa.blue_line_start);
-            else if (mouse_x > this.sa.x)
-                mouse_x = this.sa.x;
+            var {mouse_x, mouse_y} = this.convertRawCoordsToGraphCoords(raw_x, raw_y);
+            mouse_x = this.boundMouseXInDrawPoint(mouse_x);
             if (this.sa.blue_line_start <= mouse_x && mouse_x <= len_works + this.sa.blue_line_start) {
                 if (Math.ceil(mouse_x) < this.red_line_start_x) {
                     mouse_y = true;
@@ -986,7 +1001,12 @@ class VisualAssignment extends Assignment {
                 }
                 new Priority().sort();
             } else if (this.draw_mouse_point) {
-                if (isTouchDevice) return;
+                // go the mousemove to see the explanation of this
+                const raw_x = e.pageX - this.fixed_graph.offset().left;
+                const raw_y = e.pageY - this.fixed_graph.offset().top;
+                let {mouse_x} = this.convertRawCoordsToGraphCoords(raw_x, raw_y);
+                mouse_x = this.boundMouseXInDrawPoint(mouse_x);
+                if (this.last_mouse_x !== mouse_x) return;
                 // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
                 // Disable draw point
                 this.graph.off("mousemove");
