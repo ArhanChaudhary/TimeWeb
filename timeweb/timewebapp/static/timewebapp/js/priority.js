@@ -173,18 +173,16 @@ class Priority {
             if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
                 complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
             }
-            // (complete_due_date <= complete_date_now && !sa.sa.soft)
-            // This marks the assignment as completed if its due date passes
-            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
-            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
-            // Instead, give it a question mark so it can be appropriately handled
             
             // This evaluates to false if complete_due_date or complete_date_now are invalid dates
             const due_date_passed = complete_due_date <= complete_date_now;
 
+            const soft_due_date_passed = sa.sa.soft && due_date_passed;
+            const hard_due_date_passed = !sa.sa.soft && due_date_passed;
+
             let number_of_forgotten_days = today_minus_assignment_date - (sa.sa.blue_line_start + len_works); // Make this a variable so len_works++ doesn't affect this
             // Think of Math.floor(sa.sa.complete_x) === today_minus_assignment_date as Math.floor(sa.sa.complete_x) === Math.floor(complete_today_minus_assignment_date)
-            if (sa.sa.soft && due_date_passed && Math.floor(sa.sa.complete_x) === today_minus_assignment_date) {
+            if (soft_due_date_passed && Math.floor(sa.sa.complete_x) === today_minus_assignment_date) {
                 // If complete_x = 2.5, today_minus_assignment_date = 2 (but the raw value is 2.75), and sa.sa.blue_line_start + len_works is 2, then number_of_forgotten_days = 0
                 // However, this will mean nothing will autofill
                 // Increment number_of_forgotten_days to fix this
@@ -230,7 +228,13 @@ class Priority {
 
             let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
-            if (sa.sa.needs_more_info && !(due_date_passed && !sa.sa.soft)) {
+
+            // hard_due_date_passed
+            // This marks the assignment as completed if its due date passes
+            // However, if the due date is soft, the system doesnt know whether or not the user finished the assignment or needs to extend its due date
+            // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
+            // Instead, give it a question mark so it can be appropriately handled
+            if (sa.sa.needs_more_info && !hard_due_date_passed) {
                 status_image = 'question_mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom assignment needs more info";
@@ -244,7 +248,7 @@ class Priority {
                     width: 11,
                     height: 18,
                 }).css("margin-left", 2);            
-            } else if (finished_work_inputs || due_date_passed && !sa.sa.soft) {
+            } else if (finished_work_inputs || hard_due_date_passed) {
                 status_image = "completely_finished";
                 if (finished_work_inputs) {
                     status_message = 'You\'re completely finished with this assignment';
