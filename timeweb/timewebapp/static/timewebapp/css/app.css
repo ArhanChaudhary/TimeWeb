@@ -133,8 +133,6 @@ main.background-image-exists {
     transition: transform 2s ease-in-out;
     font-size: 12pt;
     position: relative;
-    /* Ensures this stacks above .assignment-container::after */
-    z-index: 1;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
     -webkit-user-select: none;
@@ -156,6 +154,8 @@ main.background-image-exists {
     --priority-color-transition-speed: 2s;
     border-radius: 5px;
     position: relative;
+    /* Ensures this stacks above .assignment-container::after */
+    z-index: 1;
     scroll-margin: 20px;
     transition: all .2s ease-in-out, opacity calc(.375s * var(--animation-speed)) ease-in-out, left 0s, padding 0s;
 }
