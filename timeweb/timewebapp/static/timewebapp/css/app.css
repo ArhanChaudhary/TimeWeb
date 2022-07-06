@@ -44,7 +44,8 @@ header.animate::after {
     transform: none;
 }
 main.background-image-exists {
-    padding: 0;
+    padding-left: 0;
+    padding-right: 0;
 }
 @media not screen and (max-width: 850px) {
     main.background-image-exists #assignments-container {
