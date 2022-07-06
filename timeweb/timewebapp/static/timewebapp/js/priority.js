@@ -222,7 +222,10 @@ class Priority {
                 }
             }
             
-            const finished_work_inputs = last_work_input >= sa.sa.y;
+            // if sa.sa.y is null, I would expect finished_work_inputs to be false
+            // However, inequalities with null can sometimes be true!
+            // Check if sa.sa.y is a number, and do the same for last_work_input for extra precaution
+            const finished_work_inputs = last_work_input >= sa.sa.y && Number.isFinite(sa.sa.y) && Number.isFinite(last_work_input);
             const not_yet_assigned = today_minus_assignment_date < 0;
 
             let alert_due_date_passed_cond = false;
