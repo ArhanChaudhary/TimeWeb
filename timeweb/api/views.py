@@ -311,8 +311,8 @@ def create_gc_assignments(request):
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except ServerNotFoundError:
         return HttpResponse(status=204)
-    TimewebModel.objects.bulk_create(gc_models_to_create)
     if not gc_models_to_create: return HttpResponse(status=204)
+    TimewebModel.objects.bulk_create(gc_models_to_create)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
     request.user.settingsmodel.save()
 
