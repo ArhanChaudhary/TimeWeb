@@ -111,7 +111,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     color: hsl(0, 0%, 64%);
     opacity: 1;
 }
-#extra-navs {
+main:not(.background-image-exists) #extra-navs {
     filter: brightness(0.6);
 }
 

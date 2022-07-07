@@ -282,15 +282,18 @@
         {% endfor %}
       </span>
       <div id="extra-navs">
-        <a href="{{ changelog }}">Changelog</a>
-        &#8226;
-        <a href="{{ contact_form }}">Contact</a>
-        &#8226;
-        <a href="{{ blog }}" id="nav-blog">Blog</a>
-        &#8226;
-        <span id="nav-credits" tabindex="0">Credits</span>
-        &#8226;
-        <a href="{{ policies }}">Policies</a>
+        {% comment %} extra-navs already has a filter style {% endcomment %}
+        <span {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
+          <a href="{{ changelog }}">Changelog</a>
+          &#8226;
+          <a href="{{ contact_form }}">Contact</a>
+          &#8226;
+          <a href="{{ blog }}" id="nav-blog">Blog</a>
+          &#8226;
+          <span id="nav-credits" tabindex="0">Credits</span>
+          &#8226;
+          <a href="{{ policies }}">Policies</a>
+        </span>
       </div>
     </div>
   </div>

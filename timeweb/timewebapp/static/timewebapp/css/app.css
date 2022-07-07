@@ -866,15 +866,17 @@ input[type=number]::-webkit-inner-spin-button {
     margin-right: 45px;
     margin-left: 45px;
     gap: 7px;
-    filter: invert(0.4);
     --font-size: 14px;
     font-size: var(--font-size);
     line-height: calc(3 * var(--font-size));
 }
-#extra-navs a {
+main:not(.background-image-exists) #extra-navs {
+    filter: invert(0.4);
+}
+#extra-navs span a {
     color: var(--color);
 }
-#extra-navs * {
+#extra-navs span * {
     cursor: pointer;
     text-decoration: underline;
 }
