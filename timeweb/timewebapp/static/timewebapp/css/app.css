@@ -120,7 +120,8 @@ main.background-image-exists {
     text-align: initial;
     height: 22px;
 }
-#id_assignment_sorting:focus {
+#id_assignment_sorting:focus:hover,
+#go-to-next-day:focus:hover {
     outline: 0;
 }
 .hide-info {

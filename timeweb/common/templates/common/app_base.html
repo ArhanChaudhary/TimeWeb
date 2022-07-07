@@ -25,7 +25,7 @@
     {% url 'blog' as blog %}
     {% url 'policies' as policies %}
     {% if user.is_authenticated and request.path == home %}
-        <div id="image-new-container" tabindex="1">
+        <div id="image-new-container" tabindex="0">
             <img width="60" height="60" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
             <span id="new-assignment-text">New Assignment</span>
         </div>
@@ -33,7 +33,7 @@
     {% if user.is_authenticated %}
         <div id="user-greeting">
             <span id="welcome">Welcome,&nbsp;</span>
-            <div tabindex="1" id="username">
+            <div tabindex="0" id="username">
                 {{ user.username }}
                 <div id="account-dropdown">
                     <a href="{{ settings }}" class="one-line">Settings<br></a>
@@ -52,7 +52,7 @@
             </div>
         </div>
     {% endif %}
-    <a href="{{ home }}" id="logo-container">
+    <a href="{{ home }}" id="logo-container" tabindex="-1">
         <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}

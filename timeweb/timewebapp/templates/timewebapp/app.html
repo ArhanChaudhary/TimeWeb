@@ -108,7 +108,8 @@
       </form>
     </div>
   </div>
-  <div id="assignments-container">
+  {% comment %} some javascript makes this focusable {% endcomment %}
+  <div id="assignments-container" tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
       (function() {
         if ($("main").hasClass("finished-header-transition")) return
@@ -138,11 +139,11 @@
             <span id="estimated-total-time"></span>
             <span id="estimated-completion-time"></span>
             <span id="tomorrow-time"></span>
-            <div id="hide-button" class="generic-button">Hide</div>
+            <div id="hide-button" class="generic-button" tabindex="0">Hide</div>
           </span>
           <span id="current-date-container">
             <span id="current-date"></span>
-            <svg id="go-to-next-day" width="21" height="16" preserveAspectRatio="none" viewBox="40 40 176 176">
+            <svg id="go-to-next-day" tabindex="0" width="21" height="16" preserveAspectRatio="none" viewBox="40 40 176 176">
               <use href="#go_to_next_day-svg"></use>
             </svg>
           </span>

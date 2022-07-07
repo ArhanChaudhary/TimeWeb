@@ -384,6 +384,14 @@ body {
 .jconfirm .jconfirm-box div.jconfirm-title-c .jconfirm-title {
     display: initial !important;
 }
+.jconfirm .jconfirm-box .jconfirm-buttons button.btn-blue:focus:not(:hover) {
+    outline: 0;
+}
+.jconfirm .jconfirm-box .jconfirm-buttons button.btn-blue:focus {
+    /* color from the jconfirm library when button is hovered */
+    background-color: #2980b9;
+    box-shadow: 0 0 0 1px #2980b9;
+}
 @media screen and (max-width: 700px) {
     .jconfirm .jconfirm-box {
         /* First 30 for the padding due to a lack of border-box, second 30 for the right and left margin */
