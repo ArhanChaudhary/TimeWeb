@@ -269,7 +269,8 @@ class Crud {
             } else if (!["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .on("transitionend", function(e) {
-                        if (e.originalEvent.propertyName !== "margin-top") return;
+                        if (e.originalEvent !== undefined // for .trigger
+                            && e.originalEvent.propertyName !== "margin-top") return;
 
                         $(this).off("transitionend")
                             .removeClass("hide-field").css("margin-top", "")
