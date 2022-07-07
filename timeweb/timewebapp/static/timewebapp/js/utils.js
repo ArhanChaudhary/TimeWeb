@@ -837,7 +837,7 @@ insertTutorialMessages: function(first_available_assignment) {
 graphAlertTutorial: function(days_until_due) {
     $.alert({
         title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
-        content: days_until_due <= 3 ? `Note: since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display on the graph. Check out your example assignment or the example account on the login page to see how TimeWeb handles longer and more complicated assignments.` : '',
+        content: days_until_due <= 4 ? `Since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display. Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.` : '',
         backgroundDismiss: false,
         alignTop: true, // alignTop is a custom extension
         onClose: function() {
@@ -899,6 +899,9 @@ graphAlertTutorial: function(days_until_due) {
         //     });
             SETTINGS.enable_tutorial = false;
             ajaxUtils.ajaxChangeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+            $("#username").addClass("open-in-tutorial").one("click", function() {
+                $(this).removeClass("open-in-tutorial").blur();
+            });
         }
     });
 },

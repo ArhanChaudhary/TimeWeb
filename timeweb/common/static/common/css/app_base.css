@@ -198,7 +198,8 @@ body {
     border: 3px solid transparent;
     -webkit-text-fill-color: currentcolor;
 }
-#username:focus-within #account-dropdown {
+#username:focus-within #account-dropdown,
+#username.open-in-tutorial #account-dropdown {
     display: block;
 }
 #account-dropdown::before {
@@ -213,7 +214,8 @@ body {
 }
 #account-dropdown :hover,
 /* tabbing */
-#account-dropdown :focus {
+#account-dropdown :focus,
+#username.open-in-tutorial #settings-nav {
     background: rgb(82,107,130);
 }
 .dropdown-hr {
@@ -383,9 +385,6 @@ body {
 }
 .jconfirm .jconfirm-box div.jconfirm-title-c .jconfirm-title {
     display: initial !important;
-}
-.jconfirm .jconfirm-box .jconfirm-buttons button.btn-blue:focus:not(:hover) {
-    outline: 0;
 }
 .jconfirm .jconfirm-box .jconfirm-buttons button.btn-blue:focus {
     /* color from the jconfirm library when button is hovered */
