@@ -272,8 +272,14 @@ class Priority {
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
             } else if (not_yet_assigned) {
+                status_image = "not_yet_assigned";
                 status_message = 'This assignment hasn\'t yet been assigned';
                 status_value = Priority.NOT_YET_ASSIGNED;
+                //hard
+                dom_status_image.attr({
+                    width: 16,
+                    height: 16,
+                }).css("margin-left", -3);
             } else {
                 let has_autofilled = false;
                 if (that.params.autofill_no_work_done && number_of_forgotten_days > 0)
