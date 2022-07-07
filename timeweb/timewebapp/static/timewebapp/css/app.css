@@ -880,6 +880,8 @@ main.finished-header-transition #extra-navs {
 }
 #extra-navs span a {
     color: var(--color);
+    /* So tabbing on an extra-nav scrolls #assignments-container all the way down */
+    scroll-margin: 20px;
 }
 #extra-navs span * {
     cursor: pointer;
