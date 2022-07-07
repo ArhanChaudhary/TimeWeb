@@ -915,9 +915,6 @@ main.finished-header-transition #extra-navs {
         --outer-assignment-horizontal-padding: 13px;
         --outer-assignment-vertical-padding: 7px;
     }
-    main#background-image-exists #assignments-container {
-        padding-left: revert;
-    }
     .assignment-container.add-line-wrapper::before,
     .assignment-container.add-line-wrapper::after {
         --horizontal-margin: 4px;
