@@ -454,7 +454,7 @@ class VisualAssignment extends Assignment {
         }
         radius /= 0.75;
         screen.stroke();
-        VisualAssignment.setCanvasFont(screen, VisualAssignment.font_size);
+        VisualAssignment.setCanvasFont(screen, parseFloat($(".hover-point-label").first().css("font-size")));
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             let str_mouse_x;
             let graph_mouse_x;
@@ -479,7 +479,7 @@ class VisualAssignment extends Assignment {
             hover_point_label.css("--x", point_x);
             hover_point_label.css("--y", point_y);
             hover_point_label.text(point_str);
-            hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width > this.width - 5);
+            hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width + 8 > this.width - 5);
             if (hover_point_label.hasClass("initial-position")) {
                 hover_point_label[0].offsetHeight;
                 hover_point_label.removeClass("disable-hover-point-label-transition initial-position");
