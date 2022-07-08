@@ -109,7 +109,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     height: -moz-min-content;
     height: min-content;
     box-sizing: border-box;
-    transition: margin 0.3s ease-in-out;
+    transition: margin calc(0.3s * var(--animation-speed)) ease-in-out;
 }
 #form-wrapper #field-group-picker-styling {
     position: absolute;
@@ -149,7 +149,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     border-left: 1px solid var(--color);
 }
 #field-group-picker-styling * {
-    transition: transform 0.2s ease-in-out 0.05s;
+    transition: transform calc(0.2s * var(--animation-speed)) ease-in-out 0.05s;
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
     transform: translateX(-207px);
@@ -211,7 +211,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     z-index: 10;
 }
 #form-wrapper .field-wrapper {
-    transition: margin-top 0.4s ease-in-out, opacity 0.6s ease-in-out 0.1s;
+    transition: margin-top calc(0.4s * var(--animation-speed)) ease-in-out, opacity 0.6s ease-in-out 0.1s;
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
     margin-top: -1px;
@@ -321,7 +321,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     Instead give a z-index of one to #id-unit-field-wrapper */
     opacity: 0;
 
-    transition: margin-top 0.4s ease-in-out, opacity 0.3s ease-in-out;
+    transition: margin-top calc(0.4s * var(--animation-speed)) ease-in-out, opacity calc(0.3s * var(--animation-speed)) ease-in-out;
 }
 #id-unit-field-wrapper {
     /* So .hide-field isnt over this when it has a lot of negative margin 
