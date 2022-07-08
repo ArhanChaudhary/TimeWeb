@@ -89,7 +89,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm(None)
-        self.context['settings_form'] = SettingsForm({
+        self.context['settings_form'] = SettingsForm(initial={ # unbound form
             'assignment_sorting': request.user.settingsmodel.assignment_sorting,
         })
 
@@ -154,7 +154,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
 
-            # TODO: I ideally want to use a TimewebForm with an instance kwarg
+            # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
 
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
