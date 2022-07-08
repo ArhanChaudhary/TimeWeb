@@ -87,9 +87,10 @@ def save_assignment(request):
             if isinstance(value, float):
                 assignment[key] = round(value, getattr(TimewebModel, key).field.decimal_places)
         
+        # see api.change_setting for why 64baf5 doesn't work here
         model_fields = {i.name: getattr(sm, i.name) for i in TimewebModel._meta.get_fields() if not i.unique}
         model_fields.update(assignment)
-        validation_form = TimewebForm(model_fields)
+        validation_form = TimewebForm(data=model_fields)
         if not validation_form.is_valid():
             assignment = {field: value for (field, value) in assignment.items() if field not in validation_form.errors}
             if not assignment: continue # It's pointless to finish the loop
@@ -110,16 +111,20 @@ def change_setting(request):
     setting = data['setting']
     value = json.loads(data['value'])
 
+    # pretty cursed code that could possibly be improved by adding the settings model to the settings form as an instance (64baf58)
+    # however this makes the data "unbound" (A bound form is a form which is passed the users input) and validation to become impossible
+    # We're going to have to make it bound because we want to validate it, but that means we need to create a bounded form from an existing settings model instance
+    # This is a bit of a hack, but it works for now
     model_fields = {i.name: getattr(request.user.settingsmodel, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
     if setting not in model_fields:
         logger.warning(f"User \"{request.user}\" tried to change a setting that doesn't exist")
         return HttpResponse(f"The setting \"{setting}\" doesn't exist.", status=404)
         
     model_fields[setting] = value
-    validation_form = SettingsForm(model_fields)
+    validation_form = SettingsForm(data=model_fields)
     if not validation_form.is_valid():
         logger.warning(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
-        logger.warning(f"{validation_form.errors}")
+        logger.info(f"{validation_form.errors}")
         return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
 
     if setting == "oauth_token":
