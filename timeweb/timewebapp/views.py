@@ -154,6 +154,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
 
+            # TODO: I ideally want to use a TimewebForm with an instance kwarg
+
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
             if self.sm.assignment_date:
