@@ -152,7 +152,7 @@ body {
 #button-container {
     display: flex;
     gap: 10px;
-    flex-flow: row;
+    flex-flow: row-reverse;
 }
 #break-days-wrapper {
     flex-wrap: wrap;

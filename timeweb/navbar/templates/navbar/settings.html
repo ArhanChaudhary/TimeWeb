@@ -98,8 +98,9 @@
             {{ hidden }}
         {% endfor %}
         <div id="button-container">
-            <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
+            {% comment %} order needs to be switched so the mobile view stacks save on top of reset {% endcomment %}
             <input type="submit" value="Save" id="submit-settings-button" class="generic-button">
+            <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
         </div>
     </form>
 {% endblock %}
