@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 confirm: {
                     keys: ['Enter'],
                     action: function() {
-                        $("#id_def_min_work_time").val("");
+                        $("#id_def_min_work_time").val(15);
                         $("#id_def_skew_ratio").val(0);
                         $("#break-days-wrapper input").prop("checked", false);
                         $("#id_ignore_ends").prop("checked", false);
