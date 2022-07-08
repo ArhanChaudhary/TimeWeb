@@ -26,7 +26,7 @@ from views import logger
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
-    def get(self,request):
+    def get(self, request):
         initial = {
             'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
             'restore_gc_assignments': False,
@@ -41,10 +41,9 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         # for parsing default due times in forms.py
         _mutable = request.POST._mutable
         request.POST._mutable = True
-        self.form = SettingsForm(data=request.POST, files=request.FILES)
+        self.form = SettingsForm(data=request.POST, files=request.FILES, instance=request.user.settingsmodel)
         request.POST._mutable = _mutable
 
-        self.checked_background_image_clear = request.POST.get("background_image-clear")
         form_is_valid = True
         if not self.form.is_valid():
             form_is_valid = False
@@ -61,44 +60,25 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             
     
     def valid_form(self, request):
-        request.user.settingsmodel.def_min_work_time = self.form.cleaned_data.get("def_min_work_time")
-        request.user.settingsmodel.def_skew_ratio = self.form.cleaned_data.get("def_skew_ratio")
-        request.user.settingsmodel.def_break_days = self.form.cleaned_data.get("def_break_days")
-        request.user.settingsmodel.def_due_time = self.form.cleaned_data.get("def_due_time")
-        request.user.settingsmodel.ignore_ends = self.form.cleaned_data.get("ignore_ends")
-        request.user.settingsmodel.animation_speed = self.form.cleaned_data.get("animation_speed")
-        request.user.settingsmodel.appearance = self.form.cleaned_data.get("appearance")
-        request.user.settingsmodel.show_priority = self.form.cleaned_data.get("show_priority")
-        request.user.settingsmodel.one_graph_at_a_time = self.form.cleaned_data.get("one_graph_at_a_time")
-        request.user.settingsmodel.close_graph_after_work_input = self.form.cleaned_data.get("close_graph_after_work_input")
-        request.user.settingsmodel.highest_priority_color = self.form.cleaned_data.get("highest_priority_color")
-        request.user.settingsmodel.lowest_priority_color = self.form.cleaned_data.get("lowest_priority_color")
-        if self.checked_background_image_clear:
-            request.user.settingsmodel.background_image = None
-        elif self.form.cleaned_data.get("background_image"):
-            request.user.settingsmodel.background_image = self.form.cleaned_data.get("background_image")
-        request.user.settingsmodel.enable_tutorial = self.form.cleaned_data.get("enable_tutorial")
-        request.user.settingsmodel.horizontal_tag_position = self.form.cleaned_data.get("horizontal_tag_position")
-        request.user.settingsmodel.vertical_tag_position = self.form.cleaned_data.get("vertical_tag_position")
-        request.user.settingsmodel.timezone = self.form.cleaned_data.get("timezone")
-        request.user.settingsmodel.default_dropdown_tags = self.form.cleaned_data.get("default_dropdown_tags")
         if self.form.cleaned_data.get("restore_gc_assignments"):
             if request.user.timewebmodel_set.all().count() > settings.MAX_NUMBER_ASSIGNMENTS:
                 self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
                 return self.invalid_form(request)
-            else:
-                request.user.settingsmodel.added_gc_assignment_ids = []
-                request.session.pop("already_created_gc_assignments_from_frontend", None)
+            self.form.instance.added_gc_assignment_ids = []
+            request.session.pop("already_created_gc_assignments_from_frontend", None)
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
             api.gc_auth_disable(request, save=False)
-        request.user.settingsmodel.save()
+
+        self.form.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
+
         if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in request.user.settingsmodel.oauth_token:
             return redirect(api.gc_auth_enable(request, next_url="home", current_url="settings"))
         return redirect("home")
     
     def invalid_form(self, request):
         self.context['form'] = self.form
+        logger.info(self.form.errors)
         # It's ok to return a 2xx from invalid form, because there is no danger of the user resubmitting because its invalid
         return super().get(request)
 

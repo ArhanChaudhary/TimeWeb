@@ -16,8 +16,7 @@ class CustomImageFieldWidget(ClearableFileInput):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
-        fields = "__all__"
-        exclude = ("user", )
+        exclude = ("oauth_token", "added_gc_assignment_ids", "seen_latest_changelog", "user")
         extra_fields = {
             "enable_gc_integration": forms.BooleanField(
                 label="Google Classroom Integration",

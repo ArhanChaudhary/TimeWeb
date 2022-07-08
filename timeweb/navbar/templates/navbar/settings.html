@@ -92,6 +92,7 @@
                 {% endif %}
         {% endfor %}
         </div>
+        {% comment %} needs to be a hidden field instead of an excluded field so app.html can display it {% endcomment %}
         {{ form.assignment_sorting.as_hidden }}
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
