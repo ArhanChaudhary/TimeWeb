@@ -152,8 +152,8 @@ LOGOUT_REDIRECT_URL = '/'
 
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 
-MAX_UPLOAD_SIZE = 5242880 # 40 MiB (max background image size)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1310720 # 10 MiB (max size for data sent by ajax by assignments)
+MAX_BACKGROUND_IMAGE_UPLOAD_SIZE = 10 * 1048576 # 10 MB (max background image size)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1.25 * 1048576 # 1.25 MB (max size for data sent by ajax by assignments)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
