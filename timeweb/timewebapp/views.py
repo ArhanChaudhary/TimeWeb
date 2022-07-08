@@ -28,10 +28,8 @@ from navbar.forms import SettingsForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-# Formatting
-from django.forms.models import model_to_dict
-
 # Misc
+from django.forms.models import model_to_dict
 from utils import days_between_two_dates, utc_to_local
 from views import logger
 

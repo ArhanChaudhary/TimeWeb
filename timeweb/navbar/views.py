@@ -22,6 +22,7 @@ from allauth.decorators import rate_limit
 from django.contrib import messages
 from requests import get as requests_get
 from views import logger
+from django.forms.models import model_to_dict
 
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
@@ -32,8 +33,11 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             'restore_gc_assignments': False,
         }
         self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
-
         self.context['settings_model'] = request.user.settingsmodel
+        self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
+                            exclude=[*SettingsForm.Meta.exclude, # SettingsForm already excludes these fields but saving the field to a model adds them back
+                            "background_image", "id", "assignment_sorting"])
+
         logger.info(f'User \"{request.user}\" is now viewing the settings page')
         return super().get(request)
         

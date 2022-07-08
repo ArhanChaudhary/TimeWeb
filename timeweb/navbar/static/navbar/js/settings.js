@@ -21,23 +21,42 @@ document.addEventListener("DOMContentLoaded", function() {
                 confirm: {
                     keys: ['Enter'],
                     action: function() {
-                        $("#id_def_min_work_time").val(15);
-                        $("#id_def_skew_ratio").val(0);
-                        $("#break-days-wrapper input").prop("checked", false);
-                        $("#id_ignore_ends").prop("checked", false);
-                        $("#id_def_due_time").data("daterangepicker").setStartDate(moment(new Date().setHours(0, 0, 0, 0)));
-                        $("#id_show_priority").prop("checked", true);
-                        $("#id_one_graph_at_a_time").prop("checked", false);
-                        $("#id_close_graph_after_work_input").prop("checked", false);
-                        $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");
-                        $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");
-                        $("#id_background_image").val("");
-                        $("#id_horizontal_tag_position").val("Middle");
-                        $("#id_animation_speed").val("1");
-                        $("#id_appearance").val("automatic");
-                        $("#id_vertical_tag_position").val("Top");
-                        $("#id_timezone").val("");
-                        $("#id_default_dropdown_tags").val("").trigger("input");
+                        const default_settings = JSON.parse(document.getElementById("default-settings").textContent);
+                        for (let [key, value] of Object.entries(default_settings)) {
+                            // adjusts value
+                            switch (key) {
+                                case "def_skew_ratio":
+                                    value--;
+                                    break;
+                                case "default_dropdown_tags":
+                                    value = value.join("\n");
+                                    break;
+                            }
+                            // parses and sets the value
+                            const $input = $("#id_" + key);
+                            switch (key) {
+                                case "def_break_days":
+                                    $("#break-days-wrapper input").prop("checked", false);
+                                    continue;
+                                case "def_due_time":
+                                    assert(value === "00:00:00");
+                                    $("#id_def_due_time").data("daterangepicker").setStartDate(moment(new Date().setHours(0, 0, 0, 0)));
+                                    continue;
+                            }
+                            if ($input.prop("jscolor")) {
+                                $input.prop("jscolor").fromString(value);
+                                continue;
+                            }
+                            if ($input.attr("type") === "checkbox") {
+                                $input.prop("checked", value);
+                                continue;
+                            }
+                            $input.val(value);
+                            // expandable textbox
+                            if ($input.is("textarea")) {
+                                $input.trigger("input");
+                            }
+                        }
                     }
                 },
                 cancel: function() {
