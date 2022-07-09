@@ -167,6 +167,9 @@ class VisualAssignment extends Assignment {
         this.resize();
     }
     resize(e={}) {
+        // this method is still ran for assignments that have already been deleted, which messes up global VisualAssignment variables
+        if (!document.contains(dom_assignment[0])) return;
+
         if (!this.sa.fixed_mode) {
             // Use sa because dynamic_start is changed in priority.js; needed to redefine starts
             this.red_line_start_x = this.sa.dynamic_start;
