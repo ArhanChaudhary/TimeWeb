@@ -39,10 +39,12 @@
                     <a href="{{ settings }}" id="settings-nav" class="one-line">Settings<br></a>
                     <a href="{{ user_guide }}" class="one-line">User Guide<br></a>
                     <div class="dropdown-hr"></div>
-                    <a href="{% url 'account_change_password' %}">Change Password</a>
-                    <a href="{% url 'reset_username' %}">Change Username</a>
+                    {% comment %} Some browsers are weirdly inconsistent in determining when to wrap 
+                    Let's hard code our own breaks instead {% endcomment %}
+                    <a href="{% url 'account_change_password' %}">Change<br>Password</a>
+                    <a href="{% url 'reset_username' %}">Change<br>Username</a>
                     <a href="{% url 'account_email' %}">Manage<br>E-mail Login</a>
-                    <a href="{% url 'socialaccount_connections' %}">Manage Google Login</a>
+                    <a href="{% url 'socialaccount_connections' %}">Manage<br>Google Login</a>
                     <div class="dropdown-hr"></div>
                     <form method="post" action="{% url 'account_logout' %}">
                         {% csrf_token %}

@@ -195,6 +195,7 @@ body {
     background: rgb(43, 56, 68);
     color: white;
     transform: translate(50%, 16px);
+    white-space: nowrap;
     border: 3px solid transparent;
     -webkit-text-fill-color: currentcolor;
 }
