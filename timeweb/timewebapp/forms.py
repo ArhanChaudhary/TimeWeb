@@ -79,11 +79,10 @@ class TimewebForm(forms.ModelForm):
             },
         }
     def __init__(self, *args, **kwargs):
-        assert 'data' in kwargs, 'pls specify the data kwarg for readibility'
 
         # form instances from update field validation vs from form submission is different
         # Parse ones from form submissions correctly
-        if isinstance(kwargs['data']['x'], str) and 'due_time' not in kwargs['data']:
+        if isinstance(kwargs.get('data', {}).get('x', None), str) and 'due_time' not in kwargs['data']:
             kwargs['data']['due_time'] = kwargs['data']['x'].split(" ", 1)[1]
             kwargs['data']['due_time'] = datetime.datetime.strptime(kwargs['data']['due_time'], '%I:%M %p').time()
             kwargs['data']['due_time'] = kwargs['data']['due_time'].strftime('%H:%M')
@@ -91,6 +90,7 @@ class TimewebForm(forms.ModelForm):
             kwargs['data']['x'] = kwargs['data']['x'].split(" ", 1)[0]
 
         super().__init__(*args, **kwargs)
+        assert not self.is_bound or 'data' in kwargs, 'pls specify the data kwarg for readibility'
         for field_name in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             self.fields[f"{field_name}-widget-checkbox"] = forms.BooleanField(widget=forms.HiddenInput(), required=False)
         self.label_suffix = ""
