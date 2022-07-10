@@ -825,6 +825,16 @@ insertTutorialMessages: function(first_available_assignment) {
                 // setTimeout needed because this runs before domSort
                 setTimeout(function() {
                     $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                    new Promise(function(resolve) {
+                        let scrollTimeout = setTimeout(resolve, 200);
+                        $("#assignments-container").scroll(() => {
+                            clearTimeout(scrollTimeout);
+                            scrollTimeout = setTimeout(resolve, 200);
+                        });
+                    }).then(function() {
+                        $("#assignments-container").off('scroll');
+                        first_available_assignment.focus();
+                    });
                 }, 0);
                 utils.ui.alreadyScrolled = true;
             }

@@ -189,6 +189,7 @@ main.background-image-exists {
 }
 #tutorial-click-assignment-to-open {
     font-size: 17px;
+    scroll-margin: 30px;
 }
 .shortcut {
     position: relative;
