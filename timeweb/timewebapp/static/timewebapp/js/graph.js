@@ -662,7 +662,7 @@ class VisualAssignment extends Assignment {
         if (today_minus_assignment_date >= 0 && today_minus_assignment_date <= this.sa.complete_x) {
             let today_x = today_minus_assignment_date * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5);
             // Ensures the today line doesn't get too close to a red point so it's easier to figure out which day it is
-            let today_x_line_left_offset = today_minus_assignment_date * this.wCon + 9;
+            let today_x_line_left_offset = today_minus_assignment_date * this.wCon + 11;
             let nearest_x_step = Math.ceil(today_minus_assignment_date) * this.wCon
             if (nearest_x_step < today_x_line_left_offset) {
                 // Subtract by how much it exeeds nearest_x_step
