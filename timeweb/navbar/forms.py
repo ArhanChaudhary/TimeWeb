@@ -67,7 +67,10 @@ class SettingsForm(forms.ModelForm):
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
-        if 'data' in kwargs and 'def_due_time' in kwargs['data'] and kwargs['data']['def_due_time']:
+        assert 'data' in kwargs, 'pls specify the data kwarg for readibility'
+
+        # See explanation in TimewebForm.__init__
+        if isinstance(kwargs['data']['def_due_time'], str):
             kwargs['data']['def_due_time'] = datetime.datetime.strptime(kwargs['data']['def_due_time'], '%I:%M %p').time()
             kwargs['data']['def_due_time'] = kwargs['data']['def_due_time'].strftime('%H:%M')
 

@@ -79,7 +79,11 @@ class TimewebForm(forms.ModelForm):
             },
         }
     def __init__(self, *args, **kwargs):
-        if 'data' in kwargs and 'x' in kwargs['data'] and kwargs['data']['x']:
+        assert 'data' in kwargs, 'pls specify the data kwarg for readibility'
+
+        # form instances from update field validation vs from form submission is different
+        # Parse ones from form submissions correctly
+        if isinstance(kwargs['data']['x'], str) and 'due_time' not in kwargs['data']:
             kwargs['data']['due_time'] = kwargs['data']['x'].split(" ", 1)[1]
             kwargs['data']['due_time'] = datetime.datetime.strptime(kwargs['data']['due_time'], '%I:%M %p').time()
             kwargs['data']['due_time'] = kwargs['data']['due_time'].strftime('%H:%M')
