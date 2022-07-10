@@ -48,7 +48,7 @@ class SettingsModel(models.Model):
     def_min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0"),_("The default minimum work time must be positive or zero"))],
+        validators=[MinValueValidator(Decimal("0"), _("This setting can't be a negative number"))],
         default=15,
         blank=True,
         null=True,
@@ -145,6 +145,11 @@ class SettingsModel(models.Model):
     )
 
     # Group "Miscellaneous"
+    swapping_animation_threshold = models.IntegerField(
+        default=15,
+        validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
+        verbose_name=_('Swapping Animation Threshold'),
+    )
     timezone = TimeZoneField(
         null=True,
         blank=True,
