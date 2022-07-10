@@ -199,8 +199,7 @@ body {
     border: 3px solid transparent;
     -webkit-text-fill-color: currentcolor;
 }
-#username:focus-within #account-dropdown,
-#username.open-in-tutorial #account-dropdown {
+#username:focus-within #account-dropdown {
     display: block;
 }
 #account-dropdown::before {
@@ -216,7 +215,7 @@ body {
 #account-dropdown :hover,
 /* tabbing */
 #account-dropdown :focus,
-#username.open-in-tutorial #settings-nav {
+#username.highlight-setings-nav #settings-nav {
     background: rgb(82,107,130);
 }
 .dropdown-hr {

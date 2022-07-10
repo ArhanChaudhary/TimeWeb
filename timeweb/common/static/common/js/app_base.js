@@ -51,6 +51,14 @@ $(function() {
         if (!$(":hover").filter(".daterangepicker").length)
             $(this).data("daterangepicker")?.hide();
     });
+    // close dropdown if clicked while open
+    let wasOpen = false;
+    $("#username").mousedown(function(e) {
+        wasOpen = $(this).is(document.activeElement) || $(document.activeElement).parents("#username").length;
+    }).click(function(e) {
+        if (wasOpen)
+            $("#username").blur();
+    });
 
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);

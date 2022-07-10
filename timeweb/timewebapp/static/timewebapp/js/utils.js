@@ -850,7 +850,7 @@ graphAlertTutorial: function(days_until_due) {
         content: days_until_due <= 4 ? `Since this assignment is due in only ${days_until_due} ${pluralize("day", days_until_due)}, there isn't much to display. Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.` : '',
         backgroundDismiss: false,
         alignTop: true, // alignTop is a custom extension
-        onClose: function() {
+        onDestroy: function() {
         // Service worker push notifs API hasn't yet been implemented :-(
         // Code once it is implemented:
 
@@ -909,8 +909,8 @@ graphAlertTutorial: function(days_until_due) {
         //     });
             SETTINGS.enable_tutorial = false;
             ajaxUtils.ajaxChangeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
-            $("#username").addClass("open-in-tutorial").one("click", function() {
-                $(this).removeClass("open-in-tutorial").blur();
+            $("#username").focus().addClass("highlight-setings-nav").one("click", function() {
+                $(this).removeClass("highlight-setings-nav");
             });
         }
     });
