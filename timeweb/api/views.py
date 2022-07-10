@@ -92,15 +92,12 @@ def save_assignment(request):
         model_fields.update(assignment)
         validation_form = TimewebForm(data=model_fields)
         if not validation_form.is_valid():
-            assignment = {field: value for (field, value) in assignment.items() if field not in validation_form.errors}
-            if not assignment: continue # It's pointless to finish the loop
+            assignment = {field: value for field, value in assignment.items() if field not in validation_form.errors}
 
+        if not assignment: continue
         for key, value in assignment.items():
             setattr(sm, key, value)
-        try:
-            sm.save()
-        except NameError: # Forgot why I put this here
-            pass
+        sm.save()
     return HttpResponse(status=204)
 
 @require_http_methods(["PATCH"])
