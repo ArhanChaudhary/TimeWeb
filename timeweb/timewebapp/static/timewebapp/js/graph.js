@@ -207,9 +207,32 @@ class VisualAssignment extends Assignment {
             }
         }
     }
+    extractRawCoordinatesFromGraphMoveEvent(e) {
+        return {
+            raw_x: (e.pageX || e.touches?.[0]?.pageX || e.changedTouches?.[0]?.pageX) - this.fixed_graph.offset().left,
+            raw_y: (e.pageY || e.touches?.[0]?.pageY || e.changedTouches?.[0]?.pageY) - this.fixed_graph.offset().top,
+        }
+    }
+    static GRAPH_HOVER_EVENT = isTouchDevice ? "touchstart touchmove" : "mousemove";
+    // Can't make this event passive on isTouchDevice because it calls e.preventDefault()
     mousemove(e, iteration_number=1) {
-        const raw_x = e.pageX - this.fixed_graph.offset().left;
-        const raw_y = e.pageY - this.fixed_graph.offset().top;
+        const {raw_x, raw_y} = this.extractRawCoordinatesFromGraphMoveEvent(e);
+        if (e.type === "touchstart" && (() => {
+            // if the click isn't the same x coordinate
+            let {mouse_x} = this.convertRawCoordsToGraphCoords(raw_x, raw_y);
+            mouse_x = this.boundMouseXInDrawPoint(mouse_x);
+            return this.last_mouse_x !== mouse_x;
+        })()) {
+            this.draw_mouse_point = true;
+            this.allow_for_click_draw_point = true;
+            setTimeout(() => {this.allow_for_click_draw_point = false}, 
+                300 // approximate time to hold down such that it doesn't become a tap but instead a hold action
+            );
+        }
+        if (e.type === "touchmove") {
+            // FIXME: https://stackoverflow.com/questions/49500339/cant-prevent-touchmove-from-scrolling-window-on-ios
+            e.preventDefault();
+        }
         // If set skew ratio is enabled, make the third point (x2,y2)
         if (this.set_skew_ratio_using_graph && iteration_number !== Assignment.AUTOTUNE_ITERATIONS + 1 && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             let x1 = this.sa.complete_x - this.red_line_start_x;
@@ -258,12 +281,7 @@ class VisualAssignment extends Assignment {
             this.setDynamicStartIfInDynamicMode({ ajax: false });
             this.mousemove(e, iteration_number + 1);
         } else {
-            // ensure .click is run after .mousemove so this.last_mouse_x is still the old value
-            // Needed in this.graph.click where clicking the same x coordinate removes the hover point label
-            // but clicking a different x coordinate doesn't remove the hover point label (for mobile)
-            setTimeout(() => {
-                this.draw(raw_x, raw_y);
-            }, 0);
+            this.draw(raw_x, raw_y);
         }
     }
     arrowSkewRatio() {
@@ -457,6 +475,7 @@ class VisualAssignment extends Assignment {
         }
         radius /= 0.75;
         screen.stroke();
+        const hover_point_label = this.dom_assignment.find(".hover-point-label");
         VisualAssignment.setCanvasFont(screen, parseFloat($(".hover-point-label").first().css("font-size")));
         if (this.draw_mouse_point && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             let str_mouse_x;
@@ -474,7 +493,6 @@ class VisualAssignment extends Assignment {
             const point_x = graph_mouse_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             const point_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - funct_mouse_x * this.hCon - 50);
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
-            const hover_point_label = this.dom_assignment.find(".hover-point-label");
             if (hover_point_label.hasClass("initial-position")) {
                 hover_point_label.addClass("disable-hover-point-label-transition");
             }
@@ -501,6 +519,9 @@ class VisualAssignment extends Assignment {
             screen.lineWidth = 2;
             screen.stroke();
             screen.fillStyle = this.getDefaultFontColor();
+        } else {
+            hover_point_label.addClass("hide-label");
+            this.draw_mouse_point = false;
         }
         
         screen.textAlign = "center";
@@ -733,7 +754,7 @@ class VisualAssignment extends Assignment {
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 hide_assignment_button = this.dom_assignment.find(".hide-assignment-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
-        this.graph.off("mousemove").mousemove(this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
+        this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
         $(window).resize(this.resize.bind(this));
 
         // BEGIN Up and down arrow event handler
@@ -972,7 +993,7 @@ class VisualAssignment extends Assignment {
         let original_skew_ratio;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
-                skew_ratio_button.text(skew_ratio_button.attr("data-label"));
+                skew_ratio_button.text(skew_ratio_button.attr("data-label")).blur();
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
@@ -988,45 +1009,48 @@ class VisualAssignment extends Assignment {
             original_skew_ratio = this.sa.skew_ratio;
             skew_ratio_button.text(skew_ratio_button.attr("data-active-label"));
             // Turn off mousemove to ensure there is only one mousemove handler at a time
-            this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
-            this.graph.trigger("mousemove");
+            this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this));
+            this.graph.trigger(VisualAssignment.GRAPH_HOVER_EVENT);
             this.set_skew_ratio_using_graph = true;
         });
-        this.graph.click(e => {
+        if (isTouchDevice) {
+            skew_ratio_button.attr("data-active-label", skew_ratio_button.attr("data-active-label-touch"));
+        }
+        this.graph.on(isTouchDevice ? "touchend" : "click", e => {
             if (this.set_skew_ratio_using_graph) {
                 // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.text(skew_ratio_button.attr("data-label"));
+                skew_ratio_button.text(skew_ratio_button.attr("data-label")).blur();
                 ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
                 ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
-                if (!this.draw_mouse_point) {
-                    this.graph.off("mousemove");
+                if (!this.draw_mouse_point && isTouchDevice) {
+                    this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
                 }
                 new Priority().sort();
-            } else if (this.draw_mouse_point) {
-                // go the mousemove to see the explanation of this
-                const raw_x = e.pageX - this.fixed_graph.offset().left;
-                const raw_y = e.pageY - this.fixed_graph.offset().top;
-                let {mouse_x} = this.convertRawCoordsToGraphCoords(raw_x, raw_y);
-                mouse_x = this.boundMouseXInDrawPoint(mouse_x);
-                if (this.last_mouse_x !== mouse_x) return;
-                // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
-                // Disable draw point
-                this.graph.off("mousemove");
-                this.draw_mouse_point = false;
-                const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.addClass("hide-label");
-                delete this.last_mouse_x;
-                this.draw();
-            } else {
-                // Runs if (!set_skew_ratio_using_graph && !draw_mouse_point)
-                // Enable draw point
-                this.draw_mouse_point = true;
-                // Turn off mousemove to ensure there is only one mousemove handler at a time
-                this.graph.off("mousemove").mousemove(this.mousemove.bind(this));
-                // Pass in e because $.trigger makes e.pageX undefined
-                this.mousemove(e);
+            // if the user quickly taps the screen, instead of doing mousemove instead toggle draw point label on
+            // toggle it off if the user clicks the same x coordinate or drags it around again
+            } else if (!isTouchDevice || !this.allow_for_click_draw_point) {
+                if (this.draw_mouse_point) {
+                    // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
+                    // Disable draw point
+                    if (!isTouchDevice) {
+                        this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
+                    }
+                    this.draw_mouse_point = false;
+                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                    hover_point_label.addClass("hide-label");
+                    this.last_mouse_x = undefined; // force the graph to draw
+                    this.draw();
+                } else {
+                    // Runs if (!set_skew_ratio_using_graph && !draw_mouse_point)
+                    // Enable draw point
+                    this.draw_mouse_point = true;
+                    // Turn off mousemove to ensure there is only one mousemove handler at a time
+                    this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this));
+                    // Pass in e because $.trigger makes e.pageX undefined
+                    this.mousemove(e);
+                }
             }
         });
         }
@@ -1165,7 +1189,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
         if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
             already_ran_tutorial = true;
             $("#tutorial-click-assignment-to-open").remove();
-            if (DEBUG) return;
+
+            const skip_in_debug = false;
+            if (skip_in_debug) return;
 
             prevent_click = true;
             setTimeout(function() {

@@ -774,6 +774,7 @@ switch (e.key) {
 displayFullDueDateOnHover: function() {
     $(".title").on("mouseover mousemove click", function(e) {
         $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
+        // could probably validate with touchstart event instead of isTouchDevice
         if (isTouchDevice && e.offsetY > $(this).height()) return false;
     }).on("mouseout", function() {
         $(this).removeClass("show-long-daysleft");
