@@ -211,7 +211,7 @@ class VisualAssignment extends Assignment {
         const raw_x = e.pageX - this.fixed_graph.offset().left;
         const raw_y = e.pageY - this.fixed_graph.offset().top;
         // If set skew ratio is enabled, make the third point (x2,y2)
-        if (this.set_skew_ratio_using_graph && iteration_number !== Assignment.AUTOTUNE_ITERATIONS + 1) {
+        if (this.set_skew_ratio_using_graph && iteration_number !== Assignment.AUTOTUNE_ITERATIONS + 1 && Number.isFinite(raw_x) && Number.isFinite(raw_y)) {
             let x1 = this.sa.complete_x - this.red_line_start_x;
             let y1 = this.sa.y - this.red_line_start_y;
 
