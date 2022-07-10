@@ -145,10 +145,10 @@ class SettingsModel(models.Model):
     )
 
     # Group "Miscellaneous"
-    swapping_animation_threshold = models.IntegerField(
+    sorting_animation_threshold = models.IntegerField(
         default=15,
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
-        verbose_name=_('Swapping Animation Threshold'),
+        verbose_name=_('Sorting Animation Threshold'),
     )
     timezone = TimeZoneField(
         null=True,

@@ -865,13 +865,13 @@ class Priority {
         }
         utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
-        if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.swapping_animation_threshold)
+        if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
             $(".assignment-container").each(function() {
                 that.setInitialAssignmentTopOffset($(this));
             });
         that.domSortAssignments(that.priority_data_list);
 
-        if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.swapping_animation_threshold)
+        if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
             $(".assignment-container").each(function() {
                 const assignment_container = $(this);
                 that.transitionSwap(assignment_container);
