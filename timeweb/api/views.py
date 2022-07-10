@@ -71,6 +71,9 @@ def save_assignment(request):
     data = QueryDict(request.body)
 
     assignments = json.loads(data['assignments'])
+    if len(assignments) > settings.MAX_NUMBER_ASSIGNMENTS:
+        return HttpResponse("ur pretty sus", status=400)
+
     # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
     for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['pk'], assignments), user=request.user):
         assignment = next(i for i in assignments if i.get('pk', None) == sm.pk)
