@@ -24,7 +24,7 @@
             <div class="error-note">{{ error|escape }}</div>
         {% endfor %}
         {% for field in form.visible_fields %}
-            {% if field.name == "enable_gc_integration" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "timezone" %}
+            {% if field.name == "enable_gc_integration" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "sorting_animation_threshold" %}
                 {% if field.name != "enable_gc_integration" %}
                     </div>
                 {% endif %}
@@ -42,7 +42,7 @@
                             Assignment Header
                         {% elif field.name == "appearance" %}
                             Personalize
-                        {% elif field.name == "timezone" %}
+                        {% elif field.name == "sorting_animation_threshold" %}
                             Miscellaneous
                         {% endif %}
                     </span>
