@@ -323,7 +323,7 @@ Assignment.MATRIX_ENDS_WEIGHT = 10000;
 // There's a chance this might not even be needed but it seems to provide a more accurate skew ratio
 // Resetting the dynamic mode start still might produce different autotuned_skew_ratio values because the dynamic start is changing,
 // compared to only autotuning is once which completely ignores if dynamic start changing has a significant impact on the skew ratio
-Assignment.AUTOTUNE_ITERATIONS = 4;
+Assignment.AUTOTUNE_ITERATIONS = 3; // used to be 3, used to be 4, now is 3
 
 Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ inverse: true }) {
     if (this.sa.fixed_mode) return;
