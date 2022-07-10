@@ -71,13 +71,10 @@ def save_assignment(request):
     data = QueryDict(request.body)
 
     assignments = json.loads(data['assignments'])
-    for assignment in assignments:
-        sm = get_object_or_404(TimewebModel, pk=assignment['pk'])
+    # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
+    for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['pk'], assignments), user=request.user):
+        assignment = next(i for i in assignments if i.get('pk', None) == sm.pk)
         del assignment['pk']
-        
-        if request.user != sm.user:
-            logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
-            return HttpResponse(status=404)
 
         for key, value in assignment.items():
             if key == "x":
