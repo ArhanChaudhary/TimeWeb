@@ -17,6 +17,7 @@ from navbar.forms import SettingsForm
 
 # Formatting
 from django.utils.text import Truncator
+from django.forms.models import model_to_dict
 import json
 
 # Google API
@@ -88,7 +89,7 @@ def save_assignment(request):
                 assignment[key] = round(value, getattr(TimewebModel, key).field.decimal_places)
         
         # see api.change_setting for why 64baf5 doesn't work here
-        model_fields = {i.name: getattr(sm, i.name) for i in TimewebModel._meta.get_fields() if not i.unique}
+        model_fields = model_to_dict(sm)
         model_fields.update(assignment)
         validation_form = TimewebForm(data=model_fields)
         if not validation_form.is_valid():
