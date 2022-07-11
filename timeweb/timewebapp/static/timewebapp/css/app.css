@@ -149,7 +149,8 @@ main.background-image-exists {
     padding-bottom: 40px;
 }
 .assignment {
-    box-shadow: 0 0 12px -11px black;
+    --box-shadow: 0 0 12px -10px black;
+    box-shadow: var(--box-shadow);
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
     /* i really could not care less about priority-color being consistent */
     --priority-color: white;
@@ -338,7 +339,7 @@ main.background-image-exists {
     display: none;
 }
 .left-side-of-header .title .title-link-icon {
-    margin-bottom: -2.25px;
+    margin-bottom: -2.5px;
     border-bottom: 1.5px solid var(--color);
     padding-bottom: 3px;
 }
@@ -874,7 +875,7 @@ input[type=number]::-webkit-inner-spin-button {
     line-height: calc(3 * var(--font-size));
 }
 main:not(.background-image-exists) #extra-navs {
-    filter: invert(0.4);
+    filter: invert(0.3);
 }
 main.finished-header-transition #extra-navs {
     visibility: initial;
@@ -915,6 +916,9 @@ main.finished-header-transition #extra-navs {
 
 /* Mobile view */
 @media screen and (max-width: 850px) {
+    .assignment {
+        --box-shadow: 0 0 12px -8px black;
+    }
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
         --outer-assignment-vertical-padding: 7px;

@@ -40,7 +40,7 @@ body {
     --bg-c: calc(var(--primary-c) + 12);
 }
 .assignment {
-    box-shadow: none;
+    --box-shadow: none !important;
 }
 .assignment-header-button:focus, .assignment-header-button:hover {
     --background-color: rgb(86, 116, 129);
@@ -112,7 +112,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     opacity: 1;
 }
 main:not(.background-image-exists) #extra-navs {
-    filter: brightness(0.6);
+    filter: brightness(0.7);
 }
 
 
