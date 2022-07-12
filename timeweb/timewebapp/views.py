@@ -64,12 +64,17 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
     def add_user_models_to_context(self, request):
-        self.context['assignment_models'] = request.user.timewebmodel_set.all()
-        self.context['settings_model'] = request.user.settingsmodel
-        self.context['assignment_models_as_json'] = list(request.user.timewebmodel_set.all().values())
-        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel)
+        # kinda cursed but saves an entire sql query
+        # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
+        # and another in the html
+        timewebmodels = list(request.user.timewebmodel_set.all())
+        self.context['assignment_models'] = timewebmodels
+        self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 
-        del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
+        self.context['settings_model'] = request.user.settingsmodel
+        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=[
+            "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id"]) # Don't use *SettingsForm.Meta.exclude because this isn't a form
+        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
         if not request.user.settingsmodel.seen_latest_changelog:

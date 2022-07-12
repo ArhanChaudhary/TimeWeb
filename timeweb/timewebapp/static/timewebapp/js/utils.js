@@ -1168,7 +1168,7 @@ for (let sa of dat) {
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     utils.reloadAtMidnight();
-    if (SETTINGS.oauth_token.token) ajaxUtils.createGCAssignments();
+    if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
     utils.ui.setClickHandlers.tickButtons();
     utils.ui.setClickHandlers.assignmentsHeaderUI();
     utils.ui.setClickHandlers.assignmentSorting();
