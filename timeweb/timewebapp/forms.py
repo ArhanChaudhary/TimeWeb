@@ -82,7 +82,7 @@ class TimewebForm(forms.ModelForm):
 
         # form instances from update field validation vs from form submission is different
         # Parse ones from form submissions correctly
-        if isinstance(kwargs.get('data', {}).get('x', None), str) and 'due_time' not in kwargs['data']:
+        if isinstance(kwargs.get('data', {}).get('x', None), str) and 'due_time' not in kwargs['data'] and kwargs['data']['x']:
             kwargs['data']['due_time'] = kwargs['data']['x'].split(" ", 1)[1]
             kwargs['data']['due_time'] = datetime.datetime.strptime(kwargs['data']['due_time'], '%I:%M %p').time()
             kwargs['data']['due_time'] = kwargs['data']['due_time'].strftime('%H:%M')
