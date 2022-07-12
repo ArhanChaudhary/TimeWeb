@@ -147,6 +147,14 @@ TEMPLATES = [
 ]
 CONN_MAX_AGE = 15
 
+# Caches are no less more expensive than querying manually in all of timeweb's cases
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'assignment_cache',
+#     }
+# }
+
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
