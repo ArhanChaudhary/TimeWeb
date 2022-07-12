@@ -31,6 +31,7 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from httplib2.error import ServerNotFoundError
 
 # Misc
+from django.db import transaction
 from utils import days_between_two_dates, utc_to_local
 from views import logger
 from django.utils.decorators import decorator_from_middleware
@@ -74,35 +75,36 @@ def save_assignment(request):
     if len(assignments) > settings.MAX_NUMBER_ASSIGNMENTS:
         return HttpResponse("ur pretty sus", status=400)
 
-    # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
-    for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['pk'], assignments), user=request.user):
-        assignment = next(i for i in assignments if i.get('pk', None) == sm.pk)
+    with transaction.atomic():
+        # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
+        for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['pk'], assignments), user=request.user):
+            assignment = next(i for i in assignments if i.get('pk', None) == sm.pk)
 
-        for key, value in assignment.items():
-            if key == "x":
-                # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
-                assignment[key] = datetime.datetime.fromtimestamp(value, timezone.utc)
-            elif key == "due_time":
-                assignment[key] = datetime.time(**value)
-            if isinstance(value, float):
-                assignment[key] = round(value, getattr(TimewebModel, key).field.decimal_places)
-        
-        # see api.change_setting for why 64baf5 doesn't work here
-        model_fields = model_to_dict(sm)
-        model_fields.update(assignment)
-        # After poking around a bit I found out that is_valid validates foreign keys with database hits which could bump up the number of database hits to O(n)
-        # aka a huge no no
-        del model_fields['user']
-        # do NOT setattr a primary key that would be a huge fricking mess
-        del assignment['pk']
-        validation_form = TimewebForm(data=model_fields)
-        if not validation_form.is_valid():
-            assignment = {field: value for field, value in assignment.items() if field not in validation_form.errors}
+            for key, value in assignment.items():
+                if key == "x":
+                    # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
+                    assignment[key] = datetime.datetime.fromtimestamp(value, timezone.utc)
+                elif key == "due_time":
+                    assignment[key] = datetime.time(**value)
+                if isinstance(value, float):
+                    assignment[key] = round(value, getattr(TimewebModel, key).field.decimal_places)
+            
+            # see api.change_setting for why 64baf5 doesn't work here
+            model_fields = model_to_dict(sm)
+            model_fields.update(assignment)
+            # After poking around a bit I found out that is_valid validates foreign keys with database hits which could bump up the number of database hits to O(n)
+            # aka a huge no no
+            del model_fields['user']
+            # do NOT setattr a primary key that would be a huge fricking mess
+            del assignment['pk']
+            validation_form = TimewebForm(data=model_fields)
+            if not validation_form.is_valid():
+                assignment = {field: value for field, value in assignment.items() if field not in validation_form.errors}
 
-        if not assignment: continue
-        for key, value in assignment.items():
-            setattr(sm, key, value)
-        sm.save()
+            if not assignment: continue
+            for key, value in assignment.items():
+                setattr(sm, key, value)
+            sm.save()
     return HttpResponse(status=204)
 
 @require_http_methods(["PATCH"])
