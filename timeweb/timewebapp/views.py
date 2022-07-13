@@ -4,7 +4,7 @@
 
 # Abstractions
 from django.shortcuts import get_object_or_404, redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import logout, login
 from django.forms import ValidationError

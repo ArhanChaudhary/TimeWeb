@@ -7,7 +7,7 @@ chardet==4.0.0
 charset-normalizer==2.0.4
 cryptography==36.0.0
 defusedxml==0.7.1
-Django==3.2.14
+Django==4.0.6
 django-allauth==0.49.0
 django-cleanup==5.2.0
 django-colorfield==0.4.3
@@ -16,7 +16,7 @@ django-csp==3.7
 django-livereload-server==0.4
 django-minify-html==1.2.0
 django-multiselectfield==0.1.12
-django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@1dcaeee2c7b3c820fdaf3a14a871c11a83829290
+django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@d7eac037cfceab8be0c23cacf0c1865ae3243969
 django-storages==1.12.3
 django-timezone-field==4.2.1
 google-api-core==2.0.1

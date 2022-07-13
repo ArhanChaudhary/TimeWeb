@@ -2,7 +2,7 @@
 
 # Abstractions
 from django.shortcuts import get_object_or_404, redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from django.http import HttpResponse, QueryDict
 from django.utils import timezone

@@ -1,6 +1,6 @@
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
 from allauth.account.forms import *
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from views import User
 from django.contrib import messages

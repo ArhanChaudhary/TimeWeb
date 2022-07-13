@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from timezone_field import TimeZoneField

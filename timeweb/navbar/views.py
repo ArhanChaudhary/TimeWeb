@@ -3,7 +3,7 @@
 # Abstractions
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse_lazy # source code uses this instead of reverse for some reason
 from django.shortcuts import redirect
 from views import TimewebGenericView
