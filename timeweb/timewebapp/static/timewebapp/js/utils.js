@@ -135,9 +135,6 @@ setClickHandlers: {
             const dom_assignment = $this.parents(".assignment");
 
             // .sort is already called in the controls' click handlers
-            const old_enable_tutoral = SETTINGS.enable_tutorial;
-            SETTINGS.enable_tutorial = false;
-
             if (!dom_assignment.hasClass("has-been-clicked")) {
                 new VisualAssignment(dom_assignment).initUI();
             }
@@ -147,12 +144,11 @@ setClickHandlers: {
             } else {
                 dom_assignment.find(".work-input-textbox").val("fin");
                 dom_assignment.find(".submit-work-button").click();
-                // THe "Close graph after work input" setting handles all of this ux for us
+                // The "Close graph after work input" setting handles all of this ux for us
                 // if (dom_assignment.hasClass('open-assignment') && $this.hasClass("slashed")) {
                 //     dom_assignment.click();
                 // }
             }
-            SETTINGS.enable_tutorial = old_enable_tutoral;
         });
     },
     assignmentsHeaderUI: function() {
