@@ -519,7 +519,8 @@ class VisualAssignment extends Assignment {
             screen.lineWidth = 2;
             screen.stroke();
             screen.fillStyle = this.getDefaultFontColor();
-        } else {
+        // isTouchDevice condition because setting skew ratio while hover point is enabled causes this to be ran because raw_x is NaN and for the hover point to disappear
+        } else if (isTouchDevice) {
             hover_point_label.addClass("hide-label");
             this.draw_mouse_point = false;
         }
