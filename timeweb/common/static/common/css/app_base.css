@@ -11,6 +11,9 @@ body {
     --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
+
+    --body-background: rgb(247, 247, 247);
+    background-color: var(--body-background);
 }
 select {
     color: var(--color); /* doesn't inherit properly */
@@ -34,6 +37,18 @@ select, .daterangepicker select:not(#dummyforspecifityurmomisprettythick) {
     background-position: right 3px top 55%;
     background-repeat: no-repeat;
 }
+
+/* https://stackoverflow.com/questions/23372903/hide-up-down-arrow-buttons-spinner-in-input-number-firefox-29#answer-23374725 */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 header {
     --background-color: rgb(13, 26, 38);
     width: 100%;
@@ -151,11 +166,6 @@ main.finished-header-transition {
 }
 #logo-container img {
     display: block;
-}
-body {
-    margin: 0;
-    --body-background: rgb(247, 247, 247);
-    background-color: var(--body-background);
 }
 #site {
     position: relative;

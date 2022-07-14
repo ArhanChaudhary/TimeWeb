@@ -6,9 +6,6 @@
     --error-note-color: hsl(353deg, 77%, 50%);
     --field-widget-background-color: hsl(0, 0%, 97%);
 }
-#form-wrapper input[type=number]::-webkit-inner-spin-button {
-    display: none;
-}
 /* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
 #form-wrapper .field-wrapper > textarea:focus {

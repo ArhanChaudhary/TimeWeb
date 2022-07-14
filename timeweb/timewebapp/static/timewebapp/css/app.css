@@ -853,13 +853,6 @@ main.background-image-exists {
 .work-input-textbox {
     width: 123px;
 }
-input[type=number]::-webkit-inner-spin-button {
-    cursor: pointer;
-    opacity: 1 !important;
-    border-left: 1px solid #d8d8d8;
-    height: 20px;
-}
-
 #extra-navs {
     position: absolute;
     bottom: 0;
