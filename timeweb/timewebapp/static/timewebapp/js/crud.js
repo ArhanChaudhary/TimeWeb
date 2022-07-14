@@ -2,11 +2,7 @@ class Crud {
     static getDefaultAssignmentFormFields = _ => ({
         "#id_name": '',
         "#id_assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
-        "#id_x_daterangepicker": (function() {
-            const due_time = new Date(date_now.valueOf());
-            due_time.setMinutes(SETTINGS.def_due_time.hour * 60 + SETTINGS.def_due_time.minute);
-            return moment(due_time);
-        })(),
+        "#id_x_daterangepicker": moment(new Date(date_now.valueOf())),
         "#id_x": (function() {
             $("#due-date-empty").click();
             return "";
@@ -28,7 +24,6 @@ class Crud {
             "#id_x_daterangepicker": (function() {
                 const due_date = new Date(sa.assignment_date.valueOf());
                 if (!sa.complete_x) {
-                    due_date.setMinutes(SETTINGS.def_due_time.hour * 60 + SETTINGS.def_due_time.minute);
                     return moment(due_date);
                 }
                 due_date.setDate(due_date.getDate() + Math.floor(sa.complete_x));

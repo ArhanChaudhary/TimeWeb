@@ -67,11 +67,7 @@ class SettingsForm(forms.ModelForm):
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
-
-        # See explanation in TimewebForm.__init__
-        if isinstance(kwargs.get('data', {}).get('def_due_time', None), str):
-            kwargs['data']['def_due_time'] = datetime.datetime.strptime(kwargs['data']['def_due_time'], '%I:%M %p').time()
-            kwargs['data']['def_due_time'] = kwargs['data']['def_due_time'].strftime('%H:%M')
+        # See explanation in TimewebForm.__init__ if i want to parse time inputs for future time field settings
 
         super().__init__(*args, **kwargs)
         assert not self.is_bound or 'data' in kwargs, 'pls specify the data kwarg for readibility'

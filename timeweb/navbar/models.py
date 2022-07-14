@@ -60,10 +60,6 @@ class SettingsModel(models.Model):
         null=True,
         verbose_name=_('Default Work Days'),
     )
-    def_due_time = models.TimeField(
-        default=get_midnight_time,
-        verbose_name=_('Default Due Time'),
-    )
 
     # Group "Assignment Graph"
     def_skew_ratio = models.DecimalField(

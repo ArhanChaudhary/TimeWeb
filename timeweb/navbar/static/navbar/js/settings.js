@@ -1,18 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
-    $("#id_def_due_time").daterangepicker({
-        buttonClasses: "generic-button",
-        parentEl: "main",
-        showDropdowns: true,
-        timePicker: true,
-        singleDatePicker: true,
-        locale: {
-            format: 'h:mm A'
-        }
-    }).on('show.daterangepicker', function (e, picker) {
-        picker.container.find(".calendar-table").hide();
-    });
     $("#reset-settings-button").click(function() {
         $.confirm({
             title: "Are you sure you want to reset your settings?",
@@ -37,10 +25,6 @@ document.addEventListener("DOMContentLoaded", function() {
                             switch (key) {
                                 case "def_break_days":
                                     $("#break-days-wrapper input").prop("checked", false);
-                                    continue;
-                                case "def_due_time":
-                                    assert(value === "00:00:00");
-                                    $("#id_def_due_time").data("daterangepicker").setStartDate(moment(new Date().setHours(0, 0, 0, 0)));
                                     continue;
                             }
                             if ($input.prop("jscolor")) {
