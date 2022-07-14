@@ -165,6 +165,13 @@ class VisualAssignment extends Assignment {
         this.dom_assignment.addClass("has-been-clicked");
         first_click && this.setGraphButtonEventListeners();
         this.resize();
+        // setParabolaValues won't run in resize in fixed mode
+        // Clicking the tick button before doing anything else on the page will then call .funct when setParabolaValues hasn't yet been ran
+        // A solution could be to run setParabolaValues every time in resize but that feels like an avoidable performance hit
+        // Instead run it if it hasn't yet at the end of initUI
+        if (this.a === undefined) {
+            this.setParabolaValues();
+        }
     }
     resize(e={}) {
         // this method is still ran for assignments that have already been deleted, which messes up global VisualAssignment variables
