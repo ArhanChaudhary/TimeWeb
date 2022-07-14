@@ -174,6 +174,7 @@ class SettingsModel(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        # allow change setting form validation without a user
         null=True,
         blank=True,
     )

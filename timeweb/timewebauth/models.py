@@ -1,10 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.validators import *
+
+class LabeledUnicodeUsernameValidator(UnicodeUsernameValidator):
+    message = _("Please enter a username that only contains letters, numbers, and @/./+/-/_ characters")
 
 class TimewebUser(AbstractUser):
-    username_validator = UnicodeUsernameValidator()
+    # Make sure to create own validator class for custom error messages if I decide to add future validators from django.contrib.auth.validators
+    username_validator = LabeledUnicodeUsernameValidator()
 
     username = models.CharField(
         _('username'),

@@ -148,6 +148,7 @@ class TimewebModel(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        # allow save assignment form validation without a user
         null=True,
         blank=True,
     )
