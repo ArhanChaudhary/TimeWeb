@@ -237,6 +237,9 @@ main.background-image-exists {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    /* safari focusing on elements with pseudoelements with transform is really buggy
+    it doesn't help that safari is also annoyingly uncooperative in possible workarounds
+    im just going to leave this visual glitch in and let the users question themselves why they use safari */
     transform: scale(2.6);
     left: 0;
     top: 0;

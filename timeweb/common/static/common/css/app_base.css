@@ -88,8 +88,9 @@ header > * {
     position: absolute;
 }
 #image-new-container img {
-    transform: scale(0.7);
     filter: hue-rotate(92deg);
+    margin-right: 9px;
+    margin-left: 9px;
 }
 #new-assignment-text {
     margin-left: 4px;
