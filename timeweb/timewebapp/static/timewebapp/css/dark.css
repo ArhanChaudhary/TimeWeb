@@ -8,6 +8,9 @@ body {
     --input-focus-color: hsl(210deg, 71%, 57%);
     --form-placeholder-color: hsl(0, 0%, 66%);
 }
+select {
+    --dropdown-arrow: var(--dropdown-arrow-darkmode);
+}
 #form-wrapper form {
     --field-widget-background-color: hsl(0deg, 0%, 19%);
 }
@@ -125,9 +128,8 @@ main:not(.background-image-exists) #extra-navs {
 .daterangepicker th.available:hover {
     background-color: hsl(0, 0%, 30%);
 }
-.daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect {
-    background: revert;
-    border: revert;
+.daterangepicker select {
+    --border-color: var(--color) !important;
 }
 
 .jconfirm.jconfirm-light .jconfirm-box {

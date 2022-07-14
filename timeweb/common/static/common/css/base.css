@@ -17,9 +17,12 @@ input, textarea {
     /* Mobile */
     -webkit-appearance: none;
     border-style: solid;
-    padding: 1px 2px;
+    padding: 2px;
     /* Firefox */
     filter: none;
+}
+select {
+    border-radius: 0;
 }
 textarea {
     resize: none;

@@ -116,7 +116,8 @@ main.background-image-exists {
     padding-left: 15px;
 }
 #id_assignment_sorting {
-    padding: 0;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
     text-align: initial;
     height: 22px;
 }
@@ -223,7 +224,8 @@ main.background-image-exists {
     left: unset;
 }
 #autofill-selection {
-    padding: 0 1px;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
     vertical-align: top;
     font-size: 10pt;
 }

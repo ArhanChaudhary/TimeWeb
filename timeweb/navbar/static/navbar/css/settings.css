@@ -52,6 +52,7 @@ body {
 .right-side-of-field > textarea,
 .right-side-of-field > select {
     font-size: 14px;
+    border-width: 1px;
 }
 .right-side-of-field > input:not([type="file"]) {
     border: 1px solid black;
