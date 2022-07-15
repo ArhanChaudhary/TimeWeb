@@ -172,9 +172,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
-            if isinstance(self.sm.y, (int, float)) and self.sm.y < 1:
-                # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
-                self.sm.y = 1
+            try:
+                if self.sm.y < 1:
+                    # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
+                    self.sm.y = 1
+            except TypeError:
+                pass
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
@@ -204,7 +207,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             except TypeError:
                 pass
 
-        if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit:
+        if self.sm.assignment_date is None or self.sm.x is None and self.sm.y is None:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
             self.sm.works = [str(first_work)]
@@ -232,67 +235,78 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if removed_works_start < 0:
                     removed_works_start = 0
 
+            min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
             if self.sm.x == None:
-                min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
-                
-                # The purpose of this part of the code is to take into account the adjusted assignment date
-                # and make it look like the graph smoothly "chops off" previous work inputs
-                # some mathy legacy reference:
+                if self.sm.y == None:
+                    # won't ever run because it will be marked as needs more info earlier
+                    pass
+                else:
+                    # The purpose of this part of the code is to take into account the adjusted assignment date
+                    # and make it look like the graph smoothly "chops off" previous work inputs
+                    # some mathy legacy reference:
 
-                # ctime * (y - new_first_work) = min_work_time_funct_round * x
-                # x = ctime * (y - new_first_work) / min_work_time_funct_round
-                # Solve for new_first_work:
-                # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
-                # new_first_work is when n = removed_works_start
-                # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
+                    # ctime * (y - new_first_work) = min_work_time_funct_round * x
+                    # x = ctime * (y - new_first_work) / min_work_time_funct_round
+                    # Solve for new_first_work:
+                    # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                    # new_first_work is when n = removed_works_start
+                    # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
 
-                # There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
-                # This is a condition from the below code that redefines works
-                # However it does not take into account capping removed_works_end at end_of_works
-                # However, end_of_works is dependent on x, creating a deadlock
-                # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
-                if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
-                    new_first_work = first_work
-                elif self.updated_assignment:
-                    new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
-                x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
+                    # There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
+                    # This is a condition from the below code that redefines works
+                    # However it does not take into account capping removed_works_end at end_of_works
+                    # However, end_of_works is dependent on x, creating a deadlock
+                    # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
+                    if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
+                        new_first_work = first_work
+                    elif self.updated_assignment:
+                        new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
+                    # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
+                    x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
 
-                if not x_num or len(self.sm.break_days) == 7:
-                    x_num = 1
-                elif self.sm.break_days:
-                    guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
-                    assign_day_of_week = self.sm.assignment_date.weekday()
-                    red_line_start_x = self.sm.blue_line_start
+                    if not x_num or len(self.sm.break_days) == 7:
+                        x_num = 1
+                    elif self.sm.break_days:
+                        guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
+                        assign_day_of_week = self.sm.assignment_date.weekday()
+                        red_line_start_x = self.sm.blue_line_start
 
-                    # Terrible implementation of inversing calcModDays
-                    xday = assign_day_of_week + red_line_start_x
-                    mods = [0]
-                    mod_counter = 0
-                    for mod_day in range(6):
-                        if (xday + mod_day) % 7 in self.sm.break_days:
-                            mod_counter += 1
-                        mods.append(mod_counter)
-                    mods = tuple(mods)
+                        # Terrible implementation of inversing calcModDays
+                        xday = assign_day_of_week + red_line_start_x
+                        mods = [0]
+                        mod_counter = 0
+                        for mod_day in range(6):
+                            if (xday + mod_day) % 7 in self.sm.break_days:
+                                mod_counter += 1
+                            mods.append(mod_counter)
+                        mods = tuple(mods)
 
-                    while 1:
-                        guess_x += 1
-                        if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
-                            x_num = max(1, guess_x)
-                            break
-                # Make sure assignments arent finished by x_num
-                # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
-                if self.sm.assignment_date < date_now:
-                    # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
-                    # x_num = (date_now - self.sm.assignment_date).days + x_num
-                    # x_num += (date_now - self.sm.assignment_date).days
-                    x_num += days_between_two_dates(date_now, self.sm.assignment_date)
-                try:
-                    self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
-                except OverflowError:
-                    self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+                        while 1:
+                            guess_x += 1
+                            if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
+                                x_num = max(1, guess_x)
+                                break
+                    # Make sure assignments arent finished by x_num
+                    # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
+                    if self.sm.assignment_date < date_now:
+                        # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
+                        # x_num = (date_now - self.sm.assignment_date).days + x_num
+                        # x_num += (date_now - self.sm.assignment_date).days
+                        x_num += days_between_two_dates(date_now, self.sm.assignment_date)
+                    try:
+                        self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
+                    except OverflowError:
+                        self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
+                        self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
             else:
                 x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
+                if self.sm.y == None:
+                    complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
+                    # the prediction for due date is ceiled so also ceil the prediction for y for consistency
+                    self.sm.y = ceil(min_work_time_funct_round / self.sm.time_per_unit * complete_x_num)
+                else:
+                    # we already have x_num and y and we don't need to do any further processing
+                    pass
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
 
