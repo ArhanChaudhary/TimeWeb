@@ -341,8 +341,8 @@ class Crud {
 
             if (sa.name === EXAMPLE_ASSIGNMENT_NAME) {
                 $.alert({
-                    title: "You cannot modify the example assignment",
-                    content: "Don't worry, you can modify everything else"
+                    title: "You cannot modify the example assignment.",
+                    content: "Don't worry, you can modify everything else."
                 });
                 return;
             }
@@ -476,7 +476,7 @@ class Crud {
             );
 
             $.alert({
-                title: `This assignment's step size has been automatically changed from ${original_funct_round} to ${$("#id_funct_round").val()}`,
+                title: `This assignment's step size has been automatically changed from ${original_funct_round} to ${$("#id_funct_round").val()}`, // don't put a period because it could look weird proceeding a number
                 content: "This helps prevent you from unnecessarily working longer than your minimum work time and ensures a smoother work schedule. The step size can be edited and overridden in the advanced inputs.",
                 onClose: function() {
                     alert_already_shown = true;

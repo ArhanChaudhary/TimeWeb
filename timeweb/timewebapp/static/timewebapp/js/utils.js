@@ -916,7 +916,7 @@ exampleAccountAlertTutorial: function() {
     if (sessionStorage.getItem("already-alerted-example-account")) return;
     sessionStorage.setItem("already-alerted-example-account", true);
     $.alert({
-        title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear perspective of how you should expect TimeWeb to look like<br><br>Feel free to look around or make any changes you want to any assignment",
+        title: "Hey there! Thanks for checking out the example account. Here, you'll get a clear perspective of how you should expect TimeWeb to look like<br><br>Feel free to look around or make any changes you want to any assignment.",
         backgroundDismiss: false,
     });
 },
