@@ -57,7 +57,7 @@ Assignment.prototype.setParabolaValues = function() {
     }
     // funct_y and funct_zero may not always be accurate in that -b/a and y1 may not be the actual funct_zero and funct_y
     // Trying to make these more accurate would require knowing whether funct rounds to min_work_time_funct_round or funct_round at -b/a and y1
-    // It probably is possible to avoid a deadlock, but I don't have the time to attempt fixing this
+    // TODO: It probably is possible to avoid a deadlock
     if (this.a <= 0 || this.b > 0) {
         var funct_zero = 0;
     } else {
@@ -106,6 +106,7 @@ Assignment.prototype.setParabolaValues = function() {
 
     left = 0;
     right = Math.ceil(this.return_y_cutoff);
+    // TODO: https://github.com/ArhanChaudhary/TimeWeb/issues/5
     while (left < right) {
         const mid = left + Math.floor((right - left) / 2);
 
@@ -164,9 +165,9 @@ Assignment.prototype.setParabolaValues = function() {
         // With early due times, return_y_cutoff may be on the last day, resulting in situations where you would have to work past midnight until the due time
         // To help prevent this, we need to see if working on the last day would result in a slope that violates the minimum work time (NOT min_work_time_funct_round because the user only cares about 
         // their inputted minimum work time. Another reason to use this is because the last day of an assignment doesn't really care about the step size)
-        // If it does, simply decrement the cutoff
+        // If it does, simply decrement the cutoff (another way to think of this is by forcing the ignore ends setting to be off for the last day if it has a due time)
 
-        // Another possible way of going about this issue is to do a similar sort of check before return_y_cutoff is set
+        // TODO: Another possible way of going about this issue is to do a similar sort of check before return_y_cutoff is set
         // This check, if activated, would simulate a work schedule without a due time to ensure work isnt assigned to the last day with the due time
         // However, this would be much harder to code. I may implement this in the future as this could possibly be more accurate, but see no reason to as my current implementation is accurate enough
         this.return_0_cutoff = NaN; // ensure funct never returns early for this cutoff
@@ -357,8 +358,6 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
     // Using WLS, we can put a lot of weight on (0,0) and (x1_from_blue_line_start, y1_from_blue_line_start) to ensure the curve is valid by passing through these two points
     // NOTE: don't worry about the fact that a large weight doesn't cause the parabola to exactly pass through these points. The a and b values are converted to valid skew ratio values
 
-    // Thanks to RedBlueBird (https://github.com/RedBlueBird) for this algorithm!
-    // https://github.com/ArhanChaudhary/TimeWeb/issues/3
     const x_matrix = works_without_break_days.map((work_input, work_input_index) => 
         [
             Math.min(work_input_index, x1_from_blue_line_start), 
@@ -375,6 +374,8 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
 
     let autotuned_skew_ratio;
     if (y_matrix.length >= 3) {
+        // Thanks to RedBlueBird (https://github.com/RedBlueBird) for this part!
+        // https://github.com/ArhanChaudhary/TimeWeb/issues/3
         const X = new mlMatrix.Matrix(x_matrix);
         const Y = new mlMatrix.Matrix(y_matrix);
 
@@ -386,6 +387,7 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
         result = mlMatrix.inverse(T.mmul(X)).mmul(T).mmul(Y)
         let a = result.data[1][0];
         let b = result.data[0][0];
+        // End of contribution
 
         // The second part's goal is to now "transfer" the skew ratio value from x1_from_blue_line_start to x1
         // Although it may seem reasonable to just directly transfer the exact skew ratio value, this isn't actually ideal
