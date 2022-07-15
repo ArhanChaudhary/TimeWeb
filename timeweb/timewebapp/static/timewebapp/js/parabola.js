@@ -161,7 +161,10 @@ Assignment.prototype.setParabolaValues = function() {
     }
 
 
-    if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
+    if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute) 
+        // this could be a quite controversial decision to disable this check; I'll let my message in #suggestions do the talking:
+        // https://canary.discord.com/channels/832155860306362438/842171586295758858/997343202292023356
+        && 0) {
         // With early due times, return_y_cutoff may be on the last day, resulting in situations where you would have to work past midnight until the due time
         // To help prevent this, we need to see if working on the last day would result in a slope that violates the minimum work time (NOT min_work_time_funct_round because the user only cares about 
         // their inputted minimum work time. Another reason to use this is because the last day of an assignment doesn't really care about the step size)
