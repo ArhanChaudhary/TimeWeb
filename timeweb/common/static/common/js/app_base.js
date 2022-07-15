@@ -217,13 +217,16 @@ sendAttributeAjax: function() {
         url: '/api/save-assignment',
         data: {assignments: JSON.stringify(ajaxUtils.sendAttributeAjax.assignments)},
         error: function(response) {
-            if (response.status === 413) {
-                $.alert({
-                    title: "An assignment has too many work inputs and can no longer be saved.",
-                    content: "Change its assignment date to today to truncate its work inputs and continue using it.",
-                    backgroundDismiss: false,
-                });
-                return;
+            switch (response.status) {
+                case 413: {
+                    const assignment_with_most_work_inputs = dat.reduce((i,j) => i.works.length > j.works.length ? i : j);
+                    $.alert({
+                        title: `"${assignment_with_most_work_inputs.name}" has too many work inputs and can no longer be saved.`,
+                        content: "Change its assignment date to today to truncate its work inputs and continue using it.",
+                        backgroundDismiss: false,
+                    });
+                    return;
+                }
             }
             ajaxUtils.error.bind(this)(...arguments);
         },
