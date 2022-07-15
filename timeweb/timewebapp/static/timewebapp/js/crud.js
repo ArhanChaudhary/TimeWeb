@@ -163,6 +163,29 @@ class Crud {
             }, 0);
         }).on('cancel.daterangepicker', function(e, picker) {
             $(this).val(old_due_date_val);
+        }).on('apply.daterangepicker', function(e, picker) {
+            if (6 <= picker.startDate.hours() && picker.startDate.hours() <= 11)
+            $.alert({
+                title: "Your due time is early.",
+                content: "For an assignment due in the morning, TimeWeb assigns work past midnight on the day it is due. To avoid this, set the due time to midnight (i.e. before you sleep)",
+                backgroundDismiss: false,
+                buttons: {
+                    ignore: function() {
+                        
+                    },
+                    "Set to midnight": {
+                        action: function() {
+                            picker.setStartDate(picker.startDate.startOf("day"));
+                            $("#id_x").trigger("hide.daterangepicker");
+                        },
+                    },
+                    "Set to your sleep time": {
+                        action: function() {
+                            $("#id_x").click();
+                        },
+                    },
+                },
+            });
         });
         $("#due-date-empty").click(function() {
             $("#id_x").val("");
