@@ -211,7 +211,7 @@
                   <span class="title">
                     {% if assignment.google_classroom_assignment_link %}
                       {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
-                      <a class="title-link-anchor" target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="-1">
+                      <a class="title-link-anchor" target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="-1">
                         {{ assignment.name }}
                         <svg class="title-link-icon" width="12" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
                           <use href="#external_link-svg"></use>
@@ -240,7 +240,7 @@
                   <span class="completion-time"></span>
                 </div>
                 {% if assignment.google_classroom_assignment_link %}
-                  <a target="_blank" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
+                  <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
                     <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
                       <use href="#external_link-svg"></use>
                     </svg>
