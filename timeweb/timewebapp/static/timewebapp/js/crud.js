@@ -468,7 +468,7 @@ class Crud {
         });
         $("#id_description").expandableTextareaHeight();
         let alert_already_shown = false;
-        $("#id_min_work_time, #id_time_per_unit").on("focusout", () => {
+        $("#id_y, #id_funct_round, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             
             if (!(
                 // Criteria for doing this alert
@@ -483,24 +483,10 @@ class Crud {
                 +$("#id_time_per_unit").val() > +$("#id_min_work_time").val() &&
                 !alert_already_shown
             )) return;
-            const original_funct_round = +$("#id_funct_round").val();
-            // funct_round * time_per_unit * y = min_work_time
-            // funct_round * time_per_unit = min_work_time
-            // funct_round = min_work_time / time_per_unit
-            $("#id_funct_round").val(
-                Math.max(Crud.STEP_SIZE_AUTO_LOWER_ROUND, // Don't want this to round to 0
-                    mathUtils.precisionRound(
-                        Crud.STEP_SIZE_AUTO_LOWER_ROUND * Math.round(
-                            $("#id_min_work_time").val() / $("#id_time_per_unit").val()
-                            / Crud.STEP_SIZE_AUTO_LOWER_ROUND
-                        )
-                    , 10)
-                )
-            );
 
             $.alert({
-                title: `This assignment's step size has been automatically changed from ${original_funct_round} to ${$("#id_funct_round").val()}`, // don't put a period because it could look weird proceeding a number
-                content: "This helps prevent you from unnecessarily working longer than your minimum work time and ensures a smoother work schedule. The step size can be edited and overridden in the advanced inputs.",
+                title: "This assignment is <b>strongly not recommended</b> to be created with only one unit of work in this manner.",
+                content: "Please consider splitting up your assignment into either 1) smaller and more plentiful units of work or 2) units of time, by clearing the name of each unit of work field.",
                 onClose: function() {
                     alert_already_shown = true;
                 }
