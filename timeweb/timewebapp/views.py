@@ -208,7 +208,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             except TypeError:
                 pass
 
-        if self.sm.assignment_date is None or self.sm.x is None and self.sm.y is None:
+        if self.sm.assignment_date is None or self.sm.time_per_unit is None or \
+            self.sm.x is None and self.sm.y is None:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
             self.sm.works = [str(first_work)]
