@@ -208,6 +208,7 @@ class Crud {
             $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
             $("form input:visible").first().focus();
         }
+        Crud.one_unit_of_work_alert_already_shown = false;
         that.old_unit_value = undefined;
         that.replaceUnit();
 
@@ -467,7 +468,7 @@ class Crud {
             }
         });
         $("#id_description").expandableTextareaHeight();
-        let alert_already_shown = false;
+        Crud.one_unit_of_work_alert_already_shown = false;
         $("#id_y, #id_funct_round, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             
             if (!(
@@ -481,14 +482,14 @@ class Crud {
                 +$("#id_time_per_unit").val() &&
                 // Make sure the new funct_round value is less than 1
                 +$("#id_time_per_unit").val() > +$("#id_min_work_time").val() &&
-                !alert_already_shown
+                !Crud.one_unit_of_work_alert_already_shown
             )) return;
 
             $.alert({
                 title: "This assignment is <b>strongly not recommended</b> to be created with only one unit of work in this manner.",
                 content: "Please consider splitting up your assignment into either 1) smaller and more plentiful units of work or 2) units of time, by clearing the name of each unit of work field.",
                 onClose: function() {
-                    alert_already_shown = true;
+                    Crud.one_unit_of_work_alert_already_shown = true;
                 }
             })
         });
