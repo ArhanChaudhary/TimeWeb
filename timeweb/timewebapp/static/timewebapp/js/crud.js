@@ -173,15 +173,15 @@ class Crud {
                     ignore: function() {
                         
                     },
-                    "Set to midnight": {
-                        action: function() {
-                            picker.setStartDate(picker.startDate.startOf("day"));
-                            $("#id_x").trigger("hide.daterangepicker");
-                        },
-                    },
                     "Set to your sleep time": {
                         action: function() {
                             $("#id_x").click();
+                        },
+                    },
+                    "Set to midnight": {
+                        action: function() {
+                            picker.setStartDate(picker.startDate.startOtf("day"));
+                            $("#id_x").trigger("hide.daterangepicker");
                         },
                     },
                 },
