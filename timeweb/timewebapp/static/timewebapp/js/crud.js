@@ -169,7 +169,7 @@ class Crud {
                     },
                     "Set to midnight": {
                         action: function() {
-                            picker.setStartDate(picker.startDate.startOtf("day"));
+                            picker.setStartDate(picker.startDate.startOf("day"));
                         },
                     },
                 },
