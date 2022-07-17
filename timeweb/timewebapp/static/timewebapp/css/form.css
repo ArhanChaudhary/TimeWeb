@@ -55,6 +55,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     border-radius: 15px;
     padding: 5px 15px 25px;
     position: relative;
+    letter-spacing: 0.5px;
 }
 #form-wrapper #cancel-button {
     position: absolute;
@@ -276,48 +277,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper .field-wrapper:not(.has-widget) .field-widget {
     display: none;
-}
-
-
-
-#form-wrapper #due-date-empty {
-    position: absolute;
-    left: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background-color: var(--color);
-    cursor: pointer;
-    transform: translateX(var(--vertical-form-padding))
-                translateX(var(--due-date-text-width, -100vw))
-                translateX(var(--magic-wand-width))
-                translateY(33px);
-}
-#form-wrapper #due-date-empty::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: scale(4);
-}
-#form-wrapper .due-date-empty-icon-slash {
-    width: 2px;
-    height: 8px;
-    position: absolute;
-    background-color: var(--body-background);
-}
-#form-wrapper #due-date-text-measurer {
-    visibility: hidden;
-    font-size: 0.83em;
-    position: absolute;
-}
-#form-wrapper #id_x, #form-wrapper, #due-date-text-measurer, #form-wrapper #id_assignment_date {
-    letter-spacing: 0.5px;
 }
 
 

@@ -3,10 +3,7 @@ class Crud {
         "#id_name": '',
         "#id_assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
         "#id_x_daterangepicker": moment(new Date(date_now.valueOf())),
-        "#id_x": (function() {
-            $("#due-date-empty").click();
-            return "";
-        })(),
+        "#id_x": "",
         "#id_soft": false,
         "#id_unit": '',
         "#id_y": '',
@@ -153,16 +150,6 @@ class Crud {
         }).on('show.daterangepicker', function(e, picker) {
             old_due_date_val = $(this).val();
             picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
-        }).on('hide.daterangepicker', function(e, picker) {
-            setTimeout(() => { // So cancel.daterangepicker runs first
-                if (["", "Predicted"].includes($(this).val())) {
-                    $("#due-date-empty").click();
-                    return;
-                }
-
-                $("#form-wrapper #due-date-text-measurer").text($(this).val());
-                $(this).parents(".field-wrapper").css("--due-date-text-width", $("#form-wrapper #due-date-text-measurer").width() + "px");
-            }, 0);
         }).on('cancel.daterangepicker', function(e, picker) {
             $(this).val(old_due_date_val);
         }).on('apply.daterangepicker', function(e, picker) {
@@ -183,17 +170,10 @@ class Crud {
                     "Set to midnight": {
                         action: function() {
                             picker.setStartDate(picker.startDate.startOtf("day"));
-                            $("#id_x").trigger("hide.daterangepicker");
                         },
                     },
                 },
             });
-        });
-        $("#due-date-empty").click(function() {         
-            if ($("#id_x").val() !== "Predicted")
-                // for hide.daterangepicker
-                $("#id_x").val("");
-            $(this).parents(".field-wrapper").prop("style").removeProperty("--due-date-text-width");
         });
         that.setCrudHandlers();
         that.addInfoButtons();
@@ -236,7 +216,6 @@ class Crud {
         that.old_unit_value = undefined;
         that.replaceUnit();
 
-        $("#id_x").trigger("hide.daterangepicker"); // already a setTimeout in hide.daterangepicker
         setTimeout(function() {
             $("#id_description").trigger("input");
             if ($("#form-wrapper #second-field-group .invalid").length) {
@@ -398,7 +377,7 @@ class Crud {
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
-                $("#form-wrapper .field-wrapper:not(.hide-field) > :not(label, #due-date-empty, .magic-wand-icon, .dont-mark-invalid-if-empty, .info-button)").each(function() {
+                $("#form-wrapper .field-wrapper:not(.hide-field) > :not(label, .magic-wand-icon, .dont-mark-invalid-if-empty, .info-button)").each(function() {
                     $(this).toggleClass("invalid", !$(this).val());
                 });
             }
@@ -467,7 +446,6 @@ class Crud {
             const field_wrapper = $(this).parents(".field-wrapper");
             const field_wrapper_input = field_wrapper.find(Crud.ALL_FOCUSABLE_FORM_INPUTS).not(".field-widget-checkbox");
             field_wrapper.toggleClass("disabled-field");
-            field_wrapper.find("#due-date-empty").click(); // for due date field
 
             if (field_wrapper.attr("original-type") === undefined)
                 field_wrapper.attr("original-type", field_wrapper_input.attr("type"));

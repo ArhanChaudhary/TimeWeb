@@ -72,16 +72,7 @@
                 {% include 'timewebapp/widgets/work_days.html' %}
               {% else %}
                 {{ field.label_tag }}
-                {% if field.name == "x" %}
-                  <div id="due-date-empty">
-                    <span class="due-date-empty-icon-slash x-first-slash"></span>
-                    <span class="due-date-empty-icon-slash x-second-slash"></span>
-                  </div>
-                  {{ field }}
-                  <div id="due-date-text-measurer"></div>
-                {% else %}
-                  {{ field }}
-                {% endif %}
+                {{ field }}
                 {% if field.name == "x" or field.name == "y" %}
                   <svg class="magic-wand-icon" viewBox="2.19 10 488.31 488.28">
                     <use href="#magic_wand-svg"></use>
