@@ -1,5 +1,6 @@
 #form-wrapper form {
     display: flex;
+    font-size: 17px;
     flex-flow: column;
     --vertical-form-padding: 5px;
     --horizontal-form-padding: 4px;
@@ -38,7 +39,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper label:not(.field-widget)::after {
     position: absolute;
     color: var(--form-placeholder-color);
-    font-size: 12px;
+    font-size: 13px;
     right: calc(var(--horizontal-form-padding) + 2px);
     bottom: -25px;
 }
@@ -281,7 +282,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     margin-left: 5px;
     transform: translateX(var(--vertical-form-padding))
                 translateX(var(--due-date-text-width, -100vw))
-                translateY(32px);
+                translateY(33px);
 }
 #form-wrapper #due-date-empty::after {
     content: '';
@@ -352,7 +353,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     padding: 20px 72px;
     color: var(--color);
     margin-top: 10px;
-    font-size: 19px;
+    font-size: 20px;
     --background-color-default: rgb(238, 238, 238);
     --background-color-hover: rgb(229, 229, 229);
     --background-color-active: rgb(245, 245, 245);
@@ -374,7 +375,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper .assignment-form-error-note {
     text-align: center;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--error-note-color);
 }
 #overlay {
@@ -415,7 +416,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #break-days-wrapper .break-days-label {
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     flex-grow: 1;
     border-left: inherit;
     display: flex;
