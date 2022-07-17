@@ -208,6 +208,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             except TypeError:
                 pass
 
+        # We don't actually need to do any further checking if x or y were predicted because of the frontend's validation
         if self.sm.assignment_date is None or self.sm.time_per_unit is None or \
             self.sm.x is None and self.sm.y is None:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
@@ -369,6 +370,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
+
+        # field value is set to "Predicted" and field is disabled in crud.js
+        # We can't do both of those in the backend because setting the field value doesn't work for disabled fields
+
+        # adds an auxillary class .disabled-field to determine whether or not the field was predicted in the submission
+        self.context['x_was_predicted'] = 'x' not in request.POST
+        self.context['y_was_predicted'] = 'y' not in request.POST
         if self.created_assignment:
             self.context['submit'] = 'Create Assignment'
         elif self.updated_assignment:

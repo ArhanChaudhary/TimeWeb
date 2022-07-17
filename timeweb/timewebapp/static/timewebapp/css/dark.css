@@ -27,6 +27,10 @@ select {
 #break-days-wrapper {
     --background-color: hsl(0, 0%, 24%);
 }
+#form-wrapper .field-wrapper.disabled-field > input {
+    --background-color: hsl(0, 0%, 18%) !important;
+    border-color: hsl(0, 0%, 50%) !important;
+}
 #break-days-wrapper input:checked + .break-days-label {
     background-color: hsl(0, 0%, 16%);
     -webkit-text-decoration-color: hsl(0, 0%, 49%);

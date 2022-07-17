@@ -88,7 +88,8 @@ class Crud {
         singleDatePicker: true,
     }
     static ALL_FOCUSABLE_FORM_INPUTS = (function() {
-        $(function() {
+        // use DOMContentLoaded instead of $(function() { so it is defined soon enough for showForm({params: show_instantly})
+        document.addEventListener("DOMContentLoaded", function() {
             // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
             Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]")
                 .filter(function() {
@@ -151,9 +152,10 @@ class Crud {
             timePicker: true,
         }).on('show.daterangepicker', function(e, picker) {
             old_due_date_val = $(this).val();
+            picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
         }).on('hide.daterangepicker', function(e, picker) {
             setTimeout(() => { // So cancel.daterangepicker runs first
-                if (!$(this).val()) {
+                if (["", "Predicted"].includes($(this).val())) {
                     $("#due-date-empty").click();
                     return;
                 }
@@ -187,8 +189,10 @@ class Crud {
                 },
             });
         });
-        $("#due-date-empty").click(function() {
-            $("#id_x").val("");
+        $("#due-date-empty").click(function() {         
+            if ($("#id_x").val() !== "Predicted")
+                // for hide.daterangepicker
+                $("#id_x").val("");
             $(this).parents(".field-wrapper").prop("style").removeProperty("--due-date-text-width");
         });
         that.setCrudHandlers();
@@ -204,17 +208,37 @@ class Crud {
         const that = this;
         if (params.show_instantly) {
             $('#overlay').show().find("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
+            // cursed way to position magic wand icon
+            // TODO: ideally i want a span wrapper around input so i dont have to consult the dark arts to position the magic wand icon
+            $(".magic-wand-icon").each(function() {
+                const field_wrapper = $(this).parents(".field-wrapper");
+                const error_note = field_wrapper.find(".assignment-form-error-note");
+
+                // the class is just to determine whether or not the field was previously predicted
+                if (field_wrapper.hasClass("disabled-field")) {
+                    field_wrapper.removeClass("disabled-field");
+                    field_wrapper.find(".magic-wand-icon").click();
+                }
+
+                if (!error_note.length) return;
+                // ew
+                $(this).css("margin-bottom", error_note.height());
+            });
         } else {
+            $(".magic-wand-icon").css("margin-bottom", "");
             $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
             $("form input:visible").first().focus();
+            $(".field-wrapper.disabled-field").each(function() {
+                $(this).find(".magic-wand-icon").click();
+            });
         }
         Crud.one_unit_of_work_alert_already_shown = false;
         that.old_unit_value = undefined;
         that.replaceUnit();
 
+        $("#id_x").trigger("hide.daterangepicker"); // already a setTimeout in hide.daterangepicker
         setTimeout(function() {
             $("#id_description").trigger("input");
-            $("#id_x").trigger("hide.daterangepicker");
             if ($("#form-wrapper #second-field-group .invalid").length) {
                 Crud.GO_TO_FIELD_GROUP({advanced: true});
             }
@@ -374,7 +398,7 @@ class Crud {
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
             if (sa.needs_more_info) {
-                $("#form-wrapper .field-wrapper:not(.hide-field) > :not(label, #due-date-empty, .dont-mark-invalid-if-empty, .info-button)").each(function() {
+                $("#form-wrapper .field-wrapper:not(.hide-field) > :not(label, #due-date-empty, .magic-wand-icon, .dont-mark-invalid-if-empty, .info-button)").each(function() {
                     $(this).toggleClass("invalid", !$(this).val());
                 });
             }
@@ -433,6 +457,23 @@ class Crud {
             }
         });
         $("#id_unit, #y-widget-checkbox").on('input', () => that.replaceUnit());
+        let recursion_stopper = false;
+        $(".magic-wand-icon").click(function() {
+            if ($(".disabled-field .magic-wand-icon").not($(this)).length === 1 && !recursion_stopper) {
+                recursion_stopper = true;
+                $(".disabled-field .magic-wand-icon").not($(this)).click();
+            }
+            recursion_stopper = false;
+            const field_wrapper = $(this).parents(".field-wrapper");
+            const field_wrapper_input = field_wrapper.find(Crud.ALL_FOCUSABLE_FORM_INPUTS).not(".field-widget-checkbox");
+            field_wrapper.toggleClass("disabled-field");
+            field_wrapper.find("#due-date-empty").click(); // for due date field
+
+            if (field_wrapper.attr("original-type") === undefined)
+                field_wrapper.attr("original-type", field_wrapper_input.attr("type"));
+            field_wrapper_input.attr("type", field_wrapper.hasClass("disabled-field") ? "text" : field_wrapper.attr("original-type"));
+            field_wrapper_input.prop("disabled", field_wrapper.hasClass("disabled-field")).val(field_wrapper.hasClass("disabled-field") ? "Predicted" : "");
+        });
         
         $("#fields-wrapper").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).on('focus', e => {
             const new_parent = $(e.target).parents(".field-group");
@@ -497,14 +538,32 @@ class Crud {
         $("#submit-assignment-button").click(function(e) {
             // Custom error messages
             if (utils.in_simulation) {
-                Crud.GO_TO_FIELD_GROUP({standard: true});
+                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#form-wrapper form #first-field-group input:visible:first").parents(".field-group")});
                 $("#form-wrapper form #first-field-group input:visible:first")[0].setCustomValidity("You can't add or edit assignments in the simulation. This functionality is not yet supported :(");
                 return;
             }
             if ($("#id_name").is(":invalid")) {
-                Crud.GO_TO_FIELD_GROUP({standard: true});
+                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_name").parents(".field-group")});
                 $("#id_name")[0].setCustomValidity("Please enter an assignment name");
                 return;
+            }
+            if ($("#id-x-field-wrapper.disabled-field").length) {
+                if ($("#id_y").val() === "") {
+                    Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_y").parents(".field-group")});
+                    $("#id_y")[0].setCustomValidity("Please enter a value for the due date prediction");
+                    return;
+                }
+            } else if ($("#id-y-field-wrapper.disabled-field").length) {
+                if ($("#id_x").val() === "") {
+                    Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_x").parents(".field-group")});
+                    // daterangepicker sometimes doesn't open when initially in advanced inputs but idc
+                    $("#id_x")[0].setCustomValidity("Please enter a value for the other field's prediction");
+                    // gets in the way of daterangepicker
+                    setTimeout(() => {
+                        $("#id_x")[0].setCustomValidity("");
+                    }, 1500);
+                    return;
+                }
             }
         });
         $("#form-wrapper form input").on("input invalid", function(e) {
