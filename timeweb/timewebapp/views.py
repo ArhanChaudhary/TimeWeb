@@ -93,7 +93,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     assignment.mark_as_done = False
             TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
         self.add_user_models_to_context(request)
-        self.context['form'] = TimewebForm(None)
+        if 'form' not in self.context: # calls to self.get may already define this context
+            self.context['form'] = TimewebForm(None)
         self.context['settings_form'] = SettingsForm(initial={ # unbound form
             'assignment_sorting': request.user.settingsmodel.assignment_sorting,
         })
@@ -373,10 +374,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form
-        self.add_user_models_to_context(request)
         for field in self.form.errors:
             self.form[field].field.widget.attrs['class'] = self.form[field].field.widget.attrs.get('class', "") + 'invalid'
-        return super().get(request)
+        return self.get(request)
 
 EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
 class ExampleAccountView(View):
