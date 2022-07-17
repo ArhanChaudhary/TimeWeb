@@ -283,7 +283,7 @@ class Crud {
                     .removeClass("hide-field").css("margin-top", "")
                     .addClass("has-widget")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
-                $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+                $("label[for='id_y']").text(`How long will this Assignment take to Complete`);
             } else if (!["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .on("transitionend", function(e) {
@@ -296,12 +296,12 @@ class Crud {
                             .addClass("has-widget")
                             .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
                         // Don't immediately change text back to how #id_y initially looks like to make it seemless
-                        $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+                        $("label[for='id_y']").text(`How long will this Assignment take to Complete`);
                     })
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             } else {
                 // Normal text change if there's nothing to do with #id_y
-                $("label[for='id_y']").text(`How Long will this Assignment Take to Complete`);
+                $("label[for='id_y']").text(`How long will this Assignment take to Complete`);
                 $("#id-y-field-wrapper").addClass("has-widget");
             }
             $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight())
