@@ -104,7 +104,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif request.session.get("just_updated_assignment_id"):
             self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
 
-        if invalid_form_context := request.session.pop('invalid_form_context'):
+        if invalid_form_context := request.session.pop('invalid_form_context', None):
             form = TimewebForm(data=invalid_form_context['form'])
             assert not form.is_valid(), form.data
             for field in form.errors:
