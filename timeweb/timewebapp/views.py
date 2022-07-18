@@ -83,7 +83,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if not request.session.pop("already_created_gc_assignments_from_frontend", None):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
 
-    def get(self, request):        
+    def get(self, request):
         utc_now = timezone.now()
         local_now = utc_to_local(request, utc_now)
         local_last_login = utc_to_local(request, request.user.last_login)
@@ -93,8 +93,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     assignment.mark_as_done = False
             TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
         self.add_user_models_to_context(request)
-        if 'form' not in self.context: # calls to self.get may already define this context
-            self.context['form'] = TimewebForm(None)
+        self.context['form'] = TimewebForm()
         self.context['settings_form'] = SettingsForm(initial={ # unbound form
             'assignment_sorting': request.user.settingsmodel.assignment_sorting,
         })
@@ -105,6 +104,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif request.session.get("just_updated_assignment_id"):
             self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
 
+        if invalid_form_context := request.session.pop('invalid_form_context'):
+            form = TimewebForm(data=invalid_form_context['form'])
+            assert not form.is_valid(), form.data
+            for field in form.errors:
+                form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
+
+            invalid_form_context['form'] = form
+            self.context.update(invalid_form_context)
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
 
@@ -122,7 +129,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # for parsing due times in forms.py
         _mutable = request.POST._mutable
         request.POST._mutable = True
-        self.form = TimewebForm(data=request.POST, files=request.FILES)
+        self.form = TimewebForm(data=request.POST)
         request.POST._mutable = _mutable
 
         # Parts of the form that can only validate in views
@@ -382,10 +389,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif self.updated_assignment:
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Edit Assignment'
-        self.context['form'] = self.form
-        for field in self.form.errors:
-            self.form[field].field.widget.attrs['class'] = self.form[field].field.widget.attrs.get('class', "") + 'invalid'
-        return self.get(request)
+        self.context['form'] = self.form.data # TimewebForm is not json serializable
+        request.session['invalid_form_context'] = self.context
+        return redirect(request.path_info)
 
 EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
 class ExampleAccountView(View):
@@ -393,4 +399,4 @@ class ExampleAccountView(View):
         if request.user.is_authenticated:
             logout(request)
         login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
-        return redirect("home") # PRG
+        return redirect("home")
