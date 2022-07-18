@@ -3,7 +3,6 @@ from contact_form.views import ContactForm as BaseContactForm
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django import forms
-import datetime
 from colorfield.widgets import ColorWidget
 from .models import SettingsModel
 from django.forms.widgets import ClearableFileInput

@@ -141,6 +141,11 @@ class SettingsModel(models.Model):
     )
 
     # Group "Miscellaneous"
+    enable_tutorial = models.BooleanField(
+        default=True,
+        verbose_name=_('Tutorial'),
+    )
+    
     sorting_animation_threshold = models.IntegerField(
         default=15,
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
@@ -149,10 +154,6 @@ class SettingsModel(models.Model):
     timezone = TimeZoneField(
         null=True,
         blank=True,
-    )
-    enable_tutorial = models.BooleanField(
-        default=True,
-        verbose_name=_('Tutorial'),
     )
 
     # Hidden
