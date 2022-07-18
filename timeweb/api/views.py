@@ -115,14 +115,21 @@ def change_setting(request):
     setting = data['setting']
     value = json.loads(data['value'])
 
+    if setting == "oauth_token":
+        if value:
+            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="settings"), status=302)
+        else:
+            gc_auth_disable(request, save=True)
+            return HttpResponse(status=204)
+
     # pretty cursed code that could possibly be improved by adding the settings model to the settings form as an instance (64baf58)
     # however this makes the data "unbound" (A bound form is a form which is passed the users input) and validation to become impossible
     # We're going to have to make it bound because we want to validate it, but that means we need to create a bounded form from an existing settings model instance
     # This is a bit of a hack, but it works for now
     model_fields = {i.name: getattr(request.user.settingsmodel, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
-    if setting not in model_fields:
+    if setting not in model_fields or setting in SettingsForm.Meta.exclude:
         logger.warning(f"User \"{request.user}\" tried to change a setting that doesn't exist")
-        return HttpResponse(f"The setting \"{setting}\" doesn't exist.", status=404)
+        return HttpResponse(f"The setting \"{setting}\" doesn't exist.", status=400)
         
     model_fields[setting] = value
     validation_form = SettingsForm(data=model_fields)
@@ -131,13 +138,7 @@ def change_setting(request):
         logger.info(f"{validation_form.errors}")
         return HttpResponse(f"The setting \"{setting}\"'s value of {value} is invalid.", status=405)
 
-    if setting == "oauth_token":
-        if value:
-            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="settings"), status=302)
-        else:
-            gc_auth_disable(request, save=False)
-    else:
-        setattr(request.user.settingsmodel, setting, value)
+    setattr(request.user.settingsmodel, setting, value)
     request.user.settingsmodel.save()
     return HttpResponse(status=204)
 
