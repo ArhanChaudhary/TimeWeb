@@ -122,9 +122,6 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
-    mark_as_done = models.BooleanField(
-        default=False,
-    )
     tags = models.JSONField(
         default=empty_list,
         blank=True,

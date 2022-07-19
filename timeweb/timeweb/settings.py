@@ -375,7 +375,6 @@ EXAMPLE_ASSIGNMENT = {
     "min_work_time": "60.00",
     "break_days": [],
     "dynamic_start": 0,
-    "mark_as_done": False,
     "description": "Example assignment description"
 }
 EDITING_EXAMPLE_ACCOUNT = False

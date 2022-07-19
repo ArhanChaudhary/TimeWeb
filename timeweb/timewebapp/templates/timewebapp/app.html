@@ -177,7 +177,7 @@
         {% for assignment in assignment_models %}
           {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
           <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
-            <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+            <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
               <div class="priority-color-strip"></div>
               <div class="assignment-header">
@@ -273,7 +273,7 @@
                   <button class="submit-work-button">Submit Work Input</button>
                   <br>
                   <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph" data-active-label-touch="Drag the graph">Set Curvature</button>
-                  <button class="hide-assignment-button" data-hide-label="Hide Assignment" data-show-label="Show Assignment"></button>
+                  <button class="display-in-text-button" data-in-text-label="Text Display" data-in-graph-label="Graph Display"></button>
                   <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
                 </div>
               </div>

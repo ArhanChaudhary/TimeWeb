@@ -60,7 +60,6 @@ class Priority {
                 const priority_color = that.percentageToColor(params.priority_percentage);
                 params.dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
             }
-            params.dom_assignment.toggleClass("mark-as-done", params.mark_as_done);
             if (params.first_sort) {
                 // Which element specifically is overflowed seems to have minimal effect on performance
                 params.dom_assignment[0].offsetHeight;
@@ -381,7 +380,7 @@ class Priority {
                         height: 15,
                     }).css("margin-left", -2);
                     status_message = `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
-                    that.total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                    that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
 
                 if ([0, 1].includes(due_date_minus_today)) {
@@ -390,7 +389,7 @@ class Priority {
                     } else if (due_date_minus_today === 1) {
                         that.display_due_tomorrow_completion_time = true;
                     }
-                    that.today_and_tomorrow_total_completion_time += Math.ceil(sa.sa.mark_as_done ? 0 : todo*sa.sa.time_per_unit);
+                    that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                     if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                         status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
@@ -503,8 +502,6 @@ class Priority {
                 has_not_important_tag,
                 name: sa.sa.name,
                 index,
-                // Not actually used for sorting, used for priority stuff later on
-                mark_as_done: sa.sa.mark_as_done,
             }
             that.priority_data_list.push(priority_data);
 
@@ -650,7 +647,7 @@ class Priority {
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
 
-        if (priority_data.mark_as_done || [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(priority_data.status_value)) {
+        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(priority_data.status_value)) {
             var priority_percentage = NaN;
         } else if ([Priority.FINISHED_FOR_TODAY, Priority.NOT_YET_ASSIGNED, Priority.COMPLETELY_FINISHED].includes(priority_data.status_value) /* Priority.NOT_YET_ASSIGNED needed for "This assignment has not yet been assigned" being set to color values greater than 1 */) {
             var priority_percentage = 0;
@@ -756,7 +753,7 @@ class Priority {
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
-            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(priority_data.status_value) && !priority_data.mark_as_done) {
+            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(priority_data.status_value)) {
                 return priority_data.status_priority;
             } else {
                 return -Infinity;
@@ -779,7 +776,7 @@ class Priority {
             }
 
             let priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
-            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(priority_data.status_value) && !priority_data.mark_as_done;
+            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(priority_data.status_value);
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
@@ -826,7 +823,6 @@ class Priority {
                     $("#assignments-container").off('scroll');
                     that.colorOrAnimateInAssignment({
                         dom_assignment,
-                        mark_as_done: priority_data.mark_as_done,
                         is_element_submitted: true,
                         priority_percentage,
                         first_sort: that.params.first_sort,
@@ -835,7 +831,6 @@ class Priority {
             } else {
                 that.colorOrAnimateInAssignment({
                     dom_assignment,
-                    mark_as_done: priority_data.mark_as_done,
                     is_element_submitted: false,
                     priority_percentage,
                     first_sort: that.params.first_sort,

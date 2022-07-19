@@ -163,9 +163,6 @@ main.background-image-exists {
     scroll-margin: 20px;
     transition: all .2s ease-in-out, opacity calc(.375s * var(--animation-speed)) ease-in-out, left 0s, padding 0s;
 }
-.assignment.mark-as-done {
-    opacity: 0.65;
-}
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring {
@@ -834,7 +831,7 @@ main.background-image-exists {
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .hide-assignment-button {
+.work-input-textbox, .display-in-text-button {
     position: relative;
     z-index: unset;
     left: 50%;
@@ -850,7 +847,7 @@ main.background-image-exists {
     margin-top: 12px;
 }
 /* 2nd row */
-.skew-ratio-button, .hide-assignment-button, .fixed-mode-button {
+.skew-ratio-button, .display-in-text-button, .fixed-mode-button {
     margin-top: 13px;
     margin-bottom: 12px;
 }

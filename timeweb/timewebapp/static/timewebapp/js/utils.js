@@ -175,9 +175,6 @@ setClickHandlers: {
                 utils.in_simulation = true;
                 ajaxUtils.disable_ajax = true;
                 date_now.setDate(date_now.getDate() + 1);
-                $(".assignment.mark-as-done").each(function() {
-                    $(this).find(".hide-assignment-button").click();
-                });
                 // Hide current time without using display none, as that can be affected by .toggle
                 $("#estimated-completion-time").css({
                     position: "absolute",
@@ -674,9 +671,6 @@ switch (e.key) {
                             break;
                         case "f":
                             assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "h":
-                            assignment_container.find(".hide-assignment-button").focus().click();
                             break;
                         case "Backspace":
                         case "s":

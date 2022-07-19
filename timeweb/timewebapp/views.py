@@ -84,14 +84,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
 
     def get(self, request):
-        utc_now = timezone.now()
-        local_now = utc_to_local(request, utc_now)
-        local_last_login = utc_to_local(request, request.user.last_login)
-        if local_last_login.day != local_now.day:
-            for assignment in request.user.timewebmodel_set.all():
-                if assignment.mark_as_done:
-                    assignment.mark_as_done = False
-            TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
         self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm()
         self.context['settings_form'] = SettingsForm(initial={ # unbound form

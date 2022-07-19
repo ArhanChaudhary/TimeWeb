@@ -18,7 +18,6 @@ class TimewebForm(forms.ModelForm):
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),
-            'mark_as_done': forms.HiddenInput(),
             'needs_more_info': forms.HiddenInput(),
             'is_google_classroom_assignment': forms.HiddenInput(),
             'tags': forms.HiddenInput(),
