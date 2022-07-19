@@ -277,7 +277,7 @@ class Crud {
         
         i.e. if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
-            $("label[for='id_works']").text(`How Long have you Already Worked`);
+            $("label[for='id_works']").text(`How long have you already worked`);
 
             if (that.old_unit_value === undefined) {
                 // Appropiately place #id_y when the form is initially loaded and shown
@@ -287,7 +287,7 @@ class Crud {
                     .removeClass("hide-field").css("margin-top", "")
                     .addClass("has-widget")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
-                $("label[for='id_y']").text(`How long will this Assignment take to Complete`);
+                $("label[for='id_y']").text(`How long will this assignment take to complete`);
             } else if (!["minute", "hour"].includes(that.old_unit_value)) {
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .on("transitionend", function(e) {
@@ -300,12 +300,13 @@ class Crud {
                             .addClass("has-widget")
                             .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
                         // Don't immediately change text back to how #id_y initially looks like to make it seemless
-                        $("label[for='id_y']").text(`How long will this Assignment take to Complete`);
+                        $("label[for='id_y']").text(`How long will this assignment take to complete`);
                     })
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
+                // don't change the step size nor time per unit here, read the below comment
             } else {
                 // Normal text change if there's nothing to do with #id_y
-                $("label[for='id_y']").text(`How long will this Assignment take to Complete`);
+                $("label[for='id_y']").text(`How long will this assignment take to complete`);
                 $("#id-y-field-wrapper").addClass("has-widget");
             }
             $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight())
@@ -328,9 +329,9 @@ class Crud {
             // Make sure this is ran before the .text because this can affect #id_y's text
             $("#id-y-field-wrapper").trigger("transitionend").off("transitionend");
 
-            $("label[for='id_y']").text(`Total number of ${plural} in this Assignment`);
-            $("label[for='id_time_per_unit']").text(`How Long does it Take to complete each ${singular}`);
-            $("label[for='id_works']").text(`Total number of ${plural} already Completed`);
+            $("label[for='id_y']").text(`Total number of ${plural} in this assignment`);
+            $("label[for='id_time_per_unit']").text(`How long does it take to complete each ${singular}`);
+            $("label[for='id_works']").text(`Total number of ${plural} already completed`);
 
             setTimeout(function() {
                 $(".hide-field").removeClass("hide-field").css("margin-top", "")
