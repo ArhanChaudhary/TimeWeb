@@ -17,14 +17,20 @@ class SettingsForm(forms.ModelForm):
         model = SettingsModel
         exclude = ("oauth_token", "added_gc_assignment_ids", "seen_latest_changelog", "user")
         extra_fields = {
-            "enable_gc_integration": forms.BooleanField(
-                label="Google Classroom Integration",
-                required=False
-            ),
-            "restore_gc_assignments": forms.BooleanField(
-                label="Restore Deleted Google Classroom Assignments",
-                required=False,
-            ),
+            "enable_gc_integration": {
+                "field": forms.BooleanField(
+                    label="Google Classroom Integration",
+                    required=False,
+                ),
+                "order": "before restore_gc_assignments",
+            },
+            "restore_gc_assignments": {
+                "field": forms.BooleanField(
+                    label="Restore Deleted Google Classroom Assignments",
+                    required=False,
+                ),
+                "order": "before def_min_work_time",
+            }
         }
         widgets = {
             "user": forms.HiddenInput(),
@@ -70,7 +76,26 @@ class SettingsForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
         assert not self.is_bound or 'data' in kwargs, 'pls specify the data kwarg for readibility'
-        self.fields = {**SettingsForm.Meta.extra_fields, **self.fields}
+
+        # Correct extra field order logic
+
+        # Maps every form field to what extra field comes after it
+        extra_fields_after_map = {extra_field_data['order'].split(" ")[1]: extra_field_name for extra_field_name, extra_field_data in SettingsForm.Meta.extra_fields.items()
+                        if extra_field_data['order'].split(" ")[0] == "after"}
+        # And before it
+        extra_fields_before_map = {extra_field_data['order'].split(" ")[1]: extra_field_name for extra_field_name, extra_field_data in SettingsForm.Meta.extra_fields.items()
+                        if extra_field_data['order'].split(" ")[0] == "before"}
+        
+        assert len(extra_fields_after_map) + len(extra_fields_before_map) == len(SettingsForm.Meta.extra_fields), "invalid order in extra_fields"
+
+        new_keyorder = list(self.fields.keys())
+        for k, v in extra_fields_after_map.items():
+            new_keyorder.insert(new_keyorder.index(k) + 1, v)
+        for k, v in reversed(extra_fields_before_map.items()):
+            new_keyorder.insert(new_keyorder.index(k), v)
+        # Rebuild the form with the new keyorder
+        # Weird {"field": None} logic because the default value is still evaluated even if the key is found for .get
+        self.fields = {k: self.fields.get(k, SettingsForm.Meta.extra_fields.get(k, {"field": None})["field"]) for k in new_keyorder}
         self.label_suffix = ""
 
 
