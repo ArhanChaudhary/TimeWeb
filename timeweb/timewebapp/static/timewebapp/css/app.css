@@ -826,19 +826,19 @@ main.background-image-exists {
     box-shadow: inset 0 0 0 3px var(--input-focus-color);
 }
 /* 1st column */
-.delete-work-input-button, .skew-ratio-button {
+.delete-work-input-button, .fixed-mode-button {
     position: absolute;
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .display-in-text-button {
+.work-input-textbox, .skew-ratio-button {
     position: relative;
     z-index: unset;
     left: 50%;
     transform: translateX(-50%);
 }
 /* 3rd column */
-.submit-work-button, .fixed-mode-button {
+.submit-work-button, .display-in-text-button {
     position: absolute;
     right: 0;
 }
