@@ -203,7 +203,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = Decimal("5")
         elif self.sm.unit.lower() in ("hour", "hours"):
             self.sm.time_per_unit = Decimal("60")
-            if old_data.unit.lower() in ("minute", "minutes"):
+            if self.updated_assignment and old_data.unit.lower() in ("minute", "minutes"):
                 self.sm.funct_round = Decimal("1")
 
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
