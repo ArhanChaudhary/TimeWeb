@@ -78,7 +78,7 @@ def save_assignment(request):
     with transaction.atomic():
         # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
         for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['pk'], assignments), user=request.user):
-            assignment = next(i for i in assignments if i.get('pk', None) == sm.pk)
+            assignment = next(i for i in assignments if i.get('pk') == sm.pk)
 
             for key, value in assignment.items():
                 if key == "x":
@@ -233,7 +233,7 @@ def create_gc_assignments(request):
                 assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
             assignment_date = utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
             assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            x = assignment.get('dueDate', None)
+            x = assignment.get('dueDate')
             tags = []
             if x:
                 if "hours" in assignment['dueTime']:
@@ -258,7 +258,7 @@ def create_gc_assignments(request):
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
             tags.insert(0, course_names[assignment['courseId']])
             description = assignment.get('description', "")
-            google_classroom_assignment_link = assignment.get("alternateLink", None)
+            google_classroom_assignment_link = assignment.get("alternateLink")
 
             # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
             new_gc_assignment_ids.add(assignment_id)
@@ -367,7 +367,7 @@ def gc_auth_callback(request):
     # return redirect(reverse("home"))
 
     # Callback URI
-    state = request.GET.get('state', None)
+    state = request.GET.get('state')
 
     flow = Flow.from_client_secrets_file(
         settings.GC_CREDENTIALS_PATH,
