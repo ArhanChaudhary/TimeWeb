@@ -73,6 +73,9 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
             api.gc_auth_disable(request, save=False)
 
+        # not forward compatible but idc
+        if self.form.instance.default_dropdown_tags == None:
+            self.form.instance.default_dropdown_tags = []
         self.form.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
 
