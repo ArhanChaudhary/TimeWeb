@@ -163,27 +163,29 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
-            if self.sm.assignment_date:
-                self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.x = self.form.cleaned_data.get("x")
-            if self.sm.x:
-                self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.due_time = self.form.cleaned_data.get("due_time")
             self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
-            try:
-                if self.sm.y < 1:
-                    # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
-                    self.sm.y = 1
-            except TypeError:
-                pass
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
-            self.sm.funct_round = self.form.cleaned_data.get("funct_round") or Decimal("1")
+            self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
+        # I dunno why I put this here but it's been here for a while
+        # and i'll have this as a safety precaution
+        if self.sm.assignment_date:
+            self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        if self.sm.x:
+            self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        if not self.sm.funct_round:
+            self.sm.funct_round = Decimal(1)
+        if self.sm.y != None and self.sm.y < 1:
+            # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
+            self.sm.y = 1
         if not self.sm.unit:
             if self.form.cleaned_data.get(f"y-widget-checkbox"):
                 self.sm.unit = "Hour"
