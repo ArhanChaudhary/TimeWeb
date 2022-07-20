@@ -67,7 +67,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # kinda cursed but saves an entire sql query
         # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
         # and another in the html
-        timewebmodels = list(request.user.timewebmodel_set.all())
+        timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 

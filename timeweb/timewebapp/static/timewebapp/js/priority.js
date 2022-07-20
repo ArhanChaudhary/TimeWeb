@@ -467,7 +467,7 @@ class Priority {
             ).toggleClass("slashed", already_entered_work_input_for_today);
             assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
             assignment_header_tick_svg.attr("viewBox", (function() {
-                let bbox = assignment_header_tick_svg[0].getBBox()
+                let bbox = assignment_header_tick_svg[0].getBBox();
                 return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
             })());
             
@@ -476,6 +476,12 @@ class Priority {
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
                                 .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
+
+            let old_hidden = status_value === Priority.COMPLETELY_FINISHED;
+            if (old_hidden !== sa.sa.hidden) {
+                sa.sa.hidden = old_hidden;
+                ajaxUtils.sendAttributeAjaxWithTimeout("hidden", sa.sa.hidden, sa.sa.id);
+            }
 
             let status_priority;
             if (status_value === Priority.COMPLETELY_FINISHED) {
