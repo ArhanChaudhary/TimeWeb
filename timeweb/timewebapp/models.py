@@ -35,6 +35,11 @@ class TimewebModel(models.Model):
         max_length=200,
         verbose_name=_('Name of this Assignment'),
     )
+    # EVEN THOUGH assignment_date and x are both dates always with times at midnight
+    # let's still use a DateTimeField
+    # DateTimeField simplifies a lot of timezone handling logic
+    # and also ensures every date object is timezone aware and is a datetime.datetime instance
+    # so comparing them is easier (datetime.date doesn't have __gt__ etc. with datetime.datetime)
     assignment_date = models.DateTimeField(
         null=True,
         blank=True,
