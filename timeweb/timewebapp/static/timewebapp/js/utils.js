@@ -1152,14 +1152,16 @@ for (let sa of dat) {
 };
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
-    utils.reloadAtMidnight();
-    if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
-    utils.ui.setClickHandlers.tickButtons();
-    utils.ui.setClickHandlers.assignmentsHeaderUI();
-    utils.ui.setClickHandlers.assignmentSorting();
-    utils.ui.setClickHandlers.deleteAllStarredAssignments();
-    utils.ui.setClickHandlers.deleteAssignmentsFromClass();
-    utils.ui.setClickHandlers.autofillWorkDone();
+    if (!VIEW_HIDDEN_ASSIGNMENTS) {
+        utils.reloadAtMidnight();
+        if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
+        utils.ui.setClickHandlers.tickButtons();
+        utils.ui.setClickHandlers.assignmentsHeaderUI();
+        utils.ui.setClickHandlers.assignmentSorting();
+        utils.ui.setClickHandlers.deleteAllStarredAssignments();
+        utils.ui.setClickHandlers.deleteAssignmentsFromClass();
+        utils.ui.setClickHandlers.autofillWorkDone();
+    }
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();

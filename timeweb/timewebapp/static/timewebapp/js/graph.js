@@ -755,6 +755,49 @@ class VisualAssignment extends Assignment {
         return $graph_button.attr("data-timeout-id");
     }
     setGraphButtonEventListeners() {
+        // Turn off mousemove to ensure there is only one mousemove handler at a time
+        this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this))
+        .on(isTouchDevice ? "touchend" : "click", e => {
+            if (this.set_skew_ratio_using_graph) {
+                // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
+                original_skew_ratio = undefined;
+                this.set_skew_ratio_using_graph = false;
+                skew_ratio_button.text(skew_ratio_button.attr("data-label")).blur();
+                ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
+                ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
+                if (!this.draw_mouse_point && isTouchDevice) {
+                    this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
+                }
+                new Priority().sort();
+            // if the user quickly taps the screen, instead of doing mousemove instead toggle draw point label on
+            // toggle it off if the user clicks the same x coordinate or drags it around again
+            } else if (!isTouchDevice || !this.allow_for_click_draw_point) {
+                if (this.draw_mouse_point) {
+                    // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
+                    // Disable draw point
+                    if (!isTouchDevice) {
+                        this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
+                    }
+                    this.draw_mouse_point = false;
+                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
+                    hover_point_label.addClass("hide-label");
+                    this.last_mouse_x = undefined; // force the graph to draw
+                    this.draw();
+                } else {
+                    // Runs if (!set_skew_ratio_using_graph && !draw_mouse_point)
+                    // Enable draw point
+                    this.draw_mouse_point = true;
+                    // Turn off mousemove to ensure there is only one mousemove handler at a time
+                    this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this));
+                    // Pass in e because $.trigger makes e.pageX undefined
+                    this.mousemove(e);
+                }
+            }
+        });
+        $(window).resize(this.resize.bind(this));
+
+        if (VIEW_HIDDEN_ASSIGNMENTS) return; // EVERYTHING PAST THIS POINT ONLY RUNS IF VIEW_HIDDEN_ASSIGNMENTS IS FALSE
+
         // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
                 work_input_textbox = this.dom_assignment.find(".work-input-textbox"),
@@ -762,9 +805,6 @@ class VisualAssignment extends Assignment {
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 display_in_text_button = this.dom_assignment.find(".display-in-text-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
-        this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this)); // Turn off mousemove to ensure there is only one mousemove handler at a time
-        $(window).resize(this.resize.bind(this));
-
         // BEGIN Up and down arrow event handler
         {
         let graphtimeout,
@@ -1024,43 +1064,6 @@ class VisualAssignment extends Assignment {
         if (isTouchDevice) {
             skew_ratio_button.attr("data-active-label", skew_ratio_button.attr("data-active-label-touch"));
         }
-        this.graph.on(isTouchDevice ? "touchend" : "click", e => {
-            if (this.set_skew_ratio_using_graph) {
-                // Runs if (set_skew_ratio_using_graph && draw_mouse_point || set_skew_ratio_using_graph && !draw_mouse_point)
-                original_skew_ratio = undefined;
-                this.set_skew_ratio_using_graph = false;
-                skew_ratio_button.text(skew_ratio_button.attr("data-label")).blur();
-                ajaxUtils.sendAttributeAjaxWithTimeout('skew_ratio', this.sa.skew_ratio, this.sa.id);
-                ajaxUtils.sendAttributeAjaxWithTimeout('dynamic_start', this.sa.dynamic_start, this.sa.id);
-                if (!this.draw_mouse_point && isTouchDevice) {
-                    this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
-                }
-                new Priority().sort();
-            // if the user quickly taps the screen, instead of doing mousemove instead toggle draw point label on
-            // toggle it off if the user clicks the same x coordinate or drags it around again
-            } else if (!isTouchDevice || !this.allow_for_click_draw_point) {
-                if (this.draw_mouse_point) {
-                    // Runs if (!set_skew_ratio_using_graph && draw_mouse_point)
-                    // Disable draw point
-                    if (!isTouchDevice) {
-                        this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
-                    }
-                    this.draw_mouse_point = false;
-                    const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                    hover_point_label.addClass("hide-label");
-                    this.last_mouse_x = undefined; // force the graph to draw
-                    this.draw();
-                } else {
-                    // Runs if (!set_skew_ratio_using_graph && !draw_mouse_point)
-                    // Enable draw point
-                    this.draw_mouse_point = true;
-                    // Turn off mousemove to ensure there is only one mousemove handler at a time
-                    this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this));
-                    // Pass in e because $.trigger makes e.pageX undefined
-                    this.mousemove(e);
-                }
-            }
-        });
         }
         // END Set skew ratio button using graph button
 

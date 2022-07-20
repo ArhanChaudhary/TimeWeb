@@ -31,6 +31,10 @@ main:not(.animate) {
 header:not(.animate), header:not(.animate)::after {
     transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
 }
+#assignments-container.animate {
+    transform: translateY(max(-400px, calc(-100% - 20px)));
+    /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
+}
 #assignments-container:not(.animate) {
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
 }
@@ -54,6 +58,9 @@ main.background-image-exists {
         padding-left: 20px;
     }
 }
+#assignments-container.view-hidden-assignments .graph-footer {
+    height: var(--assignment-margin-bottom);
+}
 #extra-navs-positioner {
     box-sizing: border-box;
     min-height: calc(100vh - var(--header-height) - 10px);
@@ -69,10 +76,6 @@ main.background-image-exists {
     pointer-events: none;
     -o-object-fit: cover;
        object-fit: cover;
-}
-#assignments-container.animate {
-    transform: translateY(max(-400px, calc(-100% - 20px)));
-    /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
 #tutorial-message {
     padding: 0 10px;
@@ -755,6 +758,7 @@ main.background-image-exists {
 .assignment-footer {
     padding-right: var(--horizontal-assignment-padding);
     padding-left: var(--horizontal-assignment-padding);
+    --assignment-margin-bottom: 12px;
     box-sizing: border-box;
     display: none;
     /* firefox acts weirdly without this */
@@ -849,7 +853,7 @@ main.background-image-exists {
 /* 2nd row */
 .skew-ratio-button, .display-in-text-button, .fixed-mode-button {
     margin-top: 13px;
-    margin-bottom: 12px;
+    margin-bottom: var(--assignment-margin-bottom);
 }
 .work-input-textbox {
     width: 123px;

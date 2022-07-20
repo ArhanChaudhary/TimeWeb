@@ -14,6 +14,7 @@
             const GC_API_INIT_FAILED = {% if GC_API_INIT_FAILED %}true{% else %}false{% endif %};
             const EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
             const CREATING_GC_ASSIGNMENTS_FROM_FRONTEND = {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}true{% else %}false{% endif %};
+            const VIEW_HIDDEN_ASSIGNMENTS = {% if view_hidden_assignments %}true{% else %}false{% endif %};
 
             // Initialize the service worker (as soon as possible)
             if ('serviceWorker' in navigator) {

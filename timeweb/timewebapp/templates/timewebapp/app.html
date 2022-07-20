@@ -107,8 +107,9 @@
       </form>
     </div>
   </div>
+  <div id="assignments-container" {% if view_hidden_assignments %}class="view-hidden-assignments"{% endif %}
   {% comment %} some javascript makes this focusable {% endcomment %}
-  <div id="assignments-container" tabindex="-1">
+  tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
       (function() {
         if ($("main").hasClass("finished-header-transition")) return
@@ -132,48 +133,50 @@
     <div id="extra-navs-positioner">
       {% comment %} <span> so :last-child is forwards-compatible {% endcomment %}
       <span>
-        <div id="assignments-header" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
-          <span id="todo-wrapper">
-            <span id="estimated-total-time-label">Todo:</span>
-            <span id="estimated-total-time"></span>
-            <span id="estimated-completion-time"></span>
-            <span id="tomorrow-time"></span>
-            <div id="hide-button" class="generic-button" tabindex="0">Hide</div>
-          </span>
-          <span id="current-date-container">
-            <span id="current-date"></span>
-            <svg id="go-to-next-day" tabindex="0" width="21" height="16" preserveAspectRatio="none" viewBox="40 40 176 176">
-              <use href="#go_to_next_day-svg"></use>
-            </svg>
-          </span>
-          <div id="sort-assignments-container">
-            <label for="{{ settings_form.assignment_sorting.auto_id }}">
-              {{ settings_form.assignment_sorting.label }}
-            </label>
-            {{ settings_form.assignment_sorting }}
+        {% if not view_hidden_assignments %}
+          <div id="assignments-header" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
+            <span id="todo-wrapper">
+              <span id="estimated-total-time-label">Todo:</span>
+              <span id="estimated-total-time"></span>
+              <span id="estimated-completion-time"></span>
+              <span id="tomorrow-time"></span>
+              <div id="hide-button" class="generic-button" tabindex="0">Hide</div>
+            </span>
+            <span id="current-date-container">
+              <span id="current-date"></span>
+              <svg id="go-to-next-day" tabindex="0" width="21" height="16" preserveAspectRatio="none" viewBox="40 40 176 176">
+                <use href="#go_to_next_day-svg"></use>
+              </svg>
+            </span>
+            <div id="sort-assignments-container">
+              <label for="{{ settings_form.assignment_sorting.auto_id }}">
+                {{ settings_form.assignment_sorting.label }}
+              </label>
+              {{ settings_form.assignment_sorting }}
+            </div>
           </div>
-        </div>
-        <div id="autofill-work-done" class="shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
-          <div class="shortcut-line-left"></div>
-          <span class="shortcut-text">
-            Autofill
-            <select class="generic-button" id="autofill-selection">
-              <option>No</option>
-              <option>All</option>
-            </select>
-            Work Done
-            <div class="generic-button" tabindex="0">Go</div>
-          </span>
-          <div class="shortcut-line-right"></div>
-        </div>
-        <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
-          <div class="shortcut-line-left"></div>
-          <span class="shortcut-text">
-            Delete all Starred Assignments
-            <div class="generic-button" tabindex="0">Go</div>
-          </span>
-          <div class="shortcut-line-right"></div>
-        </div>
+          <div id="autofill-work-done" class="shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+            <div class="shortcut-line-left"></div>
+            <span class="shortcut-text">
+              Autofill
+              <select class="generic-button" id="autofill-selection">
+                <option>No</option>
+                <option>All</option>
+              </select>
+              Work Done
+              <div class="generic-button" tabindex="0">Go</div>
+            </span>
+            <div class="shortcut-line-right"></div>
+          </div>
+          <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
+            <div class="shortcut-line-left"></div>
+            <span class="shortcut-text">
+              Delete all Starred Assignments
+              <div class="generic-button" tabindex="0">Go</div>
+            </span>
+            <div class="shortcut-line-right"></div>
+          </div>
+        {% endif %}
         {% for assignment in assignment_models %}
           {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
           <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
@@ -238,23 +241,31 @@
                   </div>
                   <span class="completion-time"></span>
                 </div>
-                {% if assignment.google_classroom_assignment_link %}
-                  <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
-                    <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
-                      <use href="#external_link-svg"></use>
+                {% if not view_hidden_assignments %}
+                  {% if assignment.google_classroom_assignment_link %}
+                    <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
+                      <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                        <use href="#external_link-svg"></use>
+                      </svg>
+                    </a>
+                  {% endif %}
+                  <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                    <svg class="tick-button" width="25" preserveAspectRatio="none">
+                      <use href="#tick-svg"></use>
                     </svg>
-                  </a>
+                  </div>
+                  <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                    <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
+                      <use href="#edit-svg"></use>
+                    </svg>
+                  </div>
+                {% else %}
+                  <div class="assignment-header-button" title="Unhide Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                    <svg viewBox="252 252.18 247.73 247.64" class="unhide-button" width="24" height="24" preserveAspectRatio="none">
+                      <use href="#unhide-svg"></use>
+                    </svg>
+                  </div>
                 {% endif %}
-                <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                  <svg class="tick-button" width="25" preserveAspectRatio="none">
-                    <use href="#tick-svg"></use>
-                  </svg>
-                </div>
-                <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                  <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
-                    <use href="#edit-svg"></use>
-                  </svg>
-                </div>
                 <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
                   <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
                     <use href="#delete-svg"></use>
@@ -268,13 +279,15 @@
                   <canvas class="graph">Your browser does not support the canvas tag.</canvas>
                 </div>
                 <div class="graph-footer">
-                  <button class="delete-work-input-button">Delete Work Input</button>
-                  <input class="work-input-textbox" placeholder="Enter Units Done"/>
-                  <button class="submit-work-button">Submit Work Input</button>
-                  <br>
-                  <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
-                  <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph" data-active-label-touch="Drag the graph">Set Curvature</button>
-                  <button class="display-in-text-button" data-in-text-label="Text Display" data-in-graph-label="Graph Display"></button>
+                  {% if not view_hidden_assignments %}
+                    <button class="delete-work-input-button">Delete Work Input</button>
+                    <input class="work-input-textbox" placeholder="Enter Units Done"/>
+                    <button class="submit-work-button">Submit Work Input</button>
+                    <br>
+                    <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
+                    <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph" data-active-label-touch="Drag the graph">Set Curvature</button>
+                    <button class="display-in-text-button" data-in-text-label="Text Display" data-in-graph-label="Graph Display"></button>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -351,6 +364,7 @@
       {% include "external_link.svg" %}
       {% include "unfinished.svg" %}
       {% include "magic_wand.svg" %}
+      {% include "unhide.svg" %}
     </defs>
   </svg>
 {% endblock %}

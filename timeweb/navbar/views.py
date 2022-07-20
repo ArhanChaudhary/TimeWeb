@@ -72,6 +72,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             request.session.pop("already_created_gc_assignments_from_frontend", None)
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
             api.gc_auth_disable(request, save=False)
+        if self.form.cleaned_data.get("view_hidden_assignments"):
+            request.session["view_hidden_assignments"] = True
 
         # not forward compatible but idc
         if self.form.instance.default_dropdown_tags == None:

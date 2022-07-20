@@ -63,11 +63,11 @@ def append_default_context(request):
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
-    def add_user_models_to_context(self, request):
+    def add_user_models_to_context(self, request, *, view_hidden):
         # kinda cursed but saves an entire sql query
         # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
         # and another in the html
-        timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
+        timewebmodels = list(request.user.timewebmodel_set.filter(hidden=view_hidden))
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 
@@ -84,26 +84,30 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
 
     def get(self, request):
-        self.add_user_models_to_context(request)
         self.context['form'] = TimewebForm()
-        self.context['settings_form'] = SettingsForm(initial={ # unbound form
-            'assignment_sorting': request.user.settingsmodel.assignment_sorting,
-        })
+        if request.session.pop("view_hidden_assignments", None):
+            self.add_user_models_to_context(request, view_hidden=True)
+            self.context["view_hidden_assignments"] = True
+        else:
+            self.add_user_models_to_context(request, view_hidden=False)
+            self.context['settings_form'] = SettingsForm(initial={ # unbound form
+                'assignment_sorting': request.user.settingsmodel.assignment_sorting,
+            })
 
-        # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-        if request.session.get("just_created_assignment_id"):
-            self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
-        elif request.session.get("just_updated_assignment_id"):
-            self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
+            # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
+            if request.session.get("just_created_assignment_id"):
+                self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
+            elif request.session.get("just_updated_assignment_id"):
+                self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
 
-        if invalid_form_context := request.session.pop('invalid_form_context', None):
-            form = TimewebForm(data=invalid_form_context['form'])
-            assert not form.is_valid(), form.data
-            for field in form.errors:
-                form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
+            if invalid_form_context := request.session.pop('invalid_form_context', None):
+                form = TimewebForm(data=invalid_form_context['form'])
+                assert not form.is_valid(), form.data
+                for field in form.errors:
+                    form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
 
-            invalid_form_context['form'] = form
-            self.context.update(invalid_form_context)
+                invalid_form_context['form'] = form
+                self.context.update(invalid_form_context)
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
 

@@ -125,24 +125,25 @@ class Priority {
             const sa = new Assignment(dom_assignment);
 
             // Remember: protect ajaxs with !sa.sa.needs_more_info
-
-            const skew_ratio_bound = sa.calcSkewRatioBound();
-            if (sa.sa.skew_ratio > skew_ratio_bound) {
-                sa.sa.skew_ratio = skew_ratio_bound;
-                !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
-            } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
-                sa.sa.skew_ratio = 2 - skew_ratio_bound;
-                !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+            if (!VIEW_HIDDEN_ASSIGNMENTS) {
+                const skew_ratio_bound = sa.calcSkewRatioBound();
+                if (sa.sa.skew_ratio > skew_ratio_bound) {
+                    sa.sa.skew_ratio = skew_ratio_bound;
+                    !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
+                    sa.sa.skew_ratio = 2 - skew_ratio_bound;
+                    !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+                }
+                
+                sa.setParabolaValues();
+                if (that.params.first_sort)
+                    // Fix dynamic start if y or anything else was changed
+                    // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
+    
+                    // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                    sa.setDynamicStartIfInDynamicMode();
             }
-
-            sa.setParabolaValues();
-            if (that.params.first_sort)
-                // Fix dynamic start if y or anything else was changed
-                // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
-
-                // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
-                sa.setDynamicStartIfInDynamicMode();
-            
+                
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
@@ -457,25 +458,27 @@ class Priority {
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
             const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
 
-            assignment_header_button.filter(function() {
-                return !!$(this).find(".tick-button").length;
-            }).toggle(
-                !(
-                    [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
-                    || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
-                )
-            ).toggleClass("slashed", already_entered_work_input_for_today);
-            assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
-            assignment_header_tick_svg.attr("viewBox", (function() {
-                let bbox = assignment_header_tick_svg[0].getBBox();
-                return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
-            })());
+            if (!VIEW_HIDDEN_ASSIGNMENTS) {
+                assignment_header_button.filter(function() {
+                    return !!$(this).find(".tick-button").length;
+                }).toggle(
+                    !(
+                        [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
+                        || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
+                    )
+                ).toggleClass("slashed", already_entered_work_input_for_today);
+                assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
+                assignment_header_tick_svg.attr("viewBox", (function() {
+                    let bbox = assignment_header_tick_svg[0].getBBox();
+                    return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+                })());
+            }
             
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
-                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
+                                .toggleClass("add-line-wrapper", !VIEW_HIDDEN_ASSIGNMENTS && [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
 
             let old_hidden = status_value === Priority.COMPLETELY_FINISHED;
             if (old_hidden !== sa.sa.hidden) {
@@ -842,29 +845,33 @@ class Priority {
                     first_sort: that.params.first_sort,
                 });
             }
-            that.addAssignmentShortcut(dom_assignment, priority_data);
-            if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
-                first_available_tutorial_assignment = dom_assignment;
+            if (!VIEW_HIDDEN_ASSIGNMENTS) {
+                that.addAssignmentShortcut(dom_assignment, priority_data);
+                if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
+                    first_available_tutorial_assignment = dom_assignment;
+                }
             }
         }
-        // End part of addAssignmentShortcut
-        that.prev_gc_assignment?.addClass("last-add-line-wrapper");
-        that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
-        that.prev_finished_assignment?.addClass("last-add-line-wrapper");
+        if (!VIEW_HIDDEN_ASSIGNMENTS) {
+            // End part of addAssignmentShortcut
+            that.prev_gc_assignment?.addClass("last-add-line-wrapper");
+            that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
+            that.prev_finished_assignment?.addClass("last-add-line-wrapper");
 
-        $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
-            // If there's only one assignment for #auto-fill-work-done specifically, don't remove the wrapper
-            if ($(this).find("#autofill-work-done").length) return;
+            $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
+                // If there's only one assignment for #auto-fill-work-done specifically, don't remove the wrapper
+                if ($(this).find("#autofill-work-done").length) return;
+    
+                $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
+                $(this).find("#delete-starred-assignments").insertBefore($(this));
+                $(this).find(".shortcut").remove();
+            });
 
-            $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
-            $(this).find("#delete-starred-assignments").insertBefore($(this));
-            $(this).find(".shortcut").remove();
-        });
-
-        if (!first_available_tutorial_assignment) {
-            first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
+            if (!first_available_tutorial_assignment) {
+                first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
+            }
+            utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
         }
-        utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
         if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
             $(".assignment-container").each(function() {
@@ -898,8 +905,8 @@ class Priority {
                 });
             });
         }
-
-        that.updateInfoHeader();
+        if (!VIEW_HIDDEN_ASSIGNMENTS)
+            that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
         
     }

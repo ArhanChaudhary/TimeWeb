@@ -34,6 +34,7 @@ class SettingsForm(forms.ModelForm):
             "view_hidden_assignments": {
                 "field": forms.BooleanField(
                     label="View Hidden Assignments",
+                    help_text="Refresh after viewing to go back to your unhidden assignments.",
                     required=False,
                 ),
                 "order": "after hide_completely_finished_assignments"
