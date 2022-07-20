@@ -43,7 +43,7 @@ from django.views.decorators.http import require_http_methods
 # def tag_update(request):
 #     old_tag_name = request.POST['old_tag_namestrip()
 #     new_tag_name = request.POST['new_tag_name'].strip()
-#     assignment_models = request.user.timewebmodel_set.all()
+#     assignment_models = request.user.timewebmodel_set.filter(hidden=False)
 #     for assignment in assignment_models:
 #         if new_tag_name in (assignment.tags or []):
 #             return HttpResponse(status=)
