@@ -145,7 +145,10 @@ class SettingsModel(models.Model):
         default=True,
         verbose_name=_('Tutorial'),
     )
-    
+    hide_completely_finished_assignments = models.BooleanField(
+        default=False,
+        verbose_name=_('Hide Completely Finished Assignments'),
+    )
     sorting_animation_threshold = models.IntegerField(
         default=15,
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
