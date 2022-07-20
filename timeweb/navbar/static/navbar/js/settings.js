@@ -86,6 +86,10 @@ document.addEventListener("DOMContentLoaded", function() {
             },
         });
     }
+    $("#logo-container").click(function(e) {
+        e.preventDefault();
+        $("main form")[0].submit();
+    });
 });
 $(window).one("load", function() {
     $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
