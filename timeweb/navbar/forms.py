@@ -30,6 +30,13 @@ class SettingsForm(forms.ModelForm):
                     required=False,
                 ),
                 "order": "before def_min_work_time",
+            },
+            "show_hidden_assignments": {
+                "field": forms.BooleanField(
+                    label="Show Hidden Assignments",
+                    required=False,
+                ),
+                "order": "after hide_completely_finished_assignments"
             }
         }
         widgets = {
