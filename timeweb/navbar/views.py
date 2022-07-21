@@ -30,7 +30,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def get(self, request):
         initial = {
             'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
-            'restore_gc_assignments': False,
         }
         self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
         self.context['settings_model'] = request.user.settingsmodel
@@ -64,9 +63,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             
     
     def valid_form(self, request):
-        if self.form.cleaned_data.get("restore_gc_assignments"):
-            self.form.instance.added_gc_assignment_ids = []
-            request.session.pop("already_created_gc_assignments_from_frontend", None)
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
             api.gc_auth_disable(request, save=False)
         if self.form.cleaned_data.get("view_deleted_assignments"):

@@ -24,13 +24,6 @@ class SettingsForm(forms.ModelForm):
                 ),
                 "order": "before immediately_delete_completely_finished_assignments",
             },
-            "restore_gc_assignments": {
-                "field": forms.BooleanField(
-                    label="Restore Deleted Google Classroom Assignments",
-                    required=False,
-                ),
-                "order": "before def_min_work_time",
-            },
             "view_deleted_assignments": {
                 "field": forms.BooleanField(
                     label="View Deleted Assignments",
