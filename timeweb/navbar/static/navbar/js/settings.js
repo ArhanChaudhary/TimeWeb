@@ -56,15 +56,6 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
 
-    let alreadyHasSubmitted = false;
-    $("form").submit(function() {
-        if (alreadyHasSubmitted) return;
-        $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
-        textareaToJSON($("#id_default_dropdown_tags"));
-        $("#submit-settings-button").val("Submitting...");
-        alreadyHasSubmitted = true;
-    });
-
     // https://github.com/wilsonzlin/minify-html/issues/71
     $("option:not([value])").attr("value", "");
 
@@ -86,8 +77,14 @@ document.addEventListener("DOMContentLoaded", function() {
             },
         });
     }
+
+    let alreadyHasSubmitted = false;
     $("#logo-container").click(function(e) {
         e.preventDefault();
+        if (alreadyHasSubmitted) return;
+        $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
+        textareaToJSON($("#id_default_dropdown_tags"));
+        alreadyHasSubmitted = true;
         $("main form")[0].submit();
     });
 });

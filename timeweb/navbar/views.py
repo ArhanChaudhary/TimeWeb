@@ -72,9 +72,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         if self.form.cleaned_data.get("view_hidden_assignments"):
             request.session["view_hidden_assignments"] = True
 
-        # not forward compatible but idc
-        if self.form.instance.default_dropdown_tags == None:
-            self.form.instance.default_dropdown_tags = []
         self.form.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
 
