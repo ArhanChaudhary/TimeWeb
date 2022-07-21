@@ -477,7 +477,7 @@ class Priority {
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
-                                .toggleClass("add-line-wrapper", !VIEWING_DELETED_ASSIGNMENTS && [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
+                                .toggleClass("add-line-wrapper", status_value === Priority.COMPLETELY_FINISHED || !VIEWING_DELETED_ASSIGNMENTS && status_value === Priority.INCOMPLETE_WORKS);
 
             let old_hidden = status_value === Priority.COMPLETELY_FINISHED;
             if (old_hidden !== sa.sa.hidden) {
@@ -691,7 +691,7 @@ class Priority {
             that.prev_gc_assignment = assignment_container;
         }
 
-        if (priority_data.status_value === Priority.INCOMPLETE_WORKS) {
+        if (!VIEWING_DELETED_ASSIGNMENTS && priority_data.status_value === Priority.INCOMPLETE_WORKS) {
             if (!that.already_found_first_incomplete_works) {
                 assignment_container.addClass("first-add-line-wrapper");
                 $("#autofill-work-done").insertBefore(dom_assignment);
@@ -844,27 +844,27 @@ class Priority {
                     first_sort: that.params.first_sort,
                 });
             }
-            if (!VIEWING_DELETED_ASSIGNMENTS) {
-                that.addAssignmentShortcut(dom_assignment, priority_data);
-                if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
-                    first_available_tutorial_assignment = dom_assignment;
-                }
+            that.addAssignmentShortcut(dom_assignment, priority_data);
+            if (!VIEWING_DELETED_ASSIGNMENTS && !first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
+                first_available_tutorial_assignment = dom_assignment;
             }
         }
-        if (!VIEWING_DELETED_ASSIGNMENTS) {
-            // End part of addAssignmentShortcut
-            that.prev_gc_assignment?.addClass("last-add-line-wrapper");
+        // End part of addAssignmentShortcut
+        that.prev_gc_assignment?.addClass("last-add-line-wrapper");
+        that.prev_finished_assignment?.addClass("last-add-line-wrapper");
+        if (!VIEWING_DELETED_ASSIGNMENTS)
             that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
-            that.prev_finished_assignment?.addClass("last-add-line-wrapper");
 
-            $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
-                // If there's only one assignment for #auto-fill-work-done specifically, don't remove the wrapper
-                if ($(this).find("#autofill-work-done").length) return;
-    
-                $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
-                $(this).find("#delete-starred-assignments").insertBefore($(this));
-                $(this).find(".shortcut").remove();
-            });
+        // wrappers that wrap only around one assignment
+        $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
+            // Don't apply this removal to #autofill-work-done
+            if ($(this).find("#autofill-work-done").length) return;
+
+            // Remove #delete-starred-assignments and every other shortcut
+            $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
+            $(this).find("#delete-starred-assignments").insertBefore($(this));
+            $(this).find(".shortcut").remove();
+        });
 
         if (!VIEWING_DELETED_ASSIGNMENTS) {
             if (!first_available_tutorial_assignment) {

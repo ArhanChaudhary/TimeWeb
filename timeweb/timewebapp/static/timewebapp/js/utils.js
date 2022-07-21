@@ -1158,10 +1158,10 @@ document.addEventListener("DOMContentLoaded", function() {
         utils.ui.setClickHandlers.tickButtons();
         utils.ui.setClickHandlers.assignmentsHeaderUI();
         utils.ui.setClickHandlers.assignmentSorting();
-        utils.ui.setClickHandlers.deleteAllStarredAssignments();
-        utils.ui.setClickHandlers.deleteAssignmentsFromClass();
         utils.ui.setClickHandlers.autofillWorkDone();
     }
+    utils.ui.setClickHandlers.deleteAllStarredAssignments();
+    utils.ui.setClickHandlers.deleteAssignmentsFromClass();
     utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();

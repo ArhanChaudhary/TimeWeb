@@ -168,15 +168,15 @@
             </span>
             <div class="shortcut-line-right"></div>
           </div>
-          <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
-            <div class="shortcut-line-left"></div>
-            <span class="shortcut-text">
-              Delete all Starred Assignments
-              <div class="generic-button" tabindex="0">Go</div>
-            </span>
-            <div class="shortcut-line-right"></div>
-          </div>
         {% endif %}
+        <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
+          <div class="shortcut-line-left"></div>
+          <span class="shortcut-text">
+            Delete all Starred Assignments
+            <div class="generic-button" tabindex="0">Go</div>
+          </span>
+          <div class="shortcut-line-right"></div>
+        </div>
         {% for assignment in assignment_models %}
           {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
           <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
