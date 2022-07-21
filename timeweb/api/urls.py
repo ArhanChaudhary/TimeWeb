@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path("delete-assignment", views.delete_assignment, name="delete_assignment"),
+    path("restore-assignment", views.restore_assignment, name="restore_assignment"),
     path("save-assignment", views.save_assignment, name="save_assignment"),
     path("change-setting", views.change_setting, name="change_setting"),
     path("tag-add", views.tag_add, name="tag_add"),

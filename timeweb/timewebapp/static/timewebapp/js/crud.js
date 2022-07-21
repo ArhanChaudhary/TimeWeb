@@ -387,6 +387,9 @@ class Crud {
             $("#submit-assignment-button").val(sa.id);
             that.showForm();
         });
+        $(".restore-button").parent().click(function() {
+            that.deleteAssignment($(this), {restore: true});
+        });
         $('.delete-button').parent().click(function() {
             that.deleteAssignment($(this));
         });
@@ -614,7 +617,18 @@ class Crud {
             return;
         }
         const sa = utils.loadAssignmentData($button);
-        if (!params.restore)
+        if (params.restore)
+            $.ajax({
+                type: "PATCH",
+                url: "/api/restore-assignment",
+                data: {assignments: [sa.id]},
+                success: success,
+                error: function() {
+                    dom_assignment.removeClass("assignment-is-deleting");
+                    ajaxUtils.error.bind(this)(...arguments);
+                }
+            });
+        else
             $.ajax({
                 type: "POST",
                 url: "/api/delete-assignment",

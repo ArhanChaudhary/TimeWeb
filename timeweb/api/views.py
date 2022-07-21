@@ -69,6 +69,15 @@ def delete_assignment(request):
     
 @require_http_methods(["PATCH"])
 @decorator_from_middleware(APIValidationMiddleware)
+def restore_assignment(request):
+    data = QueryDict(request.body)
+    assignments = data.getlist('assignments[]')
+    TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=False, dont_hide_again=True)
+    logger.info(f'User \"{request.user}\" restored {len(assignments)} assignments')
+    return HttpResponse(status=204)
+    
+@require_http_methods(["PATCH"])
+@decorator_from_middleware(APIValidationMiddleware)
 def save_assignment(request):
     data = QueryDict(request.body)
     assignments = json.loads(data['assignments'])
