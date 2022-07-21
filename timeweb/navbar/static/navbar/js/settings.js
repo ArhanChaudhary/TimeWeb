@@ -87,6 +87,15 @@ document.addEventListener("DOMContentLoaded", function() {
         alreadyHasSubmitted = true;
         $("main form")[0].submit();
     });
+    let single_action_label_timeout;
+    $(".single-action-label").click(function() {
+        clearTimeout(single_action_label_timeout);
+        single_action_label_timeout = setTimeout(() => {
+            // the timeout and the if statement allow for double or quadruple clicking to cancel the action
+            if ($(this).parents(".right-side-of-field").find("input").is(":checked"))
+                $("#logo-container").click();
+        }, 500);
+    });
 });
 $(window).one("load", function() {
     $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
