@@ -728,7 +728,7 @@ class Priority {
         $("#currently-has-changed-notice").remove();
         utils.ui.tickClock();
     }
-    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false}) {
+    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
         this.params = params;
         if (Priority.is_currently_sorting) {
             Priority.recurse_params = this.params;
@@ -869,17 +869,19 @@ class Priority {
             utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
         }
 
-        if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
-            $(".assignment-container").each(function() {
-                that.setInitialAssignmentTopOffset($(this));
-            });
-        that.domSortAssignments(that.priority_data_list);
+        if (!that.params.dont_swap) {
+            if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
+                $(".assignment-container").each(function() {
+                    that.setInitialAssignmentTopOffset($(this));
+                });
+            that.domSortAssignments(that.priority_data_list);
 
-        if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
-            $(".assignment-container").each(function() {
-                const assignment_container = $(this);
-                that.transitionSwap(assignment_container);
-            });
+            if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
+                $(".assignment-container").each(function() {
+                    const assignment_container = $(this);
+                    that.transitionSwap(assignment_container);
+                });
+        }
 
         // Make sure this is set after assignments are sorted and swapped
         if (that.params.first_sort && $("#animate-in").length) {
