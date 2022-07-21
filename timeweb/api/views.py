@@ -56,13 +56,14 @@ from django.views.decorators.http import require_http_methods
 #     logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
 #     return HttpResponse(status=204)
 
-@require_http_methods(["DELETE"])
+@require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
 def delete_assignment(request):
-    data = QueryDict(request.body)
-
-    assignments = data.getlist('assignments[]')
-    TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
+    assignments = request.POST.getlist('assignments[]')
+    if {"false": False, None: False, "true": True}[request.POST.get("actually_delete")]:
+        TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
+    else:
+        TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=True)
     logger.info(f'User \"{request.user}\" deleted {len(assignments)} assignments')
     return HttpResponse(status=204)
     

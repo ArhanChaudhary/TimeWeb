@@ -33,6 +33,7 @@ class TimewebForm(forms.ModelForm):
             'has_alerted_due_date_passed_notice': forms.HiddenInput(),
             'google_classroom_assignment_link': forms.HiddenInput(),
             'alert_due_date_incremented': forms.HiddenInput(),
+            'hidden': forms.HiddenInput(),
         }
         error_messages = {
             'name': {

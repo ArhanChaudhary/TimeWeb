@@ -598,7 +598,7 @@ class Crud {
             new Priority().sort();
         });
     }
-    deleteAssignment($button) {
+    deleteAssignment($button, params={restore: false}) {
         const that = this;
         // Unfocus to prevent pressing enter to click again
         $button.blur();
@@ -614,16 +614,17 @@ class Crud {
             return;
         }
         const sa = utils.loadAssignmentData($button);
-        $.ajax({
-            type: "DELETE",
-            url: "/api/delete-assignment",
-            data: {assignments: [sa.id]},
-            success: success,
-            error: function() {
-                dom_assignment.removeClass("assignment-is-deleting");
-                ajaxUtils.error.bind(this)(...arguments);
-            }
-        });
+        if (!params.restore)
+            $.ajax({
+                type: "POST",
+                url: "/api/delete-assignment",
+                data: {assignments: [sa.id], actually_delete: VIEWING_DELETED_ASSIGNMENTS},
+                success: success,
+                error: function() {
+                    dom_assignment.removeClass("assignment-is-deleting");
+                    ajaxUtils.error.bind(this)(...arguments);
+                }
+            });
     }
 }
 $(window).one("load", function() {

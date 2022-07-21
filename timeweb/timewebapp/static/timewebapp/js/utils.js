@@ -238,7 +238,7 @@ setClickHandlers: {
                                 return;
                             }
                             $.ajax({
-                                type: "DELETE",
+                                type: "POST",
                                 url: "/api/delete-assignment",
                                 data: {assignments: assignment_ids_to_delete},
                                 success: success,
@@ -321,7 +321,7 @@ setClickHandlers: {
                                 return;
                             }
                             $.ajax({
-                                type: "DELETE",
+                                type: "POST",
                                 url: "/api/delete-assignment",
                                 data: {assignments: assignment_ids_to_delete},
                                 success: success,
