@@ -756,6 +756,7 @@ class VisualAssignment extends Assignment {
     }
     setGraphButtonEventListeners() {
         // Turn off mousemove to ensure there is only one mousemove handler at a time
+        let original_skew_ratio;
         this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT).on(VisualAssignment.GRAPH_HOVER_EVENT, this.mousemove.bind(this))
         .on(isTouchDevice ? "touchend" : "click", e => {
             if (this.set_skew_ratio_using_graph) {
@@ -1038,7 +1039,6 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Set skew ratio using graph button
         {
-        let original_skew_ratio;
         skew_ratio_button.click(() => {
             if (original_skew_ratio) {
                 skew_ratio_button.text(skew_ratio_button.attr("data-label")).blur();
@@ -1197,20 +1197,19 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     dom_assignment.find(".rising-arrow-animation")[0].beginElement();
     sa.initUI();
     (() => {
-        if (SETTINGS.enable_tutorial && !already_ran_tutorial) {
-            already_ran_tutorial = true;
-            $("#tutorial-click-assignment-to-open").remove();
+        if (!SETTINGS.enable_tutorial || already_ran_tutorial) return;
+        already_ran_tutorial = true;
+        $("#tutorial-click-assignment-to-open").remove();
 
-            const skip_in_debug = false;
-            if (skip_in_debug) return;
+        const skip_in_debug = false;
+        if (skip_in_debug) return;
 
-            prevent_click = true;
-            setTimeout(function() {
-                const days_until_due = Math.floor(sa.sa.complete_x) - mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
-                utils.ui.graphAlertTutorial(days_until_due);
-                prevent_click = false;
-            }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
-        }
+        prevent_click = true;
+        setTimeout(function() {
+            const days_until_due = Math.floor(sa.sa.complete_x) - mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
+            utils.ui.graphAlertTutorial(days_until_due);
+            prevent_click = false;
+        }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
     })();
 });
 });
