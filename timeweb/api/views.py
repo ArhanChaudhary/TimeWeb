@@ -70,10 +70,7 @@ def delete_assignment(request):
 @decorator_from_middleware(APIValidationMiddleware)
 def save_assignment(request):
     data = QueryDict(request.body)
-
     assignments = json.loads(data['assignments'])
-    if len(assignments) > settings.MAX_NUMBER_ASSIGNMENTS:
-        return HttpResponse("ur pretty sus", status=400)
 
     with transaction.atomic():
         # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index

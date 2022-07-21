@@ -362,7 +362,6 @@ else:
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 MAX_NUMBER_OF_TAGS = 5
-MAX_NUMBER_ASSIGNMENTS = 100
 EXAMPLE_ASSIGNMENT = {
     "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
     "x": 30, # Not the db value of x, in this case is just the number of days in the assignment

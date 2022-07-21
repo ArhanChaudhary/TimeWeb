@@ -65,9 +65,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     
     def valid_form(self, request):
         if self.form.cleaned_data.get("restore_gc_assignments"):
-            if request.user.timewebmodel_set.filter(hidden=False).count() > settings.MAX_NUMBER_ASSIGNMENTS:
-                self.form.add_error("restore_gc_assignments", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
-                return self.invalid_form(request)
             self.form.instance.added_gc_assignment_ids = []
             request.session.pop("already_created_gc_assignments_from_frontend", None)
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:

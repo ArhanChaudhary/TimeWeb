@@ -133,9 +133,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
             form_is_valid = False
-        elif self.created_assignment and request.user.timewebmodel_set.filter(hidden=False).count() > settings.MAX_NUMBER_ASSIGNMENTS:
-            self.form.add_error("name", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
-            form_is_valid = False
         if not self.form.is_valid():
             form_is_valid = False
 
