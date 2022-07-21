@@ -387,28 +387,8 @@ class Crud {
             $("#submit-assignment-button").val(sa.id);
             that.showForm();
         });
-        $('.delete-button').parent().click(function(e) {
-            const $this = $(this);
-            if (e.shiftKey) {
-                that.deleteAssignment($this);
-                return;
-            }
-            const sa = utils.loadAssignmentData($this);
-            $.confirm({
-                title: `Are you sure you want to delete assignment "${sa.name}"?`,
-                content: utils.formatting.getReversibilityStatus(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            that.deleteAssignment($this);
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
-                }
-            });
+        $('.delete-button').parent().click(function() {
+            that.deleteAssignment($(this));
         });
 
         // Arrow function to preserve this
