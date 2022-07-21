@@ -85,9 +85,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
         self.context['form'] = TimewebForm()
-        if request.session.pop("view_hidden_assignments", None):
+        if request.session.pop("view_deleted_assignments_in_app_view", None):
             self.add_user_models_to_context(request, view_hidden=True)
-            self.context["view_hidden_assignments"] = True
+            self.context["view_deleted_assignments_in_app_view"] = True
         else:
             self.add_user_models_to_context(request, view_hidden=False)
             self.context['settings_form'] = SettingsForm(initial={ # unbound form

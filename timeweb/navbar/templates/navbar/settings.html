@@ -67,10 +67,10 @@
                             {% endfor %}
                             {{ field }}
                             {% if field.widget_type == "checkbox" %}
-                                <label {% if field.name == "restore_gc_assignments" or field.name == "view_hidden_assignments" %}class="single-action-label"{% endif %} tabindex="0" for={{ field.auto_id }}>
+                                <label {% if field.name == "restore_gc_assignments" or field.name == "view_deleted_assignments" %}class="single-action-label"{% endif %} tabindex="0" for={{ field.auto_id }}>
                                     {% if field.name == "restore_gc_assignments" %}
                                         Restore
-                                    {% elif field.name == "view_hidden_assignments" %}
+                                    {% elif field.name == "view_deleted_assignments" %}
                                         View
                                     {% else %}
                                         <span class="toggle-text">

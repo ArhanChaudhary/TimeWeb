@@ -58,7 +58,7 @@ main.background-image-exists {
         padding-left: 20px;
     }
 }
-#assignments-container.view-hidden-assignments .graph-footer {
+#assignments-container.viewing-deleted-assignments .graph-footer {
     height: var(--assignment-margin-bottom);
 }
 #extra-navs-positioner {

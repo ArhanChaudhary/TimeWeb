@@ -69,8 +69,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             request.session.pop("already_created_gc_assignments_from_frontend", None)
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
             api.gc_auth_disable(request, save=False)
-        if self.form.cleaned_data.get("view_hidden_assignments"):
-            request.session["view_hidden_assignments"] = True
+        if self.form.cleaned_data.get("view_deleted_assignments"):
+            request.session["view_deleted_assignments_in_app_view"] = True
 
         self.form.save()
         logger.info(f'User \"{request.user}\" updated the settings page')

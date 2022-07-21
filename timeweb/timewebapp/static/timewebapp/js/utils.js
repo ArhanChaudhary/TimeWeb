@@ -1152,7 +1152,7 @@ for (let sa of dat) {
 };
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
-    if (!VIEW_HIDDEN_ASSIGNMENTS) {
+    if (!VIEWING_DELETED_ASSIGNMENTS) {
         utils.reloadAtMidnight();
         if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
         utils.ui.setClickHandlers.tickButtons();

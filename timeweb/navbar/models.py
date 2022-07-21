@@ -44,6 +44,13 @@ APPEARANCES = (
 MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
 
 class SettingsModel(models.Model):
+
+    # Group "Assignment Deletion"
+    immediately_delete_completely_finished_assignments = models.BooleanField(
+        default=False,
+        verbose_name=_('Immediately Delete Completely Finished Assignments'),
+    )
+
     # Group "Assignment Form"
     def_min_work_time = models.DecimalField(
         max_digits=15,
@@ -144,10 +151,6 @@ class SettingsModel(models.Model):
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Tutorial'),
-    )
-    hide_completely_finished_assignments = models.BooleanField(
-        default=False,
-        verbose_name=_('Hide Completely Finished Assignments'),
     )
     sorting_animation_threshold = models.IntegerField(
         default=15,

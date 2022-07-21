@@ -125,7 +125,7 @@ class Priority {
             const sa = new Assignment(dom_assignment);
 
             // Remember: protect ajaxs with !sa.sa.needs_more_info
-            if (!VIEW_HIDDEN_ASSIGNMENTS) {
+            if (!VIEWING_DELETED_ASSIGNMENTS) {
                 const skew_ratio_bound = sa.calcSkewRatioBound();
                 if (sa.sa.skew_ratio > skew_ratio_bound) {
                     sa.sa.skew_ratio = skew_ratio_bound;
@@ -452,13 +452,12 @@ class Priority {
                     long_str_daysleft = due_date.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'});
                 }
             }
-            // Can't just define this once because len_works changes
-            const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
-            const assignment_header_button = assignment_container.find(".assignment-header-button");
-            const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
-            const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
-
-            if (!VIEW_HIDDEN_ASSIGNMENTS) {
+            
+            if (!VIEWING_DELETED_ASSIGNMENTS) {
+                const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
+                const assignment_header_button = assignment_container.find(".assignment-header-button");
+                const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
+                const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
                 assignment_header_button.filter(function() {
                     return !!$(this).find(".tick-button").length;
                 }).toggle(
@@ -478,7 +477,7 @@ class Priority {
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
-                                .toggleClass("add-line-wrapper", !VIEW_HIDDEN_ASSIGNMENTS && [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
+                                .toggleClass("add-line-wrapper", !VIEWING_DELETED_ASSIGNMENTS && [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
 
             let old_hidden = status_value === Priority.COMPLETELY_FINISHED;
             if (old_hidden !== sa.sa.hidden) {
@@ -845,14 +844,14 @@ class Priority {
                     first_sort: that.params.first_sort,
                 });
             }
-            if (!VIEW_HIDDEN_ASSIGNMENTS) {
+            if (!VIEWING_DELETED_ASSIGNMENTS) {
                 that.addAssignmentShortcut(dom_assignment, priority_data);
                 if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
                     first_available_tutorial_assignment = dom_assignment;
                 }
             }
         }
-        if (!VIEW_HIDDEN_ASSIGNMENTS) {
+        if (!VIEWING_DELETED_ASSIGNMENTS) {
             // End part of addAssignmentShortcut
             that.prev_gc_assignment?.addClass("last-add-line-wrapper");
             that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
@@ -867,6 +866,7 @@ class Priority {
                 $(this).find(".shortcut").remove();
             });
 
+        if (!VIEWING_DELETED_ASSIGNMENTS) {
             if (!first_available_tutorial_assignment) {
                 first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
             }
@@ -905,7 +905,7 @@ class Priority {
                 });
             });
         }
-        if (!VIEW_HIDDEN_ASSIGNMENTS)
+        if (!VIEWING_DELETED_ASSIGNMENTS)
             that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
         

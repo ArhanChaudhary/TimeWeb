@@ -796,7 +796,7 @@ class VisualAssignment extends Assignment {
         });
         $(window).resize(this.resize.bind(this));
 
-        if (VIEW_HIDDEN_ASSIGNMENTS) return; // EVERYTHING PAST THIS POINT ONLY RUNS IF VIEW_HIDDEN_ASSIGNMENTS IS FALSE
+        if (VIEWING_DELETED_ASSIGNMENTS) return; // EVERYTHING PAST THIS POINT ONLY RUNS IF VIEWING_DELETED_ASSIGNMENTS IS FALSE
 
         // might be easier to set the clicks to $(document) but will do later
         const skew_ratio_button = this.dom_assignment.find(".skew-ratio-button"),
