@@ -270,6 +270,8 @@ class Priority {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
+                if (SETTINGS.immediately_delete_completely_finished_assignments && !VIEWING_DELETED_ASSIGNMENTS)
+                    new Crud().deleteAssignment(dom_assignment.find(".delete-button").parent());
             } else if (not_yet_assigned) {
                 status_image = "not_yet_assigned";
                 status_message = 'This assignment hasn\'t yet been assigned';
@@ -478,12 +480,6 @@ class Priority {
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
                                 .toggleClass("add-line-wrapper", status_value === Priority.COMPLETELY_FINISHED || !VIEWING_DELETED_ASSIGNMENTS && status_value === Priority.INCOMPLETE_WORKS);
-
-            let old_hidden = status_value === Priority.COMPLETELY_FINISHED;
-            if (old_hidden !== sa.sa.hidden) {
-                sa.sa.hidden = old_hidden;
-                ajaxUtils.sendAttributeAjaxWithTimeout("hidden", sa.sa.hidden, sa.sa.id);
-            }
 
             let status_priority;
             if (status_value === Priority.COMPLETELY_FINISHED) {

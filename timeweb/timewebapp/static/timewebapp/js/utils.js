@@ -104,7 +104,14 @@ RGBToString(color, params={ invert: false }) {
 arrayToEnglish: function(array) {
     return `<ul><li>${array.join("</li><li>")}</li></ul>`;
 },
-getReversibilityStatus: () => utils.in_simulation ? "This action can be reversed by refreshing this page." : "This action is irreversible.",
+getReversibilityStatus: function() {
+    if (utils.in_simulation)
+        return "This action can be reversed by refreshing this page.";
+    else if (VIEWING_DELETED_ASSIGNMENTS)
+        return "This action is irreversible.";  
+    else
+        return "This action can be reversed by viewing your deleted assignments in the settings.";
+},
 },
 ui: {
 tickClock: function() {
