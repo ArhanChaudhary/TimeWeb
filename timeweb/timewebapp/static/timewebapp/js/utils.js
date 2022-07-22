@@ -235,10 +235,7 @@ setClickHandlers: {
                                 return _sa.id;
                             }).toArray();
                             const success = function() {
-                                const assignments_to_delete = $(".finished");
-                                assignments_to_delete.each(function() {
-                                    new Crud().transitionDeleteAssignment($(this).children(".assignment"));
-                                }); 
+                                new Crud().transitionDeleteAssignment($(".finished > .assignment"));
                             }
                             if (ajaxUtils.disable_ajax) {
                                 success();
@@ -304,6 +301,7 @@ setClickHandlers: {
                 // Adding a filter to ensure nextUntil doesn't accidentally delete external assignments isn't necessary because this shortcut should never get broken up and the wrapper should remain continuous
                 var assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);//.filter(assignment_container => 
             }
+            assignments_to_delete = assignments_to_delete.children(".assignment");
             $.confirm({
                 title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
                 content: utils.formatting.getReversibilityStatus(),
@@ -311,22 +309,19 @@ setClickHandlers: {
                     confirm: {
                         keys: ['Enter'],
                         action: function() {
-                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                                const dom_assignment = $(this).children(".assignment");
-                                const _sa = utils.loadAssignmentData(dom_assignment);
-                                return _sa.id;
-                            }).toArray();
                             const success = function() {
                                 $this.off("click");
-                                assignments_to_delete.each(function() {
-                                    new Crud().transitionDeleteAssignment($(this).children(".assignment"));
-                                });
+                                new Crud().transitionDeleteAssignment(assignments_to_delete);
                             }
         
                             if (ajaxUtils.disable_ajax) {
                                 success();
                                 return;
                             }
+
+                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
+                                return utils.loadAssignmentData(dom_assignment).id;
+                            }).toArray();
                             $.ajax({
                                 type: "POST",
                                 url: "/api/delete-assignment",

@@ -98,6 +98,7 @@ class Crud {
     static FORM_POSITION_TOP = 15
     static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
+    static SHORTCUT_DELETION_ANIMATION_THRESHOLD = 15
 
     // it is important to use .click instead of .prop("checked", true/false) so the animation click handler fires
     static STANDARD_FIELD_GROUP = () => {
@@ -575,30 +576,39 @@ class Crud {
         });
     }
     // Delete assignment
-    transitionDeleteAssignment(dom_assignment) {
+    transitionDeleteAssignment($dom_assignment) {
         const that = this;
-        const sa = utils.loadAssignmentData(dom_assignment);
+        $dom_assignment.each(function() {
+            const dom_assignment = $(this);
+            const assignment_container = dom_assignment.parents(".assignment-container");
+            const sa = utils.loadAssignmentData(dom_assignment);
 
-        // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
-        // $("#assignments-container").css("overflow", "hidden"); (unhide this in the callback if this is added back)
-        // NOTE: removed because of bugginess and just looking bad overall
-
-        // Opacity CSS transition
-        dom_assignment.css({
-            opacity: "0",
-            zIndex: dom_assignment.css("z-index")-2,
-        });
-        const assignment_container = dom_assignment.parents(".assignment-container");
-        // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
-        assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", function() {
-            dat = dat.filter(_sa => sa.id !== _sa.id);
-            // If a shorcut is in assignment_container, take it out so it doesn't get deleted
-            assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
-            assignment_container.remove();
-            // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
-            dom_assignment.removeClass("assignment-is-closing open-assignment");
-            // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-            new Priority().sort({ dont_swap: true });
+            // Make overflow hidden because trying transitioning margin bottom off the screen still allows it to be scrolled to
+            // $("#assignments-container").css("overflow", "hidden"); (unhide this in the callback if this is added back)
+            // NOTE: removed because of bugginess and just looking bad overall
+            function transition_callback() {
+                dat = dat.filter(_sa => sa.id !== _sa.id);
+                // If a shorcut is in assignment_container, take it out so it doesn't get deleted
+                assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
+                assignment_container.remove();
+                // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
+                dom_assignment.removeClass("assignment-is-closing open-assignment");
+                // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
+                new Priority().sort({ dont_swap: true });
+            }
+            
+            if ($dom_assignment.length > Crud.SHORTCUT_DELETION_ANIMATION_THRESHOLD) {
+                transition_callback();
+            } else {
+                // Opacity CSS transition
+                dom_assignment.css({
+                    opacity: "0",
+                    zIndex: dom_assignment.css("z-index")-2,
+                });
+                // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
+                assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, 
+                    Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", transition_callback);
+            }
         });
     }
     deleteAssignment($button, params={restore: false}) {
