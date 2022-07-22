@@ -78,15 +78,23 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    let alreadyHasSubmitted = false;
+    let hasSubmitted = false;
     $("#logo-container").click(function(e) {
         e.preventDefault();
-        if (alreadyHasSubmitted) return;
+        if (hasSubmitted) return;
         $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
-        alreadyHasSubmitted = true;
+        hasSubmitted = true;
         $("main form")[0].submit();
     });
+    // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
+    window.onbeforeunload = function(e) {
+        if (hasSubmitted) return;
+
+        e.preventDefault();
+        $("#logo-container").removeAttr("tabindex").focus();
+        return e.returnValue = "Your settings may be lost.";
+    };
     let single_action_label_timeout;
     $(".single-action-label").click(function() {
         clearTimeout(single_action_label_timeout);
