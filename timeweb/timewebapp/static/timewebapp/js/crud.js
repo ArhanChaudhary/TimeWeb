@@ -578,7 +578,8 @@ class Crud {
     // Delete assignment
     transitionDeleteAssignment($dom_assignment) {
         const that = this;
-        $dom_assignment.each(function() {
+        const ids = new Set();
+        $dom_assignment.each(function(i) {
             const dom_assignment = $(this);
             const assignment_container = dom_assignment.parents(".assignment-container");
             const sa = utils.loadAssignmentData(dom_assignment);
@@ -587,14 +588,18 @@ class Crud {
             // $("#assignments-container").css("overflow", "hidden"); (unhide this in the callback if this is added back)
             // NOTE: removed because of bugginess and just looking bad overall
             function transition_callback() {
-                dat = dat.filter(_sa => sa.id !== _sa.id);
                 // If a shorcut is in assignment_container, take it out so it doesn't get deleted
                 assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
                 assignment_container.remove();
                 // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
                 dom_assignment.removeClass("assignment-is-closing open-assignment");
-                // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-                new Priority().sort({ dont_swap: true });
+
+                ids.add(sa.id);
+                if (i === $dom_assignment.length - 1) {
+                    dat = dat.filter(sa => !ids.has(sa.id));
+                    // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
+                    new Priority().sort({ dont_swap: true });
+                }
             }
             
             if ($dom_assignment.length > Crud.SHORTCUT_DELETION_ANIMATION_THRESHOLD) {
