@@ -125,24 +125,22 @@ class Priority {
             const sa = new Assignment(dom_assignment);
 
             // Remember: protect ajaxs with !sa.sa.needs_more_info
-            if (!VIEWING_DELETED_ASSIGNMENTS) {
-                const skew_ratio_bound = sa.calcSkewRatioBound();
-                if (sa.sa.skew_ratio > skew_ratio_bound) {
-                    sa.sa.skew_ratio = skew_ratio_bound;
-                    !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
-                } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
-                    sa.sa.skew_ratio = 2 - skew_ratio_bound;
-                    !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
-                }
-                
-                sa.setParabolaValues();
-                if (that.params.first_sort)
-                    // Fix dynamic start if y or anything else was changed
-                    // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
-    
-                    // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
-                    sa.setDynamicStartIfInDynamicMode();
+            const skew_ratio_bound = sa.calcSkewRatioBound();
+            if (sa.sa.skew_ratio > skew_ratio_bound) {
+                sa.sa.skew_ratio = skew_ratio_bound;
+                !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
+            } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
+                sa.sa.skew_ratio = 2 - skew_ratio_bound;
+                !sa.sa.needs_more_info && ajaxUtils.sendAttributeAjaxWithTimeout("skew_ratio", sa.sa.skew_ratio, sa.sa.id);
             }
+            
+            sa.setParabolaValues();
+            if (that.params.first_sort)
+                // Fix dynamic start if y or anything else was changed
+                // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
+
+                // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                sa.setDynamicStartIfInDynamicMode();
                 
             let display_format_minutes = false;
             let len_works = sa.sa.works.length - 1;
@@ -270,7 +268,7 @@ class Priority {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
-                if (SETTINGS.immediately_delete_completely_finished_assignments && !VIEWING_DELETED_ASSIGNMENTS && !sa.sa.dont_hide_again)
+                if (SETTINGS.immediately_delete_completely_finished_assignments && !sa.sa.dont_hide_again)
                     new Crud().deleteAssignment(dom_assignment.find(".delete-button").parent());
             } else if (not_yet_assigned) {
                 status_image = "not_yet_assigned";
@@ -460,31 +458,29 @@ class Priority {
                 }
             }
             
-            if (!VIEWING_DELETED_ASSIGNMENTS) {
-                const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
-                const assignment_header_button = assignment_container.find(".assignment-header-button");
-                const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
-                const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
-                assignment_header_button.filter(function() {
-                    return !!$(this).find(".tick-button").length;
-                }).toggle(
-                    !(
-                        [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
-                        || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
-                    )
-                ).toggleClass("slashed", already_entered_work_input_for_today);
-                assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
-                assignment_header_tick_svg.attr("viewBox", (function() {
-                    let bbox = assignment_header_tick_svg[0].getBBox();
-                    return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
-                })());
-            }
+            const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
+            const assignment_header_button = assignment_container.find(".assignment-header-button");
+            const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
+            const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
+            assignment_header_button.filter(function() {
+                return !!$(this).find(".tick-button").length;
+            }).toggle(
+                !(
+                    [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
+                    || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
+                )
+            ).toggleClass("slashed", already_entered_work_input_for_today);
+            assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
+            assignment_header_tick_svg.attr("viewBox", (function() {
+                let bbox = assignment_header_tick_svg[0].getBBox();
+                return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+            })());
             
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
-                                .toggleClass("add-line-wrapper", status_value === Priority.COMPLETELY_FINISHED || !VIEWING_DELETED_ASSIGNMENTS && status_value === Priority.INCOMPLETE_WORKS);
+                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
 
             let status_priority;
             if (status_value === Priority.COMPLETELY_FINISHED) {
@@ -692,7 +688,7 @@ class Priority {
             that.prev_gc_assignment = assignment_container;
         }
 
-        if (!VIEWING_DELETED_ASSIGNMENTS && priority_data.status_value === Priority.INCOMPLETE_WORKS) {
+        if (priority_data.status_value === Priority.INCOMPLETE_WORKS) {
             if (!that.already_found_first_incomplete_works) {
                 assignment_container.addClass("first-add-line-wrapper");
                 $("#autofill-work-done").insertBefore(dom_assignment);
@@ -853,8 +849,7 @@ class Priority {
         // End part of addAssignmentShortcut
         that.prev_gc_assignment?.addClass("last-add-line-wrapper");
         that.prev_finished_assignment?.addClass("last-add-line-wrapper");
-        if (!VIEWING_DELETED_ASSIGNMENTS)
-            that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
+        that.prev_incomplete_works_assignment?.addClass("last-add-line-wrapper");
 
         // wrappers that wrap only around one assignment
         $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
@@ -867,12 +862,10 @@ class Priority {
             $(this).find(".shortcut").remove();
         });
 
-        if (!VIEWING_DELETED_ASSIGNMENTS) {
-            if (!first_available_tutorial_assignment) {
-                first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
-            }
-            utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
+        if (!first_available_tutorial_assignment) {
+            first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
         }
+        utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
         if (!that.params.dont_swap) {
             if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
@@ -908,12 +901,24 @@ class Priority {
                 });
             });
         }
-        if (!VIEWING_DELETED_ASSIGNMENTS)
-            that.updateInfoHeader();
+        that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
         
     }
 }
-document.addEventListener("DOMContentLoaded", function() {
-    new Priority().sort({ first_sort: true });
-});
+if (VIEWING_DELETED_ASSIGNMENTS) {
+    // positionTags is called from window.onload in Priority.sort
+    $(window).one("load", function() {
+        $(".assignment").each(function() {
+            new VisualAssignment($(this)).positionTags();
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        $(".assignment")
+    });
+} else {
+    document.addEventListener("DOMContentLoaded", function() {
+        new Priority().sort({ first_sort: true });
+    });
+
+}
