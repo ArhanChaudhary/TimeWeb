@@ -270,7 +270,7 @@ class Priority {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
-                if (SETTINGS.immediately_delete_completely_finished_assignments && !VIEWING_DELETED_ASSIGNMENTS)
+                if (SETTINGS.immediately_delete_completely_finished_assignments && !VIEWING_DELETED_ASSIGNMENTS && !sa.sa.dont_hide_again)
                     new Crud().deleteAssignment(dom_assignment.find(".delete-button").parent());
             } else if (not_yet_assigned) {
                 status_image = "not_yet_assigned";
@@ -397,6 +397,11 @@ class Priority {
                         status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
                 }
+            }
+
+            if (status_value !== Priority.COMPLETELY_FINISHED && sa.sa.dont_hide_again) {
+                sa.sa.dont_hide_again = false;
+                ajaxUtils.sendAttributeAjaxWithTimeout("dont_hide_again", sa.sa.dont_hide_again, sa.sa.id);
             }
 
             // If the condition to alert the due date has passed is false, set sa.sa.has_alerted_due_date_passed_notice to true

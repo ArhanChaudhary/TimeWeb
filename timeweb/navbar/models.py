@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from timezone_field import TimeZoneField
-from timewebapp.models import get_midnight_time, empty_list, empty_dict, create_image_path, WEEKDAYS
+from timewebapp.models import empty_list, empty_dict, create_image_path, WEEKDAYS
 
 HORIZONTAL_TAG_POSITIONS = (
     ("Left", "Left"),
