@@ -618,13 +618,13 @@ addTagHandlers: function() {
 },
 setKeybinds: function() {
 $(document).keydown(function(e) {
-if (e.ctrlKey || e.metaKey) return;
+if (e.ctrlKey || e.metaKey
+    || VIEWING_DELETED_ASSIGNMENTS && ["e", "Backspace", "s", "f"].includes(e.key)) return;
 switch (e.key) {
     case "n":
     case "e":
     case "d":
-    case "D":
-    case "h":
+    case "r":
     case "Backspace":
     case "s":
     case "f":
@@ -643,8 +643,7 @@ switch (e.key) {
                 break;
             case "e":
             case "d":
-            case "D":
-            case "h":
+            case "r":
             case "Backspace":
             case "s":
             case "f":
@@ -671,10 +670,8 @@ switch (e.key) {
                         case "d":
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
                             break;
-                        case "D":
-                            const click_delete_button = $.Event("click");
-                            click_delete_button.shiftKey = e.shiftKey;
-                            assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
+                        case "r":
+                            assignment_container.find(".restore-button").parents(".assignment-header-button").focus().click();
                             break;
                         case "f":
                             assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
