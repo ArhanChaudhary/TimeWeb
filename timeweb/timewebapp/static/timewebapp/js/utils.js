@@ -619,7 +619,7 @@ addTagHandlers: function() {
 setKeybinds: function() {
 $(document).keydown(function(e) {
 if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["e", "Backspace", "s", "f"].includes(e.key)) return;
+    || VIEWING_DELETED_ASSIGNMENTS && ["e", "Backspace", "s", "f", "n"].includes(e.key)) return;
 switch (e.key) {
     case "n":
     case "e":
