@@ -1066,7 +1066,7 @@ for (let sa of dat) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
             let raw_date_now = new Date(utils.getRawDateNow().valueOf());
             let time_diff = complete_due_date - raw_date_now;
-            if (time_diff + utils.SCHEDULED_TIMEOUT_DELAY > 0)
+            if (time_diff + utils.SCHEDULED_TIMEOUT_DELAY > 0 && !VIEWING_DELETED_ASSIGNMENTS)
                 $(window).one("load", function() {
                     setTimeout(function() {
                         new Priority().sort();

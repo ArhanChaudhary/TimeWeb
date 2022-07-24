@@ -67,6 +67,59 @@ class Priority {
             }
         }, 0);
     }
+    // complete_date_now isn't actually needed, just so we don't need to call new Date() again
+    static generateDaysleftMessages(sa, complete_date_now) {
+        const that = this;
+        let str_daysleft;
+        let long_str_daysleft;
+        let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
+        if (today_minus_assignment_date < 0) {
+            if (today_minus_assignment_date === -1) {
+                str_daysleft = 'Assigned Tomorrow';
+            } else if (today_minus_assignment_date > -7) {
+                str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
+            } else {
+                str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
+            }
+            long_str_daysleft = sa.sa.assignment_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
+        } else if (Number.isFinite(sa.sa.x)) {
+            const due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+            const due_date = new Date(sa.sa.assignment_date.valueOf());
+            due_date.setDate(due_date.getDate() + Math.floor(sa.sa.complete_x));
+            if (due_date_minus_today < -1) {
+                str_daysleft = -due_date_minus_today + "d Ago";
+            } else {
+                if (due_date_minus_today === -1) {
+                    str_daysleft = 'Yesterday';
+                } else if (due_date_minus_today === 0) {
+                    str_daysleft = 'Today';
+                } else if (due_date_minus_today === 1) {
+                    str_daysleft = 'Tomorrow';
+                } else if (due_date_minus_today < 7) {
+                    str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                } else {
+                    str_daysleft = due_date_minus_today + "d";
+                }
+                if (sa.sa.break_days.length) {
+                    // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
+                    // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
+                    const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true });
+                    if (remaining_work_days > 0 // NaN is returned if due_date_minus_today is negative. Let's check if it's greater than 0 for readability
+                        && due_date_minus_today !== remaining_work_days)
+                        str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
+                }
+            }
+            if (complete_date_now.getFullYear() === due_date.getFullYear()) {
+                long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
+            } else {
+                long_str_daysleft = due_date.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'});
+            }
+        } else {
+            str_daysleft = "";
+            long_str_daysleft = "";
+        }
+        return {str_daysleft, long_str_daysleft};
+    }
     setInitialAssignmentTopOffset($assignment_container) {
         const that = this;
         $assignment_container.attr("data-initial-top-offset", $assignment_container.offset().top);
@@ -119,7 +172,7 @@ class Priority {
 
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
-        let complete_date_now = utils.getRawDateNow();
+        const complete_date_now = utils.getRawDateNow();
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
@@ -413,50 +466,9 @@ class Priority {
                 that.due_date_incremented_notices.push(sa.sa);
             }
 
-            let str_daysleft = "";
-            let long_str_daysleft = "";
-            if (today_minus_assignment_date < 0) {
-                if (today_minus_assignment_date === -1) {
-                    str_daysleft = 'Assigned Tomorrow';
-                } else if (today_minus_assignment_date > -7) {
-                    str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
-                } else {
-                    str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
-                }
-                long_str_daysleft = sa.sa.assignment_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
-            } else if (Number.isFinite(sa.sa.x)) {
-                due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                const due_date = new Date(sa.sa.assignment_date.valueOf());
-                due_date.setDate(due_date.getDate() + Math.floor(sa.sa.complete_x));
-                if (due_date_minus_today < -1) {
-                    str_daysleft = -due_date_minus_today + "d Ago";
-                } else {
-                    if (due_date_minus_today === -1) {
-                        str_daysleft = 'Yesterday';
-                    } else if (due_date_minus_today === 0) {
-                        str_daysleft = 'Today';
-                    } else if (due_date_minus_today === 1) {
-                        str_daysleft = 'Tomorrow';
-                    } else if (due_date_minus_today < 7) {
-                        str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
-                    } else {
-                        str_daysleft = due_date_minus_today + "d";
-                    }
-                    if (sa.sa.break_days.length) {
-                        // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
-                        // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
-                        const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true });
-                        if (remaining_work_days > 0 // NaN is returned if due_date_minus_today is negative. Let's check if it's greater than 0 for readability
-                            && due_date_minus_today !== remaining_work_days)
-                            str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
-                    }
-                }
-                if (complete_date_now.getFullYear() === due_date.getFullYear()) {
-                    long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
-                } else {
-                    long_str_daysleft = due_date.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'});
-                }
-            }
+            let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(sa, complete_date_now);
+            dom_title.attr("data-daysleft", str_daysleft);
+            dom_title.attr("data-long-daysleft", long_str_daysleft);
             
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");
@@ -520,8 +532,6 @@ class Priority {
                 dom_status_image.find("use").removeAttr("href");
             }
             dom_status_message.html(status_message); // use .html() instead of .text() so that .unfinished-message is parsed as an HTML element
-            dom_title.attr("data-daysleft", str_daysleft);
-            dom_title.attr("data-long-daysleft", long_str_daysleft);
             // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.text(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '').toggleClass("hide-on-mobile", !!sa.unit_is_of_time);
@@ -730,6 +740,9 @@ class Priority {
         utils.ui.tickClock();
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
+        // can still be called from the tags or the end of transitionDeleteAssignment
+        if (VIEWING_DELETED_ASSIGNMENTS) return;
+
         this.params = params;
         if (Priority.is_currently_sorting) {
             Priority.recurse_params = this.params;
@@ -785,6 +798,7 @@ class Priority {
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
+            // make sure to add any added code here to VIEWING_DELETED_ASSIGNMENTS at the bottom
             new Promise(function(resolve) {
                 if (that.params.first_sort) {
                     $(window).one("load", resolve);
@@ -842,7 +856,7 @@ class Priority {
                 });
             }
             that.addAssignmentShortcut(dom_assignment, priority_data);
-            if (!VIEWING_DELETED_ASSIGNMENTS && !first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
+            if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
                 first_available_tutorial_assignment = dom_assignment;
             }
         }
@@ -914,11 +928,17 @@ if (VIEWING_DELETED_ASSIGNMENTS) {
         });
     });
     document.addEventListener("DOMContentLoaded", function() {
-        $(".assignment")
+        const complete_date_now = utils.getRawDateNow();
+        $(".assignment").each(function() {
+            let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(new Assignment($(this)), complete_date_now);
+            const dom_title = $(this).find(".title");
+            dom_title.attr("data-daysleft", str_daysleft);
+            dom_title.attr("data-long-daysleft", long_str_daysleft);
+        });
+        $("#assignments-container").css("opacity", "1");
     });
 } else {
     document.addEventListener("DOMContentLoaded", function() {
         new Priority().sort({ first_sort: true });
     });
-
 }
