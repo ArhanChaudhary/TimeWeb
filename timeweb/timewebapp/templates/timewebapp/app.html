@@ -226,21 +226,23 @@
                     <div class="description">{{ assignment.description|linebreaks }}</div>
                   {% endif %}
                 </div>
-                <svg width="30px" height="20px" class="arrow-container">
-                  <polygon points="5,0 5,20 15,10" fill="currentColor">
-                    <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
-                    <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
-                  </polygon>
-                </svg>
-                <div class="right-side-of-header">
-                  <svg class="status-image" preserveAspectRatio="none">
-                    <use></use>
+                {% if not view_deleted_assignments_in_app_view %}
+                  <svg width="30px" height="20px" class="arrow-container">
+                    <polygon points="5,0 5,20 15,10" fill="currentColor">
+                      <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
+                      <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
+                    </polygon>
                   </svg>
-                  <div class="align-to-status-message-container">
-                    <span class="status-message"></span>
+                  <div class="right-side-of-header">
+                    <svg class="status-image" preserveAspectRatio="none">
+                      <use></use>
+                    </svg>
+                    <div class="align-to-status-message-container">
+                      <span class="status-message"></span>
+                    </div>
                   </div>
-                  <span class="completion-time"></span>
-                </div>
+                {% endif %}
+                <span class="completion-time"></span>
                 {% if not view_deleted_assignments_in_app_view %}
                   {% if assignment.google_classroom_assignment_link %}
                     <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">

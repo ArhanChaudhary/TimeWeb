@@ -61,6 +61,9 @@ main.background-image-exists {
 #assignments-container.viewing-deleted-assignments .graph-footer {
     height: var(--assignment-margin-bottom);
 }
+#assignments-container.viewing-deleted-assignments .left-side-of-header {
+    --left-side-of-header-width: initial;
+}
 #extra-navs-positioner {
     box-sizing: border-box;
     min-height: calc(100vh - var(--header-height) - 10px);

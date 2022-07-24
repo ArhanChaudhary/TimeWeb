@@ -95,10 +95,11 @@ class Assignment {
     getWorkingDaysRemaining(params={reference: null, floor_due_time: false}) {
         const original_red_line_start_x = this.red_line_start_x;
         switch (params.reference) {
-            case "today":
+            case "today": {
                 let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
                 this.red_line_start_x = today_minus_assignment_date;
                 break;
+            }
             case "blue line end": {
                 let len_works = this.sa.works.length - 1;
                 this.red_line_start_x = this.sa.blue_line_start + len_works;
@@ -1098,7 +1099,7 @@ class VisualAssignment extends Assignment {
     positionTags() {
         const dom_tags = this.dom_assignment.find(".tags");
         switch (SETTINGS.horizontal_tag_position) {
-            case "Left":
+            case "Left": {
                 if (SETTINGS.vertical_tag_position === "Top") {
                     dom_tags.removeClass("tags-top");
                     dom_tags.addClass("tags-bottom");
@@ -1130,12 +1131,14 @@ class VisualAssignment extends Assignment {
                     dom_tags.removeClass("tags-bottom");
                 }
                 break;
+            }
 
-            case "Middle":
+            case "Middle": {
                 if (!dom_tags.parents(".align-to-status-message-container").length) {
                     dom_tags.prependTo(this.dom_assignment.find(".align-to-status-message-container"));
                 }
                 break;
+            }
         }
     }
     displayTruncateWarning() {
