@@ -70,15 +70,16 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if view_hidden:
             if "everything_before" in request.GET:
                 everything_before = int(request.GET["everything_before"])
-                query = request.user.timewebmodel_set.filter(hidden=True, pk__lt=everything_before).order_by("-pk")
+                all_timewebmodels = request.user.timewebmodel_set.filter(hidden=True, pk__lt=everything_before).order_by("-pk")
             else:
                 everything_before = None
-                query = request.user.timewebmodel_set.filter(hidden=True).order_by("-pk")
+                all_timewebmodels = request.user.timewebmodel_set.filter(hidden=True).order_by("-pk")
         else:
-            query = request.user.timewebmodel_set.filter(hidden=False)
-        timewebmodels = list(query[:settings.DELETED_ASSIGNMENTS_PER_PAGE])
+            all_timewebmodels = request.user.timewebmodel_set.filter(hidden=False)
+        timewebmodels = list(all_timewebmodels)
         if view_hidden:
-            self.context["show_next_page"] = query.count() > settings.DELETED_ASSIGNMENTS_PER_PAGE
+            self.context["show_next_page"] = len(timewebmodels) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+        timewebmodels = timewebmodels[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 
