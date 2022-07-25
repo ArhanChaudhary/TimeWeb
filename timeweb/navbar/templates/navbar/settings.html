@@ -10,6 +10,11 @@
 
 {% block js %}
     {{ default_settings|json_script:"default-settings" }}
+    {% comment %}
+        moment-mini is stuck on an older version of moment
+        although using a moment.js version this old has https://security.snyk.io/vuln/SNYK-JS-MOMENT-2944238 and https://security.snyk.io/vuln/SNYK-JS-MOMENT-2440688
+        these are backend vulnerabilities
+    {% endcomment %}
     <script src="https://unpkg.com/moment-mini@2.24.0/moment.min.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.js" crossorigin="anonymous"></script>
     <script src="{% static 'navbar/js/settings.js' %}"></script>

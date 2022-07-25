@@ -310,13 +310,13 @@
         <span {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
           {% if view_deleted_assignments_in_app_view %}
             {% if show_previous_page %}
-              <a id="previous-page">Previous Page</a>
+              <span id="previous-page">Previous Page</span>
             {% endif %}
             {% if show_previous_page and show_next_page %}
               &#8226;
             {% endif %}
             {% if show_next_page %}
-              <a id="next-page">Next Page</a>
+              <span id="next-page">Next Page</span>
             {% endif %}
           {% else %}
             <a href="{{ changelog }}">Changelog</a>
