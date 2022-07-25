@@ -87,6 +87,10 @@ document.addEventListener("DOMContentLoaded", function() {
         hasSubmitted = true;
         $("main form")[0].submit();
     });
+    // or else logging out will display the "you form changes my not been saved" alert
+    $("header form").submit(function() {
+        hasSubmitted = true;
+    });
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
     window.onbeforeunload = function(e) {
         if (hasSubmitted) return;
