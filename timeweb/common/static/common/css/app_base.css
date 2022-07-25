@@ -394,6 +394,9 @@ main.finished-header-transition {
 #changelog-container {
     padding: 0 10px;
 }
+.jconfirm {
+    overflow-y: auto !important;
+}
 .jconfirm .jconfirm-content-pane {
     max-height: 60vh !important;
 }
