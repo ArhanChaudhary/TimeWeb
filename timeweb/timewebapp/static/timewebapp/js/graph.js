@@ -1186,7 +1186,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
             sa.positionTags();
         });
         sa.positionTags();
-        dom_assignment.find(".falling-arrow-animation")[0].beginElement();
+        dom_assignment.find(".falling-arrow-animation")[0]?.beginElement();
         return;
     }
     SETTINGS.one_graph_at_a_time && $(".assignment.open-assignment").click();
@@ -1197,7 +1197,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     sa.positionTags();
     sa.displayTruncateWarning();
     assignment_footer.css("display", "block");
-    dom_assignment.find(".rising-arrow-animation")[0].beginElement();
+    dom_assignment.find(".rising-arrow-animation")[0]?.beginElement();
     sa.initUI();
     (() => {
         if (!SETTINGS.enable_tutorial || already_ran_tutorial) return;
