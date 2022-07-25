@@ -209,6 +209,10 @@
                     <div class="tag-add-text">Add Tag</div>
                   </div>
                 </div>
+                {% comment %}
+                note: confirm with the .assignment-header > :nth-last-child(2) selector before changing
+                any .assignment-header first child element tags
+                {% endcomment %}
                 <div class="left-side-of-header{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
                   <span class="title">
                     {% if assignment.google_classroom_assignment_link %}
@@ -227,13 +231,13 @@
                   {% endif %}
                 </div>
                 {% if not view_deleted_assignments_in_app_view %}
-                  <svg width="30px" height="20px" class="arrow-container">
-                    <polygon points="5,0 5,20 15,10" fill="currentColor">
-                      <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
-                      <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
-                    </polygon>
-                  </svg>
-                  <div class="right-side-of-header">
+                  <div class="middle-of-header">
+                    <svg width="20px" height="20px" class="arrow-container">
+                      <polygon points="5,0 5,20 15,10" fill="currentColor">
+                        <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
+                        <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
+                      </polygon>
+                    </svg>
                     <svg class="status-image" preserveAspectRatio="none">
                       <use></use>
                     </svg>
@@ -242,36 +246,38 @@
                     </div>
                   </div>
                 {% endif %}
-                <span class="completion-time"></span>
-                {% if not view_deleted_assignments_in_app_view %}
-                  {% if assignment.google_classroom_assignment_link %}
-                    <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
-                      <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
-                        <use href="#external_link-svg"></use>
+                <div class="right-side-of-header">
+                  <span class="completion-time"></span>
+                  {% if not view_deleted_assignments_in_app_view %}
+                    {% if assignment.google_classroom_assignment_link %}
+                      <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
+                        <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                          <use href="#external_link-svg"></use>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg class="tick-button" width="25" preserveAspectRatio="none">
+                        <use href="#tick-svg"></use>
                       </svg>
-                    </a>
+                    </div>
+                    <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
+                        <use href="#edit-svg"></use>
+                      </svg>
+                    </div>
+                    {% else %}
+                    <div class="assignment-header-button" title="Restore Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
+                        <use href="#restore-svg"></use>
+                      </svg>
+                    </div>
                   {% endif %}
-                  <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                    <svg class="tick-button" width="25" preserveAspectRatio="none">
-                      <use href="#tick-svg"></use>
+                  <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                    <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
+                      <use href="#delete-svg"></use>
                     </svg>
                   </div>
-                  <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                    <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
-                      <use href="#edit-svg"></use>
-                    </svg>
-                  </div>
-                  {% else %}
-                  <div class="assignment-header-button" title="Restore Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                    <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
-                      <use href="#restore-svg"></use>
-                    </svg>
-                  </div>
-                {% endif %}
-                <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                  <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
-                    <use href="#delete-svg"></use>
-                  </svg>
                 </div>
               </div>
               <div class="assignment-footer">

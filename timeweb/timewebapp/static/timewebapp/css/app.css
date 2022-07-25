@@ -407,25 +407,27 @@ main.background-image-exists {
     content: attr(data-long-daysleft) !important;
 }
 .arrow-container {
-    float: left;
     margin-left: var(--arrow-margin-left);
+    margin-right: 11px;
     overflow: visible;
     fill: currentColor;
 }
-.right-side-of-header {
+.status-image {
+    flex-shrink: 0;
+}
+.middle-of-header {
     margin: 0;
-    margin-right: 7px;
     white-space: initial;
     display: flex;
-    flex-grow: 1;
     align-items: center;
 }
-.status-image {
-    position: absolute;
+/* selects the element right before right-side-of-header
+do this because midde-of-header is hidden in the delete assignments view */
+.assignment-header > :nth-last-child(2) {
+    margin-right: 35px;
 }
 .align-to-status-message-container {
-    margin-right: 28px;
-    margin-left: 18px;
+    margin-left: 5px;
 }
 .tags {
     position: absolute;
@@ -728,13 +730,17 @@ main.background-image-exists {
 }
 .completion-time {
     white-space: nowrap;
+    margin-right: 3px;
+}
+.right-side-of-header {
     margin-left: auto;
+    display: flex;
+    align-self: normal;
 }
 .assignment-header-button {
     position: relative;
     display: flex;
     align-items: center;
-    align-self: normal;
     justify-content: center;
     /* negate the variable pixel value */
     margin-top: calc(-1 * var(--vertical-assignment-padding));
