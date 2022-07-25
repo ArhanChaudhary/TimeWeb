@@ -701,13 +701,20 @@ switch (e.key) {
                 // If there is an open assignment in view, select that one and 
                 const first_open_assignment = $(".assignment.open-assignment").first();
                 if (first_open_assignment.length) {
-                    var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").next().children(".assignment");
+                    var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").nextAll(".assignment-container").children(".assignment")
+                        .filter(function() {
+                            return new VisualAssignment($(this)).canOpenAssignment();
+                        }).first();
                     first_open_assignment[0].scrollIntoView({
                         behavior: 'smooth',
                         block: 'start',
                     });
                 } else {
-                    var assignment_to_be_opened = $(".assignment").first();
+                    var assignment_to_be_opened = $(".assignment")
+                        .filter(function() {
+                            return new VisualAssignment($(this)).canOpenAssignment();
+                        }).first();
+                    if (!assignment_to_be_opened.length) return;
                     assignment_to_be_opened[0].scrollIntoView({
                         behavior: 'smooth',
                         block: 'start',
@@ -721,7 +728,10 @@ switch (e.key) {
                 // If there is an open assignment in view, select that one and 
                 const last_open_assignment = $(".assignment.open-assignment").last();
                 if (last_open_assignment.length) {
-                    var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prev().children(".assignment");
+                    var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prevAll(".assignment-container").children(".assignment")
+                        .filter(function() {
+                            return new VisualAssignment($(this)).canOpenAssignment();
+                        }).first();
                     if (assignment_to_be_opened.length) {
                         assignment_to_be_opened[0].scrollIntoView({
                             behavior: 'smooth',
@@ -729,7 +739,11 @@ switch (e.key) {
                         });
                     }
                 } else {
-                    var assignment_to_be_opened = $(".assignment").last();
+                    var assignment_to_be_opened = $(".assignment")
+                        .filter(function() {
+                            return new VisualAssignment($(this)).canOpenAssignment();
+                        }).last();
+                    if (!assignment_to_be_opened.length) return;
                 }
                 last_open_assignment.click();
                 if (!assignment_to_be_opened.hasClass("open-assignment")) {
