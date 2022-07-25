@@ -673,14 +673,20 @@ switch (e.key) {
                             break;
                         case "Backspace":
                         case "s":
-                            if (dom_assignment.hasClass("open-assignment"))
+                            if (dom_assignment.hasClass("open-assignment")) {
                             switch (e.key) {
                                 case "Backspace":
-                                    assignment_container.find(".delete-work-input-button").focus().click();
+                                    var graph_button = assignment_container.find(".delete-work-input-button");
                                     break;
                                 case "s":
-                                    assignment_container.find(".skew-ratio-button").focus().click();
+                                    var graph_button = assignment_container.find(".skew-ratio-button");
                                     break;
+                            }
+                            // We can't use a normal .click().focus() or else
+                            // a graph button out of view scrolls it all the way to the middle of the page
+                            graph_button[0].scrollIntoView(false);
+                            graph_button.click();
+                            setTimeout(() => graph_button.focus(), 0);
                             }
                             break;
                     }
