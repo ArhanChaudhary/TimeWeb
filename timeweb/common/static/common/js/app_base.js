@@ -287,8 +287,7 @@ function resetHeaderLayout() {
     const username = $("#user-greeting #username"),
         logo = $("#logo-container"),
         welcome = $("#welcome"),
-        plus_button = $("#image-new-container img"),
-        plus_button_width = plus_button.width()||0,
+        plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
         newassignmenttext = $("#new-assignment-text");
 
     logo.css({
