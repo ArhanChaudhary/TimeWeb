@@ -619,6 +619,7 @@ switch (e.key) {
     case "n":
     case "e":
     case "d":
+    case "D":
     case "r":
     case "Backspace":
     case "s":
@@ -638,6 +639,7 @@ switch (e.key) {
                 break;
             case "e":
             case "d":
+            case "D":
             case "r":
             case "Backspace":
             case "s":
@@ -665,6 +667,11 @@ switch (e.key) {
                         case "d":
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
                             break;
+                        case "D": {
+                            const click_delete_button = $.Event("click");
+                            click_delete_button.shiftKey = e.shiftKey;
+                            assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
+                        }
                         case "r":
                             assignment_container.find(".restore-button").parents(".assignment-header-button").focus().click();
                             break;
