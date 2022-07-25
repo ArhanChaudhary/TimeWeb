@@ -553,9 +553,19 @@ class Crud {
         });
         $("#next-page").click(function() {
             const url = new URL(window.location.href);
-            url.searchParams.set('everything_before', utils.loadAssignmentData($(".assignment").last()).id);
+            url.searchParams.set('everything_before', $(".assignment").length ? utils.loadAssignmentData($(".assignment").last()).id : Crud.last_removed_id);
+            url.searchParams.delete('everything_after');
             window.location.href = url.href;
         });
+        $("#previous-page").click(function() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('everything_after', $(".assignment").length ? utils.loadAssignmentData($(".assignment").first()).id : Crud.last_removed_id);
+            url.searchParams.delete('everything_before');
+            window.location.href = url.href;
+        });
+        if ($("#next-page").length || $("#previous-page").length) {
+            $("#no-assignments-message").text("You don't have any deleted assignments on this page...")
+        }
     }
     addInfoButtons() {
         $("#id_unit").info('left',
@@ -596,6 +606,7 @@ class Crud {
                 // If a shorcut is in assignment_container, take it out so it doesn't get deleted
                 assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
                 assignment_container.remove();
+                Crud.last_removed_id = sa.id;
                 // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
                 dom_assignment.removeClass("assignment-is-closing open-assignment");
 

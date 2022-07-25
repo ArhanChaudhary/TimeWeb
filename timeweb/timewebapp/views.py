@@ -68,18 +68,39 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
         # and another in the html
         if view_hidden:
+            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=True).order_by("-pk"))
             if "everything_before" in request.GET:
                 everything_before = int(request.GET["everything_before"])
-                all_timewebmodels = request.user.timewebmodel_set.filter(hidden=True, pk__lt=everything_before).order_by("-pk")
+                everything_after = None
+
+                pk__gte_everything_before = [i for i in timewebmodels if i.pk >= everything_before]
+                pk__lt_everything_before = [i for i in timewebmodels if i.pk < everything_before]
+
+                self.context["show_previous_page"] = len(pk__gte_everything_before) > 0
+                self.context["show_next_page"] = len(pk__lt_everything_before) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+
+                timewebmodels = pk__lt_everything_before[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+            elif "everything_after" in request.GET:
+                everything_after = int(request.GET["everything_after"])
+                everything_before = None
+
+                pk__gt_everything_after = [i for i in timewebmodels if i.pk > everything_after]
+                pk__lte_everything_after = [i for i in timewebmodels if i.pk <= everything_after]
+
+                self.context["show_previous_page"] = len(pk__gt_everything_after) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_next_page"] = len(pk__lte_everything_after) > 0
+
+                timewebmodels = pk__gt_everything_after[-settings.DELETED_ASSIGNMENTS_PER_PAGE:]
             else:
                 everything_before = None
-                all_timewebmodels = request.user.timewebmodel_set.filter(hidden=True).order_by("-pk")
+                everything_after = None
+
+                self.context["show_previous_page"] = False
+                self.context["show_next_page"] = len(timewebmodels) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+
+                timewebmodels = timewebmodels[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
         else:
-            all_timewebmodels = request.user.timewebmodel_set.filter(hidden=False)
-        timewebmodels = list(all_timewebmodels)
-        if view_hidden:
-            self.context["show_next_page"] = len(timewebmodels) > settings.DELETED_ASSIGNMENTS_PER_PAGE
-        timewebmodels = timewebmodels[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 
@@ -97,7 +118,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
         self.context['form'] = TimewebForm()
-        if request.session.pop("view_deleted_assignments_in_app_view", None) or 1:
+        if request.session.pop("view_deleted_assignments_in_app_view", None):
             self.add_user_models_to_context(request, view_hidden=True)
             self.context["view_deleted_assignments_in_app_view"] = True
         else:
