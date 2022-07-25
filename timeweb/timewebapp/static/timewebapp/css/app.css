@@ -64,6 +64,13 @@ main.background-image-exists {
 #assignments-container.viewing-deleted-assignments .left-side-of-header {
     --left-side-of-header-width: initial;
 }
+#assignments-container.viewing-deleted-assignments .assignment-container ~ #no-assignments-message {
+    display: none;
+}
+#assignments-container.viewing-deleted-assignments #no-assignments-message {
+    padding: 0 var(--outer-assignment-horizontal-padding);
+    font-size: 17px;
+}
 #extra-navs-positioner {
     box-sizing: border-box;
     min-height: calc(100vh - var(--header-height) - 10px);
