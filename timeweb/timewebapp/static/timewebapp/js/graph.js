@@ -1145,6 +1145,9 @@ class VisualAssignment extends Assignment {
         const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
         dom_left_side_of_header.toggleClass("display-truncate-warning", dom_left_side_of_header.find(".description").hasOverflown());
     }
+    canOpenAssignment() {
+        return !this.sa.needs_more_info;
+    }
 }
 let already_ran_tutorial = false;
 let prevent_click = false;
@@ -1160,7 +1163,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
     
-    if (sa.sa.needs_more_info) {
+    if (!sa.canOpenAssignment()) {
         dom_assignment.find(".update-button").click();
         return;
     }
