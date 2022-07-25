@@ -302,21 +302,33 @@
           </div>
         {% endfor %}
         {% if view_deleted_assignments_in_app_view %}
-          <div id="no-assignments-message">You don't have any deleted assignments...<div>
+          <div id="no-assignments-message" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...<div>
         {% endif %}
       </span>
       <div id="extra-navs">
         {% comment %} extra-navs already has a filter style {% endcomment %}
         <span {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
-          <a href="{{ changelog }}">Changelog</a>
-          &#8226;
-          <a href="{{ contact_form }}">Contact</a>
-          &#8226;
-          <a href="{{ blog }}" id="nav-blog">Blog</a>
-          &#8226;
-          <span id="nav-credits" tabindex="0">Credits</span>
-          &#8226;
-          <a href="{{ policies }}">Policies</a>
+          {% if view_deleted_assignments_in_app_view %}
+            {% if show_previous_page %}
+              <a id="previous-page">Previous Page</a>
+            {% endif %}
+            {% if show_previous_page and show_next_page %}
+              &#8226;
+            {% endif %}
+            {% if show_next_page %}
+              <a id="next-page">Next Page</a>
+            {% endif %}
+          {% else %}
+            <a href="{{ changelog }}">Changelog</a>
+            &#8226;
+            <a href="{{ contact_form }}">Contact</a>
+            &#8226;
+            <a href="{{ blog }}" id="nav-blog">Blog</a>
+            &#8226;
+            <span id="nav-credits" tabindex="0">Credits</span>
+            &#8226;
+            <a href="{{ policies }}">Policies</a>
+          {% endif %}
         </span>
       </div>
     </div>

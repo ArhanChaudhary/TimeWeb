@@ -67,7 +67,18 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # kinda cursed but saves an entire sql query
         # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
         # and another in the html
-        timewebmodels = list(request.user.timewebmodel_set.filter(hidden=view_hidden))
+        if view_hidden:
+            if "everything_before" in request.GET:
+                everything_before = int(request.GET["everything_before"])
+                query = request.user.timewebmodel_set.filter(hidden=True, pk__lt=everything_before).order_by("-pk")
+            else:
+                everything_before = None
+                query = request.user.timewebmodel_set.filter(hidden=True).order_by("-pk")
+        else:
+            query = request.user.timewebmodel_set.filter(hidden=False)
+        timewebmodels = list(query[:settings.DELETED_ASSIGNMENTS_PER_PAGE])
+        if view_hidden:
+            self.context["show_next_page"] = query.count() > settings.DELETED_ASSIGNMENTS_PER_PAGE
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 
@@ -85,7 +96,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
         self.context['form'] = TimewebForm()
-        if request.session.pop("view_deleted_assignments_in_app_view", None):
+        if request.session.pop("view_deleted_assignments_in_app_view", None) or 1:
             self.add_user_models_to_context(request, view_hidden=True)
             self.context["view_deleted_assignments_in_app_view"] = True
         else:

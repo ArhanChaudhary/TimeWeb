@@ -551,6 +551,11 @@ class Crud {
             $("#id_works").val() && $("#id_works").val(+$("#id_works").val());
             $("#submit-assignment-button").text("Submitting...");
         });
+        $("#next-page").click(function() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('everything_before', utils.loadAssignmentData($(".assignment").last()).id);
+            window.location.href = url.href;
+        });
     }
     addInfoButtons() {
         $("#id_unit").info('left',
