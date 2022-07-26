@@ -205,8 +205,11 @@ batchRequest: function(batchCallbackName, kwargs={}) {
 
     clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
     ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => {
-        if (ajaxUtils.batchRequest[batchCallbackName].length)
+        if (ajaxUtils.batchRequest[batchCallbackName].length) {
             ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
+            delete ajaxUtils.batchRequest[batchCallbackName];
+            delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
+        }
     }, 2000);
 },
 sendAttributeAjax: function(batchRequestData) {
