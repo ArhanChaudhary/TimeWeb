@@ -122,9 +122,9 @@ def save_assignment(request):
 @decorator_from_middleware(APIValidationMiddleware)
 def change_setting(request):
     data = QueryDict(request.body)
-
-    setting = data['setting']
-    value = json.loads(data['value'])
+    settings = json.loads(data['batchRequestData'])
+    setting = settings['setting']
+    value = settings['value']
 
     if setting == "oauth_token":
         if value:

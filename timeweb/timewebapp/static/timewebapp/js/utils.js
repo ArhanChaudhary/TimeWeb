@@ -215,7 +215,7 @@ setClickHandlers: {
     assignmentSorting: function() {
         $("#id_assignment_sorting").on("change", function() {
             SETTINGS.assignment_sorting = $(this).val();
-            ajaxUtils.ajaxChangeSetting({setting: "assignment_sorting", value: SETTINGS.assignment_sorting});
+            ajaxUtils.batchRequest("ajaxChangeSetting", {assignment_sorting: SETTINGS.assignment_sorting});
             new Priority().sort();
         });
     },
@@ -920,11 +920,11 @@ graphAlertTutorial: function(days_until_due) {
         //         },
         //         onClose: function() {
         //             SETTINGS.enable_tutorial = false;
-        //             ajaxUtils.ajaxChangeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+        //             ajaxUtils.batchRequest("ajaxChangeSetting", {enable_tutorial: SETTINGS.enable_tutorial});
         //         },
         //     });
             SETTINGS.enable_tutorial = false;
-            ajaxUtils.ajaxChangeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+            ajaxUtils.batchRequest("ajaxChangeSetting", {enable_tutorial: SETTINGS.enable_tutorial});
             $("#username").focus().addClass("highlight-setings-nav").one("click", function() {
                 $(this).removeClass("highlight-setings-nav");
             });
@@ -1056,7 +1056,7 @@ if (!SETTINGS.seen_latest_changelog) {
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;
-                ajaxUtils.ajaxChangeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
+                ajaxUtils.batchRequest("ajaxChangeSetting", {seen_latest_changelog: SETTINGS.seen_latest_changelog});
             }
         });
         setTimeout(function() {

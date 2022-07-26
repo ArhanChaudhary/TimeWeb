@@ -120,15 +120,11 @@ error: function(response, textStatus) {
         },
     });
 },
-ajaxChangeSetting: function(kwargs={}) {
-    if (ajaxUtils.disable_ajax) return;
+ajaxChangeSetting: function(batchRequestData) {
     $.ajax({
         type: "PATCH",
         url: "/api/change-setting",
-        data: {
-            setting: kwargs.setting,
-            value: JSON.stringify(kwargs.value),
-        },
+        data: {batchRequestData: JSON.stringify(batchRequestData)},
         error: function(jqXHR) {
             switch (jqXHR.status) {
                 case 302:
@@ -157,7 +153,7 @@ createGCAssignments: function() {
                         buttons: {
                             "disable integration": {
                                 action: function() {
-                                    ajaxUtils.ajaxChangeSetting({setting: "oauth_token", value: false});
+                                    ajaxUtils.batchRequest("ajaxChangeSetting", {oauth_token: false});
                                 }
                             },
                             "authenticate again": {
@@ -192,6 +188,12 @@ batchRequest: function(batchCallbackName, kwargs={}) {
         ajaxUtils.batchRequest[batchCallbackName] = [];
     }
     switch (batchCallbackName) {
+        case "ajaxChangeSetting": {
+            let requestData = ajaxUtils.batchRequest[batchCallbackName];
+            for (let key in kwargs) {
+                requestData[key] = kwargs[key];
+            }
+        }
         default: {
             assert("id" in kwargs);
             let requestData = ajaxUtils.batchRequest[batchCallbackName].find(request => request.id === kwargs.id);
@@ -207,10 +209,11 @@ batchRequest: function(batchCallbackName, kwargs={}) {
         }
     }
     clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
-    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName), 250);
+    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName), 2500);
 },
 sendBatchRequest: function(batchCallbackName) {
     if (!ajaxUtils.batchRequest[batchCallbackName]?.length) return;
+
     ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
     delete ajaxUtils.batchRequest[batchCallbackName];
     delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
