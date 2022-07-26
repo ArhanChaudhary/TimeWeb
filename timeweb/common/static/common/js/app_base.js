@@ -120,11 +120,15 @@ error: function(response, textStatus) {
         },
     });
 },
-changeSetting: function(batchRequestData) {
+changeSetting: function(kwargs={}) {
+    if (ajaxUtils.disable_ajax) return;
     $.ajax({
         type: "PATCH",
         url: "/api/change-setting",
-        data: {batchRequestData: JSON.stringify(batchRequestData)},
+        data: {
+            setting: kwargs.setting,
+            value: JSON.stringify(kwargs.value),
+        },
         error: function(jqXHR) {
             switch (jqXHR.status) {
                 case 302:
@@ -153,7 +157,7 @@ createGCAssignments: function() {
                         buttons: {
                             "disable integration": {
                                 action: function() {
-                                    ajaxUtils.batchRequest("changeSetting", {oauth_token: false});
+                                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
                                 }
                             },
                             "authenticate again": {
@@ -181,22 +185,26 @@ createGCAssignments: function() {
         },
     });
 },
-batchRequest: function(batchCallbackName, kwargs={}) {
+batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
     if (ajaxUtils.disable_ajax) return;
 
-    if (!ajaxUtils.batchRequest[batchCallbackName]) {
-        ajaxUtils.batchRequest[batchCallbackName] = [];
-    }
     switch (batchCallbackName) {
         case "changeSetting": {
+            if (!ajaxUtils.batchRequest[batchCallbackName]) {
+                ajaxUtils.batchRequest[batchCallbackName] = {};
+            }
             let requestData = ajaxUtils.batchRequest[batchCallbackName];
             for (let key in kwargs) {
                 requestData[key] = kwargs[key];
             }
+            break;
         }
         default: {
+            if (!ajaxUtils.batchRequest[batchCallbackName]) {
+                ajaxUtils.batchRequest[batchCallbackName] = [];
+            }
             assert("id" in kwargs);
-            let requestData = ajaxUtils.batchRequest[batchCallbackName].find(request => request.id === kwargs.id);
+            let requestData = ajaxUtils.batchRequest[batchCallbackName].find(requestData => requestData.id === kwargs.id);
             if (!requestData) {
                 requestData = {id: kwargs.id};
                 ajaxUtils.batchRequest[batchCallbackName].push(requestData);
@@ -205,18 +213,27 @@ batchRequest: function(batchCallbackName, kwargs={}) {
             for (let key in kwargs) {
                 if (key === "id") continue;
                 requestData[key] = kwargs[key];
-            }   
+            }
         }
     }
     clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
-    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName), 2500);
+    ajaxUtils.batchRequest[batchCallbackName + "_callback"] = batchCallback;
+    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName, batchCallback), 2000);
 },
-sendBatchRequest: function(batchCallbackName) {
-    if (!ajaxUtils.batchRequest[batchCallbackName]?.length) return;
-
-    ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
+sendBatchRequest: function(batchCallbackName, batchCallback) {
+    let do_request = false;
+    switch (batchCallbackName) {
+        case "changeSetting":
+            do_request = ajaxUtils.batchRequest[batchCallbackName] !== undefined && Object.keys(ajaxUtils.batchRequest[batchCallbackName]).length;
+            break;
+        default:
+            do_request = ajaxUtils.batchRequest[batchCallbackName]?.length;
+    }
+    if (do_request)
+        batchCallback(ajaxUtils.batchRequest[batchCallbackName]);
     delete ajaxUtils.batchRequest[batchCallbackName];
     delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
+    delete ajaxUtils.batchRequest[batchCallbackName + "_callback"];
 },
 saveAssignment: function(batchRequestData) {
 

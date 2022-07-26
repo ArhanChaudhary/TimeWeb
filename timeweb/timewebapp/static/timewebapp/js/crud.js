@@ -680,6 +680,7 @@ class Crud {
                 }
             });
         else
+            // don't batch this so assignment-is-deleting is instantly removed
             $.ajax({
                 type: "POST",
                 url: "/api/delete-assignment",

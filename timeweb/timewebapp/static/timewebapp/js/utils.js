@@ -215,7 +215,7 @@ setClickHandlers: {
     assignmentSorting: function() {
         $("#id_assignment_sorting").on("change", function() {
             SETTINGS.assignment_sorting = $(this).val();
-            ajaxUtils.batchRequest("changeSetting", {assignment_sorting: SETTINGS.assignment_sorting});
+            ajaxUtils.changeSetting({setting: "assignment_sorting", value: SETTINGS.assignment_sorting});
             new Priority().sort();
         });
     },
@@ -606,7 +606,7 @@ addTagHandlers: function() {
             // GC class tags
             //sa.is_google_classroom_assignment && sa.needs_more_info && 
             new Priority().sort();
-            ajaxUtils.batchRequest("saveAssignment", {tags: sa.tags, id: sa.id});
+            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
         }
     });
 },
@@ -920,11 +920,11 @@ graphAlertTutorial: function(days_until_due) {
         //         },
         //         onClose: function() {
         //             SETTINGS.enable_tutorial = false;
-        //             ajaxUtils.batchRequest("changeSetting", {enable_tutorial: SETTINGS.enable_tutorial});
+        //             ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
         //         },
         //     });
             SETTINGS.enable_tutorial = false;
-            ajaxUtils.batchRequest("changeSetting", {enable_tutorial: SETTINGS.enable_tutorial});
+            ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
             $("#username").focus().addClass("highlight-setings-nav").one("click", function() {
                 $(this).removeClass("highlight-setings-nav");
             });
@@ -965,10 +965,12 @@ saveAndLoadStates: function() {
         // Send all queued ajax requests
         for (let batchCallbackName of Object.keys(ajaxUtils.batchRequest)) {
             block = true;
-            if (batchCallbackName.endsWith("_timeout"))
+            if (batchCallbackName.endsWith("_callback")) {
+
+            } else if (batchCallbackName.endsWith("_timeout"))
                 clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
             else if (ajaxUtils.batchRequest[batchCallbackName].length)
-                ajaxUtils.sendBatchRequest(batchCallbackName);
+                ajaxUtils.sendBatchRequest(batchCallbackName, ajaxUtils.batchRequest[batchCallbackName + "_callback"]);
         }
         if (block) {
             window.disable_loading = true;
@@ -1056,7 +1058,7 @@ if (!SETTINGS.seen_latest_changelog) {
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;
-                ajaxUtils.batchRequest("changeSetting", {seen_latest_changelog: SETTINGS.seen_latest_changelog});
+                ajaxUtils.changeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
             }
         });
         setTimeout(function() {

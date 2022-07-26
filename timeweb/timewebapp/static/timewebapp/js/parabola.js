@@ -472,5 +472,5 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
     // !this.sa.needs_more_info probably isn't needed, but just in case as a safety meachanism
-    !this.sa.needs_more_info && this.sa.skew_ratio !== old_skew_ratio && ajaxUtils.batchRequest("saveAssignment", {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
+    !this.sa.needs_more_info && this.sa.skew_ratio !== old_skew_ratio && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
 }
