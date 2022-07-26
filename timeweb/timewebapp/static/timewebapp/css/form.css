@@ -145,7 +145,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     border-left: 1px solid var(--color);
 }
 #field-group-picker-styling * {
-    transition: transform calc(0.2s * var(--animation-speed)) ease-in-out 0.05s;
+    transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
     transform: translateX(-207px);
@@ -207,7 +207,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     z-index: 10;
 }
 #form-wrapper .field-wrapper {
-    transition: margin-top calc(0.4s * var(--animation-speed)) ease-in-out, opacity 0.6s ease-in-out 0.1s;
+    transition: margin-top calc(0.4s * var(--animation-speed)) ease-in-out, opacity calc(0.6s * var(--animation-speed)) ease-in-out calc(0.1s * var(--animation-speed));
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
     margin-top: -1px;
