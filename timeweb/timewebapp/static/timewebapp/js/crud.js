@@ -468,14 +468,18 @@ class Crud {
             if (!new_parent.is(old_parent) && old_parent.length && new_parent.length
                 // Prevent infinite recursion
                 && e.relatedTarget !== undefined && e.relatedTarget !== null) {
-                preventRecursion = true;
-                e.relatedTarget.focus();
-                e.relatedTarget.blur();
-                Crud.GO_TO_FIELD_GROUP({ $dom_group: new_parent });
-                $("#first-field-group").one("transitionend", function() {
+                if (SETTINGS.animation_speed) {
                     preventRecursion = true;
-                    e.target.focus();
-                });
+                    e.relatedTarget.focus();
+                    e.relatedTarget.blur();
+                }
+                Crud.GO_TO_FIELD_GROUP({ $dom_group: new_parent });
+                if (SETTINGS.animation_speed) {
+                    $("#first-field-group").one("transitionend", function() {
+                        preventRecursion = true;
+                        e.target.focus();
+                    });
+                }
             // If the user goes to the advanced tab and presses tab after currently being focused on the element before the first
             // input in the standard tab, it will instead focus on that and give focus to a completely invisible element
             // This checks for when that happens and appropriately gives focus to the correct element
