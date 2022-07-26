@@ -53,9 +53,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         elif self.form.cleaned_data.get("background_image") and self.form.cleaned_data.get("background_image").size > settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE:
             self.form.add_error("background_image", ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576}))
             form_is_valid = False
-        elif request.isExampleAccount:
-            self.form.add_error(None, ValidationError(_('You cannot modify the example account')))
-            form_is_valid = False
         if form_is_valid:
             return self.valid_form(request)
         else:
