@@ -218,7 +218,7 @@ batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
     }
     clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
     ajaxUtils.batchRequest[batchCallbackName + "_callback"] = batchCallback;
-    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName, batchCallback), 2000);
+    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName, batchCallback), 200);
 },
 sendBatchRequest: function(batchCallbackName, batchCallback) {
     let do_request = false;
