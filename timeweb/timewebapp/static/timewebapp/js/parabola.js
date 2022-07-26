@@ -309,22 +309,20 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function(point_1, point_2
     const b = (y1 - x1 * x1 * a) / x1;
 
     // I need to check if all three points are colinear to avoid roundoff errors
-    // if (this.sa.skew_ratio === 1) return {a: 0, b: y1 / x1}; won't work because the use of this.sa.skew_ratio might cause it to unexpectedly return that
-    // Instead, determine if the slopes between [0, 0] and [x1, y1] and [x1, y1] and [x2, y2] are the same
+    // determine if the slopes between [0, 0] and [x1, y1] and [x1, y1] and [x2, y2] are the same
 
-    // https://stackoverflow.com/questions/9553354/how-do-i-get-the-decimal-places-of-a-floating-point-number-in-javascript
-    function precision(a) {
-        if (!isFinite(a)) return 0;
-        var e = 1, p = 0;
-        while (Math.round(a * e) / e !== a) { e *= 10; p++; }
-        return p;
-    }
+    // NOTE: we cannot just check for this.sa.skew_ratio === 1 because some calls to this function define skew_ratio itself
+    // if the value of skew_ratio is 1 before the call, it will still remain 1 after the call due to this check, making it impossible to another value
+    // more context: https://github.com/ArhanChaudhary/TimeWeb/commit/e79109f7571a6d8fd10bdfb77812afe6a4de0d8a
+
     let first_slope = y1/x1;
     let second_slope = (y2-y1)/(x2-x1);
-    let min_precision = Math.min(precision(first_slope), precision(second_slope));
-    // probably still buggy (roundoff errors) but should work 99.9% of the time
-    if (mathUtils.precisionRound(y1/x1 - (y2-y1)/(x2-x1), min_precision - 1) === 0)
-        return {a: 0, b: y1 / x1};
+    // TODO: very buggy (roundoff errors) but should work 99.9% of the time
+    if (second_slope === 0 && first_slope === 0 || second_slope !== 0 && Math.abs(first_slope / second_slope - 1) < 0.0000001)
+        // note: cases where a and b are Infinity are false for the above check
+
+        // i can use first_slope or second_slope instead of y2/x2, they are all the same
+        return {a: 0, b: y2 / x2};
     return {a, b};
 }
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 1000;
