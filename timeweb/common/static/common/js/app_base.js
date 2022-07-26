@@ -120,7 +120,7 @@ error: function(response, textStatus) {
         },
     });
 },
-ajaxChangeSetting: function(batchRequestData) {
+changeSetting: function(batchRequestData) {
     $.ajax({
         type: "PATCH",
         url: "/api/change-setting",
@@ -153,7 +153,7 @@ createGCAssignments: function() {
                         buttons: {
                             "disable integration": {
                                 action: function() {
-                                    ajaxUtils.batchRequest("ajaxChangeSetting", {oauth_token: false});
+                                    ajaxUtils.batchRequest("changeSetting", {oauth_token: false});
                                 }
                             },
                             "authenticate again": {
@@ -188,7 +188,7 @@ batchRequest: function(batchCallbackName, kwargs={}) {
         ajaxUtils.batchRequest[batchCallbackName] = [];
     }
     switch (batchCallbackName) {
-        case "ajaxChangeSetting": {
+        case "changeSetting": {
             let requestData = ajaxUtils.batchRequest[batchCallbackName];
             for (let key in kwargs) {
                 requestData[key] = kwargs[key];

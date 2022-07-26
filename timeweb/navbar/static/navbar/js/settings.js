@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 "try again": {
                     action: () => {
-                        ajaxUtils.batchRequest("ajaxChangeSetting", {oauth_token: true});
+                        ajaxUtils.batchRequest("changeSetting", {oauth_token: true});
                     },
                 },
             },
