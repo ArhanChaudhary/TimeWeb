@@ -961,9 +961,12 @@ saveAndLoadStates: function() {
             // Save scroll position
             localStorage.setItem("scroll", $("#assignments-container").scrollTop());
         }
-        // Send ajax before close if it's on timeout
-        if (ajaxUtils.sendAttributeAjax.assignments.length) {
-            ajaxUtils.sendAttributeAjax();
+        // Send all queued ajax requests
+        for (let batchCallbackName of Object.keys(ajaxUtils.batchRequest)) {
+            if (batchCallbackName.endsWith("_timeout")) continue;
+            // taken from ajaxUtils.batchRequest
+            if (ajaxUtils.batchRequest[batchCallbackName].length)
+                ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
         }
     });
 
