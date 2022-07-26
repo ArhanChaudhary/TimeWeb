@@ -338,20 +338,28 @@ class VisualAssignment extends Assignment {
             // 2 x = x1
             // x = x1 / 2
             var intersection_x = x1 / 2;
-
-        let x_step = x1 / VisualAssignment.TOTAL_ARROW_SKEW_RATIO_STEPS;
-        intersection_x = x_step * Math.round(intersection_x / x_step);
-        if (this.pressed_arrow_key === "ArrowUp")
-            var next_intersection_x = intersection_x - x_step;
-        else if (this.pressed_arrow_key === "ArrowDown")
-            var next_intersection_x = intersection_x + x_step;
-        
-        // plug in next_intersection_x as x into y = y1 - x(y1/x1)
-        let next_intersection = [next_intersection_x, y1 - next_intersection_x * y1/x1];
-        let parabola = this.calcAandBfromOriginAndTwoPoints(next_intersection, [x1, y1]);
-
         const original_skew_ratio = this.sa.skew_ratio;
-        this.sa.skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+        let x_step = x1 / VisualAssignment.TOTAL_ARROW_SKEW_RATIO_STEPS;
+        if (intersection_x !== x1 / 2 &&
+            (this.pressed_arrow_key === "ArrowDown" && x1 / 2 - x_step / 2 < intersection_x && intersection_x < x1 / 2 
+            || this.pressed_arrow_key === "ArrowUp" && x1 / 2 < intersection_x && intersection_x < x1 / 2 + x_step / 2)) {
+            // if the curvature is something like 0.001 and the user presses arrow down or
+            // the curvature is something like -0.001 and the user presses arrow up
+            // go to 0
+            this.sa.skew_ratio = 1;
+        } else {
+            intersection_x = x_step * Math.round(intersection_x / x_step);
+            if (this.pressed_arrow_key === "ArrowUp")
+                var next_intersection_x = intersection_x - x_step;
+            else if (this.pressed_arrow_key === "ArrowDown")
+                var next_intersection_x = intersection_x + x_step;
+            
+            // plug in next_intersection_x as x into y = y1 - x(y1/x1)
+            let next_intersection = [next_intersection_x, y1 - next_intersection_x * y1/x1];
+            let parabola = this.calcAandBfromOriginAndTwoPoints(next_intersection, [x1, y1]);
+
+            this.sa.skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+        }
 
         const skew_ratio_bound = this.calcSkewRatioBound();
         // use original_skew_ratio to allow one more arrow before bound so the parabols completely flattens
