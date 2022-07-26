@@ -457,25 +457,36 @@ class Crud {
             field_wrapper_input.attr("type", field_wrapper.hasClass("disabled-field") ? "text" : field_wrapper.attr("original-type"));
             field_wrapper_input.prop("disabled", field_wrapper.hasClass("disabled-field")).val(field_wrapper.hasClass("disabled-field") ? "Predicted" : "");
         });
-        
+        let preventRecursion;
         $("#fields-wrapper").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).on('focus', e => {
+            if (preventRecursion) {
+                preventRecursion = false;
+                return;
+            }
             const new_parent = $(e.target).parents(".field-group");
             const old_parent = $(e.relatedTarget).parents(".field-group");
-            if (!new_parent.is(old_parent) && old_parent.length && new_parent.length)
+            if (!new_parent.is(old_parent) && old_parent.length && new_parent.length
+                // Prevent infinite recursion
+                && e.relatedTarget !== undefined && e.relatedTarget !== null) {
+                preventRecursion = true;
+                e.relatedTarget.focus();
+                e.relatedTarget.blur();
                 Crud.GO_TO_FIELD_GROUP({ $dom_group: new_parent });
+                $("#first-field-group").one("transitionend", function() {
+                    preventRecursion = true;
+                    e.target.focus();
+                });
             // If the user goes to the advanced tab and presses tab after currently being focused on the element before the first
             // input in the standard tab, it will instead focus on that and give focus to a completely invisible element
             // This checks for when that happens and appropriately gives focus to the correct element
 
             // new_parent.is("#first-field-group") instead of new_parent.length because a click event is too similar to a tabbing event
             // this detects a tabbing event only
-            else if (new_parent.is("#first-field-group") && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")
-                // Prevent infinite recursion
-                && e.relatedTarget !== undefined && e.relatedTarget !== null) {
-                
+            } else if (new_parent.is("#first-field-group") && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
                 // Doesn't work because #id_y is first in Crud.ALL_FOCUSABLE_FORM_INPUTS and can cause that to be focused instead
                 // $("#second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().focus();
 
+                preventRecursion = true;
                 $("#second-field-group .field-wrapper").first().find(Crud.ALL_FOCUSABLE_FORM_INPUTS).focus();
             }
         });
@@ -544,7 +555,7 @@ class Crud {
                     // gets in the way of daterangepicker
                     setTimeout(() => {
                         $("#id_x")[0].setCustomValidity("");
-                    }, 1500);
+                    }, 2500);
                     return;
                 }
             }
