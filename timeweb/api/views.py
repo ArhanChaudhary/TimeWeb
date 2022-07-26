@@ -84,12 +84,12 @@ def restore_assignment(request):
 @decorator_from_middleware(APIValidationMiddleware)
 def save_assignment(request):
     data = QueryDict(request.body)
-    assignments = json.loads(data['assignments'])
+    assignments = json.loads(data['batchRequestData'])
 
     with transaction.atomic():
         # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
-        for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['pk'], assignments), user=request.user):
-            assignment = next(i for i in assignments if i.get('pk') == sm.pk)
+        for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['id'], assignments), user=request.user):
+            assignment = next(i for i in assignments if i.get('id') == sm.id)
 
             for key, value in assignment.items():
                 if key == "x":
@@ -107,7 +107,7 @@ def save_assignment(request):
             # aka a huge no no
             del model_fields['user']
             # do NOT setattr a primary key that would be a huge fricking mess
-            del assignment['pk']
+            del assignment['id']
             validation_form = TimewebForm(data=model_fields)
             if not validation_form.is_valid():
                 assignment = {field: value for field, value in assignment.items() if field not in validation_form.errors}

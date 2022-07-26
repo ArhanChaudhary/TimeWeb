@@ -185,27 +185,31 @@ createGCAssignments: function() {
         },
     });
 },
-sendAttributeAjaxWithTimeout: function(key, value, pk) {
+batchRequest: function(batchCallbackName, kwargs={}) {
+    if (ajaxUtils.disable_ajax) return;
+    assert("id" in kwargs);
 
-    // Add key and values to the data being sent
-    // This way, if this function is called multiple times for different keys and values, they are all sent in one ajax rather than many smaller ones
-    let sa = ajaxUtils.sendAttributeAjax.assignments.find(sa => sa.pk === pk);
-    if (!sa) {
-        sa = {pk: pk};
-        ajaxUtils.sendAttributeAjax.assignments.push(sa);
+    if (!ajaxUtils.batchRequest[batchCallbackName]) {
+        ajaxUtils.batchRequest[batchCallbackName] = [];
     }
-    sa[key] = value;
+    let requestData = ajaxUtils.batchRequest[batchCallbackName].find(request => request.id === kwargs.id);
+    if (!requestData) {
+        requestData = {id: kwargs.id};
+        ajaxUtils.batchRequest[batchCallbackName].push(requestData);
+    }
 
-    if (ajaxUtils.disable_ajax) {
-        // Reset data
-        ajaxUtils.sendAttributeAjax.assignments = [];
-        return;
+    for (let key in kwargs) {
+        if (key === "id") continue;
+        requestData[key] = kwargs[key];
     }
-    clearTimeout(ajaxUtils.ajaxTimeout);
-    ajaxUtils.ajaxTimeout = setTimeout(ajaxUtils.sendAttributeAjax, 1000);
+
+    clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
+    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => {
+        if (ajaxUtils.batchRequest[batchCallbackName].length)
+            ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
+    }, 2000);
 },
-sendAttributeAjax: function() {
-    if (!ajaxUtils.sendAttributeAjax.assignments.length) return;
+sendAttributeAjax: function(batchRequestData) {
 
     // Send data along with the assignment's primary key
 
@@ -215,7 +219,7 @@ sendAttributeAjax: function() {
     $.ajax({
         type: "PATCH",
         url: '/api/save-assignment',
-        data: {assignments: JSON.stringify(ajaxUtils.sendAttributeAjax.assignments)},
+        data: {batchRequestData: JSON.stringify(batchRequestData)},
         error: function(response) {
             switch (response.status) {
                 case 413: {
@@ -231,10 +235,8 @@ sendAttributeAjax: function() {
             ajaxUtils.error.bind(this)(...arguments);
         },
     });
-    ajaxUtils.sendAttributeAjax.assignments = [];
 },
 }
-ajaxUtils.sendAttributeAjax.assignments = [];
 
 mathUtils = {
     // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
