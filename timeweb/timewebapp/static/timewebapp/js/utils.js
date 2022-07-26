@@ -690,7 +690,7 @@ switch (e.key) {
                             }
                             // We can't use a normal .click().focus() or else
                             // a graph button out of view scrolls it all the way to the middle of the page
-                            graph_button[0].scrollIntoView(false);
+                            graph_button[0].scrollIntoView({block: "nearest"});
                             graph_button.click();
                             setTimeout(() => graph_button.focus(), 0);
                             }
