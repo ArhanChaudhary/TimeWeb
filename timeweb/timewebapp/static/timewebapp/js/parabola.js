@@ -418,7 +418,7 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function(params={ invers
         let y1 = this.sa.y - this.red_line_start_y;
 
         const mods = this.calcModDays();
-        x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) & 7]; // Handles break days, explained later
+        x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
         if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
             x1 = Math.ceil(x1);
         }
