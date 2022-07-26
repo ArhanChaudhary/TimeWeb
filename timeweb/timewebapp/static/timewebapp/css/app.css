@@ -738,6 +738,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 .completion-time {
     white-space: nowrap;
     margin-right: 3px;
+    align-self: center;
 }
 .right-side-of-header {
     margin-left: auto;
