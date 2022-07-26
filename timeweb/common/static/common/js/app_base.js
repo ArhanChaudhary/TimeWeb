@@ -218,7 +218,7 @@ sendBatchRequest: function(batchCallbackName) {
     delete ajaxUtils.batchRequest[batchCallbackName];
     delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
 },
-sendAttributeAjax: function(batchRequestData) {
+saveAssignment: function(batchRequestData) {
 
     // Send data along with the assignment's primary key
 

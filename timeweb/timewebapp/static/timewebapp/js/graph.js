@@ -53,7 +53,7 @@ class Assignment {
         this.sa.dynamic_start = this.red_line_start_x;
 
         // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
-        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.batchRequest("sendAttributeAjax", {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
+        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.batchRequest("saveAssignment", {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
         // If we don't call this again then the a and b values will be stuck at the binary search from when it was called in the earlier loop
         this.setParabolaValues();
     }
@@ -83,14 +83,14 @@ class Assignment {
             this.sa.x++;
         } while (this.getWorkingDaysRemaining({ reference: "blue line end" }) === 0);
         this.sa.complete_x = this.sa.x;
-        ajaxUtils.batchRequest("sendAttributeAjax", {due_time: this.sa.due_time, id: this.sa.id});
+        ajaxUtils.batchRequest("saveAssignment", {due_time: this.sa.due_time, id: this.sa.id});
 
         const due_date = new Date(this.sa.assignment_date.valueOf());
         due_date.setDate(due_date.getDate() + this.sa.x);
-        ajaxUtils.batchRequest("sendAttributeAjax", {x: due_date.getTime()/1000, id: this.sa.id});
+        ajaxUtils.batchRequest("saveAssignment", {x: due_date.getTime()/1000, id: this.sa.id});
 
         this.sa.alert_due_date_incremented = true;
-        ajaxUtils.batchRequest("sendAttributeAjax", {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+        ajaxUtils.batchRequest("saveAssignment", {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
     }
     getWorkingDaysRemaining(params={reference: null, floor_due_time: false}) {
         const original_red_line_start_x = this.red_line_start_x;
@@ -363,7 +363,7 @@ class VisualAssignment extends Assignment {
         }
 
         this.setDynamicStartIfInDynamicMode();
-        ajaxUtils.batchRequest("sendAttributeAjax", {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
+        ajaxUtils.batchRequest("saveAssignment", {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
         new Priority().sort();
     }
     static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
@@ -765,8 +765,8 @@ class VisualAssignment extends Assignment {
                 original_skew_ratio = undefined;
                 this.set_skew_ratio_using_graph = false;
                 skew_ratio_button.text(skew_ratio_button.attr("data-label")).blur();
-                ajaxUtils.batchRequest("sendAttributeAjax", {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
-                ajaxUtils.batchRequest("sendAttributeAjax", {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
+                ajaxUtils.batchRequest("saveAssignment", {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
+                ajaxUtils.batchRequest("saveAssignment", {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
                 if (!this.draw_mouse_point && isTouchDevice) {
                     this.graph.off(VisualAssignment.GRAPH_HOVER_EVENT);
                 }
@@ -861,7 +861,7 @@ class VisualAssignment extends Assignment {
                 this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
             }
             this.setDynamicStartIfInDynamicMode();
-            ajaxUtils.batchRequest("sendAttributeAjax", {works: this.sa.works.map(String), id: this.sa.id});
+            ajaxUtils.batchRequest("saveAssignment", {works: this.sa.works.map(String), id: this.sa.id});
             new Priority().sort();
         });
         }
@@ -1029,7 +1029,7 @@ class VisualAssignment extends Assignment {
                 this.setDynamicStartIfInDynamicMode();
             // }
 
-            ajaxUtils.batchRequest("sendAttributeAjax", {works: this.sa.works.map(String), id: this.sa.id});
+            ajaxUtils.batchRequest("saveAssignment", {works: this.sa.works.map(String), id: this.sa.id});
             
             if (SETTINGS.close_graph_after_work_input && this.dom_assignment.hasClass("open-assignment") && this.sa.blue_line_start + len_works === today_minus_assignment_date + 1)
                 this.dom_assignment.click();
@@ -1079,7 +1079,7 @@ class VisualAssignment extends Assignment {
 
             this.sa.fixed_mode = !this.sa.fixed_mode;
             fixed_mode_button.text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
-            ajaxUtils.batchRequest("sendAttributeAjax", {fixed_mode: this.sa.fixed_mode, id: this.sa.id});
+            ajaxUtils.batchRequest("saveAssignment", {fixed_mode: this.sa.fixed_mode, id: this.sa.id});
             if (this.sa.fixed_mode) {
                 this.red_line_start_x = 0;
                 this.red_line_start_y = 0;

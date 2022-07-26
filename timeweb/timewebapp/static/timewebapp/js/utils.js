@@ -606,7 +606,7 @@ addTagHandlers: function() {
             // GC class tags
             //sa.is_google_classroom_assignment && sa.needs_more_info && 
             new Priority().sort();
-            ajaxUtils.batchRequest("sendAttributeAjax", {tags: sa.tags, id: sa.id});
+            ajaxUtils.batchRequest("saveAssignment", {tags: sa.tags, id: sa.id});
         }
     });
 },

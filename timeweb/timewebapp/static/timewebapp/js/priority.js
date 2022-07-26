@@ -181,10 +181,10 @@ class Priority {
             const skew_ratio_bound = sa.calcSkewRatioBound();
             if (sa.sa.skew_ratio > skew_ratio_bound) {
                 sa.sa.skew_ratio = skew_ratio_bound;
-                !sa.sa.needs_more_info && ajaxUtils.batchRequest("sendAttributeAjax", {skew_ratio: sa.sa.skew_ratio, id: sa.sa.id});
+                !sa.sa.needs_more_info && ajaxUtils.batchRequest("saveAssignment", {skew_ratio: sa.sa.skew_ratio, id: sa.sa.id});
             } else if (sa.sa.skew_ratio < 2 - skew_ratio_bound) {
                 sa.sa.skew_ratio = 2 - skew_ratio_bound;
-                !sa.sa.needs_more_info && ajaxUtils.batchRequest("sendAttributeAjax", {skew_ratio: sa.sa.skew_ratio, id: sa.sa.id});
+                !sa.sa.needs_more_info && ajaxUtils.batchRequest("saveAssignment", {skew_ratio: sa.sa.skew_ratio, id: sa.sa.id});
             }
             
             sa.setParabolaValues();
@@ -265,7 +265,7 @@ class Priority {
                     sa.setDynamicStartIfInDynamicMode();
                 }
                 if (has_autofilled) {
-                    ajaxUtils.batchRequest("sendAttributeAjax", {works: sa.sa.works.map(String), id: sa.sa.id});
+                    ajaxUtils.batchRequest("saveAssignment", {works: sa.sa.works.map(String), id: sa.sa.id});
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
@@ -381,7 +381,7 @@ class Priority {
                 }
 
                 if (has_autofilled) {
-                    ajaxUtils.batchRequest("sendAttributeAjax", {works: sa.sa.works.map(String), id: sa.sa.id});
+                    ajaxUtils.batchRequest("saveAssignment", {works: sa.sa.works.map(String), id: sa.sa.id});
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                 }
 
@@ -452,14 +452,14 @@ class Priority {
 
             if (status_value !== Priority.COMPLETELY_FINISHED && sa.sa.dont_hide_again) {
                 sa.sa.dont_hide_again = false;
-                ajaxUtils.batchRequest("sendAttributeAjax", {dont_hide_again: sa.sa.dont_hide_again, id: sa.sa.id});
+                ajaxUtils.batchRequest("saveAssignment", {dont_hide_again: sa.sa.dont_hide_again, id: sa.sa.id});
             }
 
             // If the condition to alert the due date has passed is false, set sa.sa.has_alerted_due_date_passed_notice to true
             // This is done so that it doesn't remain as true and fail to alert the user again
             if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
                 sa.sa.has_alerted_due_date_passed_notice = false;
-                ajaxUtils.batchRequest("sendAttributeAjax", {has_alerted_due_date_passed_notice: sa.sa.has_alerted_due_date_passed_notice, id: sa.sa.id});
+                ajaxUtils.batchRequest("saveAssignment", {has_alerted_due_date_passed_notice: sa.sa.has_alerted_due_date_passed_notice, id: sa.sa.id});
             }
 
             if (sa.sa.alert_due_date_incremented) {
@@ -557,7 +557,7 @@ class Priority {
                             Priority.due_date_passed_notice_on_screen = false;
                             for (let sa of that.due_date_passed_notices) {
                                 sa.has_alerted_due_date_passed_notice = true;
-                                ajaxUtils.batchRequest("sendAttributeAjax", {has_alerted_due_date_passed_notice: sa.has_alerted_due_date_passed_notice, id: sa.id});
+                                ajaxUtils.batchRequest("saveAssignment", {has_alerted_due_date_passed_notice: sa.has_alerted_due_date_passed_notice, id: sa.id});
                             }
                         }
                     }
@@ -586,7 +586,7 @@ class Priority {
                             Priority.due_date_incremented_notice_on_screen = false;
                             for (let sa of that.due_date_incremented_notices) {
                                 sa.alert_due_date_incremented = false;
-                                ajaxUtils.batchRequest("sendAttributeAjax", {alert_due_date_incremented: sa.alert_due_date_incremented, id: sa.id});
+                                ajaxUtils.batchRequest("saveAssignment", {alert_due_date_incremented: sa.alert_due_date_incremented, id: sa.id});
                             }
                         }
                     }
