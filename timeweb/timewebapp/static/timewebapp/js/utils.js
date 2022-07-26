@@ -961,12 +961,21 @@ saveAndLoadStates: function() {
             // Save scroll position
             localStorage.setItem("scroll", $("#assignments-container").scrollTop());
         }
+        let block = false;
         // Send all queued ajax requests
         for (let batchCallbackName of Object.keys(ajaxUtils.batchRequest)) {
-            if (batchCallbackName.endsWith("_timeout")) continue;
-            // taken from ajaxUtils.batchRequest
-            if (ajaxUtils.batchRequest[batchCallbackName].length)
-                ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
+            block = true;
+            if (batchCallbackName.endsWith("_timeout"))
+                clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
+            else if (ajaxUtils.batchRequest[batchCallbackName].length)
+                ajaxUtils.sendBatchRequest(batchCallbackName);
+        }
+        if (block) {
+            window.disable_loading = true;
+            setTimeout(function() {
+                window.disable_loading = false;
+            }, 0);
+            return true;
         }
     });
 

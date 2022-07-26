@@ -187,30 +187,33 @@ createGCAssignments: function() {
 },
 batchRequest: function(batchCallbackName, kwargs={}) {
     if (ajaxUtils.disable_ajax) return;
-    assert("id" in kwargs);
 
     if (!ajaxUtils.batchRequest[batchCallbackName]) {
         ajaxUtils.batchRequest[batchCallbackName] = [];
     }
-    let requestData = ajaxUtils.batchRequest[batchCallbackName].find(request => request.id === kwargs.id);
-    if (!requestData) {
-        requestData = {id: kwargs.id};
-        ajaxUtils.batchRequest[batchCallbackName].push(requestData);
-    }
+    switch (batchCallbackName) {
+        default: {
+            assert("id" in kwargs);
+            let requestData = ajaxUtils.batchRequest[batchCallbackName].find(request => request.id === kwargs.id);
+            if (!requestData) {
+                requestData = {id: kwargs.id};
+                ajaxUtils.batchRequest[batchCallbackName].push(requestData);
+            }
 
-    for (let key in kwargs) {
-        if (key === "id") continue;
-        requestData[key] = kwargs[key];
-    }
-
-    clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
-    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => {
-        if (ajaxUtils.batchRequest[batchCallbackName].length) {
-            ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
-            delete ajaxUtils.batchRequest[batchCallbackName];
-            delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
+            for (let key in kwargs) {
+                if (key === "id") continue;
+                requestData[key] = kwargs[key];
+            }   
         }
-    }, 2000);
+    }
+    clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
+    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName), 250);
+},
+sendBatchRequest: function(batchCallbackName) {
+    if (!ajaxUtils.batchRequest[batchCallbackName]?.length) return;
+    ajaxUtils[batchCallbackName](ajaxUtils.batchRequest[batchCallbackName]);
+    delete ajaxUtils.batchRequest[batchCallbackName];
+    delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
 },
 sendAttributeAjax: function(batchRequestData) {
 

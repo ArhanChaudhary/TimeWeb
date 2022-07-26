@@ -6,9 +6,9 @@ function assert(condition, message) {
 }
 window.onbeforeunload = function() {
     if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
-    if (window.disable_loading) return;
     // setTimeout to ensure .scrollTop to record the scroll position is run before this
     setTimeout(function() {
+        if (window.disable_loading) return; // window.disable_loading is set to true by other beforeunload handlers
         document.querySelectorAll("main > *").forEach(e => {
             e.style.display = "none";
         });
