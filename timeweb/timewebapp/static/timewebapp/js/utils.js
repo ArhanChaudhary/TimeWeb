@@ -861,6 +861,10 @@ insertTutorialMessages: function(first_available_assignment) {
     }
 },
 graphAlertTutorial: function(days_until_due) {
+    // jconfirm may return the focus to .assignment after the alert
+    // and cause a quick scroll jump, this prevents that from happening
+    $(document.activeElement).blur();
+
     $.alert({
         title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
         content: "Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.",
