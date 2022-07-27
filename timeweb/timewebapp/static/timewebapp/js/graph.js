@@ -763,6 +763,27 @@ class VisualAssignment extends Assignment {
         if (!$graph_button.attr("data-timeout-id")) $graph_button.attr("data-timeout-id", ++VisualAssignment.IDGeneratorCounter);
         return $graph_button.attr("data-timeout-id");
     }
+    static monthLocales = ((locale) => {
+        const locales = [];
+        for(var i = 0; i < 12; i++) {
+            locales[i] = new Date(2022, i).toLocaleString(locale, {month: "long"});
+        }
+        return locales;
+    })([])
+    static weekdayLocales = ((locale) => {
+        const locales = {};
+        for(var i = 0; i < 7; i++) {
+            locales[new Date(2010, 0, i).getDay()] = new Date(2010, 0, i).toLocaleString(locale, {weekday: "long"});
+        }
+        return locales;
+    })([])
+    static formatDisplayInTextDate(date, display_year) {
+        const month = VisualAssignment.monthLocales[date.getMonth()];
+        const _date = date.getDate(); 
+        const year = display_year ? ", " + date.getFullYear() : "";
+        const weekday = VisualAssignment.weekdayLocales[date.getDay()];
+        return `${month} ${_date}${year} (${weekday}):`;
+    }
     setGraphButtonEventListeners() {
         // Turn off mousemove to ensure there is only one mousemove handler at a time
         let original_skew_ratio;
@@ -850,7 +871,116 @@ class VisualAssignment extends Assignment {
         display_in_text_button.click(() => {
             this.in_graph_display = !this.in_graph_display;
             display_in_text_button.text(display_in_text_button.attr(`data-${this.in_graph_display ? "in-text" : "in-graph"}-label`));
-            // ...
+
+            const len_works = this.sa.works.length - 1;
+            const last_work_input = this.sa.works[len_works];
+            const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+            const add_last_work_input = len_works && last_work_input < this.sa.y && ![len_works + this.sa.blue_line_start, len_works + this.sa.blue_line_start - 1 /* if you finished your work for today dont show last work input */].includes(today_minus_assignment_date)
+            const complete_due_date = new Date(this.sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + this.sa.complete_x);
+            const display_year = this.sa.assignment_date.getFullYear() !== complete_due_date.getFullYear();
+            const force_display_dates = [0, today_minus_assignment_date, this.sa.blue_line_start];
+            if (add_last_work_input)
+                force_display_dates.push(len_works + this.sa.blue_line_start - 1);
+            const remove_zeroes = this.sa.x - this.sa.blue_line_start > 15 || 1;
+            const unit_plural = pluralize(this.sa.unit);
+            const unit_singular = pluralize(this.sa.unit, 1);
+            const formatted_dates = [];
+            
+            let this_work;
+            let next_work = this.sa.works[0];
+            let this_funct;
+            let next_funct;
+            let diff;
+            let total = this.sa.works[0];;
+            let days_skipped = 1;
+            let end_of_works = false;
+
+            let start_index;
+            let today_index;
+            let last_work_index;
+
+            // assignment date
+            if (this.sa.blue_line_start) {
+                start_index = 1;
+                if (date_now.valueOf() === this.sa.assignment_date.valueOf()) {
+                    today_index = 0;
+                }
+                formatted_dates.push(VisualAssignment.formatDisplayInTextDate(this.sa.assignment_date, display_year));
+            }
+            let i;
+            let date_i = new Date(this.sa.assignment_date.valueOf());
+            date_i.setDate(date_i.getDate() + this.sa.blue_line_start);
+            for (i = this.sa.blue_line_start; i < this.sa.complete_x; i++) {
+                if (total === this.sa.y && remove_zeroes) {
+                    break;
+                }
+
+                let formatted_date_i = VisualAssignment.formatDisplayInTextDate(date_i, display_year);
+                date_i.setDate(date_i.getDate() + 1);
+                if (end_of_works) {
+                    if (last_work_input > next_funct) {
+                        this_funct = last_work_input;
+                    } else {
+                        this_funct = next_funct;
+                    }
+                    next_funct = this.funct(i + 1);
+                    diff = Math.max(0, next_funct - this_funct);
+                } else if (0 <= i - this.sa.blue_line_start + 1 && i - this.sa.blue_line_start + 1 <= len_works) {
+                    this_work = next_work;
+                    next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+                    diff = next_work - this_work;
+                } else if (this.sa.break_days.includes((this.assign_day_of_week + i) % 7)) {
+                    diff = 0;
+                } else {
+                    end_of_works = true;
+                    next_funct = this.funct(i + 1);
+                    diff = next_funct - last_work_input;
+                }
+
+                if (remove_zeroes && diff === 0 && !force_display_dates.includes(i)) {
+                    days_skipped++;
+                    continue;
+                }
+
+                total += diff;
+                let formatted_date = `${formatted_date_i} ${diff} ${diff === 1 ? unit_singular : unit_plural} (${total} / ${this.sa.y})`;
+                if (unit_singular.toLowerCase() !== "minute" || unit_singular.toLowerCase() !== "hour" && diff * this.sa.time_per_unit >= 60)
+                    formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
+                if (days_skipped > 1) {
+                    formatted_date += ` (${days_skipped} Days Later)`;
+                    days_skipped = 1;
+                }
+                if (today_minus_assignment_date == i)
+                    today_index = formatted_dates.length;
+                if (add_last_work_input && i === len_works + this.sa.blue_line_start - 1)
+                    last_work_index = formatted_dates.length;
+
+                formatted_dates.push(formatted_date);
+            }
+            // loops increment after the loop ends, so i is one too high
+            i--;
+            formatted_dates[0] += ' (Assign Date)';
+            if (this.sa.blue_line_start && today_minus_assignment_date > 1) {
+                formatted_dates[1] += ` (${today_minus_assignment_date} Days Later)`;
+            }
+            if (formatted_dates[today_index] != null) // use != instead of !==
+                formatted_dates[today_index] = "-------------------\n" + formatted_dates[today_index] + ' (Today)';
+            if (add_last_work_input)
+                formatted_dates[last_work_index] += ' (Last Work Input)';
+            
+            days_skipped = Math.floor(this.sa.complete_x) - i;
+            if (days_skipped === 0) {
+                formatted_dates[formatted_dates.length - 1] += ' (Due Date)';
+            } else {
+                let formatted_date = VisualAssignment.formatDisplayInTextDate(complete_due_date, display_year);
+                if (days_skipped > 1)
+                    formatted_date += ` (${days_skipped} Days Later)`;
+                formatted_date += ' (Due Date)';
+                formatted_dates.push(formatted_date);
+            }
+            formatted_dates.push(`Curvature: ${mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION)}`);
+            console.log(formatted_dates.join("\n"));
         }).text(display_in_text_button.attr(`data-${this.in_graph_display ? "in-text" : "in-graph"}-label`));
         // END Display in text button
 
