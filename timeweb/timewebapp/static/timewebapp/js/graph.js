@@ -498,12 +498,12 @@ class VisualAssignment extends Assignment {
             let graph_mouse_x;
             if (mouse_x === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 str_mouse_x = new Date(this.complete_due_date.valueOf());
-                str_mouse_x = str_mouse_x.toLocaleDateString("en-US", {...this.date_string_options_no_weekday, hour: "numeric", minute: "numeric"});
+                str_mouse_x = str_mouse_x.toLocaleDateString([], {...this.date_string_options_no_weekday, hour: "numeric", minute: "numeric"});
                 graph_mouse_x = this.sa.complete_x;
             } else {
                 str_mouse_x = new Date(this.sa.assignment_date.valueOf());
                 str_mouse_x.setDate(str_mouse_x.getDate() + mouse_x);
-                str_mouse_x = str_mouse_x.toLocaleDateString("en-US", this.date_string_options_no_weekday);
+                str_mouse_x = str_mouse_x.toLocaleDateString([], this.date_string_options_no_weekday);
                 graph_mouse_x = mouse_x;
             }
             const point_x = graph_mouse_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
@@ -549,11 +549,11 @@ class VisualAssignment extends Assignment {
             let str_day;
             if (this.sa.blue_line_start + len_works === this.sa.x && this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)) {
                 displayed_day = new Date(this.complete_due_date.valueOf());
-                str_day = displayed_day.toLocaleDateString("en-US", {...this.date_string_options, hour: "numeric", minute: "numeric"});
+                str_day = displayed_day.toLocaleDateString([], {...this.date_string_options, hour: "numeric", minute: "numeric"});
             } else {
                 displayed_day = new Date(this.sa.assignment_date.valueOf());
                 displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
-                str_day = displayed_day.toLocaleDateString("en-US", this.date_string_options);
+                str_day = displayed_day.toLocaleDateString([], this.date_string_options);
             }
             const distance_today_from_displayed_day = today_minus_assignment_date - this.sa.blue_line_start - len_works;
             switch (distance_today_from_displayed_day) {

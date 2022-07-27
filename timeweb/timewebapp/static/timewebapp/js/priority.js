@@ -77,11 +77,11 @@ class Priority {
             if (today_minus_assignment_date === -1) {
                 str_daysleft = 'Assigned Tomorrow';
             } else if (today_minus_assignment_date > -7) {
-                str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString("en-US", {weekday: 'long'})}`;
+                str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString([], {weekday: 'long'})}`;
             } else {
                 str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
             }
-            long_str_daysleft = sa.sa.assignment_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
+            long_str_daysleft = sa.sa.assignment_date.toLocaleDateString([], {month: 'long', day: 'numeric'});
         } else if (Number.isFinite(sa.sa.x)) {
             const due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
             const due_date = new Date(sa.sa.assignment_date.valueOf());
@@ -96,7 +96,7 @@ class Priority {
                 } else if (due_date_minus_today === 1) {
                     str_daysleft = 'Tomorrow';
                 } else if (due_date_minus_today < 7) {
-                    str_daysleft = due_date.toLocaleDateString("en-US", {weekday: 'long'});
+                    str_daysleft = due_date.toLocaleDateString([], {weekday: 'long'});
                 } else {
                     str_daysleft = due_date_minus_today + "d";
                 }
@@ -110,9 +110,9 @@ class Priority {
                 }
             }
             if (complete_date_now.getFullYear() === due_date.getFullYear()) {
-                long_str_daysleft = due_date.toLocaleDateString("en-US", {month: 'long', day: 'numeric'});
+                long_str_daysleft = due_date.toLocaleDateString([], {month: 'long', day: 'numeric'});
             } else {
-                long_str_daysleft = due_date.toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'});
+                long_str_daysleft = due_date.toLocaleDateString([], {year: 'numeric', month: 'long', day: 'numeric'});
             }
         } else {
             str_daysleft = "";

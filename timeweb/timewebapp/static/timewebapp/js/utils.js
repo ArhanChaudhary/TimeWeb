@@ -159,7 +159,7 @@ setClickHandlers: {
         });
     },
     assignmentsHeaderUI: function() {
-        $("#current-date").text(`Currently: ${date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'})}`);
+        $("#current-date").text(`Currently: ${date_now.toLocaleDateString([], {month: 'long', day: 'numeric', weekday: 'long'})}`);
         
         // Hide and show estimated completion time
         $("#hide-button").click(function() {
@@ -187,7 +187,7 @@ setClickHandlers: {
                     position: "absolute",
                     top: -9999,
                 });
-                $("#current-date").text("Simulated date: " + date_now.toLocaleDateString("en-US", {month: 'long', day: 'numeric', weekday: 'long'}));
+                $("#current-date").text("Simulated date: " + date_now.toLocaleDateString([], {month: 'long', day: 'numeric', weekday: 'long'}));
                 new Priority().sort();
             }
 
@@ -1032,7 +1032,7 @@ loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
 },
 getRawDateNow: function(params={ accurate_in_simulation: true, initial_define: false }) {
     if (SETTINGS.timezone) {
-        var raw_date_now = new Date(new Date().toLocaleString("en-US", {timeZone: SETTINGS.timezone}));
+        var raw_date_now = new Date(new Date().toLocaleString([], {timeZone: SETTINGS.timezone}));
     } else {
         var raw_date_now = new Date();
     }
