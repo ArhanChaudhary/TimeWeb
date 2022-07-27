@@ -388,29 +388,41 @@ class Crud {
             $("#submit-assignment-button").val(sa.id);
             that.showForm();
         });
-        $(".restore-button").parent().click(function() {
-            that.deleteAssignment($(this), {restore: true});
-        });
-        $('.delete-button').parent().click(function(e) {
+        $('.delete-button, .restore-button').parent().click(function(e) {
             const $this = $(this);
-            if (e.shiftKey) {
-                that.deleteAssignment($this);
-                return;
-            }
-            const sa = utils.loadAssignmentData($this);
-            $.confirm({
-                title: `Are you sure you want to delete assignment "${sa.name}"?`,
-                content: utils.formatting.getReversibilityStatus(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            that.deleteAssignment($this);
-                        }
-                    },
-                    cancel: function() {
-                        
+            // shift + d while in the close assignment transition bugs it
+            // use transitionend to run this
+            new Promise(function(resolve) {
+                const dom_assignment = $this.parents(".assignment");
+                if (dom_assignment.hasClass("assignment-is-closing")) {
+                    dom_assignment.find(".assignment-footer").one("transitionend", resolve);
+                } else {
+                    resolve();
+                }
+            }).then(function() {
+                if ($this.children(".delete-button").length) {
+                    if (e.shiftKey) {
+                        that.deleteAssignment($this);
+                        return;
                     }
+                    const sa = utils.loadAssignmentData($this);
+                    $.confirm({
+                        title: `Are you sure you want to delete assignment "${sa.name}"?`,
+                        content: utils.formatting.getReversibilityStatus(),
+                        buttons: {
+                            confirm: {
+                                keys: ['Enter'],
+                                action: function() {
+                                    that.deleteAssignment($this);
+                                }
+                            },
+                            cancel: function() {
+                                
+                            }
+                        }
+                    });
+                } else if ($this.children(".restore-button").length) {
+                    that.deleteAssignment($this, {restore: true});
                 }
             });
         });

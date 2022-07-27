@@ -1325,6 +1325,8 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
             });
             // Assignment name dom element can change height and the assignment header buttons can mess up their negative margins, so repoisiton the tags
             sa.positionTags();
+
+            assignment_footer.trigger("transitionend");
         });
         sa.positionTags();
         dom_assignment.find(".falling-arrow-animation")[0]?.beginElement();
