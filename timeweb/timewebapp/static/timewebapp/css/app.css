@@ -783,16 +783,30 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .graph-container > table {
     padding: 4px;
+    top: 0;
+    position: absolute;
     letter-spacing: 0.5px;
-    background-color: hsl(0, 0%, 12%);
-    color: white;
+    --background-color: hsl(0, 0%, 97%);
+    background-color: var(--background-color);
     display: block;
-    overflow-y: auto;
+    overflow-y: scroll;
+    overflow-x: auto;
+    white-space: nowrap;
     user-select: text;
 }
 .graph-container:not(.text-display) > table,
 .graph-container.text-display > :not(table) {
-    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+.today-display-in-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.today-display-in-text hr {
+    display: inline-block;
+    flex-grow: 1;
 }
 .graph-container {
     border-radius: 12px;
@@ -804,6 +818,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     width: 100%;
     height: 100%;
     border-radius: 10px;
+    transition: opacity 0.1s ease-out;
 }
 .hover-point-label {
     position: absolute;

@@ -102,6 +102,9 @@ select {
 .graph-footer > * {
     --background-color: hsl(0, 0%, 27%);
 }
+.graph-container > table {
+    --background-color: hsl(0, 0%, 12%);
+}
 
 
 /* vendor prefixed pseudo styles are mega sus

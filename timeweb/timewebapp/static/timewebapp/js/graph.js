@@ -874,6 +874,10 @@ class VisualAssignment extends Assignment {
             this.in_graph_display = !this.in_graph_display;
             graph_container.toggleClass("text-display");
             display_in_text_button.text(display_in_text_button.attr(`data-${this.in_graph_display ? "in-text" : "in-graph"}-label`));
+            if (this.in_graph_display) {
+                text_display_container[0].innerHTML = "";
+                return;
+            }
 
             const len_works = this.sa.works.length - 1;
             const last_work_input = this.sa.works[len_works];
@@ -941,7 +945,7 @@ class VisualAssignment extends Assignment {
 
                 total += diff;
                 let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>/ ${this.sa.y})`;
-                if (unit_singular.toLowerCase() !== "minute" || unit_singular.toLowerCase() !== "hour" && diff * this.sa.time_per_unit >= 60)
+                if (!["minute", "hour"].includes(unit_singular.toLowerCase()) && diff * this.sa.time_per_unit !== 0)
                     formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
                 if (today_minus_assignment_date == i)
                     today_index = formatted_dates.length;
@@ -952,19 +956,34 @@ class VisualAssignment extends Assignment {
             }
             // loops increment after the loop ends, so i is one too high
             i--;
-            formatted_dates[0] += '<td colspan="4">&nbsp;(Assign Date)';
+            formatted_dates[0] += '<td colspan="6">&nbsp;(Assign Date)';
             if (formatted_dates[today_index] != null) // use != instead of !==
-                formatted_dates[today_index] = "<td colspan=\"5\"><span class=\"today-display-in-text\"><hr>Today Line<hr></span></td></tr><tr>" + formatted_dates[today_index];
+                formatted_dates[today_index] = `<td colspan=\"5\"><span class=\"today-display-in-text\"><hr>Today Line<hr></span></td></tr><tr class="scroll-to-top">` + formatted_dates[today_index];
             if (add_last_work_input)
                 formatted_dates[last_work_index] += ' (Last Work Input)';
 
             if (Math.floor(this.sa.complete_x) === i) {
                 formatted_dates[formatted_dates.length - 1] += '&nbsp;(Due Date)';
             } else {
-                formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(complete_due_date, display_year)}</td> <td colspan="4">(Due Date)`);
+                formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(complete_due_date, display_year)}</td> <td colspan="6">&nbsp;(Due Date)`);
             }
-            formatted_dates.push(`<td colspan="5">Curvature: ${mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION)}</td></tr>`);
+            formatted_dates.push(`<td colspan="6">Curvature: ${mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION)}</td></tr>`);
             text_display_container[0].innerHTML = "<tr>" + formatted_dates.join("</td></tr><tr>");
+
+            // scroll to today
+            const scroll_to_top_tr = text_display_container.find("tr.scroll-to-top");
+            if (scroll_to_top_tr.length) {
+                const last_tr = text_display_container.find("tr:last-of-type");
+                // first try to scroll to today
+                let scroll_y = scroll_to_top_tr.offset().top - text_display_container.parent().offset().top;
+                text_display_container.parent().scrollTop(scroll_y);
+                // then add height if scrolling further isn't possible
+                scroll_y = scroll_to_top_tr.offset().top - text_display_container.parent().offset().top;
+                last_tr.css({height: "+=" + scroll_y, verticalAlign: "top"});
+                // then scroll to today
+                scroll_y = scroll_to_top_tr.offset().top - text_display_container.offset().top + parseFloat(text_display_container.parent().css("padding-top"));
+                text_display_container.parent().scrollTop(scroll_y);
+            }
         }).text(display_in_text_button.attr(`data-${this.in_graph_display ? "in-text" : "in-graph"}-label`));
         // END Display in text button
 
