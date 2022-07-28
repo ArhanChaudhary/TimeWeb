@@ -938,19 +938,12 @@ class VisualAssignment extends Assignment {
                     diff = next_funct - last_work_input;
                 }
 
-                if (remove_zeroes && diff === 0 && !force_display_dates.includes(i)) {
-                    days_skipped++;
-                    continue;
-                }
+                if (remove_zeroes && diff === 0 && !force_display_dates.includes(i)) continue;
 
                 total += diff;
                 let formatted_date = `${formatted_date_i} ${diff} ${diff === 1 ? unit_singular : unit_plural} (${total} / ${this.sa.y})`;
                 if (unit_singular.toLowerCase() !== "minute" || unit_singular.toLowerCase() !== "hour" && diff * this.sa.time_per_unit >= 60)
                     formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
-                if (days_skipped > 1) {
-                    formatted_date += ` (${days_skipped} Days Later)`;
-                    days_skipped = 1;
-                }
                 if (today_minus_assignment_date == i)
                     today_index = formatted_dates.length;
                 if (add_last_work_input && i === len_works + this.sa.blue_line_start - 1)
@@ -960,10 +953,7 @@ class VisualAssignment extends Assignment {
             }
             // loops increment after the loop ends, so i is one too high
             i--;
-            formatted_dates[0] += ' (Assign Date)';
-            if (this.sa.blue_line_start && today_minus_assignment_date > 1) {
-                formatted_dates[1] += ` (${today_minus_assignment_date} Days Later)`;
-            }
+            formatted_dates[0] += '<td colspan="4">&nbsp;(Assign Date)';
             if (formatted_dates[today_index] != null) // use != instead of !==
                 formatted_dates[today_index] = "-------------------\n" + formatted_dates[today_index] + ' (Today)';
             if (add_last_work_input)
