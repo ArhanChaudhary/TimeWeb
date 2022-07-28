@@ -882,7 +882,7 @@ class VisualAssignment extends Assignment {
             const force_display_dates = [0, today_minus_assignment_date, this.sa.blue_line_start];
             if (add_last_work_input)
                 force_display_dates.push(len_works + this.sa.blue_line_start - 1);
-            const remove_zeroes = this.sa.x - this.sa.blue_line_start > 15 || 1;
+            const remove_zeroes = this.sa.x - this.sa.blue_line_start > 15;
             const unit_plural = pluralize(this.sa.unit);
             const unit_singular = pluralize(this.sa.unit, 1);
             const formatted_dates = [];
