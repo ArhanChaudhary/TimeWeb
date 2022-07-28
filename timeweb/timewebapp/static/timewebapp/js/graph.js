@@ -868,8 +868,11 @@ class VisualAssignment extends Assignment {
 
         // BEGIN Display in text button
         this.in_graph_display = true;
+        const graph_container = this.dom_assignment.find(".graph-container");
+        const text_display_container = this.dom_assignment.find(".text-display-container");
         display_in_text_button.click(() => {
             this.in_graph_display = !this.in_graph_display;
+            graph_container.toggleClass("text-display");
             display_in_text_button.text(display_in_text_button.attr(`data-${this.in_graph_display ? "in-text" : "in-graph"}-label`));
 
             const len_works = this.sa.works.length - 1;
@@ -892,21 +895,17 @@ class VisualAssignment extends Assignment {
             let this_funct;
             let next_funct;
             let diff;
-            let total = this.sa.works[0];;
-            let days_skipped = 1;
-            let end_of_works = false;
-
-            let start_index;
             let today_index;
             let last_work_index;
+            let total = this.sa.works[0];;
+            let end_of_works = false;
 
             // assignment date
             if (this.sa.blue_line_start) {
-                start_index = 1;
                 if (date_now.valueOf() === this.sa.assignment_date.valueOf()) {
                     today_index = 0;
                 }
-                formatted_dates.push(VisualAssignment.formatDisplayInTextDate(this.sa.assignment_date, display_year));
+                formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(this.sa.assignment_date, display_year)}</td>`);
             }
             let i;
             let date_i = new Date(this.sa.assignment_date.valueOf());
@@ -941,7 +940,7 @@ class VisualAssignment extends Assignment {
                 if (remove_zeroes && diff === 0 && !force_display_dates.includes(i)) continue;
 
                 total += diff;
-                let formatted_date = `${formatted_date_i} ${diff} ${diff === 1 ? unit_singular : unit_plural} (${total} / ${this.sa.y})`;
+                let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>/ ${this.sa.y})`;
                 if (unit_singular.toLowerCase() !== "minute" || unit_singular.toLowerCase() !== "hour" && diff * this.sa.time_per_unit >= 60)
                     formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
                 if (today_minus_assignment_date == i)
@@ -955,22 +954,17 @@ class VisualAssignment extends Assignment {
             i--;
             formatted_dates[0] += '<td colspan="4">&nbsp;(Assign Date)';
             if (formatted_dates[today_index] != null) // use != instead of !==
-                formatted_dates[today_index] = "-------------------\n" + formatted_dates[today_index] + ' (Today)';
+                formatted_dates[today_index] = "<td colspan=\"5\"><hr></td></tr><tr>" + formatted_dates[today_index] + " (Today)";
             if (add_last_work_input)
                 formatted_dates[last_work_index] += ' (Last Work Input)';
-            
-            days_skipped = Math.floor(this.sa.complete_x) - i;
-            if (days_skipped === 0) {
-                formatted_dates[formatted_dates.length - 1] += ' (Due Date)';
+
+            if (Math.floor(this.sa.complete_x) === i) {
+                formatted_dates[formatted_dates.length - 1] += '&nbsp;(Due Date)';
             } else {
-                let formatted_date = VisualAssignment.formatDisplayInTextDate(complete_due_date, display_year);
-                if (days_skipped > 1)
-                    formatted_date += ` (${days_skipped} Days Later)`;
-                formatted_date += ' (Due Date)';
-                formatted_dates.push(formatted_date);
+                formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(complete_due_date, display_year)}</td> <td colspan="4">(Due Date)`);
             }
-            formatted_dates.push(`Curvature: ${mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION)}`);
-            console.log(formatted_dates.join("\n"));
+            formatted_dates.push(`<td colspan="5">Curvature: ${mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION)}</td></tr>`);
+            text_display_container[0].innerHTML = "<tr>" + formatted_dates.join("</td></tr><tr>");
         }).text(display_in_text_button.attr(`data-${this.in_graph_display ? "in-text" : "in-graph"}-label`));
         // END Display in text button
 
