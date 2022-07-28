@@ -6,6 +6,11 @@
     {% comment %} Order of these stylesheets matters {% endcomment %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
     <link rel="stylesheet" href="{% static 'navbar/css/settings.css' %}">
+    {% if settings_model.appearance == "automatic" %}
+        <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
+    {% elif settings_model.appearance == "dark" or settings_model.appearance == "fancy dark" %}
+        <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
+    {% endif %}
 {% endblock %}
 
 {% block js %}

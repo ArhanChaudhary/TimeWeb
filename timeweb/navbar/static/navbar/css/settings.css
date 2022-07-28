@@ -12,8 +12,10 @@ body {
 }
 .field-group {
     margin: 40px 0 19px;
-    box-shadow: 0 0 13px -12px black;
-    background-color: hsl(0, 0%, 96%);
+    --box-shadow: 0 0 13px -12px var(--color);
+    box-shadow: var(--box-shadow);
+    --background-color: hsl(0, 0%, 96%);
+    background-color: var(--background-color);
     padding: 15px;
     border-radius: 15px;
 }
@@ -24,7 +26,8 @@ body {
     font-weight: 700;
     font-size: 20px;
     line-height: 20px;
-    color: rgb(62, 109, 126);
+    --lightness: 37%;
+    color: hsl(196, 34%, var(--lightness));
 }
 .field-container {
     margin: 10px 0 10px 0.5em;
@@ -43,7 +46,7 @@ body {
 .right-side-of-field > * {
     box-sizing: border-box;
     width: 157px;
-    border-color: black;
+    border-color: var(--color);
 }
 .right-side-of-field > :not(.error-note) {
     margin: unset;
@@ -53,9 +56,10 @@ body {
 .right-side-of-field > select {
     font-size: 14px;
     border-width: 1px;
+    background-color: var(--primary);
 }
 .right-side-of-field > input:not([type="file"]) {
-    border: 1px solid black;
+    border: 1px solid var(--color);
 }
 .right-side-of-field > :not(#break-days-wrapper) {
     display: block;
@@ -81,6 +85,7 @@ body {
     display: block;
     width: 100%;
     border-radius: unset;
+    color: var(--color);
 }
 [type="checkbox"] {
     display: none !important;
@@ -91,8 +96,10 @@ body {
 }
 [type="checkbox"] ~ label:not(.break-days-label) {
     position: relative;
-    border: 2px solid rgb(92, 195, 199);
-    background-color: white;
+    --checkbox-widget-primary-color-lightness: 57%;
+    --checkbox-widget-primary-color: hsl(182, 49%, var(--checkbox-widget-primary-color-lightness));
+    border: 2px solid var(--checkbox-widget-primary-color);
+    background-color: var(--primary);
     display: flex !important;
     align-items: center;
     justify-content: center;
@@ -106,17 +113,9 @@ body {
     z-index: 1;
     transition: all 0.1s ease-in-out;
 }
-[type="checkbox"] ~ label:not(.break-days-label, .single-action-label):hover {
-    filter: brightness(0.91);
-}
-[type="checkbox"] ~ .single-action-label:hover:not(:active)::before {
-    background-color: rgb(84, 177, 181);
-}
-[type="checkbox"] ~ .single-action-label:hover:not(:active) {
-    background-color: hsl(0, 0%, 91%);
-}
 [type="checkbox"] ~ label:not(.break-days-label):hover:active {
-    box-shadow: 0 0 11px -1px rgb(187, 187, 187);
+    --box-shadow: 0 0 11px -1px hsl(0, 0%, 73%);
+    box-shadow: var(--box-shadow);
     filter: none;
 }
 [type="checkbox"] ~ label:not(.break-days-label)::before {
@@ -129,7 +128,7 @@ body {
     left: -1px;
     width: calc(50% + 2px);
 
-    background-color: rgb(92, 195, 199);
+    background-color: var(--checkbox-widget-primary-color);
     transition: 0.25s ease-in-out;
     transition-property: background-color, transform;
     transform-origin: left;
@@ -170,6 +169,8 @@ body {
     padding-top: 3px;
     padding-bottom: 3px;
     font-size: 14px;
+    border-top-color: var(--color) !important;
+    border-left-color: var(--color) !important;
 }
 #reset-settings-button {
     font-size: 20px;

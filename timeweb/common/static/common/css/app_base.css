@@ -132,7 +132,7 @@ main.finished-header-transition {
     font-size: 13px;
 }
 ::file-selector-button {
-    border-color: black;
+    border-color: var(--color);
 }
 .generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) - 19);
@@ -429,4 +429,9 @@ main.finished-header-transition {
         /* First 30 for the padding due to a lack of border-box, second 30 for the right and left margin */
         width: calc(100vw - 30px - 30px) !important;
     }
+}
+
+.jscolor-picker {
+    background-color: var(--primary);
+    border-radius: 8px;
 }

@@ -43,7 +43,7 @@ select {
 #form-wrapper .field-widget:hover {
     --field-widget-background-color: hsl(0, 0%, 24%);
 }
-.generic-button:hover, .generic-button:focus {
+.generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) + 12);
 }
 .assignment {
@@ -142,4 +142,20 @@ main:not(.background-image-exists) #extra-navs {
 .jconfirm.jconfirm-light .jconfirm-box {
     box-shadow: none !important;
     border: 1px solid hsl(0, 0%, 48%);
+}
+
+/* settings */
+.field-group, #break-days-wrapper {
+    --background-color: var(--primary);
+    --box-shadow: initial;
+}
+.field-group-label {
+    --lightness: 50%;
+}
+[type="checkbox"] ~ label:not(.break-days-label) {
+    --checkbox-widget-primary-color-lightness: 40%;
+    color: white;
+}
+[type="checkbox"] ~ label:not(.break-days-label):hover:active {
+    --box-shadow: initial;
 }

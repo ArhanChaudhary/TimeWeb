@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // the timeout and the if statement allow for double or quadruple clicking to cancel the action
             if ($(this).parents(".right-side-of-field").find("input").is(":checked"))
                 $("#logo-container").click();
-        }, 500);
+        }, 700);
     });
 });
 $(window).one("load", function() {
