@@ -954,7 +954,7 @@ class VisualAssignment extends Assignment {
             i--;
             formatted_dates[0] += '<td colspan="4">&nbsp;(Assign Date)';
             if (formatted_dates[today_index] != null) // use != instead of !==
-                formatted_dates[today_index] = "<td colspan=\"5\"><hr></td></tr><tr>" + formatted_dates[today_index] + " (Today)";
+                formatted_dates[today_index] = "<td colspan=\"5\"><span class=\"today-display-in-text\"><hr>Today Line<hr></span></td></tr><tr>" + formatted_dates[today_index];
             if (add_last_work_input)
                 formatted_dates[last_work_index] += ' (Last Work Input)';
 
