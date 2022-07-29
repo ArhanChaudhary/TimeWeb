@@ -945,7 +945,7 @@ class VisualAssignment extends Assignment {
 
                 total += diff;
                 let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>/ ${this.sa.y})`;
-                if (!["minute", "hour"].includes(unit_singular.toLowerCase()) && diff * this.sa.time_per_unit !== 0)
+                if (diff * this.sa.time_per_unit !== 0 && unit_singular.toLowerCase() !== "hour" && (unit_singular.toLowerCase() !== "minute" || diff * this.sa.time_per_unit >= 60))
                     formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
                 if (today_minus_assignment_date == i)
                     today_index = formatted_dates.length;
@@ -958,7 +958,7 @@ class VisualAssignment extends Assignment {
             i--;
             formatted_dates[0] += '<td colspan="6">&nbsp;(Assign Date)';
             if (formatted_dates[today_index] != null) // use != instead of !==
-                formatted_dates[today_index] = `<td colspan=\"5\"><span class=\"today-display-in-text\"><hr>Today Line<hr></span></td></tr><tr class="scroll-to-top">` + formatted_dates[today_index];
+                formatted_dates[today_index] = "<td colspan=\"5\"><span class=\"today-display-in-text\"><hr>Today Line<hr></span></td></tr><tr class=\"scroll-to-top\">" + formatted_dates[today_index];
             if (add_last_work_input)
                 formatted_dates[last_work_index] += ' (Last Work Input)';
 
