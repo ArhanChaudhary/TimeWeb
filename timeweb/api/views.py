@@ -108,7 +108,7 @@ def save_assignment(request):
             del model_fields['user']
             # do NOT setattr a primary key that would be a huge fricking mess
             del assignment['id']
-            validation_form = TimewebForm(data=model_fields)
+            validation_form = TimewebForm(data=model_fields, request=request)
             if not validation_form.is_valid():
                 assignment = {field: value for field, value in assignment.items() if field not in validation_form.errors}
 

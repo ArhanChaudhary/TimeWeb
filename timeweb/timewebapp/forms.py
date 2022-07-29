@@ -2,7 +2,7 @@ from django import forms
 from .models import TimewebModel
 from django.utils.translation import gettext_lazy as _
 import datetime
-
+from django.conf import settings
 
 class TimewebForm(forms.ModelForm):
 
@@ -90,6 +90,7 @@ class TimewebForm(forms.ModelForm):
 
             kwargs['data']['x'] = kwargs['data']['x'].split(" ", 1)[0]
 
+        self.request = kwargs.pop('request')
         super().__init__(*args, **kwargs)
         assert not self.is_bound or 'data' in kwargs, 'pls specify the data kwarg for readibility'
         for field_name in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
@@ -103,6 +104,9 @@ class TimewebForm(forms.ModelForm):
         assignment_date = cleaned_data.get("assignment_date")
         works = cleaned_data.get("works")
         y = cleaned_data.get("y")
+        if self.request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
+            self.add_error("name", forms.ValidationError(_("You can't create nor edit assignments in the example account")))
+            return cleaned_data
         if not isinstance(works, list) and works != None and y != None and works >= y >= 1:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the previous field's value of %(y)g"),code='invalid',params={

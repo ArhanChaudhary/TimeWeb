@@ -117,7 +117,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
 
     def get(self, request):
-        self.context['form'] = TimewebForm()
+        self.context['form'] = TimewebForm(request=request)
         if request.session.pop("view_deleted_assignments_in_app_view", None) or "everything_before" in request.GET or "everything_after" in request.GET:
             self.add_user_models_to_context(request, view_hidden=True)
             self.context["view_deleted_assignments_in_app_view"] = True
@@ -134,8 +134,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
 
             if invalid_form_context := request.session.pop('invalid_form_context', None):
-                form = TimewebForm(data=invalid_form_context['form'])
-                assert not form.is_valid(), form.data
+                form = TimewebForm(data=invalid_form_context['form'], request=request)
+                assert not form.is_valid(), f"{form.data}, {form.errors}"
                 for field in form.errors:
                     # https://github.com/microsoft/pyright/issues/3695
                     temp = form[field].field.widget
@@ -160,18 +160,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # for parsing due times in forms.py
         _mutable = request.POST._mutable
         request.POST._mutable = True
-        self.form = TimewebForm(data=request.POST)
+        self.form = TimewebForm(data=request.POST, request=request)
         request.POST._mutable = _mutable
 
-        # Parts of the form that can only validate in views
-        form_is_valid = True
-        if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
-            self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
-            form_is_valid = False
-        if not self.form.is_valid():
-            form_is_valid = False
-
-        if form_is_valid:
+        if self.form.is_valid():
             return self.valid_form(request)
         else:
             return self.invalid_form(request)
