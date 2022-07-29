@@ -909,7 +909,7 @@ class VisualAssignment extends Assignment {
                 if (date_now.valueOf() === this.sa.assignment_date.valueOf()) {
                     today_index = 0;
                 }
-                formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(this.sa.assignment_date, display_year)}</td>`);
+                formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(this.sa.assignment_date, display_year)}</td><td colspan="6">&nbsp;(Assign Date)`);
             }
             let i;
             let date_i = new Date(this.sa.assignment_date.valueOf());
@@ -956,14 +956,15 @@ class VisualAssignment extends Assignment {
             }
             // loops increment after the loop ends, so i is one too high
             i--;
-            formatted_dates[0] += '<td colspan="6">&nbsp;(Assign Date)';
+            if (!this.sa.blue_line_start)
+                formatted_dates[0] += '</td><td>&nbsp;(Assign Date)';
             if (formatted_dates[today_index] != null) // use != instead of !==
                 formatted_dates[today_index] = "<td colspan=\"5\"><span class=\"today-display-in-text\"><hr>Today Line<hr></span></td></tr><tr class=\"scroll-to-top\">" + formatted_dates[today_index];
             if (add_last_work_input)
                 formatted_dates[last_work_index] += ' (Last Work Input)';
 
             if (Math.floor(this.sa.complete_x) === i) {
-                formatted_dates[formatted_dates.length - 1] += '&nbsp;(Due Date)';
+                formatted_dates[formatted_dates.length - 1] += '</td><td>&nbsp;(Due Date)';
             } else {
                 formatted_dates.push(`<td>${VisualAssignment.formatDisplayInTextDate(complete_due_date, display_year)}</td> <td colspan="6">&nbsp;(Due Date)`);
             }
