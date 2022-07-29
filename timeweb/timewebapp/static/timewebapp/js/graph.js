@@ -980,6 +980,7 @@ class VisualAssignment extends Assignment {
                 text_display_container.parent().scrollTop(scroll_y);
                 // then add height if scrolling further isn't possible
                 scroll_y = scroll_to_top_tr.offset().top - text_display_container.parent().offset().top;
+                scroll_y += (text_display_container.parent().offset().top + text_display_container.parent().height()) - (last_tr.offset().top + last_tr.height());
                 last_tr.css({height: "+=" + scroll_y, verticalAlign: "top"});
                 // then scroll to today
                 scroll_y = scroll_to_top_tr.offset().top - text_display_container.offset().top + parseFloat(text_display_container.parent().css("padding-top"));
