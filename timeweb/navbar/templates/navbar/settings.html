@@ -28,6 +28,7 @@
 {% block content %}
     {% comment %} Injects libraries for the color picker {% endcomment %}
     {{ form.media }}
+    <div id="settings-scroller">
     <form method="POST" autocomplete="off" enctype="multipart/form-data">
         {% csrf_token %}
         {% if request.user.email == EXAMPLE_ACCOUNT_EMAIL %}
@@ -116,4 +117,5 @@
         {% endfor %}
         <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
     </form>
+    </div>
 {% endblock %}
