@@ -818,7 +818,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     width: 100%;
     height: 100%;
     border-radius: 10px;
-    transition: opacity 0.1s ease-out;
+    transition: opacity calc(0.1s * var(--animation-speed)) ease-out;
 }
 .hover-point-label {
     position: absolute;
