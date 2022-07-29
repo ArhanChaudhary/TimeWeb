@@ -580,7 +580,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .tag-add-box {
     white-space: normal;
-    width: 152px;
+    width: 155px;
     --box-shadow-color: rgba(170,170,170,0.65);
     --input-background-color: rgb(220,220,220);
     --background-color: var(--body-background);
