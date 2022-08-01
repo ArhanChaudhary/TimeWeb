@@ -7,7 +7,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 100px -63px black;
     position: relative;
-    width: clamp(290px, calc(100vw - 100px), 600px);
+    width: clamp(290px, calc(100vw - 40px), 600px);
     background: white;
     /* Ensures this doesnt overflow at the top */
     margin: auto;
