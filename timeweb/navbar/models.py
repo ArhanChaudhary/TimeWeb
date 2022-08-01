@@ -75,9 +75,9 @@ class SettingsModel(models.Model):
         default=1,
         verbose_name=_('Default Curvature'),
     )
-    ignore_ends = models.BooleanField(
+    loosely_enforce_minimum_work_times = models.BooleanField(
         default=False,
-        verbose_name=_('Ignore Minimum Work Time Ends'),
+        verbose_name=_('Loosely Enforce Minimum Work Times'),
     )
     one_graph_at_a_time = models.BooleanField(
         default=False,

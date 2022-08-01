@@ -83,7 +83,7 @@ Assignment.prototype.setParabolaValues = function() {
             }
         }
     }
-    if (SETTINGS.ignore_ends && this.sa.min_work_time) {
+    if (SETTINGS.loosely_enforce_minimum_work_times && this.sa.min_work_time) {
         var y_value_to_cutoff = y1;
     } else if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (funct_y < this.cutoff_to_use_round))) {
         var y_value_to_cutoff = y1 - this.min_work_time_funct_round / 2;
@@ -127,7 +127,7 @@ Assignment.prototype.setParabolaValues = function() {
     output = this.funct(this.return_y_cutoff - 1, {translateX: false});
 
 
-    if (SETTINGS.ignore_ends && this.sa.min_work_time) {
+    if (SETTINGS.loosely_enforce_minimum_work_times && this.sa.min_work_time) {
         const lower_return_y_cutoff = this.return_y_cutoff;
         const lower_output_diff = this.sa.y - output;
 
@@ -185,7 +185,7 @@ Assignment.prototype.setParabolaValues = function() {
     }
 
 
-    if (SETTINGS.ignore_ends && this.sa.min_work_time) {
+    if (SETTINGS.loosely_enforce_minimum_work_times && this.sa.min_work_time) {
         var y_value_to_cutoff = 0;
     } else if (this.sa.funct_round < this.sa.min_work_time && (!this.a && this.b < this.min_work_time_funct_round || this.a && (this.a > 0) === (funct_zero < this.cutoff_to_use_round))) {
         var y_value_to_cutoff = this.min_work_time_funct_round / 2;
@@ -219,7 +219,7 @@ Assignment.prototype.setParabolaValues = function() {
     this.return_0_cutoff = Math.max(0, left - 1);
     output = this.funct(this.return_0_cutoff + 1, {translateX: false});
     
-    if (SETTINGS.ignore_ends && this.sa.min_work_time) {
+    if (SETTINGS.loosely_enforce_minimum_work_times && this.sa.min_work_time) {
         const upper_return_0_cutoff = this.return_0_cutoff;
         const upper_output_diff = output - this.red_line_start_y;
 
