@@ -92,6 +92,10 @@ error: function(response, textStatus) {
             title = "Not found.";
             content = "Refresh or try again.";
             break;
+        case 429:
+            title = "You are being ratelimited.";
+            content = "Try again in a few seconds or minutes.";
+            break;
         case 500:
             title = "Internal server error.";
             content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";

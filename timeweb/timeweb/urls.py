@@ -29,3 +29,5 @@ urlpatterns = [
     path('', include('misc.urls')),
     path('', include('pwa.urls')),
 ]
+
+handler403 = 'common.utils._403_or_429'

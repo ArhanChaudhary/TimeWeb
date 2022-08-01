@@ -30,6 +30,8 @@ from django.dispatch import receiver
 # Misc
 from django.forms.models import model_to_dict
 from utils import days_between_two_dates, utc_to_local
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
 from views import logger
 
 @receiver(post_save, sender=User)
@@ -59,6 +61,11 @@ def append_default_context(request):
         context["GC_API_INIT_FAILED"] = True
     return context
 
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='30/m', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='100/h', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='3/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='15/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='75/h', method="POST", block=True), name='post')
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 

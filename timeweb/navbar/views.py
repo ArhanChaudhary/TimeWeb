@@ -4,7 +4,7 @@
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext as _
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, resolve
 from django.shortcuts import redirect
 from views import TimewebGenericView
 
@@ -16,12 +16,16 @@ from contact_form.views import ContactFormView as BaseContactFormView
 
 # Misc
 from django.utils.decorators import method_decorator
-from allauth.decorators import rate_limit
+from ratelimit.decorators import ratelimit
+from ratelimit.core import is_ratelimited
 from django.contrib import messages
 from requests import get as requests_get
 from views import logger
 from django.forms.models import model_to_dict
 
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='1/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='20/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='100/h', method="POST", block=True), name='post')
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
@@ -76,11 +80,13 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         # It's ok to return a 2xx from invalid form, because there is no danger of the user resubmitting because its invalid
         return super().get(request)
 
-@method_decorator(rate_limit(action="contact", message="You must wait for one minute before submitting another contact form."), name="post")
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
     def post(self, request):
+        if is_ratelimited(request, group=resolve(request.path)._func_path, key=settings.GET_CLIENT_IP, rate='1/m', method="POST", increment=True):
+            messages.error(request, "You must wait for one minute before submitting another contact form.")
+            return super().get(request)
         recaptcha_token = request.POST.get('g-recaptcha-response')
         auth = requests_get(f"https://www.google.com/recaptcha/api/siteverify?secret={settings.RECAPTCHA_SECRET_KEY}&response={recaptcha_token}")
         if auth.json()['success']:

@@ -1,11 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
 from views import TimewebGenericView
-
-def custom_permission_denied_view(request, reason=""):
-    response = render(request, "misc/403_csrf.html", {"request": request})
-    response.status_code = 403
-    return response
 
 class RickView(TimewebGenericView):
     def get(self, request, _):

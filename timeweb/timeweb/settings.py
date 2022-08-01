@@ -112,6 +112,7 @@ MIDDLEWARE = [
     'api.middleware.CatchRequestDataTooBig',
 
     'common.middleware.DefineIsExampleAccount',
+    'common.middleware.CommonRatelimit',
     # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 
@@ -123,7 +124,7 @@ if DEBUG:
     INSTALLED_APPS.append('livereload')
     MIDDLEWARE.append('livereload.middleware.LiveReloadScript')
     
-CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
+CSRF_FAILURE_VIEW = 'common.utils._403_csrf'
 ROOT_URLCONF = 'timeweb.urls'
 
 TEMPLATES = [
@@ -313,24 +314,6 @@ SOCIALACCOUNT_FORMS = {
     'signup': 'timewebauth.forms.LabeledSocialaccountSignupForm',
 }
 
-ACCOUNT_RATE_LIMITS = {
-    # Change password view (for users already logged in)
-    "change_password": "5/m",
-    # Email management (e.g. add, remove, change primary)
-    "manage_email": "10/m",
-    # Request a password reset, global rate limit per IP
-    "reset_password": "20/m",
-    # Rate limit measured per individual email address
-    "reset_password_email": "5/m",
-    # Password reset (the view the password reset email links to).
-    "reset_password_from_key": "20/m",
-    # Signups.
-    "signup": "20/m",
-    # NOTE: Login is already protected via `ACCOUNT_LOGIN_ATTEMPTS_LIMIT`
-    
-    "contact": "60/h",
-}
-
 if (DEBUG or FIX_DEBUG_LOCALLY):# and 0:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
@@ -378,6 +361,9 @@ EXAMPLE_ASSIGNMENT = {
     "description": "Example assignment description"
 }
 EDITING_EXAMPLE_ACCOUNT = False
+
+GET_CLIENT_IP = lambda group, request: request.META.get('HTTP_CF_CONNECTING_IP') or request.META['REMOTE_ADDR']
+DEFAULT_GLOBAL_RATELIMIT = '5/s'
 
 # Changelog
 from json import load as json_load

@@ -225,8 +225,10 @@ def create_gc_assignments(request):
     service = build('classroom', 'v1', credentials=credentials)
 
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
-        if type(exception) is HttpError: # HttpError for permission denied (ex if you're the teacher of a class)
+        # HttpError for permission denied (ex if you're the teacher of a class) or if you were ratelimited
+        if type(exception) is HttpError:
             logger.warning(exception)
+            assert exception.status_code in (403, 429)
             return
         if not course_coursework:
             return
@@ -310,6 +312,11 @@ def create_gc_assignments(request):
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except ServerNotFoundError:
         return HttpResponse(status=204)
+    except HttpError as e:
+        if e.status_code == 429:
+            # Ratelimited, don't care
+            return HttpResponse(status=204)
+        raise e
     courses = courses.get('courses', [])
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
