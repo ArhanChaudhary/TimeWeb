@@ -4,7 +4,7 @@
 from django.forms import ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext as _
-from django.urls import reverse_lazy # source code uses this instead of reverse for some reason
+from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from views import TimewebGenericView
 
@@ -14,11 +14,9 @@ import api.views as api
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
 
-# Signals
+# Misc
 from django.utils.decorators import method_decorator
 from allauth.decorators import rate_limit
-
-# Misc
 from django.contrib import messages
 from requests import get as requests_get
 from views import logger

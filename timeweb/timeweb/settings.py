@@ -380,6 +380,6 @@ EXAMPLE_ASSIGNMENT = {
 EDITING_EXAMPLE_ACCOUNT = False
 
 # Changelog
-import json
+from json import load as json_load
 with open("changelogs.json", "r") as f:
-    CHANGELOGS = json.load(f)
+    CHANGELOGS = json_load(f)

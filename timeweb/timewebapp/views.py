@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import logout, login
-from django.forms import ValidationError
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone

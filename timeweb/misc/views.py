@@ -1,8 +1,5 @@
-# In the future I should probably switch all my view classes to FormView
-
-# Abstractions
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from views import TimewebGenericView
 
 def custom_permission_denied_view(request, reason=""):
@@ -16,7 +13,7 @@ class RickView(TimewebGenericView):
 
 class SpookyView(TimewebGenericView):
     template_name = "misc/spooky.html"
-    
+
 class SusView(TimewebGenericView):
     template_name = "misc/sus.html"
 

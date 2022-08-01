@@ -62,8 +62,7 @@ class LabeledSocialaccountConnectionsView(SocialaccountConnectionsView):
         )
         form.save()
         return super(SocialaccountConnectionsView, self).form_valid(form)
-    
-    
+
 connections = login_required(LabeledSocialaccountConnectionsView.as_view()) # from its source code
 
 class EmailMessageView(TimewebGenericView):
