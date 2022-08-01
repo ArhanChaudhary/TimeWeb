@@ -249,10 +249,9 @@ saveAssignment: function(batchRequestData) {
         error: function(response) {
             switch (response.status) {
                 case 413: {
-                    const assignment_with_most_work_inputs = dat.reduce((i,j) => i.works.length > j.works.length ? i : j);
                     $.alert({
-                        title: `"${assignment_with_most_work_inputs.name}" has too many work inputs and can no longer be saved.`,
-                        content: "Change its assignment date to today to truncate its work inputs and continue using it.",
+                        title: "Too much data to save.",
+                        content: "If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.",
                         backgroundDismiss: false,
                     });
                     return;

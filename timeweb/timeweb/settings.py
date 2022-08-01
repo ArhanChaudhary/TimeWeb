@@ -162,7 +162,7 @@ WSGI_APPLICATION = 'timeweb.wsgi.application'
 
 # if i use float arithmetic i must convert these settings to ints or else internal errors are mean
 MAX_BACKGROUND_IMAGE_UPLOAD_SIZE = 10 * 1048576 # 10 MB (max background image size)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 # 50 KB (max size for data sent by ajax by assignments)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 # 500 KB (max size for data sent by ajax by assignments)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
