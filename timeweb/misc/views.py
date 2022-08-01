@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from views import TimewebGenericView
+from common.views import TimewebGenericView
 
 class RickView(TimewebGenericView):
     def get(self, request, _):

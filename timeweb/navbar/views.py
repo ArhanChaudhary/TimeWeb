@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext as _
 from django.urls import reverse_lazy, resolve
 from django.shortcuts import redirect
-from views import TimewebGenericView
+from common.views import TimewebGenericView
 
 # App stuff
 from django.conf import settings
@@ -20,7 +20,7 @@ from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
 from django.contrib import messages
 from requests import get as requests_get
-from views import logger
+from common.views import logger
 from django.forms.models import model_to_dict
 
 @method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='1/s', method="POST", block=True), name='post')

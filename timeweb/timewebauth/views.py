@@ -1,7 +1,7 @@
 # In the future I should probably switch all my view classes to FormView 
 
 # Abstractions
-from views import TimewebGenericView
+from common.views import TimewebGenericView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -13,7 +13,7 @@ from .forms import UsernameResetForm
 from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
 
 # Misc
-from views import logger
+from common.views import logger
 from django.contrib import messages
 from allauth.account.adapter import get_adapter as get_account_adapter
 

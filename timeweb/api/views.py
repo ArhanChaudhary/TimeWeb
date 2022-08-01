@@ -32,7 +32,7 @@ from httplib2.error import ServerNotFoundError
 # Misc
 from django.db import transaction
 from common.utils import days_between_two_dates, utc_to_local
-from views import logger
+from common.views import logger
 from django.utils.decorators import decorator_from_middleware
 from .middleware import APIValidationMiddleware
 from django.views.decorators.http import require_http_methods
