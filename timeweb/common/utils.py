@@ -3,7 +3,7 @@ from ratelimit.exceptions import Ratelimited
 from django.http import HttpResponseForbidden, HttpResponse
 
 def _403_csrf(request, reason=""):
-    response = render(request, "misc/403_csrf.html", {"request": request})
+    response = render(request, "common/403_csrf.html", {"request": request})
     response.status_code = 403
     return response
 
