@@ -406,7 +406,10 @@ def gc_auth_callback(request):
         # If the error is an HttpError and the access code is 404, the init succeeded, as the course work execute line provides a dunder id so it can execute
 
         # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
-        if isinstance(e, OAuth2Error) or isinstance(e, HttpError) and e.resp.status == 403:
+        # I don't need to worry about Ratelimit errors here because such a situation would be very rare
+
+        # Let's use type instead of isinstance because I want an exact exception class match
+        if type(e) is OAuth2Error or type(e) is HttpError and e.resp.status == 403:
             # In case users deny a permission or don't input a code in the url or cancel
             request.session['gc-init-failed'] = True
             return redirect(request.session.pop("gc-callback-current-url"))
