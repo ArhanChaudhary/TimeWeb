@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 "try again": {
                     action: () => {
+                        hasSubmitted = true;
                         ajaxUtils.changeSetting({setting: "oauth_token", value: true});
                     },
                 },
