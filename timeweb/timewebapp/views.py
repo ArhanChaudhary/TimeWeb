@@ -29,7 +29,7 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from utils import days_between_two_dates, utc_to_local
+from common.utils import days_between_two_dates, utc_to_local
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 from views import logger

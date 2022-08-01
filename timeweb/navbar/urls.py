@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import RedirectView
 from . import views, forms
-from utils import app_static_factory
+from common.utils import app_static_factory
 
 app_static = app_static_factory(__package__)
 

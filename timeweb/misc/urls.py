@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from django.http import HttpResponse
 from . import views
 from django.views.generic import RedirectView
-from utils import app_static_factory
+from common.utils import app_static_factory
 
 app_static = app_static_factory(__package__)
 
