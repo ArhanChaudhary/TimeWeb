@@ -158,6 +158,9 @@ main.finished-header-transition {
     background-color: #357ebd;
     color: #fff;
 }
+.daterangepicker .drp-buttons .cancelBtn {
+    color: #fff;
+}
 #logo-container {
     display: inline-block;
     position: relative;
