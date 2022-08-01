@@ -173,6 +173,7 @@ class Priority {
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
         const complete_date_now = utils.getRawDateNow();
+        const starred_assignment_ids_to_delete_after_sorting = new Set();
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const sa = new Assignment(dom_assignment);
@@ -196,6 +197,7 @@ class Priority {
                 sa.setDynamicStartIfInDynamicMode();
                 
             let display_format_minutes = false;
+            let delete_starred_assignment_after_sorting = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
@@ -322,7 +324,7 @@ class Priority {
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
                 if (SETTINGS.immediately_delete_completely_finished_assignments && !sa.sa.dont_hide_again)
-                    new Crud().deleteAssignment(dom_assignment.find(".delete-button").parent());
+                    delete_starred_assignment_after_sorting = true;
             } else if (not_yet_assigned) {
                 status_image = "not_yet_assigned";
                 status_message = 'This assignment hasn\'t yet been assigned';
@@ -489,10 +491,14 @@ class Priority {
             })());
             
             // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
+            if (delete_starred_assignment_after_sorting && !assignment_container.hasClass("delete-this-starred-assignment")) {
+                starred_assignment_ids_to_delete_after_sorting.add(sa.sa.id);
+            }
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
                                 .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
                                 .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
-                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value));
+                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value))
+                                .toggleClass("delete-this-starred-assignment", delete_starred_assignment_after_sorting);
 
             let status_priority;
             if (status_value === Priority.COMPLETELY_FINISHED) {
@@ -535,6 +541,22 @@ class Priority {
             // Even though this is always true, it'll add this here for compatibility
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.text(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '').toggleClass("hide-on-mobile", !!sa.unit_is_of_time);
+        });
+        if (!starred_assignment_ids_to_delete_after_sorting.size) return;
+
+        const success = function() {
+            new Crud().transitionDeleteAssignment($(".assignment-container.delete-this-starred-assignment > .assignment"));
+        }
+        if (ajaxUtils.disable_ajax) {
+            success();
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/api/delete-assignment",
+            data: {assignments: [...starred_assignment_ids_to_delete_after_sorting]},
+            success: success,
+            error: ajaxUtils.error,
         });
     }
     alertDueDates() {
