@@ -16,6 +16,7 @@ urlpatterns = [
     path('disclaimer', RedirectView.as_view(url=app_static('policies/disclaimer.html'))),
     path('privacy', RedirectView.as_view(url=app_static('policies/privacy.html'))),
     path('terms', RedirectView.as_view(url=app_static('policies/terms.html'))),
+    path('license', RedirectView.as_view(url="https://github.com/ArhanChaudhary/TimeWeb/blob/master/LICENSE")),
     
     path('facebook', RedirectView.as_view(url='https://facebook.com/TimeWebPage'), name="facebook"),
     path('instagram', RedirectView.as_view(url='https://instagram.com/TimeWebOfficial'), name="instagram"),
