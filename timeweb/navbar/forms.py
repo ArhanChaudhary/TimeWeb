@@ -34,16 +34,12 @@ class SettingsForm(forms.ModelForm):
             }
         }
         widgets = {
-            "user": forms.HiddenInput(),
             'def_min_work_time': forms.NumberInput(attrs={"min": "0"}),
-            'oauth_token': forms.HiddenInput(),
             'highest_priority_color': ColorWidget,
             'lowest_priority_color': ColorWidget,
             'def_skew_ratio': forms.NumberInput(attrs={"step": "0.1"}),
             'assignment_sorting': forms.Select(attrs={"class": "generic-button"}),
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
-            'added_gc_assignment_ids': forms.HiddenInput(),
-            'seen_latest_changelog': forms.HiddenInput(),
             'background_image': CustomImageFieldWidget(),
         }
         error_messages = {
