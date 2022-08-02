@@ -394,10 +394,18 @@ def gc_auth_callback(request):
     # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
     authorization_response = request.build_absolute_uri()
     try:
+        credentials = flow.credentials
+    except ValueError:
+        # ValueError at /api/gc-auth-callback
+        # There is no access token for this session, did you call fetch_token?
+        request.session['gc-init-failed'] = True
+        return redirect(request.session.pop("gc-callback-current-url"))
+
+    try:
         # turn those parameters into a token
         flow.fetch_token(authorization_response=authorization_response)
         # Ensure the user enabled both scopes
-        service = build('classroom', 'v1', credentials=flow.credentials)
+        service = build('classroom', 'v1', credentials=credentials)
         service.courses().list().execute()
         service.courses().courseWork().list(courseId="easter egg!").execute()
     except (HttpError, OAuth2Error) as e:
@@ -414,7 +422,7 @@ def gc_auth_callback(request):
             request.session['gc-init-failed'] = True
             return redirect(request.session.pop("gc-callback-current-url"))
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
-    request.user.settingsmodel.oauth_token.update(json.loads(flow.credentials.to_json()))
+    request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
     request.user.settingsmodel.save()
     logger.info(f"User {request.user} enabled google classroom API")
     return redirect(request.session.pop("gc-callback-next-url"))
