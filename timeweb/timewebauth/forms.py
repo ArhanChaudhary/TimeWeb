@@ -2,7 +2,7 @@ from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, D
 from allauth.account.forms import *
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from common.views import User
+from common.models import User
 from django.contrib import messages
 
 class LabeledLoginForm(LoginForm):
