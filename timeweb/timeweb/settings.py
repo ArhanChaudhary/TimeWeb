@@ -332,6 +332,8 @@ RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 
 
 # App constants
+from json import load as json_load
+from common.views import logger
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
@@ -362,7 +364,6 @@ EXAMPLE_ASSIGNMENT = {
 }
 EDITING_EXAMPLE_ACCOUNT = False
 
-from common.views import logger
 def GET_CLIENT_IP(group, request):
     if 'HTTP_CF_CONNECTING_IP' in request.META:
         return request.META['HTTP_CF_CONNECTING_IP']
@@ -371,6 +372,5 @@ def GET_CLIENT_IP(group, request):
 DEFAULT_GLOBAL_RATELIMIT = '5/s'
 
 # Changelog
-from json import load as json_load
 with open("changelogs.json", "r") as f:
     CHANGELOGS = json_load(f)
