@@ -362,7 +362,12 @@ EXAMPLE_ASSIGNMENT = {
 }
 EDITING_EXAMPLE_ACCOUNT = False
 
-GET_CLIENT_IP = lambda group, request: request.META.get('HTTP_CF_CONNECTING_IP') or request.META['REMOTE_ADDR']
+from common.views import logger
+def GET_CLIENT_IP(group, request):
+    if 'HTTP_CF_CONNECTING_IP' in request.META:
+        return request.META['HTTP_CF_CONNECTING_IP']
+    logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
+    return request.META['REMOTE_ADDR']
 DEFAULT_GLOBAL_RATELIMIT = '5/s'
 
 # Changelog
