@@ -1241,6 +1241,15 @@ class VisualAssignment extends Assignment {
 
     positionTags() {
         const dom_tags = this.dom_assignment.find(".tags");
+        if (VIEWING_DELETED_ASSIGNMENTS) {
+            if (SETTINGS.horizontal_tag_position === "Left" && SETTINGS.vertical_tag_position === "Top") {
+                SETTINGS.horizontal_tag_position = "Middle";
+                dom_tags.removeClass("tags-left").addClass("tags-middle");
+            } else if (SETTINGS.horizontal_tag_position === "Middle" && SETTINGS.vertical_tag_position === "Bottom") {
+                SETTINGS.horizontal_tag_position = "Left";
+                dom_tags.removeClass("tags-middle").addClass("tags-left");
+            }
+        }
         switch (SETTINGS.horizontal_tag_position) {
             case "Left": {
                 if (SETTINGS.vertical_tag_position === "Top") {
