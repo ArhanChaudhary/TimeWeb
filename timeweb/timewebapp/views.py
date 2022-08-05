@@ -390,6 +390,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.dynamic_start = 0
                 elif self.sm.dynamic_start > x_num - 1:
                     self.sm.dynamic_start = x_num - 1
+            if self.updated_assignment:
+                unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
+                unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
+                if unit_changed_from_hour_to_minute:
+                    self.sm.works = [str(Decimal(i) * Decimal("60")) for i in self.sm.works]
+                elif unit_changed_from_minute_to_hour:
+                    self.sm.works = [str(Decimal(i) / Decimal("60")) for i in self.sm.works]
             self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this
