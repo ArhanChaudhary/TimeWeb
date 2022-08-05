@@ -944,7 +944,7 @@ class VisualAssignment extends Assignment {
                 if (remove_zeroes && diff === 0 && !force_display_dates.includes(i)) continue;
 
                 total += diff;
-                let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>/ ${this.sa.y})`;
+                let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>total)`;
                 if (diff * this.sa.time_per_unit !== 0 && unit_singular.toLowerCase() !== "hour" && (unit_singular.toLowerCase() !== "minute" || diff * this.sa.time_per_unit >= 60))
                     formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
                 if (today_minus_assignment_date == i)
