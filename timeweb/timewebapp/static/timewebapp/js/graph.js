@@ -1110,6 +1110,7 @@ class VisualAssignment extends Assignment {
             }
             // Clear once textbox if the input is valid
             work_input_textbox.val("");
+            input_done = Math.floor(input_done * 100) / 100;
             // Cap at y and 0
             if (input_done + last_work_input > this.sa.y) {
                 input_done = this.sa.y - last_work_input;
