@@ -47,7 +47,7 @@ class Priority {
                 top: "0",
                 opacity: "1",
                 marginBottom: "0",
-            }, Priority.ANIMATE_IN_DURATION, "easeOutCubic");
+            }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
         setTimeout(() => {
@@ -856,6 +856,7 @@ class Priority {
 
                         let scrollTimeout = setTimeout(resolve, 200);
                         $("#assignments-container").scroll(() => {
+                            $("#extra-navs").hide();
                             clearTimeout(scrollTimeout);
                             scrollTimeout = setTimeout(resolve, 200);
                         });
