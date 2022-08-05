@@ -508,7 +508,8 @@ class VisualAssignment extends Assignment {
             }
             const point_x = graph_mouse_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             const point_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - funct_mouse_x * this.hCon - 50);
-            const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${funct_mouse_x})`;
+            // converting from minutes to hours can result in hidden decimal places, so we round so the user isnt overwhelmed
+            const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${Math.floor(funct_mouse_x * 100) / 100})`;
             if (hover_point_label.hasClass("initial-position")) {
                 hover_point_label.addClass("disable-hover-point-label-transition");
             }
