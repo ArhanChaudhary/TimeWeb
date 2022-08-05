@@ -928,17 +928,17 @@ class VisualAssignment extends Assignment {
                         this_funct = next_funct;
                     }
                     next_funct = this.funct(i + 1);
-                    diff = Math.max(0, next_funct - this_funct);
+                    diff = Math.max(0, mathUtils.sigFigSubtract(next_funct, this_funct));
                 } else if (0 <= i - this.sa.blue_line_start + 1 && i - this.sa.blue_line_start + 1 <= len_works) {
                     this_work = next_work;
                     next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-                    diff = next_work - this_work;
+                    diff = mathUtils.sigFigSubtract(next_work, this_work);
                 } else if (this.sa.break_days.includes((this.assign_day_of_week + i) % 7)) {
                     diff = 0;
                 } else {
                     end_of_works = true;
                     next_funct = this.funct(i + 1);
-                    diff = next_funct - last_work_input;
+                    diff = mathUtils.sigFigSubtract(next_funct, last_work_input);
                 }
 
                 if (remove_zeroes && diff === 0 && !force_display_dates.includes(i)) continue;

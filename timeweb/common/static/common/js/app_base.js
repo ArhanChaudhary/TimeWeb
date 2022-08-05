@@ -286,6 +286,16 @@ mathUtils = {
     },
     clamp: function(low, value, high) {
         return Math.min(Math.max(value, low), high)
+    },
+    countDecimals: function(n) {
+        if (Math.floor(n) === n) return 0;
+        return n.toString().split(".")[1].length || 0; 
+    },
+    sigFigSubtract: function(a, b) {
+        const a_decimals = mathUtils.countDecimals(a);
+        const b_decimals = mathUtils.countDecimals(b);
+        const max_decimals = Math.max(a_decimals, b_decimals);
+        return mathUtils.precisionRound(a - b, max_decimals);
     }
 }
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
