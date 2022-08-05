@@ -792,7 +792,10 @@ do this because midde-of-header is hidden in the delete assignments view */
     overflow-y: scroll;
     overflow-x: auto;
     white-space: nowrap;
-    user-select: text;
+    -webkit-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
 }
 .graph-container:not(.text-display) > table,
 .graph-container.text-display > :not(table) {
