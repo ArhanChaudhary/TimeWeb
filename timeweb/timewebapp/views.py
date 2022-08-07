@@ -439,10 +439,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         request.session['invalid_form_context'] = self.context
         return redirect(request.path_info)
 
-EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
+try:
+    EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
+except:
+    EXAMPLE_ACCOUNT_MODEL = None
 class ExampleAccountView(View):
     def get(self, request):
-        if request.user.is_authenticated:
-            logout(request)
-        login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
+        if EXAMPLE_ACCOUNT_MODEL is not None:
+            if request.user.is_authenticated:
+                logout(request)
+            login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
         return redirect("home")

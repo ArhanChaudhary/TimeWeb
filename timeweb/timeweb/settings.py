@@ -179,11 +179,18 @@ if os.environ.get('DATABASE_URL') is not None:
         }
     }
 else:
-    # If running locally, use a sqlite database
     DATABASES = {
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.sqlite3',
+        #     'NAME': BASE_DIR / 'db.sqlite3',
+        # },
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': '',
+            'PASSWORD': 'timeweb',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
         }
     }
 DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
