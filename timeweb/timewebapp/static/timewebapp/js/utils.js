@@ -1013,6 +1013,98 @@ saveAndLoadStates: function() {
         }
         localStorage.setItem("last_visit", date_now.valueOf());
     });
+},
+navClickHandlers: function() {
+    $("#nav-credits").click(() => $.alert({
+        title: $("#credits-template").html(),
+    }));
+
+    const special_thanks_alerts = [
+        {
+            title: "Special thanks to Kevin Chu",
+            content: `for easily being the most influential and open-minded suggester throughout the entirety of TimeWeb's development, participating
+                    in over fifty suggestion threads and solely being responsible for many of TimeWeb's major user interface improvements and so much
+                    more.`,
+        },
+        {
+            title: "Special thanks to Stanley Ho",
+            content: `for being a consistent and dedicated suggester and for being the only one to use TimeWeb almost daily throughout the 
+                    entirety of its beta and alpha phases.`,
+        },
+        {
+            title: "Special thanks to Charles P.",
+            content: `for designing TimeWeb's <a href="/favicon.ico">favicon</a>.`,
+        },
+        {
+            title: "Special thanks to Jeffery Zhang",
+            content: `for having the patience, interest, and intelligence to pioneer a core part of TimeWeb's <a href="
+                    https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
+        },
+        {
+            title: "Special thanks to Rishi Jani",
+            content: `for being someone genuine to talk to during 2020 and for continuing to support me all the way from the creation of timeweb in its
+                    pre-alpha to today and onwards.`,
+        },
+        {
+            title: "Special thanks to Adrian Zhang",
+            content: `for being the coolest coder friend to relate and talk to and for somehow not going insane from listening to all of my ramblings
+                    about school and life.`,
+        },
+        {
+            title: "Special thanks to Rohan Bhagat",
+            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known for a
+                    long time and can feel comfortable talking and relating to about anything).`,
+        },
+        {
+            title: "Special thanks to Ansh Bhatagnar",
+            content: `for carrying my sanity during history and math class and for being the most fun idiot to joke around and talk to.`,
+        },
+        {
+            title: "Special thanks to Abhik Mullick",
+            content: `for being courageous enough to provide constructive and real criticism and for being the most kind and comforting person to hang
+                    out with.`,
+        },
+        {
+            title: "Special thanks to Vikram Srinivasan",
+            content: `for helping with the initial draft of TimeWeb's v1.8.0 user interface redesign.`,
+        },
+        {
+            title: "Special thanks to Shantanu Bulbule",
+            content: `for creating the legendary <a href="#">TIMEWEB CAR</a> :D.`,
+        },
+        {
+            title: "And most importantly, my mom and my dad <3",
+        },
+    ];
+
+    function recurseAlert(alertparams, total_length) {
+        if (!alertparams.length) return;
+
+        const alertparam = alertparams.shift();
+        alertparam.onClose = function() {
+            recurseAlert(alertparams, total_length);
+        };
+        alertparam.title += ` (${total_length - alertparams.length}/${total_length})`;
+        $.alert(alertparam);
+    }
+    // most importantly my mom is and dad
+    $("#nav-special-thanks").click(() => {
+        $.alert({
+            title: "Creating TimeWeb hasn't been easy. I couldn't have done it without the emotional and mental support of some of my closest friends:",
+            buttons: {
+                escape: function() {
+                    
+                },
+                ok: {
+                    keys: ['Enter'],
+                    action: function() {
+                        recurseAlert(special_thanks_alerts, special_thanks_alerts.length);
+                    }
+                },
+            }
+        })
+    });
+
 }
 },
 reloadAtMidnight: function() {
@@ -1211,6 +1303,7 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.setAssignmentScaleUtils();
     utils.ui.setAnimationSpeed();
     utils.ui.saveAndLoadStates();
+    utils.ui.navClickHandlers();
     // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute
     let secondsRemaining = (60 - new Date().getSeconds()) * 1000;
     setTimeout(function() {

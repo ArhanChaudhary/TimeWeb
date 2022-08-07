@@ -65,9 +65,6 @@ $(function() {
         resetHeaderLayout();
     }
     $("header > *").css("visibility", "visible");
-    $("#nav-credits").click(() => $.alert({
-        title: $("#credits-template").html(),
-    }));
 });
 // It's important to remember to NOT use .done() or any other callback method on a jquery ajax
 // This is to allow ajaxUtils.error to redo the ajax with the appropriate callbacks
