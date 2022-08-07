@@ -4,6 +4,8 @@ from django.http import HttpResponseForbidden, HttpResponse
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils import timezone
+from common.views import logger
+from django.db.utils import OperationalError
 
 def _403_csrf(request, reason=""):
     response = render(request, "common/403_csrf.html", {"request": request})
@@ -42,6 +44,11 @@ def update_seen_latest_changelog():
 
 try:
     current_site = Site.objects.get(domain="localhost" if (settings.DEBUG or settings.FIX_DEBUG_LOCALLY) else "timeweb.io")
-except Site.DoesNotExist:
-    current_site = Site.objects.get(domain="example.com")
-settings.SITE_ID = current_site.id
+except (Site.DoesNotExist, OperationalError):
+    try:
+        current_site = Site.objects.get(domain="example.com")
+    except (Site.DoesNotExist, OperationalError):
+        current_site = None
+        logger.warning("You should probably configure your site model domain")
+if current_site is not None:
+    settings.SITE_ID = current_site.id
