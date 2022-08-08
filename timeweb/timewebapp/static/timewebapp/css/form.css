@@ -339,9 +339,9 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     color: var(--color);
     margin-top: 10px;
     font-size: 20px;
-    --background-color-default: rgb(238, 238, 238);
-    --background-color-hover: rgb(229, 229, 229);
-    --background-color-active: rgb(245, 245, 245);
+    --background-color-default: hsl(0, 0%, 93%);
+    --background-color-hover: hsl(0, 0%, 90%);
+    --background-color-active: hsl(0, 0%, 96%);
 
     --background-color: var(--background-color-default);
     background-color: var(--background-color);
@@ -365,7 +365,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #overlay {
     overflow: auto;
-    background-color: rgba(0,0,0,0.2);
+    background-color: hsla(0, 0%, 0%, 0.2);
     position: fixed;
     top: 0;
     left: 0;

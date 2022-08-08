@@ -6,13 +6,13 @@ body {
     --primary-c: 255;
     --c: 0;
     --input-focus-color: rgb(0, 95, 204);
-    --form-placeholder-color: rgb(117, 117, 117); /* Default chrome placeholder color */
+    --form-placeholder-color: hsl(0, 0%, 46%); /* Default chrome placeholder color */
     
     --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
 
-    --body-background: rgb(247, 247, 247);
+    --body-background: hsl(0, 0%, 97%);
     background-color: var(--body-background);
 }
 select {
@@ -255,7 +255,7 @@ main.finished-header-transition {
     width: 100%;
     margin: 4px auto;
     height: 1px;
-    background: rgb(101, 101, 101);
+    background: hsl(0, 0%, 40%);
 }
 #account-dropdown a {
     display: block;
