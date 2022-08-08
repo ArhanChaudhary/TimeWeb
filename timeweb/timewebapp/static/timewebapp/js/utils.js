@@ -1089,6 +1089,9 @@ navClickHandlers: function() {
     }
     // most importantly my mom is and dad
     $("#nav-special-thanks").click(() => {
+        // lets not modify the original so it can be used again
+        // deepcopy because recurseAlert modifies alertparam
+        const special_thanks_alerts_copy = JSON.parse(JSON.stringify(special_thanks_alerts));
         $.alert({
             title: "Creating TimeWeb hasn't been easy. I couldn't have done it without the emotional and mental support of some of my closest friends:",
             buttons: {
@@ -1098,7 +1101,7 @@ navClickHandlers: function() {
                 ok: {
                     keys: ['Enter'],
                     action: function() {
-                        recurseAlert(special_thanks_alerts, special_thanks_alerts.length);
+                        recurseAlert(special_thanks_alerts_copy, special_thanks_alerts.length);
                     }
                 },
             }
