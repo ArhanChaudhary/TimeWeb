@@ -12,7 +12,7 @@ body {
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
 
-    --body-background: hsl(0, 0%, 97%);
+    --body-background: hsl(0, 0%, 96%);
     background-color: var(--body-background);
 }
 select {

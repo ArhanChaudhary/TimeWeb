@@ -163,7 +163,7 @@ main.background-image-exists {
     padding-bottom: 40px;
 }
 .assignment {
-    --box-shadow: 0 0 12px -10px black;
+    --box-shadow: 0 0 12px -9px black;
     box-shadow: var(--box-shadow);
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
     /* i really could not care less about priority-color being consistent */
