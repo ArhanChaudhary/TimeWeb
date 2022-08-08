@@ -56,10 +56,6 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
 
-    // https://github.com/wilsonzlin/minify-html/issues/71
-    $("option:not([value])").attr("value", "");
-
-
     if (GC_API_INIT_FAILED) {
         $.alert({
             title: "Could not enable the Google Classroom integration.",
