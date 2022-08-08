@@ -953,7 +953,7 @@ main.finished-header-transition #extra-navs {
 .grey-highlight:not(.assignment-container),
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
-    --filter-drop-shadow-color: white;
+    --filter-drop-shadow-color: hsl(0, 0%, 73%);
     --filter-drop-shadow-width: 0.5px;
     filter: drop-shadow(0 var(--filter-drop-shadow-width) 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(0 calc(-1 * var(--filter-drop-shadow-width)) 0 var(--filter-drop-shadow-color, transparent))
