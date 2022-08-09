@@ -1041,17 +1041,21 @@ navClickHandlers: function() {
                     https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
         },
         {
-            title: "Special thanks to Rishi Jani",
-            content: `for being someone genuine to talk to during 2020 and for continuing to support me all the way from the creation of timeweb in its
-                    pre-alpha to today and onwards.`,
-        },
-        {
             title: "Special thanks to Adrian Zhang",
             content: `for being the coolest coder friend to relate and talk to and for somehow not going insane from listening to all of my ramblings
                     about school and life.`,
         },
         {
-            title: "Special thanks to Rohan Bhagat",
+            title: "Special thanks to Vikram Srinivasan",
+            content: `for helping with the initial draft of TimeWeb's v1.8.0 user interface redesign.`,
+        },
+        {
+            title: "Special thanks to Rishi Jani",
+            content: `for being someone genuine to talk to during 2020 and for continuing to support me all the way from the creation of TimeWeb in its
+                    pre-alpha to today and onwards.`,
+        },
+        {
+            title: "Special thanks to Rohan \"Baguette\" Bhagat",
             content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known for a
                     long time and can feel comfortable talking and relating to about anything).`,
         },
@@ -1063,10 +1067,6 @@ navClickHandlers: function() {
             title: "Special thanks to Abhik Mullick",
             content: `for being courageous enough to provide constructive and real criticism and for being the most kind and comforting person to hang
                     out with.`,
-        },
-        {
-            title: "Special thanks to Vikram Srinivasan",
-            content: `for helping with the initial draft of TimeWeb's v1.8.0 user interface redesign.`,
         },
         {
             title: "Special thanks to Shantanu Bulbule",
