@@ -30,10 +30,11 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
     def get(self, request):
-        initial = {
-            'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
-        }
-        self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
+        if "form" not in self.context:
+            initial = {
+                'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
+            }
+            self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
         self.context['settings_model'] = request.user.settingsmodel
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
                             exclude=[*SettingsForm.Meta.exclude, # SettingsForm already excludes these fields but saving the field to a model adds them back
@@ -78,7 +79,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.context['form'] = self.form
         logger.info(self.form.errors)
         # It's ok to return a 2xx from invalid form, because there is no danger of the user resubmitting because its invalid
-        return super().get(request)
+        return self.get(request)
 
 class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
