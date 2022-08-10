@@ -134,6 +134,9 @@ class Crud {
     }
     init() {
         const that = this;
+        // no today's date button because it already defaults to today on new assignment
+        // although a user might want a today button for editing an assignment date to today
+        // such a scenario is rare to happen; adding a today date button is a waste of space
         $("#id_assignment_date").daterangepicker({
             ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
             autoApply: true,
