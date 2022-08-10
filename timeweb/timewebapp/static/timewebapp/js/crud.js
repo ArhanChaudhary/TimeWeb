@@ -256,7 +256,7 @@ class Crud {
             // while the setTimeout underneath still hasn't ran
             // Queue up a recursion if that happens
 
-            // setTimout to run after the setTimeout in replaceUnitWithoutTimeout is done
+            // setTimeout to run after the setTimeout in replaceUnitWithoutTimeout is done (or else .hide-field logic doesnt run and it glitches)
             setTimeout(function() {
                 if (that.replaceUnit.recurse) {
                     that.replaceUnit.recurse = false;
@@ -283,7 +283,14 @@ class Crud {
         if (["minute", "hour"].includes(singular.toLowerCase())) {
             $("label[for='id_works']").text(`How long have you already worked`);
 
-            if (that.old_unit_value === undefined) {
+            if (that.old_unit_value === undefined ||
+                // if you enter a character and delete it really fast let's see what happens
+                // the setTimeout removes all .hide-field but most importandly removes their margin top
+                // then what the character is deleted the second part of this if statement runs and places back #id_y
+                // after its closing transition is finished
+                // however if you do this really quickly the margin-top doesn't change enough when it is removed to trigger the transitionend event
+                // let's manually specify this condition to ensure this case is properly handled
+                !["minute", "hour"].includes(that.old_unit_value) && parseFloat($("#id-y-field-wrapper").css("margin-top")) === -$("#id-y-field-wrapper").outerHeight()) {
                 // Appropiately place #id_y when the form is initially loaded and shown
                 // Simulates the state of #id-y-field-wrapper after transitionend
                 $("#id-y-field-wrapper")
