@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(function() {
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
+    // d256f25 should have fixed this but it's stupidly inconsistent
+    $("option:not([value])").attr("value", "");
 
     if (GC_API_INIT_FAILED) {
         $.alert({
