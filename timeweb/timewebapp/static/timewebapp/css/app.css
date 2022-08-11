@@ -928,6 +928,9 @@ main:not(.background-image-exists) #extra-navs {
 main.finished-header-transition #extra-navs {
     visibility: initial;
 }
+#extra-navs span {
+    white-space: nowrap;
+}
 #extra-navs span a {
     color: var(--color);
     /* So tabbing on an extra-nav scrolls #assignments-container all the way down */
