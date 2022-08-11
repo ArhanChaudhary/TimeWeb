@@ -31,7 +31,7 @@
           </div>
         </a>
         <a id="logo-anchor" href="{% url 'home' %}">
-          <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
+          <img alt="Home" src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         </a>
       </div>
       {% block content %}{% endblock %}
@@ -61,7 +61,7 @@
     </defs>
   </svg>
   <template id="password-widget-icons">
-    <img src="{% static 'timewebauth/images/hide.webp' %}" class="password-image show-password-image" width="22">
-    <img src="{% static 'timewebauth/images/show.webp' %}" class="password-image hide-password-image" width="22">
+    <img alt src="{% static 'timewebauth/images/hide.webp' %}" class="password-image show-password-image" width="22">
+    <img alt src="{% static 'timewebauth/images/show.webp' %}" class="password-image hide-password-image" width="22">
   </template>
 {% endblock %}

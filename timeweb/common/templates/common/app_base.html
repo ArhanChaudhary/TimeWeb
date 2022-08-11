@@ -26,7 +26,7 @@
     {% url 'policies' as policies %}
     {% if user.is_authenticated and request.path == home and not view_deleted_assignments_in_app_view %}
         <div id="image-new-container" tabindex="0">
-            <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
+            <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt draggable="false"/>
             <span id="new-assignment-text">New Assignment</span>
         </div>
     {% endif %}
@@ -55,7 +55,7 @@
         </div>
     {% endif %}
     <a href="{{ home }}" id="logo-container" tabindex="-1">
-        <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
+        <img alt width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
     </a>
