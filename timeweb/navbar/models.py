@@ -2,11 +2,11 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from timezone_field import TimeZoneField
-from timewebapp.models import get_midnight_time, empty_list, empty_dict, create_image_path, WEEKDAYS
+from timewebapp.models import empty_list, empty_dict, create_image_path, WEEKDAYS
 
 HORIZONTAL_TAG_POSITIONS = (
     ("Left", "Left"),
@@ -44,11 +44,18 @@ APPEARANCES = (
 MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
 
 class SettingsModel(models.Model):
+
+    # Group "Assignment Deletion"
+    immediately_delete_completely_finished_assignments = models.BooleanField(
+        default=False,
+        verbose_name=_('Immediately Delete Completely Finished Assignments'),
+    )
+
     # Group "Assignment Form"
     def_min_work_time = models.DecimalField(
         max_digits=15,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0"),_("The default minimum work time must be positive or zero"))],
+        validators=[MinValueValidator(Decimal("0"), _("This setting can't be a negative number"))],
         default=15,
         blank=True,
         null=True,
@@ -60,10 +67,6 @@ class SettingsModel(models.Model):
         null=True,
         verbose_name=_('Default Work Days'),
     )
-    def_due_time = models.TimeField(
-        default=get_midnight_time,
-        verbose_name=_('Default Due Time'),
-    )
 
     # Group "Assignment Graph"
     def_skew_ratio = models.DecimalField(
@@ -72,9 +75,9 @@ class SettingsModel(models.Model):
         default=1,
         verbose_name=_('Default Curvature'),
     )
-    ignore_ends = models.BooleanField(
+    loosely_enforce_minimum_work_times = models.BooleanField(
         default=False,
-        verbose_name=_('Ignore Minimum Work Time Ends'),
+        verbose_name=_('Loosely Enforce Minimum Work Times'),
     )
     one_graph_at_a_time = models.BooleanField(
         default=False,
@@ -145,17 +148,18 @@ class SettingsModel(models.Model):
     )
 
     # Group "Miscellaneous"
-    timezone = TimeZoneField(
-        null=True,
-        blank=True,
-    )
-    restore_gc_assignments = models.BooleanField(
-        default=False,
-        verbose_name=_('Restore Deleted Google Classroom Assignments'),
-    )
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Tutorial'),
+    )
+    sorting_animation_threshold = models.IntegerField(
+        default=15,
+        validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
+        verbose_name=_('Sorting Animation Threshold'),
+    )
+    timezone = TimeZoneField(
+        null=True,
+        blank=True,
     )
 
     # Hidden
@@ -173,6 +177,7 @@ class SettingsModel(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        # allow change setting form validation without a user
         null=True,
         blank=True,
     )

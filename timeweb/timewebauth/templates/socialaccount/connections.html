@@ -3,7 +3,7 @@
 
 {% block head_title %}Google Account Connections{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
     <h1>Google Account Connections</h1>
     {% include "account/accounts_messages.html" %}
 
@@ -21,14 +21,22 @@
                     </div>
                 {% endwith %}
             {% endfor %}
-            <button type="submit" id="submit-button">Remove Google account</button>
+            <button type="submit" class="submit-button">Remove Google account</button>
         </form>
+        <hr>
+        <span class="hr-interrupt">or</span>
     {% else %}
         <p>You currently have no Google accounts connected to your TimeWeb account.</p>
     {% endif %}
     
     {% get_providers as socialaccount_providers %}
     {% with socialaccount_providers|first as provider %}
-        <p><a href="{% provider_login_url provider.id process="connect" scope=scope auth_params=auth_params %}">Connect a new Google account</a></p>
+        <form method="POST" action="{% provider_login_url provider.id process="connect" scope=scope auth_params=auth_params %}">
+            {% csrf_token %}
+            <button class="submit-button" type="submit" no-top-margin>
+                <span title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
+                    href="">Connect a new {{provider.name}} account</span>
+            </button>
+        </form>
     {% endwith %}
 {% endblock %}

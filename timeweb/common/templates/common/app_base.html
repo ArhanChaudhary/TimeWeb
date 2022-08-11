@@ -9,7 +9,6 @@
 
 {% block base_head_js %}
     <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js" crossorigin="anonymous"></script>
     <script src="{% static 'common/js/jquery_extensions.js' %}"></script>
     <script src="{% static 'common/vendor/jquery_confirm.min.js' %}"></script>
     <script src="{% static 'common/js/app_base.js' %}"></script>
@@ -19,67 +18,52 @@
 {% block base_head_body %}
 <header>
     {% url 'home' as home %}
-    {% if user.is_authenticated and request.path == home %}
-        <div id="image-new-container" tabindex="1">
-            <img width="60" height="60" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
-            <div id="new-assignment-text">New Assignment</div>
+    {% url 'settings' as settings %}
+    {% url 'user_guide' as user_guide %}
+    {% url 'changelog' as changelog %}
+    {% url 'contact_form' as contact_form %}
+    {% url 'blog' as blog %}
+    {% url 'policies' as policies %}
+    {% if user.is_authenticated and request.path == home and not view_deleted_assignments_in_app_view %}
+        <div id="image-new-container" tabindex="0">
+            <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt="new" draggable="false"/>
+            <span id="new-assignment-text">New Assignment</span>
         </div>
     {% endif %}
-    <div id="menu" tabindex="2">
-        <svg width="89px" height="70px">
-            <rect y="24.75" x="32" width="25" height="4.25"></rect>
-            <rect y="33" x="32" width="25" height="4.25"></rect>
-            <rect y="41.25" x="32" width="25" height="4.25"></rect>
-        </svg>
-    </div>
     {% if user.is_authenticated %}
         <div id="user-greeting">
-            <span id="welcome">Welcome, </span>
-            <div tabindex="1" id="username">
+            <span id="welcome">Welcome,&nbsp;</span>
+            <div tabindex="0" id="username">
                 {{ user.username }}
                 <div id="account-dropdown">
+                    <a href="{{ settings }}" id="settings-nav" class="one-line">Settings<br></a>
+                    <a href="{{ user_guide }}" class="one-line">User Guide<br></a>
+                    <div class="dropdown-hr"></div>
+                    {% comment %} Some browsers are weirdly inconsistent in determining when to wrap 
+                    Let's hard code our own breaks instead {% endcomment %}
+                    <a href="{% url 'account_change_password' %}">Change<br>Password</a>
+                    <a href="{% url 'reset_username' %}">Change<br>Username</a>
+                    <a href="{% url 'account_email' %}">Manage<br>E-mail Login</a>
+                    <a href="{% url 'socialaccount_connections' %}">Manage<br>Google Login</a>
+                    <div class="dropdown-hr"></div>
                     <form method="post" action="{% url 'account_logout' %}">
                         {% csrf_token %}
                         <button type="submit">Log out</button>
                     </form>
-                    <div class="nav-hr"></div>
-                    <a href="{% url 'account_change_password' %}">Change Password</a>
-                    <a href="{% url 'reset_username' %}">Change Username</a>
-                    <a href="{% url 'account_email' %}">Manage<br>E-mail Login</a>
-                    <a href="{% url 'socialaccount_connections' %}">Manage Google Login</a>
                 </div>
             </div>
         </div>
     {% endif %}
-    <nav>
-        <div id="nav-menu">
-            <svg width="89px" height="70px">
-                <rect y="24.75" x="32" width="25" height="4.25"></rect>
-                <rect y="33" x="32" width="25" height="4.25"></rect>
-                <rect y="41.25" x="32" width="25" height="4.25"></rect>
-            </svg>
-        </div>
-        <div id="nav-items">
-            <a href="{% url 'user_guide' %}">User Guide</a>
-            <a href="{% url 'changelog' %}">Changelog</a>
-            <a href="{% url 'contact_form' %}">Contact</a>
-            <div class="nav-hr"></div>
-            <span id="nav-a2hs" tabindex="0">Install on Home Screen</span>
-            <a href="{% url 'blog' %}" id="nav-blog">Blog</a>
-            <span id="nav-credits" tabindex="0">Credits</span>
-            <a href="{% url 'policies' %}">Policies</a>
-        </div>
-    </nav>
-    <a href="{% url 'home' %}" id="logo-container">
-        <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" border="0" draggable="false"/>
+    <a href="{{ home }}" id="logo-container" tabindex="-1">
+        <img width="193.58" height="55" src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         <!-- cite https://fontmeme.com/fonts/alba-font/ https://fontmeme.com/permalink/201230/276691b6653dba95c45110441239adff.png -->
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
     </a>
 </header>
-<main tabindex="-1">
+<main tabindex="-1" {% if settings_model.background_image %}class="background-image-exists"{% endif %}>
     {% comment %} Use an inline script so .animate is added as EARLY as possible, otherwise the unanimated frames can show up {% endcomment %}
     <script nonce="{{request.csp_nonce}}">
-        if ("animation-ran" in sessionStorage || !$("#image-new-container").length) {
+        if ("animation-ran" in sessionStorage || {% if user.is_authenticated and request.path == home %}false{% else %}true{% endif %}) {
             $("main").addClass("finished-header-transition");
         }
     </script>
@@ -102,22 +86,57 @@
     <template id="credits-template">
         Images used:
         <ul>
-            <li><a href="https://fontmeme.com/fonts/alba-font/">TimeWeb logo</a></li>
-            <li><a href="https://www.pngitem.com/middle/TiRihwJ_plus-button-green-png-download-plus-button-green/">Plus icon</a></li>
-            <li><a href="https://adioma.com/icons/question-mark" target="_blank">Question mark icon</a> by <a href="https://adioma.com">Adioma</a></li>
-            <li><a href="https://www.flaticon.com/free-icon/invisible_565655" target="_blank">Invisible icon</a> by <a href="https://www.flaticon.com/authors/google" target="_blank">Google</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></li>
-            <li><a href="https://www.flaticon.com/free-icon/visibility_565654" target="_blank">Visibility icon</a> by <a href="https://www.flaticon.com/authors/google" target="_blank">Google</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></li>
-            <li><a href="https://iconscout.com/icon/edit-1780339" target="_blank">Edit icon</a> by <a href="https://iconscout.com/contributors/google-inc">Google Inc.</a> from <a href="https://iconscout.com">Iconscout</a></li>
-            <li><a href="https://www.flaticon.com/free-icon/trash_3096687" target="_blank">Trash icon</a> by <a href="https://www.flaticon.com/authors/bqlqn" title="bqlqn">bqlqn</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></li>
-            <li><a href="https://iconscout.com/icon/caret-double-down-3609859" target="_blank">Caret double down icon</a> by <a href="https://iconscout.com/contributors/phosphoricons">Phosphor Icons</a> from <a href="https://iconscout.com">Iconscout</a></li>
-            <li><a href="https://www.iconfinder.com/icons/298738/check_icon" target="_blank">Check icon</a> by <a href="https://github.com/">Github</a> from <a href="https://www.iconfinder.com">Iconfinder</li>
-            <li><a title="icona x png 6" href="https://pngimage.net/icona-x-png-6/">icona x png 6</a>
+            <li>
+                <a href="https://fontmeme.com/fonts/alba-font/">TimeWeb logo</a>
+            </li>
+            <li>
+                <a href="https://www.pngitem.com/middle/TiRihwJ_plus-button-green-png-download-plus-button-green/">Plus icon</a>
+            </li>
+            <li>
+                <a href="https://adioma.com/icons/question-mark" target="_blank">Question mark icon</a> by <a href="https://adioma.com">Adioma</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icon/invisible_565655" target="_blank">Invisible icon</a> by <a href="https://www.flaticon.com/authors/google" target="_blank">Google</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icon/visibility_565654" target="_blank">Visibility icon</a> by <a href="https://www.flaticon.com/authors/google" target="_blank">Google</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+            </li>
+            <li>
+                <a href="https://iconscout.com/icon/edit-1780339" target="_blank">Edit icon</a> by <a href="https://iconscout.com/contributors/google-inc">Google Inc.</a> from <a href="https://iconscout.com">Iconscout</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icon/trash_3096687" target="_blank">Trash icon</a> by <a href="https://www.flaticon.com/authors/bqlqn" title="bqlqn">bqlqn</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+            </li>
+            <li>
+                <a href="https://iconscout.com/icon/caret-double-down-3609859" target="_blank">Caret double down icon</a> by <a href="https://iconscout.com/contributors/phosphoricons">Phosphor Icons</a> from <a href="https://iconscout.com">Iconscout</a>
+            </li>
+            <li>
+                <a href="https://www.iconfinder.com/icons/298738/check_icon" target="_blank">Check icon</a> by <a href="https://github.com/">Github</a> from <a href="https://www.iconfinder.com">Iconfinder</a>
+            </li>
+            <li>
+                <a title="icona x png 6" href="https://pngimage.net/icona-x-png-6/">icona x png 6</a>
+            </li>
+            <li>
+                <a href="https://iconscout.com/icons/external-link" target="_blank">External link Icon</a> by <a href="https://iconscout.com/contributors/unicons">Unicons Font</a> on <a href="https://iconscout.com">IconScout</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/time" title="time icons">Time icons</a> by <a href="https://www.flaticon.com/authors/google" target="_blank">Google</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+            </li>
+            <li>
+                <a href="https://iconscout.com/icon/magic-wand-87" title="magic wand icon">magic wand icon</a> by <a href="https://iconscout.com/contributors/pro-symbols" target="_blank">Pro Symbols</a> from <a href="https://iconscout.com">Iconscout</a>
+            </li>
+            <li>
+                <a href="https://thenounproject.com/icon/refresh-3747304/">Restore icon</a> by <a href="https://thenounproject.com/fengquan/">Fengquan Li</a> from <a href="https://thenounproject.com/">The Noun Project</a>
+            </li>
         </ul>
-        Special thanks to these awesome people:
+        Tools used:
         <ul>
-            <li>Charles P. for designing TimeWeb's <a href="/favicon.ico">favicon</a></li>
-            <li><a href="https://github.com/RedBlueBird" target="_blank">Jeffrey Zhang</a> for the <a href="https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a></li>
-            <li>Stanley Ho and Kevin Chu for frequently suggesting many features and giving user interface advice</li>
+            <li>
+                <a href="https://convertio.co/png-svg/">PNG to SVG converter</a>
+            </li>
+            <li>
+                <a href="https://yqnn.github.io/svg-path-editor/">SVG Icon editor</a>
+            </li>
         </ul>
         <!--
         completely_finished.svg: ascii character

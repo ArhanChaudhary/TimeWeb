@@ -1,34 +1,39 @@
 label {
     display: block;
 }
-#under-password {
-    white-space: nowrap;
-    overflow: hidden;
-}
 .socialaccount-button {
     padding: 10px 0;
     position: relative;
     background: rgb(238, 245, 255);
+    /* Don't make the box-sizing border-box or else the top and bottom paddings wont work */
     width: calc(100% - 2px);
     box-sizing: unset;
     height: 30px;
     cursor: pointer;
 
     border: 1px solid rgb(13, 106, 255);
-    box-shadow: 0 0 3px 1px rgba(13, 106, 255, 0.25);
+    /* https://stackoverflow.com/questions/22446148/css-box-shadow-transition */
+    box-shadow: inset 0 0 0 0 white, 0 0 3px 1px rgba(13, 106, 255, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.5s cubic-bezier(.5,-1,.5,2), margin 0s;
+    transition: 0.5s cubic-bezier(.5,-1,.5,2);
+    transition-property: transform, box-shadow, background;
 }
-.socialaccount-button:hover {
+.socialaccount-button:hover, .socialaccount-button:focus {
     transform: scale(1.05, 1.02);
-    box-shadow: 0 0 4px 1px rgba(13, 106, 255, 0.5);
+    box-shadow: inset 0 0 0 0 white, 0 0 4px 1px rgba(13, 106, 255, 0.5);
     background: white;
 }
+.socialaccount-button:focus {
+    box-shadow: inset 0 0 0 1px rgb(0, 109, 249), 0 0 0 white;
+    border-color: rgb(0, 109, 249);
+    /* Override #assignments-container :focus */
+    outline: none !important;
+    border-radius: initial !important;
+}
 .socialaccount-button:active {
-    margin-top: 1px;
-    margin-bottom: -1px;
+    top: 1px;
 }
 .socialaccount-image {
     height: calc(100% - 8px);

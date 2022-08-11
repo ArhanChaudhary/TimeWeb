@@ -6,7 +6,10 @@ body {
     --primary-c: 48;
     --c: 213;
     --input-focus-color: hsl(210deg, 71%, 57%);
-    --form-placeholder-color: rgb(168, 168, 168);
+    --form-placeholder-color: hsl(0, 0%, 66%);
+}
+select {
+    --dropdown-arrow: var(--dropdown-arrow-darkmode);
 }
 #form-wrapper form {
     --field-widget-background-color: hsl(0deg, 0%, 19%);
@@ -24,9 +27,14 @@ body {
 #break-days-wrapper {
     --background-color: hsl(0, 0%, 24%);
 }
+#form-wrapper .field-wrapper.disabled-field > input {
+    --background-color: hsl(0, 0%, 18%) !important;
+    border-color: hsl(0, 0%, 50%) !important;
+}
 #break-days-wrapper input:checked + .break-days-label {
     background-color: hsl(0, 0%, 16%);
-    text-decoration-color: hsl(0, 0%, 49%);
+    -webkit-text-decoration-color: hsl(0, 0%, 49%);
+            text-decoration-color: hsl(0, 0%, 49%);
     color: hsl(0, 0%, 40%);
 }
 #break-days-wrapper input:not(:checked) + .break-days-label:hover {
@@ -35,15 +43,11 @@ body {
 #form-wrapper .field-widget:hover {
     --field-widget-background-color: hsl(0, 0%, 24%);
 }
-#id_assignment_sorting {
-    color: rgb(var(--c), var(--c), var(--c));
-    background-color: black;
-}
-.generic-button:hover {
+.generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) + 12);
 }
 .assignment {
-    box-shadow: none;
+    --box-shadow: none !important;
 }
 .assignment-header-button:focus, .assignment-header-button:hover {
     --background-color: rgb(86, 116, 129);
@@ -57,8 +61,8 @@ body {
     --background-color: hsl(0, 0%, 20%);
 }
 .tag-add-button::after {
-    --box-shadow-color-default: rgb(171, 171, 171);
-    --box-shadow-color-focus: rgb(211, 211, 211);
+    --box-shadow-color-default: hsl(0, 0%, 67%);
+    --box-shadow-color-focus: hsl(0, 0%, 83%);
     --box-shadow-color-invalid: rgb(187, 53, 53);
 }
 .tag-add-button:focus:not(:hover)::after {
@@ -68,13 +72,16 @@ body {
     box-shadow: 0 0 5px 2px var(--box-shadow-color-invalid);
 }
 .tag-add-button > .icon-slash {
-    --background-color: rgb(192, 192, 192);
+    --background-color: hsl(0, 0%, 75%);
 }
 .tag-add-selection-item::after {
     --background-color: hsl(0, 0%, 19%);
 }
 .tag-add-selection-item.checked::after {
     --background-color: rgb(34, 83, 99);
+}
+.tag-wrapper {
+    --ghost-opacity: 0.65;
 }
 .tag-wrapper, .tag-add {
     --background-color: unset !important;
@@ -83,9 +90,9 @@ body {
     --background-color: black;
 }
 .grey-highlight, .grey-highlight::before, .grey-highlight::after {
+    --filter-drop-shadow-width: 0.75px;
     --filter-drop-shadow-color: black !important;
 }
-#assignments-header #icon-label-container img,
 #form-wrapper #cancel-button {
     filter: invert(calc(var(--c) / 255)) hue-rotate(180deg);
 }
@@ -95,25 +102,60 @@ body {
 .graph-footer > * {
     --background-color: hsl(0, 0%, 27%);
 }
-.graph-footer ::placeholder {
-    color: rgb(163, 163, 163);
-}
-#toggle-gc-container {
-    --background-color: var(--body-background);
-    --box-shadow-color: rgb(103, 103, 103);
+.graph-container > table {
+    --background-color: hsl(0, 0%, 12%);
 }
 
+
+/* vendor prefixed pseudo styles are mega sus
+https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas-in-css */
+.graph-footer ::-moz-placeholder {
+    color: hsl(0, 0%, 64%);
+    opacity: 1;
+}
+.graph-footer :-ms-input-placeholder {
+    color: hsl(0, 0%, 64%);
+    opacity: 1;
+}
+.graph-footer ::placeholder {
+    color: hsl(0, 0%, 64%);
+    opacity: 1;
+}
+main:not(.background-image-exists) #extra-navs {
+    filter: brightness(0.7);
+}
+
+
+.generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
+    /* !important so assignment_sorting color changes */
+    color: white !important;
+}
 /* .available for higher priority */
 .daterangepicker td:not(.active).available:hover,
 .daterangepicker th.available:hover {
     background-color: hsl(0, 0%, 30%);
 }
-.daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect {
-    background: revert;
-    border: revert;
+.daterangepicker select {
+    --border-color: var(--color) !important;
 }
 
 .jconfirm.jconfirm-light .jconfirm-box {
     box-shadow: none !important;
-    border: 1px solid rgb(123, 123, 123);
+    border: 1px solid hsl(0, 0%, 48%);
+}
+
+/* settings */
+.field-group, #break-days-wrapper {
+    --background-color: var(--primary);
+    --box-shadow: initial;
+}
+.field-group-label {
+    --lightness: 50%;
+}
+[type="checkbox"] ~ label:not(.break-days-label) {
+    --checkbox-widget-primary-color-lightness: 40%;
+    color: white;
+}
+[type="checkbox"] ~ label:not(.break-days-label):hover:active {
+    --box-shadow: initial;
 }

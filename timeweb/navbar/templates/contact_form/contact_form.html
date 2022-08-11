@@ -1,7 +1,7 @@
 {% extends "account/base.html" %}
 {% load static %}
 
-{% block accounts_js %}
+{% block js %}
     <script nonce="{{request.csp_nonce}}">
         $(window).one("load", function() {
             $("#id_body").expandableTextareaHeight().trigger("input");
@@ -15,7 +15,7 @@
 
 {% block head_title %}Contact{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
     <h1>Contact</h1>
 
     <form method="POST" action="{% url 'contact_form' %}" id="contact-form">
@@ -27,13 +27,12 @@
                 {{ field }}
             </span>
         {% endfor %}
-        <button class="g-recaptcha" 
+        <button class="g-recaptcha submit-button" 
                 data-sitekey="6LfUBlIeAAAAAKPyzTPxikuduIEdK3m4i1mnBkqN" 
                 {% comment %}
                 site key for localhost: 6LdfDVIeAAAAAHqod332oJv3ICHdeQnFBBoOjICR
                 secret key for localhost: you thought lmao get it from here skrub https://www.google.com/recaptcha/admin/site/508693855/settings {% endcomment %}
                 data-callback='submitContactForm' 
-                data-action='submit'
-                id="submit-button">Send e-mail</button>
+                data-action='submit'>Send e-mail</button>
     </form>
 {% endblock %}

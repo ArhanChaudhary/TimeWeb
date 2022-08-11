@@ -2,11 +2,11 @@
 
 {% block head_title %}Login Cancelled{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
 
     <h1>Login Cancelled</h1>
     {% include "account/accounts_messages.html" %}
     
-    <p>You decided to cancel logging in via Google. If this was a mistake, please <a href="{% url 'account_login' %}">log in</a>.</p>
+    <p>You just cancelled logging in with Google. If this was a mistake, please <a href="{% url 'account_login' %}">log in</a>.</p>
 
 {% endblock %}

@@ -1,12 +1,5 @@
-# Abstractions
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from views import TimewebGenericView
-
-def custom_permission_denied_view(request, reason=""):
-    response = render(request, "misc/403_csrf.html", {"request": request})
-    response.status_code = 403
-    return response
+from common.views import TimewebGenericView
 
 class RickView(TimewebGenericView):
     def get(self, request, _):
@@ -14,9 +7,12 @@ class RickView(TimewebGenericView):
 
 class SpookyView(TimewebGenericView):
     template_name = "misc/spooky.html"
-    
+
 class SusView(TimewebGenericView):
     template_name = "misc/sus.html"
 
 class ChungusView(TimewebGenericView):
     template_name = "misc/chungus.html"
+
+class ShantanuView(TimewebGenericView):
+    template_name = "misc/shantanu.html"

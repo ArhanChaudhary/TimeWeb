@@ -1,13 +1,14 @@
 {% extends "navbar/base.html" %}
+{% comment %} Turn on word wrap if viewing from an IDE {% endcomment %}
 {% load static %}
 
 {% block head_title %}User Guide{% endblock %}
 
-{% block navbar_css %}
+{% block _css %}
     <link rel="stylesheet" href="{% static 'navbar/css/user_guide.css' %}">
 {% endblock %}
 
-{% block doc_content %}
+{% block _content %}
 {% comment %} 
 Turn on word wrap if viewing from an IDE
 the span groups the major and minor categories together for user_guide.js 
@@ -325,4 +326,4 @@ the span groups the major and minor categories together for user_guide.js
 </details>
 <hr>
 You've reached the end of TimeWeb's user guide! Feel free to <a href="{% url 'contact_form' %}">contact us</a> for further clarification. Have a great day!
-{% endblock doc_content %}
+{% endblock %}

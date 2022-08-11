@@ -2,7 +2,7 @@
 
 {% block head_title %}Change Username{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
     <h1>Change Username</h1>
 
     <form method="POST" action="{% url 'reset_username' %}" class="username_change">
@@ -14,6 +14,6 @@
             {{ field }}
             </span>
         {% endfor %}
-        <button type="submit" name="action" id="submit-button">Change username</button>
+        <button type="submit" name="action" class="submit-button">Change username</button>
     </form>
 {% endblock %}

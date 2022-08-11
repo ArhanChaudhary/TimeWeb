@@ -1,6 +1,21 @@
+from django.shortcuts import render
+from ratelimit.exceptions import Ratelimited
+from django.http import HttpResponseForbidden, HttpResponse
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.utils import timezone
+from common.views import logger
+from django.db.utils import OperationalError
+
+def _403_csrf(request, reason=""):
+    response = render(request, "common/403_csrf.html", {"request": request})
+    response.status_code = 403
+    return response
+
+def _403_or_429(request, exception=None):
+    if isinstance(exception, Ratelimited):
+        return HttpResponse('You are being ratelimited, try again in a few seconds or minutes.', status=429)
+    return HttpResponseForbidden("Forbidden, here's a cookie 🍪 to cheer you up")
 
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
@@ -28,7 +43,12 @@ def update_seen_latest_changelog():
     SettingsModel.objects.bulk_update(settings_models, ['seen_latest_changelog'])
 
 try:
-    current_site = Site.objects.get(domain="localhost" if settings.DEBUG else "timeweb.io")
-except Site.DoesNotExist:
-    current_site = Site.objects.get(domain="example.com")
-settings.SITE_ID = current_site.id
+    current_site = Site.objects.get(domain="localhost" if (settings.DEBUG or settings.FIX_DEBUG_LOCALLY) else "timeweb.io")
+except (Site.DoesNotExist, OperationalError):
+    try:
+        current_site = Site.objects.get(domain="example.com")
+    except (Site.DoesNotExist, OperationalError):
+        current_site = None
+        logger.warning("You should probably configure your site model domain")
+if current_site is not None:
+    settings.SITE_ID = current_site.id

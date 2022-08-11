@@ -1,17 +1,21 @@
+# In the future I should probably switch all my view classes to FormView 
+
 # Abstractions
-from views import TimewebGenericView
+from common.views import TimewebGenericView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.forms import ValidationError
 
 # App stuff
 from django.conf import settings
 from .forms import UsernameResetForm
+from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
 
 # Misc
-from views import logger
-from allauth.account.adapter import DefaultAccountAdapter
-DefaultAccountAdapter.clean_username.__defaults__ = (True,) # Allows non unique usernames
+from common.views import logger
+from django.contrib import messages
+from allauth.account.adapter import get_adapter as get_account_adapter
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username_reset.html"
@@ -45,3 +49,21 @@ class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     def invalid_form(self, request):
         self.context['form'] = self.form
         return super().get(request)
+
+class LabeledSocialaccountConnectionsView(SocialaccountConnectionsView):
+    def form_valid(self, form):
+        get_account_adapter().add_message(
+            self.request,
+            messages.INFO,
+            "socialaccount/messages/account_disconnected.txt",
+            message_context={
+                "sociallogout": form.cleaned_data["account"],
+            }
+        )
+        form.save()
+        return super(SocialaccountConnectionsView, self).form_valid(form)
+
+connections = login_required(LabeledSocialaccountConnectionsView.as_view()) # from its source code
+
+class EmailMessageView(TimewebGenericView):
+    template_name = "account/email/password_reset_key_message.html"

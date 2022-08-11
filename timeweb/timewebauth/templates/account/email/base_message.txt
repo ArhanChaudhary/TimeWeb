@@ -1,7 +1,9 @@
-{% autoescape off %}Hello from {{ current_site.name }}!
+{% load account %}
+{% user_display user as user_display %}
+Hello {{ user_display }},
+
 
 {% block content %}{% endblock %}
 
 Thank you for using {{ current_site.name }}!
 {{ current_site.domain }}
-{% endautoescape %}

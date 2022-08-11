@@ -3,6 +3,7 @@
     /* keep this as selector as * so fonts arent inherited (for example .info-button) */
     font-family: "Open Sans", sans-serif;
     touch-action: manipulation;
+    text-decoration-thickness: 1.5px;
 }
 html {
     -webkit-tap-highlight-color: transparent;
@@ -16,21 +17,32 @@ input, textarea {
     /* Mobile */
     -webkit-appearance: none;
     border-style: solid;
-    padding: 1px 2px;
+    padding: 2px;
     /* Firefox */
     filter: none;
+}
+select {
+    border-radius: 0;
 }
 textarea {
     resize: none;
 }
-input[type="checkbox"], input[type="radio"] {
+[type="checkbox"], [type="radio"] {
     -webkit-appearance: revert;
+    border: 1px solid var(--color);
+    margin: 3px 3px 3px 4px;
 }
 img {
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
             user-select: none;
+}
+svg[height="0"], svg[width="0"] {
+    position: absolute;
+}
+hr {
+    border-color: hsl(0, 0%, 93%);
 }
 /* Override normalize.css */
 html {
@@ -42,14 +54,20 @@ optgroup,
 select,
 textarea
 {
-    font-size: revert;
+    font-size: 11pt;
     line-height: normal;
-    margin: revert;
+    /* safari */
+    margin: 0;
 }
 /* normalize.css uses ::-webkit-file-upload-button instead of ::file-selector-button for some reason */
 ::file-selector-button {
     font: inherit;
     -webkit-appearance: button;
+    border-color: black;
+}
+
+.oudated-serviceworker-registration-bugfix {
+    display: none;
 }
 
 
@@ -66,7 +84,7 @@ textarea
 .error-note {
     background: rgba(255, 68, 12, 0.05);
     color: rgb(237 28 36);
-    border: 1px solid rgb(237 28 36);
+    border: 1px solid rgb(237 28 36) !important;
 }
 .success-note {
     background: rgba(68, 255, 12, 0.05);

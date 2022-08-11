@@ -10,25 +10,25 @@
   {% elif settings_model.appearance == "dark" or settings_model.appearance == "fancy dark" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
   {% endif %}
-{% endblock css %}
+{% endblock %}
 
 {% block js %}
   {{ assignment_models_as_json|json_script:"assignment-models" }}
   {{ settings_model_as_json|json_script:"settings-model" }}
   {{ latest_changelog|json_script:"latest-changelog" }}
-  <script src="https://unpkg.com/moment@2.29.1/moment.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/moment-mini@2.24.0/moment.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/pluralize@8.0.0/pluralize.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/jquery.easing@1.4.1/jquery.easing.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/sortablejs@1.14.0/Sortable.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/jquery-sortablejs@1.0.1/jquery-sortable.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/mathjs@10.4.0/lib/browser/math.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/ml-matrix@6.10.2/matrix.umd.js" crossorigin="anonymous"></script>
   <script src="{% static 'timewebapp/js/utils.js' %}"></script>
   <script src="{% static 'timewebapp/js/priority.js' %}"></script>
   <script src="{% static 'timewebapp/js/graph.js' %}"></script>
   <script src="{% static 'timewebapp/js/parabola.js' %}"></script>
   <script src="{% static 'timewebapp/js/crud.js' %}"></script>
-{% endblock js %}
+{% endblock %}
 
 {% block content %}
   {% if settings_model.background_image %}
@@ -55,26 +55,28 @@
 
             {% if field.name == "name" %}
               <div class="field-group" id="first-field-group">
+                <div class="instant-margin-transition">
             {% elif field.name == "unit" %}
+                </div>
               </div>
               <div class="field-group" id="second-field-group">
+                <div class="instant-margin-transition">
             {% endif %}
 
-            <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}" id="id-{{ field.name }}-field-wrapper">
+            <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
+              {% comment %} tells crud.js the field was predicted {% endcomment %}
+              {% if field.name == 'x' and x_was_predicted or field.name == 'y' and y_was_predicted %} disabled-field {% endif %}" 
+            id="id-{{ field.name }}-field-wrapper">
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Work Days</label>
                 {% include 'timewebapp/widgets/work_days.html' %}
               {% else %}
                 {{ field.label_tag }}
-                {% if field.name == "x" %}
-                  <div id="due-date-empty">
-                    <span class="due-date-empty-icon-slash x-first-slash"></span>
-                    <span class="due-date-empty-icon-slash x-second-slash"></span>
-                  </div>
-                  {{ field }}
-                  <div id="due-date-text-measurer"></div>
-                {% else %}
-                  {{ field }}
+                {{ field }}
+                {% if field.name == "x" or field.name == "y" %}
+                  <svg class="magic-wand-icon" viewBox="2.19 10 488.31 488.28">
+                    <use href="#magic_wand-svg"></use>
+                  </svg>
                 {% endif %}
               {% endif %}
               {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %}
@@ -98,13 +100,16 @@
               {% endfor %}
             </div>
           {% endfor %}
+            </div>
           </div>
         </div>
         <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
       </form>
     </div>
   </div>
-  <div id="assignments-container">
+  <div id="assignments-container" {% if view_deleted_assignments_in_app_view %}class="viewing-deleted-assignments"{% endif %}
+  {% comment %} some javascript makes this focusable {% endcomment %}
+  tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
       (function() {
         if ($("main").hasClass("finished-header-transition")) return
@@ -125,154 +130,226 @@
         });
       })();
     </script>
-    <div id="assignments-header">
-      <div id="info"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
-        <span id="estimated-total-time-label">Estimated completion time:</span><span id="estimated-total-time"></span><span id="current-time"></span><span id="tomorrow-time"></span>
-        <div id="hide-button" class="generic-button">Hide</div>
-        <div id="icon-label-container">
-          <img id="close-assignments" tabindex="0" alt="Close all Assignments" height="27" src="{% static 'timewebapp/images/close_all_assignments.webp' %}">
-          <img id="previous-day" tabindex="0" alt="Go to Previous Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.webp' %}">
-          <img id="next-day" tabindex="0" alt="Go to Next Day" height="21" width="26" src="{% static 'timewebapp/images/next_day.webp' %}">
-          <a href="{% url 'settings' %}">
-            <img id="settings" alt="Settings" height="27" src="{% static 'timewebapp/images/settings.webp' %}">
-          </a>
-          <div id="settings-icon-label">Settings</div>
-          <div id="previous-day-icon-label">Go to Previous Day</div>
-          <div id="next-day-icon-label">Go to Next Day</div>
-          <div id="close-assignments-icon-label">Close all Assignments</div>
-        </div>
-      </div>
-      {% comment %} Put grey highlight on current-date instead of current-date-text to avoid double filtering {% endcomment %}
-      <div id="current-date"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
-        <span id="current-date-text"></span>
-      </div>
-      <div id="sort-assignments-container">
-        <label for="{{ settings_form.assignment_sorting.auto_id }}"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
-          {{ settings_form.assignment_sorting.label }}
-        </label>
-        {{ settings_form.assignment_sorting }}
-      </div>
-    </div>
-    <div id="autofill-work-done" class="shortcut">
-      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
-        Autofill
-        <select id="autofill-selection">
-          <option>No</option>
-          <option>All</option>
-        </select>
-        Work Done
-        <div class="generic-button" tabindex="0">Go</div>
-      </span>
-      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-    </div>
-    <div id="delete-starred-assignments" class="shortcut">
-      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
-        Delete all Starred Assignments
-        <div class="generic-button" tabindex="0">Go</div>
-      </span>
-      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-    </div>
-    {% for assignment in assignment_models %}
-      {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
-      <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
-        <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}{% if assignment.mark_as_done %} mark-as-done{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-          {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
-          <div class="priority-color-strip"></div>
-          <div class="assignment-header">
-            <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
-              <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
-                {% for tag in assignment.tags %}
-                  <div class="tag-wrapper">
-                    <div class="tag-name">{{ tag }}</div>
-                    <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
-                      <span class="icon-slash x-first-slash"></span>
-                      <span class="icon-slash x-second-slash"></span>
-                    </div>
-                  </div>
-                {% endfor %}
-              </span>
-              <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
-                <span class="icon-slash plus-first-slash"></span>
-                <span class="icon-slash plus-second-slash"></span>
-                <span class="info-button-text info-bottom tag-add-box">
-                  <div class="tag-add-overflow-hidden-container">
-                    <input class="tag-add-input" placeholder="New Tag" tabindex="-1">
-                    <div class="tag-add-button">
-                      <span class="icon-slash plus-first-slash"></span>
-                      <span class="icon-slash plus-second-slash"></span>
-                    </div>
-                  </div>
-                </span>
-                <div class="tag-add-text">Add Tag</div>
-              </div>
-            </div>
-            <div class="relative-positioning-wrapper{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
-              <span class="title">{{ assignment.name }}</span>
-              {% if assignment.description %}
-                <div class="description">{{ assignment.description|linebreaks }}</div>
-              {% endif %}
-            </div>
-            <svg width="30px" height="20px" class="arrow-container">
-              <polygon points="5,0 5,20 15,10" fill="currentColor">
-                <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
-                <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
-              </polygon>
-            </svg>
-            <div class="right-side-of-header">
-              <svg class="status-image" preserveAspectRatio="none">
-                <use></use>
+    <div id="extra-navs-positioner">
+      {% comment %} <span> so :last-child is forwards-compatible {% endcomment %}
+      <span>
+        {% if not view_deleted_assignments_in_app_view %}
+          <div id="assignments-header" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
+            <span id="todo-wrapper">
+              <span id="estimated-total-time-label">Todo:</span>
+              <span id="estimated-total-time"></span>
+              <span id="estimated-completion-time"></span>
+              <span id="tomorrow-time"></span>
+              <div id="hide-button" class="generic-button" tabindex="0">Hide</div>
+            </span>
+            <span id="current-date-container">
+              <span id="current-date"></span>
+              <svg id="go-to-next-day" tabindex="0" width="21" height="16" preserveAspectRatio="none" viewBox="40 40 176 176">
+                <use href="#go_to_next_day-svg"></use>
               </svg>
-              <div class="align-to-status-message-container">
-                <span class="status-message"></span>
-              </div>
-              <span class="completion-time"></span>
-            </div>
-            <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <svg class="tick-button" width="25" preserveAspectRatio="none">
-                <use href="#tick-svg"></use>
-              </svg>
-            </div>
-            <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
-                <use href="#edit-svg"></use>
-              </svg>
-            </div>
-            <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-              <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
-                <use href="#delete-svg"></use>
-              </svg>
+            </span>
+            <div id="sort-assignments-container">
+              <label for="{{ settings_form.assignment_sorting.auto_id }}">
+                {{ settings_form.assignment_sorting.label }}
+              </label>
+              {{ settings_form.assignment_sorting }}
             </div>
           </div>
-          <div class="assignment-footer">
-            <div class="graph-container">
-              <div class="hover-point-label initial-position"></div>
-              <canvas class="fixed-graph"></canvas>
-              <canvas class="graph">Your browser does not support the canvas tag.</canvas>
-            </div>
-            <div class="graph-footer">
-              <button class="delete-work-input-button">Delete Work Input</button>
-              <input class="work-input-textbox" placeholder="Enter Units Done"/>
-              <button class="submit-work-button">Submit Work Input</button>
-              <br>
-              <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph, click again to cancel">Set Curvature</button>
-              <button class="hide-assignment-button" data-hide-label="Hide Assignment" data-show-label="Show Assignment"></button>
-              <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
+          <div id="autofill-work-done" class="shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+            <div class="shortcut-line-left"></div>
+            <span class="shortcut-text">
+              Autofill
+              <select class="generic-button" id="autofill-selection">
+                <option>No</option>
+                <option>All</option>
+              </select>
+              Work Done
+              <div class="generic-button" tabindex="0">Go</div>
+            </span>
+            <div class="shortcut-line-right"></div>
+          </div>
+          <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
+            <div class="shortcut-line-left"></div>
+            <span class="shortcut-text">
+              Delete all Starred Assignments
+              <div class="generic-button" tabindex="0">Go</div>
+            </span>
+            <div class="shortcut-line-right"></div>
+          </div>
+        {% endif %}
+        {% for assignment in assignment_models %}
+          {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
+          <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
+            <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+              {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
+              <div class="priority-color-strip"></div>
+              <div class="assignment-header">
+                <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
+                  <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
+                    {% comment %} Remove whitespace to remove inline-black gap (minify-html does not fix this) {% endcomment %}
+                    {% for tag in assignment.tags %}<div class="tag-wrapper">
+                        <div class="tag-name">{{ tag }}</div>
+                        <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
+                          <span class="icon-slash x-first-slash"></span>
+                          <span class="icon-slash x-second-slash"></span>
+                        </div>
+                      </div>{% endfor %}</span>
+                  <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
+                    <span class="icon-slash plus-first-slash"></span>
+                    <span class="icon-slash plus-second-slash"></span>
+                    <span class="info-button-text info-bottom tag-add-box">
+                      <div class="tag-add-overflow-hidden-container">
+                        <input class="tag-add-input" placeholder="New Tag" tabindex="-1">
+                        <div class="tag-add-button">
+                          <span class="icon-slash plus-first-slash"></span>
+                          <span class="icon-slash plus-second-slash"></span>
+                        </div>
+                      </div>
+                    </span>
+                    <div class="tag-add-text">Add Tag</div>
+                  </div>
+                </div>
+                {% comment %}
+                note: confirm with the .assignment-header > :nth-last-child(2) selector before changing
+                any .assignment-header first child element tags
+                {% endcomment %}
+                <div class="left-side-of-header{% if settings_model.appearance == "fancy dark" %} fancy-coloring{% endif %}">
+                  <span class="title">
+                    {% if assignment.google_classroom_assignment_link %}
+                      {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
+                      <a class="title-link-anchor" target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="-1">
+                        {{ assignment.name }}
+                        <svg class="title-link-icon" width="12" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                          <use href="#external_link-svg"></use>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    <span {% if assignment.google_classroom_assignment_link %} class="hide-on-mobile" {% endif %}>{{ assignment.name }}</span>
+                  </span>
+                  {% if assignment.description %}
+                    <div class="description">{{ assignment.description|linebreaks }}</div>
+                  {% endif %}
+                </div>
+                {% if not view_deleted_assignments_in_app_view %}
+                  <div class="middle-of-header">
+                    <svg width="20px" height="20px" class="arrow-container">
+                      <polygon points="5,0 5,20 15,10" fill="currentColor">
+                        <animate class="rising-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="20,5 0,5 10,15"></animate>
+                        <animate class="falling-arrow-animation" begin="indefinite" fill="freeze" attributeName="points" dur="100ms" to="5,0 5,20 15,10"></animate>
+                      </polygon>
+                    </svg>
+                    <svg class="status-image" preserveAspectRatio="none">
+                      <use></use>
+                    </svg>
+                    <div class="align-to-status-message-container">
+                      <span class="status-message"></span>
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="right-side-of-header">
+                  <span class="completion-time"></span>
+                  {% if not view_deleted_assignments_in_app_view %}
+                    {% if assignment.google_classroom_assignment_link %}
+                      <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
+                        <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
+                          <use href="#external_link-svg"></use>
+                        </svg>
+                      </a>
+                    {% endif %}
+                    <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg class="tick-button" width="25" preserveAspectRatio="none">
+                        <use href="#tick-svg"></use>
+                      </svg>
+                    </div>
+                    <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
+                        <use href="#edit-svg"></use>
+                      </svg>
+                    </div>
+                    {% else %}
+                    <div class="assignment-header-button" title="Restore Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
+                        <use href="#restore-svg"></use>
+                      </svg>
+                    </div>
+                  {% endif %}
+                  <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                    <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
+                      <use href="#delete-svg"></use>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="assignment-footer">
+                <div class="graph-container">
+                  <div class="hover-point-label initial-position"></div>
+                  <canvas class="fixed-graph"></canvas>
+                  <canvas class="graph">Your browser does not support the canvas tag.</canvas>
+                  <table>
+                    <tbody class="text-display-container">
+                      <tr>
+                        <th></th>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="graph-footer">
+                  {% if not view_deleted_assignments_in_app_view %}
+                    <button class="delete-work-input-button">Delete Work Input</button>
+                    <input class="work-input-textbox" placeholder="Enter Units Done"/>
+                    <button class="submit-work-button">Submit Work Input</button>
+                    <br>
+                    <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
+                    <button class="skew-ratio-button" data-label="Set Curvature" data-active-label="Hover the graph" data-active-label-touch="Drag the graph">Set Curvature</button>
+                    <button class="display-in-text-button" data-in-text-label="Text Display" data-in-graph-label="Graph Display"></button>
+                  {% endif %}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        {% endfor %}
+        {% if view_deleted_assignments_in_app_view %}
+          <div id="no-assignments-message" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...</div>
+        {% endif %}
+      </span>
+      <div id="extra-navs">
+        {% comment %} extra-navs already has a filter style {% endcomment %}
+        <span {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
+          {% if view_deleted_assignments_in_app_view %}
+            {% if show_previous_page %}
+              <span id="previous-page">Previous Page</span>
+            {% endif %}
+            {% if show_previous_page and show_next_page %}
+              &#8226;
+            {% endif %}
+            {% if show_next_page %}
+              <span id="next-page">Next Page</span>
+            {% endif %}
+          {% else %}
+            <a href="{{ changelog }}">Changelog</a>
+            &#8226;
+            <a href="{{ contact_form }}">Contact</a>
+            &#8226;
+            <a href="{{ blog }}" id="nav-blog">Blog</a>
+            &#8226;
+            <span id="nav-special-thanks" tabindex="0">Special Thanks</span>
+            &#8226;
+            <span id="nav-credits" tabindex="0">Credits</span>
+            &#8226;
+            <a href="{{ policies }}">Policies</a>
+          {% endif %}
+        </span>
       </div>
-    {% endfor %}
+    </div>
   </div>
   <template id="delete-gc-assignments-from-class-template">
-    <div class="delete-gc-assignments-from-class shortcut">
-      <div class="shortcut-line-left{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
-      <span class="shortcut-text{% if settings_model.background_image %} grey-highlight{% endif %}">
+    <div class="delete-gc-assignments-from-class shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+      <div class="shortcut-line-left"></div>
+      <span class="shortcut-text">
         Delete all Assignments from this Class
         <div class="generic-button" tabindex="0">Go</div>
       </span>
-      <div class="shortcut-line-right{% if settings_model.background_image %} grey-highlight{% endif %}"></div>
+      <div class="shortcut-line-right"></div>
     </div>
   </template>
   <template id="tag-add-selection-item-template">
@@ -304,30 +381,22 @@
       <br>
     </span>
   </template>
-  <div id="toggle-gc-container" class="{% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}clicked {% endif %}{% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND or GC_API_INIT_FAILED %}open {% endif %}{% if "token" in settings_model.oauth_token %}enabled{% endif %}">
-    <span id="toggle-gc-label">
-      {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}
-        Adding Google Classroom Assignments...
-      {% elif GC_API_INIT_FAILED %}
-        Authentication failed. Please try again
-      {% elif "token" in settings_model.oauth_token %}
-        Disable Google Classroom integration
-      {% else %}
-        Enable Google Classroom integration
-      {% endif %}
-    </span>
-    <img src="{% static 'timewebapp/images/gc_icon.webp' %}" width="42" height="42">
-  </div>
-  <svg>
+  <svg width="0" height="0">
     <defs>
+      {% include "go_to_next_day.svg" %}
       {% include "question_mark.svg" %}
       {% include "delete.svg" %}
       {% include "edit.svg" %}
+      {% include "completely_finished.svg" %}
       {% include "finished.svg" %}
+      {% include "not_yet_assigned.svg" %}
       {% include "question_mark.svg" %}
       {% include "slashed_tick.svg" %}
       {% include "tick.svg" %}
+      {% include "external_link.svg" %}
       {% include "unfinished.svg" %}
+      {% include "magic_wand.svg" %}
+      {% include "restore.svg" %}
     </defs>
   </svg>
-{% endblock content %}
+{% endblock %}

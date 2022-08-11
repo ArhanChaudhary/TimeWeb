@@ -1,2 +1,2 @@
-The Google account {{sociallogin|str_sociallogin}} has been removed
+The Google account {{sociallogout.extra_data.email}} has been removed
 <p hidden>**Success**</p>

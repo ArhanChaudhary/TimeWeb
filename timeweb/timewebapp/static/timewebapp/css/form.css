@@ -1,13 +1,11 @@
 #form-wrapper form {
     display: flex;
+    font-size: 17px;
     flex-flow: column;
     --vertical-form-padding: 5px;
     --horizontal-form-padding: 4px;
     --error-note-color: hsl(353deg, 77%, 50%);
     --field-widget-background-color: hsl(0, 0%, 97%);
-}
-#form-wrapper input[type=number]::-webkit-inner-spin-button {
-    display: none;
 }
 /* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
@@ -19,19 +17,31 @@
 #form-wrapper input:required {
     box-shadow: none; /* Firefox */
 }
+
+
+/* vendor prefixed pseudo styles are mega sus
+https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas-in-css */
+#form-wrapper ::-moz-placeholder {
+    color: var(--form-placeholder-color);
+    opacity: 1;
+}
+#form-wrapper :-ms-input-placeholder {
+    color: var(--form-placeholder-color);
+    opacity: 1;
+}
 #form-wrapper ::placeholder {
     color: var(--form-placeholder-color);
+    opacity: 1;
 }
+
+
+
 #form-wrapper label:not(.field-widget)::after {
     position: absolute;
     color: var(--form-placeholder-color);
-    font-size: 12px;
+    font-size: 13px;
     right: calc(var(--horizontal-form-padding) + 2px);
     bottom: -25px;
-}
-#form-wrapper label[for='id_x']::after {
-    content: '(Predicted if left empty)';
-    right: 89px;
 }
 #form-wrapper label[for='id_assignment_date']::after {
     content: "(Enter today if you don't remember)";
@@ -45,6 +55,7 @@
     border-radius: 15px;
     padding: 5px 15px 25px;
     position: relative;
+    letter-spacing: 0.5px;
 }
 #form-wrapper #cancel-button {
     position: absolute;
@@ -83,15 +94,18 @@
     overflow: hidden;
     display: flex;
     --field-group-gap: 20px;
+    --field-height: 30px;
     gap: var(--field-group-gap);
 }
 #form-wrapper .field-group {
     flex-shrink: 0;
     width: 100%;
     /* Min-content over fit-content because it has more browser support */
+    height: -webkit-min-content;
+    height: -moz-min-content;
     height: min-content;
     box-sizing: border-box;
-    transition: margin 0.3s ease-in-out;
+    transition: margin calc(0.3s * var(--animation-speed)) ease-in-out;
 }
 #form-wrapper #field-group-picker-styling {
     position: absolute;
@@ -130,24 +144,25 @@
     border-bottom-left-radius: var(--border-radius);
     border-left: 1px solid var(--color);
 }
-#form-wrapper #first-tab-line {
-    transition: margin-left 0.2s ease-in-out 0.05s;
+#field-group-picker-styling * {
+    transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
 }
-#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #first-tab-line {
-    margin-left: calc(-50% + var(--horizontal-field-group-tab-padding));
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
+    transform: translateX(-207px);
 }
-/* Really really ugly code that animates the form height on field group change */
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
     margin-left: calc(-100% - var(--field-group-gap));
-    margin-bottom: min(0px, calc(var(--second-field-group-height) - var(--first-field-group-height)));
 }
-#form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #second-field-group,
-#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #first-field-group {
+#form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #second-field-group .instant-margin-transition,
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #first-field-group .instant-margin-transition {
     margin-bottom: 0;
 }
-#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #second-field-group {
-    /* 100vh thingies to ensure second-field-group doesn't bloat the height of #fields-wrapper when the form is first shown */
-    margin-bottom: min(0px, calc(var(--first-field-group-height, 0px) - var(--second-field-group-height, 100vh)));
+#form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #second-field-group .instant-margin-transition,
+#form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group .instant-margin-transition {
+    margin-bottom: -100% !important;
+}
+#form-wrapper .notransition {
+    transition: none;
 }
 #form-wrapper .field-wrapper {
     /* for positioning */
@@ -161,8 +176,38 @@
     padding-top: var(--vertical-field-padding);
     padding-bottom: var(--vertical-field-padding);
 }
+#form-wrapper .field-wrapper:nth-last-child(1) {
+    z-index: 1;
+}
+#form-wrapper .field-wrapper:nth-last-child(2) {
+    z-index: 2;
+}
+#form-wrapper .field-wrapper:nth-last-child(3) {
+    z-index: 3;
+}
+#form-wrapper .field-wrapper:nth-last-child(4) {
+    z-index: 4;
+}
+#form-wrapper .field-wrapper:nth-last-child(5) {
+    z-index: 5;
+}
+#form-wrapper .field-wrapper:nth-last-child(6) {
+    z-index: 6;
+}
+#form-wrapper .field-wrapper:nth-last-child(7) {
+    z-index: 7;
+}
+#form-wrapper .field-wrapper:nth-last-child(8) {
+    z-index: 8;
+}
+#form-wrapper .field-wrapper:nth-last-child(9) {
+    z-index: 9;
+}
+#form-wrapper .field-wrapper:nth-last-child(10) {
+    z-index: 10;
+}
 #form-wrapper .field-wrapper {
-    transition: margin-top 0.4s ease-in-out, opacity 0.6s ease-in-out 0.1s;
+    transition: margin-top calc(0.4s * var(--animation-speed)) ease-in-out, opacity calc(0.6s * var(--animation-speed)) ease-in-out calc(0.1s * var(--animation-speed));
 }
 #form-wrapper .field-wrapper .invalid ~ .info-button {
     margin-top: -1px;
@@ -182,6 +227,21 @@
 #form-wrapper .assignment-form-error-note {
     width: 100%;
 }
+#form-wrapper .magic-wand-icon {
+    cursor: pointer;
+    --inside-padding: 3px;
+    left: calc(var(--inside-padding) + 2px);
+    bottom: var(--inside-padding);
+    position: absolute;
+    padding-bottom: inherit;
+    height: calc(var(--field-height) - var(--inside-padding) * 2);
+}
+#form-wrapper #fields-wrapper {
+    --magic-wand-width: 34px;
+}
+#form-wrapper #id_x, #form-wrapper #id_y {
+    padding-left: var(--magic-wand-width);
+}
 #form-wrapper .field-wrapper.has-widget > input {
     width: initial;
     flex-grow: 1;
@@ -198,7 +258,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    user-select: none;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
     padding-right: 6px;
     padding-left: 6px;
     border-left: none !important;
@@ -212,69 +275,41 @@
 #form-wrapper .field-widget-checkbox:checked ~ .field-widget::after {
     content: "Hours";
 }
-#form-wrapper .field-widget:not([for="id_soft"])::before {
-    content: "in: ";
-    position: absolute;
-    right: 100%;
-    padding-right: inherit;
-}
 #form-wrapper .field-wrapper:not(.has-widget) .field-widget {
     display: none;
 }
 
 
 
-#form-wrapper #due-date-empty {
-    position: absolute;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 13px;
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    background-color: var(--color);
-    cursor: pointer;
-    margin-left: 5px;
-    transform: translateX(var(--vertical-form-padding))
-                translateX(var(--due-date-text-width, -100vw))
-                translateY(32px);
-}
-#form-wrapper #due-date-empty::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: scale(4);
-}
-#form-wrapper .due-date-empty-icon-slash {
-    width: 2px;
-    height: 8px;
-    position: absolute;
-    background-color: var(--body-background);
-}
-#form-wrapper #due-date-text-measurer {
-    visibility: hidden;
-    font-size: 0.83em;
-    position: absolute;
-}
-#form-wrapper #id_x, #form-wrapper, #due-date-text-measurer, #form-wrapper #id_assignment_date {
-    letter-spacing: 0.5px;
-}
 
-
-
-
-
+#form-wrapper .field-wrapper.disabled-field > input {
+    opacity: 0.75 !important;
+    --background-color: hsl(0, 0%, 89%) !important;
+    border-color: hsl(0, 0%, 40%) !important;
+    border-width: 2px !important;
+    padding-left: calc(var(--magic-wand-width) - 1px) !important;
+    cursor: not-allowed;
+    color: var(--color);
+    /* for invalid fields */
+    box-shadow: none;
+}
+#form-wrapper .field-wrapper > input {
+    transition: 0.25s ease-out;
+    transition-property: opacity, background-color;
+}
 #form-wrapper #fields-wrapper .hide-field {
     /* no clue why this makes this work but it does */
     width: initial;
-
-    z-index: -1;
-    position: relative;
+    /* We can't set the z-index to -1 for .hide-field or else the opacity transition breaks 
+    Instead give a z-index of one to #id-unit-field-wrapper */
     opacity: 0;
+
+    transition: margin-top calc(0.4s * var(--animation-speed)) ease-in-out, opacity calc(0.3s * var(--animation-speed)) ease-in-out;
+}
+#id-unit-field-wrapper {
+    /* So .hide-field isnt over this when it has a lot of negative margin 
+    We can't set the z-index to -1 for .hide-field or else the opacity transition breaks */
+    z-index: 1;
 }
 #form-wrapper input:not(.field-widget-checkbox),
 #form-wrapper textarea {
@@ -291,6 +326,7 @@
     border: 1px solid var(--color);
     box-sizing: border-box; 
     border-radius: 3px;
+    height: var(--field-height);
     --background-color: white;
     background-color: var(--background-color);
 }
@@ -302,10 +338,10 @@
     padding: 20px 72px;
     color: var(--color);
     margin-top: 10px;
-    font-size: 19px;
-    --background-color-default: rgb(238, 238, 238);
-    --background-color-hover: rgb(229, 229, 229);
-    --background-color-active: rgb(245, 245, 245);
+    font-size: 20px;
+    --background-color-default: hsl(0, 0%, 93%);
+    --background-color-hover: hsl(0, 0%, 90%);
+    --background-color-active: hsl(0, 0%, 96%);
 
     --background-color: var(--background-color-default);
     background-color: var(--background-color);
@@ -324,12 +360,12 @@
 }
 #form-wrapper .assignment-form-error-note {
     text-align: center;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--error-note-color);
 }
 #overlay {
     overflow: auto;
-    background-color: rgba(0,0,0,0.2);
+    background-color: hsla(0, 0%, 0%, 0.2);
     position: fixed;
     top: 0;
     left: 0;
@@ -343,18 +379,18 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    height: 30px;
 }
 #break-days-wrapper input {
     display: none !important;
 }
 #break-days-wrapper input:checked + .break-days-label {
     background-color: hsl(0, 0%, 91%);
-    text-decoration: line-through hsl(0, 0%, 35%);
+    -webkit-text-decoration: line-through hsl(0, 0%, 35%);
+            text-decoration: line-through hsl(0, 0%, 35%);
     color: hsl(0, 0%, 40%);
 }
 #break-days-wrapper input:not(:checked) + .break-days-label:hover {
-    background-color: hsl(0, 0%, 97%);
+    background-color: hsl(0, 0%, 96%);
 }
 #form-wrapper .field-widget:hover {
     --field-widget-background-color: hsl(0, 0%, 93%);
@@ -364,7 +400,7 @@
 }
 #break-days-wrapper .break-days-label {
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
     flex-grow: 1;
     border-left: inherit;
     display: flex;

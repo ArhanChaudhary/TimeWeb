@@ -1,17 +1,17 @@
 {% extends "account/base.html" %}
 {% load static %}
 
-{% block accounts_css %}
-<link rel="stylesheet" href="{% static 'timewebauth/css/email.css' %}">
+{% block css %}
+  <link rel="stylesheet" href="{% static 'timewebauth/css/email.css' %}">
 {% endblock %}
 
 {% block head_title %}E-mail Addresses{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
   <h1>E-mail Addresses</h1>
   {% include "account/accounts_messages.html" %}
 
-  <p>The following e-mail addresses are associated with your account:</p>
+  <p>The following e-mail addresses are associated with your account: (Your primary e-mail address is used for password resets)</p>
   <form action="{% url 'account_email' %}" class="email_list" method="post">
     {% csrf_token %}
 
@@ -31,13 +31,17 @@
     {% endfor %}
 
     <div class="buttonHolder">
-      <button class="secondaryAction" id="submit-button" type="submit" name="action_primary" >Make primary</button>
-      <button class="secondaryAction" id="submit-button" type="submit" name="action_send" >Re-send verification</button>
-      <button class="primaryAction" id="submit-button" type="submit" name="action_remove" >Remove</button>
+      {% comment %} dont use a db query on whether to have this so the user is aware of all the functionalities
+      also so there are never no buttons making the radio select redundant {% endcomment %}
+      <button class="secondaryAction" class="submit-button" type="submit" name="action_primary" >Make primary</button>
+      <button class="secondaryAction" class="submit-button" type="submit" name="action_send" >Re-send verification</button>
+      <button class="primaryAction" class="submit-button" type="submit" name="action_remove" >Remove</button>
     </div>
   </form>
 
   {% if can_add_email %}
+    <hr>
+    <span class="hr-interrupt">or</span>
     <h2>Add E-mail Address</h2>
 
     <form method="post" action="{% url 'account_email' %}" class="add_email">
@@ -48,7 +52,7 @@
           {{ field }}
         </span>
       {% endfor %}
-      <button name="action_add" id="submit-button" type="submit">Add e-mail</button>
+      <button name="action_add" class="submit-button" type="submit">Add e-mail</button>
     </form>
   {% endif %}
 

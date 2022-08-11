@@ -4,19 +4,18 @@
 
 {% block head_title %}Confirm E-mail Address{% endblock %}
 
-
-{% block accounts_content %}
+{% block content %}
     <h1>Confirm E-mail Address</h1>
     {% include "account/accounts_messages.html" %}
 
     {% if confirmation %}
         {% user_display confirmation.email_address.user as user_display %}
 
-        <p>Please confirm that <a href="mailto:{{ confirmation.email_address.email }}">{{ confirmation.email_address.email }}</a> is an e-mail address for user {{ user_display }}.</p>
+        <p>Please confirm that {{ confirmation.email_address.email }} is an e-mail address for user {{ user_display }}.</p>
 
         <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
             {% csrf_token %}
-            <button type="submit" id="submit-button">Confirm</button>
+            <button type="submit" class="submit-button">Confirm</button>
         </form>
     {% else %}
         {% url 'account_email' as email_url %}

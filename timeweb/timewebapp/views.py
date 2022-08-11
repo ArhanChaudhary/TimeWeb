@@ -1,22 +1,23 @@
 # THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 
+# In the future I should probably switch all my view classes to FormView
+
 # Abstractions
 from django.shortcuts import get_object_or_404, redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from django.contrib.auth import logout, login
-from django.forms import ValidationError
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
-from views import TimewebGenericView
+from common.views import TimewebGenericView
 import datetime
 from math import ceil, floor
 from decimal import Decimal
 
 # App stuff
 from django.conf import settings
-from views import User
+from common.models import User
 from .models import TimewebModel
 from navbar.models import SettingsModel
 from .forms import TimewebForm
@@ -26,12 +27,12 @@ from navbar.forms import SettingsForm
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-# Formatting
-from django.forms.models import model_to_dict
-
 # Misc
-from utils import days_between_two_dates, utc_to_local
-from views import logger
+from django.forms.models import model_to_dict
+from common.utils import days_between_two_dates, utc_to_local
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
+from common.views import logger
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -39,81 +40,117 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         # The front end adjusts the assignment and due date, so we don't need to worry about using utc_to_local instead of localtime
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        TimewebModel.objects.create(**settings.EXAMPLE_ASSIGNMENT_JSON | {
+        TimewebModel.objects.create(**settings.EXAMPLE_ASSIGNMENT | {
             "assignment_date": date_now,
-            "x": date_now + datetime.timedelta(settings.EXAMPLE_ASSIGNMENT_JSON["x"]),
+            "x": date_now + datetime.timedelta(settings.EXAMPLE_ASSIGNMENT["x"]),
             "user": instance,
         })
         SettingsModel.objects.create(user=instance)
         logger.info(f'Created settings model for user "{instance.username}"')
-        if settings.DEBUG:
-            instance.is_staff = True
-            from django.contrib.auth.models import Permission
-            permissions = Permission.objects.all()
-            for permission in permissions:
-                instance.user_permissions.add(permission)
-            instance.save()
 
 def append_default_context(request):
-    return {
+    context = {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT_JSON["name"],
+        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT["name"],
         "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
     }
+    if request.session.pop("gc-init-failed", None):
+        context["GC_API_INIT_FAILED"] = True
+    return context
 
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='30/m', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='100/h', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='3/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='15/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='75/h', method="POST", block=True), name='post')
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
-    def add_user_models_to_context(self, request):
-        self.context['assignment_models'] = request.user.timewebmodel_set.all()
-        self.context['settings_model'] = request.user.settingsmodel
-        self.context['assignment_models_as_json'] = list(request.user.timewebmodel_set.all().values())
-        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel)
+    def add_user_models_to_context(self, request, *, view_hidden):
+        # kinda cursed but saves an entire sql query
+        # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
+        # and another in the html
+        if view_hidden:
+            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=True).order_by("-pk"))
+            if "everything_before" in request.GET:
+                everything_before = int(request.GET["everything_before"])
+                everything_after = None
 
-        del self.context['settings_model_as_json']['background_image'] # background_image isnt json serializable
+                pk__gte_everything_before = [i for i in timewebmodels if i.pk >= everything_before]
+                pk__lt_everything_before = [i for i in timewebmodels if i.pk < everything_before]
+
+                self.context["show_previous_page"] = len(pk__gte_everything_before) > 0
+                self.context["show_next_page"] = len(pk__lt_everything_before) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+
+                timewebmodels = pk__lt_everything_before[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+            elif "everything_after" in request.GET:
+                everything_after = int(request.GET["everything_after"])
+                everything_before = None
+
+                pk__gt_everything_after = [i for i in timewebmodels if i.pk > everything_after]
+                pk__lte_everything_after = [i for i in timewebmodels if i.pk <= everything_after]
+
+                self.context["show_previous_page"] = len(pk__gt_everything_after) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_next_page"] = len(pk__lte_everything_after) > 0
+
+                timewebmodels = pk__gt_everything_after[-settings.DELETED_ASSIGNMENTS_PER_PAGE:]
+            else:
+                everything_before = None
+                everything_after = None
+
+                self.context["show_previous_page"] = False
+                self.context["show_next_page"] = len(timewebmodels) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+
+                timewebmodels = timewebmodels[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+        else:
+            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
+        self.context['assignment_models'] = timewebmodels
+        self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
+
+        self.context['settings_model'] = request.user.settingsmodel
+        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=[
+            "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id"]) # Don't use *SettingsForm.Meta.exclude because this isn't a form
+        self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
         if not request.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = settings.CHANGELOGS[0]
 
-        if not request.session.get("already_created_gc_assignments_from_frontend", False):
+        if not request.session.pop("already_created_gc_assignments_from_frontend", None):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
+
+    def get(self, request):
+        self.context['form'] = TimewebForm(request=request)
+        if request.session.pop("view_deleted_assignments_in_app_view", None) or "everything_before" in request.GET or "everything_after" in request.GET:
+            self.add_user_models_to_context(request, view_hidden=True)
+            self.context["view_deleted_assignments_in_app_view"] = True
         else:
-            del request.session["already_created_gc_assignments_from_frontend"]
+            self.add_user_models_to_context(request, view_hidden=False)
+            self.context['settings_form'] = SettingsForm(initial={ # unbound form
+                'assignment_sorting': request.user.settingsmodel.assignment_sorting,
+            })
 
-    def get(self, request):        
-        utc_now = timezone.now()
-        local_now = utc_to_local(request, utc_now)
-        local_last_login = utc_to_local(request, request.user.last_login)
-        if local_last_login.day != local_now.day:
-            for assignment in request.user.timewebmodel_set.all():
-                if assignment.mark_as_done:
-                    assignment.mark_as_done = False
-            TimewebModel.objects.bulk_update(request.user.timewebmodel_set.all(), ['mark_as_done'])
-        self.add_user_models_to_context(request)
-        self.context['form'] = TimewebForm(None)
-        self.context['settings_form'] = SettingsForm({
-            'assignment_sorting': request.user.settingsmodel.assignment_sorting,
-        })
+            # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
+            if request.session.get("just_created_assignment_id"):
+                self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
+            elif request.session.get("just_updated_assignment_id"):
+                self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
 
-        # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-        if request.session.get("just_created_assignment_id"):
-            self.context['just_created_assignment_id'] = request.session.get("just_created_assignment_id")
-            del request.session["just_created_assignment_id"]
-        elif request.session.get("just_updated_assignment_id"):
-            self.context['just_updated_assignment_id'] = request.session.get("just_updated_assignment_id")
-            del request.session["just_updated_assignment_id"]
+            if invalid_form_context := request.session.pop('invalid_form_context', None):
+                form = TimewebForm(data=invalid_form_context['form'], request=request)
+                assert not form.is_valid(), f"{form.data}, {form.errors}"
+                for field in form.errors:
+                    # https://github.com/microsoft/pyright/issues/3695
+                    temp = form[field].field.widget
+                    temp.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
 
-        if request.session.get("gc-init-failed", False):
-            del request.session["gc-init-failed"]
-            self.context["GC_API_INIT_FAILED"] = True
+                invalid_form_context['form'] = form
+                self.context.update(invalid_form_context)
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
-
-    
 
     def post(self, request):
         # The frontend adds the assignment's pk as the "value" attribute to the submit button
@@ -129,21 +166,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # for parsing due times in forms.py
         _mutable = request.POST._mutable
         request.POST._mutable = True
-        self.form = TimewebForm(data=request.POST, files=request.FILES)
+        self.form = TimewebForm(data=request.POST, request=request)
         request.POST._mutable = _mutable
 
-        # Parts of the form that can only validate in views
-        form_is_valid = True
-        if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
-            self.form.add_error("name", ValidationError(_("You can't %(create_or_edit)s assignments in the example account") % {'create_or_edit': 'create' if self.created_assignment else 'edit'}))
-            form_is_valid = False
-        elif self.created_assignment and request.user.timewebmodel_set.all().count() > settings.MAX_NUMBER_ASSIGNMENTS:
-            self.form.add_error("name", ValidationError(_('You have too many assignments (>%(amount)d assignments)') % {'amount': settings.MAX_NUMBER_ASSIGNMENTS}))
-            form_is_valid = False
-        if not self.form.is_valid():
-            form_is_valid = False
-
-        if form_is_valid:
+        if self.form.is_valid():
             return self.valid_form(request)
         else:
             return self.invalid_form(request)
@@ -167,37 +193,57 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # old_data is needed for readjustments
             old_data = get_object_or_404(TimewebModel, pk=self.pk)
 
+            # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
+
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
-            if self.sm.assignment_date:
-                self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.x = self.form.cleaned_data.get("x")
-            if self.sm.x:
-                self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
             self.sm.due_time = self.form.cleaned_data.get("due_time")
             self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
-            if isinstance(self.sm.y, (int, float)) and self.sm.y < 1:
-                # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
-                self.sm.y = 1
             first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
-            self.sm.funct_round = self.form.cleaned_data.get("funct_round") or Decimal("1")
+            self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
+        # I dunno why I put this here but it's been here for a while
+        # and i'll have this as a safety precaution
+        if self.sm.assignment_date:
+            self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        if self.sm.x:
+            self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        if not self.sm.funct_round:
+            self.sm.funct_round = Decimal(1)
+        if self.sm.y != None and self.sm.y < 1:
+            # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
+            self.sm.y = 1
         if not self.sm.unit:
             if self.form.cleaned_data.get(f"y-widget-checkbox"):
                 self.sm.unit = "Hour"
             else:
                 self.sm.unit = "Minute"
 
-        if self.sm.unit in ("Minute", "Minutes", "minute", "minutes"):
+        if self.sm.unit.lower() in ("minute", "minutes"):
             self.sm.time_per_unit = Decimal("1")
             self.sm.funct_round = Decimal("5")
-        elif self.sm.unit in ("Hour", "Hours", "hour", "hours"):
-            self.sm.time_per_unit = Decimal("60");
+        elif self.sm.unit.lower() in ("hour", "hours"):
+            self.sm.time_per_unit = Decimal("60")
+            # Nothing prevents funct_round from staying at 5 so let's interfere
+            if (self.updated_assignment # old_data isn't defined for created assignments
+                and old_data.unit.lower() in ("minute", "minutes")
+                # No need to check if the old data's time_per_unit is 1 or funct_round is 5
+                # Because those are already true if the old data's unit is minute
+
+                # checks if the user hasn't changed the step size from what it was before
+                # TODO: some way to detect if the user manually enters a funct_round of 5
+                # the current system sets their step size to 1 in this case which makes
+                # no sense to the user
+                and self.sm.funct_round == Decimal("5")
+            ):
+                self.sm.funct_round = Decimal("1")
 
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             if field == "y": continue
@@ -207,7 +253,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 ))
             except TypeError:
                 pass
-        if not self.sm.assignment_date or not self.sm.unit or not self.sm.y or not self.sm.time_per_unit:
+
+        # We don't actually need to do any further checking if x or y were predicted because of the frontend's validation
+        if self.sm.assignment_date is None or self.sm.time_per_unit is None or \
+            self.sm.x is None and self.sm.y is None:
             # Works might become an int instead of a list but it doesnt really matter since it isnt being used
             # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
             self.sm.works = [str(first_work)]
@@ -228,80 +277,98 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
                 self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-                if date_now < old_data.assignment_date or self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
+                removed_works_start = -self.sm.blue_line_start # translates x position 0 so that it can be used to accessing works
+                removed_works_end = len(old_data.works) - 1
+                if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
-                removed_works_start = days_between_two_dates(self.sm.assignment_date, old_data.assignment_date) - old_data.blue_line_start # translates x position 0 so that it can be used to accessing works
                 if removed_works_start < 0:
                     removed_works_start = 0
 
+            min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
             if self.sm.x == None:
-                # ctime * (y - new_first_work) = min_work_time_funct_round * x
-                # x = ctime * (y - new_first_work) / min_work_time_funct_round
-                # Solve for new_first_work:
-                # reference: works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
-                # new_first_work is when n = removed_works_start
-                # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
-                min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
-                if self.created_assignment or self.sm.needs_more_info:
-                    new_first_work = first_work
-                elif self.updated_assignment:
-                    new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
-                x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
-                if self.sm.blue_line_start >= x_num:
-                    self.sm.blue_line_start = 0
-                    # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
-                    # might rewrite
-                    if self.created_assignment or self.sm.needs_more_info:
-                        self.sm.dynamic_start = 0
-                if not x_num or len(self.sm.break_days) == 7:
-                    x_num = 1
-                elif self.sm.break_days:
-                    guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
-                    assign_day_of_week = self.sm.assignment_date.weekday()
-                    red_line_start_x = self.sm.blue_line_start
+                if self.sm.y == None:
+                    # won't ever run because it will be marked as needs more info earlier
+                    pass
+                else:
+                    # The purpose of this part of the code is to take into account the adjusted assignment date
+                    # and make it look like the graph smoothly "chops off" previous work inputs
+                    # some mathy legacy reference:
 
-                    # Terrible implementation of inversing calcModDays
-                    xday = assign_day_of_week + red_line_start_x
-                    mods = [0]
-                    mod_counter = 0
-                    for mod_day in range(6):
-                        if (xday + mod_day) % 7 in self.sm.break_days:
-                            mod_counter += 1
-                        mods.append(mod_counter)
-                    mods = tuple(mods)
+                    # ctime * (y - new_first_work) = min_work_time_funct_round * x
+                    # x = ctime * (y - new_first_work) / min_work_time_funct_round
+                    # Solve for new_first_work:
+                    # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                    # new_first_work is when n = removed_works_start
+                    # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
 
-                    while 1:
-                        guess_x += 1
-                        if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
-                            x_num = max(1, guess_x)
-                            break
-                # Make sure assignments arent finished by x_num
-                # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
-                if self.sm.assignment_date < date_now:
-                    # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
-                    # x_num = (date_now - self.sm.assignment_date).days + x_num
-                    # x_num += (date_now - self.sm.assignment_date).days
-                    x_num += days_between_two_dates(date_now, self.sm.assignment_date)
-                try:
-                    self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
-                except OverflowError:
-                    self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
-                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
-                    x_num += 1
+                    # There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
+                    # This is a condition from the below code that redefines works
+                    # However it does not take into account capping removed_works_end at end_of_works
+                    # However, end_of_works is dependent on x, creating a deadlock
+                    # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
+                    if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
+                        new_first_work = first_work
+                    elif self.updated_assignment:
+                        new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
+                    # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
+                    x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
+
+                    if not x_num or len(self.sm.break_days) == 7:
+                        x_num = 1
+                    elif self.sm.break_days:
+                        guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
+                        assign_day_of_week = self.sm.assignment_date.weekday()
+                        red_line_start_x = self.sm.blue_line_start
+
+                        # Terrible implementation of inversing calcModDays
+                        xday = assign_day_of_week + red_line_start_x
+                        mods = [0]
+                        mod_counter = 0
+                        for mod_day in range(6):
+                            if (xday + mod_day) % 7 in self.sm.break_days:
+                                mod_counter += 1
+                            mods.append(mod_counter)
+                        mods = tuple(mods)
+
+                        while 1:
+                            guess_x += 1
+                            if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
+                                x_num = max(1, guess_x)
+                                break
+                    # Make sure assignments arent finished by x_num
+                    # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
+                    if self.sm.assignment_date < date_now:
+                        # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
+                        # x_num = (date_now - self.sm.assignment_date).days + x_num
+                        # x_num += (date_now - self.sm.assignment_date).days
+                        x_num += days_between_two_dates(date_now, self.sm.assignment_date)
+                    try:
+                        self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
+                    except OverflowError:
+                        self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
+                        self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
             else:
                 x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
-                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
-                    x_num += 1
-                if self.sm.blue_line_start >= x_num:
-                    self.sm.blue_line_start = 0
-                    if self.created_assignment or self.sm.needs_more_info:
-                        self.sm.dynamic_start = 0
+                if self.sm.y == None:
+                    complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
+                    # the prediction for due date is ceiled so also ceil the prediction for y for consistency
+                    self.sm.y = ceil(min_work_time_funct_round / self.sm.time_per_unit * complete_x_num)
+                else:
+                    # we already have x_num and y and we don't need to do any further processing
+                    pass
+            if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
+                x_num += 1
+
+            if self.sm.blue_line_start >= x_num:
+                self.sm.blue_line_start = 0
+                # dynamic_start is capped later on if not created_assignment (i think that's why i did this)
+                # might rewrite
+                if self.created_assignment or self.sm.needs_more_info:
+                    self.sm.dynamic_start = 0
+
             if self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
-                # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
-                removed_works_end = len(old_data.works) - 1
                 old_x_num = days_between_two_dates(self.sm.x, old_data.assignment_date)
                 if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                     old_x_num += 1
@@ -311,6 +378,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if removed_works_end > end_of_works:
                     removed_works_end = end_of_works
                 if removed_works_start <= removed_works_end:
+                    # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                     works_displacement = Decimal(old_data.works[0]) - first_work
                     self.sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start,removed_works_end+1)]
                 else:
@@ -322,6 +390,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.dynamic_start = 0
                 elif self.sm.dynamic_start > x_num - 1:
                     self.sm.dynamic_start = x_num - 1
+            if self.updated_assignment:
+                unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
+                unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
+                if unit_changed_from_hour_to_minute:
+                    self.sm.works = [str(Decimal(i) * Decimal("60")) for i in self.sm.works]
+                elif unit_changed_from_minute_to_hour:
+                    self.sm.works = [str(Decimal(i) / Decimal("60")) for i in self.sm.works]
             self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this
@@ -348,21 +423,30 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
+
+        # field value is set to "Predicted" and field is disabled in crud.js
+        # We can't do both of those in the backend because setting the field value doesn't work for disabled fields
+
+        # adds an auxillary class .disabled-field to determine whether or not the field was predicted in the submission
+        self.context['x_was_predicted'] = 'x' not in request.POST
+        self.context['y_was_predicted'] = 'y' not in request.POST
         if self.created_assignment:
             self.context['submit'] = 'Create Assignment'
         elif self.updated_assignment:
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Edit Assignment'
-        self.context['form'] = self.form
-        self.add_user_models_to_context(request)
-        for field in self.form.errors:
-            self.form[field].field.widget.attrs['class'] = self.form[field].field.widget.attrs.get('class', "") + 'invalid'
-        return super().get(request)
+        self.context['form'] = self.form.data # TimewebForm is not json serializable
+        request.session['invalid_form_context'] = self.context
+        return redirect(request.path_info)
 
-EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
+try:
+    EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
+except:
+    EXAMPLE_ACCOUNT_MODEL = None
 class ExampleAccountView(View):
     def get(self, request):
-        if request.user.is_authenticated:
-            logout(request)
-        login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
-        return redirect("home") # PRG
+        if EXAMPLE_ACCOUNT_MODEL is not None:
+            if request.user.is_authenticated:
+                logout(request)
+            login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
+        return redirect("home")

@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from django.http import HttpResponse
 from . import views
 from django.views.generic import RedirectView
-from utils import app_static_factory
+from common.utils import app_static_factory
 
 app_static = app_static_factory(__package__)
 
@@ -24,6 +24,7 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('mstile-150x150.png', RedirectView.as_view(url=app_static('icons/mstile_150x150.webp'))),
     path('safari-pinned-tab.svg', RedirectView.as_view(url=app_static('icons/safari_pinned_tab.svg'))),
 
+    path('shantanu', views.ShantanuView.as_view(), name="goat"),
     path('stackpile', RedirectView.as_view(url="https://stackpile.me"), name='stackpile'),
     path('nurse', RedirectView.as_view(url="https://contactvikram.github.io"), name='nursing ai'),
     path('spooky', views.SpookyView.as_view(), name="spooky"),

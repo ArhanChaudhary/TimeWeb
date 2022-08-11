@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import RedirectView
 from . import views, forms
-from utils import app_static_factory
+from common.utils import app_static_factory
 
 app_static = app_static_factory(__package__)
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path('disclaimer', RedirectView.as_view(url=app_static('policies/disclaimer.html'))),
     path('privacy', RedirectView.as_view(url=app_static('policies/privacy.html'))),
     path('terms', RedirectView.as_view(url=app_static('policies/terms.html'))),
+    path('license', RedirectView.as_view(url="https://github.com/ArhanChaudhary/TimeWeb/blob/master/LICENSE")),
     
     path('facebook', RedirectView.as_view(url='https://facebook.com/TimeWebPage'), name="facebook"),
     path('instagram', RedirectView.as_view(url='https://instagram.com/TimeWebOfficial'), name="instagram"),

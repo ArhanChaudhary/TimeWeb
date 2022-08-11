@@ -6,12 +6,12 @@
   <script src="{% static 'common/js/jquery_extensions.js' %}"></script>
   <script src="{% static 'timewebauth/js/base.js' %}">
   </script>
-  {% block accounts_js %}{% endblock %}
+  {% block js %}{% endblock %}
 {% endblock %}
 
 {% block base_head_css %}
   <link rel="stylesheet" href="{% static 'timewebauth/css/base.css' %}">
-  {% block accounts_css %}{% endblock %}
+  {% block css %}{% endblock %}
 {% endblock %}
 
 {% block base_head_body %}
@@ -30,11 +30,11 @@
             <div id="accounts-arrow-horizontal"></div>
           </div>
         </a>
-        <a href="{% url 'home' %}">
-          <img src="{% static 'timewebapp/images/timeweb.webp' %}" border="0" draggable="false"/>
+        <a id="logo-anchor" href="{% url 'home' %}">
+          <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         </a>
       </div>
-      {% block accounts_content %}{% endblock %}
+      {% block content %}{% endblock %}
     </div>
     <div id="loading-container">
       <div class="loading-circle"></div>

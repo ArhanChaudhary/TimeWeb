@@ -2,7 +2,7 @@
 
 {% block head_title %}Sign Up{% endblock %}
 
-{% block accounts_content %}
+{% block content %}
   <h1>Sign Up</h1>
   <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}
@@ -19,6 +19,6 @@
       <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
     {% endif %}
 
-    <button id="submit-button" type="submit">Sign up</button>
+    <button class="submit-button" type="submit">Sign up</button>
   </form>
 {% endblock %}

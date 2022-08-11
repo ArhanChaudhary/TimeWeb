@@ -18,6 +18,9 @@ try:
     DEBUG = os.environ['DEBUG'] == "True"
 except KeyError:
     DEBUG = True
+FIX_DEBUG_LOCALLY = DEBUG
+# DEBUG = False
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,7 +30,8 @@ if DEBUG:
     CSP_DEFAULT_SRC += ("http://127.0.0.1:35729", )
     CSP_CONNECT_SRC += ("ws://127.0.0.1:35729", )
 CSP_SCRIPT_SRC = CSP_DEFAULT_SRC # Needs to be set so nonce can be added
-CSP_INCLUDE_NONCE_IN = ('script-src', ) # Add nonce b64 value to header, use for inline scripts
+CSP_STYLE_SRC = CSP_DEFAULT_SRC
+CSP_INCLUDE_NONCE_IN = ('script-src', 'style-src' ) # Add nonce b64 value to header, use for inline scripts
 CSP_OBJECT_SRC = ("'none'", )
 CSP_BASE_URI = ("'none'", )
 CSP_IMG_SRC = ("'self'", "data:", "https://storage.googleapis.com")
@@ -51,16 +55,16 @@ except KeyError:
     SECRET_KEY = get_random_secret_key()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-if DEBUG:
+if DEBUG or FIX_DEBUG_LOCALLY:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['timeweb.io']
 # Application definition
 
-CSRF_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
+SESSION_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
 
-SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = not (DEBUG or FIX_DEBUG_LOCALLY)
 SECURE_HSTS_SECONDS = 63072000 # 2 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
@@ -109,6 +113,7 @@ MIDDLEWARE = [
     'api.middleware.CatchRequestDataTooBig',
 
     'common.middleware.DefineIsExampleAccount',
+    'common.middleware.CommonRatelimit',
     # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 
@@ -120,7 +125,7 @@ if DEBUG:
     INSTALLED_APPS.append('livereload')
     MIDDLEWARE.append('livereload.middleware.LiveReloadScript')
     
-CSRF_FAILURE_VIEW = 'misc.views.custom_permission_denied_view'
+CSRF_FAILURE_VIEW = 'common.utils._403_csrf'
 ROOT_URLCONF = 'timeweb.urls'
 
 TEMPLATES = [
@@ -144,13 +149,22 @@ TEMPLATES = [
 ]
 CONN_MAX_AGE = 15
 
+# Caches are no less more expensive than querying manually in all of timeweb's cases
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'assignment_cache',
+#     }
+# }
+
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 WSGI_APPLICATION = 'timeweb.wsgi.application'
 
-MAX_UPLOAD_SIZE = 5242880 # 40 MiB (max background image size)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 1310720 # 10 MiB (max size for data sent by ajax by assignments)
+# if i use float arithmetic i must convert these settings to ints or else internal errors are mean
+MAX_BACKGROUND_IMAGE_UPLOAD_SIZE = 10 * 1048576 # 10 MB (max background image size)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 # 500 KB (max size for data sent by ajax by assignments)
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -166,12 +180,19 @@ if os.environ.get('DATABASE_URL') is not None:
         }
     }
 else:
-    # If running locally, use a sqlite database
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
-        }
+        },
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.postgresql',
+        #     'NAME': 'postgres',
+        #     'USER': '',
+        #     'PASSWORD': 'timeweb',
+        #     'HOST': '127.0.0.1',
+        #     'PORT': '5432',
+        # }
     }
 DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
 # Password validation
@@ -272,7 +293,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 AUTH_USER_MODEL = 'timewebauth.TimewebUser'
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DEBUG else "https"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if (DEBUG or FIX_DEBUG_LOCALLY) else "https"
 SOCIALACCOUNT_AUTO_SIGNUP = False # Always prompt for username
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
@@ -281,9 +302,9 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_EMAIL_VERIFICATION = True
 
 SOCIALACCOUNT_ADAPTER = 'timewebauth.adapter.ExampleAccountSocialLoginAdapter'
+ACCOUNT_ADAPTER = 'timewebauth.adapter.NonUniqueUsernameAccountAdapter'
 
 ACCOUNT_FORMS = {
     'login': 'timewebauth.forms.LabeledLoginForm',
@@ -297,29 +318,11 @@ ACCOUNT_FORMS = {
 }
 
 SOCIALACCOUNT_FORMS = {
-    'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
+    'disconnect': 'timewebauth.forms.LabeledSocialaccountDisconnectForm',
     'signup': 'timewebauth.forms.LabeledSocialaccountSignupForm',
 }
 
-ACCOUNT_RATE_LIMITS = {
-    # Change password view (for users already logged in)
-    "change_password": "5/m",
-    # Email management (e.g. add, remove, change primary)
-    "manage_email": "10/m",
-    # Request a password reset, global rate limit per IP
-    "reset_password": "20/m",
-    # Rate limit measured per individual email address
-    "reset_password_email": "5/m",
-    # Password reset (the view the password reset email links to).
-    "reset_password_from_key": "20/m",
-    # Signups.
-    "signup": "20/m",
-    # NOTE: Login is already protected via `ACCOUNT_LOGIN_ATTEMPTS_LIMIT`
-    
-    "contact": "60/h",
-}
-
-if DEBUG:
+if (DEBUG or FIX_DEBUG_LOCALLY):# and 0:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
@@ -337,11 +340,13 @@ RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 
 
 # App constants
+from json import load as json_load
+from common.views import logger
 
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
 GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
-if DEBUG:
+if DEBUG or FIX_DEBUG_LOCALLY:
     GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
@@ -350,8 +355,8 @@ else:
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 MAX_NUMBER_OF_TAGS = 5
-MAX_NUMBER_ASSIGNMENTS = 100
-EXAMPLE_ASSIGNMENT_JSON = {
+DELETED_ASSIGNMENTS_PER_PAGE = 70
+EXAMPLE_ASSIGNMENT = {
     "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
     "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
     "unit": "Page",
@@ -363,12 +368,17 @@ EXAMPLE_ASSIGNMENT_JSON = {
     "min_work_time": "60.00",
     "break_days": [],
     "dynamic_start": 0,
-    "mark_as_done": False,
     "description": "Example assignment description"
 }
 EDITING_EXAMPLE_ACCOUNT = False
 
+def GET_CLIENT_IP(group, request):
+    if 'HTTP_CF_CONNECTING_IP' in request.META:
+        return request.META['HTTP_CF_CONNECTING_IP']
+    logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
+    return request.META['REMOTE_ADDR']
+DEFAULT_GLOBAL_RATELIMIT = '5/s'
+
 # Changelog
-import json
 with open("changelogs.json", "r") as f:
-    CHANGELOGS = json.load(f)
+    CHANGELOGS = json_load(f)

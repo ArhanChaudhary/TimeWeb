@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
 from django.conf import settings
 from decimal import Decimal
@@ -35,6 +35,11 @@ class TimewebModel(models.Model):
         max_length=200,
         verbose_name=_('Name of this Assignment'),
     )
+    # EVEN THOUGH assignment_date and x are both dates always with times at midnight
+    # let's still use a DateTimeField
+    # DateTimeField simplifies a lot of timezone handling logic
+    # and also ensures every date object is timezone aware and is a datetime.datetime instance
+    # so comparing them is easier (datetime.date doesn't have __gt__ etc. with datetime.datetime)
     assignment_date = models.DateTimeField(
         null=True,
         blank=True,
@@ -88,6 +93,10 @@ class TimewebModel(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"),_("This field's value must be positive"))],
     )
+    works = models.JSONField(
+        default=list_with_zero,
+        blank=True,
+    )
     funct_round = models.DecimalField(
         max_digits=15,
         decimal_places=2,
@@ -95,10 +104,6 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
         verbose_name=_('Step Size'),
-    )
-    works = models.JSONField(
-        default=list_with_zero,
-        blank=True,
     )
     min_work_time = models.DecimalField(
         max_digits=15,
@@ -122,9 +127,6 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
-    mark_as_done = models.BooleanField(
-        default=False,
-    )
     tags = models.JSONField(
         default=empty_list,
         blank=True,
@@ -135,15 +137,26 @@ class TimewebModel(models.Model):
     is_google_classroom_assignment = models.BooleanField(
         default=False,
     )
+    google_classroom_assignment_link = models.URLField(
+        null=True,
+        blank=True,
+    )
     has_alerted_due_date_passed_notice = models.BooleanField(
         default=False,
     )
     alert_due_date_incremented = models.BooleanField(
         default=False,
     )
+    hidden = models.BooleanField(
+        default=False,
+    )
+    dont_hide_again = models.BooleanField(
+        default=False,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        # allow save assignment form validation without a user
         null=True,
         blank=True,
     )

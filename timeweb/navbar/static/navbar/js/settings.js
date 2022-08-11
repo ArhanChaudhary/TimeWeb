@@ -1,43 +1,46 @@
 document.addEventListener("DOMContentLoaded", function() {
     $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
-    $("#id_def_due_time").daterangepicker({
-        buttonClasses: "generic-button",
-        parentEl: "main",
-        showDropdowns: true,
-        timePicker: true,
-        singleDatePicker: true,
-        locale: {
-            format: 'h:mm A'
-        }
-    }).on('show.daterangepicker', function (e, picker) {
-        picker.container.find(".calendar-table").hide();
-    });
     $("#reset-settings-button").click(function() {
         $.confirm({
             title: "Are you sure you want to reset your settings?",
-            content: 'If you accidentally reset your settings, don\'t click save and instead refresh the page',
+            content: 'If you accidentally reset your settings, refresh the page to restore them.',
             buttons: {
                 confirm: {
                     keys: ['Enter'],
                     action: function() {
-                        $("#id_def_min_work_time").val("");
-                        $("#id_def_skew_ratio").val(0);
-                        $("#break-days-wrapper input").prop("checked", false);
-                        $("#id_ignore_ends").prop("checked", false);
-                        $("#id_def_due_time").data("daterangepicker").setStartDate(moment(new Date().setHours(0, 0, 0, 0)));
-                        $("#id_show_priority").prop("checked", true);
-                        $("#id_one_graph_at_a_time").prop("checked", false);
-                        $("#id_close_graph_after_work_input").prop("checked", false);
-                        $("#id_highest_priority_color")[0].jscolor.fromString("#E25B50");
-                        $("#id_lowest_priority_color")[0].jscolor.fromString("#84C841");
-                        $("#id_background_image").val("");
-                        $("#id_horizontal_tag_position").val("Middle");
-                        $("#id_animation_speed").val("1");
-                        $("#id_appearance").val("automatic");
-                        $("#id_vertical_tag_position").val("Top");
-                        $("#id_timezone").val("");
-                        $("#id_default_dropdown_tags").val("").trigger("input");
+                        const default_settings = JSON.parse(document.getElementById("default-settings").textContent);
+                        for (let [key, value] of Object.entries(default_settings)) {
+                            // adjusts value
+                            switch (key) {
+                                case "def_skew_ratio":
+                                    value--;
+                                    break;
+                                case "default_dropdown_tags":
+                                    value = value.join("\n");
+                                    break;
+                            }
+                            // parses and sets the value
+                            const $input = $("#id_" + key);
+                            switch (key) {
+                                case "def_break_days":
+                                    $("#break-days-wrapper input").prop("checked", false);
+                                    continue;
+                            }
+                            if ($input.prop("jscolor")) {
+                                $input.prop("jscolor").fromString(value);
+                                continue;
+                            }
+                            if ($input.attr("type") === "checkbox") {
+                                $input.prop("checked", value);
+                                continue;
+                            }
+                            $input.val(value);
+                            // expandable textbox
+                            if ($input.is("textarea")) {
+                                $input.trigger("input");
+                            }
+                        }
                     }
                 },
                 cancel: function() {
@@ -52,27 +55,60 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(function() {
         $("#id_default_dropdown_tags").trigger("input");
     }, 0);
+    // d256f25 should have fixed this but it's stupidly inconsistent
+    $("option:not([value])").attr("value", "");
 
-    let alreadyHasSubmitted = false;
-    $("form").submit(function() {
-        if (alreadyHasSubmitted) return;
+    if (GC_API_INIT_FAILED) {
+        $.alert({
+            title: "Could not enable the Google Classroom integration.",
+            content: "Authentication failed. Please try again.",
+            backgroundDismiss: false,
+            buttons: {
+                ok: {
+
+                },
+                "try again": {
+                    action: () => {
+                        hasSubmitted = true;
+                        ajaxUtils.changeSetting({setting: "oauth_token", value: true});
+                    },
+                },
+            },
+        });
+    }
+
+    let hasSubmitted = false;
+    $("#logo-container").click(function(e) {
+        e.preventDefault();
+        if (hasSubmitted) return;
         $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
-        $("#submit-settings-button").val("Submitting...");
-        alreadyHasSubmitted = true;
+        hasSubmitted = true;
+        $("main form")[0].submit();
     });
+    // or else logging out will display the "you form changes my not been saved" alert
+    $("header form").submit(function() {
+        hasSubmitted = true;
+    });
+    // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
+    window.onbeforeunload = function(e) {
+        if (hasSubmitted) return;
 
-    // https://github.com/wilsonzlin/minify-html/issues/71
-    $("option:not([value])").attr("value", "");
-});
-$(window).resize(function() {
-    $("main form fieldset").each(function() {
-        this.style.setProperty("height", "auto", "important");
-        $(this).css("transition-duration", $(this).height()/600 + "s");
-        $(this).css("height", $(this).height());
+        e.preventDefault();
+        $("#logo-container").removeAttr("tabindex").focus();
+        return e.returnValue = "Your settings may be lost.";
+    };
+    let single_action_label_timeout;
+    $(".single-action-label").click(function() {
+        clearTimeout(single_action_label_timeout);
+        single_action_label_timeout = setTimeout(() => {
+            // the timeout and the if statement allow for double or quadruple clicking to cancel the action
+            if ($(this).parents(".right-side-of-field").find("input").is(":checked"))
+                $("#logo-container").click();
+        }, 700);
     });
-}).one("load", function() {
-    $(window).trigger("resize");
+});
+$(window).one("load", function() {
     $(".error-note").length && $(".error-note").first()[0].scrollIntoView({
         behavior: "smooth",
         block: "nearest",

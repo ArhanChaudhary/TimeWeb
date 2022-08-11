@@ -39,19 +39,19 @@ body {
     height: 100%;
     box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
-    overflow-y: scroll;
-    overflow-y: overlay;
+    overflow-y: auto;
 }
 #table-of-contents-container-label {
     display: none;
     bottom: 5px;
+    cursor: pointer;
     box-shadow: 6px 2px 6px -4px hsl(0, 0%, 50%);
 }
 #table-of-contents-container, #table-of-contents-container-label {
     width: 300px;
     position: relative;
     z-index: 2;
-    background-color: rgb(237, 237, 237);
+    background-color: hsl(0, 0%, 93%);
 }
 @-webkit-keyframes slideLabelIn {
     from {
@@ -116,18 +116,18 @@ a:visited {
 }
 #table-of-contents-container a {
     color: black;
-    -webkit-text-decoration-color: rgba(0,0,0,0.3);
-            text-decoration-color: rgba(0,0,0,0.3);
+    -webkit-text-decoration-color: hsla(0, 0%, 0%, 0.3);
+            text-decoration-color: hsla(0, 0%, 0%, 0.3);
 }
 #doc-container {
     --container-padding-right: 50px;
-    --container-padding-left: 100px;
+    --container-padding-left: 70px;
     padding-left: var(--container-padding-left);
     padding-right: var(--container-padding-right);
     padding-bottom: 150px;
     flex: 1;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     max-width: 90ch;
     position: relative;
 }
@@ -137,18 +137,18 @@ a:visited {
 }
 #doc-container::-webkit-scrollbar-track {
     border-radius: 10px;
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    box-shadow: inset 0 0 6px hsla(0, 0%, 0%, 0.3);
 }
 #doc-container::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 6px hsla(0, 0%, 0%, 0.5);
 }
 code {
     font-weight: 400;
 }
 .major-category {
     margin-top: 2em;
-    margin-left: -50px;
+    margin-left: -15px;
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 40px;
@@ -168,7 +168,7 @@ code {
     height: 100%;
     background-color: white;
     transform: scaleX(2);
-    box-shadow: 0 0 9px -7px rgb(132, 132, 132);
+    box-shadow: 0 0 9px -7px hsl(0, 0%, 52%);
 }
 .major-category.isSticky::before {
     box-shadow: none;

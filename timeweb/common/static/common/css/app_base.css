@@ -6,25 +6,68 @@ body {
     --primary-c: 255;
     --c: 0;
     --input-focus-color: rgb(0, 95, 204);
-    --form-placeholder-color: rgb(117, 117, 117); /* Default chrome placeholder color */
+    --form-placeholder-color: hsl(0, 0%, 46%); /* Default chrome placeholder color */
     
     --primary: rgb(var(--primary-c), var(--primary-c), var(--primary-c));
     --color: rgb(var(--c), var(--c), var(--c));
     color: var(--color);
+
+    --body-background: hsl(0, 0%, 96%);
+    background-color: var(--body-background);
 }
+select {
+    color: var(--color); /* doesn't inherit properly */
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    padding: 2px 16px 2px 4px !important;
+    --dropdown-arrow-lightmode: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='7' fill='black'><path d='M0 0 7 7 14 0 12 0 7 5 2 0'/></svg>");
+    --dropdown-arrow-darkmode: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='7' fill='white'><path d='M0 0 7 7 14 0 12 0 7 5 2 0'/></svg>");
+    --dropdown-arrow: var(--dropdown-arrow-lightmode);
+}
+select, .daterangepicker select:not(#dummyforspecifityurmomisprettythick) {
+    /* safari is really mean (https://stackoverflow.com/questions/7638677/how-can-i-remove-the-gloss-on-a-select-element-in-safari-on-mac) */
+    background: var(--dropdown-arrow) no-repeat;
+    background-color: var(--primary);
+    --border-color: var(--primary);
+    border: 1px solid var(--border-color);
+    background-size: 10px;
+    background-position: right 3px top 55%;
+    background-repeat: no-repeat;
+}
+
+/* https://stackoverflow.com/questions/23372903/hide-up-down-arrow-buttons-spinner-in-input-number-firefox-29#answer-23374725 */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 header {
     --background-color: rgb(13, 26, 38);
     width: 100%;
     background: var(--background-color);
-    height: 70px;
-    padding: 5px;
+    height: var(--header-height);
+    --header-top-and-bottom-padding: 5px;
+    padding-top: var(--header-top-and-bottom-padding);
+    padding-bottom: var(--header-top-and-bottom-padding);
+    padding-right: 5px;
+    padding-left: 5px;
     position: absolute;
+    color: white;
+    font-size: 20px;
     z-index: 1002;
     box-sizing: border-box;
 }
 header::after {
     content: '';
-    top: 70px;
+    top: var(--header-height);
     left: 0;
     width: 100%;
     height: 20px;
@@ -39,70 +82,59 @@ header > * {
 }
 #image-new-container {
     cursor: pointer;
-    display: inline-block;
-    height: 60px;
+    display: flex;
+    align-items: center;
+    height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
     position: absolute;
 }
 #image-new-container img {
-    float: left;
-    transform: scale(0.7);
     filter: hue-rotate(92deg);
+    margin-right: 9px;
+    margin-left: 9px;
 }
 #new-assignment-text {
     margin-left: 4px;
-    float: left;
     color: white;
-    font-size: 20px;
-    font-family: "Open Sans";
-    line-height: 60px;
-    
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+#site {
+    --header-height: 70px;
 }
 main {
     position: relative; /* Needed for positioning the background image */
     height: 100vh;
-    padding: 80px 20px 0 20px;
+    padding: calc(10px + var(--header-height)) 20px 0;
+    overflow-y: auto;
     box-shadow: inset 20px 0 0 0 var(--primary), inset -20px 0 0 0 var(--primary);
     box-sizing: border-box;
-    /* Firefox doesnt support "overlay" */
-    overflow-y: scroll;
     /* some js focuses on the main, causing it to get an outline even with tabindex -1; hide it */
     outline: 0 !important;
 }
-/* Position content such that the scrollbar doesn't clip into the header */
 main.finished-header-transition {
-    overflow-y: overlay !important;
-    height: calc(100vh - 70px);
-    padding: 10px 20px;
-    margin-top: 70px !important;
-}
-#background-image {
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 70px);
-    position: fixed;
-    pointer-events: none;
-    -o-object-fit: cover;
-       object-fit: cover;
+    padding: 10px 20px 0;
+    height: calc(100vh - var(--header-height));
+    margin-top: var(--header-height);
 }
 .generic-button, ::file-selector-button {
     cursor: pointer;
     --bg-c: var(--primary-c);
     background-color: rgb(var(--bg-c), var(--bg-c), var(--bg-c));
-    border: 1px solid rgb(147, 147, 147);
+    border: 1px solid;
     border-radius: 4px;
     display: inline-block;
-    font-size: 13px;
     text-align: center;
     align-items: flex-start;
     box-sizing: border-box;
     padding: 1px 6px;
     position: relative;
 }
-.generic-button:hover, ::file-selector-button:hover {
+.generic-button {
+    border-color: hsl(0, 0%, 58%);
+    font-size: 13px;
+}
+::file-selector-button {
+    border-color: var(--color);
+}
+.generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) - 19);
 }
 .generic-button:active, ::file-selector-button:active {
@@ -126,6 +158,9 @@ main.finished-header-transition {
     background-color: #357ebd;
     color: #fff;
 }
+.daterangepicker .drp-buttons .cancelBtn {
+    color: #fff;
+}
 #logo-container {
     display: inline-block;
     position: relative;
@@ -133,26 +168,26 @@ main.finished-header-transition {
     left: 50%;
     transform: translateX(-50%);
 }
-body {
-    margin: 0;
-    --body-background: rgb(247, 247, 247);
-    background-color: var(--body-background);
+#logo-container img {
+    display: block;
 }
 #site {
     position: relative;
     overflow: hidden;
 }
 #user-greeting {
+    display: flex;
+    align-items: center;
     position: absolute;
-    right: 104px;
-    font-size: 20px;
-    color: white;
-    padding-top: 13.4px;
+    right: 32px;
+    height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
 }
 #user-greeting #username {
     text-decoration: none;
     display: inline-block;
-    padding: 2px 2px 0 6px;
+    padding: 2px 6px;
+    padding-bottom: 4px;
+    margin-top: 2px;
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -167,11 +202,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
     border: 2px solid rgb(22, 177, 185);
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
 }
-#user-greeting #username:focus {
+#user-greeting #username:focus,
+#user-greeting #username :focus {
     outline: 0;
 }
 #user-greeting #username:focus::after {
@@ -186,10 +223,12 @@ body {
     display: none;
     right: 50%;
     width: 100px;
+    cursor: initial;
     position: absolute;
     background: rgb(43, 56, 68);
     color: white;
     transform: translate(50%, 16px);
+    white-space: nowrap;
     border: 3px solid transparent;
     -webkit-text-fill-color: currentcolor;
 }
@@ -206,14 +245,17 @@ body {
     transform: translateX(-50%);
     position: absolute;
 }
-#account-dropdown :hover {
+#account-dropdown :hover,
+/* tabbing */
+#account-dropdown :focus,
+#username.highlight-setings-nav #settings-nav {
     background: rgb(82,107,130);
 }
-.nav-hr {
+.dropdown-hr {
     width: 100%;
     margin: 4px auto;
     height: 1px;
-    background: rgb(101, 101, 101);
+    background: hsl(0, 0%, 40%);
 }
 #account-dropdown a {
     display: block;
@@ -222,6 +264,10 @@ body {
     font-size: 14px;
     padding: 6px;
     text-align: center;
+}
+#account-dropdown .one-line {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 #account-dropdown button {
     display: block;
@@ -235,60 +281,6 @@ body {
 	cursor: pointer;
 	outline: inherit;
 }
-#menu {
-    float: right;
-    margin: -5px;
-    margin-left: 10px;
-}
-#menu svg {
-    display: block;
-}
-nav {
-    left: 0;
-    top: 0;
-    position: absolute;
-    margin-left: calc(100vw + 3px);
-    transition: transform .2s ease-in-out;
-    width: 89px;
-}
-#nav-menu {
-    background: var(--background-color);
-    position: relative;
-    z-index: 1;
-    box-shadow: -5px 0 5px -5px hsl(0, 0%, 50%);
-}
-rect {
-    fill: white;
-}
-#nav-items {
-    overflow: auto;
-    max-height: calc(100vh - 65px);
-    background: rgb(43, 56, 68);
-}
-#nav-items :not(.nav-hr) {
-    text-decoration: none;
-    text-align: center;
-    display: block;
-    padding: 10px;
-    color: white;
-    cursor: pointer;
-    font-family: "Open Sans";
-    font-size: 12.5px;
-}
-#nav-items .nav-hr {
-    width: calc(100% - 6px);
-}
-#nav-items :hover, #nav-items :focus {
-    background: rgb(82,107,130);
-}
-#nav-menu svg {
-    display: block;
-}
-#menu:focus ~ nav, 
-nav:focus-within {
-    transform: translateX(calc(-100% - 3px));
-}
-
 .info-button {
     display: inline-block;
     cursor: default !important;
@@ -405,11 +397,14 @@ nav:focus-within {
 #changelog-container {
     padding: 0 10px;
 }
+.jconfirm {
+    overflow-y: auto !important;
+}
 .jconfirm .jconfirm-content-pane {
     max-height: 60vh !important;
 }
 .jconfirm .jconfirm-box {
-    width: min(70%, 800px) !important;
+    width: min(70vw, 800px) !important;
     background-color: var(--body-background) !important;
 }
 .jconfirm .jconfirm-box div.jconfirm-content-pane .jconfirm-content {
@@ -422,10 +417,24 @@ nav:focus-within {
 .jconfirm .jconfirm-box div.jconfirm-title-c {
     font-size: 16px !important;
     line-height: 18px !important;
+    overflow-wrap: break-word;
+}
+.jconfirm .jconfirm-box div.jconfirm-title-c .jconfirm-title {
+    display: initial !important;
+}
+.jconfirm .jconfirm-box .jconfirm-buttons button.btn-blue:focus {
+    /* color from the jconfirm library when button is hovered */
+    background-color: #2980b9;
+    box-shadow: 0 0 0 1px #2980b9;
 }
 @media screen and (max-width: 700px) {
     .jconfirm .jconfirm-box {
         /* First 30 for the padding due to a lack of border-box, second 30 for the right and left margin */
-        width: calc(100% - 30px - 30px) !important;
+        width: calc(100vw - 30px - 30px) !important;
     }
+}
+
+.jscolor-picker {
+    background-color: var(--primary);
+    border-radius: 8px;
 }

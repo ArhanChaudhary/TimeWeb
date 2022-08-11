@@ -4,21 +4,36 @@ html {
 }
 #assignments-container {
     position: relative;
-    /* Ensure things dont get cutoff when crud.js puts overflow: hidden on this when an assignment is being deleted */
-    top: -10px;
-    padding-top: 10px;
+    overflow-y: auto;
     opacity: 0;
+    margin-top: -10px;
+    padding-top: 10px;
     --scale-percent-y: 1.05;
-    --vertical-assignment-padding: 25px;
+    --vertical-assignment-padding: 33px;
     --horizontal-assignment-padding: 15px;
-    --outer-assignment-vertical-padding: 7px;
+    --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
 }
+#assignments-container:focus {
+    /* Arrow scroll manually focuses */
+    outline: none;
+}
+main {
+    overflow-y: hidden;
+}
+main.finished-header-transition #assignments-container {
+    /* ensure the initial transition visual doesnt break */
+    height: 100%;
+}
 main:not(.animate) {
-    transition: box-shadow 1.5s cubic-bezier(.32,1.01,.53,1.15);
+    transition: box-shadow 1.4s cubic-bezier(.32,1.01,.53,1.15);
 }
 header:not(.animate), header:not(.animate)::after {
     transition: transform 1.7s cubic-bezier(.29,.81,.37,.99);
+}
+#assignments-container.animate {
+    transform: translateY(max(-400px, calc(-100% - 20px)));
+    /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
 }
 #assignments-container:not(.animate) {
     transition: transform 1.5s cubic-bezier(.29,.81,.37,.99);
@@ -27,23 +42,53 @@ main.animate {
     box-shadow: none;
 }
 header.animate {
-    transform: translateY(-70px);
+    transform: translateY(calc(-1 * var(--header-height)));
 }
 header.animate::after {
     transform: none;
 }
-#assignments-container.animate {
-    transform: translateY(max(-400px, calc(-100% - 20px)));
-    /* transform:translateY(min(calc(400px, calc(100% + 20px))); */
+main.background-image-exists {
+    padding-left: 0;
+    padding-right: 0;
+}
+@media not screen and (max-width: 850px) {
+    main.background-image-exists #assignments-container {
+        /* fixes floating scrollbar caused by <main> padding */
+        padding-right: 20px;
+        padding-left: 20px;
+    }
+}
+#assignments-container.viewing-deleted-assignments .graph-footer {
+    height: var(--assignment-margin-bottom);
+}
+#assignments-container.viewing-deleted-assignments .left-side-of-header {
+    --left-side-of-header-width: initial;
+}
+#assignments-container.viewing-deleted-assignments .assignment-container ~ #no-assignments-message {
+    display: none;
+}
+#assignments-container.viewing-deleted-assignments #no-assignments-message {
+    padding: 0 var(--outer-assignment-horizontal-padding);
+    font-size: 17px;
+}
+#extra-navs-positioner {
+    box-sizing: border-box;
+    min-height: calc(100vh - var(--header-height) - 10px);
+    position: relative;
+}
+#background-image {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - var(--header-height));
+    position: fixed;
+    /* Don't change the z-index to -1 because it will go behind <main>, showing its side box shadows */
+    pointer-events: none;
+    -o-object-fit: cover;
+       object-fit: cover;
 }
 #tutorial-message {
     padding: 0 10px;
-}
-#icon-label-container {
-    display: inline-flex;
-    align-items: center;
-    float: right;
-    position: relative;
 }
 #assignments-header {
     position: relative;
@@ -54,31 +99,44 @@ header.animate::after {
     align-items: center;
     flex-wrap: wrap;
 }
-#info {
-    width: 100%;
+#assignments-header > * {
+    white-space: nowrap;
 }
-#info.dim > :not(#icon-label-container) {
-    opacity: 0;
-}
-#assignments-header::after {
-    content: "";
+#todo-wrapper {
     width: 100%;
     margin-bottom: 4px;
 }
-#current-date {
+#todo-wrapper .generic-button {
+    /* is 1px too tall and messes up the height */
+    margin-bottom: -1px;
+}
+#current-date-container {
     position: relative;
     order: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#go-to-next-day {
+    cursor: pointer;
 }
 #sort-assignments-container {
     display: flex;
     align-items: center;
+    order: 1;
     gap: 3px;
     margin-left: auto;
-    order: 1;
+    padding-left: 15px;
 }
-#hide-button {
-    margin-right: 5px;
-    margin-left: 5px;
+#id_assignment_sorting {
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    text-align: initial;
+    height: 22px;
+}
+#id_assignment_sorting:focus:hover,
+#go-to-next-day:focus:hover {
+    outline: 0;
 }
 .hide-info {
     height: 0;
@@ -86,64 +144,13 @@ header.animate::after {
     overflow: hidden;
     position: absolute;
 }
-#assignments-header img {
-    position: relative;
-    cursor: pointer;
-    z-index: 1;
-    padding-right: 5px;
-    padding-left: 5px;
-}
-#assignments-header a[href="/settings"] img {
-    margin-right: -5px;
-}
-#settings {
-    /* Remove weird extra space */
-    display: block;
-}
-#close-assignments {
-    order: 2;
-}
-#previous-day {
-    order: 3;
-    transform: scaleX(-1);
-}
-#next-day {
-    order: 4;
-}
-a[href="/settings"] {
-    order: 5;
-}
-#assignments-header #icon-label-container img ~ div {
-    position: absolute;
-    order: 1;
-    padding-right: 10px;
-    padding-left: 20px;
-    right: 100%;
-    white-space: nowrap;
-    text-align: right;
-    display: none;
-}
-#assignments-header img#close-assignments:hover ~ div#close-assignments-icon-label,
-#assignments-header img#previous-day:hover ~ div#previous-day-icon-label,
-#assignments-header img#next-day:hover ~ div#next-day-icon-label,
-#assignments-header a[href="/settings"]:hover ~ div#settings-icon-label,
-#assignments-header img#close-assignments:focus ~ div#close-assignments-icon-label,
-#assignments-header img#previous-day:focus ~ div#previous-day-icon-label,
-#assignments-header img#next-day:focus ~ div#next-day-icon-label,
-#assignments-header a[href="/settings"]:focus ~ div#settings-icon-label {
-    display: block;
-}
-#assignments-header img#close-assignments:hover ~ div:not(#close-assignments-icon-label),
-#assignments-header img#previous-day:hover ~ div:not(#previous-day-icon-label),
-#assignments-header img#next-day:hover ~ div:not(#next-day-icon-label),
-#assignments-header a[href="/settings"]:hover ~ div:not(#settings-icon-label) {
-    display: none !important;
-}
 .assignment-container {
     /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
+    font-size: 12pt;
     position: relative;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
+    --shortcut-border-radius: 6px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
@@ -152,19 +159,22 @@ a[href="/settings"] {
 .assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
     transition: none !important;
 }
+#extra-navs-positioner {
+    padding-bottom: 40px;
+}
 .assignment {
-    box-shadow: 0 0 12px -11px black;
+    --box-shadow: 0 0 12px -9px black;
+    box-shadow: var(--box-shadow);
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
     /* i really could not care less about priority-color being consistent */
     --priority-color: white;
     --priority-color-transition-speed: 2s;
     border-radius: 5px;
     position: relative;
+    /* Ensures this stacks above .assignment-container::after */
+    z-index: 1;
     scroll-margin: 20px;
     transition: all .2s ease-in-out, opacity calc(.375s * var(--animation-speed)) ease-in-out, left 0s, padding 0s;
-}
-.assignment.mark-as-done {
-    opacity: 0.65;
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
@@ -191,20 +201,24 @@ a[href="/settings"] {
 }
 #tutorial-click-assignment-to-open {
     font-size: 17px;
+    scroll-margin: 30px;
 }
 .shortcut {
     position: relative;
-    display: flex;
+    display: none;
     justify-content: space-evenly;
     align-items: center;
-    --margin-top-and-bottom: 3px; 
+    --margin-top-and-bottom: var(--outer-assignment-vertical-padding);
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
 }
+.assignment-container .shortcut {
+    display: flex;
+}
 .shortcut-text {
     white-space: nowrap;
-    margin-right: 3px;
-    margin-left: 3px;
+    margin-right: 6px;
+    margin-left: 5px;
 
     flex-grow: 0;
     display: flex;
@@ -220,8 +234,10 @@ a[href="/settings"] {
     left: unset;
 }
 #autofill-selection {
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
     vertical-align: top;
-    font-size: 12px;
+    font-size: 10pt;
 }
 .shortcut .generic-button {
     margin-top: 1px;
@@ -231,6 +247,9 @@ a[href="/settings"] {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    /* safari focusing on elements with pseudoelements with transform is really buggy
+    it doesn't help that safari is also annoyingly uncooperative in possible workarounds
+    im just going to leave this visual glitch in and let the users question themselves why they use safari */
     transform: scale(2.6);
     left: 0;
     top: 0;
@@ -238,70 +257,58 @@ a[href="/settings"] {
 }
 .shortcut-line-left, .shortcut-line-right {
     flex-grow: 1;
+    --negative-horizontal-margin: -15px;
+    
+    position: relative;
+    height: 20px;
+    margin-bottom: -20px;
+    border-top: 2px solid var(--color);
 }
 .shortcut-line-left {
-    --left: -14px;
-    left: var(--left);
-    margin-right: var(--left);
-    border-top: 2px solid var(--color);
-    position: relative;
+    border-top-left-radius: var(--shortcut-border-radius);
+    left: var(--negative-horizontal-margin);
+    margin-right: var(--negative-horizontal-margin);
+    border-left: 2px solid var(--color);
 }
 .shortcut-line-right {
-    float: right;
-    border-top: 2px solid var(--color);
+    border-top-right-radius: var(--shortcut-border-radius);
+    right: var(--negative-horizontal-margin);
+    margin-left: var(--negative-horizontal-margin);
+    border-right: 2px solid var(--color);
 }
-
-.shortcut-line-left::after {
+.assignment-container.add-line-wrapper::before,
+.assignment-container.add-line-wrapper::after {
     content: '';
     position: absolute;
-    border-left: 2px solid var(--color);
-    top: -2px;
-    left: -1px;
-    height: 20px;
+    height: 100%;
+    --horizontal-margin: 10px;
+    margin: 0 var(--horizontal-margin);
+    width: 36px;
+    bottom: -1px;
+    box-sizing: border-box;
 }
 .assignment-container.add-line-wrapper::before {
-    content: '';
-    position: absolute;
-    /* Put the before wrapper in front of the after wrapper, which are both visible with grey-highlight */
-    z-index: 1;
-    height: 100%;
-    left: 10px;
-    bottom: -1px;
+    left: 0;
     border-left: 2px solid var(--color);
 }
-.assignment-container.first-add-line-wrapper::before {
-    height: calc(100% - 20px);
+.assignment-container.add-line-wrapper::after {
+    right: 0;
+    border-right: 2px solid var(--color);
 }
+.assignment-container.first-add-line-wrapper::before,
+.assignment-container.first-add-line-wrapper::after {
+    height: calc(100% - 30px);
+}
+.assignment-container.last-add-line-wrapper::before,
 .assignment-container.last-add-line-wrapper::after {
-    content: '';
-    position: absolute;
-    width: 32px;
-    /* Zooming out sometimes creates a small gap betweeen add-line-wrapper::before and last-add-line-wrapper::after. So, make this left slightly inside the wrapper */
-    left: 11px;
-    bottom: -1px;
     border-bottom: 2px solid var(--color);
 }
-
-@media screen and (max-width: 900px) {
-    #assignments-container {
-        --outer-assignment-horizontal-padding: 10px;
-        --outer-assignment-vertical-padding: 5px;
-    }
-    .assignment-container.add-line-wrapper::before {
-        left: 3px;
-    }
-    .assignment-container.add-line-wrapper::after {
-        width: 23px;
-        left: 4px;
-    }
-    .shortcut-line-left {
-        --left: -6px;
-    }
-    .shortcut-text {
-        font-size: 15px;
-    }
+.assignment-container.last-add-line-wrapper::before {
+    border-bottom-left-radius: var(--shortcut-border-radius);
 }
-
+.assignment-container.last-add-line-wrapper::after {
+    border-bottom-right-radius: var(--shortcut-border-radius);
+}
 .assignment-header {
     display: flex;
     position: relative;
@@ -309,13 +316,13 @@ a[href="/settings"] {
     align-items: center;
     --arrow-margin-left: max(5px,calc(-5px + 2vw));
 }
-.relative-positioning-wrapper {
+.left-side-of-header {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
     flex-direction: column; /* put description below name */
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(35px + 13vw);
+    --left-side-of-header-width: calc(40px + 11vw);
 }
 .fancy-coloring {
     color: var(--priority-color);
@@ -324,6 +331,11 @@ a[href="/settings"] {
 .description {
     position: relative;
     display: none;
+    /* IMPORTANT TO REMEMBER: A new stacking context is apparantly needed for the line clamping to work
+    opacity achieves this
+    reference: https://stackoverflow.com/questions/16148007/which-css-properties-create-a-stacking-context */
+
+    /* Opacity should also be used to ensure fancy dark mode appearance works */
     opacity: var(--description-opacity);
     transform: translateY(-2px);
     min-width: var(--left-side-of-header-width);
@@ -337,6 +349,15 @@ a[href="/settings"] {
 .description p:last-of-type {
     margin-bottom: 0;
 }
+.left-side-of-header .title .title-link-anchor {
+    color: var(--color);
+    display: none;
+}
+.left-side-of-header .title .title-link-icon {
+    margin-bottom: -2.5px;
+    border-bottom: 1.5px solid var(--color);
+    padding-bottom: 3px;
+}
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description {
     display: -webkit-box;
@@ -344,7 +365,7 @@ a[href="/settings"] {
     -webkit-line-clamp: 8;
     overflow: hidden;
 }
-.assignment.open-assignment .relative-positioning-wrapper.display-truncate-warning::after {
+.assignment.open-assignment .left-side-of-header.display-truncate-warning::after {
     content: "[Description shortened]";
     opacity: var(--description-opacity);
     font-size: var(--description-font-size);
@@ -359,7 +380,7 @@ a[href="/settings"] {
 .assignment.open-assignment, .assignment.assignment-is-closing {
     padding-bottom: unset;
 }
-.assignment:not(.open-assignment, .needs-more-info) .title {
+.assignment:not(.open-assignment) .title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -368,22 +389,14 @@ a[href="/settings"] {
 .title {
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
-    font-size: clamp(13px, calc(11px + 0.4vw), 17px);
     --smush-daysleft: 2px;
     --smush-priority: 3px;
     overflow-wrap: break-word;
 }
 .title::after, .title::before {
     position: absolute;
+    white-space: nowrap;
     font-size: 0.75em;
-}
-/* The order of these two below matter because the bottom one will overwrite the first one if there is only one assignment */
-.assignment-container:nth-last-child(1) .title::before {
-    content: "Least Important";
-    
-}
-#assignments-container > :not(.assignment-container) + .assignment-container .title::before {
-    content: "Most Important";
 }
 .title[data-priority]::before {
     content: attr(data-priority) !important;
@@ -392,7 +405,6 @@ a[href="/settings"] {
 .title[data-daysleft]::after {
     content: attr(data-daysleft) !important;
     transform: translateY(100%) translateY(calc(-1 * var(--smush-daysleft)));
-    white-space: nowrap;
     width: calc(100% + var(--arrow-margin-left));
     padding-bottom: 20px; /* hover padding */
     left: 0;
@@ -402,41 +414,37 @@ a[href="/settings"] {
     content: attr(data-long-daysleft) !important;
 }
 .arrow-container {
-    float: left;
     margin-left: var(--arrow-margin-left);
+    margin-right: 11px;
     overflow: visible;
     fill: currentColor;
 }
-.right-side-of-header {
-    font-size: min(16.76px,calc(11px + 0.4vw));
+.status-image {
+    flex-shrink: 0;
+}
+.middle-of-header {
     margin: 0;
-    margin-right: 7px;
     white-space: initial;
     display: flex;
-    flex-grow: 1;
     align-items: center;
 }
-.status-image {
-    position: absolute;
+/* selects the element right before right-side-of-header
+do this because midde-of-header is hidden in the delete assignments view */
+.assignment-header > :nth-last-child(2) {
+    margin-right: 35px;
 }
 .align-to-status-message-container {
-    margin-right: 6px;
-    margin-left: 18px;
-}
-@media screen and (max-width: 721px) {
-    .unfinished-message {
-        display: none;
-    }
+    margin-left: 5px;
 }
 .tags {
     position: absolute;
     z-index: 1;
     white-space: nowrap;
-    font-size: min(10.25px, 0.87em);
-    --tags-left--margin-top: 7px;
-    --tags-bottom--margin-bottom: 2px;
+    font-size: 0.75em;
+    --tags-left--margin-bottom: 7px;
+    --tags-bottom--margin-bottom: 3px;
     --tags-right--margin-right: 2px;
-    --tags-top--margin-top: 2px;
+    --tags-top--margin-top: 3px;
 }
 .tags [tabindex]:focus, .tags input:focus {
     outline: 0;
@@ -464,29 +472,34 @@ a[href="/settings"] {
 }
 .tag-wrapper {
     position: relative;
-    display: inline-block;
-    vertical-align: top;
+    display: inline-flex;
+    align-items: center;
     padding: 0 5px;
     border: 1px solid var(--color);
     border-radius: 10px;
     opacity: 1;
     cursor: ew-resize;
     margin-right: 3px;
-    --background-color: linear-gradient(135deg, rgb(255,255,255) 0%, rgb(222,222,222) 100%);
+    --background-color: linear-gradient(135deg, white 0%, hsl(0, 0%, 87%) 100%);
     background: var(--background-color);
     transform-origin: right;
+    --ghost-opacity: 0.4;
     transition: margin-left calc(0.75s * var(--animation-speed)) ease-in-out,
                 opacity calc(0.7s * var(--animation-speed)) linear,
                 transform calc(0.5s * var(--animation-speed)) linear calc(0.2s * var(--animation-speed));
 }
 .tag-wrapper.ghost {
-    visibility: hidden;
+    --ghost-color: rgba(var(--c), var(--c), var(--c), var(--ghost-opacity));
+    border-color: var(--ghost-color);
+    color: var(--ghost-color)
+}
+.tag-wrapper.ghost .tag-delete {
+    background-color: var(--ghost-color);
 }
 .tag-delete {
     position: absolute;
-    width: 8px;
-    height: 8px;
-    top: 3px;
+    width: 9px;
+    height: 9px;
     right: 3px;
     border-radius: 50%;
     background-color: var(--color);
@@ -515,10 +528,10 @@ a[href="/settings"] {
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 14px;
-    height: 14px;
+    width: 16.8px;
+    height: 16.8px;
     border-radius: 10px;
-    --background-color: rgb(231, 231, 231);
+    --background-color: hsl(0, 0%, 91%);
     background-color: var(--background-color);
     border: 1px dashed var(--color);
     cursor: pointer;
@@ -553,23 +566,23 @@ a[href="/settings"] {
     transition: margin-right calc(0.15s * var(--animation-speed)) ease-in-out;
 }
 .tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
-    margin-right: 9px;
+    margin-right: 11px;
 }
 .tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
     transform: scale(1.2);
 }
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
-    width: 57px;
+    width: 68px;
 }
 .tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
 }
 .tag-add-box {
     white-space: normal;
-    width: 152px;
-    --box-shadow-color: rgba(170,170,170,0.65);
-    --input-background-color: rgb(220,220,220);
+    width: 155px;
+    --box-shadow-color: hsla(0, 0%, 67%, 0.65);
+    --input-background-color: hsl(0, 0%, 86%);
     --background-color: var(--body-background);
 
     box-shadow: 0 2px 5px 1px var(--box-shadow-color) !important;
@@ -605,7 +618,7 @@ a[href="/settings"] {
     right: 4px;
     top: 4px;
     border-radius: 50%;
-    --background-color: rgb(195,195,195);
+    --background-color: hsl(0, 0%, 76%);
     background-color: var(--background-color);
 }
 .tag-add-button::after {
@@ -635,7 +648,7 @@ a[href="/settings"] {
     box-shadow: 0 0 4px 1px var(--box-shadow-color-invalid);
 }
 .tag-add-button > .icon-slash {
-    --background-color: rgb(65,65,65);
+    --background-color: hsl(0, 0%, 25%);
     background-color: var(--background-color);
     height: 15px;
 }
@@ -662,7 +675,7 @@ a[href="/settings"] {
     width: 100%;
     height: 100%;
     z-index: -1;
-    --background-color: rgb(240, 240, 240);
+    --background-color: hsl(0, 0%, 94%);
     background-color: var(--background-color);
     transform: scaleX(0);
     transform-origin: left;
@@ -709,8 +722,8 @@ a[href="/settings"] {
 }
 .tag-add > .icon-slash {
     right: unset;
-    left: 6px;
-    height: 9px;
+    left: 7.75px;
+    height: 10px;
     background-color: var(--color);
 }
 .x-first-slash {
@@ -724,13 +737,18 @@ a[href="/settings"] {
 }
 .completion-time {
     white-space: nowrap;
+    margin-right: 3px;
+    align-self: center;
+}
+.right-side-of-header {
     margin-left: auto;
+    display: flex;
+    align-self: normal;
 }
 .assignment-header-button {
     position: relative;
     display: flex;
     align-items: center;
-    align-self: normal;
     justify-content: center;
     /* negate the variable pixel value */
     margin-top: calc(-1 * var(--vertical-assignment-padding));
@@ -752,31 +770,64 @@ a[href="/settings"] {
 }
 .assignment-header-button * {
     transition: transform 0.15s cubic-bezier(.29,1.13,.48,2.37);
+    color: var(--color);
 }
 .assignment-footer {
     padding-right: var(--horizontal-assignment-padding);
     padding-left: var(--horizontal-assignment-padding);
+    --assignment-margin-bottom: 12px;
     box-sizing: border-box;
     display: none;
     /* firefox acts weirdly without this */
     width: 100%;
 }
+.graph-container > table {
+    padding: 4px;
+    top: 0;
+    position: absolute;
+    letter-spacing: 0.5px;
+    --background-color: hsl(0, 0%, 97%);
+    background-color: var(--background-color);
+    display: block;
+    overflow-y: scroll;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-user-select: text;
+       -moz-user-select: text;
+        -ms-user-select: text;
+            user-select: text;
+}
+.graph-container:not(.text-display) > table,
+.graph-container.text-display > :not(table) {
+    opacity: 0;
+    pointer-events: none;
+}
+.today-display-in-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.today-display-in-text hr {
+    display: inline-block;
+    flex-grow: 1;
+}
 .graph-container {
     border-radius: 12px;
     height: clamp(200px,65vh,400px);
     position: relative;
-    border: 2px solid rgba(108,108,108,.75); /* rgb(178,178,178) */
+    border: 2px solid hsla(0, 0%, 42%, 0.75); /* hsl(0, 0%, 70%) */
 }
-.graph-container canvas {
+.graph-container > :not(.hover-point-label) {
     width: 100%;
     height: 100%;
     border-radius: 10px;
+    transition: opacity calc(0.1s * var(--animation-speed)) ease-out;
 }
 .hover-point-label {
     position: absolute;
     padding: 4px 7px;
     font-size: 13px;
-    box-shadow: 0 1px 3px 1px rgba(0,0,0,.3);
+    box-shadow: 0 1px 3px 1px hsla(0, 0%, 0%, 0.3);
     background-color: var(--primary);
     border-radius: 3px;
     z-index: 1;
@@ -784,13 +835,14 @@ a[href="/settings"] {
     --translatex: 10px;
     /* Don't make transform origin left or right or else the transitions between left and right get messed up */
     transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%);
-    transition: transform 0.1s linear;
+    transition: transform calc(0.1s * clamp(0, var(--animation-speed) * 999, 1)) linear;
 }
 .hover-point-label.hide-label {
-    transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%) scale(0);
+    transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%) 
+            scale(0.002); /* for some really odd reason scale(0) break the transition on safari and on mobile */
 }
 .hover-point-label.initial-position {
-    transform: scale(0);
+    transform: scale(0.002);
 }
 .hover-point-label.move-left {
     --translatex: calc(-100% - 10px);
@@ -805,22 +857,7 @@ a[href="/settings"] {
     display: block;
     position: relative;
 }
-.graph-footer .info-button {
-    /* Prevent graph buttons from oversizing */
-    margin-bottom: -1px;
-    width: 22px;
-    height: 17px;
-    font-size: 15px;
-    padding: 0 !important;
-    line-height: 17px;
-    cursor: pointer;
-}
-.graph-footer .info-button:hover {
-    box-shadow: none;
-}
 .graph-footer {
-    font-size: 15px;
-    padding: 0 13px;
     position: relative;
 }
 .graph-footer * {
@@ -829,7 +866,7 @@ a[href="/settings"] {
     border: none;
     padding: 5px 10px;
     cursor: pointer;
-    --background-color: rgb(223, 223, 223);
+    --background-color: hsl(0, 0%, 87%);
     background-color: var(--background-color);
     color: var(--color);
     z-index: 1;
@@ -841,19 +878,19 @@ a[href="/settings"] {
     box-shadow: inset 0 0 0 3px var(--input-focus-color);
 }
 /* 1st column */
-.delete-work-input-button, .skew-ratio-button {
+.delete-work-input-button, .fixed-mode-button {
     position: absolute;
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .hide-assignment-button {
+.work-input-textbox, .skew-ratio-button {
     position: relative;
     z-index: unset;
     left: 50%;
     transform: translateX(-50%);
 }
 /* 3rd column */
-.submit-work-button, .fixed-mode-button {
+.submit-work-button, .display-in-text-button {
     position: absolute;
     right: 0;
 }
@@ -862,65 +899,43 @@ a[href="/settings"] {
     margin-top: 12px;
 }
 /* 2nd row */
-.skew-ratio-button, .hide-assignment-button, .fixed-mode-button {
+.skew-ratio-button, .display-in-text-button, .fixed-mode-button {
     margin-top: 13px;
-    margin-bottom: 12px;
+    margin-bottom: var(--assignment-margin-bottom);
 }
 .work-input-textbox {
     width: 123px;
 }
-input[type=number]::-webkit-inner-spin-button {
-    cursor: pointer;
-    opacity: 1 !important;
-    border-left: 1px solid #d8d8d8;
-    height: 20px;
-}
-#toggle-gc-container {
+#extra-navs {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
     display: flex;
-    align-items: center;
-    position: fixed;
-    height: 50px;
-    border-radius: 25px;
-    right: 10px;
-    bottom: 15px;
-    padding: 4px;
-    box-sizing: border-box;
-    text-align: right;
-    --background-color: white;
-    background-color: var(--background-color);
+    visibility: hidden;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-right: 45px;
+    margin-left: 45px;
+    gap: 7px;
+    --font-size: 14px;
+    font-size: var(--font-size);
+    line-height: calc(3 * var(--font-size));
+}
+main:not(.background-image-exists) #extra-navs {
+    filter: invert(0.3);
+}
+main.finished-header-transition #extra-navs {
+    visibility: initial;
+}
+#extra-navs span a {
+    color: var(--color);
+    /* So tabbing on an extra-nav scrolls #assignments-container all the way down */
+    scroll-margin: 20px;
+}
+#extra-navs span * {
     cursor: pointer;
-    z-index: 1000;
-    --box-shadow-color: black;
-    box-shadow: 0 0 5px 1px var(--box-shadow-color);
-}
-#toggle-gc-container.enabled {
-    box-shadow: 0 0 5px 1px #3fff00, 0 0 2px 1px #29a400;
-}
-#toggle-gc-label {
-    width: 0;
-    overflow: hidden;
-    opacity: 0;
-    display: inline-block;
-    text-align: left;
-    white-space: nowrap;
-    transform: translateX(50px);
-    transition: width calc(0.5s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1);
-}
-#toggle-gc-container img {
-    position: relative;
-}
-#toggle-gc-container:hover #toggle-gc-label, #toggle-gc-container.open #toggle-gc-label {
-    opacity: 1;
-    transform: translateX(10px);
-    transition: width calc(0.5s * var(--animation-speed)) cubic-bezier(0, 0, 0.5, 1),
-                opacity calc(0.35s * var(--animation-speed)) linear calc(0.15s * var(--animation-speed)),
-                transform calc(0.3s * var(--animation-speed)) linear calc(0.15s * var(--animation-speed));
-}
-#toggle-gc-container:hover #toggle-gc-label {
-    width: 304px;
-}
-#toggle-gc-container.open #toggle-gc-label {
-    width: 333px;
+    text-decoration: underline;
 }
 
 .daterangepicker,
@@ -938,13 +953,43 @@ input[type=number]::-webkit-inner-spin-button {
 .grey-highlight:not(.assignment-container),
 .grey-highlight.assignment-container::after,
 .grey-highlight.assignment-container::before {
-    --filter-drop-shadow-color: white;
-    font-size: 19px !important;
-    filter: drop-shadow(0 0.5px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0 -0.5px 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(0.5px 0 0 var(--filter-drop-shadow-color, transparent))
-            drop-shadow(-0.5px 0 0 var(--filter-drop-shadow-color, transparent));
+    --filter-drop-shadow-color: hsl(0, 0%, 73%);
+    --filter-drop-shadow-width: 0.5px;
+    filter: drop-shadow(0 var(--filter-drop-shadow-width) 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(0 calc(-1 * var(--filter-drop-shadow-width)) 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(var(--filter-drop-shadow-width) 0 0 var(--filter-drop-shadow-color, transparent))
+            drop-shadow(calc(-1 * var(--filter-drop-shadow-width)) 0 0 var(--filter-drop-shadow-color, transparent));
 }
-.grey-highlight.shortcut-text {
-    font-size: unset !important;
+
+
+/* Mobile view */
+@media screen and (max-width: 850px) {
+    .assignment {
+        --box-shadow: 0 0 12px -8px black;
+    }
+    #assignments-container {
+        --outer-assignment-horizontal-padding: 13px;
+        --outer-assignment-vertical-padding: 7px;
+    }
+    .assignment-container.add-line-wrapper::before,
+    .assignment-container.add-line-wrapper::after {
+        --horizontal-margin: 4px;
+    }
+    .shortcut-line-left, .shortcut-line-right {
+        --negative-horizontal-margin: -9px;
+    }
+    .shortcut-text {
+        font-size: 15px;
+    }
+    .hide-on-mobile {
+        display: none;
+    }
+    .left-side-of-header .title .title-link-anchor {
+        display: initial;
+    }
+    main {
+        box-shadow: none;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
 }

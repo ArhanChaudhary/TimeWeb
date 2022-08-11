@@ -25,8 +25,10 @@ urlpatterns = [
     path('', include('home_page.urls')),
     path('', include('timewebapp.urls')),
     path('api/', include('api.urls')),
-    path('', include('timewebauth.urls')),
+    path('accounts/', include('timewebauth.urls')),
     path('', include('navbar.urls')),
     path('', include('misc.urls')),
     path('', include('pwa.urls')),
 ]
+
+handler403 = 'common.utils._403_or_429'

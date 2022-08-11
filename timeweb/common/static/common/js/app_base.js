@@ -1,60 +1,63 @@
-// https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
-isMobile = (function() {
-    if (navigator.userAgent) {
-        let check = false;
-        (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
-        return check;
-    }
-    if (navigator.userAgentData) {
-        return navigator.userAgentData.mobile;
-    }
-    return false;
-})();
-isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-function resetHeaderLayout() {
-    const username = $("#user-greeting #username"),
-        logo = $("#logo-container"),
-        welcome = $("#welcome"),
-        plus_button = $("#image-new-container img"),
-        plus_button_width = plus_button.width()||0,
-        newassignmenttext = $("#new-assignment-text");
-
-    logo.css({
-        left: '',
-        transform: '',
+document.addEventListener("DOMContentLoaded", function() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRFToken': $("input[name=\"csrfmiddlewaretoken\"]").first().val()
+        },
     });
-    logo.find("img").css("width", "");
-    welcome.toggle(!collision(welcome, logo, { margin: 10 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-    if (collision(username, logo, { margin: 10 })) {
-        logo.css({
-            left: 5 + plus_button_width,
-            transform: "none",
-        });
-        welcome.toggle(!collision(welcome, logo, { margin: 10 }));
-        newassignmenttext.css("max-width", 0);
-        if (collision(username, logo, { margin: 10 })) {
-            // compress the logo
-            logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
-        }
-    } else {
-        newassignmenttext.css("max-width",window.innerWidth/2-184);
-    }
-}
+});
 $(function() {
-    $(document.body).on("focus", () => $("main").focus()); // Using arrow or space keys to scroll on main doesn't work if the user clicks on the background and focuses on body; main needs to be focused
     $(window).on("focus", () => $(window).trigger("resize"));
-    $(document).keypress(function(e) {
-        const activeElement = $(document.activeElement);
-        if (e.key === "Enter" && activeElement.prop("tagName") !== 'BUTTON' /* Prevent double dipping */
-            // Prevent focused field widgets from toggling on enter form submission
-            && activeElement.attr("tabindex") !== "-1") {
-            activeElement.click();
+    $(document).keydown(function(e) {
+        switch (e.key) {
+            case "Enter": {
+                const activeElement = $(document.activeElement);
+                if (
+                    // Prevent double dipping
+                    // I *could* use e.preventDefault instead for forward compatibility, but is risky and prevents some functioanlities
+                    // (such as pressing enter to submit a form)
+                    !activeElement.is('button, summary, input[type="file"]')
+                    // Prevent focused field widgets from toggling on enter form submission
+                    && activeElement.attr("tabindex") !== "-1"
+                    // keydown fires constantly while enter is being held down, limit it to the first fire
+                    && !e.originalEvent.repeat) {
+                        activeElement.click();
+                }
+                break;
+            }
+            case "Tab":
+                // Prevent tabbing dispositioning screen from tabbing on nav
+                setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
+                break;
         }
     });
     $("input").on("show.daterangepicker", function(e, picker) {
+        function dothething(_minuteselect) {
+            _minuteselect.on("change", function() {
+                setTimeout(function() {
+                    // idk why but theres always a new minuteselect element when its changed
+                    const minuteselect = picker.container.find(".minuteselect:visible");
+                    minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
+                    dothething(minuteselect);
+                }, 0);
+            });
+        }
         // There's a random invisible datepicker, so only query the one that's visible
         const minuteselect = picker.container.find(".minuteselect:visible");
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
+        dothething(minuteselect);
+    // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
+    }).on('blur', function(e) {
+        // Can't use relatedTarget because it needs to be on an element with a tabindex, which the daterangepicker doesn't have
+        if (!$(":hover").filter(".daterangepicker").length)
+            $(this).data("daterangepicker")?.hide();
+    });
+    // close dropdown if clicked while open
+    let wasOpen = false;
+    $("#username").mousedown(function(e) {
+        wasOpen = $(this).is(document.activeElement) || $(document.activeElement).parents("#username").length;
+    }).click(function(e) {
+        if (wasOpen)
+            $("#username").blur();
     });
 
     if ($("#user-greeting").length) {
@@ -62,50 +65,236 @@ $(function() {
         resetHeaderLayout();
     }
     $("header > *").css("visibility", "visible");
-    // https://web.dev/customize-install/
-    let prompt;
-    window.addEventListener('beforeinstallprompt', function(e) {
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        prompt = e;
-    });
-    // https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
-    function isPwa() {
-        var displayModes = ["fullscreen", "standalone", "minimal-ui"];
-        return displayModes.some((displayMode) => window.matchMedia('(display-mode: ' + displayMode + ')').matches); 
-    }
-    if (isPwa()) {
-        $("#nav-a2hs").hide();
-    } else {
-        $("#nav-a2hs").click(function() {
-            if (prompt) {
-                // Show the install prompt
-                prompt.prompt();
-                // Wait for the user to respond to the prompt
-                prompt.userChoice.then(choiceResult => {
-                    if (choiceResult.outcome === 'accepted') {
-                        $.alert({
-                            title: "Thanks for installing TimeWeb on your home screen.",
-                        });
-                    }
-                });
-            } else if (isMobile)
-                $.alert({
-                    title: "Please use Safari to install TimeWeb on your home screen.",
-                    content: "Once you're there, click the share icon on your screen (the up arrow in a square icon) and scroll to \"Add to Home Screen\". Ignore this if you already have TimeWeb installed.",
-                });
-            else
-                $.alert({
-                    title: "Progressive web apps are not supported on your web browser.",
-                    content: "Please use Google Chrome or Microsoft Edge. Ignore this if you already have TimeWeb installed.",
-                });
-        });
-    }
-    $("#nav-credits").click(() => $.alert({
-        title: $("#credits-template").html(),
-    }));
 });
+// It's important to remember to NOT use .done() or any other callback method on a jquery ajax
+// This is to allow ajaxUtils.error to redo the ajax with the appropriate callbacks
+// The only way to properly configure such an ajax is to define their callbacks inline
+// I'm not really sure how to ensure I do this for forward compatibility so I just hope I'll stumble upon this text again or
+// Somehow remember this in the future /shrug
+
+isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
+ajaxUtils = {
+disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
+error: function(response, textStatus) {
+    if (ajaxUtils.silence_errors) return;
+    assert(this.xhr); // Ensure "this" refers to a jquery ajax
+    let title;
+    let content;
+    switch (response.status) {
+        case 0:
+            title = "Failed to connect.";
+            content = "We can't establish a connection with the server. Check your connection and try again.";
+            break;
+        case 404:
+            title = "Not found.";
+            content = "Refresh or try again.";
+            break;
+        case 429:
+            title = "You are being ratelimited.";
+            content = "Try again in a few seconds or minutes.";
+            break;
+        case 500:
+            title = "Internal server error.";
+            content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
+            break;
+        default:
+            title = `<p>Whoops, we've encountered an error${textStatus === "error" ? "" : ` of type "${textStatus}"`} while trying to connect with the server:</p>${response.responseText||response.statusText}`;
+    }
+    $.alert({
+        title: title,
+        content: content,
+        backgroundDismiss: false,
+        buttons: {
+            ok: {
+
+            },
+            "reload this page": {
+                action: function() {
+                    reloadWhenAppropriate();
+                },
+            },
+            "try again": {
+                action: () => {
+                    $.ajax(this);
+                },
+            },
+        },
+    });
+},
+changeSetting: function(kwargs={}) {
+    if (ajaxUtils.disable_ajax) return;
+    $.ajax({
+        type: "PATCH",
+        url: "/api/change-setting",
+        data: {
+            setting: kwargs.setting,
+            value: JSON.stringify(kwargs.value),
+        },
+        error: function(jqXHR) {
+            switch (jqXHR.status) {
+                case 302:
+                    var reauthorization_url = jqXHR.responseText;
+                    reloadWhenAppropriate({ href: reauthorization_url });
+                    break;
+
+                default:
+                    ajaxUtils.error.bind(this)(...arguments);
+            }
+        },
+    });
+},
+createGCAssignments: function() {
+    if (ajaxUtils.disable_ajax || !CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
+    $.ajax({
+        type: "POST",
+        url: '/api/create-gc-assignments',
+        error: function(jqXHR) {
+            switch (jqXHR.status) {
+                case 302:
+                    var reauthorization_url = jqXHR.responseText;
+                    $.alert({
+                        title: "Invalid credentials.",
+                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
+                        buttons: {
+                            "disable integration": {
+                                action: function() {
+                                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
+                                }
+                            },
+                            "authenticate again": {
+                                action: function() {
+                                    reloadWhenAppropriate({href: reauthorization_url});
+                                }
+                            },
+                        }
+                    });
+                    break;
+
+                default:
+                    ajaxUtils.error.bind(this)(...arguments);
+            }
+        },
+        success: function(response, textStatus, jqXHR) {
+            switch (jqXHR.status) {
+                case 204:
+                    break;
+
+                case 205:
+                    reloadWhenAppropriate();
+                    break;
+            }
+        },
+    });
+},
+batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
+    if (ajaxUtils.disable_ajax) return;
+
+    switch (batchCallbackName) {
+        case "changeSetting": {
+            if (!ajaxUtils.batchRequest[batchCallbackName]) {
+                ajaxUtils.batchRequest[batchCallbackName] = {};
+            }
+            let requestData = ajaxUtils.batchRequest[batchCallbackName];
+            for (let key in kwargs) {
+                requestData[key] = kwargs[key];
+            }
+            break;
+        }
+        default: {
+            if (!ajaxUtils.batchRequest[batchCallbackName]) {
+                ajaxUtils.batchRequest[batchCallbackName] = [];
+            }
+            assert("id" in kwargs);
+            let requestData = ajaxUtils.batchRequest[batchCallbackName].find(requestData => requestData.id === kwargs.id);
+            if (!requestData) {
+                requestData = {id: kwargs.id};
+                ajaxUtils.batchRequest[batchCallbackName].push(requestData);
+            }
+
+            for (let key in kwargs) {
+                if (key === "id") continue;
+                requestData[key] = kwargs[key];
+            }
+        }
+    }
+    clearTimeout(ajaxUtils.batchRequest[batchCallbackName + "_timeout"]);
+    ajaxUtils.batchRequest[batchCallbackName + "_callback"] = batchCallback;
+    ajaxUtils.batchRequest[batchCallbackName + "_timeout"] = setTimeout(() => ajaxUtils.sendBatchRequest(batchCallbackName, batchCallback), 200);
+},
+sendBatchRequest: function(batchCallbackName, batchCallback) {
+    let do_request = false;
+    switch (batchCallbackName) {
+        case "changeSetting":
+            do_request = ajaxUtils.batchRequest[batchCallbackName] !== undefined && Object.keys(ajaxUtils.batchRequest[batchCallbackName]).length;
+            break;
+        default:
+            do_request = ajaxUtils.batchRequest[batchCallbackName]?.length;
+    }
+    if (do_request)
+        batchCallback(ajaxUtils.batchRequest[batchCallbackName]);
+    delete ajaxUtils.batchRequest[batchCallbackName];
+    delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
+    delete ajaxUtils.batchRequest[batchCallbackName + "_callback"];
+},
+saveAssignment: function(batchRequestData) {
+
+    // Send data along with the assignment's primary key
+
+    // It is possible for users to send data that won't make any difference, for example they can quickly click fixed_mode twice, yet the ajax will still send
+    // Coding in a check to only send an ajax when the data has changed is tedious, as I have to store the past values of every button to check with the current value
+    // Plus, a pointless ajax of this sort won't happen frequently and will have a minimal impact on the server's performance
+    $.ajax({
+        type: "PATCH",
+        url: '/api/save-assignment',
+        data: {batchRequestData: JSON.stringify(batchRequestData)},
+        error: function(response) {
+            switch (response.status) {
+                case 413: {
+                    $.alert({
+                        title: "Too much data to save.",
+                        content: "If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.",
+                        backgroundDismiss: false,
+                    });
+                    return;
+                }
+            }
+            ajaxUtils.error.bind(this)(...arguments);
+        },
+    });
+},
+}
+
+mathUtils = {
+    // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
+    precisionRound: function(number, precision) {
+        const factor = Math.pow(10, precision);
+        return Math.round(number * factor) / factor;
+    },
+    daysBetweenTwoDates: function(larger_date, smaller_date, params={round: true}) {
+        if (params.round) {
+            const diff = (larger_date - smaller_date) / 86400000;
+            return Math.round(diff); // Round for DST too
+        } else {
+            const no_dst_date = new Date(larger_date.valueOf());
+            no_dst_date.setHours(no_dst_date.getHours() + (smaller_date.getTimezoneOffset() - larger_date.getTimezoneOffset()) / 60);
+            const diff = (no_dst_date - smaller_date) / 86400000;
+            return diff;
+        }
+    },
+    clamp: function(low, value, high) {
+        return Math.min(Math.max(value, low), high)
+    },
+    countDecimals: function(n) {
+        if (Math.floor(n) === n) return 0;
+        return n.toString().split(".")[1].length || 0; 
+    },
+    sigFigSubtract: function(a, b) {
+        const a_decimals = mathUtils.countDecimals(a);
+        const b_decimals = mathUtils.countDecimals(b);
+        const max_decimals = Math.max(a_decimals, b_decimals);
+        return mathUtils.precisionRound(a - b, max_decimals);
+    }
+}
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
 function collision($div1, $div2, params={ margin: 0}) {
     if ($div1.css("display") == "none") {
@@ -132,6 +321,32 @@ function collision($div1, $div2, params={ margin: 0}) {
     if (bottom1 + params.margin < top2 || top1 - params.margin > bottom2 || right1 + params.margin < left2 || left1 - params.margin > right2) return false;
     return true;
 }
+function resetHeaderLayout() {
+    const username = $("#user-greeting #username"),
+        logo = $("#logo-container"),
+        welcome = $("#welcome"),
+        plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
+        newassignmenttext = $("#new-assignment-text");
+
+    logo.css({
+        left: '',
+        transform: '',
+    });
+    logo.find("img").css("width", "");
+    welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+    newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+
+    if (!collision(username, logo, { margin: 30 })) return;
+    logo.css({
+        left: 5 + plus_button_width,
+        transform: "none",
+    });
+    welcome.toggle(!collision(welcome, logo, { margin: 30 }));
+
+    if (!collision(username, logo, { margin: 10 })) return;
+    // compress the logo
+    logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+}
 
 reloadResolver = null;
 function reloadWhenAppropriate(params={href: null}) {
@@ -149,7 +364,6 @@ function reloadWhenAppropriate(params={href: null}) {
         }
     });
 }
-
 jconfirm.defaults = {
     escapeKey: true,
     backgroundDismiss: true,
@@ -162,24 +376,3 @@ jconfirm.defaults = {
     closeAnimation: 'scale',
     animateFromElement: false,
 };
-mathUtils = {
-    // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
-    precisionRound: function(number, precision) {
-        const factor = Math.pow(10, precision);
-        return Math.round(number * factor) / factor;
-    },
-    daysBetweenTwoDates: function(larger_date, smaller_date, params={round: true}) {
-        if (params.round) {
-            const diff = (larger_date - smaller_date) / 86400000;
-            return Math.round(diff); // Round for DST too
-        } else {
-            const no_dst_date = new Date(larger_date.valueOf());
-            no_dst_date.setHours(no_dst_date.getHours() + (smaller_date.getTimezoneOffset() - larger_date.getTimezoneOffset()) / 60);
-            const diff = (no_dst_date - smaller_date) / 86400000;
-            return diff;
-        }
-    },
-    clamp: function(low, value, high) {
-        return Math.min(Math.max(value, low), high)
-    }
-}

@@ -1,0 +1,81 @@
+{% load static %}
+{% load account %}
+{% user_display user as user_display %}
+
+{% autoescape off %}
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <style
+            {% comment %} for local viewing {% endcomment %}
+            {% url 'view_email_message' as view_email_message %}
+            {% if request.path == view_email_message %}
+                nonce="{{request.csp_nonce}}"
+            {% endif %}
+        >
+            /* 
+            NOTE:
+            !important is NEEDED for overriding gmail styling
+            */
+            .submit-button {
+                color: white !important;
+            }
+
+
+            
+            #content-wrapper {
+                width: 500px;
+                margin: 0 auto;
+            }
+            .submit-button[no-top-margin] {
+                margin-top: initial; /* for connections.html */
+            }
+            .submit-button {
+                width: 100%;
+                background: rgb(0, 109, 249);
+                color: white;
+                border: none;
+                padding: 5px 5px;
+                margin-top: 30px;
+                cursor: pointer;
+                font: inherit;
+                /* Normalize other styles (i.e from anchor tags) */
+                text-decoration: none;
+                display: block;
+                text-align: center;
+            }
+            .submit-button:focus, .submit-button:hover {
+                background: rgba(0, 109, 249, 0.9);
+            }
+            .submit-button:focus {
+                /* Override #accounts-container :focus */
+                border-radius: initial !important;
+                outline-width: 1px !important;
+            }
+            .submit-button:focus:hover {
+                /* Override #accounts-container :focus */
+                outline: none !important;
+            }
+            .submit-button:active {
+                transform: translateY(1px);
+                background: rgb(0, 109, 249);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content-wrapper">
+            Hello {{ user_display }},
+            <br>
+            <br>
+            {% block content %}{% endblock %}
+            <p>
+                Thank you for using {{ current_site.name }}!
+                <br>
+                {{ current_site.domain }}
+            </p>
+            <img src="{% static 'timewebapp/images/timeweb.webp' %}">
+        </div>
+    </body>
+</html>    
+{% endautoescape %}
