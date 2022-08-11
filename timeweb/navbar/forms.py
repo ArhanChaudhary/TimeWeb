@@ -15,7 +15,7 @@ class CustomImageFieldWidget(ClearableFileInput):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
-        exclude = ("oauth_token", "added_gc_assignment_ids", "seen_latest_changelog", "user")
+        exclude = ("oauth_token", "added_gc_assignment_ids", "user")
         extra_fields = {
             "enable_gc_integration": {
                 "field": forms.BooleanField(
@@ -41,6 +41,7 @@ class SettingsForm(forms.ModelForm):
             'assignment_sorting': forms.Select(attrs={"class": "generic-button"}),
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'background_image': CustomImageFieldWidget(),
+            'seen_latest_changelog': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {
