@@ -1364,7 +1364,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     dom_assignment.find(".rising-arrow-animation")[0]?.beginElement();
     sa.initUI();
     (() => {
-        if (!SETTINGS.enable_tutorial || already_ran_tutorial) return;
+        if (!SETTINGS.enable_tutorial || already_ran_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
         already_ran_tutorial = true;
         $("#tutorial-click-assignment-to-open").remove();
 
