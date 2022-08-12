@@ -131,6 +131,8 @@ tickClock: function() {
 
     const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
     if (midnight.valueOf() !== date_now.valueOf()) {
+        // Don't reload in the next day to preserve changes made in the simulation
+        // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
         if (utils.in_simulation || isExampleAccount) return;
         reloadWhenAppropriate();
     }
@@ -1110,21 +1112,6 @@ navClickHandlers: function() {
 
 }
 },
-reloadAtMidnight: function() {
-    // Reloads the page after midnight hour to update the graph
-    const now = utils.getRawDateNow();
-    // this is essentially doing floor() + 1
-    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const reload_time = midnight.getTime() + 1000 * 60 * 60 * 24;
-    if (now.getTime() < reload_time) {
-        setTimeout(function() {
-            // Don't reload in the next day to preserve changes made in the simulation
-            // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
-            if (utils.in_simulation || isExampleAccount) return;
-            reloadWhenAppropriate();
-        }, reload_time - now.getTime() + utils.SCHEDULED_TIMEOUT_DELAY);
-    }
-},
 loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
     if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
     return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
@@ -1291,7 +1278,6 @@ for (let sa of dat) {
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {
-        utils.reloadAtMidnight();
         if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
         utils.ui.setClickHandlers.tickButtons();
         utils.ui.setClickHandlers.assignmentsHeaderUI();
