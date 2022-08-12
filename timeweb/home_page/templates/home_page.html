@@ -8,12 +8,12 @@
 {% block base_head_body %}
     <div class="section-block" id="first">
         <span id="first-left">
-            The new way to<br>manage your time
+            The new way to<br>manage your time<br>
             <a href="{% url 'account_login' %}">Login</a>
         </span>
         <span id="first-right">
             {% for scroller in random_scrollers %}
-                <img alt src="{% static 'home_page/scrollers/scroller'|add:scroller|add:'_light.png' %}">
+                <img alt class="assignment-scroller-image" src="{% static 'home_page/scrollers/scroller'|add:scroller|add:'_light.png' %}">
             {% endfor %}
         </span>
     </div>
