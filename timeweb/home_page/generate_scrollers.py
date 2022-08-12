@@ -22,7 +22,7 @@ for i in range(img.width - 1 - good_column_padding, good_column_padding, -1):
 top = None
 bottom = None
 left = 0
-right = img.width - 400
+right = img.width - 500
 
 count = 0
 old_color = wanted_column_colors[1]
@@ -30,7 +30,7 @@ for i in range(0, img.height):
     p = [*img.getpixel((good_column, i))][:3]
     if p != old_color:
         if p == wanted_column_colors[0]:
-            assert old_color == wanted_column_colors[1], breakpoint()
+            assert old_color == wanted_column_colors[1]
             top = i
         else:
             assert p == wanted_column_colors[1]
