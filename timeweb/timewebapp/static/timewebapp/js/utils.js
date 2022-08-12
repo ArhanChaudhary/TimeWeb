@@ -129,12 +129,14 @@ tickClock: function() {
     $("#estimated-completion-time").text(` (${str})`);
     utils.ui.old_minute_value = minute_value;
 
-    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    if (midnight.valueOf() !== date_now.valueOf()) {
-        // Don't reload in the next day to preserve changes made in the simulation
-        // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
-        if (utils.in_simulation || isExampleAccount) return;
-        reloadWhenAppropriate();
+    if (!VIEWING_DELETED_ASSIGNMENTS) {
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        if (midnight.valueOf() !== date_now.valueOf()) {
+            // Don't reload in the next day to preserve changes made in the simulation
+            // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
+            if (utils.in_simulation || isExampleAccount) return;
+            reloadWhenAppropriate();
+        }
     }
 },
 setClickHandlers: {
