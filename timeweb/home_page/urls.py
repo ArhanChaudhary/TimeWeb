@@ -4,9 +4,10 @@ from timewebapp.views import TimewebView
 
 def resolve(request):
     if request.user.is_authenticated:
-        return TimewebView.as_view()(request)
+        view_class = TimewebView
     else:
-        return views.HomePageView.as_view()(request)
+        view_class = views.HomePageView
+    return view_class.as_view()(request)
 
 urlpatterns = [
     path('', resolve, name='home'),

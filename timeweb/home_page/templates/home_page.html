@@ -2,17 +2,23 @@
 {% load static %}
 
 {% block base_head_css %}
-    <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
+    <link rel="stylesheet" href="{% static 'home_page/css/home_page.css' %}">
 {% endblock %}
 
 {% block base_head_body %}
     <div class="section-block" id="first">
-        Introducing TimeWeb
-        <br>
-        The new way to manage your time
+        <span id="first-left">
+            The new way to<br>manage your time
+            <a href="{% url 'account_login' %}">Login</a>
+        </span>
+        <span id="first-right">
+            {% for scroller in random_scrollers %}
+                <img alt src="{% static 'home_page/scrollers/scroller'|add:scroller|add:'_light.png' %}">
+            {% endfor %}
+        </span>
     </div>
     <div class="section-block" id="second">
-        <a href="{% url 'account_login' %}">log in</a>
+
     </div>
     <div class="section-block" id="third">
         
