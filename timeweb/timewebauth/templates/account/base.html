@@ -25,12 +25,12 @@
     </div>
     <div id="accounts-container">
       <div id="logo-container">
-        <a id="accounts-arrow-anchor" href="{% block back_arrow_url %}{% url 'home' %}{% endblock %}">
+        <a id="accounts-arrow-anchor" href="{% block back_arrow_url %}{% url 'account_login' %}{% endblock %}">
           <div id="accounts-arrow-container">
             <div id="accounts-arrow-horizontal"></div>
           </div>
         </a>
-        <a id="logo-anchor" href="{% url 'home' %}">
+        <a id="logo-anchor" href="{% if request.user.is_authenticated %}{% url 'home' %}{% else %}{% url 'account_login' %}{% endif %}">
           <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
         </a>
       </div>
