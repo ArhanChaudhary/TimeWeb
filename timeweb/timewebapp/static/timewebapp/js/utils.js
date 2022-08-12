@@ -1309,9 +1309,17 @@ document.addEventListener("DOMContentLoaded", function() {
     utils.ui.navClickHandlers();
     // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute
     let secondsRemaining = (60 - new Date().getSeconds()) * 1000;
+
+    let minuteCounter = 0;
     setTimeout(function() {
         utils.ui.tickClock();
-        setInterval(utils.ui.tickClock, 60000);
-        setInterval(() => $(window).trigger("resize"), 60000*60);
+        setInterval(() => {
+            utils.ui.tickClock();
+            minuteCounter++;
+            if (minuteCounter === 60) {
+                $(window).trigger("resize");
+                minuteCounter = 0;
+            }
+        }, 60 * 1000);
     }, secondsRemaining);
 });
