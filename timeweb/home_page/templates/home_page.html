@@ -6,19 +6,25 @@
 {% endblock %}
 
 {% block base_head_body %}
+<main>
     <div class="section-block" id="first">
-        <span id="first-left">
-            The new way to<br>manage your time<br>
-            <a href="{% url 'account_login' %}">Login</a>
+        <span class="section-side" id="first-left">
+            The new way to<br>manage your time
+            {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
         </span>
-        <span id="first-right">
+        <span class="section-side" id="first-right">
             {% for scroller in random_scrollers %}
                 <img alt class="assignment-scroller-image" src="{% static 'home_page/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
             {% endfor %}
         </span>
     </div>
     <div class="section-block" id="second">
+        <span class="section-side" id="second-left">
 
+        </span>
+        <span class="section-side" id="second-right">
+            Know what to do, when to do it, and for how long
+        </span>
     </div>
     <div class="section-block" id="third">
         
@@ -29,4 +35,5 @@
     <div class="section-block" id="fifth">
         
     </div>
+</main>
 {% endblock %}

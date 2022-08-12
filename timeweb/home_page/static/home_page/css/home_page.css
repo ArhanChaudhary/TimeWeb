@@ -1,16 +1,29 @@
 * {
     font-family: futura, sans-serif;
 }
+#site {
+    overflow: hidden;
+}
+main {
+    --section-height: 85vh;
+    --odd-section-color: white;
+    --even-section-color: hsl(0, 0%, 95%);
+}
+.section-block:nth-child(odd) {
+    background-color: var(--odd-section-color);
+}
+.section-block:nth-child(even) {
+    background-color: var(--even-section-color);
+}
 .section-block {
-    height: 85vh;
+    height: var(--section-height);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5vw;
     font-size: 40px;
 }
 .section-block#first {
-    padding-right: initial;
+    padding-left: 5vw;
 }
 #first-left {
     flex-shrink: 0;
@@ -19,15 +32,24 @@
 #first-right {
     filter: drop-shadow(0px 0px 6px hsl(0deg 0% 82%));
     align-self: flex-start;
-    margin-top: -65px;
+    margin-top: -45px;
+    max-height: calc(var(--section-height) * 1.5);
+    overflow: hidden;
 }
-.section-block#second {
-    background-color: rgb(241, 241, 241);
+#second-right {
+    width: 50vw;
+    position: relative;
+    background-color: inherit;
+    z-index: 1;
+    padding: 20px 5vw 20px 0;
+    box-sizing: border-box;
+    box-shadow: 0 -4px 51px 20px var(--even-section-color), 0 -103px 432px 60px var(--even-section-color)
 }
 .assignment-scroller-image {
     display: block;
-    margin-bottom: 20px;
-    width: clamp(500px, 50vw, 625px);
+    padding-bottom: 10px;
+    padding-top: 10px;
+    width: clamp(500px, calc(50vw - 30px), 625px);
 }
 @font-face {
     font-family: futura-pt;
