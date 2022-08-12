@@ -1,12 +1,14 @@
 from PIL import Image
+from pathlib import Path
 
-light = False
+app_dir = Path(__file__).resolve().parent
+light = True
 
 if light:
-    img = Image.open("/Users/administrator/Desktop/screencapture-localhost-8000-2022-08-11-17_04_52.png")
+    img = Image.open(app_dir / "light_scroller.png")
     wanted_column_colors = ([255, 255, 255], [0,0,0])
 else:
-    img = Image.open("/Users/administrator/Desktop/screencapture-localhost-8000-2022-08-11-12_08_01.png")
+    img = Image.open(app_dir / "dark_scroller.png")
     wanted_column_colors = ([48, 48, 48], [0,0,0])
 
 good_column = None
@@ -43,7 +45,7 @@ for i in range(0, img.height):
             print(f"Cropping from {top} to {bottom}")
             # crop top, bottom, left, right and save it
             img2 = img.crop((left, top, right, bottom))
-            img2.save(f"/Users/administrator/Desktop/scrollers/scroller{count}_{'light' if light else 'dark'}.png")
+            img2.save(app_dir / f"static/home_page/scrollers/scroller{count}_{'light' if light else 'dark'}.png")
             count += 1
     old_color = p
 
