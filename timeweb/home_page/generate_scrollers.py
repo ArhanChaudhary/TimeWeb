@@ -45,7 +45,7 @@ for i in range(0, img.height):
             print(f"Cropping from {top} to {bottom}")
             # crop top, bottom, left, right and save it
             img2 = img.crop((left, top, right, bottom))
-            img2.save(app_dir / f"static/home_page/scrollers/scroller{count}_{'light' if light else 'dark'}.png")
+            img2.save(app_dir / f"static/home_page/scrollers/scroller{count}_{'light' if light else 'dark'}.webp")
             count += 1
     old_color = p
 
