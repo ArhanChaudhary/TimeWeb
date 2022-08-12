@@ -1,10 +1,14 @@
 from PIL import Image
 
-# img = Image.open("/Users/administrator/Desktop/screencapture-localhost-8000-2022-08-11-12_08_01.png")
-img = Image.open("/Users/administrator/Desktop/screencapture-localhost-8000-2022-08-11-17_04_52.png")
+light = False
 
-# wanted_column_colors = ([48, 48, 48], [0,0,0])
-wanted_column_colors = ([255, 255, 255], [0,0,0])
+if light:
+    img = Image.open("/Users/administrator/Desktop/screencapture-localhost-8000-2022-08-11-17_04_52.png")
+    wanted_column_colors = ([255, 255, 255], [0,0,0])
+else:
+    img = Image.open("/Users/administrator/Desktop/screencapture-localhost-8000-2022-08-11-12_08_01.png")
+    wanted_column_colors = ([48, 48, 48], [0,0,0])
+
 good_column = None
 good_column_padding = 50 # account for the border_radius on .assignment
 
@@ -39,7 +43,7 @@ for i in range(0, img.height):
             print(f"Cropping from {top} to {bottom}")
             # crop top, bottom, left, right and save it
             img2 = img.crop((left, top, right, bottom))
-            img2.save(f"/Users/administrator/Desktop/scrollers/scroller{count}_light.png")
+            img2.save(f"/Users/administrator/Desktop/scrollers/scroller{count}_{'light' if light else 'dark'}.png")
             count += 1
     old_color = p
 
