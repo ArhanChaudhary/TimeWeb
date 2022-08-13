@@ -116,6 +116,9 @@ getReversibilityStatus: function() {
 ui: {
 tickClock: function() {
     const now = utils.getRawDateNow();
+    if (utils.ui.tickClock.oldNow === undefined) {
+        utils.ui.tickClock.oldNow = now;
+    }
     const estimated_completion_time = new Date(now.valueOf());
     const minute_value = estimated_completion_time.getMinutes();
 
@@ -137,6 +140,41 @@ tickClock: function() {
             if (utils.in_simulation || isExampleAccount) return;
             reloadWhenAppropriate();
         }
+
+        // We can't simply define a setTimeout until every assignment's due date. Here's why:
+        // 1) Due dates can be changed if an assignment is soft, outdating the setTimeout
+        // 2) setTimeouts may not run if a device is on sleep or powered off, considering there is only one opportunity for it to run
+        let now_due_dates_passed = 0;
+        for (let sa of dat) {
+            let complete_due_date = new Date(sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.complete_x));
+            if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
+                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            }
+
+            if (complete_due_date.valueOf() <= now.valueOf()) {
+                now_due_dates_passed++;
+            }
+        }
+
+        let old_now_due_dates_passed = 0;
+        for (let sa of dat) {
+            let complete_due_date = new Date(sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.complete_x));
+            if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
+                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            }
+
+            if (complete_due_date.valueOf() <= utils.ui.tickClock.oldNow.valueOf()) {
+                old_now_due_dates_passed++;
+            }
+        }
+        console.log(now_due_dates_passed, old_now_due_dates_passed);
+        utils.ui.tickClock.oldNow = now;
+
+        if (old_now_due_dates_passed !== now_due_dates_passed) {
+            new Priority().sort();
+        }      
     }
 },
 setClickHandlers: {
@@ -1132,7 +1170,6 @@ getRawDateNow: function(params={ accurate_in_simulation: true, initial_define: f
         return raw_date_now;
     }
 },
-SCHEDULED_TIMEOUT_DELAY: 5000,
 }
 
 SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
@@ -1192,15 +1229,6 @@ for (let sa of dat) {
         
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
-            let raw_date_now = new Date(utils.getRawDateNow().valueOf());
-            let time_diff = complete_due_date - raw_date_now;
-            if (time_diff + utils.SCHEDULED_TIMEOUT_DELAY > 0 && !VIEWING_DELETED_ASSIGNMENTS)
-                $(window).one("load", function() {
-                    setTimeout(function() {
-                        new Priority().sort();
-                    // Hardcoded delay if setTimeout isn't accurate
-                    }, time_diff + utils.SCHEDULED_TIMEOUT_DELAY);
-                });
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
             sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
             sa.complete_x = mathUtils.daysBetweenTwoDates(complete_due_date, sa.assignment_date, {round: false});
