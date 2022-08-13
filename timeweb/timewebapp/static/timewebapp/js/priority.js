@@ -440,15 +440,20 @@ class Priority {
                 }
 
                 if ([0, 1].includes(due_date_minus_today)) {
-                    if (due_date_minus_today === 0) {
-                        that.display_due_today_completion_time = true;
-                    } else if (due_date_minus_today === 1) {
-                        that.display_due_tomorrow_completion_time = true;
-                    }
-                    that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
+                    // hurry the F*CK up >:(
                     if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                         status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
+                    // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
+                    // when it in fact displays no useful information
+                    if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value)) {
+                        if (due_date_minus_today === 0) {
+                            that.display_due_today_completion_time = true;
+                        } else if (due_date_minus_today === 1) {
+                            that.display_due_tomorrow_completion_time = true;
+                        }
+                    }
+                    that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
             }
 
