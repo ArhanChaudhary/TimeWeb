@@ -38,6 +38,9 @@ main {
     margin-top: -45px;
     max-height: calc(var(--section-height) * 1.5 + 100px);
     overflow: hidden;
+    /* https://stackoverflow.com/questions/6421966/css-overflow-x-visible-and-overflow-y-hidden-causing-scrollbar-issue */
+    margin-left: -100px;
+    padding-left: 100px;
 }
 .assignment-scroller-image {
     display: block;
@@ -46,8 +49,10 @@ main {
     transform-origin: right;
     /* why the f*ck does this work */
     width: min(var(--assignment-scroller-max-width), 64vw - 14vh - 143px);
+    transition: cubic-bezier(0.5, -0.8, 0.43, 1.56) transform 0.35s;
 }
-.assignment-scroller-image:hover {
+.assignment-scroller-image:hover,
+.assignment-scroller-image.hover {
     transform: scale(1.1);
 }
 #graph-image {
