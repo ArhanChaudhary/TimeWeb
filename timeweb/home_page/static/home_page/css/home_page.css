@@ -34,7 +34,6 @@ main {
     margin-right: 90px;
 }
 #first-right {
-    filter: drop-shadow(0px 0px 6px hsl(0deg 0% 82%));
     align-self: flex-start;
     margin-top: -45px;
     max-height: calc(var(--section-height) * 1.5 + 100px);
@@ -42,10 +41,14 @@ main {
 }
 .assignment-scroller-image {
     display: block;
-    padding-bottom: 10px;
-    padding-top: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0px 0px 6px hsl(0deg 0% 82%);
+    transform-origin: right;
     /* why the f*ck does this work */
     width: min(var(--assignment-scroller-max-width), 64vw - 14vh - 143px);
+}
+.assignment-scroller-image:hover {
+    transform: scale(1.1);
 }
 #graph-image {
     display: block;
