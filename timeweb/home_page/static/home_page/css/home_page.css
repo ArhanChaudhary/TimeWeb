@@ -66,6 +66,11 @@ main {
     min-height: 494px;
     max-width: calc(100% - 80px);
     max-height: 65vh;
+    box-shadow: 0 0 40px -20px black;
+}
+#graph-description {
+    font-size: 23px;
+    font-family: "Open Sans";
 }
 #second-right {
     width: min(calc(50vw - var(--assignment-scroller-image-mid-offset) + var(--assignment-scroller-inner-margin)), var(--assignment-scroller-max-width) + var(--assignment-scroller-inner-margin));
@@ -79,11 +84,6 @@ main {
     box-shadow: 58px -12px 17px -4px var(--even-section-color),
                 -60px -4px 51px 20px var(--even-section-color),
                 -60px -103px 443px 49px var(--even-section-color);
-}
-@media screen and (max-width: 1400px) {
-    main {
-        --left-section-margin: 35px;
-    }
 }
 /* 1050px is mobile */
 @font-face {
