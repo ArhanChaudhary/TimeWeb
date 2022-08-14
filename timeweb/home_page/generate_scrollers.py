@@ -28,7 +28,7 @@ for i in range(img.width - 1 - good_column_padding, good_column_padding, -1):
 top = None
 bottom = None
 left = 0
-right = img.width - 500
+right = img.width - 700
 
 count = 0
 old_color = wanted_column_colors[1]
