@@ -1,5 +1,7 @@
 function getFirstSectionMid() {
-    return $("#first").height() / 2 + 10 + parseFloat($("#first-right").css("border-spacing")) - 30; // pretends like the property is negative
+    let a = $("#first").height() / 2 + parseFloat($("#first-right").css("border-spacing")) - 40; // pretends like the property is negative
+    console.log(a, $("#first").height() / 2);
+    return a;
 }
 function setMoveLefts() {
     const section_mid = getFirstSectionMid();
@@ -24,7 +26,7 @@ function scrollDown() {
     let move_up = $(most_left).find(".assignment-scroller-image").outerHeight(true);
     let org = move_up;
     move_up -= section_mid - mid;
-    move_up += Math.random() * 170 - 140;
+    // move_up += Math.random() * 140 - 70; // this doesnt work as intended completely, work on this
     if (move_up < org /* allow for some leeway */) {
         move_up = org;
     }
@@ -32,12 +34,19 @@ function scrollDown() {
         $(".assignment-scroller-image-extender").each(function() {
             $(this).toggleClass("hover", $(this).prev().is(most_left));
         });
-    }, 400);
+    }, 200);
     $("#first-right").animate({
         textIndent: "-=" + move_up,
-        borderSpacing: (Math.random() < 0.5 ? 1 : -1) * (Math.random() * 15 + 15) + 30,
+        borderSpacing: (() => {
+            if (Math.random() < 0.5) {
+                var vertical_offset = Math.random() * 20 - 40
+            } else {
+                var vertical_offset = Math.random() * 20 + 30
+            }
+            return vertical_offset + 40;
+        })(),
     }, {
-        duration: 1000,
+        duration: 500,
         step: function(now, e) {
             if (e.prop === "borderSpacing") return;
             this.style.setProperty("--move-up", now + "px");
