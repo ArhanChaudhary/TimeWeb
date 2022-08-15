@@ -79,7 +79,15 @@ main {
 }
 .assignment-scroller-image-extender {
     position: relative;
-    transition: cubic-bezier(0.5, -0.8, 0.43, 1.56) transform 0.35s;
+    transition: transform 0.35s;
+}
+.assignment-scroller-image-extender:hover,
+.assignment-scroller-image-extender.hover {
+    transition-timing-function: cubic-bezier(0.5, -0.8, 0.43, 1.56) !important;
+}
+.assignment-scroller-image-extender:not(:hover),
+.assignment-scroller-image-extender:not(.hover) {
+    transition-timing-function: ease-out;
 }
 .assignment-scroller-image-extender::after,
 .assignment-scroller-image-extender::before {
