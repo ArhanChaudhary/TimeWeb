@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="{% static 'home_page/css/home_page.css' %}">
 {% endblock %}
 
+{% block base_head_js %}
+<script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'home_page/js/home_page.js' %}"></script>
+{% endblock %}
+
 {% block base_head_body %}
 <main>
     <div class="section-block" id="first">
@@ -14,10 +19,12 @@
                 {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
             </span>
             <span class="section-side" id="first-right">
-                {% for scroller in random_scrollers %}
-                    <span class="assignment-scroller-image-extender">
-                        <img alt class="assignment-scroller-image" draggable="false" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
-                    </span>
+                {% for i in "xxx" %}
+                    {% for scroller in random_scrollers %}
+                        <span class="assignment-scroller-image-extender">
+                            <img alt class="assignment-scroller-image" draggable="false" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
+                        </span>
+                    {% endfor %}
                 {% endfor %}
             </span>
         </span>
@@ -30,7 +37,7 @@
             <span class="section-side" id="second-right">
                 Take a fine-grained control over your work
                 <p id="graph-description">
-                    An easy and highly customizable interface for your assignment's work schedule. Know what to do, when to do it, and for how long.
+                    An easy and highly customizable interface for your assignments' work schedules. Know what to do, when to do it, and for how long.
                 </p>
             </span>
         </span>

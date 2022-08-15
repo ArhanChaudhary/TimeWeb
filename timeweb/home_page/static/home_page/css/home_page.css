@@ -32,16 +32,23 @@ main {
 .section-max-width-wrapper {
     justify-content: space-between;
 }
+#second, #third {
+    position: relative;
+    z-index: 1;
+}
 #first-left {
     margin-right: var(--left-section-margin);
     flex-shrink: 0;
 }
 #first-right {
+    transform: translateY(var(--move-up));
     margin-top: -45px;
+    margin-right: -105px;
     max-height: calc(var(--section-height) + 45px);
     position: relative;
 }
-#first-right::after {
+#first-right::after,
+#first-right::before {
     left: 0;
     box-shadow: 0 0 70px 157px rgb(255 255 255 / 80%), 0 0 50px 50px white;
     content: "";
@@ -49,20 +56,25 @@ main {
     width: 100vw;
     position: absolute;
     top: 100%;
+    transform: translateY(calc(var(--move-up) * -1));
+}
+#first-right::before {
+    top: 0;
+    z-index: 1;
 }
 .assignment-scroller-image {
     transition: inherit;
     display: block;
+    margin-left: var(--move-left);
     margin-bottom: 20px;
-    margin-right: calc(-1 * var(--site-horizontal-padding));
     box-shadow: 0 0 6px 0 hsl(0deg 0% 82%), 
                 /* fake the effect of drop-shadow by plugging in the image corner holes */
                 inset 0 0 0px 2px hsl(0deg 0% 93%);
     transform-origin: right;
     width: calc(525px + var(--site-horizontal-padding));
 }
-.assignment-scroller-image:hover,
-.assignment-scroller-image.hover {
+.assignment-scroller-image-extender:hover .assignment-scroller-image,
+.assignment-scroller-image-extender.hover .assignment-scroller-image {
     transform: scale(1.1);
 }
 .assignment-scroller-image-extender {
@@ -78,19 +90,21 @@ main {
     transition: inherit;
 }
 .assignment-scroller-image-extender::after {
-    left: calc(100% + var(--site-horizontal-padding));
+    left: calc(100% + var(--move-left));
     width: 100vw;
     box-shadow: 0 0 6px 0 hsl(0deg 0% 82%);
 }
 .assignment-scroller-image-extender::before {
-    width: 10px;
+    width: 30px;
     z-index: 1;
-    left: calc(100% + var(--site-horizontal-padding) - 5px);
+    left: calc(100% + var(--move-left) - 5px);
     background-color: white;
     box-shadow: none;
 }
 .assignment-scroller-image-extender:hover::after,
-.assignment-scroller-image-extender:hover::before {
+.assignment-scroller-image-extender.hover::after,
+.assignment-scroller-image-extender:hover::before,
+.assignment-scroller-image-extender.hover::before {
     transform: scaleY(1.1);
 }
 #first .section-max-width-wrapper {
@@ -98,12 +112,8 @@ main {
 }
 .section-max-width-wrapper {
     margin: 0 var(--site-horizontal-padding);
-    max-width: 1335px;
+    max-width: 1235px;
     width: calc(100% - var(--site-horizontal-padding) * 2);
-}
-#second {
-    z-index: 1;
-    position: relative;
 }
 #graph-image {
     display: block;
