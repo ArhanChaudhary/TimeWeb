@@ -1,7 +1,5 @@
 function getFirstSectionMid() {
-    let a = $("#first").height() / 2 + parseFloat($("#first-right").css("border-spacing")) - 40; // pretends like the property is negative
-    console.log(a, $("#first").height() / 2);
-    return a;
+    return $("#first").height() / 2 + 10;
 }
 function setMoveLefts() {
     const section_mid = getFirstSectionMid();
@@ -21,15 +19,10 @@ function scrollDown() {
 
     const most_left = $(".assignment-scroller-image-extender").toArray().reduce((prev, current) => parseFloat(window.getComputedStyle(current).getPropertyValue("--move-left")) < parseFloat(window.getComputedStyle(prev).getPropertyValue("--move-left")) ? current : prev);
     const mid = $(most_left).offset().top + $(most_left).height() / 2;
-    const section_mid = getFirstSectionMid();
 
     let move_up = $(most_left).find(".assignment-scroller-image").outerHeight(true);
-    let org = move_up;
-    move_up -= section_mid - mid;
-    // move_up += Math.random() * 140 - 70; // this doesnt work as intended completely, work on this
-    if (move_up < org /* allow for some leeway */) {
-        move_up = org;
-    }
+    // correction (centering the image)
+    move_up += mid - getFirstSectionMid();
     setTimeout(() => {
         $(".assignment-scroller-image-extender").each(function() {
             $(this).toggleClass("hover", $(this).prev().is(most_left));
@@ -37,18 +30,9 @@ function scrollDown() {
     }, 200);
     $("#first-right").animate({
         textIndent: "-=" + move_up,
-        borderSpacing: (() => {
-            if (Math.random() < 0.5) {
-                var vertical_offset = Math.random() * 20 - 40
-            } else {
-                var vertical_offset = Math.random() * 20 + 30
-            }
-            return vertical_offset + 40;
-        })(),
     }, {
         duration: 500,
-        step: function(now, e) {
-            if (e.prop === "borderSpacing") return;
+        step: function(now) {
             this.style.setProperty("--move-up", now + "px");
             setMoveLefts();
         },
