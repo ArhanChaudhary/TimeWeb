@@ -9,9 +9,7 @@ main {
     --left-section-margin: 70px;
     --odd-section-color: white;
     --even-section-color: hsl(0, 0%, 95%);
-    --assignment-scroller-image-mid-offset: 90px;
-    --assignment-scroller-max-width: 525px;
-    --assignment-scroller-inner-margin: 20px;
+    --site-horizontal-padding: 30px;
 }
 .section-block:nth-child(odd) {
     background-color: var(--odd-section-color);
@@ -21,51 +19,101 @@ main {
 }
 .section-block {
     height: var(--section-height);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     font-size: 40px;
 }
-.section-block#first {
-    padding-left: var(--left-section-margin);
+.section-block,
+.section-max-width-wrapper {
+    display: flex;
+    align-items: center;
+}
+.section-block {
+    justify-content: center;
+}
+.section-max-width-wrapper {
+    justify-content: space-between;
 }
 #first-left {
+    margin-right: var(--left-section-margin);
     flex-shrink: 0;
-    margin-right: 90px;
 }
 #first-right {
-    align-self: flex-start;
     margin-top: -45px;
-    max-height: calc(var(--section-height) * 1.5 + 100px);
-    overflow: hidden;
-    /* https://stackoverflow.com/questions/6421966/css-overflow-x-visible-and-overflow-y-hidden-causing-scrollbar-issue */
-    margin-left: -100px;
-    padding-left: 100px;
+    max-height: calc(var(--section-height) + 45px);
+    position: relative;
+}
+#first-right::after {
+    left: 0;
+    box-shadow: 0 0 70px 157px rgb(255 255 255 / 80%), 0 0 50px 50px white;
+    content: "";
+    height: 0;
+    width: 100vw;
+    position: absolute;
+    top: 100%;
 }
 .assignment-scroller-image {
+    transition: inherit;
     display: block;
     margin-bottom: 20px;
+    margin-right: calc(-1 * var(--site-horizontal-padding));
     box-shadow: 0 0 6px 0 hsl(0deg 0% 82%), 
-    /* fake the effect of drop-shadow by plugging in the image corner holes */
-    inset 0 0 0px 2px hsl(0deg 0% 93%);
+                /* fake the effect of drop-shadow by plugging in the image corner holes */
+                inset 0 0 0px 2px hsl(0deg 0% 93%);
     transform-origin: right;
-    width: min(var(--assignment-scroller-max-width), 64vw - 14vh - 143px); /* why the f*ck does this work */
-    transition: cubic-bezier(0.5, -0.8, 0.43, 1.56) transform 0.35s;
+    width: calc(525px + var(--site-horizontal-padding));
 }
 .assignment-scroller-image:hover,
 .assignment-scroller-image.hover {
     transform: scale(1.1);
 }
+.assignment-scroller-image-extender {
+    position: relative;
+    transition: cubic-bezier(0.5, -0.8, 0.43, 1.56) transform 0.35s;
+}
+.assignment-scroller-image-extender::after,
+.assignment-scroller-image-extender::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: inherit;
+}
+.assignment-scroller-image-extender::after {
+    left: calc(100% + var(--site-horizontal-padding));
+    width: 100vw;
+    box-shadow: 0 0 6px 0 hsl(0deg 0% 82%);
+}
+.assignment-scroller-image-extender::before {
+    width: 10px;
+    z-index: 1;
+    left: calc(100% + var(--site-horizontal-padding) - 5px);
+    background-color: white;
+    box-shadow: none;
+}
+.assignment-scroller-image-extender:hover::after,
+.assignment-scroller-image-extender:hover::before {
+    transform: scaleY(1.1);
+}
+#first .section-max-width-wrapper {
+    align-self: flex-start;
+}
+.section-max-width-wrapper {
+    margin: 0 var(--site-horizontal-padding);
+    max-width: 1335px;
+    width: calc(100% - var(--site-horizontal-padding) * 2);
+}
+#second {
+    z-index: 1;
+    position: relative;
+}
 #graph-image {
     display: block;
     position: relative;
     z-index: 2;
-    margin-left: var(--left-section-margin);
     min-width: 500px;
     /* make sure to change min-height to the height of the image at the min-width if i ever change the image */
     min-height: 494px;
-    max-width: calc(100% - 80px);
-    max-height: 65vh;
+    max-width: calc(100% - 10px);
+    max-height: 70vh;
     box-shadow: 0 0 40px -20px black;
 }
 #graph-description {
@@ -73,19 +121,14 @@ main {
     font-family: "Open Sans";
 }
 #second-right {
-    width: min(calc(50vw - var(--assignment-scroller-image-mid-offset) + var(--assignment-scroller-inner-margin)), var(--assignment-scroller-max-width) + var(--assignment-scroller-inner-margin));
+    width: min(calc(50vw - 120px), 545px);
     position: relative;
-    background-color: inherit;
     z-index: 1;
     padding: 20px 0;
-    margin-left: 15px;
-    padding-right: 15px;
+    margin-left: 40px;
     box-sizing: border-box;
-    box-shadow: 58px -12px 17px -4px var(--even-section-color),
-                -60px -4px 51px 20px var(--even-section-color),
-                -60px -103px 443px 49px var(--even-section-color);
 }
-/* 1050px is mobile */
+/* 1200px is mobile */
 @font-face {
     font-family: futura-pt;
     src: url(".fonts/Futura PT Heavy.ttf");

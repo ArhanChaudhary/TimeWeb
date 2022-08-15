@@ -8,34 +8,37 @@
 {% block base_head_body %}
 <main>
     <div class="section-block" id="first">
-        <span class="section-side" id="first-left">
-            The new way to<br>manage your time
-            {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
-        </span>
-        <span class="section-side" id="first-right">
-            {% for scroller in random_scrollers %}
-                <img alt class="assignment-scroller-image" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
-            {% endfor %}
+        <span class="section-max-width-wrapper">
+            <span class="section-side" id="first-left">
+                The new way to<br>manage your time
+                {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
+            </span>
+            <span class="section-side" id="first-right">
+                {% for scroller in random_scrollers %}
+                    <span class="assignment-scroller-image-extender">
+                        <img alt class="assignment-scroller-image" draggable="false" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
+                    </span>
+                {% endfor %}
+            </span>
         </span>
     </div>
     <div class="section-block" id="second">
-        <span class="section-side" id="second-left">
-            <img id="graph-image" alt src="{% static 'home_page/images/light_graph.webp' %}">
-        </span>
-        <span class="section-side" id="second-right">
-            Take a fine-grained control over your work
-            <p id="graph-description">
-                An easy and highly customizable interface for your assignment's work schedule. Know what to do, when to do it, and for how long.
-            </p>
+        <span class="section-max-width-wrapper">
+            <span class="section-side" id="second-left">
+                <img id="graph-image" alt src="{% static 'home_page/images/light_graph.webp' %}">
+            </span>
+            <span class="section-side" id="second-right">
+                Take a fine-grained control over your work
+                <p id="graph-description">
+                    An easy and highly customizable interface for your assignment's work schedule. Know what to do, when to do it, and for how long.
+                </p>
+            </span>
         </span>
     </div>
     <div class="section-block" id="third">
         
     </div>
     <div class="section-block" id="fourth">
-        
-    </div>
-    <div class="section-block" id="fifth">
         
     </div>
 </main>
