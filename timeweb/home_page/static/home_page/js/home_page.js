@@ -51,3 +51,10 @@ $(window).one("load", function() {
     scrollDown();
     setInterval(scrollDown, 2000);
 });
+let turns = 0;
+let turn_mod = window.getComputedStyle($("#hour-hand")[0]).getPropertyValue("--turns-per-turn");
+$(window).scroll(function() {
+    $("#favicon-animated").prop("style").setProperty("--turns", turns);
+    turns += 0.05;
+    turns %= turn_mod;
+});

@@ -146,6 +146,37 @@ main {
     margin-left: 40px;
     box-sizing: border-box;
 }
+
+
+
+
+
+
+.section-block#fifth {
+    color: white;
+    background-color: hsl(183deg 92% 41%);
+}
+.section-block#fifth .section-max-width-wrapper {
+    max-width: 800px;
+}
+#favicon-animated {
+    position: absolute;
+    right: 0;
+    left: 0;
+    margin-right: auto;
+    margin-left: auto;
+    top: 25px;
+    filter: drop-shadow(0 0 10px white);
+    width: 150px;
+    --turns: 1;
+}
+#minute-hand {
+    transform: translate(255.81px, 255.967549px) rotate(calc(var(--turns) * 1turn));
+}
+#hour-hand {
+    --turns-per-turn: 5;
+    transform: translate(256px,255.967549px) rotate(calc(227deg + var(--turns) / var(--turns-per-turn) * 1turn));
+}
 /* 1200px is mobile */
 @font-face {
     font-family: futura-pt;
