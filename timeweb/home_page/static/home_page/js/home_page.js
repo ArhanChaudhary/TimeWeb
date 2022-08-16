@@ -1,5 +1,5 @@
 function getFirstSectionMid() {
-    return $("#first").height() / 2 + 10;
+    return $(".section-block#first").height() / 2 + 10;
 }
 function setMoveLefts() {
     const section_mid = getFirstSectionMid();
@@ -28,7 +28,7 @@ function scrollDown() {
             $(this).toggleClass("hover", $(this).prev().is(most_left));
         });
     }, 200);
-    $("#first-right").animate({
+    $(".section-block#first .right-section-side").animate({
         textIndent: "-=" + move_up,
     }, {
         duration: 500,
@@ -38,7 +38,7 @@ function scrollDown() {
         },
         complete: function() {
             const last = $(".assignment-scroller-image-extender").last();
-            if (last.offset().top + last.height() < $("#first").offset().top + $("#first").height()) {
+            if (last.offset().top + last.height() < $(".section-block#first").offset().top + $(".section-block#first").height()) {
                 $(this).css("text-indent", "0px");
                 this.style.setProperty("--move-up", "0px");
                 setMoveLefts();
