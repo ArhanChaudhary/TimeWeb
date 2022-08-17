@@ -5,7 +5,7 @@
     overflow: hidden;
 }
 main {
-    --section-height: max(575px, 85vh);
+    --preferred-section-height: 85vh;
     --left-section-margin: 70px;
     --odd-section-color: white;
     --even-section-color: hsl(0, 0%, 95%);
@@ -28,9 +28,14 @@ main {
 }
 .section-block {
     justify-content: center;
+    /* needs to be at .section-block so --preferred-sction-height can be overwritten */
+    --section-height: max(575px, var(--preferred-section-height));
 }
 .section-max-width-wrapper {
     justify-content: space-between;
+}
+.section-block#first {
+    --preferred-section-height: calc(100vh - 40px);
 }
 .section-block:not(#first) {
     position: relative;
@@ -42,20 +47,16 @@ main {
 }
 .section-block#first .right-section-side {
     transform: translateY(var(--move-up));
-    margin-right: -275px;
+    margin-right: -675px;
     max-height: calc(var(--section-height) + 45px);
     position: relative;
+    transition: margin-right 2.75s cubic-bezier(0.02, 1, 1, 1);
 }
-.section-block#first .right-section-side::after,
-.section-block#first .right-section-side::before {
-    left: 0;
-    box-shadow: 0 0 70px 157px rgb(255 255 255 / 80%), 0 0 50px 50px white;
-    content: "";
-    height: 0;
-    width: 100vw;
-    position: absolute;
-    top: 100%;
-    transform: translateY(calc(var(--move-up) * -1));
+.section-block#first .right-section-side.animate {
+    margin-right: -375px;
+}
+.section-block#first .right-section-side:not(.animate) {
+    visibility: hidden;
 }
 .section-block#first .right-section-side::before {
     top: 0;
@@ -113,9 +114,6 @@ main {
 .assignment-scroller-image-extender:hover::before,
 .assignment-scroller-image-extender.hover::before {
     transform: scaleY(1.1);
-}
-.section-block#first .section-max-width-wrapper {
-    align-self: flex-start;
 }
 .section-max-width-wrapper {
     margin: 0 var(--site-horizontal-padding);
