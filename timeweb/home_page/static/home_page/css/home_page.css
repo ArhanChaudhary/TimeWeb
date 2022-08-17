@@ -42,8 +42,7 @@ main {
 }
 .section-block#first .right-section-side {
     transform: translateY(var(--move-up));
-    margin-top: -45px;
-    margin-right: -105px;
+    margin-right: -275px;
     max-height: calc(var(--section-height) + 45px);
     position: relative;
 }
