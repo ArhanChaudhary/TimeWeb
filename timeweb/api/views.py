@@ -393,6 +393,8 @@ def gc_auth_callback(request):
 
     # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
     authorization_response = request.build_absolute_uri()
+    # turn those parameters into a token
+    flow.fetch_token(authorization_response=authorization_response)
     try:
         credentials = flow.credentials
     except ValueError:
@@ -402,8 +404,6 @@ def gc_auth_callback(request):
         return redirect(request.session.pop("gc-callback-current-url"))
 
     try:
-        # turn those parameters into a token
-        flow.fetch_token(authorization_response=authorization_response)
         # Ensure the user enabled both scopes
         service = build('classroom', 'v1', credentials=credentials)
         service.courses().list().execute()
