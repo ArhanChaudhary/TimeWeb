@@ -160,16 +160,11 @@ class Crud {
             if (6 <= picker.startDate.hours() && picker.startDate.hours() <= 11)
             $.alert({
                 title: "Your due time is early.",
-                content: "For an assignment due in the morning, TimeWeb assigns work past midnight on the day it is due. To avoid this, set the due time to midnight (i.e. before you sleep)",
+                content: "For an assignment due in the morning, TimeWeb assigns work past midnight on the day it is due. To avoid this, set the due time to midnight",
                 backgroundDismiss: false,
                 buttons: {
                     ignore: function() {
                         
-                    },
-                    "Set to your sleep time": {
-                        action: function() {
-                            $("#id_x").click();
-                        },
                     },
                     "Set to midnight": {
                         action: function() {
