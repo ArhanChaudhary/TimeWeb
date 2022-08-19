@@ -46,26 +46,21 @@ main {
     flex-shrink: 0;
 }
 .section-block#first .right-section-side {
-    transform: translateY(var(--move-up));
-    margin-right: -675px;
-    max-height: calc(var(--section-height) + 45px);
+    transform: translate(400px, var(--move-up, 0px));
+    max-height: var(--section-height);
     position: relative;
-    transition: margin-right 2.75s cubic-bezier(0.02, 1, 1, 1);
+    transition: transform 2.75s cubic-bezier(0.02, 1, 1, 1);
 }
 .section-block#first .right-section-side.animate {
-    margin-right: -375px;
-}
-.section-block#first .right-section-side:not(.animate) {
-    visibility: hidden;
+    transform: translate(200px, var(--move-up, 0px));
 }
 .section-block#first .right-section-side::before {
     top: 0;
     z-index: 1;
 }
 .assignment-scroller-image {
-    transition: inherit;
+    transition: var(--scale-transition);
     display: block;
-    margin-left: var(--move-left);
     margin-bottom: 20px;
     box-shadow: 0 0 6px 0 hsl(0deg 0% 82%), 
                 /* fake the effect of drop-shadow by plugging in the image corner holes */
@@ -73,21 +68,20 @@ main {
     transform-origin: right;
     width: calc(525px + var(--site-horizontal-padding));
 }
-.assignment-scroller-image-extender:hover .assignment-scroller-image,
-.assignment-scroller-image-extender.hover .assignment-scroller-image {
+.assignment-scroller-image-extender:hover .assignment-scroller-image {
     transform: scale(1.1);
 }
 .assignment-scroller-image-extender {
+    display: block;
     position: relative;
-    transition: transform 0.35s;
+    transform: translateX(var(--move-left));
+    /* right: -180px; */
 }
-.assignment-scroller-image-extender:hover,
-.assignment-scroller-image-extender.hover {
-    transition-timing-function: cubic-bezier(0.5, -0.8, 0.43, 1.56) !important;
+.assignment-scroller-image-extender:hover {
+    --scale-transition: transform 0.35s cubic-bezier(0.5, -0.8, 0.43, 1.56);
 }
-.assignment-scroller-image-extender:not(:hover),
-.assignment-scroller-image-extender:not(.hover) {
-    transition-timing-function: ease-out;
+.assignment-scroller-image-extender:not(:hover) {
+    --scale-transition: transform 0.35s ease-out;
 }
 .assignment-scroller-image-extender::after,
 .assignment-scroller-image-extender::before {
@@ -95,24 +89,22 @@ main {
     position: absolute;
     top: 0;
     height: 100%;
-    transition: inherit;
+    transition: var(--scale-transition);
 }
 .assignment-scroller-image-extender::after {
-    left: calc(100% + var(--move-left));
+    left: 100%;
     width: 100vw;
     box-shadow: 0 0 6px 0 hsl(0deg 0% 82%);
 }
 .assignment-scroller-image-extender::before {
     width: 30px;
     z-index: 1;
-    left: calc(100% + var(--move-left) - 5px);
+    left: calc(100% - 5px);
     background-color: white;
     box-shadow: none;
 }
 .assignment-scroller-image-extender:hover::after,
-.assignment-scroller-image-extender.hover::after,
-.assignment-scroller-image-extender:hover::before,
-.assignment-scroller-image-extender.hover::before {
+.assignment-scroller-image-extender:hover::before {
     transform: scaleY(1.1);
 }
 .section-max-width-wrapper {
@@ -172,9 +164,23 @@ main {
 }
 #hour-hand {
     --turns-per-turn: 5;
-    transform: translate(256px,255.967549px) rotate(calc(227deg + var(--turns) / var(--turns-per-turn) * 1turn));
+    transform: translate(256px, 255.967549px) rotate(calc(227deg + var(--turns) / var(--turns-per-turn) * 1turn));
 }
-/* 1200px is mobile */
+@media screen and (max-width: 1100px) {
+    .section-block#first > .section-max-width-wrapper {
+        flex-flow: column;
+    }
+    .section-block#second > .section-max-width-wrapper {
+        flex-flow: column-reverse;
+    }
+    .section-block#second .right-section-side {
+        width: initial;
+        margin-left: initial;
+    }
+    .section-block#first .right-section-side {
+        max-height: calc(100vh - 160px);
+    }
+}
 @font-face {
     font-family: futura-pt;
     src: url(".fonts/Futura PT Heavy.ttf");
