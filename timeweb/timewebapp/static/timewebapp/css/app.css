@@ -914,6 +914,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     display: flex;
     visibility: hidden;
     justify-content: center;
+    white-space: nowrap;
     flex-wrap: wrap;
     margin-right: 45px;
     margin-left: 45px;
