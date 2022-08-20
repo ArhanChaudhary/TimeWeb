@@ -169,7 +169,6 @@ tickClock: function() {
                 old_now_due_dates_passed++;
             }
         }
-        console.log(now_due_dates_passed, old_now_due_dates_passed);
         utils.ui.tickClock.oldNow = now;
 
         if (old_now_due_dates_passed !== now_due_dates_passed) {

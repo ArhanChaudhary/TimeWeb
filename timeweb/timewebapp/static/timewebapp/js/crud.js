@@ -622,6 +622,13 @@ class Crud {
         }
     }
     addInfoButtons() {
+        $("#id_name").info('left',
+            `Only enter an assignment's name to mark it as "needs more info". Useful as a reminder system for assignments that take too little time to complete to fully submit into the assignment form.`, 
+        "after").css({
+            marginTop: -22,
+            marginLeft: "auto",
+            marginRight: 7,
+        });
         $("#id_unit").info('left',
             `This is how your assignment will be split and divided up
             
