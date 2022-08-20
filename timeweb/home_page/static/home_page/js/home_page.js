@@ -11,32 +11,38 @@ now = 0;
 function setMoveLefts() {
     const section_mid = $(".section-block#first").height() / 2;
     $(".assignment-scroller-image").each(function() {
-        if ($(this).offset().top + $(this).height() > 0 && $(this).offset().top < $("#second").offset().top) {
-            let mid = $(this).offset().top + $(this).height() / 2;
-            let linear_factor = 1 - Math.abs(section_mid - mid) / section_mid;
-            if (linear_factor < 0.5) {
-                var opacity = linear_factor * 1.2 + 0.3;
-            } else {
-                var opacity = 1;
-            }
-            $(this).css("opacity", opacity);
-            const scaled_factor = -scalingFunction(linear_factor);
-            this.parentElement.style.setProperty("--move-left", scaled_factor * scaled_horizontal_factor + "px");
+        let in_view = $(this).offset().top + $(this).height() > 0 && $(this).offset().top < $("#second").offset().top;
+        if (!in_view) return;
+
+        let mid = $(this).offset().top + $(this).height() / 2;
+        let linear_factor = 1 - Math.abs(section_mid - mid) / section_mid;
+        if (linear_factor < 0.5) {
+            var opacity = linear_factor * 1.2 + 0.3;
         } else {
-            this.parentElement.style.setProperty("--move-left", "0px");
+            var opacity = 1;
         }
+        $(this).css("opacity", opacity);
+        const scaled_factor = -scalingFunction(linear_factor);
+        this.parentElement.style.setProperty("--move-left", scaled_factor * scaled_horizontal_factor + "px");
     });
 }
+velocity_stop = false;
+position_stop = false;
+needs_restarting = false;
 $(window).one("load", function() {
     const last = $(".assignment-scroller-image-extender").last();
-    const container = $(".section-block#first .right-section-side").prop("style");
+    const container = $(".section-block#first .right-section-side");
     setMoveLefts();
     $(".section-block#first .right-section-side").addClass("animate");
     let diff = 0.2;
     let diff_diff = 0.07;
     let scaled_horizontal_factor_diff = 4.6;
-    function step() {
-        container.setProperty("--move-up", now + "px");
+    step = () => {
+        if (velocity_stop || position_stop) {
+            needs_restarting = true;
+            return;
+        }
+        container.prop("style").setProperty("--move-up", now + "px");
         setMoveLefts();
         now -= diff;
         if (diff < 1.5) {
@@ -49,15 +55,58 @@ $(window).one("load", function() {
                 scaled_horizontal_factor_diff -= 0.08;
         }
         if (last.offset().top + last.height() < $(".section-block#first").offset().top + $(".section-block#first").height()) {
+            container.css("transition", "none");
             now = 0;
+            container.prop("style").setProperty("--move-up", now + "px");
+            container[0].offsetHeight;
+            container.css("transition", "");
         }
         requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
-    turn_mod = window.getComputedStyle($("#hour-hand")[0]).getPropertyValue("--turns-per-turn");
 });
 let turns = 0;
-$(window).scroll(function() {
+$(function() {
+    turn_mod = window.getComputedStyle($("#hour-hand")[0]).getPropertyValue("--turns-per-turn");
+});
+let old_position;
+let old_time;
+let old_velocity;
+$(window).scroll(function(e) {
+    const new_position = document.documentElement.scrollTop;
+    const new_time = e.originalEvent.timeStamp;
+    const new_velocity = (new_position - old_position) / (new_time - old_time);
+
+    // there are cases when, if you scroll really fast, the velocity is still something like -1 because
+    // the scroll event can happen right before you reach the top and then again right after when you hit the top,
+    // giving the false illusion of a slow velocity
+    
+    // store the past velocity to fix this
+    const min_velocity = Math.min(old_velocity, new_velocity);
+    if (new_position === 0 && min_velocity < -2.5) {
+        now += min_velocity * 25;
+    }
+
+    velocity_stop = new_velocity < -5;
+    if (new_position === 0) {
+        velocity_stop = false;
+    }
+    let first_section_height = $(".section-block#first").height();
+    position_stop = new_position >= first_section_height;
+    if (new_position < first_section_height && old_position >= first_section_height) {
+        position_stop = false;
+    }
+
+    if (!(velocity_stop || position_stop) && needs_restarting) {
+        needs_restarting = false;
+        requestAnimationFrame(step);
+    }
+
+    old_position = new_position;
+    old_time = new_time;
+    old_velocity = new_velocity;
+
+    
     $("#favicon-animated").prop("style").setProperty("--turns", turns);
     turns += 0.05;
     turns %= turn_mod;
