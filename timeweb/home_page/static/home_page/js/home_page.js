@@ -84,7 +84,7 @@ $(window).scroll(function(e) {
     // store the past velocity to fix this
     const min_velocity = Math.min(old_velocity, new_velocity);
     if (new_position === 0 && min_velocity < -2.5) {
-        now += min_velocity * 25;
+        now += Math.max(-300, min_velocity * 25);
     }
 
     velocity_stop = new_velocity < -5;
