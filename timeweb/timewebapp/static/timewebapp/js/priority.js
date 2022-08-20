@@ -486,7 +486,8 @@ class Priority {
             }).toggle(
                 !(
                     [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
-                    || status_value === Priority.COMPLETELY_FINISHED && !already_entered_work_input_for_today
+                    // don't show a check mark or star icon and an unslashed tick
+                    || [Priority.FINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHE].includes(status_value) && !already_entered_work_input_for_today
                 )
             ).toggleClass("slashed", already_entered_work_input_for_today);
             assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
