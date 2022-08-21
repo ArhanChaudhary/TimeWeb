@@ -399,7 +399,7 @@ addTagHandlers: function() {
             tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
         });
     }
-    // might be easier to attach the click to $(document) but will do later
+    // TODO: might be easier to attach the click to $(document) but will do later
     $(".tag-add").click(tagAddClick);
     let tag_names = new Set();
     function tagAddClick(e) {

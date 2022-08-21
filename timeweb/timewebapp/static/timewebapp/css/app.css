@@ -589,7 +589,9 @@ do this because midde-of-header is hidden in the delete assignments view */
     background: var(--background-color) !important;
     transform-origin: top;
     transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
-    transition: transform calc(0.15s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
+    /* let's use 0.14 instead of 0.15 because 0.15 can overflow offscreen and cause the 
+    x scrollbar to show up */
+    transition: transform calc(0.14s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
                 opacity calc(0.1s * var(--animation-speed)) ease-out;
 }
 .tag-add-box::after {
