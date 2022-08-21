@@ -26,6 +26,15 @@
                     
                 });
             }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                // give .oudated-serviceworker-registration-bugfix a grey background
+                for (let i of document.querySelectorAll('.oudated-serviceworker-registration-bugfix')) {
+                    i.style.backgroundColor = 'hsl(0deg, 0%, 90%)';
+                    i.style.zIndex = "9999";
+                    i.style.position = "relative";
+                }
+            });
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
         {% progressive_web_app_meta %}
@@ -58,7 +67,7 @@
         if not, user will reload 
         {% endcomment %}
         <h1 class="oudated-serviceworker-registration-bugfix"><b>TimeWeb is currently outdated, please reload this page. Thank you.</b></h1>
-        <h2 class="oudated-serviceworker-registration-bugfix">Old visiters of TimeWeb will use its old, cached service worker on their first visit, which doesn't update quickly enough to be replaced by this page load.</h2>
+        <h2 class="oudated-serviceworker-registration-bugfix">Old visiters of TimeWeb will use its old, cached service worker on their first visit, which doesn't update quickly enough to be replaced by this page load. This will result in styling content failing to load.</h2>
         <div id="site">
             {% comment %} 
             remember to have a <main> on these blocks, many stylesheets and scripts rely on that being present 
