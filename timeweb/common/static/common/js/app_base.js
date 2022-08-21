@@ -60,7 +60,7 @@ $(function() {
             $("#username").blur();
     });
     $("#account-dropdown").css("display", "block");
-    $("#account-dropdown").css("margin-right", Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9)));
+    $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
     $("#account-dropdown").css("display", "");
 
     if ($("#user-greeting").length) {

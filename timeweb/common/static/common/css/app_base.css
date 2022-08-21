@@ -230,6 +230,8 @@ main.finished-header-transition {
     transform: translate(50%, 16px);
     white-space: nowrap;
     border: 3px solid transparent;
+    --margin-right: 0px;
+    margin-right: var(--margin-right);
     -webkit-text-fill-color: currentcolor;
 }
 #username:focus-within #account-dropdown {
@@ -242,7 +244,7 @@ main.finished-header-transition {
     border-color: transparent transparent rgb(43, 56, 68) transparent;
     bottom: 100%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateX(var(--margin-right));
     position: absolute;
 }
 #account-dropdown :hover,
