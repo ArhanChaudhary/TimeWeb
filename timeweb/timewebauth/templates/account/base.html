@@ -27,7 +27,7 @@
       <div id="logo-container">
         {% url 'account_login' as account_login %}
         {% if request.path == account_login %}
-          <a id="accounts-arrow-anchor" href="{% url 'account_login' %}">
+          <a id="accounts-arrow-anchor" href="{% url 'home' %}">
             <div id="accounts-arrow-container">
               <div id="accounts-arrow-horizontal"></div>
             </div>
