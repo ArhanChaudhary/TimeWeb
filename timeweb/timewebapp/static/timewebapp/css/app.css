@@ -466,10 +466,6 @@ do this because midde-of-header is hidden in the delete assignments view */
     bottom: var(--tags-bottom--margin-bottom);
 }
 
-
-.assignment.tags-left .tag-add-box {
-    left: 23px;
-}
 .tag-wrapper {
     position: relative;
     display: inline-flex;
@@ -588,11 +584,15 @@ do this because midde-of-header is hidden in the delete assignments view */
     box-shadow: 0 2px 5px 1px var(--box-shadow-color) !important;
     background: var(--background-color) !important;
     transform-origin: top;
-    transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
+    transform: translateX(-50%) translate(6px, -5px) scale(0.85) !important;
     /* let's use 0.14 instead of 0.15 because 0.15 can overflow offscreen and cause the 
     x scrollbar to show up */
     transition: transform calc(0.14s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
                 opacity calc(0.1s * var(--animation-speed)) ease-out;
+}
+/* mobile view also effects the left */
+.tags.tags-left .tag-add-box {
+    left: 43px;
 }
 .tag-add-box::after {
     border-color: transparent transparent var(--input-background-color) transparent !important;
@@ -992,6 +992,9 @@ main.finished-header-transition #extra-navs {
     }
     .left-side-of-header .title .title-link-anchor {
         display: initial;
+    }
+    .tags.tags-left .tag-add-box {
+        left: 56px;
     }
     main {
         box-shadow: none;
