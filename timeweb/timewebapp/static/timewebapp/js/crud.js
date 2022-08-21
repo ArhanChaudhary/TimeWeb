@@ -137,12 +137,22 @@ class Crud {
         // no today's date button because it already defaults to today on new assignment
         // although a user might want a today button for editing an assignment date to today
         // such a scenario is rare to happen; adding a today date button is a waste of space
+        let last_assignment_date_input_val;
         $("#id_assignment_date").daterangepicker({
             ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
             autoApply: true,
             locale: {
                 format: 'MM/DD/YYYY'
             },
+        }).on('input', function() {
+            last_assignment_date_input_val = $(this).val();
+        }).on('hide.daterangepicker', function(e, picker) {
+            if (last_assignment_date_input_val === "") {
+                last_assignment_date_input_val = utils.formatting.stringifyDate(date_now);
+                $(this).val(last_assignment_date_input_val);
+                picker.setStartDate(last_assignment_date_input_val);
+                picker.setEndDate(last_assignment_date_input_val);
+            }
         });
         let old_due_date_val;
         $("#id_x").daterangepicker({
