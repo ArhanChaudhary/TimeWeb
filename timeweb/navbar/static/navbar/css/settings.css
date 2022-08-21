@@ -158,6 +158,11 @@ body {
     font-size: 0.8em;
     opacity: 0.7;
 }
+#button-container {
+    display: flex;
+    gap: 10px;
+    flex-flow: row-reverse;
+}
 #break-days-wrapper {
     flex-wrap: wrap;
     height: revert;
@@ -181,11 +186,25 @@ body {
     border-top-color: var(--color) !important;
     border-left-color: var(--color) !important;
 }
-#reset-settings-button {
+#reset-settings-button, #submit-settings-button {
     font-size: 20px;
     width: 100%;
-    margin-bottom: 50px;
     height: 50px;
+}
+#submit-settings-button {
+    background-color: hsl(182, 49%, var(--checkbox-widget-primary-color-lightness));
+    color: white;
+    border: none;
+}
+#submit-settings-button:hover, #submit-settings-button:focus:not(:hover) {
+    background-color: hsl(182, 40%, calc(var(--checkbox-widget-primary-color-lightness) - 5%));
+}
+#submit-settings-button:focus:not(:hover) {
+    box-shadow: 0 0 0 1px hsl(182, 40%, calc(var(--checkbox-widget-primary-color-lightness) - 5%));
+    outline: 0;
+}
+#reset-settings-button {
+    margin-bottom: 50px;
 }
 #reset-settings-button:focus:not(:hover) {
     outline: 0;
@@ -194,6 +213,9 @@ body {
 @media screen and (max-width: 750px) {
     .field-container {
         align-items: unset;
+        flex-flow: column;
+    }
+    #button-container {
         flex-flow: column;
     }
 }

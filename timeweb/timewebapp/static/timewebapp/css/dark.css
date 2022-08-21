@@ -152,7 +152,7 @@ main:not(.background-image-exists) #extra-navs {
 .field-group-label {
     --lightness: 50%;
 }
-[type="checkbox"] ~ label:not(.break-days-label) {
+[type="checkbox"] ~ label:not(.break-days-label), #submit-settings-button {
     --checkbox-widget-primary-color-lightness: 40%;
     color: white;
 }

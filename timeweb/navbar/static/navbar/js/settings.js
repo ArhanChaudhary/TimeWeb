@@ -80,11 +80,13 @@ document.addEventListener("DOMContentLoaded", function() {
     let hasSubmitted = false;
     $("#logo-container").click(function(e) {
         e.preventDefault();
-        if (hasSubmitted) return;
+        $("#submit-settings-button").click();
+    });
+    $("#submit-settings-button").click(function() {
+		if (hasSubmitted) return false;
         $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
         hasSubmitted = true;
-        $("main form")[0].submit();
     });
     // or else logging out will display the "you form changes my not been saved" alert
     $("header form").submit(function() {
@@ -104,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
         single_action_label_timeout = setTimeout(() => {
             // the timeout and the if statement allow for double or quadruple clicking to cancel the action
             if ($(this).parents(".right-side-of-field").find("input").is(":checked"))
-                $("#logo-container").click();
+				$("#submit-settings-button").click();
         }, 700);
     });
 });
