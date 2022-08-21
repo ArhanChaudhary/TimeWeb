@@ -27,7 +27,6 @@ body {
     margin-top: 0;
 }
 #accounts-arrow-anchor {
-    display: none; /* unused css for now, put this on #accounts-anchor so it doesn't get focused */
     position: absolute;
     left: 0;
 }
