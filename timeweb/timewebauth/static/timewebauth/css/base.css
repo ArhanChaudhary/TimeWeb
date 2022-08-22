@@ -48,7 +48,7 @@ body {
     border-left: solid 2px #afafaf;
     width: 12px;
     height: 12px;
-    transition: all cubic-bezier(0.77, 0, 0.175, 1) 0.75s;
+    transition: all cubic-bezier(0.77, 0, 0.175, 1) 0.5s;
 }
 #accounts-arrow-container::before {
     transform: rotate(45deg) translate(1px, -1px);
