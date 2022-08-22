@@ -33,12 +33,13 @@ function setMoveLefts() {
 }
 position_stop = false;
 needs_restarting = false;
+velocity_scroll_amount = 0;
 $(window).one("load", function() {
     const last = $(".assignment-scroller-image-extender").last();
     const container = $(".section-block#first .right-section-side");
     setMoveLefts();
     $(".section-block#first .right-section-side").addClass("animate");
-    let diff = 0.2;
+    let diff = 0;
     let diff_diff = 0.07;
     let scaled_horizontal_factor_diff = 4.6;
     step = () => {
@@ -49,6 +50,10 @@ $(window).one("load", function() {
         container.prop("style").setProperty("--move-up", now + "px");
         setMoveLefts();
         now -= diff;
+        if (velocity_scroll_amount < 0) {
+            now += velocity_scroll_amount;
+            velocity_scroll_amount += 0.25;
+        }
         if (diff < 1.5) {
             diff += diff_diff;
             diff_diff += 0.0003;
@@ -87,8 +92,8 @@ $(window).scroll(function(e) {
     
     // store the past velocity to fix this
     const min_velocity = Math.min(old_velocity, new_velocity);
-    if (new_position === 0 && min_velocity < -2.5) {
-        now += Math.max(-300, min_velocity * 25);
+    if (new_position === 0 && min_velocity < 0) {
+        velocity_scroll_amount += Math.max(-20, min_velocity * 2);
     }
 
     let first_section_height = $(".section-block#first").height();
