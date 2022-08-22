@@ -52,13 +52,13 @@ main {
     position: absolute;
     top: 10px;
     gap: 25px;
-    font-size: 19px;
-    font-weight: 500;
-    font-family: "Open Sans";
+    font-size: 20px;
 }
 .section-block#first header a {
     color: black;
     text-decoration: none;
+    font-weight: 700;
+    font-family: "Open Sans";
 }
 .section-block#first header a:hover {
     text-decoration: underline 2px;
