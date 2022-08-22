@@ -26,7 +26,6 @@ function setMoveLefts() {
         this.parentElement.style.setProperty("--move-left", scaled_factor * scaled_horizontal_factor + "px");
     });
 }
-velocity_stop = false;
 position_stop = false;
 needs_restarting = false;
 $(window).one("load", function() {
@@ -38,7 +37,7 @@ $(window).one("load", function() {
     let diff_diff = 0.07;
     let scaled_horizontal_factor_diff = 4.6;
     step = () => {
-        if (velocity_stop || position_stop) {
+        if (position_stop) {
             needs_restarting = true;
             return;
         }
@@ -87,17 +86,13 @@ $(window).scroll(function(e) {
         now += Math.max(-300, min_velocity * 25);
     }
 
-    velocity_stop = new_velocity < -5;
-    if (new_position === 0) {
-        velocity_stop = false;
-    }
     let first_section_height = $(".section-block#first").height();
     position_stop = new_position >= first_section_height;
     if (new_position < first_section_height && old_position >= first_section_height) {
         position_stop = false;
     }
 
-    if (!(velocity_stop || position_stop) && needs_restarting) {
+    if (!position_stop && needs_restarting) {
         needs_restarting = false;
         requestAnimationFrame(step);
     }
