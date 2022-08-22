@@ -9,21 +9,26 @@ function clamp(low, value, high) {
 scaled_horizontal_factor = 0;
 now = 0;
 function setMoveLefts() {
-    const section_mid = $(".section-block#first").height() / 2;
+    const section_mid = $(".section-block#first").height() / 2;//+ 85;
     $(".assignment-scroller-image").each(function() {
         let in_view = $(this).offset().top + $(this).height() > 0 && $(this).offset().top < $("#second").offset().top;
         if (!in_view) return;
 
         let mid = $(this).offset().top + $(this).height() / 2;
-        let linear_factor = 1 - Math.abs(section_mid - mid) / section_mid;
-        if (linear_factor < 0.5) {
-            var opacity = linear_factor * 1.2 + 0.3;
+        let linear_factor = 1 - Math.abs(section_mid - mid) / ($(".section-block#first").height() / 2)// - 175);
+        if (linear_factor < 0) {
+            var opacity = linear_factor * 3 + 0.3;
+        } else if (linear_factor < 0.5) {
+            var opacity = linear_factor * 1.4 + 0.3;
         } else {
             var opacity = 1;
         }
-        $(this).css("opacity", opacity);
-        const scaled_factor = -scalingFunction(linear_factor);
-        this.parentElement.style.setProperty("--move-left", scaled_factor * scaled_horizontal_factor + "px");
+        $(this.parentElement).css(opacity < 0 ? {
+            opacity: 0,
+        } : {
+            opacity: opacity,
+            "--move-left": `${-scalingFunction(linear_factor) * scaled_horizontal_factor}px`,
+        });
     });
 }
 position_stop = false;
