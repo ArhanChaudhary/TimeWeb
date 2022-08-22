@@ -1,5 +1,8 @@
 {% load socialaccount %}
 {% load static %}
+
+{% url 'account_signup' as account_signup %}
+
 {% get_providers as socialaccount_providers %}
 
 {% for provider in socialaccount_providers %}
@@ -11,7 +14,7 @@
           <a title="{{brand.name}}"
               class="socialaccount_provider"{% comment %} {{provider.id}} {{brand.id}}" {% endcomment %}
               href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
-              >Log in with {{brand.name}}</a>
+              >{% if request.path == account_signup %}Sign up{% else %}Log in{% endif %} with {{brand.name}}</a>
         </button>
       </div>
     {% endfor %}
@@ -23,7 +26,7 @@
       <button class="socialaccount-button" type="submit">
         <img alt class="socialaccount-image" src="{% static 'timewebauth/images/'|add:provider.id|add:'.webp' %}">
         <span title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
-            href="">Log in with {{provider.name}}</span>
+            href="">{% if request.path == account_signup %}Sign up{% else %}Log in{% endif %} with {{provider.name}}</span>
       </button>
     </form>
   </div>

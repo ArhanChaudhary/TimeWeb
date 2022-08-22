@@ -3,9 +3,12 @@
 {% block head_title %}Sign Up{% endblock %}
 
 {% block content %}
-  <h1>Sign Up</h1>
+  {% include "socialaccount/snippets/provider_list.html" with process="login" %}
   <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}
+    <hr>
+    <span class="hr-interrupt">or</span>
+
     {% include "account/accounts_messages.html" %}
 
     {% for field in form %}
