@@ -45,6 +45,27 @@ main {
     margin-right: var(--left-section-margin);
     flex-shrink: 0;
 }
+.section-block#first header {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 10px;
+    gap: 25px;
+    font-size: 19px;
+    font-weight: 500;
+    font-family: "Open Sans";
+}
+.section-block#first header a {
+    color: black;
+    text-decoration: none;
+}
+.section-block#first header a:hover {
+    text-decoration: underline 2px;
+}
+.section-block#first #logo-icon {
+    height: 100%;
+}
 .section-block#first .right-section-side {
     --move-up: 0px;
     transform: translateY(var(--move-up));

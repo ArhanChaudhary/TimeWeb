@@ -15,6 +15,12 @@
     <div class="section-block" id="first">
         <span class="section-max-width-wrapper">
             <span class="left-section-side">
+                <header>
+                    <img id="logo-icon" src="{% static 'misc/icons/icon_512x512.webp' %}" draggable="false"/>
+                    <a href="{% url 'account_signup' %}">Sign up</a>
+                    <a href="{% url 'account_login' %}">Log in</a>
+                    <a href="{% url 'example' %}">Example Account</a>
+                </header>
                 <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
                 <br>
                 The new way to<br> manage your time
