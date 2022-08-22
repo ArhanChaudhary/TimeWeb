@@ -17,17 +17,19 @@
             <span class="left-section-side">
                 <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
                 <br>
-                The new way to<br>manage your time
+                The new way to<br> manage your time
                 {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
             </span>
             <span class="right-section-side">
-                {% for i in "xxx" %}
-                    {% for scroller in random_scrollers %}
-                        <span class="assignment-scroller-image-extender">
-                            <img alt class="assignment-scroller-image" draggable="false" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
-                        </span>
+                <span id="first-section-initial-scroller-transition">
+                    {% for i in "xxx" %}
+                        {% for scroller in random_scrollers %}
+                            <span class="assignment-scroller-image-extender">
+                                <img alt class="assignment-scroller-image" draggable="false" src="{% static 'home_page/images/scrollers/scroller'|add:scroller|add:'_light.webp' %}">
+                            </span>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
+                </span>
             </span>
         </span>
     </div>

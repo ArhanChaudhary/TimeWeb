@@ -46,13 +46,18 @@ main {
     flex-shrink: 0;
 }
 .section-block#first .right-section-side {
-    transform: translate(400px, var(--move-up, 0px));
+    --move-up: 0px;
+    transform: translateY(var(--move-up));
     max-height: var(--section-height);
     position: relative;
-    transition: transform 2.75s cubic-bezier(0.02, 1, 1, 1);
 }
-.section-block#first .right-section-side.animate {
-    transform: translate(200px, var(--move-up, 0px));
+.section-block#first .right-section-side #first-section-initial-scroller-transition {
+    transition: transform 0.5s cubic-bezier(0.15, 0.63, 0.54, 1);
+    display: block;
+    transform: translateX(400px);
+}
+.section-block#first .right-section-side.animate #first-section-initial-scroller-transition {
+    transform: translateX(200px);
 }
 .section-block#first .right-section-side::before {
     top: 0;
