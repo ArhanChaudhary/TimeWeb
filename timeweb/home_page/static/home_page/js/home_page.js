@@ -52,7 +52,10 @@ $(window).one("load", function() {
         now -= diff;
         if (velocity_scroll_amount < 0) {
             now += velocity_scroll_amount;
-            velocity_scroll_amount += 0.25;
+            if (velocity_scroll_amount > -10)
+                velocity_scroll_amount += 0.15;
+            else
+                velocity_scroll_amount += 0.25;
         }
         if (diff < 1.5) {
             diff += diff_diff;
