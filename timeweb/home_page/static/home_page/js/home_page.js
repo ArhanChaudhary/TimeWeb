@@ -9,13 +9,13 @@ function clamp(low, value, high) {
 scaled_horizontal_factor = 0;
 now = 0;
 function setMoveLefts() {
-    const section_mid = $(".section-block#first").height() / 2;//+ 85;
+    const section_mid = $(".section-block#first").height() / 2 + 85 * isMobile;
     $(".assignment-scroller-image").each(function() {
         let in_view = $(this).offset().top + $(this).height() > 0 && $(this).offset().top < $("#second").offset().top;
         if (!in_view) return;
 
         let mid = $(this).offset().top + $(this).height() / 2;
-        let linear_factor = 1 - Math.abs(section_mid - mid) / ($(".section-block#first").height() / 2)// - 175);
+        let linear_factor = 1 - Math.abs(section_mid - mid) / ($(".section-block#first").height() / 2 - 175 * isMobile);
         if (linear_factor < 0) {
             var opacity = linear_factor * 3 + 0.3;
         } else if (linear_factor < 0.5) {
@@ -73,6 +73,7 @@ $(window).one("load", function() {
         requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
+    $(window).trigger("resize");
 });
 let turns = 0;
 $(function() {
@@ -115,4 +116,11 @@ $(window).scroll(function(e) {
     $("#favicon-animated").prop("style").setProperty("--turns", turns);
     turns += 0.05;
     turns %= turn_mod;
+});
+let old_window_width = window.innerWidth;
+isMobile = false;
+$(window).on("resize", function() {
+    if (window.innerWidth < 1100) {
+        // isMobile = true;
+    }
 });
