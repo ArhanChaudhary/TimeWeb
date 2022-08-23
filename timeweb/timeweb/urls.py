@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.contrib.sitemaps.views import sitemap
+from .sitemap import AppSitemap
 
 import os
 admin_url = os.environ.get("ADMINURL", "admin/")
@@ -29,6 +31,8 @@ urlpatterns = [
     path('', include('navbar.urls')),
     path('', include('misc.urls')),
     path('', include('pwa.urls')),
+    path('sitemap.xml', sitemap, {'sitemaps': {"app": AppSitemap}},
+     name='django.contrib.sitemaps.views.sitemap')
 ]
 
 handler403 = 'common.utils._403_or_429'
