@@ -3,6 +3,10 @@
 
 {% block head_title %}A NEW MILESTONE{% endblock %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
     <style nonce="{{request.csp_nonce}}">
         span {

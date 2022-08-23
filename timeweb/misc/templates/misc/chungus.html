@@ -1,6 +1,10 @@
 {% extends "common/app_base.html" %}
 {% load static %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block head_title %}big{% endblock %}
 
 {% block content %}
