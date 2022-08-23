@@ -38,17 +38,16 @@
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
         {% progressive_web_app_meta %}
-        <meta name="title" content="TimeWeb">
         <meta name="description" content="TimeWeb is a time management application that visualizes, quantifies, and prioritizes your assignments' work. Are you ready to stop procrastinating?">
+
+        <meta property="og:url" content="https://timeweb.io">
+        <meta property="og:title" content="TimeWeb">
+        <meta property="og:description" content="TimeWeb is a time management application that visualizes, quantifies, and prioritizes your assignments' work. Are you ready to stop procrastinating?">
+        <meta property="og:image" content="{% static 'misc/icons/icon_512x512.webp' %}">
 
         <meta name="twitter:card" content="summary">
         <meta name="twitter:site" content="@TimeWebOfficial">
         <meta name="twitter:creator" content="@TimeWebOfficial">
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="https://timeweb.io/">
-        <meta property="og:title" content="TimeWeb">
-        <meta property="og:description" content="TimeWeb is a time management application that visualizes, quantifies, and prioritizes your assignments' work. Are you ready to stop procrastinating?">
-        <meta property="og:image" content="{% static 'misc/icons/icon_512x512.webp' %}">
 
         <meta name="author" content="Arhan Chaudhary">
         <meta name="viewport" content="width=device-width, initial-scale=0.7, maximum-scale=1, user-scalable=no">
