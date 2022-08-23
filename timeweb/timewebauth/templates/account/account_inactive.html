@@ -2,6 +2,10 @@
 
 {% block head_title %}Account Disabled{% endblock %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
     <h1>Account Disabled</h1>
     {% include "account/accounts_messages.html" %}

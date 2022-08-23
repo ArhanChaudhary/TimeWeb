@@ -7,7 +7,7 @@ from common.utils import app_static_factory
 app_static = app_static_factory(__package__)
 
 urlpatterns = [
-    path('robots.txt', lambda x: HttpResponse("# If you came from the discord gg you get a super duper secret role\n# pm me this message at Arch#5808\n# also, pls don't tell anyone as it'll ruin the fun of this small game\nUser-Agent: *\nDisallow:", content_type="text/plain"), name="robots_file"),
+    path('robots.txt', lambda x: HttpResponse("# If you came from the discord gg you get a super duper secret role\n# pm me this message at Arch#5808\n# also, pls don't tell anyone as it'll ruin the fun of this small game\nUser-Agent: *\nDisallow: /16143132", content_type="text/plain"), name="robots_file"),
     path('.well-known/security.txt', lambda x: HttpResponse('''Contact: mailto:arhan.ch@gmail.com
 Expires: 2023-07-27T07:00:00.000Z
 Preferred-Languages: en

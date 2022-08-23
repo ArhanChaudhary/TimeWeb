@@ -1,11 +1,15 @@
 {% extends "account/base.html" %}
 {% load static %}
 
+{% block head_title %}E-mail Addresses{% endblock %}
+
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block css %}
   <link rel="stylesheet" href="{% static 'timewebauth/css/email.css' %}">
 {% endblock %}
-
-{% block head_title %}E-mail Addresses{% endblock %}
 
 {% block content %}
   <h1>E-mail Addresses</h1>

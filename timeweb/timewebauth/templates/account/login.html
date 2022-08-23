@@ -3,7 +3,9 @@
 {% load account socialaccount %}
 
 {% block head_title %}Log In{% endblock %}
-
+{% block extra_head_tags %}
+  <link rel="canonical" href="https://timeweb.io/accounts/login" />
+{% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'timewebauth/css/login.css' %}">
 {% endblock %}

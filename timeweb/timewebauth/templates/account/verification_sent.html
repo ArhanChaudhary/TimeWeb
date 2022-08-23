@@ -2,6 +2,10 @@
 
 {% block head_title %}Verify Your E-mail Address{% endblock %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
     <h1>Verify Your E-mail Address</h1>
     {% include "account/accounts_messages.html" %}
