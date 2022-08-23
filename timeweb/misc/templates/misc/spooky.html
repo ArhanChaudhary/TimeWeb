@@ -3,6 +3,10 @@
 
 {% block head_title %}Boo!{% endblock %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
     <h1>Boo!</h1>
     <img src="{% static 'misc/images/boo.svg' %}">

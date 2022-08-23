@@ -3,6 +3,10 @@
 
 {% block head_title %}suS{% endblock %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
     <img src="{% static 'misc/images/sus.webp' %}">
 {% endblock %}
