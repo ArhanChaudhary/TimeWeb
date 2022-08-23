@@ -3,6 +3,10 @@
 
 {% block head_title %}Google Account Connections{% endblock %}
 
+{% block extra_head_tags %}
+  <meta name="robots" content="noindex" />
+{% endblock %}
+
 {% block content %}
     <h1>Google Account Connections</h1>
     {% include "account/accounts_messages.html" %}
