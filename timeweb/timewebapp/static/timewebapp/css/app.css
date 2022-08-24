@@ -69,7 +69,7 @@ main.background-image-exists {
 }
 #assignments-container.viewing-deleted-assignments #no-assignments-message {
     padding: 0 var(--outer-assignment-horizontal-padding);
-    font-size: 17px;
+    font-size: 18px;
 }
 #extra-navs-positioner {
     box-sizing: border-box;
@@ -92,7 +92,7 @@ main.background-image-exists {
 }
 #assignments-header {
     position: relative;
-    font-size: 17px;
+    font-size: 18px;
     z-index: 1001;
     padding: 0 var(--outer-assignment-horizontal-padding);
     display: flex;
@@ -147,7 +147,7 @@ main.background-image-exists {
 .assignment-container {
     /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
-    font-size: 12pt;
+    font-size: 17px;
     position: relative;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
@@ -200,7 +200,7 @@ main.background-image-exists {
     transition: background-color calc(var(--priority-color-transition-speed) * var(--animation-speed));
 }
 #tutorial-click-assignment-to-open {
-    font-size: 17px;
+    font-size: 18px;
     scroll-margin: 30px;
 }
 .shortcut {
@@ -237,7 +237,7 @@ main.background-image-exists {
     padding-top: 1px !important;
     padding-bottom: 1px !important;
     vertical-align: top;
-    font-size: 10pt;
+    font-size: 14px;
 }
 .shortcut .generic-button {
     margin-top: 1px;
@@ -314,7 +314,7 @@ main.background-image-exists {
     position: relative;
     padding: var(--vertical-assignment-padding) var(--horizontal-assignment-padding);
     align-items: center;
-    --arrow-margin-left: max(5px,calc(-5px + 2vw));
+    --arrow-margin-left: max(5px, calc(2px + 2vw));
 }
 .left-side-of-header {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
@@ -322,7 +322,7 @@ main.background-image-exists {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(40px + 11vw);
+    --left-side-of-header-width: calc(45px + 11vw);
 }
 .fancy-coloring {
     color: var(--priority-color);
@@ -431,7 +431,7 @@ main.background-image-exists {
 /* selects the element right before right-side-of-header
 do this because midde-of-header is hidden in the delete assignments view */
 .assignment-header > :nth-last-child(2) {
-    margin-right: 35px;
+    margin-right: 25px;
 }
 .align-to-status-message-container {
     margin-left: 5px;
@@ -828,7 +828,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 .hover-point-label {
     position: absolute;
     padding: 4px 7px;
-    font-size: 13px;
+    font-size: 15px;
     box-shadow: 0 1px 3px 1px hsla(0, 0%, 0%, 0.3);
     background-color: var(--primary);
     border-radius: 3px;
@@ -921,7 +921,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     margin-right: 45px;
     margin-left: 45px;
     gap: 7px;
-    --font-size: 14px;
+    --font-size: 15px;
     font-size: var(--font-size);
     line-height: calc(3 * var(--font-size));
 }
@@ -985,7 +985,7 @@ main.finished-header-transition #extra-navs {
         --negative-horizontal-margin: -9px;
     }
     .shortcut-text {
-        font-size: 15px;
+        font-size: 16px;
     }
     .hide-on-mobile {
         display: none;
