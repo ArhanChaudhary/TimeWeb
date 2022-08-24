@@ -3,6 +3,7 @@ from django.urls import resolve
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
+from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
 
 class DefineIsExampleAccount:
     def __init__(self, get_response):
@@ -26,3 +27,14 @@ class CommonRatelimit:
             if is_ratelimited(request, group=group, key=settings.GET_CLIENT_IP, rate=settings.DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
                 raise Ratelimited
         return self.get_response(request)
+
+class MinifyHTMLMiddleware(_MinifyHtmlMiddleware):
+    # Custom args for SEO optimization
+    minify_args = {
+        "do_not_minify_doctype": True,
+        "ensure_spec_compliant_unquoted_attribute_values": True,
+        "keep_closing_tags": True,
+        "keep_html_and_head_opening_tags": True,
+        "minify_css": True,
+        "minify_js": True,
+    }

@@ -118,7 +118,7 @@ MIDDLEWARE = [
 
     # Even though cloudflare has an html minfier, let's instead use our own so the debug and non debug versions' html stays consistent
     # It's also more efficient than cf's html minifier
-    "django_minify_html.middleware.MinifyHtmlMiddleware",
+    "common.middleware.MinifyHTMLMiddleware",
 ]
 if DEBUG:
     INSTALLED_APPS.append('livereload')
