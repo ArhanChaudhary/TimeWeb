@@ -584,7 +584,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     box-shadow: 0 2px 5px 1px var(--box-shadow-color) !important;
     background: var(--background-color) !important;
     transform-origin: top;
-    transform: translateX(-50%) translate(6px, -5px) scale(0.85) !important;
+    transform: translateX(-50%) translate(8px, -5px) scale(0.85) !important;
     /* let's use 0.14 instead of 0.15 because 0.15 can overflow offscreen and cause the 
     x scrollbar to show up */
     transition: transform calc(0.14s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
@@ -592,18 +592,20 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 /* mobile view also effects the left */
 .tags.tags-left .tag-add-box {
-    left: 43px;
+    --move-left: 43px;
+    left: var(--move-left);
 }
 .tag-add-box::after {
     border-color: transparent transparent var(--input-background-color) transparent !important;
     pointer-events: none;
+    margin-right: var(--move-left);
     bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
 }
 .assignment.open-tag-add-box {
     z-index: 1001;
 }
 .assignment.open-tag-add-box .tag-add-box {
-    transform: translateX(-50%) translateX(6px) !important;
+    transform: translateX(-50%) translateX(8px) !important;
     opacity: 1;
     height: unset;
     overflow: visible;
