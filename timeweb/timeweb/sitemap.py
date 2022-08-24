@@ -20,4 +20,4 @@ class AppSitemap(Sitemap):
         return reverse(item)
 
     def lastmod(self, item):
-        return datetime.datetime(2022, 8, 23, 10, 8, 37, 271486, tzinfo=datetime.timezone.utc)
+        return datetime.datetime(2022, 8, 24)
