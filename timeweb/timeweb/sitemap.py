@@ -4,7 +4,7 @@ import datetime
 
 class AppSitemap(Sitemap):
     priority = 0.5
-    changefreq = 'monthly'
+    changefreq = 'weekly'
 
     def items(self):
         return [
@@ -20,4 +20,4 @@ class AppSitemap(Sitemap):
         return reverse(item)
 
     def lastmod(self, item):
-        return datetime.datetime(2022, 8, 24)
+        return datetime.datetime(2022, 8, 25)
