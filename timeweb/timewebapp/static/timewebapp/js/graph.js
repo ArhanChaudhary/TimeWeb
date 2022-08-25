@@ -715,7 +715,7 @@ class VisualAssignment extends Assignment {
             if (today_x > this.width - 12.5) {
                 today_x = this.width - 12.5;
             }
-            screen.fillStyle = "rgb(150,150,150)";
+            screen.fillStyle = "rgb(205,205,205)";
             screen.fillRect(today_x, 0, 5, this.height - 50);
             screen.fillStyle = "black";
             screen.rotate(Math.PI / 2);
