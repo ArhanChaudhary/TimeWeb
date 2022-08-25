@@ -178,7 +178,8 @@ main.background-image-exists {
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring a {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
@@ -322,10 +323,11 @@ main.background-image-exists {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(45px + 11vw);
+    --left-side-of-header-width: max(140px, calc(67px + 10vw));
 }
-.fancy-coloring {
-    color: var(--priority-color);
+.fancy-coloring, .fancy-coloring a {
+    --color: var(--priority-color);
+    color: var(--color) !important;
     transition: color calc(var(--priority-color-transition-speed) * var(--animation-speed));
 }
 .description {
@@ -350,8 +352,10 @@ main.background-image-exists {
     margin-bottom: 0;
 }
 .left-side-of-header .title .title-link-anchor {
-    color: var(--color);
     display: none;
+}
+.left-side-of-header .title .title-link-anchor {
+    color: var(--color);
 }
 .left-side-of-header .title .title-link-icon {
     margin-bottom: -2.5px;
