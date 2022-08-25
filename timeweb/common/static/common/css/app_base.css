@@ -159,7 +159,7 @@ main.finished-header-transition {
     color: #fff;
 }
 .daterangepicker .drp-buttons .cancelBtn {
-    color: #fff;
+    color: var(--color);
 }
 #logo-container {
     display: inline-block;
