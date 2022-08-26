@@ -45,7 +45,7 @@
                 <img id="graph-image" alt src="{% static 'home_page/images/light_narrow_graph.webp' %}">
             </span>
             <span class="right-section-side">
-                Take a fine-grained control over your work
+                Take complete control over your work
                 <p class="header-description">
                     An easy and highly customizable interface for your assignments' work schedules. Know what to do, when to do it, and for how long.
                 </p>
@@ -62,9 +62,7 @@
             {% include "favicon_animated.svg" %}
             <span class="right-section-side">
                 No ads. No paywalls. Just you and your assignments — uninterrupted
-                <p class="header-description">
-                    Designed with an emphasis on convenience, TimeWeb lets you focus on what's important.
-                </p>
+                <a id="bottom-signup-button" href="{% url 'account_signup' %}">Sign up</a>
             </span>
         </span>
     </div>
