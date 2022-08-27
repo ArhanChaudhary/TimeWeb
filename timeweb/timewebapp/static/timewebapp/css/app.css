@@ -359,7 +359,7 @@ main.background-image-exists {
 .assignment.open-assignment .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 8;
+    -webkit-line-clamp: 3;
     overflow: hidden;
 }
 .assignment.open-assignment .left-side-of-header.display-truncate-warning::after {
