@@ -39,7 +39,6 @@ APPEARANCES = (
     ("automatic", "Sync with device"),
     ("light", "Light Mode"),
     ("dark", "Dark Mode"),
-    ("fancy dark", "𝐹𝒶𝓃𝒸𝓎 Dark Mode"),
 )
 MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
 
