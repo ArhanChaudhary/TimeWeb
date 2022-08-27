@@ -857,15 +857,14 @@ class Priority {
                                     behavior: 'smooth',
                                     block: 'nearest',
                                 });
+		                        let scrollTimeout = setTimeout(resolve, 200);
+		                        $("#assignments-container").scroll(() => {
+                                    $("#extra-navs").hide();
+                                    clearTimeout(scrollTimeout);
+                                    scrollTimeout = setTimeout(resolve, 200);
+                                });
                             }, 0);
                         }, 0);
-
-                        let scrollTimeout = setTimeout(resolve, 200);
-                        $("#assignments-container").scroll(() => {
-                            $("#extra-navs").hide();
-                            clearTimeout(scrollTimeout);
-                            scrollTimeout = setTimeout(resolve, 200);
-                        });
                     });
                 }).then(function() {
                     $("#assignments-container").off('scroll');
