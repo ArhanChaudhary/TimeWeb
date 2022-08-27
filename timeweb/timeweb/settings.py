@@ -327,9 +327,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-DEFAULT_FROM_EMAIL = 'TimeWeb E-mail Service <arhanc.cs@gmail.com>'
-EMAIL_HOST_USER = 'arhanc.cs@gmail.com'
-MANAGERS = [('Arhan', 'arhan.ch@gmail.com')]
+DEFAULT_FROM_EMAIL = 'TimeWeb E-mail Service <timewebapp@gmail.com>'
+EMAIL_HOST_USER = 'timewebapp@gmail.com'
+MANAGERS = [('Arhan', 'timewebapp@gmail.com')]
 EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
 
 EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
