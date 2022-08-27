@@ -1,7 +1,7 @@
 main {
     overflow-y: hidden;
 }
-main form {
+#settings-form {
     padding: 0 1em;
     margin: 0 auto;
     font-size: 17px;
@@ -13,7 +13,7 @@ main form {
     padding-top: 10px;
     margin-top: -10px;
 }
-main form > .error-note:first-of-type {
+#settings-form > .error-note:first-of-type {
     margin-top: 30px;
 }
 body {

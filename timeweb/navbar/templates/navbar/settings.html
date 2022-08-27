@@ -29,7 +29,7 @@
     {% comment %} Injects libraries for the color picker {% endcomment %}
     {{ form.media }}
     <div id="settings-scroller">
-    <form method="POST" autocomplete="off" enctype="multipart/form-data">
+    <form method="POST" autocomplete="off" enctype="multipart/form-data" id="settings-form">
         {% csrf_token %}
         {% if request.user.email == EXAMPLE_ACCOUNT_EMAIL %}
             Note: changes to the settings in the example account are not saved.

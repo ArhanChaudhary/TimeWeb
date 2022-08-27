@@ -16,8 +16,6 @@ body {
     background-color: var(--body-background);
 }
 select {
-    color: var(--color); /* doesn't inherit properly */
-
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -131,6 +129,10 @@ main.finished-header-transition {
     border-color: hsl(0, 0%, 58%);
     font-size: 13px;
 }
+select, .daterangepicker .drp-buttons .cancelBtn {
+    color: var(--color); /* doesn't inherit properly */
+}
+
 ::file-selector-button {
     border-color: var(--color);
 }
@@ -157,9 +159,6 @@ main.finished-header-transition {
     border-color: transparent;
     background-color: #357ebd;
     color: #fff;
-}
-.daterangepicker .drp-buttons .cancelBtn {
-    color: var(--color);
 }
 #logo-container {
     display: inline-block;
