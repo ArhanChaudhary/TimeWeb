@@ -526,7 +526,7 @@ class Crud {
 
         $(".field-widget-checkbox").on('input', function() {
             let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
-            if (!widget_input.val()) return;
+            if (["", "Predicted"].includes(widget_input.val())) return;
             if ($(this).is(":checked")) {
                 widget_input.val(Math.round(
                     widget_input.val() / 60
