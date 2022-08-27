@@ -28,9 +28,9 @@
     $.fn.expandableTextareaHeight = function() {
         $(this).on("input", function() {
             $(this).css("height", "auto"); // Needed for expanding with text
-            // Dunno where +2 comes from but it works
-            $(this).css("height", $(this).prop("scrollHeight") + 2);
-        });
+            $(this).css("height", $(this).prop("scrollHeight"));
+        // there's sometimes a random scrollbar
+        }).css("overflow-y", "hidden");
         return $(this);
     }
     // Only change text
