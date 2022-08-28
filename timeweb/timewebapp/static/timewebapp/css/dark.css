@@ -42,6 +42,7 @@ select {
 }
 #form-wrapper .field-widget:hover {
     --field-widget-background-color: hsl(0, 0%, 24%);
+    color: white;
 }
 .generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) + 12);
@@ -144,10 +145,6 @@ main:not(.background-image-exists) #extra-navs {
 .daterangepicker th.available:hover {
     background-color: hsl(0, 0%, 30%);
 }
-.daterangepicker select {
-    --border-color: var(--color) !important;
-}
-
 .jconfirm.jconfirm-light .jconfirm-box {
     box-shadow: none !important;
     border: 1px solid hsl(0, 0%, 48%);
