@@ -305,11 +305,11 @@ class Priority {
                 if (finished_work_inputs) {
                     status_message = 'You\'re completely finished with this assignment';
                 } else {
-                    alert_due_date_passed_cond = true;
-                    if (!sa.sa.has_alerted_due_date_passed_notice) {
-                        // sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
-                        that.due_date_passed_notices.push(sa.sa);
-                    }
+					alert_due_date_passed_cond = true;
+                    if (assignment_container.is("#animate-in, #animate-color")) {
+						sa.sa.has_alerted_due_date_passed_notice = true;
+						ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {has_alerted_due_date_passed_notice: sa.sa.has_alerted_due_date_passed_notice, id: sa.sa.id});
+					}
                     status_message = 'This assignment\'s due date has passed';
                     if (sa.sa.needs_more_info)
                         if (sa.sa.is_google_classroom_assignment)
@@ -462,9 +462,12 @@ class Priority {
                 ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {dont_hide_again: sa.sa.dont_hide_again, id: sa.sa.id});
             }
 
-            // If the condition to alert the due date has passed is false, set sa.sa.has_alerted_due_date_passed_notice to true
+			if (alert_due_date_passed_cond && !sa.sa.has_alerted_due_date_passed_notice) {
+				// sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
+				that.due_date_passed_notices.push(sa.sa);
+			// If the condition to alert the due date has passed is false, set sa.sa.has_alerted_due_date_passed_notice to true
             // This is done so that it doesn't remain as true and fail to alert the user again
-            if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
+			} else if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
                 sa.sa.has_alerted_due_date_passed_notice = false;
                 ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {has_alerted_due_date_passed_notice: sa.sa.has_alerted_due_date_passed_notice, id: sa.sa.id});
             }
@@ -833,7 +836,7 @@ class Priority {
                             assignment_to_scroll_to = dom_assignment;
                         }
                         setTimeout(function() {
-                            setTimeout(function() {
+							setTimeout(function() {
                                 // scrollIntoView sometimes doesn't work without two setTimeouts
                                 assignment_to_scroll_to[0].scrollIntoView({
                                     behavior: 'smooth',
@@ -846,8 +849,8 @@ class Priority {
                                     clearTimeout(scrollTimeout);
                                     scrollTimeout = setTimeout(resolve, 200);
                                 });
-                            }, 0);
-                        }, 0);
+							}, 0);
+						}, 0);
                     });
                 }).then(function() {
                     $("#assignments-container").off('scroll');
