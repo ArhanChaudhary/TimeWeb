@@ -854,7 +854,8 @@ class Priority {
                                 });
 		                        let scrollTimeout = setTimeout(resolve, 200);
 		                        $("#assignments-container").scroll(() => {
-                                    $("#extra-navs").hide();
+									if (assignment_container.is("#animate-in"))
+										$("#extra-navs").hide();
                                     clearTimeout(scrollTimeout);
                                     scrollTimeout = setTimeout(resolve, 200);
                                 });
