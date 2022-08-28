@@ -826,7 +826,7 @@ class VisualAssignment extends Assignment {
                 }
             }
         });
-        $(window).resize(this.resize.bind(this));
+        $(window).on("resize redrawGraphs", this.resize.bind(this));
 
         if (VIEWING_DELETED_ASSIGNMENTS) return; // EVERYTHING PAST THIS POINT ONLY RUNS IF VIEWING_DELETED_ASSIGNMENTS IS FALSE
 

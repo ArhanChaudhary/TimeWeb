@@ -481,9 +481,7 @@ class Priority {
             const assignment_header_button = assignment_container.find(".assignment-header-button");
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
             const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
-            assignment_header_button.filter(function() {
-                return !!$(this).find(".tick-button").length;
-            }).toggle(
+            assignment_header_tick_svg.parents(".assignment-header-button").toggle(
                 !(
                     [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
                     // don't show a check mark or star icon and an unslashed tick
@@ -792,10 +790,7 @@ class Priority {
         that.alertDueDates();
         
         // Updates open graphs' today line and other graph text
-        // ALTHOUGH triggering this resize is very redundant at times, it is good for forward compatibility
-        // Instead of trying to update everything and keeping track of what's changed, just update everything
-        // Performance impact is minimal compared to the bugs and development time saved by this
-        $(window).trigger("resize");
+        $(window).trigger("redrawGraphs");
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
