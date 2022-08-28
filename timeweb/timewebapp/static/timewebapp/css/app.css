@@ -410,7 +410,7 @@ main.background-image-exists {
     left: 0;
     bottom: 0;
 }
-.title.show-long-daysleft[data-long-daysleft]::after {
+.assignment.show-long-daysleft .title[data-long-daysleft]::after {
     content: attr(data-long-daysleft) !important;
 }
 .arrow-container {

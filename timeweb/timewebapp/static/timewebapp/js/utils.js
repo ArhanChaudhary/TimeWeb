@@ -828,10 +828,8 @@ switch (e.key) {
     });
 },
 displayFullDueDateOnHover: function() {
-    $(".title").on("mouseover mousemove click", function(e) {
-        $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
-        // could probably validate with touchstart event instead of isTouchDevice
-        if (isTouchDevice && e.offsetY > $(this).height()) return false;
+    $(".assignment").on("mouseover click", function() {
+        $(this).addClass("show-long-daysleft");
     }).on("mouseout", function() {
         $(this).removeClass("show-long-daysleft");
     });
