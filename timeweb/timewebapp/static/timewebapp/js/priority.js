@@ -924,7 +924,7 @@ class Priority {
             document.fonts.ready.then(function() {
                 $("#animate-in").css({
                     position: "",
-                    top: $(".assignment-container:last").offset().top + $(".assignment-container:last").height() - $("#animate-in").offset().top + Priority.ANIMATE_IN_START_MARGIN,
+                    top: Math.min(window.innerHeight, $(".assignment-container:last").offset().top + $(".assignment-container:last").height() + Priority.ANIMATE_IN_START_MARGIN) - $("#animate-in").offset().top,
                     marginBottom: -$("#animate-in").outerHeight(),
                 });
             });
