@@ -29,8 +29,7 @@ select, .daterangepicker select:not(#dummyforspecifityurmomisprettythick) {
     /* safari is really mean (https://stackoverflow.com/questions/7638677/how-can-i-remove-the-gloss-on-a-select-element-in-safari-on-mac) */
     background: var(--dropdown-arrow) no-repeat;
     background-color: var(--primary);
-    --border-color: var(--primary);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color);
     background-size: 10px;
     background-position: right 3px top 55%;
     background-repeat: no-repeat;
