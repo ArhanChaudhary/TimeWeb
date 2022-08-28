@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 $(function() {
-    $(window).on("focus", () => $(window).trigger("resize"));
+    // likely not needed (?)
+    // $(window).on("focus", () => $(window).trigger("resize"));
     $(document).keydown(function(e) {
         switch (e.key) {
             case "Enter": {
