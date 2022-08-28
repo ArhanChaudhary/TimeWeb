@@ -821,19 +821,6 @@ class Priority {
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
-            // make sure to add any added code here to VIEWING_DELETED_ASSIGNMENTS at the bottom
-            new Promise(function(resolve) {
-                if (that.params.first_sort) {
-                    $(window).one("load", resolve);
-                } else {
-                    resolve();
-                }
-            }).then(function() {
-                // Assignment can be removed from dom when being deleted
-                // Ensure it exists or else positionTags crashes trying to read a non-existent element
-                if (document.contains(dom_assignment[0]))
-                    new VisualAssignment(dom_assignment).positionTags();
-            });
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
                     $(window).one('load', function() {
@@ -939,30 +926,27 @@ class Priority {
                 });
             });
         }
-        that.updateInfoHeader();
+		that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
         
     }
 }
-if (VIEWING_DELETED_ASSIGNMENTS) {
-    // positionTags is called from window.onload in Priority.sort
-    $(window).one("load", function() {
-        $(".assignment").each(function() {
-            new VisualAssignment($(this)).positionTags();
-        });
-    });
-    document.addEventListener("DOMContentLoaded", function() {
-        const complete_date_now = utils.getRawDateNow();
-        $(".assignment").each(function() {
-            let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(new Assignment($(this)), complete_date_now);
-            const dom_title = $(this).find(".title");
-            dom_title.attr("data-daysleft", str_daysleft);
-            dom_title.attr("data-long-daysleft", long_str_daysleft);
-        });
-        $("#assignments-container").css("opacity", "1");
-    });
-} else {
-    document.addEventListener("DOMContentLoaded", function() {
-        new Priority().sort({ first_sort: true });
-    });
-}
+document.addEventListener("DOMContentLoaded", function() {
+	if (VIEWING_DELETED_ASSIGNMENTS) {
+		const complete_date_now = utils.getRawDateNow();
+		$(".assignment").each(function() {
+			let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(new Assignment($(this)), complete_date_now);
+			const dom_title = $(this).find(".title");
+			dom_title.attr("data-daysleft", str_daysleft);
+			dom_title.attr("data-long-daysleft", long_str_daysleft);
+		});
+		$("#assignments-container").css("opacity", "1");
+	} else {
+		new Priority().sort({ first_sort: true });
+	}
+});
+$(window).one("load", function() {
+	$(".assignment").each(function() {
+		new VisualAssignment($(this)).positionTags();
+	});
+});
