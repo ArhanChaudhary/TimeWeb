@@ -363,9 +363,6 @@ main.background-image-exists {
     overflow: hidden;
 }
 .assignment.open-assignment .left-side-of-header.display-truncate-warning::after {
-    /* remove for now */
-    display: none;
-
     content: "[Description shortened]";
     opacity: var(--description-opacity);
     font-size: var(--description-font-size);

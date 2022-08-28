@@ -1301,6 +1301,8 @@ class VisualAssignment extends Assignment {
         }
     }
     displayTruncateWarning() {
+        // remove for now
+        return;
         const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
         dom_left_side_of_header.toggleClass("display-truncate-warning", dom_left_side_of_header.find(".description").hasOverflown());
     }
