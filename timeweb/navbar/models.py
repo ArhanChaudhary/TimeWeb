@@ -152,7 +152,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Tutorial'),
     )
     sorting_animation_threshold = models.IntegerField(
-        default=15,
+        default=50,
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
         verbose_name=_('Sorting Animation Threshold'),
     )
