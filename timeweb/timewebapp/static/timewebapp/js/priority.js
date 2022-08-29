@@ -715,8 +715,7 @@ class Priority {
         const sa = utils.loadAssignmentData(dom_assignment);
         const assignment_container = dom_assignment.parents(".assignment-container");
 
-        if (!["Not Important", "Important"].includes(sa.tags[0]))
-            var current_tag = sa.tags[0];
+        var current_tag = priority_data.first_real_tag;
         if (sa.is_google_classroom_assignment && sa.needs_more_info && !dom_assignment.parents(".assignment-container").hasClass("finished") && current_tag) {
             assignment_container.addClass("add-line-wrapper");
             if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
