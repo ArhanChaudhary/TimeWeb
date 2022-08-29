@@ -287,7 +287,7 @@ class Priority {
             // So, dont star it because the user may misinterpret that as having completed the assignment when in reality the user may need an extension
             // Instead, give it a question mark so it can be appropriately handled
             if (sa.sa.needs_more_info && !hard_due_date_passed) {
-                status_image = 'question_mark';
+				status_image = 'question_mark';
                 if (sa.sa.is_google_classroom_assignment) {
                     status_message = "This Google Classroom assignment needs more info";
                     status_value = first_real_tag ? Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG : Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT;
@@ -295,6 +295,9 @@ class Priority {
                     status_message = "This assignment needs more info";
                     status_value = Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT;
                 }
+                // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
+				if (Number.isFinite(Math.floor(sa.sa.complete_x) - today_minus_assignment_date))
+					due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                 //hard
                 dom_status_image.attr({
                     width: 11,
@@ -530,6 +533,7 @@ class Priority {
                 first_real_tag,
                 has_important_tag,
                 has_not_important_tag,
+                due_date_minus_today,
                 name: sa.sa.name,
                 index,
             }
@@ -668,8 +672,7 @@ class Priority {
         // a.status_value and b.status_value must be equal at this point, so define a shared variable for readability
         let status_value = a.status_value;
 
-        if (!SETTINGS.assignment_sorting === "Reversed" && [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value) 
-        || SETTINGS.assignment_sorting === "Reversed" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value)) {
+        if (SETTINGS.assignment_sorting === "Reversed" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW].includes(status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
@@ -679,6 +682,20 @@ class Priority {
         }
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+
+        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value)) {
+            // b.due_date_minus_today === undefined: Treat undefined as negative infinity
+
+            // 5 < 10 => true
+            // undefined < 10 => false (the below makes this true)
+            
+            // 10 > 5 => true
+            // 10 > undefined => false (the below makes this true)
+            
+            // a.due_date_minus_today !== undefined: If both are undefined, skip this check
+            if (a.due_date_minus_today < b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+            if (a.due_date_minus_today > b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
+        }
 
         if (a.name < b.name) return -1;
         if (a.name > b.name) return 1;
