@@ -534,7 +534,7 @@ class Priority {
                 has_important_tag,
                 has_not_important_tag,
                 due_date_minus_today,
-                name: sa.sa.name,
+                name: sa.sa.name.toLowerCase(),
                 index,
             }
             that.priority_data_list.push(priority_data);
