@@ -51,7 +51,8 @@ main {
     align-items: center;
     position: absolute;
     top: 10px;
-    gap: 25px;
+    gap: 35px;
+    white-space: nowrap;
     font-size: 20px;
 }
 .section-block#first header a {
