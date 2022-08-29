@@ -985,9 +985,6 @@ main.finished-header-transition #extra-navs {
     .shortcut-line-left, .shortcut-line-right {
         --negative-horizontal-margin: -9px;
     }
-    .shortcut-text {
-        font-size: 16px;
-    }
     .hide-on-mobile {
         display: none;
     }
