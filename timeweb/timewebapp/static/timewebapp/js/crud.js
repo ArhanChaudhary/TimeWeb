@@ -633,9 +633,9 @@ class Crud {
     }
     addInfoButtons() {
         $("#id_name").info('left',
-            `Only enter an assignment's name to mark it as "needs more info".
+            `Only enter an assignment's name to mark it as "needs more info"
             
-            Useful as a reminder system for assignments you don't want to fully submit to the assignment form.`, 
+            Useful as a reminder system for assignments you don't want to fully submit to the assignment form`, 
         "after").css({
             marginTop: -22,
             marginLeft: "auto",
@@ -649,6 +649,15 @@ class Crud {
             marginTop: -22,
             marginLeft: "auto",
             marginRight: 7,
+        });
+        $("#id_works").info('left',
+            `The following is only relevant if you're re-entering this field
+
+            This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`,
+        "after").css({
+            marginRight: -14,
+            bottom: -10,
+            right: 20,
         });
         $("#id_funct_round").info('left',
             "", // overridden in replaceUnit
