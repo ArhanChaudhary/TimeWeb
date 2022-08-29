@@ -1035,7 +1035,14 @@ saveAndLoadStates: function() {
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
                     $(".assignment").filter(function() {
-                        return open_assignments.includes($(this).attr("data-assignment-id"));
+                        const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
+                        if (!was_open) return false;
+
+                        // if you edit an open assignment and make it needs more info
+                        // ensure it isn't clicked
+                        const dom_assignment = $(this);
+                        const sa = new VisualAssignment(dom_assignment);
+                        return sa.canOpenAssignment();
                     }).click();
                 }
 
