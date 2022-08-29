@@ -924,7 +924,23 @@ class Priority {
             document.fonts.ready.then(function() {
                 $("#animate-in").css({
                     position: "",
-                    top: Math.min(window.innerHeight, $(".assignment-container:last").offset().top + $(".assignment-container:last").height() + Priority.ANIMATE_IN_START_MARGIN) - $("#animate-in").offset().top,
+                    top: Math.max(
+                        // ensure assignments don't scroll from the top of the screen
+                        // the below min parameter sets the assignment to the very bottom of your screen,
+                        // no matter what
+                        // this ensures that if the assignment is downwards from your scroll position,
+                        // it won't be at the bottom of your screen and instead at the bottom
+                        // of your assignments
+                        Priority.ANIMATE_IN_START_MARGIN,
+                        Math.min(
+                            // ensure assignments don't scroll from the bottom to the top too far
+                            window.innerHeight,
+                            $(".assignment-container:last").offset().top + $(".assignment-container:last").height() + Priority.ANIMATE_IN_START_MARGIN
+                        // subtract the offset top to get the actual top value
+                        // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                        // offset top and make that number its new top
+                        ) - $("#animate-in").offset().top
+                    ),
                     marginBottom: -$("#animate-in").outerHeight(),
                 });
             });
