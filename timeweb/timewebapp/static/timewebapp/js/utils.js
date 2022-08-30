@@ -1121,6 +1121,10 @@ navClickHandlers: function() {
             content: `for creating the legendary <a href="#">TIMEWEB CAR</a> :D.`,
         },
         {
+            title: "Special thanks to Andrew Sun",
+            content: `om g andrew suS (!!)   +gets 100 we,b coin .`,
+        },
+        {
             title: "And most importantly, my mom and my dad <3",
         },
     ];
