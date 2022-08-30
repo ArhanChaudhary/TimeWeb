@@ -88,7 +88,7 @@ class LabeledAddEmailForm(AddEmailForm):
         users = filter_users_by_email(value)
         on_this_account = [u for u in users if u.pk == self.user.pk]
         on_diff_account = [u for u in users if u.pk != self.user.pk]
-        on_example_account = value == settings.EXAMPLE_ACCOUNT_EMAIL
+        on_example_account = self.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
 
         if on_example_account:
             raise forms.ValidationError(errors["example_account"])
@@ -111,7 +111,7 @@ class LabeledChangePasswordForm(ChangePasswordForm):
         self.label_suffix = ""
 
     def clean(self, *args, **kwargs):
-        if str(self.user) == settings.EXAMPLE_ACCOUNT_EMAIL:
+        if self.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
             raise forms.ValidationError(_("You cannot modify the example account"))
         return LabeledTwoPasswordForm.clean(self)
 
