@@ -1326,11 +1326,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     utils.ui.setClickHandlers.deleteAllStarredAssignments();
     utils.ui.setClickHandlers.deleteAssignmentsFromClass();
-    utils.ui.addTagHandlers();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();
     utils.ui.setAssignmentScaleUtils();
-    utils.ui.setAnimationSpeed();
+    setTimeout(() => {
+        utils.ui.addTagHandlers();
+        utils.ui.setAnimationSpeed();
+    }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();
     // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute

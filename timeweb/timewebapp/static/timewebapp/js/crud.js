@@ -134,58 +134,60 @@ class Crud {
     }
     init() {
         const that = this;
-        // no today's date button because it already defaults to today on new assignment
-        // although a user might want a today button for editing an assignment date to today
-        // such a scenario is rare to happen; adding a today date button is a waste of space
-        let last_assignment_date_input_val;
-        $("#id_assignment_date").daterangepicker({
-            ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
-            autoApply: true,
-            locale: {
-                format: 'MM/DD/YYYY'
-            },
-        }).on('input', function() {
-            last_assignment_date_input_val = $(this).val();
-        }).on('hide.daterangepicker', function(e, picker) {
-            if (last_assignment_date_input_val === "") {
-                last_assignment_date_input_val = utils.formatting.stringifyDate(date_now);
-                $(this).val(last_assignment_date_input_val);
-                picker.setStartDate(last_assignment_date_input_val);
-                picker.setEndDate(last_assignment_date_input_val);
-            }
-        });
-        let old_due_date_val;
-        $("#id_x").daterangepicker({
-            ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
-            locale: {
-                format: 'MM/DD/YYYY h:mm A'
-            },
-            timePicker: true,
-        }).on('show.daterangepicker', function(e, picker) {
-            old_due_date_val = $(this).val();
-            picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
-        }).on('cancel.daterangepicker', function(e, picker) {
-            $(this).val(old_due_date_val);
-        }).on('apply.daterangepicker', function(e, picker) {
-            if (6 <= picker.startDate.hours() && picker.startDate.hours() <= 11)
-            $.alert({
-                title: "Your due time is early.",
-                content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight",
-                backgroundDismiss: false,
-                buttons: {
-                    ignore: function() {
-                        
-                    },
-                    "Set to midnight": {
-                        action: function() {
-                            picker.setStartDate(picker.startDate.startOf("day"));
+        setTimeout(() => {
+            // no today's date button because it already defaults to today on new assignment
+            // although a user might want a today button for editing an assignment date to today
+            // such a scenario is rare to happen; adding a today date button is a waste of space
+            let last_assignment_date_input_val;
+            $("#id_assignment_date").daterangepicker({
+                ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
+                autoApply: true,
+                locale: {
+                    format: 'MM/DD/YYYY'
+                },
+            }).on('input', function() {
+                last_assignment_date_input_val = $(this).val();
+            }).on('hide.daterangepicker', function(e, picker) {
+                if (last_assignment_date_input_val === "") {
+                    last_assignment_date_input_val = utils.formatting.stringifyDate(date_now);
+                    $(this).val(last_assignment_date_input_val);
+                    picker.setStartDate(last_assignment_date_input_val);
+                    picker.setEndDate(last_assignment_date_input_val);
+                }
+            });
+            let old_due_date_val;
+            $("#id_x").daterangepicker({
+                ...Crud.DEFAULT_DATERANGEPICKER_OPTIONS,
+                locale: {
+                    format: 'MM/DD/YYYY h:mm A'
+                },
+                timePicker: true,
+            }).on('show.daterangepicker', function(e, picker) {
+                old_due_date_val = $(this).val();
+                picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
+            }).on('cancel.daterangepicker', function(e, picker) {
+                $(this).val(old_due_date_val);
+            }).on('apply.daterangepicker', function(e, picker) {
+                if (6 <= picker.startDate.hours() && picker.startDate.hours() <= 11)
+                $.alert({
+                    title: "Your due time is early.",
+                    content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight",
+                    backgroundDismiss: false,
+                    buttons: {
+                        ignore: function() {
+                            
+                        },
+                        "Set to midnight": {
+                            action: function() {
+                                picker.setStartDate(picker.startDate.startOf("day"));
+                            },
                         },
                     },
-                },
+                });
             });
-        });
-        that.setCrudHandlers();
-        that.addInfoButtons();
+            that.setCrudHandlers();
+            that.addInfoButtons();
+        }, 0);
 
         if ($(".assignment-form-error-note").length) {
             that.showForm({ show_instantly: true });
