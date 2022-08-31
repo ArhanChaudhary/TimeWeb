@@ -115,7 +115,7 @@ getReversibilityStatus: function() {
 },
 ui: {
 tickClock: function() {
-    const now = utils.getRawDateNow();
+    const now = utils.getRawDateNow({ dont_stem_off_date_now: true });
     if (utils.ui.tickClock.oldNow === undefined) {
         utils.ui.tickClock.oldNow = now;
     }
@@ -1166,13 +1166,13 @@ loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
     if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
     return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
 },
-getRawDateNow: function(params={ accurate_in_simulation: true, initial_define: false }) {
+getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
     if (SETTINGS.timezone) {
         var raw_date_now = new Date(new Date().toLocaleString([], {timeZone: SETTINGS.timezone}));
     } else {
         var raw_date_now = new Date();
     }
-    if (params.accurate_in_simulation && !params.initial_define) {
+    if (!params.dont_stem_off_date_now) {
         let complete_date_now = new Date(date_now.valueOf());
         complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), 0, 0);
         return complete_date_now;
@@ -1203,7 +1203,7 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-date_now = new Date(utils.getRawDateNow({ initial_define: true }).toDateString());
+date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
