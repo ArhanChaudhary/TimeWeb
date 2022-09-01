@@ -1080,23 +1080,23 @@ navClickHandlers: function() {
                     entirety of its beta and alpha phases.`,
         },
         {
-            title: "Special thanks to Charles P.",
-            content: `for designing TimeWeb's <a href="/favicon.ico">favicon</a>.`,
-        },
-        {
             title: "Special thanks to Jeffery Zhang",
-            content: `for having the patience, interest, and intelligence to pioneer a core part of TimeWeb's <a href="
-                    https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
+            content: `for being one of my best friends through all of high school and for having the patience, interest, and intelligence to pioneer a core part of TimeWeb's <a href="
+            https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
         },
         {
             title: "Special thanks to Adrian Zhang",
             content: `for being the coolest coder friend to relate and talk to and for somehow not going insane from listening to all of my ramblings
-                    about school and life.`,
+            about school and life.`,
         },
         {
             title: "Special thanks to Rohan \"Baguette\" Bhagat",
-            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known for a
-                    long time and can feel comfortable talking and relating to about anything).`,
+            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known since 
+            middle school and can feel comfortable talking and relating to about anything).`,
+        },
+        {
+            title: "Special thanks to Charles P.",
+            content: `for designing TimeWeb's <a href="/favicon.ico">favicon</a>.`,
         },
         {
             title: "Special thanks to Vikram Srinivasan",
@@ -1122,7 +1122,7 @@ navClickHandlers: function() {
         },
         {
             title: "Special thanks to Andrew Sun",
-            content: `om g andrew suS (!!)   +gets 100 we,b coin .`,
+            content: `om g andrew suS (!!) +gets 100 we,b coin .`,
         },
         {
             title: "And most importantly, my mom and my dad <3",
