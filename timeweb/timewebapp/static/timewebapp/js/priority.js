@@ -326,7 +326,8 @@ class Priority {
                     height: 16,
                 }).css("margin-left", -3);
                 status_value = Priority.COMPLETELY_FINISHED;
-                if (SETTINGS.immediately_delete_completely_finished_assignments && !sa.sa.dont_hide_again)
+                // finished_work_inputs to ensure that assignments are only deleted when the user is aware
+                if (finished_work_inputs && SETTINGS.immediately_delete_completely_finished_assignments && !sa.sa.dont_hide_again)
                     delete_starred_assignment_after_sorting = true;
             } else if (not_yet_assigned) {
                 status_image = "not_yet_assigned";
