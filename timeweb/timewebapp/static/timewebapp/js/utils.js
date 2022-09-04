@@ -1120,7 +1120,7 @@ navClickHandlers: function() {
         },
         {
             title: "Special thanks to Shantanu Bulbule",
-            content: `for creating the legendary <a href="#">TIMEWEB CAR</a> :D.`,
+            content: `for creating the legendary <a href="https://imgur.com/a/OPU1Xcd" target="_blank">TIMEWEB CAR</a> :D.`,
         },
         {
             title: "Special thanks to Andrew Sun",
