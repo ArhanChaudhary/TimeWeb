@@ -332,7 +332,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         mods = [0]
                         mod_counter = 0
                         for mod_day in range(6):
-                            if (xday + mod_day) % 7 in self.sm.break_days:
+                            if str((xday + mod_day) % 7) in self.sm.break_days:
                                 mod_counter += 1
                             mods.append(mod_counter)
                         mods = tuple(mods)
