@@ -249,6 +249,13 @@ class Crud {
                 // You may stll be focused on an <input> when the form is hidden, invalidating keybinds
                 $(document.activeElement).blur();
             }).find("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
+            $("#form-wrapper input").each(function() {
+                // hideForm when not focused on an input (such as pressing escape) sometimes forgets to hide the daterangepicker
+                // manually do so
+                if ($(this).data("daterangepicker")?.container.is(":visible")) {
+                    $(this).trigger("blur");
+                }
+            });
         }
     }
     replaceUnit() {
