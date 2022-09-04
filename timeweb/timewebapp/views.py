@@ -317,16 +317,17 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     elif self.updated_assignment:
                         new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
                     # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
-                    x_num = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
+                    work_day_count = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
 
-                    if not x_num or len(self.sm.break_days) == 7:
+                    if not work_day_count or len(self.sm.break_days) == 7:
                         x_num = 1
                     elif self.sm.break_days:
-                        guess_x = 7*floor(x_num/(7-len(self.sm.break_days)) - 1) - 1
-                        assign_day_of_week = self.sm.assignment_date.weekday()
-                        red_line_start_x = self.sm.blue_line_start
+                        guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
 
                         # Terrible implementation of inversing calcModDays
+                        # make this an actual function
+                        assign_day_of_week = self.sm.assignment_date.weekday()
+                        red_line_start_x = self.sm.blue_line_start
                         xday = assign_day_of_week + red_line_start_x
                         mods = [0]
                         mod_counter = 0
@@ -338,9 +339,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
                         while 1:
                             guess_x += 1
-                            if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == x_num:
+                            if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == work_day_count:
                                 x_num = max(1, guess_x)
                                 break
+                    else:
+                        x_num = work_day_count
                     # Make sure assignments arent finished by x_num
                     # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
                     if self.sm.assignment_date < date_now:
