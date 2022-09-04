@@ -36,6 +36,7 @@ from common.views import logger
 from django.utils.decorators import decorator_from_middleware
 from .middleware import APIValidationMiddleware
 from django.views.decorators.http import require_http_methods
+from re import sub as re_sub, IGNORECASE
 
 # Unused but I'll keep it here just in case
 
@@ -194,6 +195,49 @@ def tag_delete(request):
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
 
+def simplify_tag_name(tag_name):
+    # abbreviate "Recommendation" to "Rec" using regex
+    abbreviations = [
+        (r"(rec)ommendation", "\\1"),
+        (r"(bio)logy", "\\1"),
+        (r"english (literature)", "\\1"),
+        (r"(lit)erature", "\\1"),
+        (r"computer science", "CS"),
+        (r"(stat)istics", "\\1s"),
+        (r"(gov)ernment", "\\1"),
+        (r"(econ)omics", "\\1"),
+        (r"(chem)istry", "\\1"),
+        (r"(calc)ulus", "\\1"),
+        (r"honors ([a-z]{2,}) ([6-9]|1[0-2])\b", "\\1 \\2H"),
+        (r"([a-z]{2,}) ([6-9]|1[0-2]) honors\b", "\\2 \\1H"),
+        (r"(trig)onometry", "\\1"),
+        (r"(digital photo)graphy", "\\1"),
+    ]
+    for abbreviation in abbreviations:
+        tag_name = re_sub(abbreviation[0], abbreviation[1], tag_name, flags=IGNORECASE)
+
+    def tag_name_re_subs(regexes, tag_name):
+        tag_name = ' '.join(tag_name.split())
+        for regex in regexes:
+            pre_tag_name = re_sub(fr"(-+ *)?{regex}( *-+)?", "", tag_name, flags=IGNORECASE)
+            pre_tag_name = re_sub(r"\(\)", "", pre_tag_name)
+            pre_tag_name = " ".join(pre_tag_name.split())
+            if not pre_tag_name or len(tag_name) < 15:
+                return tag_name
+            tag_name = pre_tag_name
+        return tag_name
+
+    tag_name = tag_name_re_subs([
+        # remove "2022-2023" from tagname
+        r"(20)?\d\d( | - |-|/)(20)?\d\d",
+        # remove period number
+        r"((per(iod)?|période|período|grade) ?|p|quarter |q)-?\d",
+        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) (per(iod)?|période|período|grade)",
+        # remove teacher title
+        r"mr?s?\.? [a-z]+('s)?",
+    ], tag_name)
+    return tag_name
+
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
 def create_gc_assignments(request):
@@ -267,7 +311,7 @@ def create_gc_assignments(request):
                     continue
                 due_time = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
-            tags.insert(0, course_names[assignment['courseId']])
+            tags.insert(0, simplify_tag_name(course_names[assignment['courseId']]))
             description = assignment.get('description', "")
             google_classroom_assignment_link = assignment.get("alternateLink")
 
