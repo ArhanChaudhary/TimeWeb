@@ -32,20 +32,22 @@ $(function() {
         }
     });
     $("input").on("show.daterangepicker", function(e, picker) {
-        function dothething(_minuteselect) {
-            _minuteselect.on("change", function() {
+        function dothething(_timeselects) {
+            _timeselects.on("change", function() {
                 setTimeout(function() {
                     // idk why but theres always a new minuteselect element when its changed
                     const minuteselect = picker.container.find(".minuteselect:visible");
                     minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-                    dothething(minuteselect);
+                    const timeselects = picker.container.find(".calendar-time > select:visible");
+                    dothething(timeselects);
                 }, 0);
             });
         }
         // There's a random invisible datepicker, so only query the one that's visible
         const minuteselect = picker.container.find(".minuteselect:visible");
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-        dothething(minuteselect);
+        const timeselects = picker.container.find(".calendar-time > select:visible");
+        dothething(timeselects);
     // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
     }).on('blur', function(e) {
         // Can't use relatedTarget because it needs to be on an element with a tabindex, which the daterangepicker doesn't have
