@@ -476,7 +476,10 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
     let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
 
     // Roundoff errors
-    if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE) return;
+    if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE ||
+    // Leads to zero divisions later on and NaN curvature values
+    // Can happen when you don't complete an assignment by its due date
+    x1_from_blue_line_start === 0) return;
 
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for the actual WLS!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3
