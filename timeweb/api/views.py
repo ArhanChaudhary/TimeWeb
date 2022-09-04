@@ -229,7 +229,7 @@ def simplify_tag_name(tag_name):
 
     tag_name = tag_name_re_subs([
         # school name
-        r"\bmsj(hs)?\b",
+        r"msj(hs)?",
 
         # year
         r"(20)?\d\d( | - |-|/)(20)?\d\d",
