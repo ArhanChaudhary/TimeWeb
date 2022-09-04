@@ -18,8 +18,8 @@ urlpatterns = [
     path('terms', RedirectView.as_view(url=app_static('policies/terms.html'))),
     path('license', RedirectView.as_view(url="https://github.com/ArhanChaudhary/TimeWeb/blob/master/LICENSE")),
     
-    path('facebook', RedirectView.as_view(url='https://facebook.com/TimeWebPage'), name="facebook"),
-    path('instagram', RedirectView.as_view(url='https://instagram.com/TimeWebOfficial'), name="instagram"),
+    path('facebook', RedirectView.as_view(url='https://facebook.com/TimeWeb-106585978849307'), name="facebook"),
+    path('instagram', RedirectView.as_view(url='https://instagram.com/TimeWebApp'), name="instagram"),
     path('twitter', RedirectView.as_view(url='https://twitter.com/TimeWebOfficial'), name="twitter"),
     path('discord', RedirectView.as_view(url='https://discord.gg/fQgPXX5qpD'), name="discord"),
     path('youtube', RedirectView.as_view(url='https://youtube.com/channel/UCbd8BxiMRGDM6rwaf59vc8g'), name="youtube"),
