@@ -230,11 +230,19 @@ def simplify_tag_name(tag_name):
     tag_name = tag_name_re_subs([
         # school name
         r"\bmsj(hs)?\b",
-        # remove "2022-2023" from tagname
+
+        # year
         r"(20)?\d\d( | - |-|/)(20)?\d\d",
+
         # remove period number
+
+        # grade-5
         r"((per(iod)?|période|período|grade) ?|p|quarter |q)-?\d",
+        # second period
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) (per(iod)?|période|período|grade)",
+        # (1st)
+        r"\(((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th)\)",
+
         # remove teacher title
         r"m(rs|r|s)\. [a-z]+('s)?",
     ], tag_name)
