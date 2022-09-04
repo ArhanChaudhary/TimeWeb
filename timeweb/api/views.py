@@ -236,7 +236,7 @@ def simplify_tag_name(tag_name):
         r"((per(iod)?|période|período|grade) ?|p|quarter |q)-?\d",
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) (per(iod)?|période|período|grade)",
         # remove teacher title
-        r"mr?s?\.? [a-z]+('s)?",
+        r"m(rs|r|s)\. [a-z]+('s)?",
     ], tag_name)
     return tag_name
 
