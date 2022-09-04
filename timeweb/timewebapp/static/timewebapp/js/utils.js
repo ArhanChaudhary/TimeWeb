@@ -731,8 +731,10 @@ switch (e.key) {
                             }
                             // We can't use a normal .click().focus() or else
                             // a graph button out of view scrolls it all the way to the middle of the page
-                            graph_button[0].scrollIntoView({block: "nearest"});
                             graph_button.click();
+                            // scroll AFTER it is clicked, the click even may call Priority.sort and further
+                            // alter the position of the graph button
+                            graph_button[0].scrollIntoView({block: "nearest"});
                             setTimeout(() => graph_button.focus(), 0);
                             }
                             break;
