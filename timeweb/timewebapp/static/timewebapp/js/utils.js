@@ -1052,7 +1052,6 @@ saveAndLoadStates: function() {
                 // Needs to scroll after assignments are opened
                 if ("scroll" in localStorage) {
                     $("#assignments-container").scrollTop(localStorage.getItem("scroll"));
-                    localStorage.removeItem("scroll");
                 }
             }, 0);
         let date_now = new Date();
