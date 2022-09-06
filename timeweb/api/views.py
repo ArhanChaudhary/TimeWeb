@@ -232,7 +232,13 @@ def simplify_tag_name(tag_name):
         r"msj(hs)?",
 
         # year
+
+        # 2022 - 2023
         r"(20)?\d\d( | - |-|/)(20)?\d\d",
+        # 2022 American Lit
+        r"^20\d\d",
+        # American Lit 2022
+        r"20\d\d$",
 
         # remove period number
 
