@@ -37,7 +37,7 @@ Assignment.prototype.setParabolaValues = function () {
 
     const mods = this.calcModDays();
     x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-    if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+    if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
         x1 = Math.ceil(x1);
     }
 
