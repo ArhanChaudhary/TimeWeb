@@ -27,6 +27,7 @@ Canonical: https://timeweb.io/.well-known/security.txt''', content_type="text/pl
     path('shantanu', views.ShantanuView.as_view(), name="goat"),
     path('stackpile', RedirectView.as_view(url="https://stackpile.me"), name='stackpile'),
     path('nurse', RedirectView.as_view(url="https://contactvikram.github.io"), name='nursing ai'),
+    path('sk', RedirectView.as_view(url="https://www.instagram.com/siddhantkuwar/")),
     path('spooky', views.SpookyView.as_view(), name="spooky"),
     path('sus', views.SusView.as_view(), name="sus"),
     path('mc.blogcraft.dev', lambda x: HttpResponse(status=418), name="bithub"),
