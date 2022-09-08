@@ -1083,12 +1083,17 @@ navClickHandlers: function() {
         {
             title: "Special thanks to Jeffery Zhang",
             content: `for being one of my best friends through all of high school and for having the patience, interest, and intelligence to pioneer a core part of TimeWeb's <a href="
-            https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
+                    https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
+        },
+        {
+            title: "Special thanks to Ansh Bhatagnar",
+            content: `for carrying my sanity during history and math class and for being the most fun idiot to joke around and talk to. For also carrying my
+                    motivation over many study voice calls.`,
         },
         {
             title: "Special thanks to Adrian Zhang",
             content: `for being the coolest coder friend to relate and talk to and for somehow not going insane from listening to all of my ramblings
-            about school and life.`,
+                    about school and life.`,
         },
         {
             title: "Special thanks to Rohan \"Baguette\" Bhagat",
@@ -1109,10 +1114,6 @@ navClickHandlers: function() {
             title: "Special thanks to Rishi Jani",
             content: `for being someone genuine to talk to during 2020 and for continuing to support me all the way from the creation of TimeWeb in its
                     pre-alpha to today and onwards.`,
-        },
-        {
-            title: "Special thanks to Ansh Bhatagnar",
-            content: `for carrying my sanity during history and math class and for being the most fun idiot to joke around and talk to.`,
         },
         {
             title: "Special thanks to Abhik Mullick",
