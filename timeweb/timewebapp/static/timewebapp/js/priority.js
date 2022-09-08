@@ -986,8 +986,7 @@ $(window).one("load", function() {
 	$(".assignment").each(function() {
 		new VisualAssignment($(this)).positionTags();
 	});
-    if ("scroll" in localStorage) {
-        $("#assignments-container").scrollTop(localStorage.getItem("scroll"));
-        localStorage.removeItem("scroll");
+    if ("scroll" in sessionStorage) {
+        $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
     }
 });

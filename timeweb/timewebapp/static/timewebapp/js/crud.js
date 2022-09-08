@@ -341,7 +341,7 @@ class Crud {
             // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
             // This is to make the form more smooth and less unpredictable (i.e. if you set a step size to some value with 
             // some unit of work, clear the unit of work, and re-enter the same thing, the step size would have changed to
-            // 1 or 5 instead of what was originally entered)
+            // 0.5 or 5 instead of what was originally entered)
 
             if (singular.toLowerCase() === "minute") {
                 $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight())

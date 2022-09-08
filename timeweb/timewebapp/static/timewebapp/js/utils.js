@@ -1013,7 +1013,7 @@ saveAndLoadStates: function() {
                 }).toArray()
             ));
             // Save scroll position
-            localStorage.setItem("scroll", $("#assignments-container").scrollTop());
+            sessionStorage.setItem("scroll", $("#assignments-container").scrollTop());
         }
         let block = false;
         // Send all queued ajax requests
@@ -1057,8 +1057,8 @@ saveAndLoadStates: function() {
 
                 // Scroll to original position
                 // Needs to scroll after assignments are opened
-                if ("scroll" in localStorage) {
-                    $("#assignments-container").scrollTop(localStorage.getItem("scroll"));
+                if ("scroll" in sessionStorage) {
+                    $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
                 }
             }, 0);
     });
