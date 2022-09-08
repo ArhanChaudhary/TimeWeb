@@ -162,8 +162,30 @@ Assignment.prototype.setParabolaValues = function () {
 
 
     if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)
-        // this could be a quite controversial decision to disable this check; I'll let my message in #suggestions do the talking:
-        // https://canary.discord.com/channels/832155860306362438/842171586295758858/997343202292023356
+        // "TimeWeb is already able to recognize and manipulate the red line to nullify work inputs at midnight."
+
+        // After giving the replied to suggestion a lot of thought, I am considering perhaps removing this check and allowing for the 
+        // graph to generate bogus schedules that assign work between 12:00 AM and 8:00 AM. The following will explain my reasoning for
+        // why this check should be removed:
+
+        // 1) It discourages users to set due dates at times such as 8 AM
+
+        // title. the replied to suggestion explains all of the issues with setting a due date at 8 AM. After seeing that they have to 
+        // work between midnight and 8 AM, users will feel inclined to fix this by changing their due date back to 12 AM, which is what I 
+        // want. Not removing this check makes the graph seem less wrong; the user might now think that it's OK to enter a due date at a 
+        // time such as 8 AM when they see a work schedule that isn't messed up.
+
+        // 2) It makes it harder to say you want to work on the last day
+
+        // If I don't remove this check and always nullify work inputs at midnight, it could be quite frustrating to the user. What if they
+        // want to work between 12:00 AM and 8:00 AM, but TimeWeb doesn't allow them and instead assigns nullifies the amount of work to do
+        // in that timeframe?
+
+        // 3) Compromises can be made
+
+        // It doesn't have to be an either/or decision — I can incorporate advantages from both sides of the suggestion that reduce
+        // the risk of removing this check. I can warn the user before submitting the creation of an assignment if they enter a due time 
+        // between 12:00 AM - 11:59 AM and very clearly describe the dangers of setting a due time that early.
         && 0) {
         // With early due times, return_y_cutoff may be on the last day, resulting in situations where you would have to work past midnight until the due time
         // To help prevent this, we need to see if working on the last day would result in a slope that violates the minimum work time (NOT min_work_time_funct_round because the user only cares about 
