@@ -251,6 +251,13 @@ setClickHandlers: {
             });
 
         });
+        let raw_date_now = new Date();
+        if (raw_date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && raw_date_now.getHours() < 4) {
+            // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
+            // this alert is for fellow insomniacs who lose track of time
+            $("#current-date-container").append("<span id=\"currently-has-changed-notice\">(has changed)</span>");
+        }
+        localStorage.setItem("last_visit", raw_date_now.valueOf());
     },
 
     assignmentSorting: function() {
@@ -1054,13 +1061,6 @@ saveAndLoadStates: function() {
                     $("#assignments-container").scrollTop(localStorage.getItem("scroll"));
                 }
             }, 0);
-        let date_now = new Date();
-        if (date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && date_now.getHours() < 4) {
-            // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
-            // this alert is for fellow insomniacs who lose track of time
-            $("#current-date-container").append("<span id=\"currently-has-changed-notice\">(has changed)</span>");
-        }
-        localStorage.setItem("last_visit", date_now.valueOf());
     });
 },
 navClickHandlers: function() {
