@@ -782,7 +782,8 @@ class Priority {
             }
             $("#tomorrow-time").text(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
         }
-        $("#currently-has-changed-notice").remove();
+        if (!that.params.first_sort)
+            $("#currently-has-changed-notice").remove();
         utils.ui.tickClock();
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
