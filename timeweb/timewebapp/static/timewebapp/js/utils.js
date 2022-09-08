@@ -1095,16 +1095,16 @@ navClickHandlers: function() {
             content: `for being the coolest coder friend to relate and talk to and for somehow not going insane from listening to all of my ramblings
                     about school and life.`,
         },
-        {
-            title: "Special thanks to Rohan \"Baguette\" Bhagat",
-            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known since 
-            middle school and can feel comfortable talking and relating to about anything).`,
-        },
+        
         {
             title: "Special thanks to Vikram Srinivasan",
             content: `for being a reliable advisor for many of TimeWeb's core designs and functionalities, such as the initial draft of the
                     v1.8.0 user interface redesign, and for being an active and playful member of TimeWeb's community. Special thanks to his
                     phone, too, for being a constant victim to my testing.`,
+        },
+        {
+            title: "Special thanks to Rohan \"Baguette\" Bhagat",
+            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known since middle school and can feel comfortable talking and relating to about anything.`,
         },
         {
             title: "Special thanks to Charles P.",
