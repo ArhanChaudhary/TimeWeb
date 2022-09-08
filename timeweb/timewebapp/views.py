@@ -371,8 +371,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
                 self.sm.dynamic_start = 0
-
-            if self.sm.needs_more_info or self.created_assignment:
+                self.sm.works = [str(first_work)]
+            elif self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
                 old_x_num = days_between_two_dates(self.sm.x, old_data.assignment_date)
