@@ -516,10 +516,7 @@ class Priority {
                 status_priority = -index;
             } else if (status_value === Priority.NOT_YET_ASSIGNED) {
                 status_priority = today_minus_assignment_date;
-            } else if ([Priority.FINISHED_FOR_TODAY, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(status_value)) {
-                // Include Priority.FINISHED_FOR_TODAY
-                // If you're submitting work inputs for a check marked assignments ahead of time, it might swap with other check marked assignments, if this wasn't here and it went to the end of the if chain, which would make no sense
-
+            } else if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(status_value)) {
                 // Don't use NaN because NaN === NaN is false for calculations used later
                 status_priority = undefined;
             } else {
