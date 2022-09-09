@@ -200,16 +200,21 @@ def simplify_tag_name(tag_name):
     abbreviations = [
         (r"(rec)ommendation", "\\1"),
         (r"(bio)logy", "\\1"),
-        (r"english (literature)", "\\1"),
+        (r"(english|american) ?(literature)", "\\2"),
         (r"(lit)erature", "\\1"),
-        (r"computer science", "CS"),
+        (r"computer ?science", "CS"),
+        (r"(psych)ology", "\\1"),
         (r"(stat)istics", "\\1s"),
         (r"(gov)ernment", "\\1"),
         (r"(econ)omics", "\\1"),
         (r"(chem)istry", "\\1"),
         (r"(calc)ulus", "\\1"),
-        (r"honors ([a-z]{2,}) ([6-9]|1[0-2])\b", "\\1 \\2H"),
-        (r"([a-z]{2,}) ([6-9]|1[0-2]) honors\b", "\\2 \\1H"),
+        (r"honors ?([a-z]{2,}) ?([6-9]|1[0-2])\b", "\\1 \\2H"),
+        (r"honors ?([6-9]|1[0-2]) ?([a-z]{2,})", "\\2 \\1H"),
+        (r"([a-z]{2,}) ?([6-9]|1[0-2]) ?honors", "\\1 \\2H"),
+        (r"([a-z]{2,}) ?honors ?([6-9]|1[0-2])\b", "\\1 \\2H"),
+        (r"([6-9]|1[0-2]) ?honors ?([a-z]{2,})", "\\2 \\1H"),
+        (r"([6-9]|1[0-2]) ?([a-z]{2,}) ?honors", "\\2 \\1H"),
         (r"(trig)onometry", "\\1"),
         (r"(digital photo)graphy", "\\1"),
     ]
@@ -243,7 +248,7 @@ def simplify_tag_name(tag_name):
         # remove period number
 
         # grade-5
-        r"((per(iod)?|période|período|grade) ?|p|quarter |q)-?\d",
+        r"((per(iod)?|période|período|grade) ?|p|quarter ?|q)-?\d",
         # second period
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) (per(iod)?|période|período|grade)",
         # (1st)
