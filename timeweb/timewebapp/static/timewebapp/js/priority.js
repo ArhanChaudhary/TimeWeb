@@ -982,12 +982,18 @@ document.addEventListener("DOMContentLoaded", function() {
 	} else {
 		new Priority().sort({ first_sort: true });
 	}
-});
-$(window).one("load", function() {
-	$(".assignment").each(function() {
-		new VisualAssignment($(this)).positionTags();
-	});
-    if ("scroll" in sessionStorage) {
-        $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
+    function positionTags() {
+        $(".assignment").each(function() {
+            new VisualAssignment($(this)).positionTags();
+        });
+        if ("scroll" in sessionStorage) {
+            $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
+        }
+    }
+    if (SETTINGS.horizontal_tag_position === "Left") {
+        // "Left" is mega slow, do it after
+        $(window).one("load", positionTags);
+    } else {
+        positionTags();
     }
 });
