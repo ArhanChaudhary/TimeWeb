@@ -75,10 +75,13 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    description = models.TextField(
-        null=True,
+    min_work_time = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0"),_("The minimum work time must be positive or zero"))],
         blank=True,
-        verbose_name=_('Assignment Description'),
+        null=True,
+        verbose_name=_('Minimum Daily Work Time'),
     )
     unit = models.CharField(
         null=True,
@@ -105,19 +108,16 @@ class TimewebModel(models.Model):
         null=True,
         verbose_name=_('Step Size'),
     )
-    min_work_time = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal("0"),_("The minimum work time must be positive or zero"))],
-        blank=True,
-        null=True,
-        verbose_name=_('Minimum Daily Work Time'),
-    )
     break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True,
         verbose_name=_('Working Days'),
+    )
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_('Assignment Description'),
     )
     fixed_mode = models.BooleanField(
         default=False,
