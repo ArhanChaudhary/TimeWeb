@@ -1131,6 +1131,11 @@ class VisualAssignment extends Assignment {
 
                 // Attempts to undo the last work input to ensure the autotune isn't double dipped
                 // Note that the invsering of the autotune algorithm is still not perfect, but usable
+
+                // Don't apply the input_done !== todo_for_blue_line_end check here because delete work input
+                // button doesn't have it
+                // a more rigorous reason is because it makes no sense to preserve the dynamic mode start
+                // as it might have to change if was at the last work input before getting deleted
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
@@ -1159,25 +1164,26 @@ class VisualAssignment extends Assignment {
             
             // +Add this check for setDynamicModeIfInDynamicMode
             // -Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
-            // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
-            // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
+            // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode,
+                // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
             // -However, this isn't really that much of a problem; I can just call this a "feature" of dynamic mode in that it tries to make stuff linear. Disabling this makes dynamic mode completely deterministic in its red line start
+            // +nm we kinda need this check or else dynamic mode makes like no sense at all, screw those "inconsistencies" i mentioned earlier i dont wanna make stuff unexpected for the user;
+                // these inconsistencies are frankly not really that relevant, and dynamic mode is fine to not be completely deterministic
 
             // Remember to add this check to the above autotune if I decide to add this back
 
-            // Also remember to add this code if this is added back:
-            // let todo_for_blue_line_end = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
-            // if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
-            //     todo_for_blue_line_end = 0;
-            // }
+            let todo_for_blue_line_end = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
+                todo_for_blue_line_end = 0;
+            }
             
-            // if (input_done !== todo_for_blue_line_end) {
+            if (input_done !== todo_for_blue_line_end) {
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatioIfInDynamicMode();
                 }
                 this.setDynamicStartIfInDynamicMode();
-            // }
+            }
 
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
             
