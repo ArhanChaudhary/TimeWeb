@@ -441,7 +441,7 @@ class Priority {
                         height: 15,
                     }).css("margin-left", -2);
                     if (todo + last_work_input === sa.sa.y) {
-                        status_message = "Finish this assignment for today";
+                        status_message = "Finish this assignment today";
                     } else {
                         status_message = `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
                     }
