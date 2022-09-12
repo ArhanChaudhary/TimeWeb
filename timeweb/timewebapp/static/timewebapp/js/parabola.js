@@ -498,15 +498,14 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
     if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
         x1_from_blue_line_start = Math.ceil(x1_from_blue_line_start);
     }
+    if (len_works_without_break_days > Assignment.MAX_WORK_INPUTS_AUTOTUNE ||
+    // Leads to zero divisions later on and NaN curvature values
+    // Can happen when you don't complete an assignment by its due date
+    // We don't need to add this to shouldAutotune because the scenarios in which this will happen are irrelevant
+    x1_from_blue_line_start === 0) return;
 
     // number of work inputs to do between the start of the red line and the due date
     let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
-
-    // Roundoff errors
-    if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE ||
-    // Leads to zero divisions later on and NaN curvature values
-    // Can happen when you don't complete an assignment by its due date
-    x1_from_blue_line_start === 0) return;
 
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for the actual WLS!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3
@@ -619,7 +618,7 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
 
         Defining such a factor is more simple that you think:
         autotune factor = number of work inputs / number of working days between the start of
-        the red line and the due date
+        the blue line and the due date
 
         forming a linear gradient that successfully mitigates this issue
         */
