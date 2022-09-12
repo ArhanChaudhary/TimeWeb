@@ -28,7 +28,7 @@ class Assignment {
         const skew_ratio_bound = mathUtils.precisionRound((y1 + this.min_work_time_funct_round) * x1 / y1, 10);
         return skew_ratio_bound;
     }
-    setDynamicStartIfInDynamicMode(params={ ajax: true }) {
+    setDynamicStartIfInDynamicMode(params={ dont_ajax: false }) {
         if (this.sa.fixed_mode) return;
 
         const old_dynamic_start = this.sa.dynamic_start;
@@ -53,7 +53,7 @@ class Assignment {
         this.sa.dynamic_start = this.red_line_start_x;
 
         // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
-        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
+        !params.dont_ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
         // If we don't call this again then the a and b values will be stuck at the binary search from when it was called in the earlier loop
         this.setParabolaValues();
     }
@@ -303,7 +303,7 @@ class VisualAssignment extends Assignment {
             } else if (x2 >= x1) {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
-            this.setDynamicStartIfInDynamicMode({ ajax: false });
+            this.setDynamicStartIfInDynamicMode({ dont_ajax: true });
             this.mousemove(e, iteration_number + 1);
         } else {
             this.draw(raw_x, raw_y);
@@ -1167,7 +1167,7 @@ class VisualAssignment extends Assignment {
                 && this.sa.soft)
                 this.incrementDueDate();
             // Will never run if incrementDueDate() is called
-            if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
+            else if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
                 this.sa.works.pop();
                 not_applicable_message_title = "End of Assignment.";
                 not_applicable_message_description = "You've reached the end of this assignment; there are no more work inputs to submit.";

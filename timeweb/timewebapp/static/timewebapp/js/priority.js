@@ -344,9 +344,7 @@ class Priority {
                 if (that.params.autofill_no_work_done && number_of_forgotten_days > 0)
                     for (let i = 0; i < number_of_forgotten_days; i++) {
                         
-                        if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) {
-                            break;
-                        }
+                        if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) break;
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
