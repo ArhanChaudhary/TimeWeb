@@ -3,7 +3,7 @@ class Priority {
     static ANIMATE_IN_DURATION = 1500 * SETTINGS.animation_speed;
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
     static ANIMATE_IN_START_MARGIN = 120; // Moves #animate-in a bit below the last assignment to give it more breathing room
-    static TOO_MUCH_TO_AUTOFILL_CUTOFF = 7500;
+    static TOO_MUCH_TO_AUTOFILL_CUTOFF = 750;
     
     static INCOMPLETE_WORKS = 11;
     static NO_WORKING_DAYS = 10;
