@@ -36,19 +36,46 @@ class Assignment {
 
         let low = this.sa.blue_line_start;
         let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
-        while (low < high) {
-            const mid = Math.floor((low + high) / 2);
-            this.red_line_start_x = mid;
+
+        this.iter = 0;
+        for (this.red_line_start_x = low; this.red_line_start_x <= high; this.red_line_start_x++) {
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             this.setParabolaValues();
+            if (this.redLineStartXIsValid() || 
+                // don't do the increment on the last iteration       
+                this.red_line_start_x === high) break;
 
-            if (this.redLineStartXIsValid()) {
-                high = mid;
-            } else {
-                low = mid + 1;
+            if (this.iter > 20000) {
+                low = this.red_line_start_x;
+                while (low < high) {
+                    const mid = Math.floor((low + high) / 2);
+                    this.red_line_start_x = mid;
+                    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                    this.setParabolaValues();
+        
+                    if (this.redLineStartXIsValid()) {
+                        high = mid;
+                    } else {
+                        low = mid + 1;
+                    }
+                }
+                this.red_line_start_x = low;
+                break;
             }
         }
-        this.red_line_start_x = low;
+
+        // high-first approach:
+
+        // for (this.red_line_start_x = high - 1; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
+        //     this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        //     this.setParabolaValues();
+        //     if (!this.redLineStartXIsValid()) break;
+        // }
+        // // ++ for three cases:
+        // // if for loop doesnt run, do ++ to fix red_line_start_x
+        // // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
+        // // if for loop doesnt find, do ++; red_line_start_x is less than blue_line_start which is illegal
+        // this.red_line_start_x++;
         this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
         this.sa.dynamic_start = this.red_line_start_x;
 
@@ -70,6 +97,7 @@ class Assignment {
                 this_work = prev_work;
             prev_funct = this.funct(i - 1),
             prev_work = this.sa.works[i - this.sa.blue_line_start - 1];
+            this.iter++;
             const valid = this_work === this_funct && prev_work === prev_funct;
             if (!valid) {
                 return false;
