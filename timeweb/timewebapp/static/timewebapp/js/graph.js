@@ -70,7 +70,8 @@ class Assignment {
                 this_work = next_work;
             next_funct = this.funct(i + 1),
             next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-            if (next_funct - this_funct !== next_work - this_work) {
+            const valid = this_work === this_funct && prev_work === prev_funct;
+            if (!valid) {
                 return false;
             }
         }
