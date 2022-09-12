@@ -63,19 +63,35 @@ class Assignment {
 
         // checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
         const len_works = this.sa.works.length - 1;
-        let next_funct = this.funct(this.red_line_start_x),
-            next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-        for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
-            const this_funct = next_funct,
-                this_work = next_work;
-            next_funct = this.funct(i + 1),
-            next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+        let prev_funct = this.funct(len_works + this.sa.blue_line_start),
+            prev_work = this.sa.works[len_works];
+        for (let i = len_works + this.sa.blue_line_start; i > this.red_line_start_x; i--) {
+            const this_funct = prev_funct,
+                this_work = prev_work;
+            prev_funct = this.funct(i - 1),
+            prev_work = this.sa.works[i - this.sa.blue_line_start - 1];
             const valid = this_work === this_funct && prev_work === prev_funct;
             if (!valid) {
                 return false;
             }
         }
         return true;
+
+        // high-first approach
+        // const len_works = this.sa.works.length - 1;
+        // let next_funct = this.funct(this.red_line_start_x),
+        //     next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        // for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
+        //     const this_funct = next_funct,
+        //         this_work = next_work;
+        //     next_funct = this.funct(i + 1),
+        //     next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+        //     this.iter++;
+        //     if (next_funct - this_funct !== next_work - this_work) {
+        //         return false;
+        //     }
+        // }
+        // return true;
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
