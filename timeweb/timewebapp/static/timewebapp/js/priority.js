@@ -348,7 +348,7 @@ class Priority {
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
-                        if (number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
+                        if (sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                                 sa.setDynamicStartIfInDynamicMode();
                                 sa.autotuneSkewRatioIfInDynamicMode();
@@ -378,6 +378,7 @@ class Priority {
                 }
 
                 if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
+                    if (sa.shouldAutotune())
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                         sa.setDynamicStartIfInDynamicMode();
                         sa.autotuneSkewRatioIfInDynamicMode();

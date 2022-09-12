@@ -93,6 +93,23 @@ class Assignment {
         // }
         // return true;
     }
+    shouldAutotune() {
+        // works_without_break_days = this.sa.works.filter(function (work_input, work_input_index) {
+        //     // If break days are enabled, filter out work inputs that are on break days
+        //     // Use the same logic in calcModDays to detemine whether a work input is on a break day and add -1 at the end to select the work input after every non break day
+        //     // Add work_input_index === 0 because the above logic may skip over the first work input
+        //     return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
+        // }.bind(this));
+        // const len_works_without_break_days = works_without_break_days.length - 1;
+
+        let len_works = this.sa.works.length - 1;
+        const mods = this.calcModDays();
+
+        // TODO: probably need to test this but mods is super insiginicant
+        len_works -= Math.floor(len_works / 7) * this.sa.break_days.length + mods[(len_works + this.sa.blue_line_start) % 7];
+
+        return len_works <= Assignment.MAX_WORK_INPUTS_AUTOTUNE;
+    }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
         this.sa.due_time = {hour: 0, minute: 0};
@@ -1017,6 +1034,7 @@ class VisualAssignment extends Assignment {
             }
             this.sa.works.pop();
             len_works--;
+            if (this.shouldAutotune())
             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                 this.setDynamicStartIfInDynamicMode();
                 this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
@@ -1153,6 +1171,7 @@ class VisualAssignment extends Assignment {
                 // button doesn't have it
                 // a more rigorous reason is because it makes no sense to preserve the dynamic mode start
                 // as it might have to change if was at the last work input before getting deleted
+                if (this.shouldAutotune())
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
@@ -1195,6 +1214,7 @@ class VisualAssignment extends Assignment {
             }
             
             if (input_done !== todo_for_blue_line_end) {
+                if (this.shouldAutotune())
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                     this.setDynamicStartIfInDynamicMode();
                     this.autotuneSkewRatioIfInDynamicMode();
