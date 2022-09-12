@@ -349,7 +349,12 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function (point_1, point_
 }
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 1000;
 Assignment.THIRD_POINT_STEP = 0.01;
-Assignment.MATRIX_ENDS_WEIGHT = 10000;
+// this NEEDS to be really really big
+// lets say x1_from_blue_line_start is 1800, and so x2 is 1799.99
+// If I put a lower weight, y2 can be something like 598.3 instead of 599.88
+// this tiny difference of 1 unit of work is magnified because it is over 0.01 in the x axis,
+// leading to absurd curvature values
+Assignment.MATRIX_ENDS_WEIGHT = 10000000;
 
 // There is a deadlock netween autotuneSkewRatioIfInDynamicMode and setDynamicStartInDynamicMode:
 // When dynamic start is set, skew ratio needs to be re-autotuned
