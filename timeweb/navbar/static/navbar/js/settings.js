@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // d256f25 should have fixed this but it's stupidly inconsistent
     $("option:not([value])").attr("value", "");
 
+    let hasSubmitted = false;
     if (GC_API_INIT_FAILED) {
         $.alert({
             title: "Could not enable the Google Classroom integration.",
@@ -77,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    let hasSubmitted = false;
     $("#logo-container").click(function(e) {
         e.preventDefault();
         $("#submit-settings-button").click();
@@ -108,6 +108,38 @@ document.addEventListener("DOMContentLoaded", function() {
             if ($(this).parents(".right-side-of-field").find("input").is(":checked"))
 				$("#submit-settings-button").click();
         }, 700);
+    });
+    $(".not-yet-implemented").click(function() {
+        if (!$(this).prop("checked")) return;
+        setTimeout(() => {
+            $(this).prop("checked", false);
+            $.alert({
+                title: "Not yet implemented",
+                content: `This integration hasn't yet been implemented but is planned for a future release. If you want to want this feature sooner, 
+                        you can peer pressure me by sending me a nudge.`,
+                buttons: {
+                    ok: {
+
+                    },
+                    nudge: {
+                        action: () => {
+                            switch ($(this).attr("id")) {
+                                case "id_calendar_integration":
+                                    var setting = "nudge_calendar";
+                                    break;
+                                case "id_notifications_integration":
+                                    var setting = "nudge_notifications";
+                                    break;
+                                case "id_canvas_integration":
+                                    var setting = "nudge_canvas";
+                                    break;
+                            }
+                            ajaxUtils.changeSetting({setting: setting, value: true});
+                        },
+                    },
+                }
+            });
+        }, 500);
     });
 });
 $(window).one("load", function() {

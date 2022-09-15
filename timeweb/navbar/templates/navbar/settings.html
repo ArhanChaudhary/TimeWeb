@@ -87,20 +87,21 @@
                                     {% if field.name == "view_deleted_assignments" %}
                                         View
                                     {% else %}
-                                        <span class="toggle-text">
-                                            {% if field.name == "enable_gc_integration" %}
+                                        {% if field.name == "enable_gc_integration" or field.name == "calendar_integration" or field.name == "notifications_integration" or field.name == "canvas_integration" %}
+                                            <span class="toggle-text">
                                                 Disable
-                                            {% else %}
-                                                Off
-                                            {% endif %}
-                                        </span>
-                                        <span class="toggle-text">
-                                            {% if field.name == "enable_gc_integration" %}
+                                            </span>
+                                            <span class="toggle-text">
                                                 Enable
-                                            {% else %}
+                                            </span>
+                                        {% else %}
+                                            <span class="toggle-text">
+                                                Off
+                                            </span>
+                                            <span class="toggle-text">
                                                 On
-                                            {% endif %}
-                                        </span>
+                                            </span>
+                                        {% endif %}
                                     {% endif %}
                                 </label>
                             {% endif %}
