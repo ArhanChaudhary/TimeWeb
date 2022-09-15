@@ -59,6 +59,7 @@
         {% block base_head_js %}{% endblock %}
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
+    <body tabindex="-1" class="{% if settings_model.appearance == "dark" %}dark{% endif %}">
     <body tabindex="-1">
         {% comment %} 
         most frustrating bug to exist where service workers from like last year persist
