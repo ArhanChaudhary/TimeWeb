@@ -108,16 +108,17 @@ class TimewebModel(models.Model):
         null=True,
         verbose_name=_('Step Size'),
     )
+    # order description above break_days or else it just looks really awkward of break_days isn't last
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name=_('Assignment Description'),
+    )
     break_days = MultiSelectField(
         choices=WEEKDAYS,
         blank=True,
         null=True,
         verbose_name=_('Working Days'),
-    )
-    description = models.TextField(
-        null=True,
-        blank=True,
-        verbose_name=_('Assignment Description'),
     )
     fixed_mode = models.BooleanField(
         default=False,
