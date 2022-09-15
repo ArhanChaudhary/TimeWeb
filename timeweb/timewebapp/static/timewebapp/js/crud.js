@@ -171,7 +171,7 @@ class Crud {
                 if (6 <= picker.startDate.hours() && picker.startDate.hours() <= 11)
                 $.alert({
                     title: "Your due time is early.",
-                    content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight",
+                    content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight.",
                     backgroundDismiss: false,
                     buttons: {
                         ignore: function() {
@@ -546,19 +546,34 @@ class Crud {
         });
         $("#id_description").expandableTextareaHeight();
         Crud.one_unit_of_work_alert_already_shown = false;
-        $("#id_y, #id_funct_round, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
-            
+        $("#id_y, #id_x, #id_assignment_date, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
+            let time_per_unit = $("#id_time_per_unit");
+            if (time_per_unit.siblings(".field-widget-checkbox").is(":checked")) {
+                time_per_unit = Math.round(+time_per_unit.val() * 60);
+            } else {
+                time_per_unit = +time_per_unit.val();
+            }
+            // we don't need to use min_work_time_funct_round instead because it is irrelevant when y is 1
+            let min_work_time = $("#id_min_work_time");
+            if (min_work_time.siblings(".field-widget-checkbox").is(":checked")) {
+                min_work_time = Math.round(+min_work_time.val() * 60);
+            } else {
+                min_work_time = +min_work_time.val();
+            }
+            let complete_x = mathUtils.daysBetweenTwoDates(
+                new Date($("#id_x").val()),
+                new Date($("#id_assignment_date").val()),
+                {round: false}
+            );
             if (!(
                 // Criteria for doing this alert
 
                 +$("#id_y").val() === 1 &&
-                // <= 1 to alert again if it aleady alerted, meaning funct_round will be set to some number less than 1
-                +$("#id_funct_round").val() <= 1 &&
-                // + to make sure it isnt empty nor 0, as funct_round is then set to 0 or NaN
-                +$("#id_min_work_time").val() &&
-                +$("#id_time_per_unit").val() &&
-                // Make sure the new funct_round value is less than 1
-                +$("#id_time_per_unit").val() > +$("#id_min_work_time").val() &&
+                // make sure isnt empty nor 0
+                min_work_time && time_per_unit && complete_x &&
+                // 15 min work time => 5 days and 1h30m time_per_unit for this alert
+                time_per_unit >= min_work_time * 6 &&
+                complete_x >= 5 &&
                 !Crud.one_unit_of_work_alert_already_shown
             )) return;
 
