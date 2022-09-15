@@ -37,6 +37,7 @@ from django.utils.decorators import decorator_from_middleware
 from .middleware import APIValidationMiddleware
 from django.views.decorators.http import require_http_methods
 from re import sub as re_sub, IGNORECASE
+from math import floor
 
 # Unused but I'll keep it here just in case
 
@@ -63,11 +64,13 @@ def delete_assignment(request):
     if {"false": False, None: False, "true": True}[request.POST.get("actually_delete")]:
         TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
     else:
+        now = timezone.now()
+        now = now.replace(microsecond=floor(now.microsecond / 100000) * 100000)
         # Let's mark dont_hide_again True every time so we don't have to go through the headache of determining
         # Another reason to mark it as True every time is that the assignment can be marked with a star while its in the deleted view
         # but not when it was deleted and as a result dont_hide_again will be False and the assignment
         # will be immediately deleted when restored
-        TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=True, dont_hide_again=True)
+        TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=True, dont_hide_again=True, deletion_time=now)
     logger.info(f'User \"{request.user}\" deleted {len(assignments)} assignments')
     return HttpResponse(status=204)
     

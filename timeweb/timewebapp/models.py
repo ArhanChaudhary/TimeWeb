@@ -153,6 +153,10 @@ class TimewebModel(models.Model):
     dont_hide_again = models.BooleanField(
         default=False,
     )
+    deletion_time = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

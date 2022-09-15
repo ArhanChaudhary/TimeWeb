@@ -972,7 +972,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	if (VIEWING_DELETED_ASSIGNMENTS) {
 		const complete_date_now = utils.getRawDateNow();
 		$(".assignment").each(function() {
-			let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(new Assignment($(this)), complete_date_now);
+            let deletion_time = new Assignment($(this)).sa.deletion_time;
+            let str_daysleft = `Deleted ${utils.formatting.formatSeconds((complete_date_now - deletion_time) / 1000)} ago`;
+
+            if (complete_date_now.getFullYear() === deletion_time.getFullYear()) {
+                var long_str_daysleft = deletion_time.toLocaleDateString([], {month: 'long', day: 'numeric'});
+            } else {
+                var long_str_daysleft = deletion_time.toLocaleDateString([], {year: 'numeric', month: 'long', day: 'numeric'});
+            }
+            long_str_daysleft = `Deleted ${long_str_daysleft}`;
 			const dom_title = $(this).find(".title");
 			dom_title.attr("data-daysleft", str_daysleft);
 			dom_title.attr("data-long-daysleft", long_str_daysleft);

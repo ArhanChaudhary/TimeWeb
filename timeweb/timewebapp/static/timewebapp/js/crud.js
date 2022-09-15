@@ -625,14 +625,34 @@ class Crud {
             $("#submit-assignment-button").text("Submitting...");
         });
         $("#next-page").click(function() {
+            if ($(".assignment").length) {
+                var everything_before = utils.loadAssignmentData($(".assignment").last()).deletion_time;
+            } else {
+                if (Crud.last_removed_deletion_time) {
+                    var everything_before = Crud.last_removed_deletion_time;
+                } else {
+                    window.location.href = window.location.pathname;
+                }
+            }
+            everything_before = everything_before.valueOf() / 1000;
             const url = new URL(window.location.href);
-            url.searchParams.set('everything_before', $(".assignment").length ? utils.loadAssignmentData($(".assignment").last()).id : Crud.last_removed_id);
+            url.searchParams.set('everything_before', everything_before);
             url.searchParams.delete('everything_after');
             window.location.href = url.href;
         });
         $("#previous-page").click(function() {
+            if ($(".assignment").length) {
+                var everything_after = utils.loadAssignmentData($(".assignment").first()).deletion_time;
+            } else {
+                if (Crud.last_removed_deletion_time) {
+                    var everything_after = Crud.last_removed_deletion_time;
+                } else {
+                    window.location.href = window.location.pathname;
+                }
+            }
+            everything_after = everything_after.valueOf() / 1000;
             const url = new URL(window.location.href);
-            url.searchParams.set('everything_after', $(".assignment").length ? utils.loadAssignmentData($(".assignment").first()).id : Crud.last_removed_id);
+            url.searchParams.set('everything_after', everything_after);
             url.searchParams.delete('everything_before');
             window.location.href = url.href;
         });
@@ -697,7 +717,7 @@ class Crud {
                 // If a shorcut is in assignment_container, take it out so it doesn't get deleted
                 assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
                 assignment_container.remove();
-                Crud.last_removed_id = sa.id;
+                Crud.last_removed_deletion_time = sa.deletion_time;
                 // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
                 dom_assignment.removeClass("assignment-is-closing open-assignment");
 

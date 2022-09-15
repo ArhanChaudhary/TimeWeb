@@ -74,29 +74,29 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # we have to force request.user.timewebmodel_set.all() to non lazily evaluate or else it executes once to seralize it
         # and another in the html
         if view_hidden:
-            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=True).order_by("-pk"))
+            timewebmodels = list(request.user.timewebmodel_set.filter(hidden=True).order_by("-deletion_time"))
             if "everything_before" in request.GET:
-                everything_before = int(request.GET["everything_before"])
+                everything_before = float(request.GET["everything_before"])
                 everything_after = None
 
-                pk__gte_everything_before = [i for i in timewebmodels if i.pk >= everything_before]
-                pk__lt_everything_before = [i for i in timewebmodels if i.pk < everything_before]
+                deletion_time__gte_everything_before = [i for i in timewebmodels if i.deletion_time.timestamp() >= everything_before]
+                deletion_time__lt_everything_before = [i for i in timewebmodels if i.deletion_time.timestamp() < everything_before]
 
-                self.context["show_previous_page"] = len(pk__gte_everything_before) > 0
-                self.context["show_next_page"] = len(pk__lt_everything_before) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_previous_page"] = len(deletion_time__gte_everything_before) > 0
+                self.context["show_next_page"] = len(deletion_time__lt_everything_before) > settings.DELETED_ASSIGNMENTS_PER_PAGE
 
-                timewebmodels = pk__lt_everything_before[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+                timewebmodels = deletion_time__lt_everything_before[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
             elif "everything_after" in request.GET:
-                everything_after = int(request.GET["everything_after"])
+                everything_after = float(request.GET["everything_after"])
                 everything_before = None
 
-                pk__gt_everything_after = [i for i in timewebmodels if i.pk > everything_after]
-                pk__lte_everything_after = [i for i in timewebmodels if i.pk <= everything_after]
+                deletion_time__gt_everything_after = [i for i in timewebmodels if i.deletion_time.timestamp() > everything_after]
+                deletion_time__lte_everything_after = [i for i in timewebmodels if i.deletion_time.timestamp() <= everything_after]
 
-                self.context["show_previous_page"] = len(pk__gt_everything_after) > settings.DELETED_ASSIGNMENTS_PER_PAGE
-                self.context["show_next_page"] = len(pk__lte_everything_after) > 0
+                self.context["show_previous_page"] = len(deletion_time__gt_everything_after) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_next_page"] = len(deletion_time__lte_everything_after) > 0
 
-                timewebmodels = pk__gt_everything_after[-settings.DELETED_ASSIGNMENTS_PER_PAGE:]
+                timewebmodels = deletion_time__gt_everything_after[-settings.DELETED_ASSIGNMENTS_PER_PAGE:]
             else:
                 everything_before = None
                 everything_after = None

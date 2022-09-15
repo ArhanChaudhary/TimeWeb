@@ -15,6 +15,24 @@ formatMinutes: function(total_minutes) {
     if (!minute) return hour + "h";
     return hour + "h " + minute + "m";
 },
+formatSeconds: function(total_seconds) {
+    // https://stackoverflow.com/questions/30679279/how-to-convert-seconds-into-year-month-days-hours-minutes-respectively
+    let y = Math.floor(total_seconds / 31536000);
+    let mo = Math.floor((total_seconds % 31536000) / 2628000);
+    let d = Math.floor(((total_seconds % 31536000) % 2628000) / 86400);
+    let h = Math.floor((total_seconds % (3600 * 24)) / 3600);
+    let m = Math.floor((total_seconds % 3600) / 60);
+    let s = Math.floor(total_seconds % 60);
+
+    let yDisplay = y > 0 ? y + "y" : "";
+    let moDisplay = mo > 0 ? mo + "mo" : "";
+    let dDisplay = d > 0 ? d + "d" : "";
+    let hDisplay = h > 0 ? h + "h" : "";
+    let mDisplay = m > 0 ? m + "m" : "";
+    let sDisplay = s > 0 ? s + "s" : "";
+    let displays = [yDisplay, moDisplay, dDisplay, hDisplay, mDisplay, sDisplay];
+    return displays.filter(d => d).slice(0, 2).join(" ");
+},
 // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
 hexToRGB: function(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -1264,6 +1282,9 @@ for (let sa of dat) {
             sa.assignment_date.setDate(sa.assignment_date.getDate() + x_transform);
             sa.fake_assignment_date = false; // probably isnt needed but ill keep this here anyways
         }
+    }
+    if (VIEWING_DELETED_ASSIGNMENTS) {
+        sa.deletion_time = new Date(sa.deletion_time);
     }
     // Repopulating the form
     sa.original_min_work_time = +sa.min_work_time;

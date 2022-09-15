@@ -35,6 +35,7 @@ class TimewebForm(forms.ModelForm):
             'alert_due_date_incremented': forms.HiddenInput(),
             'hidden': forms.HiddenInput(),
             'dont_hide_again': forms.HiddenInput(),
+            'deletion_time': forms.HiddenInput(),
         }
         error_messages = {
             'name': {
