@@ -52,6 +52,10 @@ body {
     flex-wrap: wrap;
     flex-flow: column;
 }
+.right-side-of-field {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 .right-side-of-field > * {
     box-sizing: border-box;
     width: 157px;
