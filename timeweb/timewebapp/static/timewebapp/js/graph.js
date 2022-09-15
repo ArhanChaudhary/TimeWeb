@@ -1320,13 +1320,11 @@ class VisualAssignment extends Assignment {
     positionTags() {
         const dom_tags = this.dom_assignment.find(".tags");
         if (VIEWING_DELETED_ASSIGNMENTS) {
-            if (SETTINGS.horizontal_tag_position === "Left" && SETTINGS.vertical_tag_position === "Top") {
-                SETTINGS.horizontal_tag_position = "Middle";
-                dom_tags.removeClass("tags-left").addClass("tags-middle");
-            } else if (SETTINGS.horizontal_tag_position === "Middle" && SETTINGS.vertical_tag_position === "Bottom") {
+            // we don't want to remove tags-left etc because of might mess up css positioning
+            if (SETTINGS.horizontal_tag_position === "Middle")
                 SETTINGS.horizontal_tag_position = "Left";
+            if (dom_tags.hasClass("tags-middle"))
                 dom_tags.removeClass("tags-middle").addClass("tags-left");
-            }
         }
         switch (SETTINGS.horizontal_tag_position) {
             case "Left": {
@@ -1344,12 +1342,20 @@ class VisualAssignment extends Assignment {
                 let title_top = dom_left_side_of_header[0].offsetTop;
                 let title_height = dom_left_side_of_header.height();
                 if (SETTINGS.vertical_tag_position === "Bottom") {
-                    // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
-                    title_height += Math.max(0, dom_title.getPseudoStyle("::after", "height") - parseFloat(dom_title.css("--smush-daysleft")));
+                    var pseudo_height = dom_title.getPseudoStyle("::after", "height");
+                    if (pseudo_height === "auto") {
+                        pseudo_height = 0;
+                    }
+                    pseudo_height -= parseFloat(dom_title.css("--smush-daysleft"));
                 } else if (SETTINGS.vertical_tag_position === "Top") {
-                    // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
-                    title_height += Math.max(0, dom_title.getPseudoStyle("::before", "height") - parseFloat(dom_title.css("--smush-priority")));
+                    var pseudo_height = dom_title.getPseudoStyle("::before", "height");
+                    if (pseudo_height === "auto") {
+                        pseudo_height = 0;
+                    }
+                    pseudo_height -= parseFloat(dom_title.css("--smush-priority"))
                 }
+                // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
+                title_height += Math.max(0, pseudo_height);
 
                 // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
                 const padding_to_add = title_top + title_height - tag_top + parseFloat(dom_tags.css("--tags-left--margin-bottom"));
