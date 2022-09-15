@@ -965,6 +965,19 @@ class Priority {
             });
         }
 		that.updateInfoHeader();
+        if (that.params.first_sort) {
+            let assignment_header = $("#assignments-header");
+            if (assignment_header.position().top !== 0) {
+                assignment_header.insertBefore(assignment_header.parent()).prependTo(assignment_header.next());
+                console.log("fixed");
+            }
+            let assignment_container = $(".assignment-container:first");
+            if (assignment_container.position().top !== assignment_header.outerHeight()) {
+                assignment_container.insertBefore(assignment_container.parent()).prependTo(assignment_container.next());
+                console.log("fixed");
+                console.log($(".assignment-container"));
+            }
+        }
         $("#assignments-container").css("opacity", "1");
         
     }
