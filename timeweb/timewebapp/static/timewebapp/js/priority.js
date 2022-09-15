@@ -145,10 +145,11 @@ class Priority {
     domSwapAssignments(tar1_index, tar2_index) {  
         const tar1 = $(".assignment-container").eq(tar1_index),
                 tar2 = $(".assignment-container").eq(tar2_index);
-        const swap_temp = $("<span></span>").insertAfter(tar2);
+        const swap_temp = $("<span>");
+        // ideally use a shitty virtual dom here or smtn
+        tar2.after(swap_temp);
         tar1.after(tar2);
-        swap_temp.after(tar1);
-        swap_temp.remove();
+        swap_temp.replaceWith(tar1);
     }
 
     transitionSwap(assignment_container) {
