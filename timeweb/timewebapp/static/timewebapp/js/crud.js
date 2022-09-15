@@ -680,9 +680,7 @@ class Crud {
             marginRight: 7,
         });
         $("#id_works").info('left',
-            `The following is only relevant if you're re-entering this field
-
-            This value is also the y-coordinate of the first point on the blue line, and changing this initial value will vertically translate all of your other work inputs accordingly`,
+            `This value is also your initial work input, so changing this initial value will vertically translate all of your other work inputs accordingly`,
         "after").css({
             marginRight: -14,
             bottom: -10,
