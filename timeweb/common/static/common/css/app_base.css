@@ -334,8 +334,8 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     display: block;
     text-align: left;
     padding: 0 !important;
-    font-size: 13px;
-    line-height: 14px;
+    font-size: 14px;
+    line-height: 15px;
     font-style: normal;
     white-space: pre-line;
     opacity: 0;
