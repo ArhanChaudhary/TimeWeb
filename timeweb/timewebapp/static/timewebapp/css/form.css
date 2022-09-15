@@ -172,7 +172,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    --vertical-field-padding: 13px;
+    --vertical-field-padding: 15px;
     padding-top: var(--vertical-field-padding);
     padding-bottom: var(--vertical-field-padding);
 }
