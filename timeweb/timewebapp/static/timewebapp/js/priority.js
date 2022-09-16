@@ -178,6 +178,7 @@ class Priority {
         const starred_assignment_ids_to_delete_after_sorting = new Set();
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
+            const assignment_container = dom_assignment.parent();
             const sa = new Assignment(dom_assignment);
 
             // Remember: protect ajaxs with !sa.sa.needs_more_info
@@ -204,8 +205,7 @@ class Priority {
             let last_work_input = sa.sa.works[len_works];
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
             let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
-            const assignment_container = $(".assignment-container").eq(index),
-                dom_status_image = $(".status-image").eq(index),
+            const dom_status_image = $(".status-image").eq(index),
                 dom_status_message = $(".status-message").eq(index),
                 dom_title = $(".title").eq(index),
                 dom_completion_time = $(".completion-time").eq(index),
@@ -499,9 +499,19 @@ class Priority {
                     || [Priority.FINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHED].includes(status_value) && !already_entered_work_input_for_today
                 )
             ).toggleClass("slashed", already_entered_work_input_for_today);
-            assignment_header_tick_svg.find("use").attr("href", `#${tick_image}-svg`);
+            let href = `#${tick_image}-svg`;
+            assignment_header_tick_svg.find("use").attr("href", href);
             assignment_header_tick_svg.attr("viewBox", (function() {
-                let bbox = assignment_header_tick_svg[0].getBBox();
+                if (!Priority.BBoxCache)
+                    Priority.BBoxCache = {};
+                let bbox;
+                if (href in Priority.BBoxCache) {
+                    bbox = Priority.BBoxCache[href];
+                } else {
+                    bbox = assignment_header_tick_svg[0].getBBox();
+                    if (!(bbox.x === 0 && bbox.y === 0 && bbox.width === 0 && bbox.height === 0))
+                        Priority.BBoxCache[href] = bbox;
+                }
                 return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
             })());
             
@@ -543,8 +553,18 @@ class Priority {
 
             if (status_image) {
                 dom_status_image.show();
-                dom_status_image.find("use").attr("href", `#${status_image}-svg`);
-                let bbox = dom_status_image[0].getBBox();
+                let href = `#${status_image}-svg`;
+                dom_status_image.find("use").attr("href", href);
+                if (!Priority.BBoxCache)
+                    Priority.BBoxCache = {};
+                let bbox;
+                if (href in Priority.BBoxCache) {
+                    bbox = Priority.BBoxCache[href];
+                } else {
+                    bbox = dom_status_image[0].getBBox();
+                    if (!(bbox.x === 0 && bbox.y === 0 && bbox.width === 0 && bbox.height === 0))
+                        Priority.BBoxCache[href] = bbox;
+                }
                 dom_status_image.attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
             } else {
                 dom_status_image.hide();
