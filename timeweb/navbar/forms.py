@@ -15,7 +15,7 @@ class CustomImageFieldWidget(ClearableFileInput):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
-        exclude = ("oauth_token", "added_gc_assignment_ids", "user")
+        exclude = ("oauth_token", "added_gc_assignment_ids", "user", "nudge_calendar", "nudge_notifications", "nudge_canvas")
         extra_fields = {
             "enable_gc_integration": {
                 "field": forms.BooleanField(
