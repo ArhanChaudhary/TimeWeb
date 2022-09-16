@@ -3,8 +3,10 @@ from django.urls import resolve
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
+from .utils import get_client_ip
 from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
 
+DEFAULT_GLOBAL_RATELIMIT = "5/s"
 class DefineIsExampleAccount:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -24,7 +26,7 @@ class CommonRatelimit:
                 group = "api"
             else:
                 group = resolved._func_path
-            if is_ratelimited(request, group=group, key=settings.GET_CLIENT_IP, rate=settings.DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
+            if is_ratelimited(request, group=group, key=get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
                 raise Ratelimited
         return self.get_response(request)
 

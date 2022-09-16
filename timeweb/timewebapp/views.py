@@ -22,6 +22,7 @@ from .models import TimewebModel
 from navbar.models import SettingsModel
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
+from common.views import logger, CHANGELOGS
 
 # Signals
 from django.db.models.signals import post_save
@@ -29,10 +30,26 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from common.utils import days_between_two_dates, utc_to_local
+from common.utils import days_between_two_dates, utc_to_local, get_client_ip
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
-from common.views import logger
+
+MAX_NUMBER_OF_TAGS = 5
+DELETED_ASSIGNMENTS_PER_PAGE = 70
+EXAMPLE_ASSIGNMENT = {
+    "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
+    "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
+    "unit": "Page",
+    "y": "400.00",
+    "blue_line_start": 0,
+    "skew_ratio": "1.0000000000",
+    "time_per_unit": "3.00",
+    "funct_round": "1.00",
+    "min_work_time": "60.00",
+    "break_days": [],
+    "dynamic_start": 0,
+    "description": "Example assignment description"
+}
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -40,9 +57,9 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
         # The front end adjusts the assignment and due date, so we don't need to worry about using utc_to_local instead of localtime
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        TimewebModel.objects.create(**settings.EXAMPLE_ASSIGNMENT | {
+        TimewebModel.objects.create(**EXAMPLE_ASSIGNMENT | {
             "assignment_date": date_now,
-            "x": date_now + datetime.timedelta(settings.EXAMPLE_ASSIGNMENT["x"]),
+            "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
             "user": instance,
         })
         SettingsModel.objects.create(user=instance)
@@ -51,8 +68,8 @@ def create_settings_model_and_example(sender, instance, created, **kwargs):
 def append_default_context(request):
     context = {
         "EXAMPLE_ACCOUNT_EMAIL": settings.EXAMPLE_ACCOUNT_EMAIL,
-        "EXAMPLE_ASSIGNMENT_NAME": settings.EXAMPLE_ASSIGNMENT["name"],
-        "MAX_NUMBER_OF_TAGS": settings.MAX_NUMBER_OF_TAGS,
+        "EXAMPLE_ASSIGNMENT_NAME": EXAMPLE_ASSIGNMENT["name"],
+        "MAX_NUMBER_OF_TAGS": MAX_NUMBER_OF_TAGS,
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
@@ -61,11 +78,11 @@ def append_default_context(request):
         context["GC_API_INIT_FAILED"] = True
     return context
 
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='30/m', method="GET", block=True), name='get')
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='100/h', method="GET", block=True), name='get')
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='3/s', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='15/m', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='75/h', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=get_client_ip, rate='30/m', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=get_client_ip, rate='100/h', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=get_client_ip, rate='3/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=get_client_ip, rate='15/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=get_client_ip, rate='75/h', method="POST", block=True), name='post')
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
@@ -83,9 +100,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 deletion_time__lt_everything_before = [i for i in timewebmodels if i.deletion_time.timestamp() < everything_before]
 
                 self.context["show_previous_page"] = len(deletion_time__gte_everything_before) > 0
-                self.context["show_next_page"] = len(deletion_time__lt_everything_before) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_next_page"] = len(deletion_time__lt_everything_before) > DELETED_ASSIGNMENTS_PER_PAGE
 
-                timewebmodels = deletion_time__lt_everything_before[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+                timewebmodels = deletion_time__lt_everything_before[:DELETED_ASSIGNMENTS_PER_PAGE]
             elif "everything_after" in request.GET:
                 everything_after = float(request.GET["everything_after"])
                 everything_before = None
@@ -93,18 +110,18 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 deletion_time__gt_everything_after = [i for i in timewebmodels if i.deletion_time.timestamp() > everything_after]
                 deletion_time__lte_everything_after = [i for i in timewebmodels if i.deletion_time.timestamp() <= everything_after]
 
-                self.context["show_previous_page"] = len(deletion_time__gt_everything_after) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_previous_page"] = len(deletion_time__gt_everything_after) > DELETED_ASSIGNMENTS_PER_PAGE
                 self.context["show_next_page"] = len(deletion_time__lte_everything_after) > 0
 
-                timewebmodels = deletion_time__gt_everything_after[-settings.DELETED_ASSIGNMENTS_PER_PAGE:]
+                timewebmodels = deletion_time__gt_everything_after[-DELETED_ASSIGNMENTS_PER_PAGE:]
             else:
                 everything_before = None
                 everything_after = None
 
                 self.context["show_previous_page"] = False
-                self.context["show_next_page"] = len(timewebmodels) > settings.DELETED_ASSIGNMENTS_PER_PAGE
+                self.context["show_next_page"] = len(timewebmodels) > DELETED_ASSIGNMENTS_PER_PAGE
 
-                timewebmodels = timewebmodels[:settings.DELETED_ASSIGNMENTS_PER_PAGE]
+                timewebmodels = timewebmodels[:DELETED_ASSIGNMENTS_PER_PAGE]
         else:
             timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
         self.context['assignment_models'] = timewebmodels
@@ -119,7 +136,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
         if not request.user.settingsmodel.seen_latest_changelog:
-            self.context['latest_changelog'] = settings.CHANGELOGS[0]
+            self.context['latest_changelog'] = CHANGELOGS[0]
 
         if not request.session.pop("already_created_gc_assignments_from_frontend", None):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token

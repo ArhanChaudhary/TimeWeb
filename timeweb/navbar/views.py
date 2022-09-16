@@ -11,6 +11,8 @@ from common.views import TimewebGenericView
 # App stuff
 from django.conf import settings
 import api.views as api
+from common.utils import get_client_ip
+from common.views import CHANGELOGS
 from .forms import SettingsForm
 from contact_form.views import ContactFormView as BaseContactFormView
 
@@ -23,9 +25,9 @@ from requests import get as requests_get
 from common.views import logger
 from django.forms.models import model_to_dict
 
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='1/s', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='20/m', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=settings.GET_CLIENT_IP, rate='100/h', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=get_client_ip, rate='1/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=get_client_ip, rate='20/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=get_client_ip, rate='100/h', method="POST", block=True), name='post')
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
@@ -85,7 +87,7 @@ class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
     def post(self, request):
-        if is_ratelimited(request, group=resolve(request.path)._func_path, key=settings.GET_CLIENT_IP, rate='1/m', method="POST", increment=True):
+        if is_ratelimited(request, group=resolve(request.path)._func_path, key=get_client_ip, rate='1/m', method="POST", increment=True):
             messages.error(request, "You must wait for one minute before submitting another contact form.")
             return super().get(request)
         recaptcha_token = request.POST.get('g-recaptcha-response')
@@ -111,5 +113,5 @@ class ChangelogView(TimewebGenericView):
     template_name = "navbar/changelog.html"
 
     def get(self, request):
-        self.context['changelogs'] = settings.CHANGELOGS
+        self.context['changelogs'] = CHANGELOGS
         return super().get(request)

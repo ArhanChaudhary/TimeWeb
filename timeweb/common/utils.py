@@ -7,6 +7,12 @@ from django.utils import timezone
 from common.views import logger
 from django.db.utils import OperationalError
 
+def get_client_ip(group, request):
+    if 'HTTP_CF_CONNECTING_IP' in request.META:
+        return request.META['HTTP_CF_CONNECTING_IP']
+    logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
+    return request.META['REMOTE_ADDR']
+
 def _403_csrf(request, reason=""):
     response = render(request, "common/403_csrf.html", {"request": request})
     response.status_code = 403

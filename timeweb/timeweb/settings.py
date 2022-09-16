@@ -242,39 +242,16 @@ else:
     GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
         BASE_DIR / "sa_private_key.json"
     )
-# Django Logging config
-ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'WARNING'
-DJANGO_LOG_LEVEL = 'INFO' if DEBUG else 'WARNING'
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': ROOT_LOG_LEVEL,
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': DJANGO_LOG_LEVEL,
-        }
-    },
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d}>> {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{asctime} <<{levelname}>> {message}',
-            'style': '{',
-        },
-    },
-}
+# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
+GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
+GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
+if DEBUG or FIX_DEBUG_LOCALLY:
+    GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+else:
+    GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback"
+# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -332,52 +309,41 @@ EMAIL_HOST_USER = 'timewebapp@gmail.com'
 MANAGERS = [('Arhan', 'timewebapp@gmail.com')]
 EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
 
-EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
-
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 
-
-
-# App constants
-from json import load as json_load
-from common.views import logger
-
-# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
-GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
-if DEBUG or FIX_DEBUG_LOCALLY:
-    GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-else:
-    GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback"
-# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-
-MAX_NUMBER_OF_TAGS = 5
-DELETED_ASSIGNMENTS_PER_PAGE = 70
-EXAMPLE_ASSIGNMENT = {
-    "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
-    "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
-    "unit": "Page",
-    "y": "400.00",
-    "blue_line_start": 0,
-    "skew_ratio": "1.0000000000",
-    "time_per_unit": "3.00",
-    "funct_round": "1.00",
-    "min_work_time": "60.00",
-    "break_days": [],
-    "dynamic_start": 0,
-    "description": "Example assignment description"
-}
+EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
 EDITING_EXAMPLE_ACCOUNT = False
 
-def GET_CLIENT_IP(group, request):
-    if 'HTTP_CF_CONNECTING_IP' in request.META:
-        return request.META['HTTP_CF_CONNECTING_IP']
-    logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
-    return request.META['REMOTE_ADDR']
-DEFAULT_GLOBAL_RATELIMIT = '5/s'
-
-# Changelog
-with open("changelogs.json", "r") as f:
-    CHANGELOGS = json_load(f)
+# Django Logging config
+ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'WARNING'
+DJANGO_LOG_LEVEL = 'INFO' if DEBUG else 'WARNING'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': ROOT_LOG_LEVEL,
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': DJANGO_LOG_LEVEL,
+        }
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d}>> {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{asctime} <<{levelname}>> {message}',
+            'style': '{',
+        },
+    },
+}

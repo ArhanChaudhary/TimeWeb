@@ -12,6 +12,7 @@ from django.conf import settings
 from timewebapp.models import TimewebModel
 from navbar.models import SettingsModel
 from timewebapp.forms import TimewebForm
+from timewebapp.views import MAX_NUMBER_OF_TAGS
 from navbar.forms import SettingsForm
 
 # Formatting
@@ -167,7 +168,7 @@ def tag_add(request):
 
     tag_names = request.POST.getlist('tag_names[]')
     tag_names = [tag_name for tag_name in tag_names if tag_name not in sm.tags]
-    if len(sm.tags) + len(tag_names) > settings.MAX_NUMBER_OF_TAGS: return HttpResponse(status=422)
+    if len(sm.tags) + len(tag_names) > MAX_NUMBER_OF_TAGS: return HttpResponse(status=422)
     if tag_names:
         sm.tags.extend(tag_names)
         sm.save()
