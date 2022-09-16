@@ -224,4 +224,8 @@ body {
     #button-container {
         flex-flow: column;
     }
+    .right-side-of-field {
+        margin-top: 2px;
+        margin-bottom: 18px;
+    }
 }
