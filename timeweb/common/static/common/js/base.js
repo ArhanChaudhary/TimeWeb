@@ -4,7 +4,7 @@ function assert(condition, message) {
         throw new Error(message || "Assertion failed");
     }
 }
-window.onbeforeunload = function() {
+window.addEventListener("beforeunload", function() {
     if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
     // setTimeout to ensure .scrollTop to record the scroll position is run before this
     setTimeout(function() {
@@ -21,4 +21,4 @@ window.onbeforeunload = function() {
         else 
             document.getElementById("loading-container").style.display = "contents";
     }, 0);
-};
+});

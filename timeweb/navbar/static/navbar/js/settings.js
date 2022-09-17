@@ -93,13 +93,18 @@ document.addEventListener("DOMContentLoaded", function() {
         hasSubmitted = true;
     });
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
-    window.onbeforeunload = function(e) {
+    window.addEventListener("beforeunload", function(e) {
         if (hasSubmitted) return;
 
         e.preventDefault();
         $("#logo-container").removeAttr("tabindex").focus();
+
+        window.disable_loading = true;
+        setTimeout(function() {
+            window.disable_loading = false;
+        }, 0);
         return e.returnValue = "Your settings may be lost.";
-    };
+    });
     let single_action_label_timeout;
     $(".single-action-label").click(function() {
         clearTimeout(single_action_label_timeout);
