@@ -16,25 +16,31 @@
             const CREATING_GC_ASSIGNMENTS_FROM_FRONTEND = {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}true{% else %}false{% endif %};
             const VIEWING_DELETED_ASSIGNMENTS = {% if view_deleted_assignments_in_app_view %}true{% else %}false{% endif %};
 
-            // Initialize the service worker (as soon as possible)
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/serviceworker.js', {
-                    scope: '/'
-                }).then(function (registration) {
-                    
-                }, function (err) {
-                    
+            {
+                let csp_failure = false;
+                window.addEventListener("load", function() {
+                    if (csp_failure) {
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1750);
+                    }
                 });
-            }
+                window.addEventListener("error", function(e) {
+                    if (e.message === "Uncaught ReferenceError: $ is not defined") {
+                        csp_failure = true;
+                    }
+                });
+                // Initialize the service worker (as soon as possible)
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/serviceworker.js', {
+                        scope: '/'
+                    }).then(function (registration) {
 
-            document.addEventListener("DOMContentLoaded", function() {
-                // give .oudated-serviceworker-registration-bugfix a grey background
-                for (let i of document.querySelectorAll('.oudated-serviceworker-registration-bugfix')) {
-                    i.style.backgroundColor = 'hsl(0deg, 0%, 90%)';
-                    i.style.zIndex = "9999";
-                    i.style.position = "relative";
+                    }, function (err) {
+    
+                    });
                 }
-            });
+            }
         </script>
         <title>{% block head_title %}TimeWeb{% endblock %}</title>
         {% progressive_web_app_meta %}
@@ -60,14 +66,6 @@
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
     <body tabindex="-1" class="{% if settings_model.appearance == "dark" %}dark{% endif %}">
-    <body tabindex="-1">
-        {% comment %} 
-        most frustrating bug to exist where service workers from like last year persist
-        if base.css loads in (i.e. the csp isnt outdated), we can hide this because it was successful
-        if not, user will reload 
-        {% endcomment %}
-        <h1 class="oudated-serviceworker-registration-bugfix"><b>TimeWeb is currently outdated, please reload this page. Thank you.</b></h1>
-        <h2 class="oudated-serviceworker-registration-bugfix">Old visiters of TimeWeb will use its old, cached service worker on their first visit, which doesn't update quickly enough to be replaced by this page load. This will result in styling content failing to load.</h2>
         <div id="site">
             {% comment %} 
             remember to have a <main> on these blocks, many stylesheets and scripts rely on that being present 
