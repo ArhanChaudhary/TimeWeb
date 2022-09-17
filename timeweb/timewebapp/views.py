@@ -245,26 +245,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             else:
                 self.sm.unit = "Minute"
 
-        if self.sm.unit.lower() in ("minute", "minutes"):
-            self.sm.time_per_unit = Decimal("1")
-            self.sm.funct_round = Decimal("5")
-        elif self.sm.unit.lower() in ("hour", "hours"):
-            self.sm.time_per_unit = Decimal("60")
-            # Nothing prevents funct_round from staying at 5 so let's interfere
-            if (self.created_assignment or
-                self.updated_assignment # old_data isn't defined for created assignments
-                and old_data.unit.lower() in ("minute", "minutes")
-                # No need to check if the old data's time_per_unit is 1 or funct_round is 5
-                # Because those are already true if the old data's unit is minute
-
-                # checks if the user hasn't changed the step size from what it was before
-                # TODO: some way to detect if the user manually enters a funct_round of 5
-                # the current system sets their step size to 0.5 in this case which makes
-                # no sense to the user
-                and self.sm.funct_round == Decimal("5")
-            ):
-                self.sm.funct_round = Decimal("0.5")
-
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             if field == "y": continue
             try:

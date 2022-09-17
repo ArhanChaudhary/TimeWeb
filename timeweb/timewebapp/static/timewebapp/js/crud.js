@@ -338,17 +338,22 @@ class Crud {
                 .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
             $("#id-works-field-wrapper").addClass("has-widget");
 
-            // Let's make the logic for changing the step size and time per unit for "minute" and "hour" units of work server sided
-            // This is to make the form more smooth and less unpredictable (i.e. if you set a step size to some value with 
-            // some unit of work, clear the unit of work, and re-enter the same thing, the step size would have changed to
-            // 0.5 or 5 instead of what was originally entered)
-
             if (singular.toLowerCase() === "minute") {
                 $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight())
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
+                // if you set a step size to some value with some unit of work, clear the unit of work, and re-enter the same thing
+                // the step size will be set to 0.5 or 5 instead of what was originally entered
+                // but who really cares this is what i see as expected behavior and is the user's responsibility to notice
+                $("#id_funct_round").val(5);
+                // we can do this because this value is only ever set when this field is anyways invisible,
+                // and when the unit of work is cleared this field is then emptied!
+                $("#id_time_per_unit").val(1);
             } else if (singular.toLowerCase() === "hour") {
                 $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
+                // (same two above comments apply here too)
+                $("#id_funct_round").val(0.5);
+                $("#id_time_per_unit").val(60);
             }
         } else {
             // Make sure this is ran before the .text because this can affect #id_y's text
