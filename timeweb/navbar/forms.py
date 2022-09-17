@@ -15,7 +15,7 @@ class CustomImageFieldWidget(ClearableFileInput):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
-        exclude = ("oauth_token", "added_gc_assignment_ids", "user", "nudge_calendar", "nudge_notifications", "nudge_canvas")
+        exclude = ("oauth_token", "added_gc_assignment_ids", "user")
         extra_fields = {
             "enable_gc_integration": {
                 "field": forms.BooleanField(
@@ -66,6 +66,9 @@ class SettingsForm(forms.ModelForm):
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'background_image': CustomImageFieldWidget(),
             'seen_latest_changelog': forms.HiddenInput(),
+            'calendar_integration': forms.HiddenInput(),
+            'notifications_integration': forms.HiddenInput(),
+            'canvas_integration': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {
