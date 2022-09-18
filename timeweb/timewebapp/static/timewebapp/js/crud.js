@@ -700,7 +700,7 @@ class Crud {
             marginRight: 7,
         });
         $("#id_works").info('left',
-            `This value is also your initial work input, so changing this initial value will vertically translate all of your other work inputs accordingly`,
+            `This is also your initial work input, so changing this value will vertically translate all of your other work inputs accordingly`,
         "after").css({
             marginRight: -14,
             bottom: -10,
