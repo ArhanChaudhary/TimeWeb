@@ -66,9 +66,9 @@ class SettingsForm(forms.ModelForm):
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'background_image': CustomImageFieldWidget(),
             'seen_latest_changelog': forms.HiddenInput(),
-            'calendar_integration': forms.HiddenInput(),
-            'notifications_integration': forms.HiddenInput(),
-            'canvas_integration': forms.HiddenInput(),
+            'nudge_calendar': forms.HiddenInput(),
+            'nudge_notifications': forms.HiddenInput(),
+            'nudge_canvas': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {
