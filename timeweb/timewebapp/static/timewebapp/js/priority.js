@@ -192,7 +192,7 @@ class Priority {
             }
             
             sa.setParabolaValues();
-            if (that.params.first_sort && dom_assignment.hasClass("refresh-dynamic-mode")) {
+            if (that.params.first_sort && !sa.sa.needs_more_info && dom_assignment.hasClass("refresh-dynamic-mode")) {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
                 if (sa.shouldAutotune({ skip_work_days_check: true }))
