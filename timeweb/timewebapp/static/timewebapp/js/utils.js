@@ -680,6 +680,8 @@ setKeybinds: function() {
 $(document).keydown(function(e) {
 if (e.ctrlKey || e.metaKey
     || VIEWING_DELETED_ASSIGNMENTS && ["e", "Backspace", "s", "f", "n"].includes(e.key)) return;
+const form_is_showing = $("#overlay").is(":visible");
+const form_is_hidden = !form_is_showing;
 switch (e.key) {
     case "n":
     case "e":
@@ -695,9 +697,10 @@ switch (e.key) {
         if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
         switch (e.key) {
             case "n":
-                setTimeout(() => { // Fix typing on the assignment form itself
-                    !$("#overlay").is(":visible") && $("#image-new-container").click();
-                }, 0);
+                if (form_is_showing) return;
+                $("#image-new-container").click();
+                // Fix typing on the assignment form itself
+                e.preventDefault();
                 break;
             case "t":
                 $("#assignments-container").scrollTop(0);
@@ -724,10 +727,10 @@ switch (e.key) {
                             dom_assignment.click();
                             break;
                         case "e":
+                            if (form_is_showing) return;
+                            assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
                             // Fix typing on the assignment form itself
-                            setTimeout(function() {
-                                assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                            }, 0);
+                            e.preventDefault();
                             break;
                         case "d":
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
