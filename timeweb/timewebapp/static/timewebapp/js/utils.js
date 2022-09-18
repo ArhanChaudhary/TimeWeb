@@ -692,7 +692,7 @@ switch (e.key) {
     case "o":
     case "c":
     case "t":
-        if ($(document.activeElement).prop("tagName").toLowerCase() !== "input")
+        if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
         switch (e.key) {
             case "n":
                 setTimeout(() => { // Fix typing on the assignment form itself
@@ -773,6 +773,7 @@ switch (e.key) {
         break;
     case "ArrowDown":
     case "ArrowUp":
+        if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
         const open_assignmens_on_screen = $(".open-assignment").filter(function() {
             return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
         });
