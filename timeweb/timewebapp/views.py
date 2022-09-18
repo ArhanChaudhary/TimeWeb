@@ -162,9 +162,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 form = TimewebForm(data=invalid_form_context['form'], request=request)
                 assert not form.is_valid(), f"{form.data}, {form.errors}"
                 for field in form.errors:
-                    # https://github.com/microsoft/pyright/issues/3695
-                    temp = form[field].field.widget
-                    temp.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
+                    form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
 
                 invalid_form_context['form'] = form
                 self.context.update(invalid_form_context)
