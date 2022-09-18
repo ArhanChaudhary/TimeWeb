@@ -489,9 +489,11 @@ def gc_auth_callback(request):
         if type(e) is OAuth2Error or type(e) is HttpError and e.resp.status == 403:
             # In case users deny a permission or don't input a code in the url or cancel
             request.session['gc-init-failed'] = True
+            del request.session["gc-callback-next-url"]
             return redirect(request.session.pop("gc-callback-current-url"))
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
     request.user.settingsmodel.save()
     logger.info(f"User {request.user} enabled google classroom API")
+    del request.session["gc-callback-current-url"]
     return redirect(request.session.pop("gc-callback-next-url"))
