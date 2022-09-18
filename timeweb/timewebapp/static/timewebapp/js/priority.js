@@ -624,11 +624,10 @@ class Priority {
         let due_date_incremented_notice_content;
         if (that.due_date_incremented_notices.length === 1) {
             due_date_incremented_notice_title = `Notice: "${that.due_date_incremented_notices[0].name}" has had its due date incremented because it has soft due dates enabled.`;
-            due_date_incremented_notice_content = "This only occurs when an assignment's due date passes, but the assignment still isn't complete. If you don't want this to happen, disable soft due dates in the edit assignment form.";
         } else if (that.due_date_incremented_notices.length > 1) {
             due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they have soft due dates enabled.`;
-            due_date_incremented_notice_content = "This only occurs when an assignment's due date passes, but the assignment still isn't complete. If you don't want this to happen, disable soft due dates in the edit assignment form.";
         }
+        due_date_incremented_notice_content = "This only occurs when an assignment's due date passes, but the assignment still isn't finished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
         if (due_date_incremented_notice_title && !Priority.due_date_incremented_notice_on_screen) {
             Priority.due_date_incremented_notice_on_screen = true;
             $.alert({
