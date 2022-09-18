@@ -227,7 +227,7 @@
                     <span {% if assignment.google_classroom_assignment_link %} class="hide-on-mobile" {% endif %}>{{ assignment.name }}</span>
                   </span>
                   {% if assignment.description %}
-                    <div class="description">{{ assignment.description|linebreaks }}</div>
+                    <div class="description">{{ assignment.description|linebreaksbr }}</div>
                   {% endif %}
                 </div>
                 {% if not view_deleted_assignments_in_app_view %}
