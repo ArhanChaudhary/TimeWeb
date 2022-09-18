@@ -30,7 +30,7 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from common.utils import days_between_two_dates, utc_to_local, get_client_ip
+from common.utils import days_between_two_dates, utc_to_local, get_client_ip, minutes_to_hours, hours_to_minutes
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
@@ -255,11 +255,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.unit = "Minute"
 
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
-            if field == "y": continue
             try:
-                setattr(self.sm, field, getattr(self.sm, field) * (
-                    60 if self.form.cleaned_data.get(f"{field}-widget-checkbox") else 1
-                ))
+                if field == "y": continue
+                if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                    setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
             except TypeError:
                 pass
 
@@ -408,10 +407,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if self.updated_assignment:
                 unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
                 unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
+                # minutes_to_hours and hours_to_minutes are not needed because i want this to be an accurate conversion
                 if unit_changed_from_hour_to_minute:
-                    self.sm.works = [str(Decimal(i) * Decimal("60")) for i in self.sm.works]
+                    self.sm.works = [str(hours_to_minutes(Decimal(i))) for i in self.sm.works]
                 elif unit_changed_from_minute_to_hour:
-                    self.sm.works = [str(Decimal(i) / Decimal("60")) for i in self.sm.works]
+                    self.sm.works = [str(minutes_to_hours(Decimal(i))) for i in self.sm.works]
             self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this

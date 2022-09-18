@@ -6,6 +6,7 @@ from django.contrib.sites.models import Site
 from django.utils import timezone
 from common.views import logger
 from django.db.utils import OperationalError
+from decimal import Decimal
 
 def get_client_ip(group, request):
     if 'HTTP_CF_CONNECTING_IP' in request.META:
@@ -25,6 +26,14 @@ def _403_or_429(request, exception=None):
 
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
+
+# IMPORTANT
+# Make sure these two function mirror the corresponding frontend logic
+def hours_to_minutes(hours):
+    return round(hours * Decimal(60))
+
+def minutes_to_hours(minutes):
+    return round(minutes / Decimal(60) * Decimal(100)) / Decimal(100)
 
 def utc_to_local(request, utctime):
     if request.user.is_authenticated and request.user.settingsmodel.timezone:
