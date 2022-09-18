@@ -14,6 +14,7 @@ import api.views as api
 from common.utils import get_client_ip
 from common.views import CHANGELOGS
 from .forms import SettingsForm
+from .models import SettingsModel
 from contact_form.views import ContactFormView as BaseContactFormView
 
 # Misc
@@ -24,6 +25,17 @@ from django.contrib import messages
 from requests import get as requests_get
 from common.views import logger
 from django.forms.models import model_to_dict
+from copy import deepcopy
+
+TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('loosely_enforce_minimum_work_times', )
+DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('id', 'immediately_delete_completely_finished_assignments', 'def_min_work_time',
+    'def_break_days', 'def_skew_ratio', 'one_graph_at_a_time', 'close_graph_after_work_input', 'show_priority', 'highest_priority_color',
+    'lowest_priority_color', 'assignment_sorting', 'default_dropdown_tags', 'horizontal_tag_position', 'vertical_tag_position', 
+    'appearance', 'background_image', 'animation_speed', 'enable_tutorial', 'sorting_animation_threshold', 'timezone', 'oauth_token', 
+    'added_gc_assignment_ids', 'seen_latest_changelog', 'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user')
+# Make sure to change the logic comparing the old data too if a new field is expensive to equare
+
+assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(SettingsModel._meta.fields), "update this list"
 
 @method_decorator(ratelimit(key=get_client_ip, rate='1/s', method="POST", block=True), name='post')
 @method_decorator(ratelimit(key=get_client_ip, rate='20/m', method="POST", block=True), name='post')
@@ -46,6 +58,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         return super().get(request)
         
     def post(self, request):
+        self.old_data = deepcopy(request.user.settingsmodel)
+
         # for parsing default due times in forms.py
         _mutable = request.POST._mutable
         request.POST._mutable = True
@@ -69,7 +83,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             api.gc_auth_disable(request, save=False)
         if self.form.cleaned_data.get("view_deleted_assignments"):
             request.session["view_deleted_assignments_in_app_view"] = True
-
+        if any(getattr(self.old_data, field) != getattr(self.form.instance, field) for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS):
+            request.session["refresh_dynamic_mode_all"] = True
         self.form.save()
         logger.info(f'User \"{request.user}\" updated the settings page')
 

@@ -50,6 +50,13 @@ EXAMPLE_ASSIGNMENT = {
     "dynamic_start": 0,
     "description": "Example assignment description"
 }
+TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
+                                        "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
+DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
+                                        "google_classroom_assignment_link", "has_alerted_due_date_passed_notice",
+                                        "alert_due_date_incremented", "dont_hide_again", "deletion_time", "user", "needs_more_info")
+# Make sure to change the logic comparing the old data too if a new field is expensive to equare
+assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -157,6 +164,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
             elif request.session.get("just_updated_assignment_id"):
                 self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
+            if request.session.get("refresh_dynamic_mode_all"):
+                self.context['refresh_dynamic_mode_all'] = request.session.pop("refresh_dynamic_mode_all")
+            if request.session.get("refresh_dynamic_mode"):
+                self.context['refresh_dynamic_mode'] = request.session.pop("refresh_dynamic_mode")
 
             if invalid_form_context := request.session.pop('invalid_form_context', None):
                 form = TimewebForm(data=invalid_form_context['form'], request=request)
@@ -305,7 +316,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # new_first_work is when n = removed_works_start
                     # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
 
-                    # There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
+                    # TODO: There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
                     # This is a condition from the below code that redefines works
                     # However it does not take into account capping removed_works_end at end_of_works
                     # However, end_of_works is dependent on x, creating a deadlock
@@ -423,6 +434,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif self.updated_assignment:
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
             request.session['just_updated_assignment_id'] = self.sm.pk
+            for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS:
+                if field == "works" and getattr(old_data, field)[0] != getattr(self.sm, field)[0] or getattr(old_data, field) != getattr(self.sm, field):
+                    request.session['refresh_dynamic_mode'] = self.sm.pk
+                    break
         return redirect(request.path_info)
 
     def invalid_form(self, request):

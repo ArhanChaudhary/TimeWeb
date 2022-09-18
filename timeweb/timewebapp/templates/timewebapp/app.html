@@ -180,7 +180,7 @@
         {% for assignment in assignment_models %}
           {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
           <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
-            <div class="assignment{% if assignment.needs_more_info %} needs-more-info{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+            <div class="assignment {% if assignment.needs_more_info %}needs-more-info{% endif %} {% if refresh_dynamic_mode_all or refresh_dynamic_mode == assignment.pk %}refresh-dynamic-mode{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
               <div class="priority-color-strip"></div>
               <div class="assignment-header">

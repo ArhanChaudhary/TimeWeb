@@ -192,12 +192,16 @@ class Priority {
             }
             
             sa.setParabolaValues();
-            if (that.params.first_sort)
+            if (that.params.first_sort && dom_assignment.hasClass("refresh-dynamic-mode")) {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
-
-                // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                if (sa.shouldAutotune({ skip_work_days_check: true }))
+                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                    sa.setDynamicStartIfInDynamicMode();
+                    sa.autotuneSkewRatioIfInDynamicMode();
+                }
                 sa.setDynamicStartIfInDynamicMode();
+            }
                 
             let display_format_minutes = false;
             let delete_starred_assignment_after_sorting = false;
