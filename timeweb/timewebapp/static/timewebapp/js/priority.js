@@ -12,10 +12,11 @@ class Priority {
     static NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT = 7;
     static UNFINISHED_FOR_TODAY_AND_DUE_TODAY = 6;
     static UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW = 5;
-    static UNFINISHED_FOR_TODAY = 4;
-    static FINISHED_FOR_TODAY = 3;
-    static NOT_YET_ASSIGNED = 2;
-    static COMPLETELY_FINISHED = 1;
+    static UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW = 4;
+    static UNFINISHED_FOR_TODAY = 3;
+    static FINISHED_FOR_TODAY = 2;
+    static NOT_YET_ASSIGNED = 1;
+    static COMPLETELY_FINISHED = 0;
 
     constructor() {
         const that = this;
@@ -92,12 +93,17 @@ class Priority {
             } else {
                 if (due_date_minus_today === -1) {
                     str_daysleft = 'Yesterday';
-                } else if (due_date_minus_today === 0) {
-                    str_daysleft = 'Today';
-                } else if (due_date_minus_today === 1) {
-                    str_daysleft = 'Tomorrow';
-                } else if (due_date_minus_today < 7) {
-                    str_daysleft = due_date.toLocaleDateString([], {weekday: 'long'});
+                } else if (due_date_minus_today >= 0 && due_date_minus_today < 7) {
+                    if (due_date_minus_today === 0) {
+                        str_daysleft = 'Today';
+                    } else if (due_date_minus_today === 1) {
+                        str_daysleft = 'Tomorrow';
+                    } else if (due_date_minus_today < 7) {
+                        str_daysleft = due_date.toLocaleDateString([], {weekday: 'long'});
+                    }
+                    if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59) {
+                        str_daysleft = "End of " + str_daysleft;
+                    }
                 } else {
                     str_daysleft = due_date_minus_today + "d";
                 }
@@ -462,7 +468,10 @@ class Priority {
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
                         } else if (due_date_minus_today === 1) {
                             that.display_due_tomorrow_completion_time = true;
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                            if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
+                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
+                            else
+                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                         }
                     }
                     that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
@@ -697,7 +706,7 @@ class Priority {
         // a.status_value and b.status_value must be equal at this point, so define a shared variable for readability
         let status_value = a.status_value;
 
-        if (SETTINGS.assignment_sorting === "Reversed" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
+        if (SETTINGS.assignment_sorting === "Reversed" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
@@ -839,7 +848,7 @@ class Priority {
         that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
         that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
-            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(priority_data.status_value)) {
+            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(priority_data.status_value)) {
                 return priority_data.status_priority;
             } else {
                 return -Infinity;
@@ -862,7 +871,7 @@ class Priority {
             }
 
             let priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
-            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(priority_data.status_value);
+            const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(priority_data.status_value);
             const dom_title = $(".title").eq(priority_data.index);
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
