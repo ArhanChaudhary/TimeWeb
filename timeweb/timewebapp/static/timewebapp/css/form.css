@@ -293,6 +293,9 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     /* for invalid fields */
     box-shadow: none;
 }
+#form-wrapper .field-wrapper.disabled-field .field-widget {
+    display: none;
+}
 #form-wrapper .field-wrapper > input {
     transition: 0.25s ease-out;
     transition-property: opacity, background-color;
