@@ -102,12 +102,12 @@ class Crud {
 
     // it is important to use .click instead of .prop("checked", true/false) so the animation click handler fires
     static STANDARD_FIELD_GROUP = () => {
-        if ($("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+        if ($("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
             $("#form-wrapper #field-group-picker").click();
         }
     }
     static ADVANCED_FIELD_GROUP = () => {
-        if (!$("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+        if (!$("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
             $("#form-wrapper #field-group-picker").click();
         }
     }
@@ -461,7 +461,7 @@ class Crud {
         $("#form-wrapper #field-group-picker").click(() => {
             $("#first-field-group, #second-field-group").trigger("transitionend");
             let second_minus_first = $("#form-wrapper #second-field-group .instant-margin-transition")[0].scrollHeight - $("#form-wrapper #first-field-group .instant-margin-transition")[0].scrollHeight;
-            if ($("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+            if ($("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
                 $("#first-field-group").css("margin-bottom", -second_minus_first).one("transitionend", function() {
                     $("#first-field-group").addClass("notransition");
                     $("#first-field-group").css("margin-bottom", "");
@@ -529,7 +529,7 @@ class Crud {
 
             // new_parent.is("#first-field-group") instead of new_parent.length because a click event is too similar to a tabbing event
             // this detects a tabbing event only
-            } else if (new_parent.is("#first-field-group") && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").is(":checked")) {
+            } else if (new_parent.is("#first-field-group") && !old_parent.length && $("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
                 // Doesn't work because #id_y is first in Crud.ALL_FOCUSABLE_FORM_INPUTS and can cause that to be focused instead
                 // $("#second-field-group").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).first().focus();
 
@@ -543,7 +543,7 @@ class Crud {
             if (["", "Predicted"].includes(widget_input.val())) return;
             // IMPORTANT
             // Make sure this mirrors the corresponding backend logic
-            if ($(this).is(":checked")) {
+            if ($(this).prop("checked")) {
                 widget_input.val(Math.round(
                     widget_input.val() / 60
                 * 100) / 100);
@@ -555,14 +555,14 @@ class Crud {
         Crud.one_unit_of_work_alert_already_shown = false;
         $("#id_y, #id_x, #id_assignment_date, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             let time_per_unit = $("#id_time_per_unit");
-            if (time_per_unit.siblings(".field-widget-checkbox").is(":checked")) {
+            if ($("#time_per_unit-widget-checkbox").prop("checked")) {
                 time_per_unit = Math.round(+time_per_unit.val() * 60);
             } else {
                 time_per_unit = +time_per_unit.val();
             }
             // we don't need to use min_work_time_funct_round instead because it is irrelevant when y is 1
             let min_work_time = $("#id_min_work_time");
-            if (min_work_time.siblings(".field-widget-checkbox").is(":checked")) {
+            if ($("#time_per_unit-widget-checkbox").prop("checked")) {
                 min_work_time = Math.round(+min_work_time.val() * 60);
             } else {
                 min_work_time = +min_work_time.val();
