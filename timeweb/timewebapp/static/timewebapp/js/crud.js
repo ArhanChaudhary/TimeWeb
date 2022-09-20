@@ -116,7 +116,7 @@ class Crud {
         if (params.standard) {
             Crud.STANDARD_FIELD_GROUP();
         } else if (params.advanced) {
-            Crud.TOGGLE_FIELD_GROUP();
+            Crud.ADVANCED_FIELD_GROUP();
         } else if (params.toggle) {
             Crud.TOGGLE_FIELD_GROUP();
         } else if (params.$dom_group) {
