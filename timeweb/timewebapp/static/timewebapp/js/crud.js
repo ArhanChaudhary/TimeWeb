@@ -1,24 +1,28 @@
 class Crud {
+    // IMPORTANT
+    // Make sure this mirrors the corresponding backend logic
+    static hoursToMinutes = hours => Math.round(hours * 60);
+    static minutesToHours = minutes => Math.round(minutes / 60 * 100) / 100;
     static getDefaultAssignmentFormFields = _ => ({
-        "#id_name": '',
-        "#id_assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
-        "#id_x_daterangepicker": moment(new Date(date_now.valueOf())),
-        "#id_x": "",
-        "#id_soft": false,
-        "#id_unit": '',
-        "#id_y": '',
-        "#id_works": 0,
-        "#id_time_per_unit": '',
-        "#id_description": '',
-        "#id_funct_round": 1,
-        "#id_min_work_time": +SETTINGS.def_min_work_time||'',
-        "#id_break_days": SETTINGS.def_break_days,
+        "name": '',
+        "assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
+        "x_daterangepicker": moment(new Date(date_now.valueOf())),
+        "x": "",
+        "soft": false,
+        "unit": "Minute",
+        "y": '',
+        "works": 0,
+        "time_per_unit": 1,
+        "description": '',
+        "funct_round": 5,
+        "min_work_time": +SETTINGS.def_min_work_time||'',
+        "break_days": SETTINGS.def_break_days,
     })
     static generateAssignmentFormFields = sa => {
         const fields = {
-            "#id_name": sa.name,
-            "#id_assignment_date_daterangepicker": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
-            "#id_x_daterangepicker": (function() {
+            "name": sa.name,
+            "assignment_date_daterangepicker": sa.fake_assignment_date ? "" : utils.formatting.stringifyDate(sa.assignment_date),
+            "x_daterangepicker": (function() {
                 const due_date = new Date(sa.assignment_date.valueOf());
                 if (!sa.complete_x) {
                     return moment(due_date);
@@ -29,28 +33,35 @@ class Crud {
                 }
                 return moment(due_date);
             })(),
-            "#id_soft": sa.soft,
-            "#id_unit": sa.unit,
-            "#id_y": sa.y,
-            "#id_time_per_unit": sa.time_per_unit,
-            "#id_description": sa.description,
-            "#id_works": sa.works[0],
-            "#id_funct_round": sa.funct_round,
-            "#id_min_work_time": Number.isFinite(sa.original_min_work_time) ? sa.original_min_work_time : '',
-            "#id_break_days": sa.break_days,
+            "soft": sa.soft,
+            "unit": sa.unit,
+            "y": sa.y,
+            "time_per_unit": sa.time_per_unit,
+            "description": sa.description,
+            "works": sa.works[0],
+            "funct_round": sa.funct_round,
+            "min_work_time": sa.original_min_work_time,
+            "break_days": sa.break_days,
         }
-        if (!sa.complete_x) fields["#id_x"] = "";
+        if (!sa.complete_x) fields.x = "";
         return fields;
     }
     static setAssignmentFormFields(formDict) {
+        const normalized_unit = pluralize(formDict.unit, 1).toLowerCase();
         for (let [field, value] of Object.entries(formDict)) {
             const field_is_daterangepicker = field.endsWith("_daterangepicker");
             if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
-            const $field = $(field);
+            const $field = $("#id_" + field);
 
-            if (field === "#id_break_days") continue;
-            if (field === "#id_unit") {
-                const normalized_value = pluralize(value, 1).toLowerCase();
+            if (field === "break_days") continue;
+                for (let break_day of Array(7).keys()) {
+                    // (break_day+6)%7) is for an ordering issue, ignore that
+                    // Treat this as $("#id_def_break_days_"+break_day)
+                    $(`#id_def_break_days_${(break_day+6) % 7}`).prop("checked", value.includes(break_day));
+                }
+                continue;
+            }
+            if (field === "unit") {
                 if (normalized_value === "minute") {
                     $("#y-widget-checkbox").prop("checked", false);
                     $field.val("");
@@ -71,11 +82,6 @@ class Crud {
                 $field.data("daterangepicker").setEndDate(value);
             } else
                 $field.val(value);
-        }
-        for (let break_day of Array(7).keys()) {
-            // (break_day+6)%7) is for an ordering issue, ignore that
-            // Treat this as $("#id_def_break_days_"+break_day)
-            $(`#id_def_break_days_${(break_day+6) % 7}`).prop("checked", formDict["#id_break_days"].includes(break_day));
         }
     }
     static DEFAULT_DATERANGEPICKER_OPTIONS = {
@@ -541,14 +547,10 @@ class Crud {
         $(".field-widget-checkbox").on('input', function() {
             let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
             if (["", "Predicted"].includes(widget_input.val())) return;
-            // IMPORTANT
-            // Make sure this mirrors the corresponding backend logic
             if ($(this).prop("checked")) {
-                widget_input.val(Math.round(
-                    widget_input.val() / 60
-                * 100) / 100);
+                widget_input.val(Crud.minutesToHours(widget_input.val()));
             } else {
-                widget_input.val(Math.round(widget_input.val() * 60));
+                widget_input.val(Crud.hoursToMinutes(widget_input.val()));
             }
         });
         $("#id_description").expandableTextareaHeight();

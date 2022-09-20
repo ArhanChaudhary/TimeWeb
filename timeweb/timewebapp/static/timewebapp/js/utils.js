@@ -1290,8 +1290,10 @@ for (let sa of dat) {
     if (VIEWING_DELETED_ASSIGNMENTS) {
         sa.deletion_time = new Date(sa.deletion_time);
     }
-    // Repopulating the form
+    // Repopulating the form (min work time is capped and divided)
     sa.original_min_work_time = +sa.min_work_time;
+    if (!Number.isFinite(sa.original_min_work_time))
+        sa.original_min_work_time = '';
 
     if (sa.y) sa.y = +sa.y;
     if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;
