@@ -619,7 +619,7 @@ class Crud {
                     // gets in the way of daterangepicker
                     setTimeout(() => {
                         $("#id_x")[0].setCustomValidity("");
-                    }, 2500);
+                    }, 4500);
                     return;
                 }
             }
