@@ -263,6 +263,32 @@ def simplify_course_name(tag_name):
     ], tag_name)
     return tag_name
 
+def request_courses(request, service, *, safely=True):
+    if safely:
+        try:
+            # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
+            courses = service.courses().list().execute()
+        except RefreshError:
+            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+        # If connection to the server randomly dies (could happen locally when wifi is off)
+        except ServerNotFoundError:
+            return HttpResponse(status=204)
+        except HttpError as e:
+            if e.status_code == 429:
+                # Ratelimited, don't care
+                return HttpResponse(status=204)
+            raise e
+    else:
+        courses = service.courses().list().execute()
+    courses = courses.get('courses', [])
+    return courses
+
+def simplify_courses(courses):
+    return [{
+                "id": i["id"],
+                "name": simplify_course_name(i["name"]),
+            } for i in courses if i["courseState"] != "ARCHIVED"]
+
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
 def create_gc_assignments(request):
@@ -294,10 +320,13 @@ def create_gc_assignments(request):
     service = build('classroom', 'v1', credentials=credentials)
 
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
+        # it is possible for this function to process courses that are in the cache but archived
+        # this does not matter
         if type(exception) is HttpError:
             # 403 if you are a teacher of a class
+            # 404 if the cached courses are outdated and a course has been deleted
             # 429 if you are ratelimited, don't care
-            if exception.status_code in (403, 404):
+            if exception.status_code in (403, 404, 429):
                 logger.warning(exception)
             else:
                 logger.error(exception)
@@ -338,7 +367,10 @@ def create_gc_assignments(request):
                     continue
                 due_time = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
-            tags.insert(0, simplify_course_name(course_names[assignment['courseId']]))
+            tags.insert(0, next(
+                i['name'] for i in request.user.settingsmodel.gc_courses_cache
+                if assignment['courseId'] == i['id']
+            ))
             description = assignment.get('description', "")
             google_classroom_assignment_link = assignment.get("alternateLink")
 
@@ -375,29 +407,12 @@ def create_gc_assignments(request):
                 funct_round=5,
                 # y is missing
             ))
-    try:
-        # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list().execute()
-    except RefreshError:
-        return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
-    # If connection to the server randomly dies (could happen locally when wifi is off)
-    except ServerNotFoundError:
-        return HttpResponse(status=204)
-    except HttpError as e:
-        if e.status_code == 429:
-            # Ratelimited, don't care
-            return HttpResponse(status=204)
-        raise e
-    courses = courses.get('courses', [])
+
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
+    for course in request.user.settingsmodel.gc_courses_cache:
+        batch.add(coursework_lazy.list(courseId=course["id"]))
 
-    course_names = {}
-    for course in courses:
-        if course['courseState'] == "ARCHIVED":
-            continue
-        course_names[course['id']] = course['name']
-        batch.add(coursework_lazy.list(courseId=course['id']))
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
     new_gc_assignment_ids = set()
     gc_models_to_create = []
@@ -485,7 +500,7 @@ def gc_auth_callback(request):
     try:
         # Ensure the user enabled both scopes
         service = build('classroom', 'v1', credentials=credentials)
-        service.courses().list().execute()
+        courses = request_courses(request, service, safely=False)
         service.courses().courseWork().list(courseId="easter egg!").execute()
     except (HttpError, OAuth2Error) as e:
         # If the error is an OAuth2Error, the init failed
@@ -501,6 +516,7 @@ def gc_auth_callback(request):
             request.session['gc-init-failed'] = True
             del request.session["gc-callback-next-url"]
             return redirect(request.session.pop("gc-callback-current-url"))
+    request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
     request.user.settingsmodel.save()
