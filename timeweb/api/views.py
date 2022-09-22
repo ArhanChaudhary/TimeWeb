@@ -294,16 +294,18 @@ def create_gc_assignments(request):
     service = build('classroom', 'v1', credentials=credentials)
 
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
-        # HttpError for permission denied (ex if you're the teacher of a class) or if you were ratelimited
         if type(exception) is HttpError:
-            logger.warning(exception)
-            assert exception.status_code in (403, 429)
+            # 403 if you are a teacher of a class
+            # 429 if you are ratelimited, don't care
+            if exception.status_code in (403, 404):
+                logger.warning(exception)
+            else:
+                logger.error(exception)
             return
         if not course_coursework:
             return
         course_coursework = course_coursework['courseWork']
         for assignment in course_coursework:
-
             # Load and interpret json data
             assignment_id = int(assignment['id'], 10)
             assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
@@ -340,7 +342,7 @@ def create_gc_assignments(request):
             description = assignment.get('description', "")
             google_classroom_assignment_link = assignment.get("alternateLink")
 
-            # Have this below everything else to not include assignments with due dates before today in new_gc_assignment_ids (x < date_now)
+            # Assignment is valid to be created
             new_gc_assignment_ids.add(assignment_id)
             if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
                 continue
