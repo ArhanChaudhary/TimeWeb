@@ -27,7 +27,7 @@ from google.auth.transport.requests import Request
 from google.auth.exceptions import RefreshError, TransportError
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
-from oauthlib.oauth2.rfc6749.errors import OAuth2Error
+from oauthlib.oauth2.rfc6749.errors import OAuth2Error, AccessDeniedError, InvalidGrantError
 from httplib2.error import ServerNotFoundError
 
 # Misc
@@ -463,7 +463,14 @@ def gc_auth_callback(request):
     # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
     authorization_response = request.build_absolute_uri()
     # turn those parameters into a token
-    flow.fetch_token(authorization_response=authorization_response)
+    try:
+        flow.fetch_token(authorization_response=authorization_response)
+    except (InvalidGrantError, AccessDeniedError):
+        # InvalidGrantError If the user needs parental permission and then clicks cancel
+        # AccessDeniedError If the user reloads (dont remember how but it has happened)
+        request.session['gc-init-failed'] = True
+        del request.session["gc-callback-next-url"]
+        return redirect(request.session.pop("gc-callback-current-url"))
     try:
         credentials = flow.credentials
     except ValueError:
