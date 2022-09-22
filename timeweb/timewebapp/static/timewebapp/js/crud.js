@@ -53,7 +53,7 @@ class Crud {
             if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
             const $field = $("#id_" + field);
 
-            if (field === "break_days") continue;
+            if (field === "break_days") {
                 for (let break_day of Array(7).keys()) {
                     // (break_day+6)%7) is for an ordering issue, ignore that
                     // Treat this as $("#id_def_break_days_"+break_day)
@@ -62,11 +62,11 @@ class Crud {
                 continue;
             }
             if (field === "unit") {
-                if (normalized_value === "minute") {
+                if (normalized_unit === "minute") {
                     $("#y-widget-checkbox").prop("checked", false);
                     $field.val("");
                     continue;
-                } else if (normalized_value === "hour") {
+                } else if (normalized_unit === "hour") {
                     $("#y-widget-checkbox").prop("checked", true);
                     $field.val("");
                     continue;
