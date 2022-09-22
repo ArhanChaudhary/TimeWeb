@@ -181,6 +181,7 @@ createGCAssignments: function() {
             }
         },
         success: function(response, textStatus, jqXHR) {
+            ajaxUtils.updateGCCourses();
             switch (jqXHR.status) {
                 case 204:
                     break;
@@ -188,6 +189,38 @@ createGCAssignments: function() {
                 case 205:
                     reloadWhenAppropriate();
                     break;
+            }
+        },
+    });
+},
+updateGCCourses: function() {
+    $.ajax({
+        type: "POST",
+        url: '/api/update-gc-courses',
+        error: function(jqXHR) {
+            switch (jqXHR.status) {
+                case 302:
+                    var reauthorization_url = jqXHR.responseText;
+                    $.alert({
+                        title: "Invalid credentials.",
+                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
+                        buttons: {
+                            "disable integration": {
+                                action: function() {
+                                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
+                                }
+                            },
+                            "authenticate again": {
+                                action: function() {
+                                    reloadWhenAppropriate({href: reauthorization_url});
+                                }
+                            },
+                        }
+                    });
+                    break;
+
+                default:
+                    ajaxUtils.error.bind(this)(...arguments);
             }
         },
     });

@@ -263,25 +263,35 @@ def simplify_course_name(tag_name):
     ], tag_name)
     return tag_name
 
-def request_courses(request, service, *, safely=True):
-    if safely:
-        try:
-            # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-            courses = service.courses().list().execute()
-        except RefreshError:
-            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
-        # If connection to the server randomly dies (could happen locally when wifi is off)
-        except ServerNotFoundError:
-            return HttpResponse(status=204)
-        except HttpError as e:
-            if e.status_code == 429:
-                # Ratelimited, don't care
-                return HttpResponse(status=204)
-            raise e
-    else:
+@require_http_methods(["POST"])
+@decorator_from_middleware(APIValidationMiddleware)
+def update_gc_courses(request):
+    # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
+    # we want to be able to alert the user if their credentials for listing courses is invalid
+    credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
+    if not credentials.valid:
+        # rest this logic on create_gc_assignments, idrc if its invalid here
+        return HttpResponse(status=204)
+    service = build('classroom', 'v1', credentials=credentials)
+    try:
+        # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute()
+    except RefreshError:
+        return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+    # If connection to the server randomly dies (could happen locally when wifi is off)
+    except ServerNotFoundError:
+        return HttpResponse(status=204)
+    except HttpError as e:
+        if e.status_code == 429:
+            # Ratelimited, don't care
+            return HttpResponse(status=204)
+        raise e
     courses = courses.get('courses', [])
-    return courses
+    temp = request.user.settingsmodel.gc_courses_cache
+    request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
+    if temp != request.user.settingsmodel.gc_courses_cache:
+        request.user.settingsmodel.save()
+    return HttpResponse(status=204)
 
 def simplify_courses(courses):
     return [{
@@ -500,7 +510,7 @@ def gc_auth_callback(request):
     try:
         # Ensure the user enabled both scopes
         service = build('classroom', 'v1', credentials=credentials)
-        courses = request_courses(request, service, safely=False)
+        courses = service.courses().list().execute()
         service.courses().courseWork().list(courseId="easter egg!").execute()
     except (HttpError, OAuth2Error) as e:
         # If the error is an OAuth2Error, the init failed
@@ -516,6 +526,7 @@ def gc_auth_callback(request):
             request.session['gc-init-failed'] = True
             del request.session["gc-callback-next-url"]
             return redirect(request.session.pop("gc-callback-current-url"))
+    courses = courses.get('courses', [])
     request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
