@@ -199,7 +199,7 @@ def tag_delete(request):
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
 
-def simplify_tag_name(tag_name):
+def simplify_course_name(tag_name):
     # abbreviate "Recommendation" to "Rec" using regex
     abbreviations = [
         (r"(rec)ommendation", "\\1"),
@@ -336,7 +336,7 @@ def create_gc_assignments(request):
                     continue
                 due_time = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
-            tags.insert(0, simplify_tag_name(course_names[assignment['courseId']]))
+            tags.insert(0, simplify_course_name(course_names[assignment['courseId']]))
             description = assignment.get('description', "")
             google_classroom_assignment_link = assignment.get("alternateLink")
 
