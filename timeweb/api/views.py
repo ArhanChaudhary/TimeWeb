@@ -200,27 +200,29 @@ def tag_delete(request):
     return HttpResponse(status=204)
 
 def simplify_course_name(tag_name):
-    # abbreviate "Recommendation" to "Rec" using regex
     abbreviations = [
-        (r"(rec)ommendation", "\\1"),
-        (r"(bio)logy", "\\1"),
-        (r"(english|american) ?(literature)", "\\2"),
-        (r"(lit)erature", "\\1"),
+        (r"(rec)ommendation", r"\1"),
+        (r"(bio)logy", r"\1"),
+        (r"(english|american) ?(literature)", r"\2"),
+        (r"(lit)erature", r"\1"),
         (r"computer ?science", "CS"),
-        (r"(psych)ology", "\\1"),
-        (r"(stat)istics", "\\1s"),
-        (r"(gov)ernment", "\\1"),
-        (r"(econ)omics", "\\1"),
-        (r"(chem)istry", "\\1"),
-        (r"(calc)ulus", "\\1"),
-        (r"honors ?([a-z]{2,}) ?([6-9]|1[0-2])\b", "\\1 \\2H"),
-        (r"honors ?([6-9]|1[0-2]) ?([a-z]{2,})", "\\2 \\1H"),
-        (r"([a-z]{2,}) ?([6-9]|1[0-2]) ?honors", "\\1 \\2H"),
-        (r"([a-z]{2,}) ?honors ?([6-9]|1[0-2])\b", "\\1 \\2H"),
-        (r"([6-9]|1[0-2]) ?honors ?([a-z]{2,})", "\\2 \\1H"),
-        (r"([6-9]|1[0-2]) ?([a-z]{2,}) ?honors", "\\2 \\1H"),
-        (r"(trig)onometry", "\\1"),
-        (r"(digital photo)graphy", "\\1"),
+        (r"(psych)ology", r"\1"),
+        (r"(stat)istics", r"\1s"),
+        (r"(american )?(gov)ernment", r"\2"),
+        (r"(econ)omics", r"\1"),
+        (r"(chem)istry", r"\1"),
+        (r"(calc)ulus", r"\1"),
+        (r"honors ?([a-z]{2,}) ?([6-9]|1[0-2])(st|nd|rd|th)?( grade)?\b", r"\1 \2H"),
+        (r"([a-z]{2,}) ?([6-9]|1[0-2])(st|nd|rd|th)?( grade)? ?honors", r"\1 \2H"),
+        (r"([a-z]{2,}) ?honors ?([6-9]|1[0-2])(st|nd|rd|th)?( grade)?\b", r"\1 \2H"),
+        (r"([6-9]|1[0-2])(st|nd|rd|th)?( grade)? ?honors ?([a-z]{2,})", r"\4 \1H"),
+        (r"honors ?([6-9]|1[0-2])(st|nd|rd|th)?( grade)? ?([a-z]{2,})", r"\4 \1H"),
+        (r"([6-9]|1[0-2])(st|nd|rd|th)?( grade)? ?([a-z]{2,}) ?honors", r"\4 \1H"),
+
+        (r"(trig)onometry", r"\1"),
+        (r"(digital photo)graphy", r"\1"),
+        (r"(p(é|e)r)(iode?|(í|i)odo)", r"\1"),
+        (r"(sem)ester", r"\1"),
     ]
     for abbreviation in abbreviations:
         tag_name = re_sub(abbreviation[0], abbreviation[1], tag_name, flags=IGNORECASE)
@@ -236,6 +238,14 @@ def simplify_course_name(tag_name):
             tag_name = pre_tag_name
         return tag_name
 
+    # Don't try to include a google classroom course section because:
+    # 1) it can mess up ordering of what to remove pretty badly
+    # for example, if a class is named "Period 4" and the section is "2017"
+    # this will simplify it to "2017"
+    # I can't just assume 
+    # 2) it's not really necessary, as the name is 90% of the time enough
+    # information to identify the class,
+    # 3) less info is anyways better to fit the assignment tag length
     tag_name = tag_name_re_subs([
         # school name
         r"msj(hs)?",
@@ -243,23 +253,39 @@ def simplify_course_name(tag_name):
         # year
 
         # 2022 - 2023
-        r"(20)?\d\d( | - |-|/)(20)?\d\d",
+        r"(?<!\d)(20\d\d( | - |-|/)20|\d\d( | - |-|/)|20\d\d( | - |-|/))\d\d(?!\d)",
         # 2022 American Lit
-        r"^20\d\d",
+        r"^20\d\d(?!\d)",
         # American Lit 2022
-        r"20\d\d$",
+        r"(?<!\d)20\d\d$",
 
         # remove period number
 
-        # grade-5
-        r"((per(iod)?|période|período|grade) ?|p|quarter ?|q)-?\d",
+        # 12th grade
+        r"((1|fir)st|(2|seco)nd|(3|thi)rd|([4-9]|1[0-2]|four|fif|six|seven|eigh|nin|ten|eleven|twelve)th) grade",
         # second period
-        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) (per(iod)?|période|período|grade)",
+        # do this above grade-5 or else 5th Period 6th Grade Math => 5th th Grade Math
+        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) per",
+        # 3rd quarter
+        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(4|four)th) quarter",
+        # 1st sem
+        r"((1|fir)st|(2|seco)nd) sem",
+        # grade-5
+        r"((per|grade|quarter|sem)(#| #|# | |-| -|- | - |\. | \.|\.|)|(p|q)-?)\d\d?",
         # (1st)
         r"\(((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th)\)",
 
+        # Repeat these again
+        r"^20\d\d(?!\d)",
+        r"(?<!\d)20\d\d$",
+
         # remove teacher title
-        r"m(rs|r|s)\. [a-z]+('s)?",
+        r"^m(rs|r|s)\.? [a-z]+(-[a-z]+)?('s)?",
+        r"(?<![a-z])m(rs|r|s)\.? [a-z]+(-[a-z]+)?$",
+
+        # Repeat this again
+        r"^20\d\d(?!\d)",
+        r"(?<!\d)20\d\d$",
     ], tag_name)
     return tag_name
 
@@ -295,9 +321,9 @@ def update_gc_courses(request):
 
 def simplify_courses(courses):
     return [{
-                "id": i["id"],
-                "name": simplify_course_name(i["name"]),
-            } for i in courses if i["courseState"] != "ARCHIVED"]
+                "id": course["id"],
+                "name": simplify_course_name(course["name"]),
+            } for course in courses if course["courseState"] != "ARCHIVED"]
 
 @require_http_methods(["POST"])
 @decorator_from_middleware(APIValidationMiddleware)
