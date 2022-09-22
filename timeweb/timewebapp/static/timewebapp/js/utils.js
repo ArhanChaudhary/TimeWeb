@@ -386,7 +386,7 @@ setClickHandlers: {
                             }
 
                             const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                                return utils.loadAssignmentData(dom_assignment).id;
+                                return utils.loadAssignmentData($(this)).id;
                             }).toArray();
                             $.ajax({
                                 type: "POST",
