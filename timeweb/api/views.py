@@ -470,6 +470,7 @@ def gc_auth_callback(request):
         # ValueError at /api/gc-auth-callback
         # There is no access token for this session, did you call fetch_token?
         request.session['gc-init-failed'] = True
+        del request.session["gc-callback-next-url"]
         return redirect(request.session.pop("gc-callback-current-url"))
 
     try:
