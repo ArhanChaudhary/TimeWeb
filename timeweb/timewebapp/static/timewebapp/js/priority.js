@@ -1004,7 +1004,7 @@ class Priority {
                 console.log("fixed");
             }
             let assignment_container = $(".assignment-container:first");
-            if (assignment_container.position().top !== assignment_header.outerHeight()) {
+            if (assignment_container.length && assignment_container.position().top !== assignment_header.outerHeight()) {
                 assignment_container.insertBefore(assignment_container.parent()).prependTo(assignment_container.next());
                 console.log("fixed");
                 console.log($(".assignment-container"));
