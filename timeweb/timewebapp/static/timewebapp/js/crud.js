@@ -354,12 +354,14 @@ class Crud {
                 // we can do this because this value is only ever set when this field is anyways invisible,
                 // and when the unit of work is cleared this field is then emptied!
                 $("#id_time_per_unit").val(1);
+                $("#time_per_unit-widget-checkbox").prop("checked", false);
             } else if (singular.toLowerCase() === "hour") {
                 $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
                 // (same two above comments apply here too)
                 $("#id_funct_round").val(0.5);
-                $("#id_time_per_unit").val(60);
+                $("#id_time_per_unit").val(1);
+                $("#time_per_unit-widget-checkbox").prop("checked", true);
             }
         } else {
             // Make sure this is ran before the .text because this can affect #id_y's text
@@ -385,6 +387,7 @@ class Crud {
                 $("#id-y-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-y-field-wrapper").outerHeight())
                     .insertAfter($("#id-unit-field-wrapper"));
                 $("#id_time_per_unit").val("");
+                $("#time_per_unit-widget-checkbox").prop("checked", false);
                 $("#id_funct_round").val(1);
             }
         }
