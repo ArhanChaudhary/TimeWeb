@@ -5,10 +5,10 @@
 
     "description": "Are your planners just not enough for all of your work? Say no more. Introducing TimeWeb — The new way to manage your time.",
     "icons": {
-        "16": "16.png",
-        "32": "32.png",
-        "48": "48.png",
-        "128": "128.png"
+        "16": "16.webp",
+        "32": "32.webp",
+        "48": "48.webp",
+        "128": "128.webp"
     },
     
     "background": {
