@@ -87,6 +87,7 @@ class Crud {
                     }
                     continue;
                 case "works":
+                case "funct_round":
                     switch (normalized_unit) {
                         case "minute":
                             if (Crud.shouldConvertToHours(value)) {
@@ -353,9 +354,6 @@ class Crud {
             val = val.slice(1, -1);
         let plural = pluralize(val),
             singular = pluralize(val, 1);
-        $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time
-        
-        i.e. if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         if (["minute", "hour"].includes(singular.toLowerCase())) {
             $("label[for='id_works']").text(`How long have you already worked`);
 
@@ -398,15 +396,14 @@ class Crud {
             }
             $("#id-time_per_unit-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-time_per_unit-field-wrapper").outerHeight())
                 .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
-            $("#id-works-field-wrapper").addClass("has-widget");
+            $("#id-works-field-wrapper, #id-funct_round-field-wrapper").addClass("has-widget");
 
             if (singular.toLowerCase() === "minute") {
-                $("#id-funct_round-field-wrapper").addClass("hide-field").css("margin-top", -$("#id-funct_round-field-wrapper").outerHeight())
-                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", -1);
-                // if you set a step size to some value with some unit of work, clear the unit of work, and re-enter the same thing
-                // the step size will be set to 0.5 or 5 instead of what was originally entered
-                // but who really cares this is what i see as expected behavior and is the user's responsibility to notice
                 if (!["minute", undefined].includes(that.old_unit_value)) {
+                    // if you set a step size to some value with some unit of work, clear the unit of work, and re-enter the same thing
+                    // the step size will be set to 0.5 or 5 instead of what was originally entered
+                    // but who really cares this is what i see as expected behavior and is the user's responsibility to notice
+                    $("#funct_round-widget-checkbox").prop("checked", false);
                     $("#id_funct_round").val(5);
                 }
                 // we can do this because this value is only ever set when this field is anyways invisible,
@@ -414,15 +411,17 @@ class Crud {
                 $("#id_time_per_unit").val(1);
                 $("#time_per_unit-widget-checkbox").prop("checked", false);
             } else if (singular.toLowerCase() === "hour") {
-                $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "")
-                    .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
                 // (same two above comments apply here too)
                 if (!["hour", undefined].includes(that.old_unit_value)) {
-                    $("#id_funct_round").val(0.5);
+                    $("#funct_round-widget-checkbox").prop("checked", false);
+                    $("#id_funct_round").val(30);
                 }
                 $("#id_time_per_unit").val(1);
                 $("#time_per_unit-widget-checkbox").prop("checked", true);
             }
+            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the length of time that you will work in increments of
+        
+            i.e. if you enter 5 minutes, you will only work in multiples of 5 minutes (10m, 25m, 1h, etc)`)
         } else {
             // Make sure this is ran before the .text because this can affect #id_y's text
             $("#id-y-field-wrapper").trigger("transitionend").off("transitionend");
@@ -435,7 +434,7 @@ class Crud {
                 $(".hide-field").removeClass("hide-field").css("margin-top", "")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
             }, 0);
-            $("#id-y-field-wrapper, #id-works-field-wrapper").removeClass("has-widget");
+            $("#id-y-field-wrapper, #id-works-field-wrapper, #id-funct_round-field-wrapper").removeClass("has-widget");
 
             if (that.old_unit_value === undefined) {
                 // Appropiately place #id_y when the form is initially loaded and shown
@@ -450,6 +449,9 @@ class Crud {
                 $("#time_per_unit-widget-checkbox").prop("checked", false);
                 $("#id_funct_round").val(1);
             }
+            $("label[for='id_funct_round'] ~ .info-button .info-button-text").text(`This is the number of ${plural} you will complete at a time
+        
+            i.e. if you enter 3, you will only work in multiples of 3 (6 ${plural}, 9 ${plural}, 15 ${plural}, etc)`)
         }
         that.old_unit_value = singular.toLowerCase();
     }
@@ -776,9 +778,9 @@ class Crud {
         $("#id_funct_round").info('left',
             "", // overridden in replaceUnit
         "after").css({
-            marginTop: -22,
-            marginLeft: "auto",
-            marginRight: 7,
+            marginRight: -14,
+            bottom: -10,
+            right: 20,
         });
         $("label[for=\"id_soft\"]").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,

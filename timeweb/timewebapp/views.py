@@ -257,6 +257,27 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             try:
                 if field == "y": continue
+                if field == "funct_round":
+                    '''
+                    why did i waste so much time making this
+
++-----------------+--------+-------------------------+--------------------------+--------------+
+| decision matrix |        |                         |     funct_round unit     |              |
++-----------------+--------+-------------------------+--------------------------+--------------+
+|                 |        | minute                  | hour                     | other        |
++-----------------+--------+-------------------------+--------------------------+--------------+
+|                 | minute | pass                    | multiply step size by 60 | not possible |
++-----------------+--------+-------------------------+--------------------------+--------------+
+| unit            | hour   | divide step size by 60  | pass                     | not possible |
++-----------------+--------+-------------------------+--------------------------+--------------+
+|                 | other  | not possible            | not possible             | pass         |
++-----------------+--------+-------------------------+--------------------------+--------------+
+                    '''
+                    if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                        setattr(self.sm, field, minutes_to_hours(getattr(self.sm, field)))
+                    elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                        setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
+                    continue
                 if field == "works":
                     # NOTE: changing just funct_round unit should not affect the rest of works
                     # so it is safe to do this and not include it as a condition where works is

@@ -9,7 +9,7 @@ class TimewebForm(forms.ModelForm):
     class Meta:
         model = TimewebModel
         fields = "__all__"
-        ADD_CHECKBOX_WIDGET_FIELDS = ["y", "x", "min_work_time", "time_per_unit", "works"]
+        ADD_CHECKBOX_WIDGET_FIELDS = ["y", "x", "min_work_time", "time_per_unit", "works", "funct_round"]
         widgets = {
             'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
             'due_time': forms.HiddenInput(),
