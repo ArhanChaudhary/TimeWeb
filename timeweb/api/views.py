@@ -233,7 +233,7 @@ def simplify_course_name(tag_name):
             pre_tag_name = re_sub(fr"(-+ *)?{regex}( *-+)?", "", tag_name, flags=IGNORECASE)
             pre_tag_name = re_sub(r"\(\)", "", pre_tag_name)
             pre_tag_name = " ".join(pre_tag_name.split())
-            if not pre_tag_name or len(tag_name) < 15:
+            if not pre_tag_name or len(tag_name) < 10:
                 return tag_name
             tag_name = pre_tag_name
         return tag_name
