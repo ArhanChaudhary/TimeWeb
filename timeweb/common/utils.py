@@ -24,6 +24,18 @@ def _403_or_429(request, exception=None):
         return HttpResponse('You are being ratelimited, try again in a few seconds or minutes.', status=429)
     return HttpResponseForbidden("Forbidden, here's a cookie 🍪 to cheer you up")
 
+def calc_mod_days(self):
+    assign_day_of_week = self.sm.assignment_date.weekday()
+    red_line_start_x = self.sm.blue_line_start
+    mods = [0]
+    mod_counter = 0
+    for mod_day in range(6):
+        if str((assign_day_of_week + red_line_start_x + mod_day) % 7) in self.sm.break_days:
+            mod_counter += 1
+        mods.append(mod_counter)
+    mods = tuple(mods)
+    return mods
+
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 

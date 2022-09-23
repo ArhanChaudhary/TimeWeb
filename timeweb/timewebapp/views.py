@@ -30,7 +30,7 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from common.utils import days_between_two_dates, utc_to_local, get_client_ip, minutes_to_hours, hours_to_minutes
+from common.utils import days_between_two_dates, utc_to_local, calc_mod_days, get_client_ip, minutes_to_hours, hours_to_minutes
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
@@ -360,21 +360,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     if not work_day_count or len(self.sm.break_days) == 7:
                         x_num = 1
                     elif self.sm.break_days:
-                        guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
+                        mods = calc_mod_days(self)
 
                         # Terrible implementation of inversing calcModDays
-                        # make this an actual function
-                        assign_day_of_week = self.sm.assignment_date.weekday()
-                        red_line_start_x = self.sm.blue_line_start
-                        xday = assign_day_of_week + red_line_start_x
-                        mods = [0]
-                        mod_counter = 0
-                        for mod_day in range(6):
-                            if str((xday + mod_day) % 7) in self.sm.break_days:
-                                mod_counter += 1
-                            mods.append(mod_counter)
-                        mods = tuple(mods)
-
+                        guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
                         while 1:
                             guess_x += 1
                             if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == work_day_count:
