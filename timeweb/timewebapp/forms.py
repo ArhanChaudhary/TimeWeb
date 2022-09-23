@@ -108,11 +108,22 @@ class TimewebForm(forms.ModelForm):
         if self.request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             self.add_error("name", forms.ValidationError(_("You can't create nor edit assignments in the example account")))
             return cleaned_data
-        if not isinstance(works, list) and works != None and y != None and works >= y >= 1:
+
+        normalize_works = 1
+        normalize_y = 1
+        comparing_time = False
+        if cleaned_data['y-widget-checkbox']:
+            normalize_y = 60
+            comparing_time = True
+        if cleaned_data['works-widget-checkbox']:
+            normalize_works = 60
+            comparing_time = True
+
+        if not isinstance(works, list) and works != None and y != None and works * normalize_works >= y * normalize_y >= 1:
             self.add_error("works",
-                forms.ValidationError(_("This field's value of %(value)g can't be %(equal_to_or_greater_than)s the previous field's value of %(y)g"),code='invalid',params={
-                    'value': works,
-                    'y': y,
+                forms.ValidationError(_("This field's value of %(value)s can't be %(equal_to_or_greater_than)s the previous field's value of %(y)s"),code='invalid',params={
+                    'value': f"{works}{({1: 'm', 60: 'h'}[normalize_works] if comparing_time else '')}",
+                    'y': f"{y}{({1: 'm', 60: 'h'}[normalize_y] if comparing_time else '')}",
                     'equal_to_or_greater_than': "equal to" if works == y else "greater than",
                 })
             )
