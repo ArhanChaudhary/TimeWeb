@@ -57,6 +57,24 @@ def update_seen_latest_changelog():
             model.seen_latest_changelog = False
     SettingsModel.objects.bulk_update(settings_models, ['seen_latest_changelog'])
 
+def deletion_time_fix():
+    """
+    This function is manually invoked to ensure all deletion times are unique
+    """
+    from .models import User
+    import datetime
+    users = User.objects.all()
+    for user in users:
+        hidden = user.timewebmodel_set.filter(hidden=True)
+        if hidden.count() <= 1: continue
+
+        def is_unique(time):
+            return user.timewebmodel_set.filter(hidden=True).filter(deletion_time=time).count() == 1
+        for assignment in hidden:
+            while not is_unique(assignment.deletion_time):
+                assignment.deletion_time += datetime.timedelta(microseconds=100000)
+                assignment.save()
+
 try:
     current_site = Site.objects.get(domain="localhost" if (settings.DEBUG or settings.FIX_DEBUG_LOCALLY) else "timeweb.io")
 except (Site.DoesNotExist, OperationalError):
