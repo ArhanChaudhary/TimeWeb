@@ -406,7 +406,9 @@ class Crud {
                 // if you set a step size to some value with some unit of work, clear the unit of work, and re-enter the same thing
                 // the step size will be set to 0.5 or 5 instead of what was originally entered
                 // but who really cares this is what i see as expected behavior and is the user's responsibility to notice
-                $("#id_funct_round").val(5);
+                if (!["minute", undefined].includes(that.old_unit_value)) {
+                    $("#id_funct_round").val(5);
+                }
                 // we can do this because this value is only ever set when this field is anyways invisible,
                 // and when the unit of work is cleared this field is then emptied!
                 $("#id_time_per_unit").val(1);
@@ -415,7 +417,9 @@ class Crud {
                 $("#id-funct_round-field-wrapper").removeClass("hide-field").css("margin-top", "")
                     .find(Crud.ALL_FOCUSABLE_FORM_INPUTS).attr("tabindex", "");
                 // (same two above comments apply here too)
-                $("#id_funct_round").val(0.5);
+                if (!["hour", undefined].includes(that.old_unit_value)) {
+                    $("#id_funct_round").val(0.5);
+                }
                 $("#id_time_per_unit").val(1);
                 $("#time_per_unit-widget-checkbox").prop("checked", true);
             }
