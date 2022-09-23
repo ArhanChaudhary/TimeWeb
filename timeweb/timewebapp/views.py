@@ -257,6 +257,15 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             try:
                 if field == "y": continue
+                if field == "works":
+                    # NOTE: changing just funct_round unit should not affect the rest of works
+                    # so it is safe to do this and not include it as a condition where works is
+                    # redefined if unit changes from minute to hour or vice versa
+                    if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                        first_work = minutes_to_hours(first_work)
+                    elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                        first_work = hours_to_minutes(first_work)
+                    continue
                 if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
                     setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
             except TypeError:

@@ -3,6 +3,15 @@ class Crud {
     // Make sure this mirrors the corresponding backend logic
     static hoursToMinutes = hours => Math.round(hours * 60);
     static minutesToHours = minutes => Math.round(minutes / 60 * 100) / 100;
+
+    static shouldConvertToHours = minutes => {
+        let as_hours = Crud.minutesToHours(minutes);
+        return as_hours >= 1 && as_hours % 0.5 === 0;
+    }
+    static shouldConvertToMinutes = hours => {
+        let as_minutes = Crud.hoursToMinutes(hours);
+        return !(as_minutes >= 60 && as_minutes % 30 === 0);
+    }
     static getDefaultAssignmentFormFields = _ => ({
         "name": '',
         "assignment_date_daterangepicker": utils.formatting.stringifyDate(date_now),
@@ -53,24 +62,71 @@ class Crud {
             if (field_is_daterangepicker) field = field.replace("_daterangepicker", "");
             const $field = $("#id_" + field);
 
-            if (field === "break_days") {
-                for (let break_day of Array(7).keys()) {
-                    // (break_day+6)%7) is for an ordering issue, ignore that
-                    // Treat this as $("#id_def_break_days_"+break_day)
-                    $(`#id_def_break_days_${(break_day+6) % 7}`).prop("checked", value.includes(break_day));
-                }
-                continue;
-            }
-            if (field === "unit") {
-                if (normalized_unit === "minute") {
-                    $("#y-widget-checkbox").prop("checked", false);
-                    $field.val("");
+            switch (field) {
+                case "break_days":
+                    for (let break_day of Array(7).keys()) {
+                        // (break_day+6)%7) is for an ordering issue, ignore that
+                        // Treat this as $("#id_def_break_days_"+break_day)
+                        $(`#id_def_break_days_${(break_day+6) % 7}`).prop("checked", value.includes(break_day));
+                    }
                     continue;
-                } else if (normalized_unit === "hour") {
-                    $("#y-widget-checkbox").prop("checked", true);
-                    $field.val("");
+                case "unit":
+                    switch (normalized_unit) {
+                        case "minute":
+                            $("#y-widget-checkbox").prop("checked", false);
+                            $field.val("");
+                            break;
+                        case "hour":
+                            $("#y-widget-checkbox").prop("checked", true);
+                            $field.val("");
+                            break;
+                        default:
+                            // if we set it to true it could be converted to minutes for no reason
+                            $("#y-widget-checkbox").prop("checked", false);
+                            $field.val(value);
+                    }
                     continue;
-                }
+                case "works":
+                    switch (normalized_unit) {
+                        case "minute":
+                            if (Crud.shouldConvertToHours(value)) {
+                                $(`#${field}-widget-checkbox`).prop("checked", true);
+                                $field.val(Crud.minutesToHours(value));
+                            } else {
+                                $(`#${field}-widget-checkbox`).prop("checked", false);
+                                $field.val(value);
+                            }
+                            break;
+                        case "hour":
+                            if (Crud.shouldConvertToMinutes(value)) {
+                                $(`#${field}-widget-checkbox`).prop("checked", false);
+                                $field.val(Crud.hoursToMinutes(value));
+                            } else {
+                                $(`#${field}-widget-checkbox`).prop("checked", true);
+                                $field.val(value);
+                            }
+                            break;
+                        default:
+                            // if we set it to true it could be converted to minutes for no reason
+                            $(`#${field}-widget-checkbox`).prop("checked", false);
+                            $field.val(value);
+                    }
+                    continue;
+                case "min_work_time":
+                // it's fine if time_per_unit widget checkbox is set even when hidden
+                // this is because the unit for this field is always "minute" or "hour"
+                // so it's fine to interchange between the two
+                // works, however, can refer to units other than "minute" or "hour", so this does
+                // not apply to that
+                case "time_per_unit":
+                    if (Crud.shouldConvertToHours(value)) {
+                        $(`#${field}-widget-checkbox`).prop("checked", true);
+                        $field.val(Crud.minutesToHours(value));
+                    } else {
+                        $(`#${field}-widget-checkbox`).prop("checked", false);
+                        $field.val(value);
+                    }
+                    continue;
             }
 
             if ($field.attr("type") === "checkbox")
