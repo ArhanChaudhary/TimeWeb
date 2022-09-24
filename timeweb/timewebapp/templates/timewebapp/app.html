@@ -155,14 +155,6 @@
               {{ settings_form.assignment_sorting }}
             </div>
           </div>
-          <div id="delete-starred-assignments" class="shortcut {% if settings_model.background_image %} grey-highlight{% endif %}">
-            <div class="shortcut-line-left"></div>
-            <span class="shortcut-text">
-              Delete Starred Assignments
-              <div class="generic-button" tabindex="0">Go</div>
-            </span>
-            <div class="shortcut-line-right"></div>
-          </div>
         {% endif %}
         {% for assignment in assignment_models %}
           {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
@@ -349,6 +341,16 @@
           <option>All</option>
         </select>
         Work Done
+        <div class="generic-button" tabindex="0">Go</div>
+      </span>
+      <div class="shortcut-line-right"></div>
+    </div>
+  </template>
+  <template id="delete-starred-assignments-template">
+    <div class="delete-starred-assignments shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+      <div class="shortcut-line-left"></div>
+      <span class="shortcut-text">
+        Delete Starred Assignments
         <div class="generic-button" tabindex="0">Go</div>
       </span>
       <div class="shortcut-line-right"></div>

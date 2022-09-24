@@ -287,7 +287,9 @@ setClickHandlers: {
     },
 
     deleteAllStarredAssignments: function() {
-        $("#delete-starred-assignments .generic-button").click(function() {
+        $(document).click(function(e) {
+            let $this = $(e.target);
+            if (!$this.is(".delete-starred-assignments .generic-button")) return;
             $.confirm({
                 title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
                 content: utils.formatting.getReversibilityStatus(),

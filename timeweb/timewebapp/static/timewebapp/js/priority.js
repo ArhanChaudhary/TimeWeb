@@ -789,10 +789,10 @@ class Priority {
             that.prev_incomplete_works_assignment = assignment_container;
         }
         if (priority_data.status_value === Priority.COMPLETELY_FINISHED) {
-            if (!that.already_found_first_finished) {
-                assignment_container.addClass("first-add-line-wrapper");
-                $("#delete-starred-assignments").insertBefore(dom_assignment);
-                that.already_found_first_finished = true;
+            assignment_container.addClass("add-line-wrapper");
+            if (that.prev_status_value !== Priority.COMPLETELY_FINISHED) {
+                if (that.prev_finished_assignment) that.prev_finished_assignment.addClass("last-add-line-wrapper");
+                assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-starred-assignments-template").html());
             }
             that.prev_finished_assignment = assignment_container;
         }
@@ -860,11 +860,7 @@ class Priority {
         }));
         let first_available_tutorial_assignment_fallback;
         let first_available_tutorial_assignment;
-        $("#delete-starred-assignments").each(function() {
-            if ($(this).parent().is(".assignment-container"))
-                $(this).insertBefore($(this).parent());
-        });
-        $(".delete-gc-assignments-from-class, .autofill-work-done").remove();
+        $(".delete-gc-assignments-from-class, .autofill-work-done, .delete-starred-assignments").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             const dom_assignment = $(".assignment").eq(priority_data.index);
@@ -939,9 +935,8 @@ class Priority {
             // Don't apply this removal to .autofill-work-done
             if ($(this).find(".autofill-work-done").length) return;
 
-            // Remove #delete-starred-assignments and every other shortcut
+            // Remove .delete-starred-assignments and every other shortcut
             $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
-            $(this).find("#delete-starred-assignments").insertBefore($(this));
             $(this).find(".shortcut").remove();
         });
 
