@@ -358,7 +358,7 @@ setClickHandlers: {
     deleteAssignmentsFromClass: function() {
         $(document).click(function(e) {
             let $this = $(e.target);
-            if (!($this.hasClass("generic-button") && $this.parents(".delete-gc-assignments-from-class").length)) return;
+            if (!$this.is(".delete-gc-assignments-from-class .generic-button")) return;
             const assignment_container = $this.parents(".assignment-container");
             const dom_assignment = assignment_container.children(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
