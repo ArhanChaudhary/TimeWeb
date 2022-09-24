@@ -533,8 +533,6 @@ class Priority {
                 starred_assignment_ids_to_delete_after_sorting.add(sa.sa.id);
             }
             assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
-                                .toggleClass("incomplete-works", status_value === Priority.INCOMPLETE_WORKS)
-                                .toggleClass("question-mark", [Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NO_WORKING_DAYS, Priority.INCOMPLETE_WORKS].includes(status_value))
                                 .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value))
                                 .toggleClass("delete-this-starred-assignment", delete_starred_assignment_after_sorting);
 
@@ -921,7 +919,14 @@ class Priority {
                 });
             }
             that.addAssignmentShortcut(dom_assignment, priority_data);
-            if (!first_available_tutorial_assignment && !assignment_container.hasClass("question-mark") && !dom_assignment.hasClass("assignment-is-deleting")) {
+            if (!first_available_tutorial_assignment && ![
+                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
+                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
+                    Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
+                    Priority.NO_WORKING_DAYS,
+                    Priority.INCOMPLETE_WORKS
+                ].includes(priority_data.status_value) && !dom_assignment.hasClass("assignment-is-deleting")
+            ) {
                 first_available_tutorial_assignment = dom_assignment;
             }
         }

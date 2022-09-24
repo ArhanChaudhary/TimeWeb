@@ -297,10 +297,8 @@ setClickHandlers: {
                     confirm: {
                         keys: ['Enter'],
                         action: function() {
-                            const assignment_ids_to_delete = $(".assignment-container.finished").map(function() {
-                                const dom_assignment = $(this).children(".assignment");
-                                const _sa = utils.loadAssignmentData(dom_assignment);
-                                return _sa.id;
+                            const assignment_ids_to_delete = $(".assignment-container.finished .assignment").map(function() {
+                                return utils.loadAssignmentData($(this)).id;
                             }).toArray();
                             const success = function() {
                                 new Crud().transitionDeleteAssignment($(".finished > .assignment"));
@@ -1069,16 +1067,18 @@ saveAndLoadStates: function() {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".assignment").filter(function() {
+                    $(".assignment").each(function() {
                         const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
-                        if (!was_open) return false;
+                        if (!was_open) return;
 
                         // if you edit an open assignment and make it needs more info
                         // ensure it isn't clicked
                         const dom_assignment = $(this);
                         const sa = new VisualAssignment(dom_assignment);
-                        return sa.canOpenAssignment();
-                    }).click();
+                        if (sa.canOpenAssignment()) {
+                            dom_assignment.click();
+                        }
+                    });
                 }
 
                 // Scroll to original position
