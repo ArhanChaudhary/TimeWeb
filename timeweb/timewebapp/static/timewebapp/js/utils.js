@@ -325,7 +325,9 @@ setClickHandlers: {
     },
 
     autofillWorkDone: function() {
-        $("#autofill-work-done .generic-button:not(select)").click(function(e) {
+        $(document).click(function(e) {
+            let $this = $(e.target);
+            if (!$this.is(".autofill-work-done .generic-button:not(select)")) return;
             $.confirm({
                 title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
                 content: (function() {

@@ -802,7 +802,7 @@ class Crud {
             // NOTE: removed because of bugginess and just looking bad overall
             function transition_callback() {
                 // If a shorcut is in assignment_container, take it out so it doesn't get deleted
-                assignment_container.find("#delete-starred-assignments, #autofill-work-done").insertBefore(assignment_container);
+                assignment_container.find("#delete-starred-assignments").insertBefore(assignment_container);
                 assignment_container.remove();
                 Crud.last_removed_deletion_time = sa.deletion_time;
                 // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)

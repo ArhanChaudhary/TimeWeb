@@ -778,10 +778,10 @@ class Priority {
         }
 
         if (priority_data.status_value === Priority.INCOMPLETE_WORKS) {
-            if (!that.already_found_first_incomplete_works) {
-                assignment_container.addClass("first-add-line-wrapper");
-                $("#autofill-work-done").insertBefore(dom_assignment);
-                that.already_found_first_incomplete_works = true;
+            assignment_container.addClass("add-line-wrapper");
+            if (that.prev_status_value !== Priority.INCOMPLETE_WORKS) {
+                if (that.prev_incomplete_works_assignment) that.prev_incomplete_works_assignment.addClass("last-add-line-wrapper");
+                assignment_container.addClass("first-add-line-wrapper").prepend($("#autofill-work-done-template").html());
             }
             that.prev_incomplete_works_assignment = assignment_container;
         }
@@ -793,6 +793,7 @@ class Priority {
             }
             that.prev_finished_assignment = assignment_container;
         }
+        that.prev_status_value = priority_data.status_value;
     }
     updateInfoHeader() {
         const that = this;
@@ -856,11 +857,11 @@ class Priority {
         }));
         let first_available_tutorial_assignment_fallback;
         let first_available_tutorial_assignment;
-        $("#autofill-work-done, #delete-starred-assignments").each(function() {
+        $("#delete-starred-assignments").each(function() {
             if ($(this).parent().is(".assignment-container"))
                 $(this).insertBefore($(this).parent());
         });
-        $(".delete-gc-assignments-from-class").remove();
+        $(".delete-gc-assignments-from-class, .autofill-work-done").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             const dom_assignment = $(".assignment").eq(priority_data.index);
@@ -932,8 +933,8 @@ class Priority {
 
         // wrappers that wrap only around one assignment
         $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
-            // Don't apply this removal to #autofill-work-done
-            if ($(this).find("#autofill-work-done").length) return;
+            // Don't apply this removal to .autofill-work-done
+            if ($(this).find(".autofill-work-done").length) return;
 
             // Remove #delete-starred-assignments and every other shortcut
             $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
