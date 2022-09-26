@@ -901,9 +901,14 @@ class Priority {
 
         if (!that.params.dont_swap) {
             const $assignment_container = $(".assignment-container");
+
+            let tops = new Array($assignment_container.length);
+            tops.fill(undefined);
+            Object.seal(tops);
+
             if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
-                $assignment_container.each(function() {
-                    $(this).attr("data-initial-top-offset", $(this).offset().top);
+                $assignment_container.each(function(i) {
+                    tops[i] = $(this).offset().top;
                 });
             // Selection sort
             for (let [index, sa] of that.priority_data_list.entries()) {
@@ -925,13 +930,13 @@ class Priority {
             }
 
             if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
-                $assignment_container.each(function() {
+                $assignment_container.each(function(i) {
                     const assignment_container = $(this);
-                    const initial_height = assignment_container.attr("data-initial-top-offset");
+                    const initial_height = tops[i];
                     let current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned MATRIX_ENDS_WEIGHT
                     // Assignments can move while this is being executed; current_translate_value becomes old inaccurate
                     // Account for this for this execution time inconsistency by multiplying it by an eyeballed adjustment factor of 0.9
-                    current_translate_value *= 0.9
+                    current_translate_value *= 0.9;
                     // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
                     const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
                     const transform_value = initial_height - final_height;
