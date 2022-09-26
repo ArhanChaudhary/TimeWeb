@@ -131,6 +131,16 @@ class Priority {
         const that = this;
         const complete_date_now = utils.getRawDateNow();
         const starred_assignment_ids_to_delete_after_sorting = new Set();
+        if (that.params.autofill_all_work_done) {
+            that.params.autofill_all_work_done = that.params.autofill_all_work_done.toArray();
+        } else {
+            that.params.autofill_all_work_done = [];
+        }
+        if (that.params.autofill_no_work_done) {
+            that.params.autofill_no_work_done = that.params.autofill_no_work_done.toArray();
+        } else {
+            that.params.autofill_no_work_done = [];
+        }
         $(".assignment").each(function(index) {
             const dom_assignment = $(this);
             const assignment_container = dom_assignment.parent();
@@ -201,7 +211,7 @@ class Priority {
                 // Increment number_of_forgotten_days to fix this
                 number_of_forgotten_days++;
             }
-            if (!sa.sa.needs_more_info && that.params.autofill_all_work_done && number_of_forgotten_days > 0) {
+            if (!sa.sa.needs_more_info && that.params.autofill_all_work_done.includes(dom_assignment[0]) && number_of_forgotten_days > 0) {
                 let has_autofilled = false;
                 for (let i = 0; i < number_of_forgotten_days; i++) {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
@@ -301,7 +311,7 @@ class Priority {
                 }).css("margin-left", -3);
             } else {
                 let has_autofilled = false;
-                if (that.params.autofill_no_work_done && number_of_forgotten_days > 0)
+                if (that.params.autofill_no_work_done.includes(dom_assignment[0]) && number_of_forgotten_days > 0)
                     for (let i = 0; i < number_of_forgotten_days; i++) {
                         
                         if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) break;
@@ -477,12 +487,10 @@ class Priority {
                 return `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
             })());
             
-            // Add finished to assignment-container so it can easily be deleted with $(".finished").remove() when all finished assignments are deleted in advanced
             if (delete_starred_assignment_after_sorting && !assignment_container.hasClass("delete-this-starred-assignment")) {
                 starred_assignment_ids_to_delete_after_sorting.add(sa.sa.id);
             }
-            assignment_container.toggleClass("finished", status_value === Priority.COMPLETELY_FINISHED)
-                                .toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value))
+            assignment_container.toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value))
                                 .toggleClass("delete-this-starred-assignment", delete_starred_assignment_after_sorting);
 
             let status_priority;
@@ -714,7 +722,7 @@ class Priority {
         const assignment_container = dom_assignment.parents(".assignment-container");
 
         var current_tag = priority_data.first_real_tag;
-        if (sa.is_google_classroom_assignment && sa.needs_more_info && !dom_assignment.parents(".assignment-container").hasClass("finished") && current_tag) {
+        if (sa.is_google_classroom_assignment && sa.needs_more_info && priority_data.status_value !== Priority.COMPLETELY_FINISHED && current_tag) {
             assignment_container.addClass("add-line-wrapper");
             if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
                 if (that.prev_gc_assignment) that.prev_gc_assignment.addClass("last-add-line-wrapper");
@@ -910,23 +918,9 @@ class Priority {
                 $assignment_container.each(function(i) {
                     tops[i] = $(this).offset().top;
                 });
-            // Selection sort
-            for (let [index, sa] of that.priority_data_list.entries()) {
-                // index represents the selected assignment's final position
-                // sa.index represents the selected assignment's current position
-                if (index !== sa.index) {
-                    // Swap them in the dom
-                    const tar1 = $assignment_container.eq(index),
-                            tar2 = $assignment_container.eq(sa.index);
-                    const swap_temp = $("<span>");
-                    // ideally use a shitty virtual dom here or smtn
-                    tar2.after(swap_temp);
-                    tar1.after(tar2);
-                    swap_temp.replaceWith(tar1);
-                    // Swap them in priority_data_list
-                    that.priority_data_list.find(sa => sa.index === index).index = sa.index; // Adjust index of assignment that used to be there 
-                    sa.index = index; // Adjust index of current swapped assignment
-                }
+
+            for (let [index, priority_data] of that.priority_data_list.entries()) {
+                $assignment_container.eq(priority_data.index).css("order", index);
             }
 
             if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
@@ -965,6 +959,7 @@ class Priority {
             })
             // Load the fonts first or height() may return the wrong values
             document.fonts.ready.then(function() {
+                const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
                 $("#animate-in").css({
                     position: "",
                     top: Math.max(
@@ -978,7 +973,7 @@ class Priority {
                         Math.min(
                             // ensure assignments don't scroll from the bottom to the top too far
                             window.innerHeight,
-                            $(".assignment-container:last").offset().top + $(".assignment-container:last").height() + Priority.ANIMATE_IN_START_MARGIN
+                            last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
                         // subtract the offset top to get the actual top value
                         // eg if we want this to be at 500px from the top of the screen, subtract its existing
                         // offset top and make that number its new top
@@ -989,19 +984,6 @@ class Priority {
             });
         }
 		that.updateInfoHeader();
-        if (that.params.first_sort) {
-            let assignment_header = $("#assignments-header");
-            if (assignment_header.position().top !== 0) {
-                assignment_header.insertBefore(assignment_header.parent()).prependTo(assignment_header.next());
-                console.log("fixed");
-            }
-            let assignment_container = $(".assignment-container:first");
-            if (assignment_container.length && assignment_container.position().top !== assignment_header.outerHeight()) {
-                assignment_container.insertBefore(assignment_container.parent()).prependTo(assignment_container.next());
-                console.log("fixed");
-                console.log($(".assignment-container"));
-            }
-        }
         $("#assignments-container").css("opacity", "1");
         
     }

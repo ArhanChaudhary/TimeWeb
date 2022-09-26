@@ -290,18 +290,20 @@ setClickHandlers: {
         $(document).click(function(e) {
             let $this = $(e.target);
             if (!$this.is(".delete-starred-assignments .generic-button")) return;
+            const assignment_container = $this.parents(".assignment-container");
+            const assignments_to_delete = utils.inLineWrapperQuery(assignment_container).children(".assignment");
             $.confirm({
-                title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
+                title: `Are you sure you want to delete ${assignments_to_delete.length} starred ${pluralize("assignment", assignments_to_delete.length)}?`,
                 content: utils.formatting.getReversibilityStatus(),
                 buttons: {
                     confirm: {
                         keys: ['Enter'],
                         action: function() {
-                            const assignment_ids_to_delete = $(".assignment-container.finished .assignment").map(function() {
+                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
                                 return utils.loadAssignmentData($(this)).id;
                             }).toArray();
                             const success = function() {
-                                new Crud().transitionDeleteAssignment($(".finished > .assignment"));
+                                new Crud().transitionDeleteAssignment(assignments_to_delete);
                             }
                             if (ajaxUtils.disable_ajax) {
                                 success();
@@ -328,6 +330,8 @@ setClickHandlers: {
         $(document).click(function(e) {
             let $this = $(e.target);
             if (!$this.is(".autofill-work-done .generic-button:not(select)")) return;
+            const assignment_container = $this.parents(".assignment-container");
+            const assignments_to_autofill = utils.inLineWrapperQuery(assignment_container).children(".assignment");
             $.confirm({
                 title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
                 content: (function() {
@@ -343,7 +347,7 @@ setClickHandlers: {
                         keys: ['Enter'],
                         action: function() {
                             const params = {};
-                            params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = true;
+                            params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = assignments_to_autofill;
                             new Priority().sort(params);
                         }
                     },
@@ -360,18 +364,9 @@ setClickHandlers: {
             let $this = $(e.target);
             if (!$this.is(".delete-gc-assignments-from-class .generic-button")) return;
             const assignment_container = $this.parents(".assignment-container");
-            const dom_assignment = assignment_container.children(".assignment");
-            const sa = utils.loadAssignmentData(dom_assignment);
-            if (assignment_container.hasClass("last-add-line-wrapper")) {
-                var assignments_to_delete = assignment_container;
-            } else {
-                const end_of_line_wrapper = assignment_container.nextAll(".assignment-container.last-add-line-wrapper").first();
-                // Adding a filter to ensure nextUntil doesn't accidentally delete external assignments isn't necessary because this shortcut should never get broken up and the wrapper should remain continuous
-                var assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);//.filter(assignment_container => 
-            }
-            assignments_to_delete = assignments_to_delete.children(".assignment");
+            const assignments_to_delete = utils.inLineWrapperQuery(assignment_container).children(".assignment");
             $.confirm({
-                title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
+                title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${utils.loadAssignmentData(assignment_container.children(".assignment")).tags[0]}"?<br>(An assignment's class name is its first tag)`,
                 content: utils.formatting.getReversibilityStatus(),
                 buttons: {
                     confirm: {
@@ -1136,6 +1131,34 @@ getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
     } else {
         return raw_date_now;
     }
+},
+flexboxOrderQuery: function($query) {
+    $query = $($query);
+    let ret = new Array($query.length);
+    ret.fill(undefined);
+    Object.seal(ret);
+
+    $query.each(function() {
+        ret[+$(this).css("order")] = this;
+    });
+
+    return $(ret);
+},
+inLineWrapperQuery: function($first_assignment_container) {
+    let in_wrapper = false;
+    let ret = $();
+    utils.flexboxOrderQuery(".assignment-container").each(function() {
+        if ($(this).is($first_assignment_container)) {
+            in_wrapper = true;
+        }
+        if (in_wrapper) {
+            ret = ret.add(this);
+            if ($(this).hasClass("last-add-line-wrapper")) {
+                return false; // break
+            }
+        }
+    });
+    return ret;
 },
 }
 
