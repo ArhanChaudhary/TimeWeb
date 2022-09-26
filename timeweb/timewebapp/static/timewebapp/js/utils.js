@@ -1304,7 +1304,7 @@ for (let sa of dat) {
     if (sa.y) sa.y = +sa.y;
     if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;
     if (sa.funct_round) sa.funct_round = +sa.funct_round;
-    if (sa.min_work_time) sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
+    if (sa.min_work_time) sa.min_work_time = +sa.min_work_time;
     if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);

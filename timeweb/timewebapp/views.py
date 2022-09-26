@@ -256,8 +256,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             try:
-                if field == "y": continue
-                if field == "funct_round":
+                if field in ("x", "y"):
+                    pass
+                elif field == "funct_round":
                     '''
                     why did i waste so much time making this
 
@@ -277,8 +278,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         setattr(self.sm, field, minutes_to_hours(getattr(self.sm, field)))
                     elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
                         setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
-                    continue
-                if field == "works":
+                elif field == "works":
                     # NOTE: changing just funct_round unit should not affect the rest of works
                     # so it is safe to do this and not include it as a condition where works is
                     # redefined if unit changes from minute to hour or vice versa
@@ -286,9 +286,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         first_work = minutes_to_hours(first_work)
                     elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
                         first_work = hours_to_minutes(first_work)
-                    continue
-                if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                    setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
+                elif field in ("min_work_time", "time_per_unit"):
+                    if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                        setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
+                    if field in ("min_work_time", ):
+                        setattr(self.sm, field, safe_conversion(getattr(self.sm, field), 1 / self.sm.time_per_unit))
             except TypeError:
                 pass
 
@@ -355,7 +357,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     elif self.updated_assignment:
                         new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
                     # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
-                    work_day_count = ceil(self.sm.time_per_unit * (self.sm.y - new_first_work) / min_work_time_funct_round)
+                    work_day_count = ceil((self.sm.y - new_first_work) / min_work_time_funct_round)
 
                     if not work_day_count or len(self.sm.break_days) == 7:
                         x_num = 1
@@ -388,7 +390,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if self.sm.y == None:
                     complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
                     # the prediction for due date is ceiled so also ceil the prediction for y for consistency
-                    self.sm.y = ceil(min_work_time_funct_round / self.sm.time_per_unit * complete_x_num)
+                    self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
                 else:
                     # we already have x_num and y and we don't need to do any further processing
                     pass

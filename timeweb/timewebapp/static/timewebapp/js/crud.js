@@ -121,6 +121,8 @@ class Crud {
                     }
                     continue;
                 case "min_work_time":
+                    value = Crud.safeConversion(value, formDict.time_per_unit);
+                case "min_work_time":
                 // it's fine if time_per_unit widget checkbox is set even when hidden
                 // this is because the unit for this field is always "minute" or "hour"
                 // so it's fine to interchange between the two
@@ -748,6 +750,8 @@ class Crud {
         });
         $("#previous-page").click(function() {
             if ($(".assignment").length) {
+                // i dont need to worry is .first() is actually the first assignment because of css order
+                // because the assignments are ordered in the backend in the deleted assignments view
                 var everything_after = utils.loadAssignmentData($(".assignment").first()).deletion_time;
             } else {
                 if (Crud.last_removed_deletion_time) {
