@@ -127,57 +127,6 @@ class Priority {
         }
         return {str_daysleft, long_str_daysleft};
     }
-    setInitialAssignmentTopOffset($assignment_container) {
-        const that = this;
-        $assignment_container.attr("data-initial-top-offset", $assignment_container.offset().top);
-    }
-
-    domSortAssignments(priority_data_list) {
-        const that = this;
-        // Selection sort
-        for (let [index, sa] of priority_data_list.entries()) {
-            // index represents the selected assignment's final position
-            // sa.index represents the selected assignment's current position
-            if (index !== sa.index) {
-                // Swap them in the dom
-                that.domSwapAssignments(index, sa.index);
-                // Swap them in priority_data_list
-                priority_data_list.find(sa => sa.index === index).index = sa.index; // Adjust index of assignment that used to be there 
-                sa.index = index; // Adjust index of current swapped assignment
-            }
-        }
-    }
-
-    domSwapAssignments(tar1_index, tar2_index) {  
-        const tar1 = $(".assignment-container").eq(tar1_index),
-                tar2 = $(".assignment-container").eq(tar2_index);
-        const swap_temp = $("<span>");
-        // ideally use a shitty virtual dom here or smtn
-        tar2.after(swap_temp);
-        tar1.after(tar2);
-        swap_temp.replaceWith(tar1);
-    }
-
-    transitionSwap(assignment_container) {
-        const initial_height = assignment_container.attr("data-initial-top-offset");
-        let current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned MATRIX_ENDS_WEIGHT
-        // Assignments can move while this is being executed; current_translate_value becomes old inaccurate
-        // Account for this for this execution time inconsistency by multiplying it by an eyeballed adjustment factor of 0.9
-        current_translate_value *= 0.9
-        // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
-        const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
-        const transform_value = initial_height - final_height;
-        assignment_container.removeAttr("data-initial-top-offset");
-        assignment_container.addClass("transform-instantly")
-                .css("transform", `translateY(${transform_value}px)`)
-                [0].offsetHeight;
-        assignment_container.removeClass("transform-instantly")
-                .css({
-                    transform: "",
-                    transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
-                });
-    }        
-
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
         const complete_date_now = utils.getRawDateNow();
@@ -951,16 +900,50 @@ class Priority {
         utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
         if (!that.params.dont_swap) {
-            if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
-                $(".assignment-container").each(function() {
-                    that.setInitialAssignmentTopOffset($(this));
+            const $assignment_container = $(".assignment-container");
+            if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
+                $assignment_container.each(function() {
+                    $(this).attr("data-initial-top-offset", $(this).offset().top);
                 });
-            that.domSortAssignments(that.priority_data_list);
+            // Selection sort
+            for (let [index, sa] of that.priority_data_list.entries()) {
+                // index represents the selected assignment's final position
+                // sa.index represents the selected assignment's current position
+                if (index !== sa.index) {
+                    // Swap them in the dom
+                    const tar1 = $assignment_container.eq(index),
+                            tar2 = $assignment_container.eq(sa.index);
+                    const swap_temp = $("<span>");
+                    // ideally use a shitty virtual dom here or smtn
+                    tar2.after(swap_temp);
+                    tar1.after(tar2);
+                    swap_temp.replaceWith(tar1);
+                    // Swap them in priority_data_list
+                    that.priority_data_list.find(sa => sa.index === index).index = sa.index; // Adjust index of assignment that used to be there 
+                    sa.index = index; // Adjust index of current swapped assignment
+                }
+            }
 
-            if (!that.params.first_sort && $(".assignment-container").length <= SETTINGS.sorting_animation_threshold)
-                $(".assignment-container").each(function() {
+            if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
+                $assignment_container.each(function() {
                     const assignment_container = $(this);
-                    that.transitionSwap(assignment_container);
+                    const initial_height = assignment_container.attr("data-initial-top-offset");
+                    let current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned MATRIX_ENDS_WEIGHT
+                    // Assignments can move while this is being executed; current_translate_value becomes old inaccurate
+                    // Account for this for this execution time inconsistency by multiplying it by an eyeballed adjustment factor of 0.9
+                    current_translate_value *= 0.9
+                    // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
+                    const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
+                    const transform_value = initial_height - final_height;
+                    assignment_container.removeAttr("data-initial-top-offset");
+                    assignment_container.addClass("transform-instantly")
+                            .css("transform", `translateY(${transform_value}px)`)
+                            [0].offsetHeight;
+                    assignment_container.removeClass("transform-instantly")
+                            .css({
+                                transform: "",
+                                transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
+                            });
                 });
         }
 
