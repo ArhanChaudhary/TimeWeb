@@ -412,6 +412,16 @@ class Crud {
                     // but who really cares this is what i see as expected behavior and is the user's responsibility to notice
                     $("#funct_round-widget-checkbox").prop("checked", false);
                     $("#id_funct_round").val(5);
+
+                    // let's not ensure minimum work time is never less than the step size
+                    // it may be very confusing to the user to see the minimum work time 
+                    // field randomly change form toggling the y checkbox. Minimum work
+                    // time anyways represents a user's preference and inputted value.
+                    // We can take care of the original goal of trying to ensure the minimum
+                    // work time is never less than the step size by playing it off
+                    // as a natural side effect (i.e minutes are always rounded to the 
+                    // nearest 5 NATURALLY and hours are always rounded to the nearest 0.5
+                    // NATURALLY)
                 }
                 // we can do this because this value is only ever set when this field is anyways invisible,
                 // and when the unit of work is cleared this field is then emptied!
