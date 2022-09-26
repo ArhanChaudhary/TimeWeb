@@ -333,7 +333,7 @@ setClickHandlers: {
             const assignment_container = $this.parents(".assignment-container");
             const assignments_to_autofill = utils.inLineWrapperQuery(assignment_container).children(".assignment");
             $.confirm({
-                title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
+                title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done for ${assignments_to_autofill.length} ${pluralize("assignment", assignments_to_autofill.length)}?`,
                 content: (function() {
                     switch ($("#autofill-selection").val()) {
                         case "No":
@@ -366,7 +366,7 @@ setClickHandlers: {
             const assignment_container = $this.parents(".assignment-container");
             const assignments_to_delete = utils.inLineWrapperQuery(assignment_container).children(".assignment");
             $.confirm({
-                title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${utils.loadAssignmentData(assignment_container.children(".assignment")).tags[0]}"?<br>(An assignment's class name is its first tag)`,
+                title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${utils.loadAssignmentData(assignment_container.children(".assignment")).tags[0]}"?<br>(A Google Classroom assignment's first tag is considered its class name)`,
                 content: utils.formatting.getReversibilityStatus(),
                 buttons: {
                     confirm: {
