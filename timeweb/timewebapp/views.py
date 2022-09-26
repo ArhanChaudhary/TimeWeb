@@ -30,7 +30,7 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from common.utils import days_between_two_dates, utc_to_local, calc_mod_days, get_client_ip, minutes_to_hours, hours_to_minutes
+from common.utils import days_between_two_dates, utc_to_local, calc_mod_days, get_client_ip, minutes_to_hours, hours_to_minutes, safe_conversion
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 

@@ -40,12 +40,17 @@ def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 
 # IMPORTANT
-# Make sure these two function mirror the corresponding frontend logic
-def hours_to_minutes(hours):
-    return round(hours * Decimal(60))
-
-def minutes_to_hours(minutes):
-    return round(minutes / Decimal(60) * Decimal(100)) / Decimal(100)
+# Make sure these three function mirror the corresponding frontend logic
+hours_to_minutes = lambda hours: safe_conversion(hours, 60)
+minutes_to_hours = lambda minutes: safe_conversion(minutes, 1/60)
+def safe_conversion(value, factor):
+    value = Decimal(value)
+    factor = Decimal(factor)
+    if factor < 1 or factor == 1:
+        ret = round(value * factor * 100) / 100;
+    elif factor > 1:
+        ret = round(value * factor)
+    return Decimal(ret)
 
 def utc_to_local(request, utctime):
     if request.user.is_authenticated and request.user.settingsmodel.timezone:
