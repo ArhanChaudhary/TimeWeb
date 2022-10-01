@@ -286,119 +286,129 @@ setClickHandlers: {
         });
     },
 
-    deleteAllStarredAssignments: function() {
-        $(document).click(function(e) {
-            let $this = $(e.target);
-            if (!$this.is(".delete-starred-assignments .generic-button")) return;
-            const assignment_container = $this.parents(".assignment-container");
-            const assignments_to_delete = utils.inLineWrapperQuery(assignment_container).children(".assignment");
-            $.confirm({
-                title: `Are you sure you want to delete ${assignments_to_delete.length} starred ${pluralize("assignment", assignments_to_delete.length)}?`,
-                content: utils.formatting.getReversibilityStatus(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                                return utils.loadAssignmentData($(this)).id;
-                            }).toArray();
-                            const success = function() {
-                                new Crud().transitionDeleteAssignment(assignments_to_delete);
-                            }
-                            if (ajaxUtils.disable_ajax) {
-                                success();
-                                return;
-                            }
-                            $.ajax({
-                                type: "POST",
-                                url: "/api/delete-assignment",
-                                data: {assignments: assignment_ids_to_delete},
-                                success: success,
-                                error: ajaxUtils.error,
-                            });
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
-                }
-            });
+    shortcuts: function() {
+        const shortcuts = [
+{
+    selector: ".delete-starred-assignments .generic-button",
+    // cannot use arrow function to preserve `this`
+    confirmAction: function(params) {
+        const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
+            return utils.loadAssignmentData($(this)).id;
+        }).toArray();
+        const success = function() {
+            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+        }
+        if (ajaxUtils.disable_ajax) {
+            success();
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/api/delete-assignment",
+            data: {assignments: assignment_ids_to_delete},
+            success: success,
+            error: ajaxUtils.error,
         });
     },
-
-    autofillWorkDone: function() {
-        $(document).click(function(e) {
-            let $this = $(e.target);
-            if (!$this.is(".autofill-work-done .generic-button:not(select)")) return;
-            const assignment_container = $this.parents(".assignment-container");
-            const assignments_to_autofill = utils.inLineWrapperQuery(assignment_container).children(".assignment");
-            $.confirm({
-                title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done for ${assignments_to_autofill.length} ${pluralize("assignment", assignments_to_autofill.length)}?`,
-                content: (function() {
-                    switch ($("#autofill-selection").val()) {
-                        case "No":
-                            return "Assumes you haven't done anything since your last work input and autofills in no work done until today";
-                        case "All":
-                            return "Assumes you followed your work schedule since your last work input and autofills in all work done until today";
-                    }
-                })(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            const params = {};
-                            params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = assignments_to_autofill;
-                            new Priority().sort(params);
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
+    generateJConfirmParams: function(params) {
+        return {
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} starred ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            content: utils.formatting.getReversibilityStatus(),
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: () => this.confirmAction(params),
+                },
+                cancel: function() {
+                    
                 }
-            });
+            },
+        }
+    },
+},
+{
+    selector: ".autofill-work-done .generic-button:not(select)",
+    confirmAction: function(params) {
+        const params2 = {};
+        params2[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = params.assignments_in_wrapper;
+        new Priority().sort(params2);
+    },
+    generateJConfirmParams: function(params) {
+        return {
+            title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done for ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            content: (function() {
+                switch ($("#autofill-selection").val()) {
+                    case "No":
+                        return "Assumes you haven't done anything since your last work input and autofills in no work done until today";
+                    case "All":
+                        return "Assumes you followed your work schedule since your last work input and autofills in all work done until today";
+                }
+            })(),
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: () => this.confirmAction(params),
+                },
+                cancel: function() {
+                    
+                }
+            }
+        }
+    },
+},
+{
+    selector: ".delete-gc-assignments-from-class .generic-button",
+    confirmAction: function(params) {
+        const success = function() {
+            params.$this.off("click");
+            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+        }
+
+        if (ajaxUtils.disable_ajax) {
+            success();
+            return;
+        }
+
+        const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
+            return utils.loadAssignmentData($(this)).id;
+        }).toArray();
+        $.ajax({
+            type: "POST",
+            url: "/api/delete-assignment",
+            data: {assignments: assignment_ids_to_delete},
+            success: success,
+            error: ajaxUtils.error,
         });
     },
+    generateJConfirmParams: function(params) {
+        return {
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)} from class "${utils.loadAssignmentData(params.assignment_container.children(".assignment")).tags[0]}"?<br>(A Google Classroom assignment's first tag is considered its class name)`,
+            content: utils.formatting.getReversibilityStatus(),
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: () => this.confirmAction(params),
+                },
+                cancel: function() {
+                    
+                }
+            }
+        }
+    }
+}
+        ];
 
-    deleteAssignmentsFromClass: function() {
         $(document).click(function(e) {
             let $this = $(e.target);
-            if (!$this.is(".delete-gc-assignments-from-class .generic-button")) return;
-            const assignment_container = $this.parents(".assignment-container");
-            const assignments_to_delete = utils.inLineWrapperQuery(assignment_container).children(".assignment");
-            $.confirm({
-                title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${utils.loadAssignmentData(assignment_container.children(".assignment")).tags[0]}"?<br>(A Google Classroom assignment's first tag is considered its class name)`,
-                content: utils.formatting.getReversibilityStatus(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            const success = function() {
-                                $this.off("click");
-                                new Crud().transitionDeleteAssignment(assignments_to_delete);
-                            }
-        
-                            if (ajaxUtils.disable_ajax) {
-                                success();
-                                return;
-                            }
+            const shortcut = shortcuts.find(s => $this.is(s.selector));
+            if (!shortcut) return;
 
-                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                                return utils.loadAssignmentData($(this)).id;
-                            }).toArray();
-                            $.ajax({
-                                type: "POST",
-                                url: "/api/delete-assignment",
-                                data: {assignments: assignment_ids_to_delete},
-                                success: success,
-                                error: ajaxUtils.error,
-                            });
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
-                }
-            });
+            const assignment_container = $this.parents(".assignment-container");
+            const assignments_in_wrapper = utils.inLineWrapperQuery(assignment_container).children(".assignment");
+            if (e.shiftKey)
+                shortcut.confirmAction({assignments_in_wrapper, $this});
+            else
+                $.confirm(shortcut.generateJConfirmParams({assignments_in_wrapper, assignment_container, $this}));
         });
     },
 },
@@ -1307,10 +1317,8 @@ document.addEventListener("DOMContentLoaded", function() {
         utils.ui.setClickHandlers.tickButtons();
         utils.ui.setClickHandlers.assignmentsHeaderUI();
         utils.ui.setClickHandlers.assignmentSorting();
-        utils.ui.setClickHandlers.autofillWorkDone();
     }
-    utils.ui.setClickHandlers.deleteAllStarredAssignments();
-    utils.ui.setClickHandlers.deleteAssignmentsFromClass();
+    utils.ui.setClickHandlers.shortcuts();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();
     utils.ui.setAssignmentScaleUtils();
