@@ -265,9 +265,10 @@ class VisualAssignment extends Assignment {
         if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
             this.drawFixed();
             this.draw();
+            // Don't hide graph hover point label on set skew ratio end if enabled
             if (!e.isTrigger) {
                 const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.addClass("hide-label");
+                hover_point_label.removeClass("hide-label move-left").addClass("initial-position");
             }
         }
     }
