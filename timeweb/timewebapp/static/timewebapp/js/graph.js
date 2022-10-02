@@ -256,12 +256,6 @@ class VisualAssignment extends Assignment {
             this.height = this.fixed_graph.height();
             assignment_footer.hide();
         }
-        //hard
-        if (this.width > 500) {
-            VisualAssignment.font_size = 13.9;
-        } else {
-            VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
-        }
         this.wCon = (this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / this.sa.complete_x;
         this.hCon = (this.height - 55) / this.sa.y;
         this.graph[0].width = this.width * this.scale;
@@ -605,7 +599,6 @@ class VisualAssignment extends Assignment {
         }
         
         screen.textAlign = "center";
-        VisualAssignment.setCanvasFont(screen, VisualAssignment.font_size);
         const center = (str, y_pos) => screen.fillText(str, (VisualAssignment.GRAPH_Y_AXIS_MARGIN+10+this.width)/2, screen.text_height * y_pos - 2);
         if (!assignment_container.hasClass("finished")) {
             let displayed_day;
