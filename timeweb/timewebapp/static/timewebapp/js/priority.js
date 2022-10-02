@@ -127,9 +127,9 @@ class Priority {
         }
         return {str_daysleft, long_str_daysleft};
     }
-    static generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa) {
+    static generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, reference_relative_date) {
         if (todo + last_work_input === sa.sa.y) {
-            return "Finish this assignment today";
+            return "Finish this assignment" + (reference_relative_date ? " today" : "");
         } else {
             return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
         }
@@ -416,7 +416,7 @@ class Priority {
                         width: 15,
                         height: 15,
                     }).css("margin-left", -2);
-                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa);
+                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, true);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
 
