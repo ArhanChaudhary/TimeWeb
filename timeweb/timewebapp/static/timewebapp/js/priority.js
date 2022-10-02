@@ -127,6 +127,13 @@ class Priority {
         }
         return {str_daysleft, long_str_daysleft};
     }
+    static generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa) {
+        if (todo + last_work_input === sa.sa.y) {
+            return "Finish this assignment today";
+        } else {
+            return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
+        }
+    }
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
         const complete_date_now = utils.getRawDateNow();
@@ -409,11 +416,7 @@ class Priority {
                         width: 15,
                         height: 15,
                     }).css("margin-left", -2);
-                    if (todo + last_work_input === sa.sa.y) {
-                        status_message = "Finish this assignment today";
-                    } else {
-                        status_message = `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
-                    }
+                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
 
@@ -540,6 +543,8 @@ class Priority {
             }
             dom_status_message.html(status_message); // use .html() instead of .text() so that .unfinished-message is parsed as an HTML element
             // Even though this is always true, it'll add this here for compatibility
+
+            // !! is needed because toggleClass only works with booleans
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
             dom_completion_time.text(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '').toggleClass("hide-on-mobile", !!sa.unit_is_of_time);
         });
