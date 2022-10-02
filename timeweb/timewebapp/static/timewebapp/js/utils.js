@@ -473,59 +473,55 @@ addTagHandlers: function() {
                 tag_names = new Set();
                 return;
             }
-            const success = function() {
-                if (utils.ui.close_on_success) {
-                    utils.ui.close_on_success = false;
-                    $this.find(".tag-add-input").blur();
-                }
-                // Add tags to dat locally
-                sa.tags.push(...tag_names);
 
-                // There are too many conditions on whether to sort or not, so just sort every time
-
-                // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
-                // "important" and "not important" because they were designed to affect priority
-                // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
-                    new Priority().sort();
-                // }
-
-                // Close box and add tags visually
-                dom_assignment.removeClass("open-tag-add-box");
-                transitionCloseTagBox($this);
-                for (let tag_name of tag_names) {
-                    const tag = $($("#tag-template").html());
-                    tag.find(".tag-name").text(tag_name);
-                    tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
-                    tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
-
-                    tag.addClass("tag-add-transition-disabler");
-                    // Need to use jquery instead of css to set marginLeft
-                    tag.css({
-                        marginLeft: -tag.outerWidth(true),
-                        opacity: "0",
-                        transform: "scale(0.6)",
-                    });
-                    tag[0].offsetHeight;
-                    tag.removeClass("tag-add-transition-disabler");
-                    tag.css({
-                        marginLeft: "",
-                        opacity: "",
-                        transform: "",
-                    });
-
-                    tag.prev().css("z-index", "1");
-                    tag.one("transitionend", function() {
-                        tag.prev().css("z-index", "");
-                    });
-                }
-                tag_names = new Set();
+            if (utils.ui.close_on_success) {
+                utils.ui.close_on_success = false;
+                $this.find(".tag-add-input").blur();
             }
-            
+            // Add tags to dat locally
+            sa.tags.push(...tag_names);
+
+            // There are too many conditions on whether to sort or not, so just sort every time
+
+            // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
+            // "important" and "not important" because they were designed to affect priority
+            // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+                new Priority().sort();
+            // }
+
+            // Close box and add tags visually
+            dom_assignment.removeClass("open-tag-add-box");
+            transitionCloseTagBox($this);
+            for (let tag_name of tag_names) {
+                const tag = $($("#tag-template").html());
+                tag.find(".tag-name").text(tag_name);
+                tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
+                tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
+
+                tag.addClass("tag-add-transition-disabler");
+                // Need to use jquery instead of css to set marginLeft
+                tag.css({
+                    marginLeft: -tag.outerWidth(true),
+                    opacity: "0",
+                    transform: "scale(0.6)",
+                });
+                tag[0].offsetHeight;
+                tag.removeClass("tag-add-transition-disabler");
+                tag.css({
+                    marginLeft: "",
+                    opacity: "",
+                    transform: "",
+                });
+
+                tag.prev().css("z-index", "1");
+                tag.one("transitionend", function() {
+                    tag.prev().css("z-index", "");
+                });
+            }            
             // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
-            if (ajaxUtils.disable_ajax || !tag_names.size) {
-                success();
-                return;
-            }
+            if (ajaxUtils.disable_ajax || !tag_names.size) return;
+            
+            tag_names = new Set();
             $.ajax({
                 type: "POST",
                 url: "/api/tag-add",
@@ -533,7 +529,6 @@ addTagHandlers: function() {
                     pk: sa.id,
                     tag_names: [...tag_names],
                 },
-                success: success,
                 error: ajaxUtils.error,
             });
             return;
@@ -600,41 +595,35 @@ addTagHandlers: function() {
             pk: sa.id,
             tag_names: [$this.attr("data-tag-deletion-name")],
         }
-        const success = function() {
-            // Remove data locally from dat
-            sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+        // Remove data locally from dat
+        sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
 
-            // There are too many conditions on whether to sort or not, so just sort every time
+        // There are too many conditions on whether to sort or not, so just sort every time
 
-            // GC class tags
-            // if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
-                new Priority().sort();
-            // }
+        // GC class tags
+        // if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
+            new Priority().sort();
+        // }
 
-            tag_wrapper.addClass("tag-is-deleting");
-            // Transition the deletion
-            // Need to use jquery to set css for marginLeft
-            tag_wrapper.css({
-                marginLeft: -tag_wrapper.outerWidth(true),
-                opacity: "0",
-                transform: "scale(0.6)",
-            });
-            tag_wrapper.prev().css("z-index", "1");
-            tag_wrapper.one("transitionend", function() {
-                tag_wrapper.prev().css("z-index", "");
-                tag_wrapper.remove();
-            });
-            $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
-        }
-        if (ajaxUtils.disable_ajax) {
-            success();
-            return;
-        }
+        tag_wrapper.addClass("tag-is-deleting");
+        // Transition the deletion
+        // Need to use jquery to set css for marginLeft
+        tag_wrapper.css({
+            marginLeft: -tag_wrapper.outerWidth(true),
+            opacity: "0",
+            transform: "scale(0.6)",
+        });
+        tag_wrapper.prev().css("z-index", "1");
+        tag_wrapper.one("transitionend", function() {
+            tag_wrapper.prev().css("z-index", "");
+            tag_wrapper.remove();
+        });
+        $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
+        if (ajaxUtils.disable_ajax) return;
         $.ajax({
             type: "DELETE",
             url: "/api/tag-delete",
             data: data,
-            success: success,
             error: function() {
                 tag_wrapper.removeClass("keep-delete-open");
                 ajaxUtils.error.bind(this)(...arguments);
