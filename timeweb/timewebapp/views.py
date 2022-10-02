@@ -380,6 +380,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         # x_num = (date_now - self.sm.assignment_date).days + x_num
                         # x_num += (date_now - self.sm.assignment_date).days
                         x_num += days_between_two_dates(date_now, self.sm.assignment_date)
+                        # There is no need to modify blue_line_start by this addition because it is adjusted earlier
+                        # To see why this is the case, let's think about this abstractly.
+                        # We are adding x_num to the due date, and the due date is after the assignment date and,
+                        # deductively, after the x position of the start of the blue line. Since we are only adding
+                        # to the end of the assignment, away from all of these affect variables, this addition should,
+                        #  in theory, not affect blue_line_start.
                     try:
                         self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
                     except OverflowError:
