@@ -23,11 +23,15 @@
   <script src="https://unpkg.com/sortablejs@1.14.0/Sortable.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/jquery-sortablejs@1.0.1/jquery-sortable.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/ml-matrix@6.10.2/matrix.umd.js" crossorigin="anonymous"></script>
-  <script src="{% static 'timewebapp/js/utils.js' %}"></script>
-  <script src="{% static 'timewebapp/js/priority.js' %}"></script>
-  <script src="{% static 'timewebapp/js/graph.js' %}"></script>
-  <script src="{% static 'timewebapp/js/parabola.js' %}"></script>
-  <script src="{% static 'timewebapp/js/crud.js' %}"></script>
+  {% if DEBUG %}
+    <script src="{% static 'timewebapp/js/utils.js' %}"></script>
+    <script src="{% static 'timewebapp/js/priority.js' %}"></script>
+    <script src="{% static 'timewebapp/js/graph.js' %}"></script>
+    <script src="{% static 'timewebapp/js/parabola.js' %}"></script>
+    <script src="{% static 'timewebapp/js/crud.js' %}"></script>
+  {% else %}
+    <script src="{% static 'timewebapp/js/bundle.js' %}"></script>
+  {% endif %}
 {% endblock %}
 
 {% block content %}

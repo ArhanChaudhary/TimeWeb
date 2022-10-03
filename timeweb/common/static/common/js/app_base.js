@@ -66,6 +66,32 @@ $(function() {
     $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
     $("#account-dropdown").css("display", "");
 
+    function resetHeaderLayout() {
+        const username = $("#user-greeting #username"),
+            logo = $("#logo-container"),
+            welcome = $("#welcome"),
+            plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
+            newassignmenttext = $("#new-assignment-text");
+    
+        logo.css({
+            left: '',
+            transform: '',
+        });
+        logo.find("img").css("width", "");
+        welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+        newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+    
+        if (!collision(username, logo, { margin: 30 })) return;
+        logo.css({
+            left: 5 + plus_button_width,
+            transform: "none",
+        });
+        welcome.toggle(!collision(welcome, logo, { margin: 30 }));
+    
+        if (!collision(username, logo, { margin: 10 })) return;
+        // compress the logo
+        logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+    }
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);
         resetHeaderLayout();
@@ -78,8 +104,8 @@ $(function() {
 // I'm not really sure how to ensure I do this for forward compatibility so I just hope I'll stumble upon this text again or
 // Somehow remember this in the future /shrug
 
-isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
-ajaxUtils = {
+window.isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
+window.ajaxUtils = {
 disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
 error: function(response, textStatus) {
     if (ajaxUtils.silence_errors) return;
@@ -303,7 +329,7 @@ saveAssignment: function(batchRequestData) {
 },
 }
 
-mathUtils = {
+window.mathUtils = {
     // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
     precisionRound: function(number, precision) {
         const factor = Math.pow(10, precision);
@@ -335,7 +361,7 @@ mathUtils = {
     }
 }
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
-function collision($div1, $div2, params={ margin: 0}) {
+window.collision = function($div1, $div2, params={ margin: 0}) {
     if ($div1.css("display") == "none") {
         var hide_$div1 = true;
         $div1.show();
@@ -360,35 +386,8 @@ function collision($div1, $div2, params={ margin: 0}) {
     if (bottom1 + params.margin < top2 || top1 - params.margin > bottom2 || right1 + params.margin < left2 || left1 - params.margin > right2) return false;
     return true;
 }
-function resetHeaderLayout() {
-    const username = $("#user-greeting #username"),
-        logo = $("#logo-container"),
-        welcome = $("#welcome"),
-        plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
-        newassignmenttext = $("#new-assignment-text");
-
-    logo.css({
-        left: '',
-        transform: '',
-    });
-    logo.find("img").css("width", "");
-    welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-    newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
-
-    if (!collision(username, logo, { margin: 30 })) return;
-    logo.css({
-        left: 5 + plus_button_width,
-        transform: "none",
-    });
-    welcome.toggle(!collision(welcome, logo, { margin: 30 }));
-
-    if (!collision(username, logo, { margin: 10 })) return;
-    // compress the logo
-    logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
-}
-
-reloadResolver = null;
-function reloadWhenAppropriate(params={href: null}) {
+window.reloadResolver = null;
+window.reloadWhenAppropriate = function(params={href: null}) {
     new Promise(function(resolve) {
         if ($(".jconfirm").length) {
             reloadResolver = resolve;

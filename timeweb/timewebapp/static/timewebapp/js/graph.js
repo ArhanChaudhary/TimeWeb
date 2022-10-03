@@ -189,6 +189,7 @@ class Assignment {
         return x1;
     }
 }
+window.Assignment = Assignment;
 class VisualAssignment extends Assignment {
     static CLOSE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static MOUSE_POSITION_TRANSFORM = {x: 0.1, y: -1.3} // Adjusts the mouse position by a few pixels to make it visually more accurate
@@ -1381,6 +1382,7 @@ class VisualAssignment extends Assignment {
         return !this.sa.needs_more_info;
     }
 }
+window.VisualAssignment = VisualAssignment;
 let already_ran_tutorial = false;
 let prevent_click = false;
 $(function() {

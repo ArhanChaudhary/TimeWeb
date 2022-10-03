@@ -1,5 +1,5 @@
-isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-function assert(condition, message) {
+window.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+window.assert = function(condition, message) {
     if (!condition) {
         throw new Error(message || "Assertion failed");
     }

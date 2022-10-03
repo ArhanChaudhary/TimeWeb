@@ -1,4 +1,4 @@
-utils = {
+window.utils = {
 formatting: {
 stringifyDate: function(date) {
     if (!date instanceof Date) return "";
@@ -1161,7 +1161,7 @@ inLineWrapperQuery: function($first_assignment_container) {
 },
 }
 
-SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+window.SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
 SETTINGS.animation_speed = +SETTINGS.animation_speed;
 if (!SETTINGS.seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
@@ -1182,14 +1182,14 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
+window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
     x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
 }
 // Load in assignment data
-dat = JSON.parse(document.getElementById("assignment-models").textContent);
+window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);

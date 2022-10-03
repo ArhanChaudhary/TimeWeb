@@ -993,6 +993,7 @@ class Priority {
         
     }
 }
+window.Priority = Priority;
 document.addEventListener("DOMContentLoaded", function() {
 	if (VIEWING_DELETED_ASSIGNMENTS) {
 		const complete_date_now = utils.getRawDateNow();
