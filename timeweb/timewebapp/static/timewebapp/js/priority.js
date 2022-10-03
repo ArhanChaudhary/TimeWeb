@@ -399,6 +399,7 @@ class Priority {
                     if (current_work_input_is_break_day) {
                         status_message = 'Today isn\'t a working day for this assignment';
                     } else {
+                        // we need to mention today or this can be interpreted as completely finished
                         status_message = 'You\'re finished with this assignment\'s work for today';
                     }
                     //hard
@@ -416,7 +417,7 @@ class Priority {
                         width: 15,
                         height: 15,
                     }).css("margin-left", -2);
-                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, true);
+                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, false);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
 
