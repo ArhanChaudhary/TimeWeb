@@ -410,14 +410,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             elif self.sm.needs_more_info or self.created_assignment:
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
-                old_x_num = days_between_two_dates(self.sm.x, old_data.assignment_date)
-                if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
-                    old_x_num += 1
-                end_of_works = old_x_num - self.sm.blue_line_start
-
                 # If the edited due date cuts off some of the work inputs
-                if removed_works_end > end_of_works:
-                    removed_works_end = end_of_works
+                actual_len_works = removed_works_end + 1 - removed_works_start
+                len_works = actual_len_works - 1
+                if len_works + self.sm.blue_line_start > x_num:
+                    # (removed_works_end + 1 - removed_works_start) - 1 + self.sm.blue_line_start > x_num
+                    # removed_works_end - removed_works_start + self.sm.blue_line_start > x_num
+                    # removed_works_end > x_num + removed_works_start - self.sm.blue_line_start
+                    removed_works_end = x_num + removed_works_start - self.sm.blue_line_start
                 if removed_works_start <= removed_works_end:
                     # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                     works_displacement = Decimal(old_data.works[0]) - first_work
@@ -427,7 +427,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # If the assignment or due date cuts off every work input
                     self.sm.works = [str(first_work)]
                 
-                self.sm.dynamic_start += self.sm.blue_line_start - old_data.blue_line_start
+                # In theory, the ONLY thing that should affect dynamic_start is changing the assignment date
+
+                # By testing and generalizing, we can see that it is not possible for dynamic_start
+                # to be a value that is not on a work input.
+                # TODO: rigorously prove this
+                self.sm.dynamic_start += days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
                 if self.sm.dynamic_start < 0:
                     self.sm.dynamic_start = 0
                 elif self.sm.dynamic_start > x_num - 1:
