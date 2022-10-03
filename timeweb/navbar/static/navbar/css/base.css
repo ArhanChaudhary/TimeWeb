@@ -2,7 +2,7 @@ body {
     --roboto-font-weight: 700;
 }
 #flex-container {
-    height: calc(100vh - 70px);
+    height: calc(var(--100vh) - 70px);
     /* Cancel out paddings */
     margin-top: -10px;
     margin-bottom: -10px;

@@ -76,7 +76,7 @@ main.background-image-exists {
 }
 #extra-navs-positioner {
     box-sizing: border-box;
-    min-height: calc(100vh - var(--header-height) - 10px);
+    min-height: calc(var(--100vh) - var(--header-height) - 10px);
     position: relative;
 }
 #extra-navs-positioner > span {

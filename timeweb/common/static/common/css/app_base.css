@@ -98,7 +98,7 @@ header > * {
 }
 main {
     position: relative; /* Needed for positioning the background image */
-    height: 100vh;
+    height: var(--100vh);
     padding: calc(10px + var(--header-height)) 20px 0;
     overflow-y: auto;
     box-shadow: inset 20px 0 0 0 var(--primary), inset -20px 0 0 0 var(--primary);
@@ -108,7 +108,7 @@ main {
 }
 main.finished-header-transition {
     padding: 10px 20px 0;
-    height: calc(100vh - var(--header-height));
+    height: calc(var(--100vh) - var(--header-height));
     margin-top: var(--header-height);
 }
 .generic-button, ::file-selector-button {

@@ -8,6 +8,7 @@
 html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    --100vh: calc(var(--vh, 1vh) * 100);
 }
 input, textarea {
     -webkit-user-select: text;
