@@ -468,8 +468,10 @@ def create_gc_assignments(request):
     return HttpResponse(status=205)
 
 def generate_gc_authorization_url(request, *, next_url, current_url):
-    flow = Flow.from_client_secrets_file(
-        settings.GC_CREDENTIALS_PATH, scopes=settings.GC_SCOPES)
+    flow = Flow.from_client_config(
+        settings.GC_CREDENTIALS_JSON,
+        scopes=settings.GC_SCOPES
+    )
     flow.redirect_uri = settings.GC_REDIRECT_URI
     # Generate URL for request to Google's OAuth 2.0 server.
     # Use kwargs to set optional request parameters.
@@ -507,10 +509,11 @@ def gc_auth_callback(request):
     # Callback URI
     state = request.GET.get('state')
 
-    flow = Flow.from_client_secrets_file(
-        settings.GC_CREDENTIALS_PATH,
+    flow = Flow.from_client_config(
+        settings.GC_CREDENTIALS_JSON,
         scopes=settings.GC_SCOPES,
-        state=state)
+        state=state
+    )
     flow.redirect_uri = settings.GC_REDIRECT_URI
 
     # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us

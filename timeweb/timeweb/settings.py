@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+import json
+from pathlib import Path
+from google.oauth2 import service_account
 
 # SECURITY WARNING: don't run with debug turned on in production!
 try:
@@ -238,13 +240,20 @@ else:
     GS_MEDIA_BUCKET_NAME = 'twmedia'
 
     GS_PROJECT_ID = 'timeweb-308201'
-    from google.oauth2 import service_account
-    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        BASE_DIR / "sa_private_key.json"
-    )
+    if key := os.environ.get("SA_PRIVATE_KEY"):
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
+            json.loads(key)
+        )
+    else:
+        print("GS_CREDENTIALS not found; background images will not work")
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
+GC_CREDENTIALS_JSON = os.environ.get("GC_API_CREDENTIALS")
+if (GC_CREDENTIALS_JSON := os.environ.get("GC_API_CREDENTIALS")) is None:
+    print("GC_API_CREDENTIALS is not set; Google Classroom API will not work")
+else:
+    GC_CREDENTIALS_JSON = json.loads(GC_CREDENTIALS_JSON)
+
 if DEBUG or FIX_DEBUG_LOCALLY:
     GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'

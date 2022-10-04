@@ -78,10 +78,6 @@ Original splash screens
 example_assignment_load.py
 pre_changelogs.py
 
-# Google API requests
-sa_private_key.json
-gc_api_credentials.json
-
 # Flask stuff:
 instance/
 .webassets-cache
