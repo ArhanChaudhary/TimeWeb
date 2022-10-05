@@ -1131,18 +1131,16 @@ getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
         return raw_date_now;
     }
 },
-flexboxOrderQuery: function($query) {
-    $query = $($query);
-    let ret = new Array($query.length);
-    ret.fill(undefined);
-    Object.seal(ret);
-
-    $query.each(function() {
-        ret[+$(this).css("order")] = this;
-    });
-
-    return $(ret);
-},
+flexboxOrderQuery: $query => $($($query).toArray().sort((a, b) => {
+    // we cannot fill in the indexes of an array with $query.length
+    // because it isn't guaranteed order numbers will be consecutive
+    // (for example such as when assignments are deleted)
+    const a_order = +$(a).css("order");
+    const b_order = +$(b).css("order");
+    if (a_order == b_order) return 0;
+    if (a_order > b_order) return 1;
+    if (a_order < b_order) return -1;
+})),
 inLineWrapperQuery: function($first_assignment_container) {
     let in_wrapper = false;
     let ret = $();
