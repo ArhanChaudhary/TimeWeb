@@ -47,13 +47,16 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     content: "(Enter today if you don't remember)";
 }
 #form-wrapper {
-    width: min(100vw, 490px);
+    --raw-form-width: min(100vw, 490px);
+    width: var(--raw-form-width);
     box-sizing: border-box;
     background: var(--primary);
     box-shadow: 0 0 100px -23px black;
     margin: 5px auto 35px;
     border-radius: 15px;
-    padding: 5px 15px 25px;
+    --horizontal-form-margin: 15px;
+    padding: 5px var(--horizontal-form-margin) 25px;
+    --form-width: calc(var(--raw-form-width) - var(--horizontal-form-margin) * 2);
     position: relative;
     letter-spacing: 0.5px;
 }
@@ -148,7 +151,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
-    transform: translateX(-207px);
+    transform: translateX(calc(var(--form-width) / 100 * -45));
 }
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
     margin-left: calc(-100% - var(--field-group-gap));
