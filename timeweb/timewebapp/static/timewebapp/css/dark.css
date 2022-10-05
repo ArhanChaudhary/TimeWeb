@@ -65,6 +65,7 @@ select {
 .tag-add-box {
     --background-color: hsl(0, 0%, 15%);
     --box-shadow-color: hsla(0, 0%, 32%, 0.65);
+    --box-shadow-color2: white;
     --input-background-color: hsl(0, 0%, 11%);
 }
 .tag-add-button {

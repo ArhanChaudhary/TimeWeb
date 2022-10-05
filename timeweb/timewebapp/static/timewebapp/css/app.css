@@ -581,6 +581,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     white-space: normal;
     width: 155px;
     --box-shadow-color: hsla(0, 0%, 67%, 0.65);
+    --box-shadow-color2: black;
     --input-background-color: hsl(0, 0%, 86%);
     --background-color: var(--body-background);
 
@@ -603,6 +604,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     pointer-events: none;
     margin-right: var(--move-left);
     bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
+    filter: drop-shadow(0 0 1px var(--box-shadow-color2));
+    z-index: -1;
 }
 .assignment.open-tag-add-box {
     z-index: 1001;
