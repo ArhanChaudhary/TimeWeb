@@ -579,7 +579,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .tag-add-box {
     white-space: normal;
-    width: 155px;
+    width: 159px;
     --box-shadow-color: hsla(0, 0%, 67%, 0.65);
     --box-shadow-color2: black;
     --input-background-color: hsl(0, 0%, 86%);
@@ -596,7 +596,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 /* mobile view also effects the left */
 .tags.tags-left .tag-add-box {
-    --move-left: 43px;
+    --move-left: 58px;
     left: var(--move-left);
 }
 .tag-add-box::after {
@@ -999,7 +999,7 @@ main.finished-header-transition #extra-navs {
         display: initial;
     }
     .tags.tags-left .tag-add-box {
-        left: 56px;
+        left: 58px;
     }
     main {
         box-shadow: none;
