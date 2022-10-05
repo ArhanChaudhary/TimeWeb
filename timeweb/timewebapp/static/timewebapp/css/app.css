@@ -434,7 +434,8 @@ main.background-image-exists {
 /* selects the element right before right-side-of-header
 do this because midde-of-header is hidden in the delete assignments view */
 .assignment-header > :nth-last-child(2) {
-    margin-right: 25px;
+    --assignment-header-text-right-margin: 25px;
+    margin-right: var(--assignment-header-text-right-margin);
 }
 .align-to-status-message-container {
     margin-left: 6px;
@@ -764,7 +765,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     margin-top: calc(-1 * var(--vertical-assignment-padding));
     margin-bottom: calc(-1 * var(--vertical-assignment-padding));
     margin-right: -4px;
-    padding: 0 7px;
+    --horizontal-header-button-padding: 8px;
+    padding: 0 var(--horizontal-header-button-padding);
     cursor: pointer;
     background-color: var(--background-color);
     transition: background-color 0.25s ease-out;
@@ -991,6 +993,12 @@ main.finished-header-transition #extra-navs {
     }
     .shortcut-line-left, .shortcut-line-right {
         --negative-horizontal-margin: -9px;
+    }
+    .assignment-header > :nth-last-child(2) {
+        --assignment-header-text-right-margin: 10px;
+    }
+    .assignment-header-button {
+        --horizontal-header-button-padding: 6px;
     }
     .hide-on-mobile {
         display: none;
