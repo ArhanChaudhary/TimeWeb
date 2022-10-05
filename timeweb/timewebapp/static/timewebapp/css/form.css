@@ -47,7 +47,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     content: "(Enter today if you don't remember)";
 }
 #form-wrapper {
-    --raw-form-width: min(100vw, 490px);
+    --raw-form-width: min(calc(100vw - 55px), 490px);
     width: var(--raw-form-width);
     box-sizing: border-box;
     background: var(--primary);
