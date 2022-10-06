@@ -6,6 +6,7 @@ from django import forms
 from colorfield.widgets import ColorWidget
 from .models import SettingsModel
 from django.forms.widgets import ClearableFileInput
+from django.utils.html import format_html
 
 class CustomImageFieldWidget(ClearableFileInput):
     clear_checkbox_label = _('Clear image')
@@ -20,6 +21,11 @@ class SettingsForm(forms.ModelForm):
             "enable_gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
+                    help_text=format_html("{} <a href=\"/user-guide#adding-google-classroom-assignments\">{}</a>{}",
+                        "Imports assignments from Google Classroom to TimeWeb. Some assignments are ",
+                        "automatically filtered",
+                        ". If nothing happens after authorization, there aren't any valid Google Classroom assignments to add."
+                    ),
                     required=False,
                 ),
                 "order": "before immediately_delete_completely_finished_assignments",
@@ -29,6 +35,7 @@ class SettingsForm(forms.ModelForm):
                     label="Google Calendar Integration",
                     required=False,
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    help_text="Not yet implemented.",
                 ),
                 "order": "after enable_gc_integration",
             },
@@ -36,6 +43,7 @@ class SettingsForm(forms.ModelForm):
                 "field": forms.BooleanField(
                     label="Notifications Integration",
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    help_text="Not yet implemented.",
                     required=False,
                 ),
                 "order": "after calendar_integration",
@@ -43,6 +51,7 @@ class SettingsForm(forms.ModelForm):
             "canvas_integration": {
                 "field": forms.BooleanField(
                     label="Canvas Integration",
+                    help_text="Not yet implemented.",
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
                     required=False,
                 ),
