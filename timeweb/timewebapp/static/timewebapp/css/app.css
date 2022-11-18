@@ -716,7 +716,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     word-break: break-word;
 }
 .tag-add-checkbox {
-    -webkit-appearance: revert;
+    appearance: revert;
 }
 .tag-add-transition-disabler {
     transition: none !important;
