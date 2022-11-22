@@ -37,7 +37,7 @@ idna==3.2
 minify_html==0.8.0
 oauthlib==3.2.1
 packaging==21.0
-Pillow==9.0.1
+Pillow==9.3.0
 protobuf==3.18.3
 psycopg2==2.9.3
 psycopg2-binary==2.9.3
