@@ -69,6 +69,21 @@ class Priority {
             }
         }, 0);
     }
+    // https://www.desmos.com/calculator/zlzx0bqhur
+    // I will not be explaining anything nor answering any questions
+    // goodbye
+    static dayZeroScaleOutput = 5;
+    static dueDateTransitionValue = 1.8;
+    static piecewiseCutoff = 2.85;
+    static dueDateScalingFunction(days_until_due) {
+        if (days_until_due > Priority.piecewiseCutoff)
+            return days_until_due - Priority.dueDateTransitionValue;
+        else
+            return days_until_due / (Priority.dayZeroScaleOutput - Priority.dayZeroScaleOutput * Math.pow(days_until_due, 2) / Math.pow(Priority.piecewiseCutoff, 2) + Math.pow(days_until_due, 2) / (Math.pow(Priority.piecewiseCutoff, 2) - Priority.dueDateTransitionValue * Priority.piecewiseCutoff));
+    }
+    static todoScalingFunction(minutes) {
+        return Math.sqrt(minutes);
+    }
     // complete_date_now isn't actually needed, just so we don't need to call new Date() again
     static generateDaysleftMessages(sa, complete_date_now) {
         const that = this;
@@ -508,7 +523,7 @@ class Priority {
             } else {
                 // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
                 // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                status_priority = todo * sa.sa.time_per_unit / (sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+                status_priority = Priority.todoScalingFunction(todo * sa.sa.time_per_unit) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }
 
             const priority_data = {
