@@ -851,7 +851,11 @@ class Priority {
             let priority_percentage = that.priorityDataToPriorityPercentage(priority_data);
             const add_priority_percentage = SETTINGS.show_priority && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(priority_data.status_value);
             const dom_title = $(".title").eq(priority_data.index);
+
+            const old_add_priority_percentage = !!dom_title.attr("data-priority");
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
+            if (old_add_priority_percentage !== add_priority_percentage && document.contains(dom_assignment[0]))
+                new VisualAssignment(dom_assignment).positionTags();
 
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
                 new Promise(function(resolve) {
