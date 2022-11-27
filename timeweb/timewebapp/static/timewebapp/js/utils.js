@@ -647,6 +647,11 @@ addTagHandlers: function() {
     });
     $(".tag-sortable-container").sortable({
         animation: 150,
+        // some mobile phones consider a tap to be a drag,
+        // preventing tag deletion
+        delay: 200,
+        delayOnTouchOnly: true,
+
         ghostClass: "ghost",
         direction: "horizontal",
         onMove: function(e) {
