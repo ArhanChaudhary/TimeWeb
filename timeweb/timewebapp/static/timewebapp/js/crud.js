@@ -10,7 +10,6 @@ class Crud {
             return Math.round(value * factor);
         }
     }
-
     static shouldConvertToHours = minutes => {
         let as_hours = Crud.minutesToHours(minutes);
         return as_hours >= 1 && as_hours % 0.5 === 0;
@@ -204,6 +203,29 @@ class Crud {
             }
         }
     }
+    static alertEarlyDueDate() {
+        const picker = $("#id_x").data("daterangepicker");
+        if (!(
+            6 <= picker.startDate.hours() && picker.startDate.hours() <= 11
+        ) || Crud.alerted_early_due_time) return;
+        Crud.alerted_early_due_time = true;
+
+        $.alert({
+            title: "Your due time is early.",
+            content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight.",
+            backgroundDismiss: false,
+            buttons: {
+                ignore: function() {
+                    
+                },
+                "Set to midnight": {
+                    action: function() {
+                        picker.setStartDate(picker.startDate.startOf("day"));
+                    },
+                },
+            },
+        });
+    }
     init() {
         const that = this;
         setTimeout(() => {
@@ -239,24 +261,15 @@ class Crud {
                 picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
             }).on('cancel.daterangepicker', function(e, picker) {
                 $(this).val(old_due_date_val);
-            }).on('apply.daterangepicker', function(e, picker) {
-                if (6 <= picker.startDate.hours() && picker.startDate.hours() <= 11)
-                $.alert({
-                    title: "Your due time is early.",
-                    content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight.",
-                    backgroundDismiss: false,
-                    buttons: {
-                        ignore: function() {
-                            
-                        },
-                        "Set to midnight": {
-                            action: function() {
-                                picker.setStartDate(picker.startDate.startOf("day"));
-                            },
-                        },
-                    },
-                });
             });
+            Crud.ALL_FOCUSABLE_FORM_INPUTS.each(function() {
+                if ($(this).is("#id_x")) {
+                   var event = "apply.daterangepicker";
+                } else {
+                   var event = "focusout";
+                }
+                $(this).on(event, Crud.alertEarlyDueDate);
+            })
             that.setCrudHandlers();
             that.addInfoButtons();
         }, 0);
@@ -296,6 +309,7 @@ class Crud {
             });
         }
         Crud.one_unit_of_work_alert_already_shown = false;
+        Crud.alerted_early_due_time = false;
         that.old_unit_value = undefined;
         that.replaceUnit();
 
@@ -639,6 +653,7 @@ class Crud {
         });
         $("#id_description").expandableTextareaHeight();
         Crud.one_unit_of_work_alert_already_shown = false;
+        Crud.alerted_early_due_time = false;
         $("#id_y, #id_x, #id_assignment_date, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             let time_per_unit = $("#id_time_per_unit");
             if ($("#time_per_unit-widget-checkbox").prop("checked")) {
