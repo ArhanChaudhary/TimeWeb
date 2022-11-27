@@ -206,8 +206,9 @@
                           <use href="#external_link-svg"></use>
                         </svg>
                       </a>
+                    {% else %}
+                      <span>{{ assignment.name }}</span>
                     {% endif %}
-                    <span {% if assignment.google_classroom_assignment_link %} class="hide-on-mobile" {% endif %}>{{ assignment.name }}</span>
                   </span>
                   {% if assignment.description %}
                     <div class="description">{{ assignment.description|linebreaksbr }}</div>
@@ -232,13 +233,6 @@
                 <div class="right-side-of-header">
                   <span class="completion-time"></span>
                   {% if not view_deleted_assignments_in_app_view %}
-                    {% if assignment.google_classroom_assignment_link %}
-                      <a target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" class="assignment-header-button hide-on-mobile">
-                        <svg width="25" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
-                          <use href="#external_link-svg"></use>
-                        </svg>
-                      </a>
-                    {% endif %}
                     <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
                       <svg class="tick-button" width="25" preserveAspectRatio="none">
                         <use href="#tick-svg"></use>

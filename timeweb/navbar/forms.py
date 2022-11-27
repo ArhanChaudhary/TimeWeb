@@ -21,7 +21,7 @@ class SettingsForm(forms.ModelForm):
             "enable_gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
-                    help_text=format_html("{} <a href=\"/user-guide#adding-google-classroom-assignments\">{}</a>{}",
+                    help_text=format_html("{} <a target=\"_blank\" href=\"/user-guide#adding-google-classroom-assignments\">{}</a>{}",
                         "Imports assignments from Google Classroom to TimeWeb. Some assignments are ",
                         "automatically filtered",
                         ". If nothing happens after authorization, there aren't any valid Google Classroom assignments to add."
@@ -95,6 +95,7 @@ class SettingsForm(forms.ModelForm):
         }
         help_texts = {
             "def_skew_ratio": "Set this value to 0 to make it linear.",
+            "def_min_work_time": "Enter this value in minutes. If you typically complete longer periods of work at a time, set this to a high value (such as 60 minutes or 90 minutes).",
             "loosely_enforce_minimum_work_times": "Ignores every assignments' minimum work time on their first and last working days in exchange for making their work distributions smoother. Recommended to be turned on.",
             "show_priority": "Displays the priority percentage and color for every assignment.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",

@@ -351,9 +351,6 @@ main.background-image-exists {
     margin-bottom: 0;
 }
 .left-side-of-header .title .title-link-anchor {
-    display: none;
-}
-.left-side-of-header .title .title-link-anchor {
     color: var(--color);
 }
 .left-side-of-header .title .title-link-icon {
@@ -1004,9 +1001,6 @@ main.finished-header-transition #extra-navs {
     }
     .hide-on-mobile {
         display: none;
-    }
-    .left-side-of-header .title .title-link-anchor {
-        display: initial;
     }
     .tags.tags-left .tag-add-box {
         left: 58px;
