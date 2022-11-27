@@ -443,7 +443,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     position: absolute;
     z-index: 1;
     white-space: nowrap;
-    font-size: 0.75em;
+    font-size: 13.6px;
     --tags-left--margin-bottom: 7px;
     --tags-bottom--margin-bottom: 3px;
     --tags-right--margin-right: 2px;
@@ -497,9 +497,9 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .tag-delete {
     position: absolute;
-    width: 9px;
-    height: 9px;
-    right: 3px;
+    width: 10.5px;
+    height: 10.5px;
+    right: 4px;
     border-radius: 50%;
     background-color: var(--color);
     cursor: pointer;
@@ -527,8 +527,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 16.8px;
-    height: 16.8px;
+    width: 19.7px;
+    height: 19.7px;
     border-radius: 10px;
     --background-color: hsl(0, 0%, 91%);
     background-color: var(--background-color);
@@ -565,14 +565,14 @@ do this because midde-of-header is hidden in the delete assignments view */
     transition: margin-right calc(0.15s * var(--animation-speed)) ease-in-out;
 }
 .tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
-    margin-right: 11px;
+    margin-right: 15px;
 }
 .tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
     transform: scale(1.2);
 }
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
-    width: 68px;
+    width: 78px;
 }
 .tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
@@ -726,14 +726,14 @@ do this because midde-of-header is hidden in the delete assignments view */
     right: 0;
     left: 0;
     margin: auto;
-    height: 6px;
+    height: 7px;
     width: 1px;
     position: absolute;
 }
 .tag-add > .icon-slash {
     right: unset;
-    left: 7.75px;
-    height: 10px;
+    left: 9.25px;
+    height: 12px;
     background-color: var(--color);
 }
 .x-first-slash {
