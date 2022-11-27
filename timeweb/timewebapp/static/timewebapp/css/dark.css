@@ -57,7 +57,7 @@ select {
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .left-side-of-header a {
     transition: none;
 }
-.left-side-of-header, .left-side-of-header a {
+.left-side-of-header.fancy-coloring, .left-side-of-header.fancy-coloring a {
     --color: var(--priority-color);
     color: var(--color) !important;
     transition: color calc(var(--priority-color-transition-speed) * var(--animation-speed));

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
   {% if settings_model.appearance == "automatic" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
-  {% elif settings_model.appearance == "dark" %}
+  {% elif settings_model.appearance == "dark" or settings_model.appearance == "lesser dark" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
   {% endif %}
 {% endblock %}
@@ -196,7 +196,7 @@
                 note: confirm with the .assignment-header > :nth-last-child(2) selector before changing
                 any .assignment-header first child element tags
                 {% endcomment %}
-                <div class="left-side-of-header">
+                <div class="left-side-of-header {% if settings_model.appearance == "dark" or settings_model.appearance == "automatic" %}fancy-coloring{% endif %}">
                   <span class="title">
                     {% if assignment.google_classroom_assignment_link %}
                       {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
