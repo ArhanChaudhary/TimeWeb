@@ -665,7 +665,8 @@ class Crud {
                 // make sure isnt empty nor 0
                 min_work_time && time_per_unit && complete_x &&
                 // 15 min work time => 5 days and 1h30m time_per_unit for this alert
-                time_per_unit >= min_work_time * 6 &&
+                // 1hr min work time => 5 days and 3h time_per_unit for this alert
+                time_per_unit >= Math.max(min_work_time, 30) * 3 &&
                 complete_x >= 5 &&
                 !Crud.one_unit_of_work_alert_already_shown
             )) return;
@@ -692,22 +693,21 @@ class Crud {
                 return;
             }
             if ($("#id-x-field-wrapper.disabled-field").length) {
-                if ($("#id_y").val() === "") {
-                    Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_y").parents(".field-group")});
-                    $("#id_y")[0].setCustomValidity("Please enter a value for the due date prediction");
-                    return;
-                }
-            } else if ($("#id-y-field-wrapper.disabled-field").length) {
-                if ($("#id_x").val() === "") {
-                    Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_x").parents(".field-group")});
-                    // daterangepicker sometimes doesn't open when initially in advanced inputs but idc
-                    $("#id_x")[0].setCustomValidity("Please enter a value for the other field's prediction");
-                    // gets in the way of daterangepicker
-                    setTimeout(() => {
-                        $("#id_x")[0].setCustomValidity("");
-                    }, 4500);
-                    return;
-                }
+                if ($("#id_y").val() !== "") return;
+                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_y").parents(".field-group")});
+                $("#id_y")[0].setCustomValidity("Please enter a value for the due date prediction");
+                return;
+            }
+            if ($("#id-y-field-wrapper.disabled-field").length) {
+                if ($("#id_x").val() !== "") return;
+                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_x").parents(".field-group")});
+                // daterangepicker sometimes doesn't open when initially in advanced inputs but idc
+                $("#id_x")[0].setCustomValidity("Please enter a value for the other field's prediction");
+                // gets in the way of daterangepicker
+                setTimeout(() => {
+                    $("#id_x")[0].setCustomValidity("");
+                }, 4500);
+                return;
             }
         });
         $("#form-wrapper form input").on("input invalid", function(e) {
