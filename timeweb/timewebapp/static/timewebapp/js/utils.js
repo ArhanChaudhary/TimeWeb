@@ -148,9 +148,10 @@ tickClock: function() {
     // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
     str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
     $("#estimated-completion-time").text(` (${str})`);
-    utils.ui.old_minute_value = minute_value;
-
-    if (!VIEWING_DELETED_ASSIGNMENTS) {
+    if (!VIEWING_DELETED_ASSIGNMENTS &&
+        // Don't tickClock in simulation or else Priority.sort calls tickClock which calls Priority.sort again
+        // this messes up current_translate_value *= 0.9
+        !utils.in_simulation) {
         const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         if (midnight.valueOf() !== date_now.valueOf()) {
             // Don't reload in the next day to preserve changes made in the simulation
