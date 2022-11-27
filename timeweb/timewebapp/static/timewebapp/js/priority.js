@@ -300,9 +300,9 @@ class Priority {
                 }
                 //hard
                 dom_status_image.attr({
-                    width: 16,
-                    height: 16,
-                }).css("margin-left", -3);
+                    width: 19,
+                    height: 19,
+                }).css({marginTop: -2, marginLeft: -1, marginRight: -2});
                 status_value = Priority.COMPLETELY_FINISHED;
                 // finished_work_inputs to ensure that assignments are only deleted when the user is aware
                 if (finished_work_inputs && SETTINGS.immediately_delete_completely_finished_assignments && !sa.sa.dont_hide_again)
@@ -313,9 +313,9 @@ class Priority {
                 status_value = Priority.NOT_YET_ASSIGNED;
                 //hard
                 dom_status_image.attr({
-                    width: 16,
-                    height: 16,
-                }).css("margin-left", -3);
+                    width: 15,
+                    height: 15,
+                }).css({marginLeft: -1, marginRight: -1});
             } else {
                 let has_autofilled = false;
                 if (that.params.autofill_no_work_done.includes(dom_assignment[0]) && number_of_forgotten_days > 0)
@@ -406,7 +406,7 @@ class Priority {
                     dom_status_image.attr({
                         width: 15,
                         height: 15,
-                    }).css("margin-left", -2);
+                    }).css({marginLeft: -1, marginRight: -1});
                     status_value = Priority.FINISHED_FOR_TODAY;
                 } else {
                     status_value = Priority.UNFINISHED_FOR_TODAY;
@@ -416,7 +416,7 @@ class Priority {
                     dom_status_image.attr({
                         width: 15,
                         height: 15,
-                    }).css("margin-left", -2);
+                    }).css({marginLeft: -1, marginRight: -1});
                     status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, false);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
