@@ -642,25 +642,40 @@ class Priority {
     assignmentSortingComparator(a, b) {
         const that = this;
 
-        if (SETTINGS.assignment_sorting === "Tag Name A-Z") {
+        switch (SETTINGS.assignment_sorting) {
+            case "Tag Name A-Z":
+                // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
 
-            // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
+                // "r" < "z" => true
+                // "r" < undefined => false (the below makes this true)
+                
+                // "z" > "r" => true
+                // undefined > "r" => false (the below makes this true)
+                
+                // a.first_real_tag !== undefined: If both are undefined, skip this check
+                if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
+                if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+                break;
+            case "Tag Name Z-A":
+                // same logic as above, but reversed
+                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
+                if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+                break;
+            case "Soonest Due Date First":
+                // b.due_date_minus_today === undefined: Treat undefined as negative infinity
 
-            // "r" < "z" => true
-            // "r" < undefined => false (the below makes this true)
-            
-            // "z" > "r" => true
-            // undefined > "r" => false (the below makes this true)
-            
-            // a.first_real_tag !== undefined: If both are undefined, skip this check
-            if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
-            if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
-        } else if (SETTINGS.assignment_sorting === "Tag Name Z-A") {
-            // same logic as above, but reversed
-            if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
-            if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+                // 5 < 10 => true
+                // undefined < 10 => false (the below makes this true)
+                
+                // 10 > 5 => true
+                // 10 > undefined => false (the below makes this true)
+                
+                // a.due_date_minus_today !== undefined: If both are undefined, skip this check
+                if (a.due_date_minus_today < b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+                if (a.due_date_minus_today > b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
+                break;
+                
         }
-
         
         let a_status_value = a.status_value;
         let b_status_value = b.status_value;
@@ -700,15 +715,7 @@ class Priority {
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
 
         if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value)) {
-            // b.due_date_minus_today === undefined: Treat undefined as negative infinity
-
-            // 5 < 10 => true
-            // undefined < 10 => false (the below makes this true)
-            
-            // 10 > 5 => true
-            // 10 > undefined => false (the below makes this true)
-            
-            // a.due_date_minus_today !== undefined: If both are undefined, skip this check
+            // exact same logic as above
             if (a.due_date_minus_today < b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
             if (a.due_date_minus_today > b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
         }

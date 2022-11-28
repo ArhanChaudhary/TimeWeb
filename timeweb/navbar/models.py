@@ -23,13 +23,13 @@ MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in VERTICAL_TAG_POSITION
 
 # Most Work Today First
 # Least Work Today First
-# Soonest Due Date First
 
 ASSIGNMENT_SORTINGS = (
     ("Most Important First", "Most Important First"),
     ("Least Important First", "Least Important First"),
     ("Tag Name A-Z", "Tag Name A-Z"),
     ("Tag Name Z-A", "Tag Name Z-A"),
+    ("Soonest Due Date First", "Soonest Due Date First"),
 )
 MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SORTINGS], key=len))
 
