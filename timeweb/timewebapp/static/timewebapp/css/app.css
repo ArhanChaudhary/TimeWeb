@@ -220,6 +220,9 @@ main.background-image-exists {
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
 }
+.assignment-container.add-shortcut-margin {
+    margin-top: 5px;
+}
 .shortcut-text {
     white-space: nowrap;
     margin-right: 6px;

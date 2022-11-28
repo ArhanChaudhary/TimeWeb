@@ -934,8 +934,13 @@ class Priority {
         }
         utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
 
+        const $assignment_container = $(".assignment-container");
+        // We need to do this in a separate loop so single assignment line wrappers are removed appropriately
+        for (let [index, priority_data] of that.priority_data_list.entries()) {
+            const assignment_container = $assignment_container.eq(priority_data.index);
+            assignment_container.toggleClass("add-shortcut-margin", index === 0 && assignment_container.hasClass("add-line-wrapper"));
+        }
         if (!that.params.dont_swap) {
-            const $assignment_container = $(".assignment-container");
 
             let tops = new Array($assignment_container.length);
             tops.fill(undefined);
