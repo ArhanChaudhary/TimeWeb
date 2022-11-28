@@ -655,6 +655,10 @@ class Priority {
             // a.first_real_tag !== undefined: If both are undefined, skip this check
             if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
             if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+        } else if (SETTINGS.assignment_sorting === "Tag Name Z-A") {
+            // same logic as above, but reversed
+            if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
+            if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
         }
 
         
