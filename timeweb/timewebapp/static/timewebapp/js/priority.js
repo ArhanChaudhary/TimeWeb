@@ -642,7 +642,7 @@ class Priority {
     assignmentSortingComparator(a, b) {
         const that = this;
 
-        if (SETTINGS.assignment_sorting === "Tag Name") {
+        if (SETTINGS.assignment_sorting === "Tag Name A-Z") {
 
             // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
 
@@ -684,7 +684,7 @@ class Priority {
         // a.status_value and b.status_value must be equal at this point, so define a shared variable for readability
         let status_value = a.status_value;
 
-        if (SETTINGS.assignment_sorting === "Reversed" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
+        if (SETTINGS.assignment_sorting === "Least Important First" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
             // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
             if (a.status_priority < b.status_priority) return -1;
             if (a.status_priority > b.status_priority) return 1;
