@@ -229,6 +229,8 @@ class Priority {
             for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_real_tag); tag_index_iterator++) {
                 first_real_tag = sa.sa.tags[tag_index_iterator];
             }
+            if (first_real_tag)
+                first_real_tag = first_real_tag.toLowerCase();
             
             if (sa.sa.tags.includes("Important")) {
                 var has_important_tag = true;
