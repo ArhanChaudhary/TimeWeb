@@ -716,8 +716,8 @@ class Priority {
 
         if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value)) {
             // exact same logic as above
-            if (a.due_date_minus_today < b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
-            if (a.due_date_minus_today > b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
+            if (a.due_date_minus_today < b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
+            if (a.due_date_minus_today > b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
         }
 
         if (a.name < b.name) return -1;
