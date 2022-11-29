@@ -762,13 +762,8 @@ class Priority {
                 if (that.prev_gc_assignment) that.prev_gc_assignment.addClass("last-add-line-wrapper");
                 assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-from-class-template").html());
             }
-            // put this inside the if because if there is an assignment that doens't safistify
-            // this if statement but its tag does match the current tag then first-add-line-wrapper
-            // won't be added
-            that.prev_tag = current_tag;
             that.prev_gc_assignment = assignment_container;
         }
-
         if (priority_data.status_value === Priority.INCOMPLETE_WORKS) {
             assignment_container.addClass("add-line-wrapper");
             if (that.prev_status_value !== Priority.INCOMPLETE_WORKS) {
@@ -785,6 +780,7 @@ class Priority {
             }
             that.prev_finished_assignment = assignment_container;
         }
+        that.prev_tag = current_tag;
         that.prev_status_value = priority_data.status_value;
     }
     updateInfoHeader() {
