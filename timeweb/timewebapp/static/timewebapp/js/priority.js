@@ -149,6 +149,29 @@ class Priority {
             return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
         }
     }
+    // create a sorting function that compares numbers on the number line for less than [0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5]
+    static dueDateCompareLessThan(a, b) {
+        if (a === b || a === undefined || b === undefined) {
+            return false;
+        } else if (a >= 0 && b >= 0) {
+            return a < b;
+        } else if (a < 0 && b < 0) {
+            return a > b;
+        } else {
+            return a >= 0;
+        }
+    }
+    static dueDateCompareGreaterThan(a, b) {
+        if (a === b || a === undefined || b === undefined) {
+            return false;
+        } else if (a >= 0 && b >= 0) {
+            return a > b;
+        } else if (a < 0 && b < 0) {
+            return a < b;
+        } else {
+            return a < 0;
+        }
+    }
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
         const complete_date_now = utils.getRawDateNow();
@@ -671,8 +694,10 @@ class Priority {
                 // 10 > undefined => false (the below makes this true)
                 
                 // a.due_date_minus_today !== undefined: If both are undefined, skip this check
-                if (a.due_date_minus_today < b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
-                if (a.due_date_minus_today > b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
+
+                // we need a custom lt and gt comparator so we can deal with negative numbers
+                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
+                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
                 break;
                 
         }
@@ -716,8 +741,11 @@ class Priority {
 
         if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value)) {
             // exact same logic as above
-            if (a.due_date_minus_today < b.due_date_minus_today || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
-            if (a.due_date_minus_today > b.due_date_minus_today || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
+            // as a note, this will never deal with negative numbers, as a negative
+            // due date means the assignment was already due. so, the status value
+            // will be completely_finished and this if statement won't run
+            if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
+            if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
         }
 
         if (a.name < b.name) return -1;
