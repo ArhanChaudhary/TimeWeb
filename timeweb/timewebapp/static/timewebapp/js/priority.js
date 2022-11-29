@@ -413,7 +413,6 @@ class Priority {
                 if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
                     complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
                 }
-                due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                 const todo_is_completed = todo <= 0;
                 const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
                 const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start;
@@ -460,7 +459,7 @@ class Priority {
                     status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, false);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
-
+                const due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                 if ([0, 1].includes(due_date_minus_today)) {
                     if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                         // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
@@ -551,6 +550,10 @@ class Priority {
                 status_priority = Priority.todoScalingFunction(todo * sa.sa.time_per_unit) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }
 
+            // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
+            if (Number.isFinite(Math.floor(sa.sa.complete_x) - today_minus_assignment_date))
+                // define this at the very end in case incrementDueDate is called
+                due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
             const priority_data = {
                 status_value,
                 status_priority,
