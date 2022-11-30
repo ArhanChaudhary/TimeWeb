@@ -752,6 +752,11 @@ class Priority {
                     if (a.todays_work > b.todays_work) return -1;
                     if (a.todays_work < b.todays_work) return 1;
                     break;
+                case "Least Work Today First":
+                    // min to max
+                    if (a.todays_work > b.todays_work) return 1;
+                    if (a.todays_work < b.todays_work) return -1;
+                    break;
             }
         }
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;

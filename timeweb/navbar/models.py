@@ -25,6 +25,7 @@ ASSIGNMENT_SORTINGS = (
     ("Most Priority First", "Most Priority First"),
     ("Least Priority First", "Least Priority First"),
     ("Most Work Today First", "Most Work Today First"),
+    ("Least Work Today First", "Least Work Today First"),
     ("Soonest Due Date First", "Soonest Due Date First"),
     ("Tag Name A-Z", "Tag Name A-Z"),
     ("Tag Name Z-A", "Tag Name Z-A")
