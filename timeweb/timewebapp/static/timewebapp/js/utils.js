@@ -954,7 +954,7 @@ saveAndLoadStates: function() {
     // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
     // Use beforeunload instead of unload or else the loading screen triggers and $("#assignments-container").scrollTop() becomes 0
     $(window).on('beforeunload', function() {
-        if (!SETTINGS.enable_tutorial) {
+        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
                 $(".assignment.open-assignment").map(function() {
@@ -986,7 +986,7 @@ saveAndLoadStates: function() {
 
     // Ensure fonts load for the graph
     document.fonts.ready.then(function() {
-        if (!SETTINGS.enable_tutorial) 
+        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS)
             // setTimeout so the assignments are clicked after the click handlers are set
             setTimeout(function() {
                 // Reopen closed assignments
