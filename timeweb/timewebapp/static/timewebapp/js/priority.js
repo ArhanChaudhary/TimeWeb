@@ -537,6 +537,7 @@ class Priority {
                                 .toggleClass("delete-this-starred-assignment", delete_starred_assignment_after_sorting);
 
             let status_priority;
+            let todays_work;
             if (status_value === Priority.COMPLETELY_FINISHED) {
                 status_priority = -index;
             } else if (status_value === Priority.NOT_YET_ASSIGNED) {
@@ -547,7 +548,8 @@ class Priority {
             } else {
                 // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
                 // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                status_priority = Priority.todoScalingFunction(todo * sa.sa.time_per_unit) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+                todays_work = todo * sa.sa.time_per_unit;
+                status_priority = Priority.todoScalingFunction(todays_work) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }
 
             // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
@@ -563,6 +565,7 @@ class Priority {
                 due_date_minus_today,
                 name: sa.sa.name.toLowerCase(),
                 index,
+                todays_work,
             }
             that.priority_data_list.push(priority_data);
 
@@ -743,6 +746,11 @@ class Priority {
                     // min to max
                     if (a.status_priority < b.status_priority) return -1;
                     if (a.status_priority > b.status_priority) return 1;
+                    break;
+                case "Most Work Today First":
+                    // max to min
+                    if (a.todays_work > b.todays_work) return -1;
+                    if (a.todays_work < b.todays_work) return 1;
                     break;
             }
         }
