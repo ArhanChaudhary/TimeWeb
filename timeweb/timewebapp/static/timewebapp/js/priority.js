@@ -704,7 +704,6 @@ class Priority {
                 if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
                 if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
                 break;
-                
         }
         
         let a_status_value = a.status_value;
@@ -733,13 +732,19 @@ class Priority {
         // a.status_value and b.status_value must be equal at this point, so define a shared variable for readability
         let status_value = a.status_value;
 
-        if (SETTINGS.assignment_sorting === "Least Important First" && [Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
-            // If the assignment is a google classroom assignment that needs more info and has a first tag (because the status priority is now their first tag) or is sorting in reverse, sort from min to max
-            if (a.status_priority < b.status_priority) return -1;
-            if (a.status_priority > b.status_priority) return 1;
-        } else {
-            if (a.status_priority < b.status_priority) return 1;
-            if (a.status_priority > b.status_priority) return -1;
+        if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
+            switch (SETTINGS.assignment_sorting) {
+                case "Most Important First":
+                    // max to min
+                    if (a.status_priority < b.status_priority) return 1;
+                    if (a.status_priority > b.status_priority) return -1;
+                    break;
+                case "Least Important First":
+                    // min to max
+                    if (a.status_priority < b.status_priority) return -1;
+                    if (a.status_priority > b.status_priority) return 1;
+                    break;
+            }
         }
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
