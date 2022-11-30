@@ -674,6 +674,13 @@ class Priority {
         const that = this;
 
         switch (SETTINGS.assignment_sorting) {
+            // These assignment sortings are sorted *before* status value,
+            // causing assignments due tomorrow to be not be at the top
+            // Each setting has a justification for why it is sorted before
+
+            // We do not need to worry about different status groups here
+            // when sorting alphabetically you are not sorting by priority
+            // so if stuff is due tomorrow or today i guess its fine
             case "Tag Name A-Z":
                 // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
 
@@ -687,11 +694,17 @@ class Priority {
                 if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
                 break;
+            // We do not need to worry about different status groups here
+            // when sorting alphabetically you are not sorting by priority
+            // so if stuff is due tomorrow or today i guess its fine
             case "Tag Name Z-A":
                 // same logic as above, but reversed
                 if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
                 break;
+            // We do not need to worry about different status groups here
+            // if something is due today or tomorrow it will already be sorted
+            // like that anyways
             case "Soonest Due Date First":
                 // b.due_date_minus_today === undefined: Treat undefined as negative infinity
 
