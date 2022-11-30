@@ -737,12 +737,12 @@ class Priority {
 
         if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
             switch (SETTINGS.assignment_sorting) {
-                case "Most Important First":
+                case "Most Priority First":
                     // max to min
                     if (a.status_priority < b.status_priority) return 1;
                     if (a.status_priority > b.status_priority) return -1;
                     break;
-                case "Least Important First":
+                case "Least Priority First":
                     // min to max
                     if (a.status_priority < b.status_priority) return -1;
                     if (a.status_priority > b.status_priority) return 1;
