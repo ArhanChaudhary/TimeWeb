@@ -693,6 +693,7 @@ switch (e.key) {
     case "Backspace":
     case "s":
     case "f":
+    case "0":
     case "o":
     case "c":
     case "t":
@@ -714,6 +715,7 @@ switch (e.key) {
             case "Backspace":
             case "s":
             case "f":
+            case "0":
             case "o":
             case "c":
                 let assignment_container = $(":hover").filter(".assignment-container");
@@ -747,6 +749,10 @@ switch (e.key) {
                             break;
                         case "f":
                             assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
+                            break;
+                        case "0":
+                            dom_assignment.find(".work-input-textbox").val("0");
+                            dom_assignment.find(".submit-work-button").click();
                             break;
                         case "Backspace":
                         case "s":
