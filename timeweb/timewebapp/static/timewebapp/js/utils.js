@@ -743,6 +743,7 @@ switch (e.key) {
                             const click_delete_button = $.Event("click");
                             click_delete_button.shiftKey = e.shiftKey;
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
+                            break;
                         }
                         case "r":
                             assignment_container.find(".restore-button").parents(".assignment-header-button").focus().click();
