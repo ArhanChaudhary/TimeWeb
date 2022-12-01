@@ -1127,9 +1127,14 @@ getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
         raw_date_now = new Date(raw_date_now.toLocaleString([], {timeZone: SETTINGS.timezone}));
     if (!params.dont_stem_off_date_now) {
         let complete_date_now = new Date(date_now.valueOf());
-        // precision up to seconds or else deleted assignments view sometimes displays a 
-        // negative "deleted ago" date
-        complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), raw_date_now.getSeconds(), 0);
+        if (utils.in_simulation) {
+            // lock simulation date to 12:00 AM to prevent assignments with due times from being completed
+            complete_date_now.setHours(0, 0, 0, 0);
+        } else {
+            // precision up to seconds or else deleted assignments view sometimes displays a 
+            // negative "deleted ago" date
+            complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), raw_date_now.getSeconds(), 0);
+        }
         return complete_date_now;
     } else {
         return raw_date_now;
