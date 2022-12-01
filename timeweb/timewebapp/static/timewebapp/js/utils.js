@@ -133,7 +133,7 @@ getReversibilityStatus: function() {
 },
 ui: {
 tickClock: function() {
-    const now = utils.getRawDateNow({ dont_stem_off_date_now: true });
+    const now = utils.getRawDateNow();
     if (utils.ui.tickClock.oldNow === undefined) {
         utils.ui.tickClock.oldNow = now;
     }
@@ -1122,11 +1122,9 @@ loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
     return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
 },
 getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
-    if (SETTINGS.timezone) {
-        var raw_date_now = new Date(new Date().toLocaleString([], {timeZone: SETTINGS.timezone}));
-    } else {
-        var raw_date_now = new Date();
-    }
+    let raw_date_now = new Date();
+    if (SETTINGS.timezone) 
+        raw_date_now = new Date(raw_date_now.toLocaleString([], {timeZone: SETTINGS.timezone}));
     if (!params.dont_stem_off_date_now) {
         let complete_date_now = new Date(date_now.valueOf());
         // precision up to seconds or else deleted assignments view sometimes displays a 
