@@ -1252,7 +1252,7 @@ for (let sa of dat) {
     }
     // Repopulating the form (min work time is capped and divided)
     sa.original_min_work_time = +sa.min_work_time;
-    if (!Number.isFinite(sa.original_min_work_time))
+    if (!Number.isFinite(sa.original_min_work_time) || sa.original_min_work_time === 0)
         sa.original_min_work_time = '';
 
     if (sa.y) sa.y = +sa.y;
