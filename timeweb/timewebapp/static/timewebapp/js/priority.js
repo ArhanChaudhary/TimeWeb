@@ -538,18 +538,24 @@ class Priority {
 
             let status_priority;
             let todays_work;
-            if (status_value === Priority.COMPLETELY_FINISHED) {
-                status_priority = -index;
-            } else if (status_value === Priority.NOT_YET_ASSIGNED) {
-                status_priority = today_minus_assignment_date;
-            } else if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT].includes(status_value)) {
-                // Don't use NaN because NaN === NaN is false for calculations used later
-                status_priority = undefined;
-            } else {
-                // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
-                // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                todays_work = todo * sa.sa.time_per_unit;
-                status_priority = Priority.todoScalingFunction(todays_work) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+            switch (status_value) {
+                case Priority.COMPLETELY_FINISHED:
+                    status_priority = -index;
+                    break;
+                case Priority.NOT_YET_ASSIGNED:
+                    status_priority = today_minus_assignment_date;
+                    break;
+                case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
+                case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
+                case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
+                    // Don't use NaN because NaN === NaN is false for calculations used later
+                    status_priority = undefined;
+                    break;
+                default:
+                    // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
+                    // However this doesn't happen because the assignment will have been marked have completed in this scenario
+                    todays_work = todo * sa.sa.time_per_unit;
+                    status_priority = Priority.todoScalingFunction(todays_work) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
             }
 
             // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
@@ -748,38 +754,47 @@ class Priority {
         // a.status_value and b.status_value must be equal at this point, so define a shared variable for readability
         let status_value = a.status_value;
 
-        if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(status_value)) {
-            switch (SETTINGS.assignment_sorting) {
-                case "Most Work Today First":
-                    // max to min
-                    if (a.todays_work > b.todays_work) return -1;
-                    if (a.todays_work < b.todays_work) return 1;
-                case "Least Work Today First":
-                    // min to max
-                    if (a.todays_work > b.todays_work) return 1;
-                    if (a.todays_work < b.todays_work) return -1;
-                case "Most Priority First":
-                    // max to min
-                    if (a.status_priority < b.status_priority) return 1;
-                    if (a.status_priority > b.status_priority) return -1;
-                    break;
-                case "Least Priority First":
-                    // min to max
-                    if (a.status_priority < b.status_priority) return -1;
-                    if (a.status_priority > b.status_priority) return 1;
-                    break;
-            }
+        switch (status_value) {
+            case Priority.UNFINISHED_FOR_TODAY:
+            case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
+            case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
+            case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
+                switch (SETTINGS.assignment_sorting) {
+                    case "Most Work Today First":
+                        // max to min
+                        if (a.todays_work > b.todays_work) return -1;
+                        if (a.todays_work < b.todays_work) return 1;
+                    case "Least Work Today First":
+                        // min to max
+                        if (a.todays_work > b.todays_work) return 1;
+                        if (a.todays_work < b.todays_work) return -1;
+                    case "Most Priority First":
+                        // max to min
+                        if (a.status_priority > b.status_priority) return -1;
+                        if (a.status_priority < b.status_priority) return 1;
+                        break;
+                    case "Least Priority First":
+                        // min to max
+                        if (a.status_priority > b.status_priority) return 1;
+                        if (a.status_priority < b.status_priority) return -1;
+                        break;
+                }
+                break;
         }
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
 
-        if ([Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG].includes(status_value)) {
-            // exact same logic as above
-            // as a note, this will never deal with negative numbers, as a negative
-            // due date means the assignment was already due. so, the status value
-            // will be completely_finished and this if statement won't run
-            if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
-            if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
+        switch (status_value) {
+            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
+            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
+            case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
+                // exact same logic as above
+                // as a note, this will never deal with negative numbers, as a negative
+                // due date means the assignment was already due. so, the status value
+                // will be completely_finished and this if statement won't run
+                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
+                break;
         }
 
         if (a.name < b.name) return -1;
