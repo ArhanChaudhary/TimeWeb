@@ -919,15 +919,49 @@ class Priority {
         
         // Updates open graphs' today line and other graph text
         $(window).trigger("redrawGraphs");
-        that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
-        // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
-        that.highest_priority = Math.max(...that.priority_data_list.map(function(priority_data) {
-            if ([Priority.UNFINISHED_FOR_TODAY, Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW, Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY].includes(priority_data.status_value)) {
-                return priority_data.status_priority;
-            } else {
-                return -Infinity;
+
+        const old_setting = SETTINGS.assignment_sorting;
+        SETTINGS.assignment_sorting = "Most Priority First";
+        that.priority_data_list = that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
+        SETTINGS.assignment_sorting = old_setting;
+
+        // The first assignment will always be the highest priority assignment because ever other assignment is being monotonically scaled down
+        that.highest_priority = that.priority_data_list.find(priority_data => [
+            Priority.UNFINISHED_FOR_TODAY,
+            Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
+            Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
+            Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
+        ].includes(priority_data.status_value));
+        if (that.highest_priority) {
+            that.highest_priority = that.highest_priority.status_priority;
+        } else {
+            that.highest_priority = -Infinity;
+        }
+
+        function scale() {
+            let old_status_priority = that.priority_data_list[0].status_priority;
+            let old_status_value = that.priority_data_list[0].status_value;
+            for (let [i, priority_data] of that.priority_data_list.entries()) {
+                let current_status_priority = priority_data.status_priority;
+                let current_status_value = priority_data.status_value;
+                if (current_status_value !== old_status_value) {
+                    if (current_status_priority > old_status_priority - that.highest_priority * 0.01) {
+                        const scaling_factor = (old_status_priority - that.highest_priority * 0.01) / current_status_priority;
+                        for (let j = i; j < that.priority_data_list.length; j++) {
+                            that.priority_data_list[j].status_priority *= scaling_factor;
+                        }
+                        scale();
+                        return;
+                    }
+                }
+                old_status_priority = current_status_priority;
+                old_status_value = current_status_value;
             }
-        }));
+        }
+        scale();
+        that.priority_data_list = that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
+        // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
+
         let first_available_tutorial_assignment_fallback;
         let first_available_tutorial_assignment;
         $(".delete-gc-assignments-from-class, .autofill-work-done, .delete-starred-assignments").remove();
