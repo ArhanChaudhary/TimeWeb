@@ -539,9 +539,6 @@ class Priority {
             let status_priority;
             let todays_work;
             switch (status_value) {
-                case Priority.COMPLETELY_FINISHED:
-                    status_priority = -index;
-                    break;
                 case Priority.NOT_YET_ASSIGNED:
                     status_priority = today_minus_assignment_date;
                     break;
