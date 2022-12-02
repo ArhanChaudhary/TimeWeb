@@ -706,19 +706,19 @@ class Priority {
             // if something is due today or tomorrow it will already be sorted
             // like that anyways
             case "Soonest Due Date First":
-                // b.due_date_minus_today === undefined: Treat undefined as negative infinity
+                // b.due_date_minus_today === undefined: Treat undefined as positive infinity
 
                 // 5 < 10 => true
-                // undefined < 10 => false (the below makes this true)
+                // 5 < undefined => false (the below makes this true)
                 
                 // 10 > 5 => true
-                // 10 > undefined => false (the below makes this true)
+                // undefined > 5 => false (the below makes this true)
                 
                 // a.due_date_minus_today !== undefined: If both are undefined, skip this check
 
                 // we need a custom lt and gt comparator so we can deal with negative numbers
-                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
-                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
+                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
                 break;
         }
         
@@ -778,8 +778,8 @@ class Priority {
             // as a note, this will never deal with negative numbers, as a negative
             // due date means the assignment was already due. so, the status value
             // will be completely_finished and this if statement won't run
-            if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
-            if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
+            if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+            if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
         }
 
         if (a.name < b.name) return -1;
