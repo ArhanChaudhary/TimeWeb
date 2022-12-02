@@ -787,6 +787,7 @@ class Priority {
             case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
             case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
             case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
+            case Priority.COMPLETELY_FINISHED:
                 // exact same logic as above
                 // as a note, this will never deal with negative numbers, as a negative
                 // due date means the assignment was already due. so, the status value
