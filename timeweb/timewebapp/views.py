@@ -426,6 +426,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 else:
                     # If the assignment or due date cuts off every work input
                     self.sm.works = [str(first_work)]
+                if Decimal(self.sm.works[len_works]) >= self.sm.y:
+                    # ensures assignments don't immediately delete after editing a y value
+                    # less than the last work input
+                    self.sm.dont_hide_again = True
                 
                 # In theory, the ONLY thing that should affect dynamic_start is changing the assignment date
 
