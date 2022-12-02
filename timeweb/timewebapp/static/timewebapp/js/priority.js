@@ -536,16 +536,16 @@ class Priority {
             assignment_container.toggleClass("add-line-wrapper", [Priority.COMPLETELY_FINISHED, Priority.INCOMPLETE_WORKS].includes(status_value))
                                 .toggleClass("delete-this-starred-assignment", delete_starred_assignment_after_sorting);
 
-            let status_priority;
+            let status_priority; // Don't use NaN because NaN === NaN is false for calculations used later
             let todays_work;
             switch (status_value) {
-                case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
-                case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
-                case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
-                    // Don't use NaN because NaN === NaN is false for calculations used later
-                    status_priority = undefined;
-                    break;
-                default:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
+                case Priority.UNFINISHED_FOR_TODAY:
+                case Priority.INCOMPLETE_WORKS:
+                case Priority.NO_WORKING_DAYS:
+                case Priority.FINISHED_FOR_TODAY:
                     // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
                     // However this doesn't happen because the assignment will have been marked have completed in this scenario
                     todays_work = todo * sa.sa.time_per_unit;
