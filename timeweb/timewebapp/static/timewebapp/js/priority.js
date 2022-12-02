@@ -539,9 +539,6 @@ class Priority {
             let status_priority;
             let todays_work;
             switch (status_value) {
-                case Priority.NOT_YET_ASSIGNED:
-                    status_priority = today_minus_assignment_date;
-                    break;
                 case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
                 case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
                 case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
@@ -569,6 +566,7 @@ class Priority {
                 name: sa.sa.name.toLowerCase(),
                 index,
                 todays_work,
+                today_minus_assignment_date,
             }
             that.priority_data_list.push(priority_data);
 
@@ -777,6 +775,10 @@ class Priority {
                         break;
                 }
                 break;
+            case Priority.NOT_YET_ASSIGNED:
+                if (a.today_minus_assignment_date > b.today_minus_assignment_date) return -1;
+                if (a.today_minus_assignment_date < b.today_minus_assignment_date) return 1;
+                break;
         }
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
@@ -819,7 +821,7 @@ class Priority {
     }
     addAssignmentShortcut(dom_assignment, priority_data) {
         const that = this;
-        // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete all assignments of this class"
+        // Loops through every google classroom assignment that needs more info AND has a tag (representing their class) to add "delete assignments of this class"
         // Uses the same below logic for delete starred assignments and autoill work done
 
         // This has to be looped before they are sorted so setInitialAssignmentTopOffset is accurate
