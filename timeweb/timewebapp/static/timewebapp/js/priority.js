@@ -459,16 +459,16 @@ class Priority {
                     status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, false);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
-                const due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                if ([0, 1].includes(due_date_minus_today)) {
+                const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                if ([0, 1].includes(due_date_minus_today_floor)) {
                     if (status_value === Priority.UNFINISHED_FOR_TODAY) {
                         // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
                         // when it in fact displays no useful information
-                        if (due_date_minus_today === 0) {
+                        if (due_date_minus_today_floor === 0) {
                             // hurry the F*CK up >:(
                             that.display_due_today_completion_time = true;
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
-                        } else if (due_date_minus_today === 1) {
+                        } else if (due_date_minus_today_floor === 1) {
                             that.display_due_tomorrow_completion_time = true;
                             if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
                                 status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
@@ -553,9 +553,9 @@ class Priority {
             }
 
             // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
-            if (Number.isFinite(Math.floor(sa.sa.complete_x) - today_minus_assignment_date))
+            if (Number.isFinite(sa.sa.complete_x - today_minus_assignment_date))
                 // define this at the very end in case incrementDueDate is called
-                due_date_minus_today = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                due_date_minus_today = sa.sa.complete_x - today_minus_assignment_date;
             const priority_data = {
                 status_value,
                 status_priority,
