@@ -755,6 +755,10 @@ class Priority {
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
                 switch (SETTINGS.assignment_sorting) {
+                    // For both todays_work and status_priority,
+                    // there will never be a case where one will
+                    // be undefined and another will not be undefined,
+                    // as the status values are the same at this point
                     case "Most Work Today First":
                         // max to min
                         if (a.todays_work > b.todays_work) return -1;
