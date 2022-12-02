@@ -543,13 +543,14 @@ class Priority {
                 case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
                 case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
                 case Priority.UNFINISHED_FOR_TODAY:
+                    todays_work = sa.sa.time_per_unit * todo;
                 case Priority.INCOMPLETE_WORKS:
                 case Priority.NO_WORKING_DAYS:
                 case Priority.FINISHED_FOR_TODAY:
                     // If due times are enabled, it's possible for (sa.sa.complete_x - (sa.sa.blue_line_start - len_works)) to become negative
                     // However this doesn't happen because the assignment will have been marked have completed in this scenario
-                    todays_work = todo * sa.sa.time_per_unit;
-                    status_priority = Priority.todoScalingFunction(todays_work) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+                    status_priority = Priority.todoScalingFunction(sa.sa.time_per_unit * todo) / Priority.dueDateScalingFunction(sa.sa.complete_x - (sa.sa.blue_line_start + len_works));
+                    break;
             }
 
             // due_date_minus_today can be NaN sometimes and break the logic in assignmentSortingComparator
@@ -754,6 +755,9 @@ class Priority {
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
+            case Priority.INCOMPLETE_WORKS:
+            case Priority.NO_WORKING_DAYS:
+            case Priority.FINISHED_FOR_TODAY:
                 switch (SETTINGS.assignment_sorting) {
                     // For both todays_work and status_priority,
                     // there will never be a case where one will
