@@ -944,6 +944,15 @@ class Priority {
             let old_status_priority = that.priority_data_list[0].status_priority;
             let old_status_value = that.priority_data_list[0].status_value;
             for (let [i, priority_data] of that.priority_data_list.entries()) {
+                if (![
+                    // Every status group with a priority percentage
+                    Priority.UNFINISHED_FOR_TODAY,
+                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
+                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
+                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
+                ].includes(priority_data.status_value))
+                    continue;
+
                 let current_status_priority = priority_data.status_priority;
                 let current_status_value = priority_data.status_value;
                 if (current_status_value !== old_status_value && current_status_priority > old_status_priority - that.highest_priority * 0.01) {
