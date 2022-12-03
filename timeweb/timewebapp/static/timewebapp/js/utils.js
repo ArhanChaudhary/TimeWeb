@@ -206,6 +206,9 @@ setClickHandlers: {
                 new VisualAssignment(dom_assignment).initUI();
             }
 
+            if (!dom_assignment.hasClass("open-assignment")) {
+                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement()
+            }
             if ($this.hasClass("slashed")) {
                 dom_assignment.find(".delete-work-input-button").click();
             } else {
@@ -753,11 +756,16 @@ switch (e.key) {
                             assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
                             break;
                         case "0":
+                            if (!dom_assignment.hasClass("open-assignment")) {
+                                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement()
+                            }
                             dom_assignment.find(".work-input-textbox").val("0");
                             dom_assignment.find(".submit-work-button").click();
                             break;
                         case "Backspace":
                         case "s":
+                            // I would animate the arrow for Backspace too but 
+                            // that only works when an assignment is open
                             if (dom_assignment.hasClass("open-assignment")) {
                             switch (e.key) {
                                 case "Backspace":
