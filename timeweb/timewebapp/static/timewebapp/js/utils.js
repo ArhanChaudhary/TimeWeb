@@ -782,6 +782,7 @@ switch (e.key) {
         }
         break;
     case "Escape":
+        // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
         new Crud().hideForm();
         break;
     }
