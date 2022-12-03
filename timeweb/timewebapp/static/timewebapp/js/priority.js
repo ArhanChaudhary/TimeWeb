@@ -941,8 +941,8 @@ class Priority {
         }
 
         function scale() {
-            let old_status_priority = that.priority_data_list[0].status_priority;
-            let old_status_value = that.priority_data_list[0].status_value;
+            let old_status_priority;
+            let old_status_value;
             for (let [i, priority_data] of that.priority_data_list.entries()) {
                 if (![
                     // Every status group with a priority percentage
@@ -955,7 +955,10 @@ class Priority {
 
                 let current_status_priority = priority_data.status_priority;
                 let current_status_value = priority_data.status_value;
-                if (current_status_value !== old_status_value && current_status_priority > old_status_priority - that.highest_priority * 0.01) {
+                // old_status_priority !== undefined because i can't initially define old_status_priority
+                // (and set it to that.priority_data_list[0].status_priority)
+                // this is because [0] may not be unfinished for today
+                if (current_status_value !== old_status_value && old_status_priority !== undefined && current_status_priority > old_status_priority - that.highest_priority * 0.01) {
                     const scaling_factor = (old_status_priority - that.highest_priority * 0.01) / current_status_priority;
                     for (let j = i; j < that.priority_data_list.length; j++) {
                         that.priority_data_list[j].status_priority *= scaling_factor;
