@@ -672,7 +672,7 @@ class Priority {
             });
         }
     }
-    assignmentSortingComparator(a, b) {
+    assignmentSortingComparator(a, b, initial_monotonic_sort) {
         const that = this;
 
         switch (SETTINGS.assignment_sorting) {
@@ -729,6 +729,7 @@ class Priority {
         // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
         // -Not needed anymore because of Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG
         // if (!(sa.sa.is_google_classroom_assignment && sa.sa.needs_more_info)) {
+        if (!initial_monotonic_sort) {
             if (a.has_important_tag) {
                 a_status_value += 0.25;
             }
@@ -741,7 +742,8 @@ class Priority {
             if (b.has_not_important_tag) {
                 b_status_value -= 0.25;
             }
-            // }
+        }
+        // }
 
         // Max to min
         if (a_status_value < b_status_value) return 1;
@@ -922,7 +924,7 @@ class Priority {
 
         const old_setting = SETTINGS.assignment_sorting;
         SETTINGS.assignment_sorting = "Most Priority First";
-        that.priority_data_list = that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
+        that.priority_data_list = that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b, true));
         SETTINGS.assignment_sorting = old_setting;
 
         // The first assignment will always be the highest priority assignment because ever other assignment is being monotonically scaled down
@@ -944,22 +946,20 @@ class Priority {
             for (let [i, priority_data] of that.priority_data_list.entries()) {
                 let current_status_priority = priority_data.status_priority;
                 let current_status_value = priority_data.status_value;
-                if (current_status_value !== old_status_value) {
-                    if (current_status_priority > old_status_priority - that.highest_priority * 0.01) {
-                        const scaling_factor = (old_status_priority - that.highest_priority * 0.01) / current_status_priority;
-                        for (let j = i; j < that.priority_data_list.length; j++) {
-                            that.priority_data_list[j].status_priority *= scaling_factor;
-                        }
-                        scale();
-                        return;
+                if (current_status_value !== old_status_value && current_status_priority > old_status_priority - that.highest_priority * 0.01) {
+                    const scaling_factor = (old_status_priority - that.highest_priority * 0.01) / current_status_priority;
+                    for (let j = i; j < that.priority_data_list.length; j++) {
+                        that.priority_data_list[j].status_priority *= scaling_factor;
                     }
+                    scale();
+                    return;
                 }
                 old_status_priority = current_status_priority;
                 old_status_value = current_status_value;
             }
         }
         scale();
-        that.priority_data_list = that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b));
+        that.priority_data_list = that.priority_data_list.sort((a, b) => that.assignmentSortingComparator(a, b, false));
         // /* Source code lurkers, uncomment this for some fun */function shuffleArray(array) {for (var i = array.length - 1; i > 0; i--) {var j = Math.floor(Math.random() * (i + 1));var temp = array[i];array[i] = array[j];array[j] = temp;}};shuffleArray(that.priority_data_list);
 
         let first_available_tutorial_assignment_fallback;
