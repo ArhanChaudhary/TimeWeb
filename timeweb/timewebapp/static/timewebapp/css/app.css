@@ -158,10 +158,6 @@ main.background-image-exists {
     position: relative;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
 }
 .assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
     transition: none !important;
