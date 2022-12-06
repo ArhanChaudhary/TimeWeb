@@ -271,9 +271,9 @@ class Crud {
                 $(this).on(event, Crud.alertEarlyDueDate);
             })
             that.setCrudHandlers();
-            that.addInfoButtons();
         }, 0);
-
+        
+        that.addInfoButtons();
         if ($(".assignment-form-error-note").length) {
             that.showForm({ show_instantly: true });
         } else {
