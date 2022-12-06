@@ -754,7 +754,7 @@ class Crud {
                 if (Crud.last_removed_deletion_time) {
                     var everything_before = Crud.last_removed_deletion_time;
                 } else {
-                    window.location.href = window.location.pathname;
+                    window.location.href = "/";
                 }
             }
             everything_before = everything_before.valueOf() / 1000;
@@ -772,7 +772,7 @@ class Crud {
                 if (Crud.last_removed_deletion_time) {
                     var everything_after = Crud.last_removed_deletion_time;
                 } else {
-                    window.location.href = window.location.pathname;
+                    window.location.href = "/";
                 }
             }
             everything_after = everything_after.valueOf() / 1000;

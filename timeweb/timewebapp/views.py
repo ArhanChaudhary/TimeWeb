@@ -158,7 +158,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
     def get(self, request):
         self.context['form'] = TimewebForm(request=request)
-        if request.session.pop("view_deleted_assignments_in_app_view", None) or "everything_before" in request.GET or "everything_after" in request.GET:
+        if request.path == reverse("deleted_assignments"):
             self.add_user_models_to_context(request, view_hidden=True)
             self.context["view_deleted_assignments_in_app_view"] = True
         else:
@@ -250,7 +250,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
         if self.sm.x:
             self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
-
         if not self.sm.funct_round:
             self.sm.funct_round = Decimal(1)
         if self.sm.y != None and self.sm.y < 1:
@@ -483,7 +482,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if field == "works" and getattr(old_data, field)[0] != getattr(self.sm, field)[0] or getattr(old_data, field) != getattr(self.sm, field):
                     request.session['refresh_dynamic_mode'] = self.sm.pk
                     break
-        return redirect(request.path_info)
+        return redirect("home")
 
     def invalid_form(self, request):
         logger.info(f"User \"{request.user}\" submitted an invalid form")
@@ -501,7 +500,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form.data.urlencode() # TimewebForm is not json serializable
         request.session['invalid_form_context'] = self.context
-        return redirect(request.path_info)
+        return redirect("home")
 
 try:
     EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)

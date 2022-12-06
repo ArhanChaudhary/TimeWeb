@@ -82,8 +82,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
     def valid_form(self, request):
         if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
             api.gc_auth_disable(request, save=False)
-        if self.form.cleaned_data.get("view_deleted_assignments"):
-            request.session["view_deleted_assignments_in_app_view"] = True
         if any(getattr(self.old_data, field) != getattr(self.form.instance, field) for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS):
             request.session["refresh_dynamic_mode_all"] = True
         self.form.save()
@@ -91,7 +89,10 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
 
         if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in request.user.settingsmodel.oauth_token:
             return redirect(api.gc_auth_enable(request, next_url="home", current_url="settings"))
-        return redirect("home")
+        if self.form.cleaned_data.get("view_deleted_assignments"):
+            return redirect("deleted_assignments")
+        else:
+            return redirect("home")
     
     def invalid_form(self, request):
         self.context['form'] = self.form
