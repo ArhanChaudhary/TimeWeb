@@ -5,7 +5,7 @@
 # Abstractions
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import gettext as _
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.contrib.auth import logout, login
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -170,7 +170,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.context['refresh_dynamic_mode'] = request.session.pop("refresh_dynamic_mode")
 
             if invalid_form_context := request.session.pop('invalid_form_context', None):
-                form = TimewebForm(data=invalid_form_context['form'], request=request)
+                form = TimewebForm(data=QueryDict(invalid_form_context['form']), request=request)
                 assert not form.is_valid(), f"{form.data}, {form.errors}"
                 for field in form.errors:
                     form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + 'invalid'
@@ -491,7 +491,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         elif self.updated_assignment:
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Edit Assignment'
-        self.context['form'] = self.form.data # TimewebForm is not json serializable
+        self.context['form'] = self.form.data.urlencode() # TimewebForm is not json serializable
         request.session['invalid_form_context'] = self.context
         return redirect(request.path_info)
 
