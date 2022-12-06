@@ -6,7 +6,11 @@ window.assert = function(condition, message) {
 }
 window.addEventListener("pageshow", function(e) {
     if (e.persisted || window.performance?.getEntriesByType("navigation")[0].type === "back_forward") {
-        document.querySelector("main").classList.remove("loading");
+        if (RELOAD_VIEWS.includes(window.location.pathname)) {
+            window.location.reload();
+        } else {
+            document.querySelector("main").classList.remove("loading");
+        }
     }
 });
 window.addEventListener("beforeunload", function() {

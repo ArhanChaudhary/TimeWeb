@@ -1,8 +1,12 @@
 from django.urls import path
-from . import views
 from django.conf import settings
 
+RELOAD_VIEWS = ('home', 'deleted_assignments', )
+
+from . import views
+
 urlpatterns = [
+    # if I add any views make sure to change RELOAD_VIEWS
     path('', views.TimewebView.as_view(),name='home'),
     path('example', views.ExampleAccountView.as_view(), name='example'),
 ]

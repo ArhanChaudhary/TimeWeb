@@ -20,6 +20,7 @@ from django.conf import settings
 from common.models import User
 from .models import TimewebModel
 from navbar.models import SettingsModel
+from .urls import RELOAD_VIEWS
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
 from common.views import logger, CHANGELOGS
@@ -30,7 +31,13 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from common.utils import days_between_two_dates, utc_to_local, calc_mod_days, get_client_ip, minutes_to_hours, hours_to_minutes, safe_conversion
+from common.utils import (days_between_two_dates, 
+                        utc_to_local,
+                        calc_mod_days,
+                        get_client_ip,
+                        minutes_to_hours,
+                        hours_to_minutes,
+                        safe_conversion)
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
@@ -80,6 +87,7 @@ def append_default_context(request):
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
+        "RELOAD_VIEWS": list(map(lambda x: reverse(x), RELOAD_VIEWS)),
     }
     if request.session.pop("gc-init-failed", None):
         context["GC_API_INIT_FAILED"] = True
