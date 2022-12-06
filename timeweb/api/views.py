@@ -504,7 +504,7 @@ def gc_auth_disable(request, *, save=True):
 def gc_auth_callback(request):
     # Fail it early (for debugging
     # request.session['gc-init-failed'] = True
-    # return redirect(reverse("home"))
+    # return redirect("home")
 
     # Callback URI
     state = request.GET.get('state')
