@@ -256,7 +256,8 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper .field-widget-checkbox:not(#id_soft) {
     position: absolute;
-    left: -100vw;
+    /* don't use left: -100vw; because it breaks on smaller vws */
+    left: -9999px;
 }
 #form-wrapper .field-widget {
     cursor: pointer;
