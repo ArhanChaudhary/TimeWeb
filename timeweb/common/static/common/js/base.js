@@ -4,22 +4,17 @@ window.assert = function(condition, message) {
         throw new Error(message || "Assertion failed");
     }
 }
+window.addEventListener("pageshow", function(e) {
+    if (e.persisted || window.performance?.getEntriesByType("navigation")[0].type === "back_forward") {
+        document.querySelector("main").classList.remove("loading");
+    }
+});
 window.addEventListener("beforeunload", function() {
     if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
     // setTimeout to ensure .scrollTop to record the scroll position is run before this
     setTimeout(function() {
         if (window.disable_loading) return; // window.disable_loading is set to true by other beforeunload handlers
-        document.querySelectorAll("main > *").forEach(e => {
-            e.style.display = "none";
-        });
-        document.getElementsByTagName("main")[0].style.display = "flex";
-        document.getElementsByTagName("main")[0].style.justifyContent = "center";
-        document.getElementsByTagName("main")[0].style.alignItems = "center";
-        if (document.getElementById("background-image")) document.getElementById("background-image").style.display = "block";
-        if (document.getElementById("circles-background"))
-            document.getElementById("circles-background").style.display = "block";
-        else 
-            document.getElementById("loading-container").style.display = "contents";
+        document.querySelector("main").classList.add("loading");
     }, 0);
 });
 function setVh() {

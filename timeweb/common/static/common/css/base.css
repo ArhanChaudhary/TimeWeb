@@ -149,6 +149,25 @@ textarea
     --x: -0.7071;
     --y: 0.7071;
 }
+
+main.loading > * {
+    display: none !important;
+}
+main.loading {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+main.loading #background-image {
+    display: block !important;
+}
+main.loading #circles-background {
+    display: block !important;
+}
+main.loading #loading-container {
+    display: contents !important;
+}
+
 @-webkit-keyframes animateLoading {
     from {
         background: hsl(0, 0%, 50%);
