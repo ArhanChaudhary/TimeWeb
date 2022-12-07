@@ -774,6 +774,9 @@ class Priority {
                         if (a.todays_work > b.todays_work) return 1;
                         if (a.todays_work < b.todays_work) return -1;
                     case "Most Priority First":
+                    case "Tag Name A-Z":
+                    case "Tag Name Z-A":
+                    case "Soonest Due Date First":
                         // max to min
                         if (a.status_priority > b.status_priority) return -1;
                         if (a.status_priority < b.status_priority) return 1;
