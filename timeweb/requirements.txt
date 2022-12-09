@@ -1,7 +1,7 @@
 asgiref==3.4.1
 beautifulsoup4==4.11.1
 cachetools==4.2.2
-certifi==2021.5.30
+certifi==2022.12.7
 cffi==1.15.0
 chardet==4.0.0
 charset-normalizer==2.0.4
