@@ -34,11 +34,10 @@ from httplib2.error import ServerNotFoundError
 from django.db import transaction
 from common.utils import days_between_two_dates, utc_to_local
 from common.views import logger
-from django.utils.decorators import decorator_from_middleware
-from .middleware import APIValidationMiddleware
 from django.views.decorators.http import require_http_methods
 from re import sub as re_sub, IGNORECASE
 from math import floor
+# Reminder: do NOT use decorator_from_middleware, as it is only for old-style django middlewares
 
 # Unused but I'll keep it here just in case
 
@@ -59,7 +58,6 @@ from math import floor
 #     return HttpResponse(status=204)
 
 @require_http_methods(["POST"])
-@decorator_from_middleware(APIValidationMiddleware)
 def delete_assignment(request):
     assignments = request.POST.getlist('assignments[]')
     if {"false": False, None: False, "true": True}[request.POST.get("actually_delete")]:
@@ -76,7 +74,6 @@ def delete_assignment(request):
     return HttpResponse(status=204)
     
 @require_http_methods(["PATCH"])
-@decorator_from_middleware(APIValidationMiddleware)
 def restore_assignment(request):
     data = QueryDict(request.body)
     assignments = data.getlist('assignments[]')
@@ -85,7 +82,6 @@ def restore_assignment(request):
     return HttpResponse(status=204)
     
 @require_http_methods(["PATCH"])
-@decorator_from_middleware(APIValidationMiddleware)
 def save_assignment(request):
     data = QueryDict(request.body)
     assignments = json.loads(data['batchRequestData'])
@@ -123,7 +119,6 @@ def save_assignment(request):
     return HttpResponse(status=204)
 
 @require_http_methods(["PATCH"])
-@decorator_from_middleware(APIValidationMiddleware)
 def change_setting(request):
     data = QueryDict(request.body)
     setting = data['setting']
@@ -157,7 +152,6 @@ def change_setting(request):
     return HttpResponse(status=204)
 
 @require_http_methods(["POST"])
-@decorator_from_middleware(APIValidationMiddleware)
 def tag_add(request):
     pk = request.POST['pk']
     sm = get_object_or_404(TimewebModel, pk=pk)
@@ -177,7 +171,6 @@ def tag_add(request):
     return HttpResponse(status=204)
 
 @require_http_methods(["DELETE"])
-@decorator_from_middleware(APIValidationMiddleware)
 def tag_delete(request):
     data = QueryDict(request.body)
 
@@ -198,6 +191,10 @@ def tag_delete(request):
 
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
+
+@require_http_methods(["POST"])
+def evalulate_current_state(request):
+    pass
 
 def simplify_course_name(tag_name):
     abbreviations = [
@@ -290,7 +287,6 @@ def simplify_course_name(tag_name):
     return tag_name
 
 @require_http_methods(["POST"])
-@decorator_from_middleware(APIValidationMiddleware)
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
     # we want to be able to alert the user if their credentials for listing courses is invalid
@@ -326,7 +322,6 @@ def simplify_courses(courses):
             } for course in courses if course["courseState"] != "ARCHIVED"]
 
 @require_http_methods(["POST"])
-@decorator_from_middleware(APIValidationMiddleware)
 def create_gc_assignments(request):
     if 'token' not in request.user.settingsmodel.oauth_token: return HttpResponse(status=401)
     # The file token.json stores the user's access and refresh tokens, and is
@@ -500,12 +495,14 @@ def gc_auth_disable(request, *, save=True):
         request.user.settingsmodel.save()
 
 @require_http_methods(["GET"])
-@decorator_from_middleware(APIValidationMiddleware)
 def gc_auth_callback(request):
     # Fail it early (for debugging
     # request.session['gc-init-failed'] = True
     # return redirect("home")
-
+    def callback_failed():
+        request.session['gc-init-failed'] = True
+        del request.session["gc-callback-next-url"]
+        return redirect(request.session.pop("gc-callback-current-url"))
     # Callback URI
     state = request.GET.get('state')
 
@@ -524,17 +521,13 @@ def gc_auth_callback(request):
     except (InvalidGrantError, AccessDeniedError):
         # InvalidGrantError If the user needs parental permission and then clicks cancel
         # AccessDeniedError If the user reloads (dont remember how but it has happened)
-        request.session['gc-init-failed'] = True
-        del request.session["gc-callback-next-url"]
-        return redirect(request.session.pop("gc-callback-current-url"))
+        return callback_failed()
     try:
         credentials = flow.credentials
     except ValueError:
         # ValueError at /api/gc-auth-callback
         # There is no access token for this session, did you call fetch_token?
-        request.session['gc-init-failed'] = True
-        del request.session["gc-callback-next-url"]
-        return redirect(request.session.pop("gc-callback-current-url"))
+        return callback_failed()
 
     try:
         # Ensure the user enabled both scopes
@@ -552,9 +545,7 @@ def gc_auth_callback(request):
         # Let's use type instead of isinstance because I want an exact exception class match
         if type(e) is OAuth2Error or type(e) is HttpError and e.resp.status == 403:
             # In case users deny a permission or don't input a code in the url or cancel
-            request.session['gc-init-failed'] = True
-            del request.session["gc-callback-next-url"]
-            return redirect(request.session.pop("gc-callback-current-url"))
+            return callback_failed()
     courses = courses.get('courses', [])
     request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
