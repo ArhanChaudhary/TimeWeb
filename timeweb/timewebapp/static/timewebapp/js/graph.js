@@ -154,7 +154,33 @@ class Assignment {
         this.sa.alert_due_date_incremented = true;
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
     }
-    getWorkingDaysRemaining(params={reference: null, floor_due_time: false}) {
+    getWorkingDaysRemaining(params={reference: null, floor_due_time: false, diffcheck: false}) {
+        if (params.diffcheck) {
+            let working_days = 0;
+            let diff;            
+            let len_works = this.sa.works.length - 1;
+            // First point the red line is drawn on, taken from draw()
+            // If in fixed mode, choose this anyways
+            let i = this.sa.blue_line_start + len_works;
+            let this_funct;
+            let next_funct = this.funct(i);
+            for (; i < (params.floor_due_time ? Math.floor(this.sa.complete_x) : this.sa.x); i++) {
+                if (this.sa.break_days.includes((this.assign_day_of_week + i) % 7)) {
+                    continue;
+                }
+
+                this_funct = next_funct;
+                next_funct = this.funct(i + 1);
+                diff = mathUtils.sigFigSubtract(next_funct, this_funct);
+                if (diff !== 0) {
+                    working_days++;
+                    if (next_funct === this.sa.y) {
+                        break;
+                    }
+                }
+            }
+            return working_days;
+        }
         const original_red_line_start_x = this.red_line_start_x;
         switch (params.reference) {
             case "today": {
