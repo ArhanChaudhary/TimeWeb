@@ -113,6 +113,7 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'api.middleware.CatchRequestDataTooBig',
 
+    'common.middleware.LogoutExampleAccount',
     'common.middleware.DefineIsExampleAccount',
     'common.middleware.CommonRatelimit',
     'api.middleware.APIValidationMiddleware',

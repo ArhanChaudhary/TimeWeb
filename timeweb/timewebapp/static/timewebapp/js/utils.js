@@ -1323,6 +1323,7 @@ for (let sa of dat) {
         sa.break_days = sa.break_days.map(break_day => (break_day + x_transform) % 7);
     }
 };
+sessionStorage.setItem("login_email", ACCOUNT_EMAIL);
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {

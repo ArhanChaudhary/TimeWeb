@@ -1,7 +1,10 @@
 from django.urls import path
 from django.conf import settings
 
-RELOAD_VIEWS = ('home', 'deleted_assignments', )
+RELOAD_VIEWS = ('home', 'deleted_assignments', 'account_login', ) # account_login must be the last one so base.js can reload
+KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS = ("home", "example", "settings", "deleted_assignments",
+    "user_guide", "account_change_password", "reset_username", "account_email", 
+    "socialaccount_connections", "serviceworker")
 
 from . import views
 

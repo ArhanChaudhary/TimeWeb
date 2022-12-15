@@ -6,9 +6,14 @@ window.assert = function(condition, message) {
 }
 window.addEventListener("pageshow", function(e) {
     if (e.persisted || window.performance?.getEntriesByType("navigation")[0].type === "back_forward") {
-        if (RELOAD_VIEWS.includes(window.location.pathname)) {
+        // We have to reload at account login in case a user goes back from the account page to the login page
+        // This will mess up the csrf token, so we reload the page to get a new one
+        let exclude_login_route = RELOAD_VIEWS.slice(0, -1);
+        let login_route = RELOAD_VIEWS[RELOAD_VIEWS.length - 1];
+        if (exclude_login_route.includes(window.location.pathname) || login_route === window.location.pathname && sessionStorage.getItem("login_email") === EXAMPLE_ACCOUNT_EMAIL) {
             window.location.reload();
         } else {
+            if (window.ajaxUtils) window.ajaxUtils.silence_errors = false;
             document.querySelector("main").classList.remove("loading");
         }
     }

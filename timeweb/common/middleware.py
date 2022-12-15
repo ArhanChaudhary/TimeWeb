@@ -1,12 +1,23 @@
 from django.conf import settings
 from django.urls import resolve
+from django.contrib.auth import logout
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
 from .utils import get_client_ip
 from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
+from timewebapp.urls import KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS
 
 DEFAULT_GLOBAL_RATELIMIT = "5/s"
+class LogoutExampleAccount:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if resolve(request.path_info).url_name not in KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS and request.user.is_authenticated and request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
+            logout(request)
+        return self.get_response(request)
+
 class DefineIsExampleAccount:
     def __init__(self, get_response):
         self.get_response = get_response
