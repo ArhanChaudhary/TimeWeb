@@ -1,4 +1,5 @@
-from django.shortcuts import render
+import re
+from django.shortcuts import redirect
 from ratelimit.exceptions import Ratelimited
 from django.http import HttpResponseForbidden, HttpResponse
 from django.conf import settings
@@ -11,13 +12,16 @@ from decimal import Decimal
 def get_client_ip(group, request):
     if 'HTTP_CF_CONNECTING_IP' in request.META:
         return request.META['HTTP_CF_CONNECTING_IP']
-    logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
+    if not settings.DEBUG:
+        logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
     return request.META['REMOTE_ADDR']
 
 def _403_csrf(request, reason=""):
-    response = render(request, "common/403_csrf.html", {"request": request})
-    response.status_code = 403
-    return response
+    # https://stackoverflow.com/questions/8508602/check-if-request-is-ajax-in-python/67734999#67734999
+    is_html_request = re.search(r'^text/html', request.META.get('HTTP_ACCEPT'))
+    if not is_html_request: # is ajax
+        return HttpResponse("Your login session has expired or is invalid. Please refresh the page and then try again. Here's a cookie 🍪 to cheer you up.", status=403)
+    return redirect("account_login")
 
 def _403_or_429(request, exception=None):
     if isinstance(exception, Ratelimited):
