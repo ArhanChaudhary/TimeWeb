@@ -15,7 +15,7 @@
             const EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
             const CREATING_GC_ASSIGNMENTS_FROM_FRONTEND = {% if CREATING_GC_ASSIGNMENTS_FROM_FRONTEND %}true{% else %}false{% endif %};
             const VIEWING_DELETED_ASSIGNMENTS = {% if view_deleted_assignments_in_app_view %}true{% else %}false{% endif %};
-            const RELOAD_VIEWS = [{% for view in RELOAD_VIEWS %}"/{{ view }}", {% endfor %}];
+            const RELOAD_VIEWS = [{% for view in RELOAD_VIEWS %}"{{ view }}", {% endfor %}];
 
             {
                 let csp_failure = false;
