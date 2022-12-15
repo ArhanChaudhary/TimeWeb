@@ -506,10 +506,14 @@ try:
     EXAMPLE_ACCOUNT_MODEL = User.objects.get(email=settings.EXAMPLE_ACCOUNT_EMAIL)
 except:
     EXAMPLE_ACCOUNT_MODEL = None
-class ExampleAccountView(View):
+class ExampleAccountView(TimewebView):
+    # Ignore LoginRequiredMixin
+    def dispatch(self, *args, **kwargs):
+        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
+
     def get(self, request):
         if EXAMPLE_ACCOUNT_MODEL is not None:
             if request.user.is_authenticated:
                 logout(request)
             login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
-        return redirect("home")
+        return super(ExampleAccountView, self).get(request)
