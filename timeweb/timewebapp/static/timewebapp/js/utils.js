@@ -971,6 +971,7 @@ saveAndLoadStates: function() {
     // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
     // Use beforeunload instead of unload or else the loading screen triggers and $("#assignments-container").scrollTop() becomes 0
     $(window).on('beforeunload', function() {
+        sessionStorage.setItem("login_email", ACCOUNT_EMAIL);
         if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
@@ -1323,7 +1324,6 @@ for (let sa of dat) {
         sa.break_days = sa.break_days.map(break_day => (break_day + x_transform) % 7);
     }
 };
-sessionStorage.setItem("login_email", ACCOUNT_EMAIL);
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {

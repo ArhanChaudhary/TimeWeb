@@ -17,6 +17,7 @@ window.addEventListener("pageshow", function(e) {
             document.querySelector("main").classList.remove("loading");
         }
     }
+    sessionStorage.removeItem("login_email");
 });
 window.addEventListener("beforeunload", function() {
     if (window.ajaxUtils) window.ajaxUtils.silence_errors = true;
