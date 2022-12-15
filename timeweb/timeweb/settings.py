@@ -115,7 +115,7 @@ MIDDLEWARE = [
 
     'common.middleware.DefineIsExampleAccount',
     'common.middleware.CommonRatelimit',
-    # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
+    'api.middleware.APIValidationMiddleware',
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 
     # Even though cloudflare has an html minfier, let's instead use our own so the debug and non debug versions' html stays consistent
