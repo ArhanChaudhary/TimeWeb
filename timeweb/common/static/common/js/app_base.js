@@ -130,7 +130,7 @@ error: function(response, textStatus) {
             content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
             break;
         default:
-            title = `<p>Whoops, we've encountered an error${textStatus === "error" ? "" : ` of type "${textStatus}"`} while trying to connect with the server:</p>${response.responseText||response.statusText}`;
+            title = `Whoops, we've encountered an error${textStatus === "error" ? "" : ` of type "${textStatus}"`} while trying to connect with the server:<br><br>${response.responseText||response.statusText}`;
     }
     $.alert({
         title: title,
