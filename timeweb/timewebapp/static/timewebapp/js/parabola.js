@@ -348,13 +348,7 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function (point_1, point_
     return { a, b };
 }
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 1000;
-Assignment.THIRD_POINT_STEP = 0.01;
-// this NEEDS to be really really big
-// lets say x1_from_blue_line_start is 1800, and so x2 is 1799.99
-// If I put a lower weight, y2 can be something like 598.3 instead of 599.88
-// this tiny difference of 1 unit of work is magnified because it is over 0.01 in the x axis,
-// leading to absurd curvature values
-Assignment.MATRIX_ENDS_WEIGHT = 10000000;
+Assignment.MATRIX_ENDS_WEIGHT = 100000;
 
 // There is a deadlock netween autotuneSkewRatioIfInDynamicMode and setDynamicStartInDynamicMode:
 // When dynamic start is set, skew ratio needs to be re-autotuned
@@ -557,22 +551,50 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         Thankfully, the efforts put into WLS aren't in vain. Perhaps we can find a better way
         to transfer the WLS curvature to the red line...
 
-        as a reminder, the red line needs only one more control point to create a
-        complete parabola. What if we use (x-0.01, f(x-0.01)) on the green line as our 
-        third point?
+        We want a parabola where the derivative at the due date is the same for both lines. It turns out,
+        That is enough information to create a unique parabola! Here's how we do it:
 
-        the precise logic of translating the parabola and untranslating it is hard to wrap
-        your head around, so I've created a desmos graph to clearly demonstrate how this works
-        https://www.desmos.com/calculator/fxznq4cjka
+        let x = x1_from_blue_line_start
+        let y = y1_from_blue_line_start
+        let x1 = this.sa.complete_x - this.red_line_start_x
+        let y1 = this.sa.complete_x - this.sa.works[0]
+        let a = a
+        let b = b
+        let a1 = new a
+        let b1 = new b
 
-        Notice the three points that form the red line (in this case colored purple) — the
-        green point, the black point, and the red point right next to the black point
-        (bit hard to see):
-        https://cdn.discordapp.com/attachments/836818352160243722/991803369347883008/unknown.png
+        Since the derivative is a constant, let's make it a variable for simplicity. Use the parabola from
+        the origin to (x, y) as the dervative is 2ax + b and we dont have the new a and b yet:
+        s = 2ax + b
+
+        We want the derivative at the due date to be the same for both lines, so we can set the derivative
+        of the new parabola to the derivative of the old parabola:
+        2(a1)x1 + b1 = s
+
+        And we can now create a system of equations to find the new a and b:
+        2(a1)x1 + b1 = s
+        (a1)(x1)^2 + (b1)(x1) = y1
+
+        We can now solve for a1 and b1:
+        b1 = s - 2(a1)x1
+        (a1)(x1)^2 + (s - 2(a1)x1)(x1) = y1
+        (a1)(x1)^2 + s(x1) - 2(a1)(x1)^2 = y1
+        -(a1)(x1)^2 + s(x1) = y1
+        -(a1)(x1)^2 = y1 - s(x1)
+        (a1)(x1)^2 = s(x1) - y1
+        a1 = (s(x1) - y1)/(x1)^2
+
+        b1 = s - 2(a1)x1
+        b1 = s - 2((s(x1) - y1)/(x1)^2)x1
+        b1 = s - 2(s(x1) - y1)/(x1)
+        b1 = s + 2(y1 - s(x1))/(x1)
+        b1 = s + (2(y1) - 2s(x1))/(x1)
+        b1 = s + 2(y1)/(x1) - 2s(x1)/(x1)
+        b1 = s - 2s + 2(y1)/(x1)
+        b1 = 2(y1)/(x1) - s
+
+        Test casing: https://www.desmos.com/calculator/pfpb5x0hsc
         */
-
-        let x2 = x1_from_blue_line_start - Assignment.THIRD_POINT_STEP;
-        let y2 = x2 * (a * x2 + b);
 
         // Change the scope of the skew ratio to x1 ("transfer" the skew ratio value from
         // x1_from_blue_line_start to x1)
@@ -587,12 +609,12 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
             x1 = Math.ceil(x1);
         }
 
-        // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
-        // y1_from_blue_line_start - y1 simplifies to red_line_start_y - works[0]
-        // Translate the point to the scope of x1
-        x2 -= x1_from_blue_line_start - x1;
-        y2 -= y1_from_blue_line_start - y1;
-        const parabola = this.calcAandBfromOriginAndTwoPoints([x2, y2], [x1, y1]);
+        let slope = 2 * a * x1_from_blue_line_start + b;
+        const parabola = {
+            // https://www.desmos.com/calculator/pfpb5x0hsc
+            a: (x1_from_blue_line_start * slope - y1_from_blue_line_start) / Math.pow(x1_from_blue_line_start, 2),
+            b: 2 * y1_from_blue_line_start / x1_from_blue_line_start - slope,
+        };
         autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
 
         // Zero division somewhere
