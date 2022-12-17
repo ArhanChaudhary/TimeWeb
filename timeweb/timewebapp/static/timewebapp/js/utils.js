@@ -1340,10 +1340,11 @@ document.addEventListener("DOMContentLoaded", function() {
         setInterval(() => {
             utils.ui.tickClock();
             minuteCounter++;
-            if (minuteCounter === 60) {
-                $(window).trigger("resize");
-                minuteCounter = 0;
-            }
+            if (minuteCounter !== 60) return;
+
+            $(window).trigger("resize");
+            minuteCounter = 0;
+            if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
         }, 60 * 1000);
     }, secondsRemaining);
 });
