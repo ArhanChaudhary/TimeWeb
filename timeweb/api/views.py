@@ -465,6 +465,11 @@ def create_gc_assignments(request):
     if not gc_models_to_create: return HttpResponse(status=204)
     TimewebModel.objects.bulk_create(gc_models_to_create)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
+
+    device_uuid = request.POST['device_uuid']
+    request.user.settingsmodel.device_uuid = device_uuid
+    request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()
+
     request.user.settingsmodel.save()
 
     request.session["already_created_gc_assignments_from_frontend"] = True
