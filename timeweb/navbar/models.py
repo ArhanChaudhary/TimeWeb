@@ -198,5 +198,14 @@ class SettingsModel(models.Model):
         null=True,
         blank=True,
     )
+    device_uuid = models.CharField(
+        max_length=8,
+        null=True,
+        blank=True,
+    )
+    device_uuid_api_timestamp = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
     def __str__(self):
         return self.user.username

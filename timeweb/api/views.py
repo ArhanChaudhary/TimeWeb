@@ -193,8 +193,16 @@ def tag_delete(request):
     return HttpResponse(status=204)
 
 @require_http_methods(["POST"])
-def evalulate_current_state(request):
-    pass
+def evaluate_current_state(request):
+    same_device = request.POST['device_uuid'] == request.user.settingsmodel.device_uuid
+    if same_device:
+        return HttpResponse(status=200)
+
+    created_tab_after_last_api_call = int(request.POST['tab_creation_time'], 10)/1000 > request.user.settingsmodel.device_uuid_api_timestamp.timestamp()
+    if created_tab_after_last_api_call:
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=205)
 
 def simplify_course_name(tag_name):
     abbreviations = [

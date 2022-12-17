@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (ajaxUtils?.disable_ajax) {
             options.success?.();
             jqXHR.abort();
+            return;
         }
+        if (!options.url.startsWith("/api")) return;
+        options.data = $.param($.extend(originalOptions.data, {device_uuid: window.DEVICE_UUID, tab_creation_time: window.TAB_CREATION_TIME}));
     });
 });
 $(function() {
@@ -329,6 +332,31 @@ saveAssignment: function(batchRequestData) {
             }
             ajaxUtils.error.bind(this)(...arguments);
         },
+    });
+},
+evaluateCurrentState: function() {
+    $.ajax({
+        type: "POST",
+        url: "/api/evalulate-current-state",
+        success: function(response, textStatus, jqXHR) {
+            if (!jqXHR) return; // In case manually called
+            if (jqXHR.status !== 205 || ajaxUtils.evaluateCurrentState.showing_alert) return;
+            ajaxUtils.evaluateCurrentState.showing_alert = true;
+            $.alert({
+                title: "Your assignments are outdated.",
+                content: "You have modified your assignments on a different tab or device. Please reload the page to refresh your assignments.",
+                backgroundDismiss: false,
+                buttons: {
+                    reload: {
+                        action: reloadWhenAppropriate,
+                    },
+                },
+                onDestroy: function() {
+                    delete ajaxUtils.evaluateCurrentState.showing_alert;
+                },
+            });
+        },
+        error: ajaxUtils.error,
     });
 },
 }
