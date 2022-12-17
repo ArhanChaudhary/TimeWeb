@@ -604,10 +604,6 @@ class Priority {
         const success = function() {
             new Crud().transitionDeleteAssignment($(".assignment-container.delete-this-starred-assignment > .assignment"));
         }
-        if (ajaxUtils.disable_ajax) {
-            success();
-            return;
-        }
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",

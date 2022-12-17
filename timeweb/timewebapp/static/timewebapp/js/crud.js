@@ -876,10 +876,6 @@ class Crud {
         const success = function() {
             that.transitionDeleteAssignment(dom_assignment);
         }
-        if (ajaxUtils.disable_ajax) {
-            success();
-            return;
-        }
         const sa = utils.loadAssignmentData($button);
         if (params.restore)
             $.ajax({

@@ -4,6 +4,12 @@ document.addEventListener("DOMContentLoaded", function() {
             'X-CSRFToken': $("input[name=\"csrfmiddlewaretoken\"]").first().val()
         },
     });
+    $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+        if (ajaxUtils?.disable_ajax) {
+            options.success?.();
+            jqXHR.abort();
+        }
+    });
 });
 $(function() {
     // likely not needed (?)
@@ -154,7 +160,6 @@ error: function(response, textStatus) {
     });
 },
 changeSetting: function(kwargs={}) {
-    if (ajaxUtils.disable_ajax) return;
     $.ajax({
         type: "PATCH",
         url: "/api/change-setting",
@@ -176,7 +181,7 @@ changeSetting: function(kwargs={}) {
     });
 },
 createGCAssignments: function() {
-    if (ajaxUtils.disable_ajax || !CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
+    if (!CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
     $.ajax({
         type: "POST",
         url: '/api/create-gc-assignments',
@@ -208,6 +213,7 @@ createGCAssignments: function() {
         },
         success: function(response, textStatus, jqXHR) {
             ajaxUtils.updateGCCourses();
+            if (!jqXHR) return; // In case manually called
             switch (jqXHR.status) {
                 case 204:
                     break;
@@ -252,8 +258,6 @@ updateGCCourses: function() {
     });
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
-    if (ajaxUtils.disable_ajax) return;
-
     switch (batchCallbackName) {
         case "changeSetting": {
             if (!ajaxUtils.batchRequest[batchCallbackName]) {

@@ -302,10 +302,6 @@ setClickHandlers: {
         const success = function() {
             new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
         }
-        if (ajaxUtils.disable_ajax) {
-            success();
-            return;
-        }
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",
@@ -367,12 +363,6 @@ setClickHandlers: {
             params.$this.off("click");
             new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
         }
-
-        if (ajaxUtils.disable_ajax) {
-            success();
-            return;
-        }
-
         const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
             return utils.loadAssignmentData($(this)).id;
         }).toArray();
@@ -623,7 +613,6 @@ addTagHandlers: function() {
             tag_wrapper.remove();
         });
         $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
-        if (ajaxUtils.disable_ajax) return;
         $.ajax({
             type: "DELETE",
             url: "/api/tag-delete",
