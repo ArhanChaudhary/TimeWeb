@@ -513,9 +513,7 @@ addTagHandlers: function() {
                 });
             }            
             // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
-            if (ajaxUtils.disable_ajax || !tag_names.size) return;
-            
-            tag_names = new Set();
+            if (!tag_names.size) return;
             $.ajax({
                 type: "POST",
                 url: "/api/tag-add",
