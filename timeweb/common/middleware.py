@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import resolve
+from django.http import QueryDict
 from django.contrib.auth import logout
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
@@ -24,6 +25,17 @@ class DefineIsExampleAccount:
 
     def __call__(self, request):
         request.isExampleAccount = request.user.is_authenticated and request.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
+        return self.get_response(request)
+
+class DefineUTCOffset:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.method == "POST":
+            request.utc_offset = request.POST.get("utc_offset")
+        elif request.method in ("DELETE", "PATCH"):
+            request.utc_offset = QueryDict(request.body).get("utc_offset")
         return self.get_response(request)
 
 class CommonRatelimit:

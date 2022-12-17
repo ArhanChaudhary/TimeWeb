@@ -1,4 +1,5 @@
 import re
+import pytz
 from django.shortcuts import redirect
 from ratelimit.exceptions import Ratelimited
 from django.http import HttpResponseForbidden, HttpResponse
@@ -57,10 +58,8 @@ def safe_conversion(value, factor):
     return Decimal(ret)
 
 def utc_to_local(request, utctime):
-    if request.user.is_authenticated and request.user.settingsmodel.timezone:
-        return utctime.astimezone(request.user.settingsmodel.timezone)
-    else:
-        return timezone.localtime(utctime)
+    assert request.user.settingsmodel.timezone or request.utc_offset, "User must have a timezone or utc_offset"
+    return utctime.astimezone(pytz.timezone(request.user.settingsmodel.timezone or request.utc_offset))
 
 def app_static_factory(app_name):
     def app_static(url_path):

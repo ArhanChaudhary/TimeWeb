@@ -11,7 +11,11 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         if (!options.url.startsWith("/api")) return;
-        options.data = $.param($.extend(originalOptions.data, {device_uuid: window.DEVICE_UUID, tab_creation_time: window.TAB_CREATION_TIME}));
+        options.data = $.param($.extend(originalOptions.data, {
+            device_uuid: window.DEVICE_UUID,
+            tab_creation_time: window.TAB_CREATION_TIME,
+            utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }));
     });
 });
 $(function() {

@@ -741,11 +741,16 @@ class Crud {
                 e.preventDefault();
                 return;
             }
+            // hidden field
             submitted = true;
             // Enable disabled field on submit so it's sent with post
             $("#id_time_per_unit, #id_funct_round").removeAttr("disabled");
             // JSON fields are picky with their number inputs, convert them to standard form
             $("#id_works").val() && $("#id_works").val(+$("#id_works").val());
+            $("<input />").attr("type", "hidden")
+                .attr("name", "utc_offset")
+                .attr("value", Intl.DateTimeFormat().resolvedOptions().timeZone)
+                .appendTo(this);
             $("#submit-assignment-button").text("Submitting...");
         });
         $("#next-page").click(function() {

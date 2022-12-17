@@ -353,7 +353,6 @@ def create_gc_assignments(request):
                 request.user.settingsmodel.save()
         else:
             return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
-
     date_now = utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     service = build('classroom', 'v1', credentials=credentials)

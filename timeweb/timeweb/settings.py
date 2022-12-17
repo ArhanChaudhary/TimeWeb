@@ -115,6 +115,7 @@ MIDDLEWARE = [
 
     'common.middleware.LogoutExampleAccount',
     'common.middleware.DefineIsExampleAccount',
+    'common.middleware.DefineUTCOffset',
     'common.middleware.CommonRatelimit',
     'api.middleware.APIValidationMiddleware',
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
@@ -211,7 +212,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = "America/Los_Angeles"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
