@@ -523,6 +523,7 @@ addTagHandlers: function() {
                 },
                 error: ajaxUtils.error,
             });
+            tag_names = new Set();
             return;
         }
         // Tag add textbox was selected or tags were selected
