@@ -844,7 +844,11 @@ class Priority {
         var current_tag = priority_data.first_real_tag;
         if (sa.is_google_classroom_assignment && sa.needs_more_info && priority_data.status_value !== Priority.COMPLETELY_FINISHED && current_tag) {
             assignment_container.addClass("add-line-wrapper");
-            if (current_tag !== that.prev_tag) { // Still works if an assignment needs more info but doesn't have a tag
+            // We need to check that.prev_gc_assignment !== that.prev_assignment
+            // This deteects if there is a break between a wrapper. If there is,
+            // add the last-add-line-wrapper class to the previous assignment and
+            // make the current assignment the first line wrapper
+            if (that.prev_tag !== current_tag || that.prev_gc_assignment !== that.prev_assignment) { // Still works if an assignment needs more info but doesn't have a tag
                 if (that.prev_gc_assignment) that.prev_gc_assignment.addClass("last-add-line-wrapper");
                 assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-gc-assignments-from-class-template").html());
             }
@@ -852,7 +856,7 @@ class Priority {
         }
         if (priority_data.status_value === Priority.INCOMPLETE_WORKS) {
             assignment_container.addClass("add-line-wrapper");
-            if (that.prev_status_value !== Priority.INCOMPLETE_WORKS) {
+            if (that.prev_status_value !== Priority.INCOMPLETE_WORKS || that.prev_incomplete_works_assignment !== that.prev_assignment) {
                 if (that.prev_incomplete_works_assignment) that.prev_incomplete_works_assignment.addClass("last-add-line-wrapper");
                 assignment_container.addClass("first-add-line-wrapper").prepend($("#autofill-work-done-template").html());
             }
@@ -860,7 +864,7 @@ class Priority {
         }
         if (priority_data.status_value === Priority.COMPLETELY_FINISHED) {
             assignment_container.addClass("add-line-wrapper");
-            if (that.prev_status_value !== Priority.COMPLETELY_FINISHED) {
+            if (that.prev_status_value !== Priority.COMPLETELY_FINISHED || that.prev_finished_assignment !== that.prev_assignment) {
                 if (that.prev_finished_assignment) that.prev_finished_assignment.addClass("last-add-line-wrapper");
                 assignment_container.addClass("first-add-line-wrapper").prepend($("#delete-starred-assignments-template").html());
             }
@@ -868,6 +872,7 @@ class Priority {
         }
         that.prev_tag = current_tag;
         that.prev_status_value = priority_data.status_value;
+        that.prev_assignment = assignment_container;
     }
     updateInfoHeader() {
         const that = this;
