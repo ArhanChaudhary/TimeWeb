@@ -781,6 +781,21 @@ switch (e.key) {
         // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
         new Crud().hideForm();
         break;
+    case "ArrowDown":
+    case "ArrowUp":
+        if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
+        const open_assignmens_on_screen = $(".open-assignment").filter(function() {
+            return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
+        });
+        if (open_assignmens_on_screen.length !== 0) {
+            // Prevent arrow scroll
+            e.preventDefault();
+        } else {
+            // Allow arrow scroll
+            // Relies on the fact that #assignments-container is the scrolling element
+            $("#assignments-container").focus();
+        }
+        break;
     }
     });
     $(".tag-add-input").keydown(function(e) {
