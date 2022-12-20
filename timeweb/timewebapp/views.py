@@ -3,11 +3,10 @@
 # In the future I should probably switch all my view classes to FormView
 
 # Abstractions
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, reverse
 from django.utils.translation import gettext as _
 from django.http import HttpResponse, QueryDict
 from django.contrib.auth import logout, login
-from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 from common.views import TimewebGenericView
