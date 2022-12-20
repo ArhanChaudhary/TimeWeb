@@ -706,7 +706,7 @@ class VisualAssignment extends Assignment {
 
         VisualAssignment.setCanvasFont(screen, 13.75);
         const rounded_complete_x = Math.max(Math.floor(this.sa.complete_x * 100), 1) / 100;
-        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - VisualAssignment.GRAPH_Y_AXIS_MARGIN + 60) / 100));
+        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / 150));
         const draw_big_index_at_complete_x = this.sa.complete_x % x_axis_scale === 0 || this.sa.complete_x < 10;
         const small_x_axis_scale = x_axis_scale / 5;
         const label_smaller_x_indicies = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.9 < small_x_axis_scale * this.wCon;
@@ -805,9 +805,9 @@ class VisualAssignment extends Assignment {
         }
         VisualAssignment.setCanvasFont(screen, 12);
         screen.textAlign = "right";
-        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
+        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 55) / 125));
         const small_y_axis_scale = y_axis_scale / 5;
-        const label_smaller_y_indicies = screen.text_height * 1.8 < small_y_axis_scale * this.hCon;
+        const label_smaller_y_indicies = screen.text_height * 2 < small_y_axis_scale * this.hCon;
         if (this.sa.y >= 10) {
             for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
                 const displayed_number = smaller_index * small_y_axis_scale;
