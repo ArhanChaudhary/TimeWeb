@@ -26,7 +26,7 @@ def _403_csrf(request, reason=""):
 
 def _403_or_429(request, exception=None):
     if isinstance(exception, Ratelimited):
-        return HttpResponse('You are being ratelimited, try again in a few seconds or minutes.', status=429)
+        return HttpResponse('You are being ratelimited, try again in a few seconds or minutes. Here\'s a cookie 🍪 to cheer you up.', status=429)
     return HttpResponseForbidden("Forbidden, here's a cookie 🍪 to cheer you up")
 
 def calc_mod_days(self):
