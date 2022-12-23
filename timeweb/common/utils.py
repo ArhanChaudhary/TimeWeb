@@ -5,7 +5,6 @@ from ratelimit.exceptions import Ratelimited
 from django.http import HttpResponseForbidden, HttpResponse
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.utils import timezone
 from common.views import logger
 from django.db.utils import OperationalError
 from decimal import Decimal

@@ -5,7 +5,7 @@ from django.contrib.auth import logout
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
-from .utils import get_client_ip
+from . import utils
 from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
 from timewebapp.urls import KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS
 
@@ -49,7 +49,7 @@ class CommonRatelimit:
                 group = "api"
             else:
                 group = resolved._func_path
-            if is_ratelimited(request, group=group, key=get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
+            if is_ratelimited(request, group=group, key=utils.get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
                 raise Ratelimited
         return self.get_response(request)
 
