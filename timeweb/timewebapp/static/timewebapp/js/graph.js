@@ -665,9 +665,12 @@ class VisualAssignment extends Assignment {
         screen.scale(1 / this.scale, 1 / this.scale);
     }
     static GRAPH_Y_AXIS_MARGIN = 55;
-    static SMALLER_SMALLER_MARGIN = 11;
-    static SMALLER_BIGGER_MARGIN = 7;
-    static BIGGER_BIGGER_MARGIN = 19;
+    static SMALLER_SMALLER_MARGIN_X = 11;
+    static SMALLER_BIGGER_MARGIN_X = 7;
+    static BIGGER_BIGGER_MARGIN_X = 19;
+    static SMALLER_SMALLER_MARGIN_Y = 6;
+    static SMALLER_BIGGER_MARGIN_Y = 2;
+    static BIGGER_BIGGER_MARGIN_Y = 7;
     //hard (the entire function)
     drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
@@ -796,7 +799,7 @@ class VisualAssignment extends Assignment {
                     small_last_number_left = number_x_pos - numberwidth / 2;
                     screen.fillStyle = "rgb(80,80,80)"; // Number color
                     screen.fillText(smaller_index, number_x_pos, this.height - 10 - 17);
-                } else if (small_last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.SMALLER_SMALLER_MARGIN) {
+                } else if (small_last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.SMALLER_SMALLER_MARGIN_X) {
                     screen.fillStyle = "rgb(80,80,80)"; // Number color
                     screen.fillText(smaller_index, number_x_pos, this.height - 10 - 17);
                 }
@@ -805,42 +808,98 @@ class VisualAssignment extends Assignment {
         }
         VisualAssignment.setCanvasFont(screen, 12);
         screen.textAlign = "right";
+
         const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 55) / 125));
+        const draw_big_index_at_y = this.sa.y % y_axis_scale === 0 || this.sa.y < 10;
         const small_y_axis_scale = y_axis_scale / 5;
-        const label_smaller_y_indicies = screen.text_height * 2 < small_y_axis_scale * this.hCon;
+        const label_smaller_y_indicies = screen.text_height * 2.1 < small_y_axis_scale * this.hCon;
+        let small_last_number_bottom;
         if (this.sa.y >= 10) {
-            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
-                const displayed_number = smaller_index * small_y_axis_scale;
-                if (smaller_index % 5) {
-                    const gradient_percent = 1 - (displayed_number * this.hCon) / (this.height - 50);
-                    screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
-                    screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
+            let smaller_index;
+            let number_y_pos;
+
+            if (!draw_big_index_at_y) {
+                smaller_index = this.sa.y;
+
+                const gradient_percent = 1 - (smaller_index * this.hCon) / (this.height - 50);
+                screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - smaller_index * this.hCon - 51.5, this.width - 50, 2);
+                
+                number_y_pos = 4;
+                screen.fillStyle = "rgb(80,80,80)";
+                screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                small_last_number_bottom = number_y_pos + screen.text_height / 2;
+            }
+            let first_loop = true;
+            for (let smaller_index = Math.ceil(this.sa.y / small_y_axis_scale - 1) * small_y_axis_scale; smaller_index > 0; smaller_index -= small_y_axis_scale) {
+                if (smaller_index / small_y_axis_scale % 5 === 0) continue;
+
+                const gradient_percent = 1 - (smaller_index * this.hCon) / (this.height - 50);
+                number_y_pos = this.height - smaller_index * this.hCon - 54;
+                screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, number_y_pos + 2.5, this.width - 50, 2);
+                if (!label_smaller_y_indicies) continue;
+                
+                if (!first_loop) {
                     screen.fillStyle = "rgb(80,80,80)";
-                    if (label_smaller_y_indicies) {
-                        let number_y_pos = this.height - displayed_number * this.hCon - 54 + screen.text_height / 2;
-                        if (number_y_pos < 4 + screen.text_height / 2) {
-                            number_y_pos = 4 + screen.text_height / 2;
-                        }
-                        screen.fillText(displayed_number, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos);
-                    }
+                    screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                    continue;
                 }
+
+                if (draw_big_index_at_y) {
+                    small_last_number_bottom = number_y_pos + screen.text_height / 2;
+                    screen.fillStyle = "rgb(80,80,80)";
+                    screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                } else if ((number_y_pos - screen.text_height / 2) - small_last_number_bottom > VisualAssignment.SMALLER_SMALLER_MARGIN_Y) {
+                    screen.fillStyle = "rgb(80,80,80)";
+                    screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                }
+                first_loop = false;
             }
         }
         VisualAssignment.setCanvasFont(screen, label_smaller_y_indicies ? 15 : 16.5);
-        for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
-            if (bigger_index * 2 < y_axis_scale) {
-                // roundoff errors
-                break;
+        {
+            let bigger_index;
+            let number_y_pos;
+            let last_number_bottom;
+
+            if (draw_big_index_at_y) {
+                bigger_index = this.sa.y;
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
+                number_y_pos = 5;
+                screen.fillStyle = "black";
+                screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                last_number_bottom = number_y_pos + screen.text_height / 2;
             }
-            screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
-            screen.fillStyle = "black";
-            let number_y_pos = this.height - bigger_index * this.hCon - 54 + screen.text_height / 2;
-            if (number_y_pos < 5 + screen.text_height / 2) {
-                number_y_pos = 5 + screen.text_height / 2;
+            let first_loop = true;
+            for (bigger_index = Math.ceil(this.sa.y / y_axis_scale - 1) * y_axis_scale; bigger_index > 0; bigger_index -= y_axis_scale) {
+                number_y_pos = this.height - bigger_index * this.hCon - 54;
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, number_y_pos + 1.5, this.width - 50, 5);
+
+                if (!first_loop) {
+                    screen.fillStyle = "black";
+                    screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                    continue;
+                }
+
+                if (
+                    (
+                        small_last_number_bottom === undefined || 
+                        (number_y_pos - screen.text_height / 2) - small_last_number_bottom > VisualAssignment.SMALLER_BIGGER_MARGIN_Y
+                    ) && (
+                        !draw_big_index_at_y ||
+                        (number_y_pos - screen.text_height / 2) - last_number_bottom > VisualAssignment.BIGGER_BIGGER_MARGIN_Y
+                    )
+                ) {
+                    screen.fillStyle = "black";
+                    screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                }
+                first_loop = false;
             }
-            screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos);
         }
+        screen.fillStyle = "black";
         screen.fillText("0", VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, this.height - 53.5);
 
         screen.textAlign = "center";
@@ -877,10 +936,11 @@ class VisualAssignment extends Assignment {
                 if (
                     (
                         small_last_number_left === undefined || // small_last_number_left has an opportunity to be defined despite the evaluation of draw_big_index_at_complete_x
-                        small_last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.SMALLER_BIGGER_MARGIN
+                        small_last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.SMALLER_BIGGER_MARGIN_X
                     ) && (
+
                         !draw_big_index_at_complete_x ||
-                        last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.BIGGER_BIGGER_MARGIN
+                        last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.BIGGER_BIGGER_MARGIN_X
                     )
                 ) {
                     screen.fillStyle = "black";
