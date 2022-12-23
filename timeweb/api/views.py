@@ -32,7 +32,7 @@ from httplib2.error import ServerNotFoundError
 
 # Misc
 from django.db import transaction
-from common.utils import days_between_two_dates, utc_to_local
+import common.utils as utils
 from common.views import logger
 from django.views.decorators.http import require_http_methods
 from re import sub as re_sub, IGNORECASE
@@ -353,7 +353,7 @@ def create_gc_assignments(request):
                 request.user.settingsmodel.save()
         else:
             return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
-    date_now = utc_to_local(request, timezone.now())
+    date_now = utils.utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     service = build('classroom', 'v1', credentials=credentials)
 
@@ -380,7 +380,7 @@ def create_gc_assignments(request):
                 assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
             except ValueError:
                 assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
-            assignment_date = utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
+            assignment_date = utils.utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
             assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             x = assignment.get('dueDate')
             tags = []
@@ -389,7 +389,7 @@ def create_gc_assignments(request):
                     assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                 if "minutes" in assignment['dueTime']:
                     assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                x = utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
+                x = utils.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
                 if x < date_now:
                     continue
 
@@ -401,7 +401,7 @@ def create_gc_assignments(request):
                 if date_now == x:
                     tags.append("Important")
             else:
-                if days_between_two_dates(date_now, assignment_date) > 60:
+                if utils.days_between_two_dates(date_now, assignment_date) > 60:
                     continue
                 due_time = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
@@ -418,7 +418,7 @@ def create_gc_assignments(request):
                 continue
 
             # From create assignment
-            blue_line_start = days_between_two_dates(date_now, assignment_date)
+            blue_line_start = utils.days_between_two_dates(date_now, assignment_date)
             if blue_line_start < 0:
                 blue_line_start = 0
             dynamic_start = blue_line_start

@@ -11,7 +11,7 @@ from common.views import TimewebGenericView
 # App stuff
 from django.conf import settings
 import api.views as api
-from common.utils import get_client_ip
+import common.utils as utils
 from common.views import CHANGELOGS
 from .forms import SettingsForm
 from .models import SettingsModel
@@ -38,9 +38,9 @@ DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('id', 'immediately_delete_completely_f
 
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(SettingsModel._meta.fields), "update this list"
 
-@method_decorator(ratelimit(key=get_client_ip, rate='1/s', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=get_client_ip, rate='20/m', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=get_client_ip, rate='100/h', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='1/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='20/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='100/h', method="POST", block=True), name='post')
 class SettingsView(LoginRequiredMixin, TimewebGenericView):
     template_name = "navbar/settings.html"
 
@@ -104,7 +104,7 @@ class ContactFormView(BaseContactFormView):
     success_url = reverse_lazy("contact_form")
 
     def post(self, request):
-        if is_ratelimited(request, group=resolve(request.path)._func_path, key=get_client_ip, rate='1/m', method="POST", increment=True):
+        if is_ratelimited(request, group=resolve(request.path)._func_path, key=utils.get_client_ip, rate='1/m', method="POST", increment=True):
             messages.error(request, "You must wait for one minute before submitting another contact form.")
             return super().get(request)
         recaptcha_token = request.POST.get('g-recaptcha-response')

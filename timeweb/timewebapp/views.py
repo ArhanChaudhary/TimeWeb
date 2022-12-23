@@ -30,13 +30,7 @@ from django.dispatch import receiver
 
 # Misc
 from django.forms.models import model_to_dict
-from common.utils import (days_between_two_dates, 
-                        utc_to_local,
-                        calc_mod_days,
-                        get_client_ip,
-                        minutes_to_hours,
-                        hours_to_minutes,
-                        safe_conversion)
+import common.utils as utils
 from django.utils.decorators import method_decorator
 from ratelimit.decorators import ratelimit
 
@@ -67,7 +61,7 @@ assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RE
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
-        # The front end adjusts the assignment and due date, so we don't need to worry about using utc_to_local instead of localtime
+        # The front end adjusts the assignment and due date, so we don't need to worry about using utils.utc_to_local instead of localtime
         date_now = timezone.localtime(timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         TimewebModel.objects.create(**EXAMPLE_ASSIGNMENT | {
@@ -92,11 +86,11 @@ def append_default_context(request):
         context["GC_API_INIT_FAILED"] = True
     return context
 
-@method_decorator(ratelimit(key=get_client_ip, rate='30/m', method="GET", block=True), name='get')
-@method_decorator(ratelimit(key=get_client_ip, rate='100/h', method="GET", block=True), name='get')
-@method_decorator(ratelimit(key=get_client_ip, rate='3/s', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=get_client_ip, rate='15/m', method="POST", block=True), name='post')
-@method_decorator(ratelimit(key=get_client_ip, rate='75/h', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='30/m', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='100/h', method="GET", block=True), name='get')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='3/s', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='15/m', method="POST", block=True), name='post')
+@method_decorator(ratelimit(key=utils.get_client_ip, rate='75/h', method="POST", block=True), name='post')
 class TimewebView(LoginRequiredMixin, TimewebGenericView):
     template_name = 'timewebapp/app.html'
 
@@ -281,22 +275,22 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 +-----------------+--------+-------------------------+--------------------------+--------------+
                     '''
                     if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        setattr(self.sm, field, minutes_to_hours(getattr(self.sm, field)))
+                        setattr(self.sm, field, utils.minutes_to_hours(getattr(self.sm, field)))
                     elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
+                        setattr(self.sm, field, utils.hours_to_minutes(getattr(self.sm, field)))
                 elif field == "works":
                     # NOTE: changing just funct_round unit should not affect the rest of works
                     # so it is safe to do this and not include it as a condition where works is
                     # redefined if unit changes from minute to hour or vice versa
                     if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        first_work = minutes_to_hours(first_work)
+                        first_work = utils.minutes_to_hours(first_work)
                     elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        first_work = hours_to_minutes(first_work)
+                        first_work = utils.hours_to_minutes(first_work)
                 elif field in ("min_work_time", "time_per_unit"):
                     if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        setattr(self.sm, field, hours_to_minutes(getattr(self.sm, field)))
+                        setattr(self.sm, field, utils.hours_to_minutes(getattr(self.sm, field)))
                     if field in ("min_work_time", ):
-                        setattr(self.sm, field, safe_conversion(getattr(self.sm, field), 1 / self.sm.time_per_unit))
+                        setattr(self.sm, field, utils.safe_conversion(getattr(self.sm, field), 1 / self.sm.time_per_unit))
             except TypeError:
                 pass
 
@@ -314,21 +308,21 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.works = [str(first_work)]
             self.sm.needs_more_info = True
         else:
-            date_now = utc_to_local(request, timezone.now())
+            date_now = utils.utc_to_local(request, timezone.now())
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if settings.EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
                 original_date_now = date_now
-                date_now = utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
+                date_now = utils.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
                 self.sm.assignment_date -= original_date_now - date_now
                 self.sm.x -= original_date_now - date_now
             if self.created_assignment or self.sm.needs_more_info:
-                self.sm.blue_line_start = days_between_two_dates(date_now, self.sm.assignment_date)
+                self.sm.blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
                 if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
                     self.sm.blue_line_start = 0
                 self.sm.dynamic_start = self.sm.blue_line_start
             else:
-                self.sm.blue_line_start = old_data.blue_line_start + days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
+                self.sm.blue_line_start = old_data.blue_line_start + utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
                 removed_works_start = -self.sm.blue_line_start # translates x position 0 so that it can be used to accessing works
                 removed_works_end = len(old_data.works) - 1
                 if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
@@ -368,7 +362,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     if not work_day_count or len(self.sm.break_days) == 7:
                         x_num = 1
                     elif self.sm.break_days:
-                        mods = calc_mod_days(self)
+                        mods = utils.calc_mod_days(self)
 
                         # Terrible implementation of inversing calcModDays
                         guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
@@ -385,7 +379,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
                         # x_num = (date_now - self.sm.assignment_date).days + x_num
                         # x_num += (date_now - self.sm.assignment_date).days
-                        x_num += days_between_two_dates(date_now, self.sm.assignment_date)
+                        x_num += utils.days_between_two_dates(date_now, self.sm.assignment_date)
                         # There is no need to modify blue_line_start by this addition because it is adjusted earlier
                         # To see why this is the case, let's think about this abstractly.
                         # We are adding x_num to the due date, and the due date is after the assignment date and,
@@ -398,7 +392,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
                         self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
             else:
-                x_num = days_between_two_dates(self.sm.x, self.sm.assignment_date)
+                x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
                 if self.sm.y == None:
                     complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
                     # the prediction for due date is ceiled so also ceil the prediction for y for consistency
@@ -442,7 +436,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # By testing and generalizing, we can see that it is not possible for dynamic_start
                 # to be a value that is not on a work input.
                 # TODO: rigorously prove this
-                self.sm.dynamic_start += days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
+                self.sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
                 if self.sm.dynamic_start < 0:
                     self.sm.dynamic_start = 0
                 elif self.sm.dynamic_start > x_num - 1:
@@ -450,11 +444,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if self.updated_assignment:
                 unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
                 unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
-                # minutes_to_hours and hours_to_minutes are not needed because i want this to be an accurate conversion
+                # utils.minutes_to_hours and utils.hours_to_minutes are not needed because i want this to be an accurate conversion
                 if unit_changed_from_hour_to_minute:
-                    self.sm.works = [str(hours_to_minutes(Decimal(i))) for i in self.sm.works]
+                    self.sm.works = [str(utils.hours_to_minutes(Decimal(i))) for i in self.sm.works]
                 elif unit_changed_from_minute_to_hour:
-                    self.sm.works = [str(minutes_to_hours(Decimal(i))) for i in self.sm.works]
+                    self.sm.works = [str(utils.minutes_to_hours(Decimal(i))) for i in self.sm.works]
             self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this

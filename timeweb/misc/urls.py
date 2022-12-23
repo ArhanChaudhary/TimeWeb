@@ -2,9 +2,9 @@ from django.urls import path, re_path
 from django.http import HttpResponse
 from . import views
 from django.views.generic import RedirectView
-from common.utils import app_static_factory
+import common.utils as utils
 
-app_static = app_static_factory(__package__)
+app_static = utils.app_static_factory(__package__)
 
 urlpatterns = [
     path('robots.txt', lambda x: HttpResponse("# If you came from the discord gg you get a super duper secret role\n# pm me this message at Arch#5808\n# also, pls don't tell anyone as it'll ruin the fun of this small game\nUser-Agent: *\nDisallow:", content_type="text/plain"), name="robots_file"),

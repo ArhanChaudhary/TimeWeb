@@ -1,9 +1,9 @@
 from django.urls import path
 from django.views.generic import RedirectView
 from . import views, forms
-from common.utils import app_static_factory
+import common.utils as utils
 
-app_static = app_static_factory(__package__)
+app_static = utils.app_static_factory(__package__)
 
 urlpatterns = [
     path('settings', views.SettingsView.as_view(), name='settings'),
