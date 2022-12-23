@@ -233,24 +233,24 @@
                 {% endif %}
                 <div class="right-side-of-header">
                   <span class="completion-time"></span>
-                  {% if not view_deleted_assignments_in_app_view %}
-                    <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                      <svg class="tick-button" width="25" preserveAspectRatio="none">
-                        <use href="#tick-svg"></use>
-                      </svg>
-                    </div>
-                    <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
-                      <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
-                        <use href="#edit-svg"></use>
-                      </svg>
-                    </div>
-                    {% else %}
+                  {% if view_deleted_assignments_in_app_view %}
                     <div class="assignment-header-button" title="Restore Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
                       <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
                         <use href="#restore-svg"></use>
                       </svg>
                     </div>
+                  {% else %}
+                    <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                      <svg class="tick-button" width="25" preserveAspectRatio="none">
+                        <use href="#tick-svg"></use>
+                      </svg>
+                    </div>
                   {% endif %}
+                  <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+                    <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
+                      <use href="#edit-svg"></use>
+                    </svg>
+                  </div>
                   <div class="assignment-header-button" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
                     <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
                       <use href="#delete-svg"></use>

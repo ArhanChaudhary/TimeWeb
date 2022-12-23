@@ -1578,14 +1578,6 @@ class VisualAssignment extends Assignment {
     canOpenAssignment() {
         return !this.sa.needs_more_info;
     }
-    shake() {
-        const that = this;
-        that.dom_assignment.animate({left: -5}, 75, "easeOutCubic", function() {
-            that.dom_assignment.animate({left: 5}, 75, "easeOutCubic", function() {
-                that.dom_assignment.animate({left: 0}, 75, "easeOutCubic");
-            });
-        });
-    }
 }
 window.VisualAssignment = VisualAssignment;
 let already_ran_tutorial = false;
@@ -1603,8 +1595,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const sa = new VisualAssignment(dom_assignment);
     
     if (!sa.canOpenAssignment()) {
-        if (dom_assignment.find(".update-button").click().length === 0)
-            sa.shake();
+        dom_assignment.find(".update-button").click();
         return;
     }
 

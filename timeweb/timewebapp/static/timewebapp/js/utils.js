@@ -672,7 +672,7 @@ addTagHandlers: function() {
 setKeybinds: function() {
 $(document).keydown(function(e) {
 if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["e", "Backspace", "s", "f", "n"].includes(e.key)
+    || VIEWING_DELETED_ASSIGNMENTS && ["Backspace", "s", "f", "n"].includes(e.key)
     || e.originalEvent.repeat && ["Backspace", "s", "f", "0"].includes(e.key)) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;

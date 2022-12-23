@@ -703,6 +703,11 @@ class Crud {
                 $("#form-wrapper form #first-field-group input:visible:first")[0].setCustomValidity("You can't add or edit assignments in the simulation. This functionality is not yet supported :(");
                 return;
             }
+            if (VIEWING_DELETED_ASSIGNMENTS) {
+                Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_name").parents(".field-group")});
+                $("#id_name")[0].setCustomValidity("You can't add or edit assignments in the deleted assignments view. Please restore this assignment first.");
+                return;
+            }
             if ($("#id_name").is(":invalid")) {
                 Crud.GO_TO_FIELD_GROUP({$dom_group: $("#id_name").parents(".field-group")});
                 $("#id_name")[0].setCustomValidity("Please enter an assignment name");
