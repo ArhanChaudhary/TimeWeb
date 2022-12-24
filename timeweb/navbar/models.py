@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone as _timezone
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from timezone_field import TimeZoneField
@@ -206,6 +207,7 @@ class SettingsModel(models.Model):
     device_uuid_api_timestamp = models.DateTimeField(
         null=True,
         blank=True,
+        default=_timezone.now,
     )
     def __str__(self):
         return self.user.username
