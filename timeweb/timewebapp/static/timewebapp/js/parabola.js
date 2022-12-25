@@ -760,15 +760,83 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         */
 
         autotuned_skew_ratio = 2 - autotuned_skew_ratio;
-
+        // The part of step 3 that actually autotunes the skew ratio
+        this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     } else {
-        // TODO: improve non inverse algorithm; this one currently works but not as well as I want
+        /*
         var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+        autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
+        autotuned_skew_ratio = 2 - autotuned_skew_ratio;
+        this.sa.skew_ratio = this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+
+        var autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+        autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
+        new_skew_ratio = old_skew_ratio + (2 - autotuned_skew_ratio - old_skew_ratio) * autotune_factor;
+
+        var autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor) - old_skew_ratio) * autotune_factor;
+
+        var autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS));
+
+        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - (works_without_break_days.length / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - (works_without_break_days.length / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS));
+
+        let n = new_skew_ratio
+        let o = old_skew_ratio
+        let a = autotuned_skew_ratio
+        let l = works_without_break_days.length
+        let x = x1_from_blue_line_start
+        let i = Assignment.AUTOTUNE_ITERATIONS
+
+        n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - (l / x), 1 / i))) - o) * (1 - Math.pow(1 - (l / x), 1 / i));
+
+        let r = l/x;
+
+        n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - r, 1 / i))) - o) * (1 - Math.pow(1 - r, 1 / i));
+
+        let f = 1 - Math.pow(1 - r, 1 / i);
+
+        n = o + (2 - (a + (1 - a) * f) - o) * f;
+
+        The inverse algorithm solves for o:
+
+        n = o + (2 - (a + (1 - a)f) - o)f
+        n = o + 2f - (a + (1 - a)f)f - of
+        n = o - of + 2f - (a + (1 - a)f)f
+        n = o(1 - f) + 2f - (a + (1 - a)f)f
+        n - 2f + (a + (1 - a)f)f = o(1 - f)
+        (n - 2f + (a + (1 - a)f)f)/(1-f) = o
+        o = (n - 2f + (a + f - af)f)/(1-f)
+        o = (n - 2f + af + f^2 - af^2)/(1-f)
+        o = (n - 2f + af + f^2(1 - a))/(1-f)
+        o = (n + f(-2 + a) + f^2(1 - a))/(1-f)
+        o = (f^2(1 - a) + f(a - 2) + n)/(1-f)
+
+        This algorithm isn't perfect due to an unfortunate implementation quirk of todo !== input_done in
+        submit_work_input_button. Let's say the current skew ratio is A, you don't have to do work today, and
+        you input no work done for today. The skew ratio will stay at A because of the todo !== input_done
+        check. Now, say the current skew ratio is B but you do have to do work for today. If you enter no work
+        done, it is possible for the skew ratio to autotune to the exact value of A. That means that there isn't
+        a one-to-one mapping of the autotuning algorithm when you submit work inputs, and this also means that
+        the inverse algorithm doesn't know which mapping to use. In the current implementation of
+        delete_work_input_button, it just assumes the first scenario mapping, regardless whether or not it was
+        the actual path taken to reach skew ratio A. Of course, this leads to the skew ratio sometimes being
+        significantly off from the actual original skew ratio, but alas this is the best we can do for now.
+
+        TODO: Perhaps we *could* fix this by saving a list of input values for when let's say scenarios 1 or 2 was
+        taken. Maybe that's an idea for the future.
+
+        Another inaccuracy of this inversing algorithm is the fact that it doesn't use the same red_line_start_x
+        values as it repeatedly calls setDynamicStartInDynamic mode. Thankfully, this doesn't seem to big of an
+        issue compared to the above issue.
+        */
+        let autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+        this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
     }
-    // The part of step 3 that actually autotunes the skew ratio
-    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
 

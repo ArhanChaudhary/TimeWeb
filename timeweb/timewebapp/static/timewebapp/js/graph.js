@@ -547,7 +547,7 @@ class VisualAssignment extends Assignment {
         screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR);
         screen.lineWidth = radius;
         screen.beginPath();
-        for (let point_x = this.sa.fixed_mode ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
+        for (let point_x = /*(*/this.sa.fixed_mode/* || DEBUG)*/ ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.funct(point_x);
             circle_x = point_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             if (circle_x > this.width - 5) {
@@ -1252,14 +1252,23 @@ class VisualAssignment extends Assignment {
                 VisualAssignment.flashNotApplicable(delete_work_input_button);
                 return;
             }
-            this.sa.works.pop();
-            len_works--;
-            if (this.shouldAutotune())
-            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                this.setDynamicStartIfInDynamicMode();
+            // Check out parabola.js for an explanation of what happens here
+
+            // Make sure to update submit_work_input_button if this is changed
+            if (len_works + this.sa.blue_line_start === this.sa.dynamic_start) {
+                if (this.shouldAutotune())
+                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                    this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                    this.setDynamicStartIfInDynamicMode();
+                }
                 this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                this.sa.works.pop();
+                len_works--;
+                this.setDynamicStartIfInDynamicMode();
+            } else {
+                this.sa.works.pop();
+                len_works--;
             }
-            this.setDynamicStartIfInDynamicMode();
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
             new Priority().sort();
         });
@@ -1380,26 +1389,29 @@ class VisualAssignment extends Assignment {
             }
 
             if (use_in_progress) {
-                if (this.sa.works[len_works] === last_work_input) return; // Pointless input
-                len_works--;
-                this.sa.works.pop();
+                if (this.sa.works[len_works] === last_work_input) return; // Pointless input (input_done === 0)
 
                 // Attempts to undo the last work input to ensure the autotune isn't double dipped
                 // Note that the invsering of the autotune algorithm is still not perfect, but usable
 
-                // Don't apply the input_done !== todo_for_blue_line_end check here because delete work input
-                // button doesn't have it
-                // a more rigorous reason is because it makes no sense to preserve the dynamic mode start
-                // as it might have to change if was at the last work input before getting deleted
-                if (this.shouldAutotune())
-                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                    this.setDynamicStartIfInDynamicMode();
+                // Make sure to update delete_work_input_button if this is changed
+                if (len_works + this.sa.blue_line_start === this.sa.dynamic_start) {
+                    if (this.shouldAutotune())
+                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                        this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                        this.setDynamicStartIfInDynamicMode();
+                    }
                     this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                    this.sa.works.pop();
+                    len_works--;
+                    this.setDynamicStartIfInDynamicMode();
+                } else {
+                    this.sa.works.pop();
+                    len_works--;
                 }
-                this.setDynamicStartIfInDynamicMode();
             }
-            len_works++;
             this.sa.works.push(last_work_input);
+            len_works++;
 
             // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
             if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && last_work_input < this.sa.y
