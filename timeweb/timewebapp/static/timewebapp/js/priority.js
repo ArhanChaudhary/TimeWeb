@@ -268,21 +268,7 @@ class Priority {
                     last_work_input += Math.max(0, todo);
                     sa.sa.works.push(last_work_input);
                     len_works++;
-
-                    if (number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                            sa.setDynamicStartIfInDynamicMode();
-                            sa.autotuneSkewRatioIfInDynamicMode();
-                        }
-                        sa.setDynamicStartIfInDynamicMode();
-                    }
-                }
-                if (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
-                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                        sa.setDynamicStartIfInDynamicMode();
-                        sa.autotuneSkewRatioIfInDynamicMode();
-                    }
-                    sa.setDynamicStartIfInDynamicMode();
+                    // no need to set dynamic start or autotune skew ratio because it doesn't happen if input === todo (graph.js)
                 }
                 if (has_autofilled) {
                     ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: sa.sa.works.map(String), id: sa.sa.id});
@@ -360,12 +346,13 @@ class Priority {
                 let has_autofilled = false;
                 if (that.params.autofill_no_work_done.includes(dom_assignment[0]) && number_of_forgotten_days > 0)
                     for (let i = 0; i < number_of_forgotten_days; i++) {
-                        
                         if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) break;
+
+                        todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
-                        if (sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
+                        if (todo !== 0 && sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                                 sa.setDynamicStartIfInDynamicMode();
                                 sa.autotuneSkewRatioIfInDynamicMode();
