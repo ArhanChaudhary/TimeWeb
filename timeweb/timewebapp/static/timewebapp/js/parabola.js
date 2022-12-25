@@ -810,7 +810,18 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         o = (n - 2f + af + f^2 - af^2)/(1-f)
         o = (n - 2f + af + f^2(1 - a))/(1-f)
         o = (n + f(-2 + a) + f^2(1 - a))/(1-f)
-        o = (f^2(1 - a) + f(a - 2) + n)/(1-f)
+        o = (f^2(1 - a) + f(a - 2) + n)/(1-f) for f != 1
+
+        Solve for when f === 1 for edge case handling:
+        Assume 1 - Math.pow(1 - r, 1 / i) = 1
+        1 - (1 - r)^(1/i) != 1
+        (1 - r)^(1/i) != 0
+        (1 - r)^(1/i) != 0
+        a^b = 0
+        Since b is a positive rational number, a = 0 for a^b = 0
+        1 - r = 0
+        r = 1
+
 
         This algorithm isn't perfect due to an unfortunate implementation quirk of todo !== input_done in
         submit_work_input_button. Let's say the current skew ratio is A, you don't have to do work today, and
@@ -831,8 +842,12 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         issue compared to the above issue.
         */
         let autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
+        if (autotune_factor === 1) {
+            this.sa.skew_ratio = 1;
+        } else {
+            autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+            this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
+        }
     }
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
