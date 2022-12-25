@@ -643,10 +643,7 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
 
         forming a linear gradient that successfully mitigates this issue
         */
-
-        // Math.min(..., 1) to make sure the autotune factor is never greater than 1 (this 
-        // can happen with due times)
-        var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
 
         /*
         STEP 4: Nullifying repeated iterations
@@ -764,30 +761,30 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     } else {
         /*
-        var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
         autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
         autotuned_skew_ratio = 2 - autotuned_skew_ratio;
         this.sa.skew_ratio = this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
 
-        var autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
         autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
         new_skew_ratio = old_skew_ratio + (2 - autotuned_skew_ratio - old_skew_ratio) * autotune_factor;
 
-        var autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
         new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor) - old_skew_ratio) * autotune_factor;
 
-        var autotune_factor = works_without_break_days.length / x1_from_blue_line_start;
+        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
         new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS));
 
-        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - (works_without_break_days.length / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - (works_without_break_days.length / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS));
+        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS));
 
         let n = new_skew_ratio
         let o = old_skew_ratio
         let a = autotuned_skew_ratio
-        let l = works_without_break_days.length
+        let l = len_works_without_break_days
         let x = x1_from_blue_line_start
         let i = Assignment.AUTOTUNE_ITERATIONS
 
@@ -833,7 +830,7 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         values as it repeatedly calls setDynamicStartInDynamic mode. Thankfully, this doesn't seem to big of an
         issue compared to the above issue.
         */
-        let autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        let autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
         this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
     }
