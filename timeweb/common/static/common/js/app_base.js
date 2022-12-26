@@ -360,7 +360,9 @@ evaluateCurrentState: function() {
                 },
             });
         },
-        error: ajaxUtils.error,
+        error: function() {
+            // lets make errors to this api call silent
+        },
     });
 },
 }
