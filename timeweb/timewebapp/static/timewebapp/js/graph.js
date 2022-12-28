@@ -5,10 +5,6 @@ class Assignment {
         this.assign_day_of_week = this.sa.assignment_date?.getDay();
         this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
         this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
-        if (!Number.isFinite(this.red_line_start_x) || !Number.isFinite(this.red_line_start_y)) {
-            this.red_line_start_x = undefined;
-            this.red_line_start_y = undefined;
-        }
         this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
         if (this.sa.unit) this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
     }
@@ -165,13 +161,18 @@ class Assignment {
             let i = this.sa.blue_line_start + len_works;
             let this_funct;
             let next_funct = this.funct(i);
+            if (next_funct === undefined || Number.isNaN(next_funct)) return NaN;
             for (; i < (params.floor_due_time ? Math.floor(this.sa.complete_x) : this.sa.x); i++) {
                 if (this.sa.break_days.includes((this.assign_day_of_week + i) % 7)) {
                     continue;
                 }
 
                 this_funct = next_funct;
+                // if the assignment is somehow invalid and this.red_line_start_y is ever undefined
+                // from this.red_line_start_x being longer than this.sa.works, undefined values crash
+                // sigFigSubtract. Return NaN to silently fail instead.
                 next_funct = this.funct(i + 1);
+                if (next_funct === undefined || Number.isNaN(next_funct)) return NaN;
                 diff = mathUtils.sigFigSubtract(next_funct, this_funct);
                 if (diff !== 0) {
                     working_days++;
@@ -1394,7 +1395,7 @@ class VisualAssignment extends Assignment {
                 if (this.sa.works[len_works] === last_work_input) return; // Pointless input (input_done === 0)
 
                 // Attempts to undo the last work input to ensure the autotune isn't double dipped
-                // Note that the invsering of the autotune algorithm is still not perfect, but usable
+                // Note that the inversing of the autotune algorithm is still not perfect, but usable
 
                 // Make sure to update delete_work_input_button if this is changed
                 if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
