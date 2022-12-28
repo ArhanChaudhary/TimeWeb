@@ -202,15 +202,15 @@ class Priority {
             }
             
             sa.setParabolaValues();
-            if (that.params.first_sort && !sa.sa.needs_more_info && dom_assignment.hasClass("refresh-dynamic-mode")) {
+            if (that.params.first_sort && !sa.sa.needs_more_info && !sa.sa.fixed_mode && dom_assignment.hasClass("refresh-dynamic-mode")) {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
                 if (sa.shouldAutotune({ skip_work_days_check: true }))
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                    sa.setDynamicStartIfInDynamicMode();
-                    sa.autotuneSkewRatioIfInDynamicMode();
+                    sa.setDynamicStart();
+                    sa.autotuneSkewRatio();
                 }
-                sa.setDynamicStartIfInDynamicMode();
+                sa.setDynamicStart();
             }
                 
             let display_format_minutes = false;
@@ -352,15 +352,15 @@ class Priority {
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
-                        // theres a small chance that we dont actually need to run setDynamicStartIfInDynamicMode
+                        // theres a small chance that we dont actually need to run setDynamicStart
                         // if shouldAutotune is false, but its more forward compatible to just run it anyways
-                        if (todo !== 0) {
+                        if (todo !== 0 && !this.sa.fixed_mode) {
                             if (sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF)
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                                sa.setDynamicStartIfInDynamicMode();
-                                sa.autotuneSkewRatioIfInDynamicMode();
+                                sa.setDynamicStart();
+                                sa.autotuneSkewRatio();
                             }
-                            sa.setDynamicStartIfInDynamicMode();
+                            sa.setDynamicStart();
                         }
                     }
                 /**
@@ -385,12 +385,14 @@ class Priority {
                 }
 
                 if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
-                    if (sa.shouldAutotune())
-                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                        sa.setDynamicStartIfInDynamicMode();
-                        sa.autotuneSkewRatioIfInDynamicMode();
+                    if (!this.sa.fixed_mode) {
+                        if (sa.shouldAutotune())
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                            sa.setDynamicStart();
+                            sa.autotuneSkewRatio();
+                        }
+                        sa.setDynamicStart();
                     }
-                    sa.setDynamicStartIfInDynamicMode();
                 }
 
                 if (has_autofilled) {

@@ -28,9 +28,7 @@ class Assignment {
         const skew_ratio_bound = mathUtils.precisionRound((y1 + this.min_work_time_funct_round) * x1 / y1, 10);
         return skew_ratio_bound;
     }
-    setDynamicStartIfInDynamicMode(params={ dont_ajax: false }) {
-        if (this.sa.fixed_mode) return;
-
+    setDynamicStart(params={ dont_ajax: false }) {
         const old_dynamic_start = this.sa.dynamic_start;
         const len_works = this.sa.works.length - 1;
 
@@ -130,13 +128,16 @@ class Assignment {
         // }.bind(this));
         // const len_works_without_break_days = works_without_break_days.length - 1;
 
+        let should_autotune = true;
         let len_works = this.sa.works.length - 1;
         const mods = this.calcModDays();
 
         // TODO: probably need to test this but mods is super insiginicant
         len_works -= Math.floor(len_works / 7) * this.sa.break_days.length + mods[(len_works + this.sa.blue_line_start) % 7];
+        should_autotune &&= len_works <= Assignment.MAX_WORK_INPUTS_AUTOTUNE;
+        should_autotune &&= !this.sa.fixed_mode;
 
-        return len_works <= Assignment.MAX_WORK_INPUTS_AUTOTUNE;
+        return should_autotune;
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
@@ -370,7 +371,8 @@ class VisualAssignment extends Assignment {
             } else if (x2 >= x1) {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
-            this.setDynamicStartIfInDynamicMode({ dont_ajax: true });
+            if (!this.sa.fixed_mode)
+                this.setDynamicStart({ dont_ajax: true });
             this.mousemove(e, iteration_number + 1);
         } else {
             this.draw(raw_x, raw_y);
@@ -453,8 +455,8 @@ class VisualAssignment extends Assignment {
         } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && this.pressed_arrow_key === "ArrowDown") {
             this.sa.skew_ratio = skew_ratio_bound;
         }
-
-        this.setDynamicStartIfInDynamicMode();
+        if (!this.sa.fixed_mode)
+            this.setDynamicStart();
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
         new Priority().sort();
     }
@@ -1255,16 +1257,16 @@ class VisualAssignment extends Assignment {
             // Check out parabola.js for an explanation of what happens here
 
             // Make sure to update submit_work_input_button if this is changed
-            if (len_works + this.sa.blue_line_start === this.sa.dynamic_start) {
+            if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
                 if (this.shouldAutotune())
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                    this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
-                    this.setDynamicStartIfInDynamicMode();
+                    this.autotuneSkewRatio({ inverse: false });
+                    this.setDynamicStart();
                 }
-                this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                this.autotuneSkewRatio({ inverse: false });
                 this.sa.works.pop();
                 len_works--;
-                this.setDynamicStartIfInDynamicMode();
+                this.setDynamicStart();
             } else {
                 this.sa.works.pop();
                 len_works--;
@@ -1395,16 +1397,16 @@ class VisualAssignment extends Assignment {
                 // Note that the invsering of the autotune algorithm is still not perfect, but usable
 
                 // Make sure to update delete_work_input_button if this is changed
-                if (len_works + this.sa.blue_line_start === this.sa.dynamic_start) {
+                if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
                     if (this.shouldAutotune())
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                        this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
-                        this.setDynamicStartIfInDynamicMode();
+                        this.autotuneSkewRatio({ inverse: false });
+                        this.setDynamicStart();
                     }
-                    this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                    this.autotuneSkewRatio({ inverse: false });
                     this.sa.works.pop();
                     len_works--;
-                    this.setDynamicStartIfInDynamicMode();
+                    this.setDynamicStart();
                 } else {
                     this.sa.works.pop();
                     len_works--;
@@ -1430,10 +1432,10 @@ class VisualAssignment extends Assignment {
                 return;
             }
             
-            // +Add this check for setDynamicModeIfInDynamicMode
+            // +Add this check for setDynamicMode
             // -Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
             // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode,
-                // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
+                // Autotune and setDynamicStart somewhat fix this but fails with high minimum work times
             // -However, this isn't really that much of a problem; I can just call this a "feature" of dynamic mode in that it tries to make stuff linear. Disabling this makes dynamic mode completely deterministic in its red line start
             // +nm we kinda need this check or else dynamic mode makes like no sense at all, screw those "inconsistencies" i mentioned earlier i dont wanna make stuff unexpected for the user;
                 // these inconsistencies are frankly not really that relevant, and dynamic mode is fine to not be completely deterministic
@@ -1445,13 +1447,13 @@ class VisualAssignment extends Assignment {
                 todo_for_blue_line_end = 0;
             }
             
-            if (input_done !== todo_for_blue_line_end) {
+            if (input_done !== todo_for_blue_line_end && !this.sa.fixed_mode) {
                 if (this.shouldAutotune())
                 for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                    this.setDynamicStartIfInDynamicMode();
-                    this.autotuneSkewRatioIfInDynamicMode();
+                    this.setDynamicStart();
+                    this.autotuneSkewRatio();
                 }
-                this.setDynamicStartIfInDynamicMode();
+                this.setDynamicStart();
             }
 
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
@@ -1471,7 +1473,8 @@ class VisualAssignment extends Assignment {
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
-                this.setDynamicStartIfInDynamicMode();
+                if (!this.sa.fixed_mode)
+                    this.setDynamicStart();
                 this.draw();
                 // No need to ajax since skew ratio is the same
                 return;
@@ -1511,10 +1514,10 @@ class VisualAssignment extends Assignment {
             } else {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                // However, we still need to call setDynamicStart() to compensate if the skew ratio in fixed mode was modified
+                this.setDynamicStart();
             }
-            // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
-            // However, we still need to call setDynamicStartIfInDynamicMode() to compensate if the skew ratio in fixed mode was modified
-            this.setDynamicStartIfInDynamicMode();
             new Priority().sort();
         }).text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
         }

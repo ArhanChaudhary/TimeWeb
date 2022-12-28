@@ -350,10 +350,10 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function (point_1, point_
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 1000;
 Assignment.MATRIX_ENDS_WEIGHT = 100000;
 
-// There is a deadlock netween autotuneSkewRatioIfInDynamicMode and setDynamicStartInDynamicMode:
+// There is a deadlock netween autotuneSkewRatio and setDynamicStart:
 // When dynamic start is set, skew ratio needs to be re-autotuned
 // But when skew ratio is re-autotuned, it may mess up dynamic start
-// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatioIfInDynamicMode should be run
+// This variable is the number of iterations setDynamicStart and autotuneSkewRatio should be run
 
 // There's a chance this might not even be needed but it seems to provide a more accurate skew ratio
 // Resetting the dynamic mode start still might produce different autotuned_skew_ratio values because the dynamic start is changing,
@@ -417,7 +417,7 @@ still imply. for the purposes of understanding the algorithm, assume that this i
 the goal of the algorithm is to automatically edit the curvature in the most ideal way possible
 in scenarios like these
 */
-Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inverse: true }) {
+Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
     /*
     TABLE OF CONTENTS
     the goal of the autotuning algorithm is to modify the curvature of an assignment such that:
@@ -432,7 +432,6 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
     5. Autotunes the auotuned curvature closer to linear the end of the assignment gets closer
     6. Autotunes the curvature closer to the inverse of the autotuned curvature
     */
-    if (this.sa.fixed_mode) return;
     const old_skew_ratio = this.sa.skew_ratio;
 
     /*
@@ -656,10 +655,10 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         The key takeaway is the fact that I have to loop through and repeat these two functions
         many times:
         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-            this.setDynamicStartIfInDynamicMode();
+            this.setDynamicStart();
             this.autotuneSkewRatio();
         }
-        this.setDynamicStartIfInDynamicMode();
+        this.setDynamicStart();
 
         The problem with this is rerunning the autotuning algorithm is that it magnifies 
         the curvature by double dipping this algorithm
