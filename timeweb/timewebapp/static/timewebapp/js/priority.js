@@ -352,7 +352,10 @@ class Priority {
                         has_autofilled = true;
                         sa.sa.works.push(last_work_input);
                         len_works++;
-                        if (todo !== 0 && sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
+                        // theres a small chance that we dont actually need to run setDynamicStartIfInDynamicMode
+                        // if shouldAutotune is false, but its more forward compatible to just run it anyways
+                        if (todo !== 0) {
+                            if (sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF)
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                                 sa.setDynamicStartIfInDynamicMode();
                                 sa.autotuneSkewRatioIfInDynamicMode();
