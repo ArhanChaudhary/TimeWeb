@@ -417,7 +417,7 @@ still imply. for the purposes of understanding the algorithm, assume that this i
 the goal of the algorithm is to automatically edit the curvature in the most ideal way possible
 in scenarios like these
 */
-Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
+Assignment.prototype.WLSWorkInputs = function() {
     /*
     TABLE OF CONTENTS
     the goal of the autotuning algorithm is to modify the curvature of an assignment such that:
@@ -431,10 +431,7 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
     algorithm is run many times for a single auototune
     5. Autotunes the auotuned curvature closer to linear the end of the assignment gets closer
     6. Autotunes the curvature closer to the inverse of the autotuned curvature
-    */
-    const old_skew_ratio = this.sa.skew_ratio;
 
-    /*
     STEP 1: Weighted Least Squares Regression
     Let's remind ourselves the end goal:
     we want to change the curvature from this:
@@ -476,7 +473,6 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
         return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
     }.bind(this));
     const len_works_without_break_days = works_without_break_days.length - 1;
-
     const original_red_line_start_x = this.red_line_start_x;
     const original_red_line_start_y = this.red_line_start_y;
     // red_line_start_x needs to be set for calcModDays to be accurate
@@ -491,14 +487,19 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
     if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
         x1_from_blue_line_start = Math.ceil(x1_from_blue_line_start);
     }
-    // Leads to zero divisions later on and NaN curvature values
-    // Can happen when you don't complete an assignment by its due date
-    // We don't need to add this to shouldAutotune because the scenarios in which this will happen are irrelevant
-    if (x1_from_blue_line_start === 0) return;
-
+    
     // number of work inputs to do between the start of the red line and the due date
     let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
 
+    this.red_line_start_x = original_red_line_start_x;
+    this.red_line_start_y = original_red_line_start_y;
+
+    // Leads to zero divisions later on and NaN curvature values
+    // Can happen when you don't complete an assignment by its due date
+    // We don't need to add this to shouldAutotune because the scenarios in which this will happen are irrelevant
+    // NOTE: may not actually be needed if there is a todo=0 break days check
+    if (x1_from_blue_line_start === 0) return NaN;
+    
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for the actual WLS!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3
     // Start of contribution
@@ -515,10 +516,10 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
         x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
         y_matrix.push([y1_from_blue_line_start]);
     }
-
-    let autotuned_skew_ratio;
     // A parabola cant be defined with less than 3 points
-    if (y_matrix.length >= 3) {
+    if (y_matrix.length < 3) {
+        var parabola = NaN;
+    } else {
         const X = new mlMatrix.Matrix(x_matrix);
         const Y = new mlMatrix.Matrix(y_matrix);
 
@@ -527,11 +528,41 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
         T.data[T.data.length - 1][1] *= Assignment.MATRIX_ENDS_WEIGHT;
         T = T.transpose();
 
-        result = mlMatrix.inverse(T.mmul(X)).mmul(T).mmul(Y)
-        let a = result.data[1][0];
-        let b = result.data[0][0];
+        const result = mlMatrix.inverse(T.mmul(X)).mmul(T).mmul(Y);
+        const a = result.data[1][0];
+        const b = result.data[0][0];
+        var parabola = {a, b};
         // End of contribution
+    }
+    return { parabola, len_works_without_break_days, x1_from_blue_line_start, y1_from_blue_line_start };
+}
 
+Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_factor } */, inverseOption/* = { inverse } */) {
+    assert(inverseOption.inverse === true || inverseOption.inverse === false, "inverseOption.inverse must be either true or false");
+    const old_skew_ratio = this.sa.skew_ratio;
+    /*
+    STEP 3: Defining an autotune factor
+    With only one work input, the regression algorithm is heavily skewed towards that one
+    work input, resulting in nonsensical curvatures such as these:
+    https://cdn.discordapp.com/attachments/834305828487561216/872673400257118228/Screen_Recording_2021-08-04_at_7.51.42_PM.mov
+
+    We need some sort of way to make this algorithm less influential at the start and more
+    influential at the end by defining an autotuning factor
+    
+    (which when closer to 0, will be more inclined to retain the original curvature value,
+    and when closer 1, will be more inclined to change to the new curvature value)
+
+    Defining such a factor is more simple that you think:
+    autotune factor = number of work inputs / number of working days between the start of
+    the blue line and the due date
+
+    forming a linear gradient that successfully mitigates this issue
+    */
+    let autotune_factor = wls.len_works_without_break_days / wls.x1_from_blue_line_start;
+    if (Number.isNaN(wls.parabola)) {
+        // A parabola cannot be defined by two or less points; instead connect a line
+        var autotuned_skew_ratio = 1;
+    } else {
         /*
         STEP 2: Transferring the curvature
         Our WLS algorithm generates a parabola form the origin to (x, y), but as it turns out
@@ -597,8 +628,6 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
 
         // Change the scope of the skew ratio to x1 ("transfer" the skew ratio value from
         // x1_from_blue_line_start to x1)
-        this.red_line_start_x = original_red_line_start_x;
-        this.red_line_start_y = original_red_line_start_y;
         let x1 = this.sa.complete_x - this.red_line_start_x;
         let y1 = this.sa.y - this.red_line_start_y;
 
@@ -608,42 +637,18 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
             x1 = Math.ceil(x1);
         }
 
-        let slope = 2 * a * x1_from_blue_line_start + b;
-        const parabola = {
+        const slope = 2 * wls.parabola.a * wls.x1_from_blue_line_start + wls.parabola.b;
+        const transferred_parabola = {
             // https://www.desmos.com/calculator/pfpb5x0hsc
-            a: (x1_from_blue_line_start * slope - y1_from_blue_line_start) / Math.pow(x1_from_blue_line_start, 2),
-            b: 2 * y1_from_blue_line_start / x1_from_blue_line_start - slope,
+            a: (wls.x1_from_blue_line_start * slope - wls.y1_from_blue_line_start) / Math.pow(wls.x1_from_blue_line_start, 2),
+            b: 2 * wls.y1_from_blue_line_start / wls.x1_from_blue_line_start - slope,
         };
-        autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+        var autotuned_skew_ratio = (transferred_parabola.a + transferred_parabola.b) * x1 / y1;
 
         // Zero division somewhere
         if (!Number.isFinite(autotuned_skew_ratio)) return;
-
-    } else {
-        // A parabola cannot be defined by two or less points; instead connect a line
-        autotuned_skew_ratio = 1;
     }
-    if (params.inverse) {
-        /*
-        STEP 3: Defining an autotune factor
-        With only one work input, the regression algorithm is heavily skewed towards that one
-        work input, resulting in nonsensical curvatures such as these:
-        https://cdn.discordapp.com/attachments/834305828487561216/872673400257118228/Screen_Recording_2021-08-04_at_7.51.42_PM.mov
-
-        We need some sort of way to make this algorithm less influential at the start and more
-        influential at the end by defining an autotuning factor
-        
-        (which when closer to 0, will be more inclined to retain the original curvature value,
-        and when closer 1, will be more inclined to change to the new curvature value)
-
-        Defining such a factor is more simple that you think:
-        autotune factor = number of work inputs / number of working days between the start of
-        the blue line and the due date
-
-        forming a linear gradient that successfully mitigates this issue
-        */
-        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-
+    if (!inverseOption.inverse) {
         /*
         STEP 4: Nullifying repeated iterations
         The algorithms to autotune the curvature and the start of the red line have an
@@ -758,70 +763,72 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
         autotuned_skew_ratio = 2 - autotuned_skew_ratio;
         // The part of step 3 that actually autotunes the skew ratio
         this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+    /*
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
+    autotuned_skew_ratio = 2 - autotuned_skew_ratio;
+    this.sa.skew_ratio = this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
+    new_skew_ratio = old_skew_ratio + (2 - autotuned_skew_ratio - old_skew_ratio) * autotune_factor;
+
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor) - old_skew_ratio) * autotune_factor;
+
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS));
+
+    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS));
+
+    let n = new_skew_ratio
+    let o = old_skew_ratio
+    let a = autotuned_skew_ratio
+    let l = len_works_without_break_days
+    let x = x1_from_blue_line_start
+    let i = Assignment.AUTOTUNE_ITERATIONS
+
+    n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - (l / x), 1 / i))) - o) * (1 - Math.pow(1 - (l / x), 1 / i));
+
+    let r = l/x;
+
+    n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - r, 1 / i))) - o) * (1 - Math.pow(1 - r, 1 / i));
+
+    let f = 1 - Math.pow(1 - r, 1 / i);
+
+    n = o + (2 - (a + (1 - a) * f) - o) * f;
+
+    The inverse algorithm solves for o:
+
+    n = o + (2 - (a + (1 - a)f) - o)f
+    n = o + 2f - (a + (1 - a)f)f - of
+    n = o - of + 2f - (a + (1 - a)f)f
+    n = o(1 - f) + 2f - (a + (1 - a)f)f
+    n - 2f + (a + (1 - a)f)f = o(1 - f)
+    (n - 2f + (a + (1 - a)f)f)/(1-f) = o
+    o = (n - 2f + (a + f - af)f)/(1-f)
+    o = (n - 2f + af + f^2 - af^2)/(1-f)
+    o = (n - 2f + af + f^2(1 - a))/(1-f)
+    o = (n + f(-2 + a) + f^2(1 - a))/(1-f)
+    o = (f^2(1 - a) + f(a - 2) + n)/(1-f) for f != 1
+
+    Solve for when f === 1 for edge case handling:
+    Assume 1 - Math.pow(1 - r, 1 / i) = 1
+    1 - (1 - r)^(1/i) != 1
+    (1 - r)^(1/i) != 0
+    (1 - r)^(1/i) != 0
+    a^b = 0
+    Since b is a positive rational number, a = 0 for a^b = 0
+    1 - r = 0
+    r = 1
+    */
+    } else if (autotune_factor === 1) {
+        this.sa.skew_ratio = 1;
     } else {
         /*
-        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
-        autotuned_skew_ratio = 2 - autotuned_skew_ratio;
-        this.sa.skew_ratio = this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
-
-        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
-        new_skew_ratio = old_skew_ratio + (2 - autotuned_skew_ratio - old_skew_ratio) * autotune_factor;
-
-        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor) - old_skew_ratio) * autotune_factor;
-
-        var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS));
-
-        new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS));
-
-        let n = new_skew_ratio
-        let o = old_skew_ratio
-        let a = autotuned_skew_ratio
-        let l = len_works_without_break_days
-        let x = x1_from_blue_line_start
-        let i = Assignment.AUTOTUNE_ITERATIONS
-
-        n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - (l / x), 1 / i))) - o) * (1 - Math.pow(1 - (l / x), 1 / i));
-
-        let r = l/x;
-
-        n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - r, 1 / i))) - o) * (1 - Math.pow(1 - r, 1 / i));
-
-        let f = 1 - Math.pow(1 - r, 1 / i);
-
-        n = o + (2 - (a + (1 - a) * f) - o) * f;
-
-        The inverse algorithm solves for o:
-
-        n = o + (2 - (a + (1 - a)f) - o)f
-        n = o + 2f - (a + (1 - a)f)f - of
-        n = o - of + 2f - (a + (1 - a)f)f
-        n = o(1 - f) + 2f - (a + (1 - a)f)f
-        n - 2f + (a + (1 - a)f)f = o(1 - f)
-        (n - 2f + (a + (1 - a)f)f)/(1-f) = o
-        o = (n - 2f + (a + f - af)f)/(1-f)
-        o = (n - 2f + af + f^2 - af^2)/(1-f)
-        o = (n - 2f + af + f^2(1 - a))/(1-f)
-        o = (n + f(-2 + a) + f^2(1 - a))/(1-f)
-        o = (f^2(1 - a) + f(a - 2) + n)/(1-f) for f != 1
-
-        Solve for when f === 1 for edge case handling:
-        Assume 1 - Math.pow(1 - r, 1 / i) = 1
-        1 - (1 - r)^(1/i) != 1
-        (1 - r)^(1/i) != 0
-        (1 - r)^(1/i) != 0
-        a^b = 0
-        Since b is a positive rational number, a = 0 for a^b = 0
-        1 - r = 0
-        r = 1
-
-
         This algorithm isn't perfect due to an unfortunate implementation quirk of todo !== input_done in
         submit_work_input_button. Let's say the current skew ratio is A, you don't have to do work today, and
         you input no work done for today. The skew ratio will stay at A because of the todo !== input_done
@@ -840,13 +847,8 @@ Assignment.prototype.autotuneSkewRatio = function (params = { inverse: true }) {
         values as it repeatedly calls setDynamicStartInDynamic mode. Thankfully, this doesn't seem to big of an
         issue compared to the above issue.
         */
-        let autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-        if (autotune_factor === 1) {
-            this.sa.skew_ratio = 1;
-        } else {
-            autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-            this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
-        }
+        autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+        this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
     }
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);

@@ -1449,10 +1449,12 @@ class VisualAssignment extends Assignment {
             }
             
             if (input_done !== todo_for_blue_line_end && !this.sa.fixed_mode) {
-                if (this.shouldAutotune())
-                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                    this.setDynamicStart();
-                    this.autotuneSkewRatio();
+                const WLS = this.WLSWorkInputs();
+                if (this.shouldAutotune() && !Number.isNaN(WLS)) {
+                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                        this.setDynamicStart();
+                        this.autotuneSkewRatio(WLS, {inverse: false});
+                    }
                 }
                 this.setDynamicStart();
             }
