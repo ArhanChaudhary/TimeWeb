@@ -3,12 +3,12 @@
 
 {% block base_head_css %}
     <link rel="stylesheet" href="{% static 'common/css/app_base.css' %}">
-    <link rel="stylesheet" href="https://unpkg.com/jquery-confirm@3.3.4/dist/jquery-confirm.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'common/vendor/jquery_confirm.min.css' %}">
     {% block css %}{% endblock %}
 {% endblock %}
 
 {% block base_head_js %}
-    <script src="https://unpkg.com/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'common/vendor/jquery.js' %}"></script>
     <script src="{% static 'common/js/jquery_extensions.js' %}"></script>
     <script src="{% static 'common/vendor/jquery_confirm.min.js' %}"></script>
     <script src="{% static 'common/js/app_base.js' %}"></script>

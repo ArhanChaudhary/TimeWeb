@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block css %}
-  <link rel="stylesheet" href="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="{% static 'common/vendor/daterangepicker.css' %}"/>
   <link rel="stylesheet" href="{% static 'timewebapp/css/app.css' %}">
   <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
   {% if user.settingsmodel.appearance == "automatic" %}
@@ -16,22 +16,18 @@
   {{ assignment_models_as_json|json_script:"assignment-models" }}
   {{ settings_model_as_json|json_script:"settings-model" }}
   {{ latest_changelog|json_script:"latest-changelog" }}
-  <script src="https://unpkg.com/moment-mini@2.24.0/moment.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/pluralize@8.0.0/pluralize.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/jquery.easing@1.4.1/jquery.easing.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/sortablejs@1.14.0/Sortable.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/jquery-sortablejs@1.0.1/jquery-sortable.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/ml-matrix@6.10.2/matrix.umd.js" crossorigin="anonymous"></script>
-  {% if DEBUG %}
-    <script src="{% static 'timewebapp/js/utils.js' %}"></script>
-    <script src="{% static 'timewebapp/js/priority.js' %}"></script>
-    <script src="{% static 'timewebapp/js/graph.js' %}"></script>
-    <script src="{% static 'timewebapp/js/parabola.js' %}"></script>
-    <script src="{% static 'timewebapp/js/crud.js' %}"></script>
-  {% else %}
-    <script src="{% static 'timewebapp/js/bundle.js' %}"></script>
-  {% endif %}
+  <script src="{% static 'common/vendor/moment.js' %}"></script>
+  <script src="{% static 'common/vendor/daterangepicker.js' %}"></script>
+  <script src="{% static 'common/vendor/pluralize.js' %}"></script>
+  <script src="{% static 'common/vendor/jquery.easing.min.js' %}"></script>
+  <script src="{% static 'common/vendor/sortable.min.js' %}"></script>
+  <script src="{% static 'common/vendor/matrix.umd.js' %}"></script>
+  <script src="{% static 'common/vendor/jquery-sortable.js' %}"></script>
+  <script src="{% static 'timewebapp/js/utils.js' %}"></script>
+  <script src="{% static 'timewebapp/js/priority.js' %}"></script>
+  <script src="{% static 'timewebapp/js/graph.js' %}"></script>
+  <script src="{% static 'timewebapp/js/parabola.js' %}"></script>
+  <script src="{% static 'timewebapp/js/crud.js' %}"></script>
 {% endblock %}
 
 {% block extra_header_elements %}
