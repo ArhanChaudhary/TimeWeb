@@ -156,9 +156,20 @@ class Assignment {
             let working_days = 0;
             let diff;            
             let len_works = this.sa.works.length - 1;
-            // First point the red line is drawn on, taken from draw()
-            // If in fixed mode, choose this anyways
-            let i = this.sa.blue_line_start + len_works;
+            let i;
+            switch (params.reference) {
+                case "today": {
+                    i = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+                    break;
+                }
+                case "blue line end":
+                case "visual red line start": {
+                    // First point the red line is drawn on, taken from draw()
+                    // If in fixed mode, choose this anyways
+                    i = this.sa.blue_line_start + len_works;
+                    break;
+                }
+            }
             let this_funct;
             let next_funct = this.funct(i);
             if (next_funct === undefined || Number.isNaN(next_funct)) return NaN;
