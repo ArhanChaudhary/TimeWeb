@@ -1259,12 +1259,14 @@ class VisualAssignment extends Assignment {
 
             // Make sure to update submit_work_input_button if this is changed
             if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
-                if (this.shouldAutotune())
-                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                    this.autotuneSkewRatio({ inverse: false });
-                    this.setDynamicStart();
+                const WLS = this.WLSWorkInputs();
+                if (this.shouldAutotune() && !Number.isNaN(WLS)) {
+                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                        this.setDynamicStart();
+                        this.autotuneSkewRatio(WLS, {inverse: true});
+                    }
                 }
-                this.autotuneSkewRatio({ inverse: false });
+                this.autotuneSkewRatio(WLS, {inverse: true});
                 this.sa.works.pop();
                 len_works--;
                 this.setDynamicStart();
@@ -1399,12 +1401,14 @@ class VisualAssignment extends Assignment {
 
                 // Make sure to update delete_work_input_button if this is changed
                 if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
-                    if (this.shouldAutotune())
-                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                        this.autotuneSkewRatio({ inverse: false });
-                        this.setDynamicStart();
+                    const WLS = this.WLSWorkInputs();
+                    if (this.shouldAutotune() && !Number.isNaN(WLS)) {
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                            this.setDynamicStart();
+                            this.autotuneSkewRatio(WLS, {inverse: true});
+                        }
                     }
-                    this.autotuneSkewRatio({ inverse: false });
+                    this.autotuneSkewRatio(WLS, {inverse: true});
                     this.sa.works.pop();
                     len_works--;
                     this.setDynamicStart();
