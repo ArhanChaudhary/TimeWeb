@@ -730,8 +730,13 @@ Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_f
 
         this step of the algorithm simply autotunes the already autotuned curvature
         closer to linear as there are fewer work inputs left to input in an assignment
+
+        TODO: only after had I written step 4 did I realize that it DOESN'T TAKE INTO ACCOUNT STEP 5 (/facepalm)
+        TODO: I spent nearly two days trying to rederive the equation and i got quartic equations :((
+        TODO: I'm not going to re-paste the derivations as you're better off not seeing them lol
+        TODO: So a really really ugly way untested patch is to cube root the autotune factor to upscale this step
         */
-        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * Math.pow(autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
 
         /**
         STEP 6: Reflecting the entire parabola
@@ -766,23 +771,18 @@ Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_f
     /*
     var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
     autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
+    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * Math.sqrt(autotune_factor);
     autotuned_skew_ratio = 2 - autotuned_skew_ratio;
     this.sa.skew_ratio = this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
 
     var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
     autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor;
+    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * Math.sqrt(autotune_factor);
     new_skew_ratio = old_skew_ratio + (2 - autotuned_skew_ratio - old_skew_ratio) * autotune_factor;
 
     var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
     autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * autotune_factor) - old_skew_ratio) * autotune_factor;
-
-    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
-    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS));
-
-    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS))) - old_skew_ratio) * (1 - Math.pow(1 - (len_works_without_break_days / x1_from_blue_line_start), 1 / Assignment.AUTOTUNE_ITERATIONS));
+    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * Math.sqrt(autotune_factor)) - old_skew_ratio) * autotune_factor;
 
     let n = new_skew_ratio
     let o = old_skew_ratio
@@ -790,30 +790,23 @@ Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_f
     let l = len_works_without_break_days
     let x = x1_from_blue_line_start
     let i = Assignment.AUTOTUNE_ITERATIONS
+    let f = 1 - Math.pow(1 - l/x, 1 / i);
 
-    n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - (l / x), 1 / i))) - o) * (1 - Math.pow(1 - (l / x), 1 / i));
-
-    let r = l/x;
-
-    n = o + (2 - (a + (1 - a) * (1 - Math.pow(1 - r, 1 / i))) - o) * (1 - Math.pow(1 - r, 1 / i));
-
-    let f = 1 - Math.pow(1 - r, 1 / i);
-
-    n = o + (2 - (a + (1 - a) * f) - o) * f;
+    n = o + (2 - (a + (1 - a) * f^(1/i)) - o) * f;
 
     The inverse algorithm solves for o:
 
-    n = o + (2 - (a + (1 - a)f) - o)f
-    n = o + 2f - (a + (1 - a)f)f - of
-    n = o - of + 2f - (a + (1 - a)f)f
-    n = o(1 - f) + 2f - (a + (1 - a)f)f
-    n - 2f + (a + (1 - a)f)f = o(1 - f)
-    (n - 2f + (a + (1 - a)f)f)/(1-f) = o
-    o = (n - 2f + (a + f - af)f)/(1-f)
-    o = (n - 2f + af + f^2 - af^2)/(1-f)
-    o = (n - 2f + af + f^2(1 - a))/(1-f)
-    o = (n + f(-2 + a) + f^2(1 - a))/(1-f)
-    o = (f^2(1 - a) + f(a - 2) + n)/(1-f) for f != 1
+    n = o + (2 - (a + (1 - a)f^(1/i)) - o)f
+    n = o + 2f - (a + (1 - a)f^(1/i))f - of
+    n = o - of + 2f - (a + (1 - a)f^(1/i))f
+    n = o(1 - f) + 2f - (a + (1 - a)f^(1/i))f
+    n - 2f + (a + (1 - a)f^(1/i))f = o(1 - f)
+    (n - 2f + (a + (1 - a)f^(1/i))f)/(1-f) = o
+    o = (n - 2f + (a + f^(1/i) - f^(1/i)a)f)/(1-f)
+    o = (n - 2f + af + f^(1+1/i) - af^(1+1/i))/(1-f)
+    o = (n - 2f + af + f^(1+1/i)(1 - a))/(1-f)
+    o = (n + f(-2 + a) + f^(1+1/i)(1 - a))/(1-f)
+    o = (f^(1+1/i)(1 - a) + f(a - 2) + n)/(1-f) for f != 1
 
     Solve for when f === 1 for edge case handling:
     Assume 1 - Math.pow(1 - r, 1 / i) = 1
@@ -848,7 +841,7 @@ Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_f
         issue compared to the above issue.
         */
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        this.sa.skew_ratio = (Math.pow(autotune_factor, 2) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
+        this.sa.skew_ratio = (Math.pow(autotune_factor, 1 + 1 / Assignment.AUTOTUNE_ITERATIONS) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
     }
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
