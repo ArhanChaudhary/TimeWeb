@@ -1442,13 +1442,11 @@ class VisualAssignment extends Assignment {
                 // these inconsistencies are frankly not really that relevant, and dynamic mode is fine to not be completely deterministic
 
             // Remember to add this check to the above autotune if I decide to add this back
-
-            let todo_for_blue_line_end = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
-            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
-                todo_for_blue_line_end = 0;
+            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
+                todo = 0;
             }
             
-            if (input_done !== todo_for_blue_line_end && !this.sa.fixed_mode) {
+            if (input_done !== todo && !this.sa.fixed_mode) {
                 const WLS = this.WLSWorkInputs();
                 if (this.shouldAutotune() && !Number.isNaN(WLS)) {
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
