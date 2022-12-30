@@ -1447,6 +1447,12 @@ class VisualAssignment extends Assignment {
                 });
                 return;
             }
+
+            // This check does nothing 100% of the time as todo is anyways 0 for break days
+
+            // if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
+            //     todo = 0;
+            // }
             
             // +Add this check for setDynamicMode
             // -Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
@@ -1455,12 +1461,11 @@ class VisualAssignment extends Assignment {
             // -However, this isn't really that much of a problem; I can just call this a "feature" of dynamic mode in that it tries to make stuff linear. Disabling this makes dynamic mode completely deterministic in its red line start
             // +nm we kinda need this check or else dynamic mode makes like no sense at all, screw those "inconsistencies" i mentioned earlier i dont wanna make stuff unexpected for the user;
                 // these inconsistencies are frankly not really that relevant, and dynamic mode is fine to not be completely deterministic
+                // the fact that setDynamicStart uses a linear search algorithm now
+                // almost guarantees calling it again will yield the same, current dynamic start
 
-            // Remember to add this check to the above autotune if I decide to add this back
-            if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
-                todo = 0;
-            }
-            
+            // don't also forget to add this check to autofill all work done AND autofill no work done if i decide to remove it
+            // don't also forget to rework delete_work_input_button and parabola.js if i decide to remove/modify it
             if (input_done !== todo && !this.sa.fixed_mode) {
                 const WLS = this.WLSWorkInputs();
                 if (this.shouldAutotune() && !Number.isNaN(WLS)) {
