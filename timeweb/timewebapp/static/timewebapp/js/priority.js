@@ -127,7 +127,7 @@ class Priority {
                     // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
                     const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true, diffcheck: true });
                     // NaN is returned if due_date_minus_today is negative. Let's check if it's greater than 0 for readability
-                    if (remaining_work_days > 0)
+                    if (remaining_work_days >= 0)
                         str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
                 }
             }
