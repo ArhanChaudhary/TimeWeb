@@ -1268,8 +1268,9 @@ class VisualAssignment extends Assignment {
 
             // Make sure to update submit_work_input_button if this is changed
             if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
+                let WLS;
                 if (this.shouldAutotune()) {
-                    const WLS = this.WLSWorkInputs();
+                    WLS = this.WLSWorkInputs();
                     if (!Number.isNaN(WLS)) {
                         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
                             this.setDynamicStart();
@@ -1412,8 +1413,9 @@ class VisualAssignment extends Assignment {
 
                 // Make sure to update delete_work_input_button if this is changed
                 if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
+                    let WLS;
                     if (this.shouldAutotune()) {
-                        const WLS = this.WLSWorkInputs();
+                        WLS = this.WLSWorkInputs();
                         if (!Number.isNaN(WLS)) {
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
                                 this.setDynamicStart();
