@@ -1268,11 +1268,13 @@ class VisualAssignment extends Assignment {
 
             // Make sure to update submit_work_input_button if this is changed
             if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
-                const WLS = this.WLSWorkInputs();
-                if (this.shouldAutotune() && !Number.isNaN(WLS)) {
-                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                        this.setDynamicStart();
-                        this.autotuneSkewRatio(WLS, {inverse: true});
+                if (this.shouldAutotune()) {
+                    const WLS = this.WLSWorkInputs();
+                    if (!Number.isNaN(WLS)) {
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                            this.setDynamicStart();
+                            this.autotuneSkewRatio(WLS, {inverse: true});
+                        }
                     }
                 }
                 this.autotuneSkewRatio(WLS, {inverse: true});
@@ -1410,11 +1412,13 @@ class VisualAssignment extends Assignment {
 
                 // Make sure to update delete_work_input_button if this is changed
                 if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
-                    const WLS = this.WLSWorkInputs();
-                    if (this.shouldAutotune() && !Number.isNaN(WLS)) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                            this.setDynamicStart();
-                            this.autotuneSkewRatio(WLS, {inverse: true});
+                    if (this.shouldAutotune()) {
+                        const WLS = this.WLSWorkInputs();
+                        if (!Number.isNaN(WLS)) {
+                            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                                this.setDynamicStart();
+                                this.autotuneSkewRatio(WLS, {inverse: true});
+                            }
                         }
                     }
                     this.autotuneSkewRatio(WLS, {inverse: true});
@@ -1465,11 +1469,13 @@ class VisualAssignment extends Assignment {
             // don't also forget to add this check to autofill all work done AND autofill no work done if i decide to remove it
             // don't also forget to rework delete_work_input_button and parabola.js if i decide to remove/modify it
             if (input_done !== todo && !this.sa.fixed_mode) {
-                const WLS = this.WLSWorkInputs();
-                if (this.shouldAutotune() && !Number.isNaN(WLS)) {
-                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                        this.setDynamicStart();
-                        this.autotuneSkewRatio(WLS, {inverse: false});
+                if (this.shouldAutotune()) {
+                    const WLS = this.WLSWorkInputs();
+                    if (!Number.isNaN(WLS)) {
+                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                            this.setDynamicStart();
+                            this.autotuneSkewRatio(WLS, {inverse: false});
+                        }
                     }
                 }
                 this.setDynamicStart();

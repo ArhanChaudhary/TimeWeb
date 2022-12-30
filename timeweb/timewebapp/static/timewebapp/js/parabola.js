@@ -497,7 +497,7 @@ Assignment.prototype.WLSWorkInputs = function() {
     // Leads to zero divisions later on and NaN curvature values
     // Can happen when you don't complete an assignment by its due date
     // We don't need to add this to shouldAutotune because the scenarios in which this will happen are irrelevant
-    // NOTE: may not actually be needed if there is a todo=0 break days check
+    // NOTE: probably not actually be needed if it is never equal to 0
     if (x1_from_blue_line_start === 0) return NaN;
     
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for the actual WLS!
