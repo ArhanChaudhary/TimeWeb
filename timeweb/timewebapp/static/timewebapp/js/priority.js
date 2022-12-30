@@ -359,7 +359,7 @@ class Priority {
                         // theres a small chance that we dont actually need to run setDynamicStart
                         // if shouldAutotune is false, but its more forward compatible to just run it anyways
                         if (todo !== 0 && !sa.sa.fixed_mode) {
-                            if (sa.shouldAutotune() && number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
+                            if (sa.shouldAutotune({ extra_conditions: [number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF] })) {
                                 const WLS = sa.WLSWorkInputs();
                                 if (!Number.isNaN(WLS)) {
                                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
