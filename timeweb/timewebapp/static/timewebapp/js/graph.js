@@ -1275,8 +1275,8 @@ class VisualAssignment extends Assignment {
                     const WLS = this.WLSWorkInputs();
                     if (!Number.isNaN(WLS)) {
                         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                            this.setDynamicStart();
                             this.autotuneSkewRatio(WLS, {inverse: true});
+                            this.setDynamicStart();
                         }
                         this.autotuneSkewRatio(WLS, {inverse: true});
                     }
@@ -1419,8 +1419,8 @@ class VisualAssignment extends Assignment {
                         const WLS = this.WLSWorkInputs();
                         if (!Number.isNaN(WLS)) {
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                                this.setDynamicStart();
                                 this.autotuneSkewRatio(WLS, {inverse: true});
+                                this.setDynamicStart();
                             }
                             this.autotuneSkewRatio(WLS, {inverse: true});
                         }
