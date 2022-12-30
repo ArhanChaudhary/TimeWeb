@@ -206,7 +206,7 @@ class Priority {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
                 const WLS = sa.WLSWorkInputs();
-                if (sa.shouldAutotune({ skip_work_days_check: true }) && !Number.isNaN(WLS)) {
+                if (sa.shouldAutotune({ skip_break_days_check: true }) && !Number.isNaN(WLS)) {
                     for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                         sa.setDynamicStart();
                         sa.autotuneSkewRatio(WLS, {inverse: false});
@@ -388,10 +388,13 @@ class Priority {
                     sa.incrementDueDate();
                 }
 
+                // || increment_due_date_condition for when users go to the next day without entering a work input
                 if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
                     if (!sa.sa.fixed_mode) {
                         const WLS = sa.WLSWorkInputs();
-                        if (sa.shouldAutotune() && !Number.isNaN(WLS)) {
+                        // { skip_break_days_check: true } because this can be thought of as refreshing dynamic mode
+                        // in both the case of increment_due_date_condition and number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF
+                        if (sa.shouldAutotune({ skip_break_days_check: true }) && !Number.isNaN(WLS)) {
                             for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
                                 sa.setDynamicStart();
                                 sa.autotuneSkewRatio(WLS, {inverse: false});

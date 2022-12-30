@@ -115,25 +115,23 @@ class Assignment {
         // }
         // return true;
     }
-    shouldAutotune() {
-        // works_without_break_days = this.sa.works.filter(function (work_input, work_input_index) {
-        //     // If break days are enabled, filter out work inputs that are on break days
-        //     // Use the same logic in calcModDays to detemine whether a work input is on a break day and add -1 at the end to select the work input after every non break day
-        //     // Add work_input_index === 0 because the above logic may skip over the first work input
-        //     return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
-        // }.bind(this));
-        // const len_works_without_break_days = works_without_break_days.length - 1;
+    shouldAutotune(params={ skip_break_days_check: false }) {
+        const in_dynamic_mode = !this.sa.fixed_mode;
+        if (!in_dynamic_mode) return false;
 
-        let should_autotune = true;
         let len_works = this.sa.works.length - 1;
         const mods = this.calcModDays();
-
-        // TODO: probably need to test this but mods is super insiginicant
         len_works -= Math.floor(len_works / 7) * this.sa.break_days.length + mods[(len_works + this.sa.blue_line_start) % 7];
-        should_autotune &&= len_works <= Assignment.MAX_WORK_INPUTS_AUTOTUNE;
-        should_autotune &&= !this.sa.fixed_mode;
+        const too_many_work_inputs = len_works > Assignment.MAX_WORK_INPUTS_AUTOTUNE;
+        if (too_many_work_inputs) return false;
 
-        return should_autotune;
+        if (!params.skip_break_days_check) {
+            // i dont want any work inputs whatsoever to have ANY effect on the curvature of the red line on a break day
+            const on_break_day = this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7);
+            if (on_break_day) return false;
+        }
+
+        return true;
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
