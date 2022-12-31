@@ -134,7 +134,12 @@ class Priority {
                 if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0 && !incomplete_past_inputs && !reached_end_of_assignment && SETTINGS.display_working_days_left) { 
                     // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
                     // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
-                    const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true, diffcheck: true });
+
+                    // It technically makes more sense to use reference "today", but let's try to instead use "blue line end" for consistency
+                    // If today is before blue line end, this.funct before blue_line_end is always constant, so there is no difference in the diffcheck
+                    // If today is equal to blue line end, they have the same reference starting location and the diffcheck is by definition the same
+                    // If today is after blue line end, this wont even be ran
+                    const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "blue line end", floor_due_time: true, diffcheck: true });
                     // NaN is returned if due_date_minus_today is negative. Let's check if it's greater than 0 for readability
                     if (remaining_work_days >= 0)
                         str_daysleft += ` (${remaining_work_days} work day${remaining_work_days === 1 ? "" : "s"})`;
