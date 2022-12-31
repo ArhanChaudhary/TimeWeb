@@ -390,6 +390,11 @@ class Priority {
                     if (increment_due_date_condition) {
                         sa.sa.x = today_minus_assignment_date;
                         sa.incrementDueDate();
+                        complete_due_date = new Date(sa.sa.assignment_date.valueOf());
+                        complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
+                        if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
+                            complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
+                        }
                         // don't autotune here because x1 is 1
                         sa.setDynamicStart();
                     }
@@ -413,12 +418,6 @@ class Priority {
                         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: sa.sa.works.map(String), id: sa.sa.id});
                         todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input; // Update this if loop ends
                     }
-                }
-
-                complete_due_date = new Date(sa.sa.assignment_date.valueOf());
-                complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
-                if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
-                    complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
                 }
                 const todo_is_completed = todo <= 0;
                 const current_work_input_is_break_day = sa.sa.break_days.includes((sa.assign_day_of_week + today_minus_assignment_date) % 7);
