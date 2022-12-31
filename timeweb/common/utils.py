@@ -29,6 +29,7 @@ def _403_or_429(request, exception=None):
     return HttpResponseForbidden("Forbidden, here's a cookie 🍪 to cheer you up")
 
 def calc_mod_days(self):
+    # Note to future self: I have rigorously tested the inclusion of +1 and it is needed
     assign_day_of_week = self.sm.assignment_date.weekday() + 1 # js moment
     red_line_start_x = self.sm.blue_line_start
     mods = [0]
