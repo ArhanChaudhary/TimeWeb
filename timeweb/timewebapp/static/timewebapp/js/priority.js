@@ -390,24 +390,23 @@ class Priority {
                     if (increment_due_date_condition) {
                         sa.sa.x = today_minus_assignment_date;
                         sa.incrementDueDate();
+                        // don't autotune here because x1 is 1
+                        sa.setDynamicStart();
                     }
 
-                    // || increment_due_date_condition for when users go to the next day without entering a work input
-                    if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || increment_due_date_condition) {
-                        if (!sa.sa.fixed_mode) {
-                            // { skip_break_days_check: true } because this can be thought of as refreshing dynamic mode
-                            // in both the case of increment_due_date_condition and number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF
-                            if (sa.shouldAutotune({ skip_break_days_check: true })) {
-                                const WLS = sa.WLSWorkInputs();
-                                if (!Number.isNaN(WLS)) {
-                                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                                        sa.setDynamicStart();
-                                        sa.autotuneSkewRatio(WLS, {inverse: false});
-                                    }
+                    if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF && !sa.sa.fixed_mode) {
+                        // { skip_break_days_check: true } because this can be thought of as refreshing dynamic mode
+                        // in both the case of increment_due_date_condition and number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF
+                        if (sa.shouldAutotune({ skip_break_days_check: true })) {
+                            const WLS = sa.WLSWorkInputs();
+                            if (!Number.isNaN(WLS)) {
+                                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                                    sa.setDynamicStart();
+                                    sa.autotuneSkewRatio(WLS, {inverse: false});
                                 }
                             }
-                            sa.setDynamicStart();
                         }
+                        sa.setDynamicStart();
                     }
 
                     if (has_autofilled) {
