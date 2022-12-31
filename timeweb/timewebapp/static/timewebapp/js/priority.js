@@ -205,16 +205,7 @@ class Priority {
             if (that.params.first_sort && !sa.sa.needs_more_info && !sa.sa.fixed_mode && dom_assignment.hasClass("refresh-dynamic-mode")) {
                 // Fix dynamic start if y or anything else was changed
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
-                if (sa.shouldAutotune({ skip_break_days_check: true })) {
-                    const WLS = sa.WLSWorkInputs();
-                    if (!Number.isNaN(WLS)) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                            sa.setDynamicStart();
-                            sa.autotuneSkewRatio(WLS, {inverse: false});
-                        }
-                    }
-                }
-                sa.setDynamicStart();
+                sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true } });
             }
                 
             let display_format_minutes = false;
@@ -359,16 +350,7 @@ class Priority {
                         // theres a small chance that we dont actually need to run setDynamicStart
                         // if shouldAutotune is false, but its more forward compatible to just run it anyways
                         if (todo !== 0 && !sa.sa.fixed_mode) {
-                            if (sa.shouldAutotune({ extra_conditions: [number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF] })) {
-                                const WLS = sa.WLSWorkInputs();
-                                if (!Number.isNaN(WLS)) {
-                                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                                        sa.setDynamicStart();
-                                        sa.autotuneSkewRatio(WLS, {inverse: false});
-                                    }
-                                }
-                            }
-                            sa.setDynamicStart();
+                            sa.refreshDynamicMode({ shouldAutotuneParams: { extra_conditions: [number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF] }});
                         }
                     }
                     /**
@@ -401,17 +383,7 @@ class Priority {
 
                     if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF && !sa.sa.fixed_mode) {
                         // { skip_break_days_check: true } because this can be thought of as refreshing dynamic mode
-                        // in both the case of increment_due_date_condition and number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF
-                        if (sa.shouldAutotune({ skip_break_days_check: true })) {
-                            const WLS = sa.WLSWorkInputs();
-                            if (!Number.isNaN(WLS)) {
-                                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                                    sa.setDynamicStart();
-                                    sa.autotuneSkewRatio(WLS, {inverse: false});
-                                }
-                            }
-                        }
-                        sa.setDynamicStart();
+                        sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true }});
                     }
 
                     if (has_autofilled) {

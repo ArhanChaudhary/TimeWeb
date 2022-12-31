@@ -136,6 +136,34 @@ class Assignment {
 
         return true;
     }
+    refreshDynamicMode({ params={ inverse: false }, shouldAutotuneParams=undefined } = {}) {
+        if (params.inverse) {
+            if (this.shouldAutotune()) {
+                const WLS = this.WLSWorkInputs();
+                if (!Number.isNaN(WLS)) {
+                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                        this.autotuneSkewRatio(WLS, {inverse: true});
+                        this.setDynamicStart();
+                    }
+                    this.autotuneSkewRatio(WLS, {inverse: true});
+                }
+            }
+            this.sa.works.pop();
+            this.setDynamicStart();
+            return;
+        }
+
+        if (this.shouldAutotune(shouldAutotuneParams)) {
+            const WLS = this.WLSWorkInputs();
+            if (!Number.isNaN(WLS)) {
+                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                    this.setDynamicStart();
+                    this.autotuneSkewRatio(WLS, {inverse: false});
+                }
+            }
+        }
+        this.setDynamicStart();
+    }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
         this.sa.due_time = {hour: 0, minute: 0};
@@ -1274,23 +1302,11 @@ class VisualAssignment extends Assignment {
 
             // Make sure to update submit_work_input_button if this is changed
             if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
-                if (this.shouldAutotune()) {
-                    const WLS = this.WLSWorkInputs();
-                    if (!Number.isNaN(WLS)) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                            this.autotuneSkewRatio(WLS, {inverse: true});
-                            this.setDynamicStart();
-                        }
-                        this.autotuneSkewRatio(WLS, {inverse: true});
-                    }
-                }
-                this.sa.works.pop();
-                len_works--;
-                this.setDynamicStart();
+                this.refreshDynamicMode({ params: { inverse: true } });
             } else {
                 this.sa.works.pop();
-                len_works--;
             }
+            len_works--;
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
             new Priority().sort();
         });
@@ -1418,23 +1434,11 @@ class VisualAssignment extends Assignment {
 
                 // Make sure to update delete_work_input_button if this is changed
                 if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
-                    if (this.shouldAutotune()) {
-                        const WLS = this.WLSWorkInputs();
-                        if (!Number.isNaN(WLS)) {
-                            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
-                                this.autotuneSkewRatio(WLS, {inverse: true});
-                                this.setDynamicStart();
-                            }
-                            this.autotuneSkewRatio(WLS, {inverse: true});
-                        }
-                    }
-                    this.sa.works.pop();
-                    len_works--;
-                    this.setDynamicStart();
+                    this.refreshDynamicMode({ params: { inverse: true } });
                 } else {
                     this.sa.works.pop();
-                    len_works--;
                 }
+                len_works--;
             }
             this.sa.works.push(last_work_input);
             len_works++;
@@ -1475,16 +1479,7 @@ class VisualAssignment extends Assignment {
             // don't also forget to add this check to autofill all work done AND autofill no work done if i decide to remove it
             // don't also forget to rework delete_work_input_button and parabola.js if i decide to remove/modify it
             if (input_done !== todo && !this.sa.fixed_mode) {
-                if (this.shouldAutotune()) {
-                    const WLS = this.WLSWorkInputs();
-                    if (!Number.isNaN(WLS)) {
-                        for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                            this.setDynamicStart();
-                            this.autotuneSkewRatio(WLS, {inverse: false});
-                        }
-                    }
-                }
-                this.setDynamicStart();
+                this.refreshDynamicMode();
             }
 
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
