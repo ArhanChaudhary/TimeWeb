@@ -33,7 +33,7 @@ DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('id', 'immediately_delete_completely_f
     'lowest_priority_color', 'assignment_sorting', 'default_dropdown_tags', 'horizontal_tag_position', 'vertical_tag_position', 
     'appearance', 'background_image', 'animation_speed', 'enable_tutorial', 'sorting_animation_threshold', 'timezone', 'oauth_token', 
     'added_gc_assignment_ids', 'seen_latest_changelog', 'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user',
-    'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp')
+    'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp', 'display_working_days_left', )
 # Make sure to change the logic comparing the old data too if a new field is expensive to equare
 
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(SettingsModel._meta.fields), "update this list"

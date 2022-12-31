@@ -131,7 +131,7 @@ class Priority {
                 // NOTE: due_date_minus_today > 0 and complete_due_date <= complete_date_now might be redundant but idc
                 const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now && sa.sa.soft;
                 const reached_end_of_assignment = len_works + sa.sa.blue_line_start === sa.sa.x;
-                if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0 && !incomplete_past_inputs && !reached_end_of_assignment) { 
+                if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0 && !incomplete_past_inputs && !reached_end_of_assignment && SETTINGS.display_working_days_left) { 
                     // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
                     // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
                     const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true, diffcheck: true });

@@ -119,6 +119,10 @@ class SettingsModel(models.Model):
         blank=True,
         verbose_name=_('Default Dropdown Tags'),
     )
+    display_working_days_left = models.BooleanField(
+        default=False,
+        verbose_name=('Display Number of Working Days Left'),
+    )
     horizontal_tag_position = models.CharField(
         max_length=MAX_HORIZONTAL_TAG_POSITIONS_LENGTH,
         choices=HORIZONTAL_TAG_POSITIONS,
