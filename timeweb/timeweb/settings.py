@@ -66,7 +66,12 @@ else:
 CSRF_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
 SESSION_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
 
-SECURE_SSL_REDIRECT = not (DEBUG or FIX_DEBUG_LOCALLY)
+CSRF_TRUSTED_ORIGINS = ['https://timeweb.io']
+
+# railway (timeweb's hosting provider) misbehaves with this setting enabled
+# For future reference, please check out this https://discord.com/channels/713503345364697088/1039676438338605127/1039676438338605127
+# (in the Railway discord server)
+# SECURE_SSL_REDIRECT = not (DEBUG or FIX_DEBUG_LOCALLY)
 SECURE_HSTS_SECONDS = 63072000 # 2 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
