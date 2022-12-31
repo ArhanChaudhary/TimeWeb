@@ -122,7 +122,16 @@ class Priority {
                 } else {
                     str_daysleft = due_date_minus_today + "d";
                 }
-                if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0) { 
+                let len_works = sa.sa.works.length - 1;
+                const complete_due_date = new Date(sa.sa.assignment_date.valueOf());
+                complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.sa.complete_x));
+                if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
+                    complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
+                }
+                // NOTE: due_date_minus_today > 0 and complete_due_date <= complete_date_now might be redundant but idc
+                const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now && sa.sa.soft;
+                const reached_end_of_assignment = len_works + sa.sa.blue_line_start === sa.sa.x;
+                if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0 && !incomplete_past_inputs && !reached_end_of_assignment) { 
                     // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
                     // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
                     const remaining_work_days = sa.getWorkingDaysRemaining({ reference: "today", floor_due_time: true, diffcheck: true });
