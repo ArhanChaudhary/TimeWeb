@@ -245,9 +245,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
         if not self.sm.funct_round:
             self.sm.funct_round = Decimal(1)
-        if self.sm.y != None and self.sm.y < 1:
-            # I remember some graph code completely crashing when y is less than 1. Cap it at one for safety
-            self.sm.y = 1
         if not self.sm.unit:
             if self.form.cleaned_data.get(f"y-widget-checkbox"):
                 self.sm.unit = "Hour"
