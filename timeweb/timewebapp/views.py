@@ -418,11 +418,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # removed_works_end - removed_works_start + self.sm.blue_line_start > x_num
                     # removed_works_end > x_num + removed_works_start - self.sm.blue_line_start
                     removed_works_end = x_num + removed_works_start - self.sm.blue_line_start
-                if removed_works_start <= removed_works_end:
+                    actual_len_works = removed_works_end + 1 - removed_works_start
+                    len_works = actual_len_works - 1
+                if len_works >= 0:
                     # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                     works_displacement = Decimal(old_data.works[0]) - first_work
                     if not (works_displacement == 0 and removed_works_start == 0 and removed_works_end + 1 == len(old_data.works)):
-                        self.sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start,removed_works_end+1)]
+                        self.sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start, removed_works_end + 1)]
                 else:
                     # If the assignment or due date cuts off every work input
                     self.sm.works = [str(first_work)]
