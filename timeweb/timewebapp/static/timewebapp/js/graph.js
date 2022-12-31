@@ -151,6 +151,9 @@ class Assignment {
 
         this.sa.alert_due_date_incremented = true;
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+
+        this.sa.skew_ratio = 1;
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
     }
     getWorkingDaysRemaining(params={reference: null, floor_due_time: false, diffcheck: false}) {
         if (params.diffcheck) {
