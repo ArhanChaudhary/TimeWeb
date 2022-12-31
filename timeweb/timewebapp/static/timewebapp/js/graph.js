@@ -1478,6 +1478,16 @@ class VisualAssignment extends Assignment {
 
             // don't also forget to add this check to autofill all work done AND autofill no work done if i decide to remove it
             // don't also forget to rework delete_work_input_button and parabola.js if i decide to remove/modify it
+
+            // TODO: say you have two assignments with the same x1 value but assignment 2 has break days. Say todo is 0.5, and you complete
+            // two units of work on the first assignment. This will cause the curvatuve to autotune. However, if you complete 1.5 units
+            // during the second assignment's break days, and then 0.5 units of work on a work day, the curvature won't autotune because
+            // input_done === todo, but works_without_break_days is the same as assignment #1. There are three approaches I can take to this
+            // problem:
+            // 1) Don't autotune in this case, as autotuning would violate the input_done !== todo functionality of dynamic mode
+            // 2) Autotune in this case, as break days are supposed to be completely ignored from the code's perspective
+            // 3) Ignore this because this is an insanely irrelevant edge case that I am stupidly overthinking and wasting time on
+            // Currently going w/option 3 8')
             if (input_done !== todo && !this.sa.fixed_mode) {
                 this.refreshDynamicMode();
             }

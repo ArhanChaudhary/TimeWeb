@@ -733,9 +733,9 @@ Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_f
         closer to linear as there are fewer work inputs left to input in an assignment
 
         TODO: only after had I written step 4 did I realize that it DOESN'T TAKE INTO ACCOUNT STEP 5 (/facepalm)
-        TODO: I spent nearly two days trying to rederive the equation and i got quartic equations :((
-        TODO: I'm not going to re-paste the derivations as you're better off not seeing them lol
-        TODO: So a really really ugly way untested patch is to cube root the autotune factor to upscale this step
+        I spent nearly two days trying to rederive the equation and i got quartic equations :((
+        I'm not going to re-paste the derivations as you're better off not seeing them lol
+        So a really really ugly way untested patch is to cube root the autotune factor to upscale this step
         */
         autotuned_skew_ratio += (1 - autotuned_skew_ratio) * Math.pow(autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
 
