@@ -122,10 +122,10 @@ class Assignment {
         const in_dynamic_mode = !this.sa.fixed_mode;
         if (!in_dynamic_mode) return false;
 
-        let len_works = this.sa.works.length - 1;
+        const len_works = this.sa.works.length - 1;
         const mods = this.calcModDays();
-        len_works -= Math.floor(len_works / 7) * this.sa.break_days.length + mods[(len_works + this.sa.blue_line_start) % 7];
-        const too_many_work_inputs = len_works > Assignment.MAX_WORK_INPUTS_AUTOTUNE;
+        const len_works_without_break_days = len_works - (Math.floor(len_works / 7) * this.sa.break_days.length + mods[(len_works + this.sa.blue_line_start) % 7]);
+        const too_many_work_inputs = len_works_without_break_days > Assignment.MAX_WORK_INPUTS_AUTOTUNE;
         if (too_many_work_inputs) return false;
 
         if (!params.skip_break_days_check) {
