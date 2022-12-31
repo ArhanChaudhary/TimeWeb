@@ -36,6 +36,8 @@ Assignment.prototype.setParabolaValues = function () {
         y1 = this.sa.y - this.red_line_start_y;
 
     const mods = this.calcModDays();
+    // if x1 is negative (can happen when autofilling no work done for an assignment with a soft due date) then mods[-1] will make this NaN
+    // and trigger the zero division if statement below
     x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
     if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
         x1 = Math.ceil(x1);
@@ -106,7 +108,6 @@ Assignment.prototype.setParabolaValues = function () {
 
     left = 0;
     right = Math.ceil(this.return_y_cutoff);
-    // TODO: https://github.com/ArhanChaudhary/TimeWeb/issues/5
     while (left < right) {
         const mid = left + Math.floor((right - left) / 2);
 
