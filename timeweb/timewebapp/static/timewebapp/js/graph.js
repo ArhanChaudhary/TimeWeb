@@ -116,7 +116,7 @@ class Assignment {
         // return true;
     }
     shouldAutotune(params={ skip_break_days_check: false, extra_conditions: [] }) {
-        const extra_conditions_all_true = params.extra_conditions.every(condition => condition);
+        const extra_conditions_all_true = (params.extra_conditions || []).every(condition => condition);
         if (!extra_conditions_all_true) return false;
 
         const in_dynamic_mode = !this.sa.fixed_mode;
