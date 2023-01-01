@@ -198,7 +198,7 @@ createGCAssignments: function() {
                     var reauthorization_url = jqXHR.responseText;
                     $.alert({
                         title: "Invalid credentials.",
-                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
+                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the integration.",
                         buttons: {
                             "disable integration": {
                                 action: function() {
@@ -242,7 +242,7 @@ updateGCCourses: function() {
                     var reauthorization_url = jqXHR.responseText;
                     $.alert({
                         title: "Invalid credentials.",
-                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
+                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the integration.",
                         buttons: {
                             "disable integration": {
                                 action: function() {
@@ -328,7 +328,9 @@ saveAssignment: function(batchRequestData) {
                 case 413: {
                     $.alert({
                         title: "Too much data to save.",
-                        content: "If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.",
+                        content: `If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.<br><br>
+                        
+                        We understand if this may be frustrating, so feel free to <a href=\"/contact\">contact us</a> for personal assistance.`,
                         backgroundDismiss: false,
                     });
                     return;
