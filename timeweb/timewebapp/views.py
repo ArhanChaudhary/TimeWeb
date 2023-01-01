@@ -418,9 +418,23 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     actual_len_works = removed_works_end + 1 - removed_works_start
                     len_works = actual_len_works - 1
                 if len_works >= 0:
+                    unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
+                    unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
+                    # utils.minutes_to_hours and utils.hours_to_minutes are not needed because i want this to be an accurate conversion
+                    if unit_changed_from_hour_to_minute:
+                        old_data.works = [str(utils.hours_to_minutes(Decimal(i))) for i in old_data.works]
+                    elif unit_changed_from_minute_to_hour:
+                        old_data.works = [str(utils.minutes_to_hours(Decimal(i))) for i in old_data.works]
                     # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                     works_displacement = Decimal(old_data.works[0]) - first_work
-                    if not (works_displacement == 0 and removed_works_start == 0 and removed_works_end + 1 == len(old_data.works)):
+                    if not (
+                        # All of these need to be true to skip redfining self.sm.works:
+                        works_displacement == 0 and
+                        removed_works_start == 0 and
+                        removed_works_end + 1 == len(old_data.works) and
+                        not unit_changed_from_hour_to_minute and
+                        not unit_changed_from_minute_to_hour
+                    ):
                         self.sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start, removed_works_end + 1)]
                 else:
                     # If the assignment or due date cuts off every work input
@@ -440,14 +454,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     self.sm.dynamic_start = 0
                 elif self.sm.dynamic_start > x_num - 1:
                     self.sm.dynamic_start = x_num - 1
-            if self.updated_assignment:
-                unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
-                unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
-                # utils.minutes_to_hours and utils.hours_to_minutes are not needed because i want this to be an accurate conversion
-                if unit_changed_from_hour_to_minute:
-                    self.sm.works = [str(utils.hours_to_minutes(Decimal(i))) for i in self.sm.works]
-                elif unit_changed_from_minute_to_hour:
-                    self.sm.works = [str(utils.minutes_to_hours(Decimal(i))) for i in self.sm.works]
             self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this
