@@ -281,6 +281,10 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
+            # if needed
+            # 'prompt': 'consent',
+            # might be needed?
+            # 'inlcude_granted_scopes': 'true',
         }
     }
 }
