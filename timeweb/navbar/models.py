@@ -14,13 +14,13 @@ HORIZONTAL_TAG_POSITIONS = (
     ("Middle", "Middle"),
     ("Right", "Right"),
 )
-MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in HORIZONTAL_TAG_POSITIONS], key=len))
+MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in HORIZONTAL_TAG_POSITIONS], key=len))
 
 VERTICAL_TAG_POSITIONS = (
     ("Top", "Top"),
     ("Bottom", "Bottom"),
 )
-MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in VERTICAL_TAG_POSITIONS], key=len))
+MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in VERTICAL_TAG_POSITIONS], key=len))
 
 ASSIGNMENT_SORTINGS = (
     ("Most Priority First", "Most Priority First"),
@@ -31,14 +31,14 @@ ASSIGNMENT_SORTINGS = (
     ("Tag Name A-Z", "Tag Name A-Z"),
     ("Tag Name Z-A", "Tag Name Z-A")
 )
-MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SORTINGS], key=len))
+MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[0] for i in ASSIGNMENT_SORTINGS], key=len))
 
 ANIMATION_SPEED = (
     ("1", "Normal (1x)"),
     ("0.5", "Fast (2x)"),
     ("0", "None (No animation)"),
 )
-MAX_ANIMATION_SPEED_LENGTH = len(max([i[1] for i in ANIMATION_SPEED], key=len))
+MAX_ANIMATION_SPEED_LENGTH = len(max([i[0] for i in ANIMATION_SPEED], key=len))
 
 APPEARANCES = (
     ("automatic", "Sync with device"),
@@ -46,7 +46,7 @@ APPEARANCES = (
     ("dark", "Dark Mode"),
     ("lesser dark", "Lesser Dark Mode"),
 )
-MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
+MAX_APPEARANCES_LENGTH = len(max([i[0] for i in APPEARANCES], key=len))
 
 class SettingsModel(models.Model):
 
