@@ -11,6 +11,7 @@ window.addEventListener("pageshow", function(e) {
         let exclude_login_route = RELOAD_VIEWS.slice(0, -1);
         let login_route = RELOAD_VIEWS[RELOAD_VIEWS.length - 1];
         if (exclude_login_route.includes(window.location.pathname) || login_route === window.location.pathname && sessionStorage.getItem("login_email")) {
+            window.ignore_reload_alert = true;
             window.location.reload();
         } else {
             if (window.ajaxUtils) window.ajaxUtils.silence_errors = false;

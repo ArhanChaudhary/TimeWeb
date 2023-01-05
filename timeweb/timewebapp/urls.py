@@ -1,7 +1,13 @@
 from django.urls import path
 from django.conf import settings
 
-RELOAD_VIEWS = ('home', 'deleted_assignments', 'account_login', ) # account_login must be the last one so base.js can reload
+# account_login must be the last one so base.js can reload
+# settings must be the second to last one so base.js can redirect
+# settings must be here for two reasons:
+# 1. so the user can use the back button in the deleted assignments view
+# 2. so unsubmitted settings dont persist if the users use the back button in the assignments view
+# 3. the save button and the logo are unclickable after the unload event
+RELOAD_VIEWS = ('home', 'deleted_assignments', 'settings', 'account_login', )
 KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS = ("home", "example", "settings", "deleted_assignments",
     "user_guide", "account_change_password", "reset_username", "account_email", 
     "socialaccount_connections", "serviceworker")

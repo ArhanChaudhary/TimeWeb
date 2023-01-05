@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
     window.addEventListener("beforeunload", function(e) {
-        if (hasSubmitted) return;
+        if (hasSubmitted || window.ignore_reload_alert) return;
 
         e.preventDefault();
         $("#logo-container").removeAttr("tabindex").focus();
