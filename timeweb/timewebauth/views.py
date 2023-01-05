@@ -6,16 +6,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.forms import ValidationError
+from django.urls import reverse_lazy
+from allauth.account.adapter import get_adapter as get_account_adapter
+from allauth.account.views import PasswordResetFromKeyView
+from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
 
 # App stuff
 from django.conf import settings
 from .forms import UsernameResetForm
-from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
 
 # Misc
 from common.views import logger
 from django.contrib import messages
-from allauth.account.adapter import get_adapter as get_account_adapter
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username_reset.html"
@@ -67,3 +69,8 @@ labeled_connections = login_required(LabeledSocialaccountConnectionsView.as_view
 
 class EmailMessageView(TimewebGenericView):
     template_name = "account/email/password_reset_key_message.html"
+
+class PasswordResetFromKeyViewNoDone(PasswordResetFromKeyView):
+    success_url = reverse_lazy("account_login")
+
+password_reset_from_key_no_done_view = PasswordResetFromKeyViewNoDone.as_view()
