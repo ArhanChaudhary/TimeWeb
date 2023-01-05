@@ -138,7 +138,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['settings_model'] = request.user.settingsmodel
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=[
              # Don't use *SettingsForm.Meta.exclude because this isn't a form
-            "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar", "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp"
+            "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
+            "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
+            "gc_courses_cache",
         ])
         self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
