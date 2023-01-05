@@ -12,7 +12,7 @@ urlpatterns = [
     # Remove the original allauth view
     path('logout/', page_not_found),
     # Slight modification to this route's view
-    path("connections/", views.connections, name="socialaccount_connections"),
+    path("social/connections/", views.labeled_connections, name="socialaccount_connections"),
     # Own view
     path('username/reset/', views.UsernameResetView.as_view(), name='reset_username'),
 ]
