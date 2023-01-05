@@ -29,6 +29,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error, AccessDeniedError, InvalidGrantError
 from httplib2.error import ServerNotFoundError
+from googleapiclient.discovery_cache.base import Cache
 
 # Misc
 from django.db import transaction
@@ -294,6 +295,17 @@ def simplify_course_name(tag_name):
     ], tag_name)
     return tag_name
 
+# Taken from https://github.com/googleapis/google-api-python-client/issues/325#issuecomment-274349841
+# Probably wont be used since it is a document cache but whatever I guess it at least supressed the warning
+class MemoryCache(Cache):
+    _CACHE = {}
+
+    def get(self, url):
+        return MemoryCache._CACHE.get(url)
+
+    def set(self, url, content):
+        MemoryCache._CACHE[url] = content
+
 @require_http_methods(["POST"])
 def update_gc_courses(request):
     # NOTE: we cannot simply run this in create_gc_assignments after the response is sent because
@@ -302,7 +314,7 @@ def update_gc_courses(request):
     if not credentials.valid:
         # rest this logic on create_gc_assignments, idrc if its invalid here
         return HttpResponse(status=204)
-    service = build('classroom', 'v1', credentials=credentials)
+    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
         courses = service.courses().list().execute()
@@ -355,7 +367,7 @@ def create_gc_assignments(request):
             return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     date_now = utils.utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-    service = build('classroom', 'v1', credentials=credentials)
+    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
         # it is possible for this function to process courses that are in the cache but archived
@@ -543,7 +555,7 @@ def gc_auth_callback(request):
 
     try:
         # Ensure the user enabled both scopes
-        service = build('classroom', 'v1', credentials=credentials)
+        service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
         courses = service.courses().list().execute()
         service.courses().courseWork().list(courseId="easter egg!").execute()
     except (HttpError, OAuth2Error) as e:
