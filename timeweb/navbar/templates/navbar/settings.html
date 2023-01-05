@@ -83,7 +83,7 @@
                             {% endfor %}
                             {{ field }}
                             {% if field.widget_type == "checkbox" %}
-                                <label {% if field.name == "view_deleted_assignments" %}class="single-action-label"{% endif %} tabindex="0" for={{ field.auto_id }}>
+                                <label {% if field.name == "view_deleted_assignments" %}class="single-action-label immediate-action"{% endif %} tabindex="0" for={{ field.auto_id }}>
                                     {% if field.name == "view_deleted_assignments" %}
                                         View
                                     {% else %}

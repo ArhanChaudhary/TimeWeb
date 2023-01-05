@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return e.returnValue = "Your settings may be lost.";
     });
     let single_action_label_timeout;
-    $(".single-action-label").click(function() {
+    $(".immediate-action").click(function() {
         clearTimeout(single_action_label_timeout);
         single_action_label_timeout = setTimeout(() => {
             // the timeout and the if statement allow for double or quadruple clicking to cancel the action
