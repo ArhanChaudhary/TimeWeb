@@ -964,11 +964,20 @@ main.finished-header-transition #extra-navs {
     border-color: var(--color);
 }
 
-.grey-highlight:not(.assignment-container),
-.grey-highlight.assignment-container::after,
-.grey-highlight.assignment-container::before {
-    --filter-drop-shadow-color: hsl(0, 0%, 73%);
+#assignments-container.thin-text-shadow-width {
     --filter-drop-shadow-width: 0.5px;
+}
+#assignments-container.normal-text-shadow-width {
+    --filter-drop-shadow-width: 1px;
+}
+#assignments-container.thick-text-shadow-width {
+    --filter-drop-shadow-width: 1.5px;
+}
+
+#assignments-container:not(.none-text-shadow-width) .grey-highlight:not(.assignment-container),
+#assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::after,
+#assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::before {
+    --filter-drop-shadow-color: hsl(0, 0%, 73%);
     filter: drop-shadow(0 var(--filter-drop-shadow-width) 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(0 calc(-1 * var(--filter-drop-shadow-width)) 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(var(--filter-drop-shadow-width) 0 0 var(--filter-drop-shadow-color, transparent))

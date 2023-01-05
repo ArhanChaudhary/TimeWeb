@@ -33,6 +33,14 @@ ASSIGNMENT_SORTINGS = (
 )
 MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[0] for i in ASSIGNMENT_SORTINGS], key=len))
 
+BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH = (
+    ("none", "None"),
+    ("thin", "Thin"),
+    ("normal", "Normal"),
+    ("thick", "Thick"),
+)
+MAX_BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH_LENGTH = len(max([i[0] for i in BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH], key=len))
+
 ANIMATION_SPEED = (
     ("1", "Normal (1x)"),
     ("0.5", "Fast (2x)"),
@@ -148,6 +156,12 @@ class SettingsModel(models.Model):
         null=True,
         blank=True,
         verbose_name=_('Background Image'),
+    )
+    background_image_text_shadow_width = models.CharField(
+        max_length=MAX_BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH_LENGTH,
+        choices=BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH,
+        default=_("normal"),
+        verbose_name=_('Background Image Text Shadow Width'),
     )
     animation_speed = models.CharField(
         max_length=MAX_ANIMATION_SPEED_LENGTH,

@@ -111,9 +111,8 @@
       </form>
     </div>
   </div>
-  <div id="assignments-container" {% if view_deleted_assignments_in_app_view %}class="viewing-deleted-assignments"{% endif %}
-  {% comment %} some javascript makes this focusable {% endcomment %}
-  tabindex="-1">
+  {% comment %} add tabindex because some js makes main focusable {% endcomment %}
+  <div id="assignments-container" class="{% if view_deleted_assignments_in_app_view %}viewing-deleted-assignments{% endif %} {% if settings_model.background_image %}{{ settings_model.background_image_text_shadow_width }}-text-shadow-width{% endif %}" tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
       (function() {
         if ($("main").hasClass("finished-header-transition")) return

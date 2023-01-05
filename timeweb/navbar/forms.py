@@ -106,6 +106,7 @@ class SettingsForm(forms.ModelForm):
             "timezone": "Backend calculations use your browser's timezone. Choose your timezone here if you wish to change it.",
             "sorting_animation_threshold": "Only do the assignment sorting animation when there are this many assignments or less. Due to performance lag as the number of assignments increase, enter a higher number if your device is high-end and a lower number if your device is low-end.",
             "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished by your work inputs. Ignores assignments that are marked as completely finished from their due dates passing. Deleted assignments can be recovered and restored from the deleted assignments view.",
+            "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
