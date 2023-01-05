@@ -354,6 +354,7 @@ class Priority {
             } else {
                 let has_autofilled = false;
                 if (that.params.autofill_no_work_done.includes(dom_assignment[0]) && number_of_forgotten_days > 0) {
+                    let iter = 0;
                     for (let i = 0; i < number_of_forgotten_days; i++) {
                         if (!sa.sa.soft && len_works + sa.sa.blue_line_start === sa.sa.x) break;
 
@@ -363,8 +364,9 @@ class Priority {
                         len_works++;
                         // theres a small chance that we dont actually need to run setDynamicStart
                         // if shouldAutotune is false, but its more forward compatible to just run it anyways
-                        if (todo !== 0 && !sa.sa.fixed_mode) {
+                        if (todo !== 0 && !sa.sa.fixed_mode && iter < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) {
                             sa.refreshDynamicMode({ shouldAutotuneParams: { extra_conditions: [number_of_forgotten_days < Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF] }});
+                            iter++;
                         }
                     }
                     /**
@@ -395,7 +397,7 @@ class Priority {
                         sa.setDynamicStart();
                     }
 
-                    if (has_autofilled && number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF && !sa.sa.fixed_mode) {
+                    if (has_autofilled && (number_of_forgotten_days >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF || iter >= Priority.TOO_MUCH_TO_AUTOFILL_CUTOFF) && !sa.sa.fixed_mode) {
                         // { skip_break_days_check: true } because this can be thought of as refreshing dynamic mode
                         sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true }});
                     }
