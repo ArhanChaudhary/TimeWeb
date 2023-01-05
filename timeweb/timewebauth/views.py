@@ -6,14 +6,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.forms import ValidationError
+from django.http import HttpResponseNotAllowed
 from django.urls import reverse_lazy
 from allauth.account.adapter import get_adapter as get_account_adapter
 from allauth.account.views import PasswordResetFromKeyView
 from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.views import OAuth2LoginView, OAuth2View
+from allauth.socialaccount.providers.base.mixins import OAuthLoginMixin
 
 # App stuff
 from django.conf import settings
 from .forms import UsernameResetForm
+from allauth.socialaccount import app_settings
 
 # Misc
 from common.views import logger
@@ -69,6 +74,18 @@ labeled_connections = login_required(LabeledSocialaccountConnectionsView.as_view
 
 class EmailMessageView(TimewebGenericView):
     template_name = "account/email/password_reset_key_message.html"
+
+class OAuthLoginMixinNoGet(OAuthLoginMixin):
+    def dispatch(self, request, *args, **kwargs):
+        if (not app_settings.LOGIN_ON_GET) and request.method == "GET":
+            return HttpResponseNotAllowed(["POST"])
+        return self.login(request, *args, **kwargs)
+
+class OAuth2LoginViewNoGet(OAuthLoginMixinNoGet, OAuth2View):
+    def login(self, *args, **kwargs):
+        return OAuth2LoginView.login(self, *args, **kwargs)
+
+oauth2_login_no_get = OAuth2LoginViewNoGet.adapter_view(GoogleOAuth2Adapter)
 
 class PasswordResetFromKeyViewNoDone(PasswordResetFromKeyView):
     success_url = reverse_lazy("account_login")

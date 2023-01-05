@@ -10,6 +10,7 @@ urlpatterns = [
     path("password/reset/key/done/", page_not_found, {'exception': Exception()}),
     # Remove the original allauth templates
     path('logout/', LogoutView.as_view(http_method_names=['post']), name='account_logout'),
+    path('google/login/', views.oauth2_login_no_get, name="google_login"),
     # Slight modification to this route's view
     path("social/connections/", views.labeled_connections, name="socialaccount_connections"),
     # Own view
