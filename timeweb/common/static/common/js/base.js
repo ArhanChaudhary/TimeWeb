@@ -10,7 +10,7 @@ window.addEventListener("pageshow", function(e) {
         // This will mess up the csrf token, so we reload the page to get a new one
         let exclude_login_route = RELOAD_VIEWS.slice(0, -1);
         let login_route = RELOAD_VIEWS[RELOAD_VIEWS.length - 1];
-        if (exclude_login_route.includes(window.location.pathname) || login_route === window.location.pathname && sessionStorage.getItem("login_email") === EXAMPLE_ACCOUNT_EMAIL) {
+        if (exclude_login_route.includes(window.location.pathname) || login_route === window.location.pathname && sessionStorage.getItem("login_email")) {
             window.location.reload();
         } else {
             if (window.ajaxUtils) window.ajaxUtils.silence_errors = false;
