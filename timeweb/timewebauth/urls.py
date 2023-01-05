@@ -10,11 +10,11 @@ urlpatterns = [
     path("password/reset/key/done/", page_not_found),
     # There is already a built-in functionality to logout in the app
     # Remove the original allauth view
-    path('logout', page_not_found),
+    path('logout/', page_not_found),
     # Slight modification to this route's view
     path("connections/", views.connections, name="socialaccount_connections"),
     # Own view
-    path('username/reset', views.UsernameResetView.as_view(), name='reset_username'),
+    path('username/reset/', views.UsernameResetView.as_view(), name='reset_username'),
 ]
 if settings.DEBUG:
     urlpatterns.append(path('view-email-message', views.EmailMessageView.as_view(), name="view_email_message"))

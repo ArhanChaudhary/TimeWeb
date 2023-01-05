@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }));
+        options.url += options.url.endsWith("/") ? "" : "/";
     });
 });
 $(function() {

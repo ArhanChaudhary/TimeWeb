@@ -11,8 +11,8 @@ from . import views
 urlpatterns = [
     # if I add any views make sure to change RELOAD_VIEWS
     path('', views.TimewebView.as_view(),name='home'),
-    path('deleted-assignments', views.TimewebView.as_view(), name='deleted_assignments'),
-    path('example', views.ExampleAccountView.as_view(), name='example'),
+    path('deleted-assignments/', views.TimewebView.as_view(), name='deleted_assignments'),
+    path('example/', views.ExampleAccountView.as_view(), name='example'),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static
