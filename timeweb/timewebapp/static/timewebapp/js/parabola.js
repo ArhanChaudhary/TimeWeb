@@ -340,7 +340,6 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function (point_1, point_
 
     let first_slope = y1 / x1;
     let second_slope = (y2 - y1) / (x2 - x1);
-    // TODO: very buggy (roundoff errors) but should work 99.9% of the time
     if (second_slope === 0 && first_slope === 0 || second_slope !== 0 && Math.abs(first_slope / second_slope - 1) < 0.0000001)
         // note: cases where a and b are Infinity are false for the above check
 
