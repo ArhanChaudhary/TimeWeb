@@ -7,10 +7,10 @@ from . import views
 urlpatterns = [
     # Redirect to login instead of password/reset/key/done/ after a successful password reset
     path("login/", allauth_views.login, name="account_reset_password_from_key_done"),
-    path("password/reset/key/done/", page_not_found),
+    path("password/reset/key/done/", page_not_found, {'exception': Exception()}),
     # There is already a built-in functionality to logout in the app
     # Remove the original allauth view
-    path('logout/', page_not_found),
+    path('logout/', page_not_found, {'exception': Exception()}),
     # Slight modification to this route's view
     path("social/connections/", views.labeled_connections, name="socialaccount_connections"),
     # Own view
