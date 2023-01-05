@@ -80,6 +80,9 @@ body {
 .right-side-of-field > .single-action-label {
     height: initial !important;
 }
+.clearable-file-input-text {
+    font-size: 14px;
+}
 [type="checkbox"] ~ .single-action-label::before {
     width: 100% !important;
     left: 0 !important;

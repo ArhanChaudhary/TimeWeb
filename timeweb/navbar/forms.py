@@ -9,8 +9,8 @@ from django.forms.widgets import ClearableFileInput
 from django.utils.html import format_html
 
 class CustomImageFieldWidget(ClearableFileInput):
-    clear_checkbox_label = _('Clear image')
-    input_text = _('Change image')
+    clear_checkbox_label = _('Clear current image')
+    input_text = _('Change current image')
     template_name = 'navbar/widgets/clearable_file_input.html'
 
 class SettingsForm(forms.ModelForm):
