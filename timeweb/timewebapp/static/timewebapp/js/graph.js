@@ -543,6 +543,7 @@ class VisualAssignment extends Assignment {
         const assignment_container = this.dom_assignment.parents(".assignment-container");
 
         // draw() always runs setParabolaValues but I'll leave it like this because it's easier to maintain and for forward compatibility
+        // TODO: find and test some condition (like if set_skew_ratio is false) to not run setParabolaValues or else it this is really inefficient
         this.setParabolaValues();
 
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
