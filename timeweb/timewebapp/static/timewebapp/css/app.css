@@ -851,9 +851,6 @@ do this because midde-of-header is hidden in the delete assignments view */
     transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%) 
             scale(0.002); /* for some really odd reason scale(0) break the transition on safari and on mobile */
 }
-.hover-point-label.initial-position {
-    transform: scale(0.002);
-}
 .hover-point-label.move-left {
     --translatex: calc(-100% - 10px);
 }
