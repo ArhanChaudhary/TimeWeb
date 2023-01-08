@@ -408,7 +408,17 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
                 if self.sm.dynamic_start < 0:
                     self.sm.dynamic_start = 0
-                elif self.sm.dynamic_start > x_num - 1:
+                # Should we include the dynamic_start >= x_num check?
+                # Let's see if this is possible
+
+                # if this runs, then self.sm.blue_line_start >= x_num is false
+                # so blue_line_start < x_num
+
+                # We also know that dynamic_start >= blue_line_start
+
+                # Combining these, the following inequality is true at this point:
+                # dynamic_start >= blue_line_start < x_num, which does not imply dynamic_start >= x_num is false
+                elif self.sm.dynamic_start >= x_num:
                     self.sm.dynamic_start = x_num - 1
                 removed_works_end = len(old_data.works) - 1
                 # If the edited due date cuts off some of the work inputs
