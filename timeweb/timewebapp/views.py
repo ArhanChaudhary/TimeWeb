@@ -385,11 +385,35 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 else:
                     # we already have x_num and y and we don't need to do any further processing
                     pass
+            old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
+                old_x_num += 1
+            old_ideal_blue_line_start = utils.days_between_two_dates(date_now, old_data.assignment_date)
+            ideal_blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
+            if (self.created_assignment or self.sm.needs_more_info or 
 
-            if self.created_assignment or self.sm.needs_more_info:
-                self.sm.blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
+                # if self.sm.blue_line_start >= x_num then blue_line_start is 0
+                old_ideal_blue_line_start >= old_x_num and 
+                not ideal_blue_line_start >= old_x_num or
+
+                # if blue_line_start < 0 then blue_line_start is 0
+                
+                # Note: this action does NOT affect works, even if it may be
+                # more mathematically logical to do so
+
+                # For context, what is happening here is blue_line_start is being
+                # forced back to today for an assignment that used to have an
+                # assignment date in the future. This should in theory affect
+                # works by clearing it, as every day is now offset. But practically,
+                # users are unlike to actually want this to happen.
+                # 1) they probably don't care about the offset
+                # 2) it would be extremely frustrating to have their work inputs cleared
+                # 3) they might have assigned in the future in the first place by typo or testing
+                old_ideal_blue_line_start < 0 and
+                not ideal_blue_line_start < 0
+            ):
+                self.sm.blue_line_start = ideal_blue_line_start
             else:
                 self.sm.blue_line_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
             if self.sm.blue_line_start < 0:
@@ -397,6 +421,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.blue_line_start = 0
             else:
                 removed_works_start = 0
+            # Defines
+            # 1) self.sm.blue_line_start
+            # 2) self.sm.dynamic_start
+            # 3) self.sm.works
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
                 self.sm.dynamic_start = self.sm.blue_line_start
