@@ -315,20 +315,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 date_now = utils.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
                 self.sm.assignment_date -= original_date_now - date_now
                 self.sm.x -= original_date_now - date_now
-            if self.created_assignment or self.sm.needs_more_info:
-                self.sm.blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
-                if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
-                    self.sm.blue_line_start = 0
-                self.sm.dynamic_start = self.sm.blue_line_start
-            else:
-                self.sm.blue_line_start = old_data.blue_line_start + utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-                removed_works_start = -self.sm.blue_line_start # translates x position 0 so that it can be used to accessing works
-                removed_works_end = len(old_data.works) - 1
-                if self.sm.blue_line_start < 0 or settings.EDITING_EXAMPLE_ACCOUNT:
-                    self.sm.blue_line_start = 0
-                if removed_works_start < 0:
-                    removed_works_start = 0
-
             min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
             if self.sm.x == None:
                 if self.sm.y == None:
@@ -402,13 +388,29 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
 
+            if self.created_assignment or self.sm.needs_more_info:
+                self.sm.blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
+            else:
+                self.sm.blue_line_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
+            if self.sm.blue_line_start < 0:
+                removed_works_start = -self.sm.blue_line_start # translates x position 0 so that it can be used to accessing works
+                self.sm.blue_line_start = 0
+            else:
+                removed_works_start = 0
             if self.sm.blue_line_start >= x_num:
                 self.sm.blue_line_start = 0
-                self.sm.dynamic_start = 0
+                self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]
             elif self.sm.needs_more_info or self.created_assignment:
+                self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]
             elif self.updated_assignment:
+                self.sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
+                if self.sm.dynamic_start < 0:
+                    self.sm.dynamic_start = 0
+                elif self.sm.dynamic_start > x_num - 1:
+                    self.sm.dynamic_start = x_num - 1
+                removed_works_end = len(old_data.works) - 1
                 # If the edited due date cuts off some of the work inputs
                 actual_len_works = removed_works_end + 1 - removed_works_start
                 len_works = actual_len_works - 1
@@ -445,17 +447,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # ensures assignments don't immediately delete after editing a y value
                     # less than the last work input
                     self.sm.dont_hide_again = True
-                
-                # In theory, the ONLY thing that should affect dynamic_start is changing the assignment date
-
-                # By testing and generalizing, we can see that it is not possible for dynamic_start
-                # to be a value that is not on a work input.
-                # TODO: rigorously prove this
-                self.sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-                if self.sm.dynamic_start < 0:
-                    self.sm.dynamic_start = 0
-                elif self.sm.dynamic_start > x_num - 1:
-                    self.sm.dynamic_start = x_num - 1
             self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this
