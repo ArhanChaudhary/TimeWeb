@@ -844,11 +844,11 @@ do this because midde-of-header is hidden in the delete assignments view */
     pointer-events: none; /* hovering this label doesn't allow clicking the graph */
     --translatex: 10px;
     /* Don't make transform origin left or right or else the transitions between left and right get messed up */
-    transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%);
+    transform: translate(calc(1px * var(--x, 0)), calc(1px * var(--y, 0))) translate(var(--translatex), -50%);
     transition: transform calc(0.1s * clamp(0, var(--animation-speed) * 999, 1)) linear;
 }
 .hover-point-label.hide-label {
-    transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%) 
+    transform: translate(calc(1px * var(--x, 0)), calc(1px * var(--y, 0))) translate(var(--translatex), -50%) 
             scale(0.002); /* for some really odd reason scale(0) break the transition on safari and on mobile */
 }
 .hover-point-label.move-left {
