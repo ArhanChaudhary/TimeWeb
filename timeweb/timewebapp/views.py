@@ -443,6 +443,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 else:
                     # If the assignment or due date cuts off every work input
                     self.sm.works = [str(first_work)]
+                    actual_len_works = 1
+                    len_works = actual_len_works - 1
                 if Decimal(self.sm.works[len_works]) >= self.sm.y:
                     # ensures assignments don't immediately delete after editing a y value
                     # less than the last work input
