@@ -99,16 +99,17 @@ class TimewebForm(forms.ModelForm):
             self.fields[f"{field_name}-widget-checkbox"] = forms.BooleanField(widget=forms.HiddenInput(), required=False)
         self.label_suffix = ""
 
-    def clean(self):
-        cleaned_data = super().clean()
-        x = cleaned_data.get("x")
-        due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
-        assignment_date = cleaned_data.get("assignment_date")
-        works = cleaned_data.get("works")
-        y = cleaned_data.get("y")
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if name == "":
+            raise forms.ValidationError(_("You can't have a blank name"))
         if self.request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
-            self.add_error("name", forms.ValidationError(_("You can't create nor edit assignments in the example account")))
-            return cleaned_data
+            raise forms.ValidationError(_("You can't create nor edit assignments in the example account"))
+        return name
+
+    def clean(self):
+        # A useful reference on how to correctly use form validation: https://stackoverflow.com/a/31729820/12230735
+        cleaned_data = super().clean()
 
         normalize_works = 1
         normalize_y = 1
@@ -119,7 +120,8 @@ class TimewebForm(forms.ModelForm):
         if cleaned_data['works-widget-checkbox']:
             normalize_works = 60
             comparing_time = True
-
+        y = cleaned_data.get("y")
+        works = cleaned_data.get("works")
         if not isinstance(works, list) and works != None and y != None and works * normalize_works >= y * normalize_y >= 1:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)s can't be %(equal_to_or_greater_than)s the previous field's value of %(y)s"),code='invalid',params={
@@ -129,7 +131,11 @@ class TimewebForm(forms.ModelForm):
                 })
             )
             self.add_error("y", forms.ValidationError(""))
+
         # if x or assignment date is none, the assignment needs more info
+        x = cleaned_data.get("x")
+        due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
+        assignment_date = cleaned_data.get("assignment_date")
         if x != None and assignment_date != None:
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
             if complete_due_date <= assignment_date:
