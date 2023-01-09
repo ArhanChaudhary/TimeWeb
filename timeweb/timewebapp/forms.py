@@ -3,6 +3,7 @@ from .models import TimewebModel
 from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
+import common.utils as utils
 
 class TimewebForm(forms.ModelForm):
 
@@ -120,9 +121,27 @@ class TimewebForm(forms.ModelForm):
         if cleaned_data['works-widget-checkbox']:
             normalize_works = 60
             comparing_time = True
+
         y = cleaned_data.get("y")
         works = cleaned_data.get("works")
-        if not isinstance(works, list) and works != None and y != None and works * normalize_works >= y * normalize_y >= 1:
+        x = cleaned_data.get("x")
+        assignment_date = cleaned_data.get("assignment_date")
+        if isinstance(works, list):
+            len_works = len(works) - 1
+            blue_line_start = cleaned_data.get("blue_line_start")
+            x_num = utils.days_between_two_dates(x, assignment_date)
+            if blue_line_start + len_works > x_num:
+                # Don't actually do this bc we need to raise an error for it to be excluded from save_assignment
+
+                # [-n:] removes the last n items for n >= 1
+                # We want to remove the amount of work inputs that are past the due date
+                # cleaned_data['works'] = works[:-(blue_line_start + len_works - x_num)]
+
+                # Also note if it somehow gets stuck in a place where work inputs are after the due date, we are
+                # ok, even with this check. While they won't get deleted server side, they will client side, and
+                # the user will eventually delete work inputs until before the due date and skip this error
+                self.add_error("works", forms.ValidationError("You have too many work inputs"))
+        elif works != None and y != None and works * normalize_works >= y * normalize_y >= 1:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)s can't be %(equal_to_or_greater_than)s the previous field's value of %(y)s"),code='invalid',params={
                     'value': f"{works}{({1: 'm', 60: 'h'}[normalize_works] if comparing_time else '')}",
@@ -133,9 +152,7 @@ class TimewebForm(forms.ModelForm):
             self.add_error("y", forms.ValidationError(""))
 
         # if x or assignment date is none, the assignment needs more info
-        x = cleaned_data.get("x")
         due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
-        assignment_date = cleaned_data.get("assignment_date")
         if x != None and assignment_date != None:
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
             if complete_due_date <= assignment_date:
