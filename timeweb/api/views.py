@@ -334,16 +334,17 @@ def update_gc_courses(request):
             return HttpResponse(status=204)
         raise e
     courses = courses.get('courses', [])
-    temp = request.user.settingsmodel.gc_courses_cache
-    request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
-    if temp != request.user.settingsmodel.gc_courses_cache:
+    old_courses = request.user.settingsmodel.gc_courses_cache
+    new_courses = simplify_courses(courses, include_name=False)
+    if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
+        request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
         request.user.settingsmodel.save()
     return HttpResponse(status=204)
 
-def simplify_courses(courses):
+def simplify_courses(courses, include_name=True):
     return [{
                 "id": course["id"],
-                "name": simplify_course_name(course["name"]),
+                "name": simplify_course_name(course["name"]) if include_name else None,
             } for course in courses if course["courseState"] != "ARCHIVED"]
 
 @require_http_methods(["POST"])
