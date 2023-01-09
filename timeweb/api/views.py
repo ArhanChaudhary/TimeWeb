@@ -327,6 +327,11 @@ def update_gc_courses(request):
         if e.status_code == 429:
             # Ratelimited, don't care
             return HttpResponse(status=204)
+        if e.status_code >= 500:
+            # this happened one time:
+            # googleapiclient.errors.HttpError: <HttpError 503 when requesting https://classroom.googleapis.com/v1/courses?alt=json returned "The service is currently unavailable.". Details: "The service is currently unavailable.">
+            logger.error(e)
+            return HttpResponse(status=204)
         raise e
     courses = courses.get('courses', [])
     temp = request.user.settingsmodel.gc_courses_cache
