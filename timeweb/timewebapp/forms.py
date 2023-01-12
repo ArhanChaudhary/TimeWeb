@@ -126,9 +126,11 @@ class TimewebForm(forms.ModelForm):
         works = cleaned_data.get("works")
         x = cleaned_data.get("x")
         assignment_date = cleaned_data.get("assignment_date")
-        if isinstance(works, list):
+        blue_line_start = cleaned_data.get("blue_line_start")
+        # save_assignment from the frontend for needs more info assignments can
+        # have works defined but not blue_line_start and etc
+        if isinstance(works, list) and blue_line_start != None and x != None and assignment_date != None:
             len_works = len(works) - 1
-            blue_line_start = cleaned_data.get("blue_line_start")
             x_num = utils.days_between_two_dates(x, assignment_date)
             if blue_line_start + len_works > x_num:
                 # Don't actually do this bc we need to raise an error for it to be excluded from save_assignment
