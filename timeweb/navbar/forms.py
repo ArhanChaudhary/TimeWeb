@@ -6,7 +6,7 @@ from django import forms
 from colorfield.widgets import ColorWidget
 from .models import SettingsModel
 from django.forms.widgets import ClearableFileInput
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 class CustomImageFieldWidget(ClearableFileInput):
     clear_checkbox_label = _('Clear current image')
@@ -21,11 +21,7 @@ class SettingsForm(forms.ModelForm):
             "enable_gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
-                    help_text=format_html("{} <a target=\"_blank\" href=\"/user-guide#adding-google-classroom-assignments\">{}</a>{}",
-                        "Imports assignments from Google Classroom to TimeWeb. Some assignments are ",
-                        "automatically filtered",
-                        ". If nothing happens after authorization, there aren't any valid Google Classroom assignments to add."
-                    ),
+                    help_text=mark_safe('Imports assignments from Google Classroom to TimeWeb. Some assignments are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.'),
                     required=False,
                 ),
                 "order": "before immediately_delete_completely_finished_assignments",

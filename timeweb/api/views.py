@@ -356,21 +356,21 @@ def create_gc_assignments(request):
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
     # If there are no valid credentials available, let the user log in.
     if not credentials.valid:
-        if credentials.expired and credentials.refresh_token:
-            try:
-                # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
-                credentials.refresh(Request())
-            except RefreshError:
-                # In case users manually revoke access to their oauth scopes after authorizing
-                return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
-            # If connection to the server randomly dies (could happen locally when wifi is off)
-            except TransportError:
-                return HttpResponse(status=204)
-            else:
-                request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
-                request.user.settingsmodel.save()
-        else:
+        can_be_refreshed = credentials.expired and credentials.refresh_token
+        if not can_be_refreshed:
             return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+        try:
+            # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
+            credentials.refresh(Request())
+        except RefreshError:
+            # In case users manually revoke access to their oauth scopes after authorizing
+            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
+        # If connection to the server randomly dies (could happen locally when wifi is off)
+        except TransportError:
+            return HttpResponse(status=204)
+        else:
+            request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
+            request.user.settingsmodel.save()
     date_now = utils.utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
@@ -407,7 +407,7 @@ def create_gc_assignments(request):
                     assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                 if "minutes" in assignment['dueTime']:
                     assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                x = utils.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime']).replace(tzinfo=timezone.utc))
+                x = utils.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime'], tzinfo=timezone.utc))
                 if x < date_now:
                     continue
 

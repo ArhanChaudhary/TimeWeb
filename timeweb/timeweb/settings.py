@@ -256,7 +256,7 @@ else:
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
 GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
 GC_CREDENTIALS_JSON = os.environ.get("GC_API_CREDENTIALS")
-if (GC_CREDENTIALS_JSON := os.environ.get("GC_API_CREDENTIALS")) is None:
+if GC_CREDENTIALS_JSON is None:
     print("GC_API_CREDENTIALS is not set; Google Classroom API will not work")
 else:
     GC_CREDENTIALS_JSON = json.loads(GC_CREDENTIALS_JSON)

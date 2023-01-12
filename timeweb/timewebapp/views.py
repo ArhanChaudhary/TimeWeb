@@ -312,7 +312,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if settings.EDITING_EXAMPLE_ACCOUNT:
                 # Example account date (for below logic purposes)
                 original_date_now = date_now
-                date_now = utils.utc_to_local(request, datetime.datetime(2021, 5, 3).replace(tzinfo=timezone.utc))
+                date_now = utils.utc_to_local(request, datetime.datetime(2021, 5, 3, tzinfo=timezone.utc))
                 self.sm.assignment_date -= original_date_now - date_now
                 self.sm.x -= original_date_now - date_now
             min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
