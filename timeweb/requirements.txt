@@ -34,7 +34,7 @@ gunicorn==20.1.0
 html5lib==1.1
 httplib2==0.19.1
 idna==3.2
-minify_html==0.8.0
+minify_html==0.10.7
 oauthlib==3.2.1
 packaging==21.0
 Pillow==9.3.0
