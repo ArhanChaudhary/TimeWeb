@@ -14,7 +14,7 @@ django-colorfield==0.4.3
 django-contact-form==1.9
 django-csp==3.7
 django-livereload-server==0.4
-django-minify-html @ git+https://github.com/adamchainz/django-minify-html.git@234467bcfa4670b7d50e51bdba685c7f977b79df
+django-minify-html==1.4.0
 django-multiselectfield==0.1.12
 django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@060de0e83e9798d1001f75087a693c4d7dd1dda8
 django-ratelimit==3.0.1
