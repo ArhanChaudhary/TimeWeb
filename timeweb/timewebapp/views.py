@@ -3,7 +3,7 @@
 # In the future I should probably switch all my view classes to FormView
 
 # Abstractions
-from django.shortcuts import get_object_or_404, redirect, reverse
+from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
 from django.http import HttpResponse, QueryDict
 from django.contrib.auth import logout, login
@@ -229,12 +229,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             first_work = Decimal(str(self.sm.works or 0))
             self.sm.user = request.user
         elif self.updated_assignment:
-            self.sm = get_object_or_404(TimewebModel, pk=self.pk)
-            if request.user != self.sm.user:
-                logger.warning(f"User \"{request.user}\" can't edit an assignment that isn't their's")
-                return HttpResponse(status=404)
-                
-            # old_data is needed for readjustments
+            self.sm = TimewebModel.objects.get(pk=self.pk, user=request.user)
             old_data = deepcopy(self.sm)
 
             # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58

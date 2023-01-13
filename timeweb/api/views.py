@@ -1,7 +1,7 @@
 # budget rest api
 
 # Abstractions
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.http import HttpResponse, QueryDict
 from django.utils import timezone
@@ -155,11 +155,7 @@ def change_setting(request):
 @require_http_methods(["POST"])
 def tag_add(request):
     pk = request.POST['pk']
-    sm = get_object_or_404(TimewebModel, pk=pk)
-
-    if request.user != sm.user:
-        logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
-        return HttpResponse(status=404)
+    sm = TimewebModel.objects.get(pk=pk, user=request.user)
 
     tag_names = request.POST.getlist('tag_names[]')
     tag_names = [tag_name for tag_name in tag_names if tag_name not in sm.tags]
@@ -176,11 +172,7 @@ def tag_delete(request):
     data = QueryDict(request.body)
 
     pk = data['pk']
-    sm = get_object_or_404(TimewebModel, pk=pk)
-
-    if request.user != sm.user:
-        logger.warning(f"User \"{request.user}\" can't save an assignment that isn't theirs")
-        return HttpResponse(status=404)
+    sm = TimewebModel.objects.get(pk=pk, user=request.user)
 
     tag_names = data.getlist('tag_names[]')
     # Remove tag_names from sm.tags
