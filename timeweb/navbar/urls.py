@@ -1,6 +1,6 @@
 from django.urls import path
 from django.views.generic import RedirectView
-from . import views, forms
+from . import views
 import common.utils as utils
 
 app_static = utils.app_static_factory(__package__)
@@ -10,7 +10,6 @@ urlpatterns = [
     path('blog/', views.BlogView.as_view(), name='blog'),
     path('user-guide/', views.UserguideView.as_view(), name='user_guide'),
     path('changelog/', views.ChangelogView.as_view(), name='changelog'),
-    path('contact/', views.ContactFormView.as_view(form_class=forms.ContactForm), name='contact_form'),
     path('policies/', RedirectView.as_view(url=app_static('policies/policies.html')), name='policies'),
     path('cookies/', RedirectView.as_view(url=app_static('policies/cookies.html'))),
     path('disclaimer/', RedirectView.as_view(url=app_static('policies/disclaimer.html'))),

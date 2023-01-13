@@ -15,7 +15,7 @@ import common.utils as utils
 from common.views import CHANGELOGS
 from .forms import SettingsForm
 from .models import SettingsModel
-from contact_form.views import ContactFormView as BaseContactFormView
+from contact_form.views import ContactFormView
 
 # Misc
 from django.utils.decorators import method_decorator
@@ -101,8 +101,8 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         # It's ok to return a 2xx from invalid form, because there is no danger of the user resubmitting because its invalid
         return self.get(request)
 
-class ContactFormView(BaseContactFormView):
-    success_url = reverse_lazy("contact_form")
+class SecuredFormView(ContactFormView):
+    success_url = reverse_lazy("secured_contact_form")
 
     def post(self, request):
         if is_ratelimited(request, group=resolve(request.path)._func_path, key=utils.get_client_ip, rate='1/m', method="POST", increment=True):

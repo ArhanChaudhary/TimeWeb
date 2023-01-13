@@ -7,7 +7,6 @@ from colorfield.widgets import ColorWidget
 from .models import SettingsModel
 from django.forms.widgets import ClearableFileInput
 from django.utils.safestring import mark_safe
-from timewebapp.views import MAX_TAG_LENGTH
 
 class CustomImageFieldWidget(ClearableFileInput):
     clear_checkbox_label = _('Clear current image')
@@ -145,6 +144,9 @@ class SettingsForm(forms.ModelForm):
         if any(len(tag) > MAX_TAG_LENGTH for tag in default_dropdown_tags):
             raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
         return default_dropdown_tags
+
+# needs to be down here due to circular imports
+from timewebapp.views import MAX_TAG_LENGTH
 
 class ContactForm(BaseContactForm):
     body = forms.CharField(widget=forms.Textarea, label=_("Ask me anything"))

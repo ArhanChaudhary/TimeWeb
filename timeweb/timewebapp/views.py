@@ -19,7 +19,6 @@ from django.conf import settings
 from common.models import User
 from .models import TimewebModel
 from navbar.models import SettingsModel
-from .urls import RELOAD_VIEWS
 from common.views import logger, CHANGELOGS
 
 # Signals
@@ -558,3 +557,6 @@ class ExampleAccountView(TimewebView):
                 logout(request)
             login(request, EXAMPLE_ACCOUNT_MODEL, 'allauth.account.auth_backends.AuthenticationBackend')
         return super(ExampleAccountView, self).get(request)
+
+# needs to be down here due to circular imports
+from .urls import RELOAD_VIEWS
