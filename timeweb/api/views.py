@@ -400,20 +400,28 @@ def create_gc_assignments(request):
                 complete_assignment_date = datetime.datetime.strptime(complete_assignment_date,'%Y-%m-%dT%H:%M:%SZ')
             complete_assignment_date = utils.utc_to_local(request, complete_assignment_date.replace(tzinfo=timezone.utc))
             assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            complete_x = assignment.get('dueDate')
             tags = []
-            if complete_x:
-                if "hours" in assignment['dueTime']:
-                    assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
-                if "minutes" in assignment['dueTime']:
-                    assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                complete_x = utils.utc_to_local(request, datetime.datetime(**complete_x, **assignment['dueTime'], tzinfo=timezone.utc))
-                if complete_x < complete_date_now:
+            if 'dueDate' in assignment:
+                # From https://developers.google.com/classroom/reference/rest/v1/courses.courseWork#CourseWork.FIELDS.due_time
+                # "This[the due time] must be specified if dueDate is specified."
+
+                # Assignments due at 2:31 AM UTC => assignment['dueTime'] = {'hours': 2, 'minutes': 31}
+                # Assignments due at 2:00 AM UTC => assignment['dueTime'] = {'hours': 2}
+                # Assignments due at 12:00 AM UTC => assignment['dueTime'] = {}
+                due_time = datetime.time(assignment['dueTime'].get('hours', 0), assignment['dueTime'].get('minutes', 0))
+                complete_x = utils.utc_to_local(request, datetime.datetime(
+                    **assignment['dueDate'],
+                    hour=due_time.hour,
+                    minute=due_time.minute,
+                    tzinfo=timezone.utc,
+                ))
+                if not (
+                    # The due date must be after today
+                    complete_x > complete_date_now
+                ):
                     continue
 
-                due_time = datetime.time(complete_x.hour, complete_x.minute)
-                x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
-                    
+                x = complete_x.replace(hour=0, minute=0)
                 if assignment_date >= x:
                     continue
                 if date_now == x:
