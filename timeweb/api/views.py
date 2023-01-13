@@ -417,13 +417,13 @@ def create_gc_assignments(request):
                 ))
                 if not (
                     # The due date must be after today
-                    complete_x > complete_date_now
+                    complete_x > complete_date_now and
+                    # The due date must be after the assignment date 
+                    complete_x > complete_assignment_date
                 ):
                     continue
 
                 x = complete_x.replace(hour=0, minute=0)
-                if assignment_date >= x:
-                    continue
                 if date_now == x:
                     tags.append("Important")
             else:
