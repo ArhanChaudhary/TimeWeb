@@ -11,7 +11,10 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         if (!options.url.startsWith("/api")) return;
-        options.data = $.param($.extend(originalOptions.data, {
+        // do NOT use originalOptions, IMPORTANT
+        // re-trying the ajax does not preserve originalOptions,
+        // so we must instread derive it from options
+        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(decodeURIComponent(options.data))), {
             device_uuid: window.DEVICE_UUID,
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
