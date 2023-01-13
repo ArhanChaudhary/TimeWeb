@@ -1187,15 +1187,12 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-window.TAB_CREATION_TIME = utils.getRawDateNow({ dont_stem_off_date_now: true });
-window.date_now = new Date(window.TAB_CREATION_TIME.toDateString());
-window.TAB_CREATION_TIME = window.TAB_CREATION_TIME.valueOf();
+window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
     x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
 }
-window.DEVICE_UUID = Math.random().toString(16).slice(2, 10);
 // Load in assignment data
 window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {

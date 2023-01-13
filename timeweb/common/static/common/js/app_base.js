@@ -1,3 +1,5 @@
+window.TAB_CREATION_TIME = new Date().valueOf();
+window.DEVICE_UUID = Math.random().toString(16).slice(2, 10);
 document.addEventListener("DOMContentLoaded", function() {
     $.ajaxSetup({
         headers: {
