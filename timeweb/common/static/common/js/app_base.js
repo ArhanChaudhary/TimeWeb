@@ -332,6 +332,9 @@ evaluateCurrentState: function() {
                 content: "You have modified your assignments on a different tab or device. Please reload the page to refresh your assignments.",
                 backgroundDismiss: false,
                 buttons: {
+                    ignore: {
+
+                    },
                     reload: {
                         action: reloadWhenAppropriate,
                     },
