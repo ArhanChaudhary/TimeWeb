@@ -409,6 +409,8 @@ def create_gc_assignments(request):
                 # Assignments due at 2:00 AM UTC => assignment['dueTime'] = {'hours': 2}
                 # Assignments due at 12:00 AM UTC => assignment['dueTime'] = {}
                 due_time = datetime.time(assignment['dueTime'].get('hours', 0), assignment['dueTime'].get('minutes', 0))
+                if request.user.settingsmodel.gc_assignments_always_midnight and due_time.hour == 23 and due_time.minute == 59:
+                    due_time = datetime.time(0, 0)
                 complete_x = utils.utc_to_local(request, datetime.datetime(
                     **assignment['dueDate'],
                     hour=due_time.hour,

@@ -24,7 +24,7 @@ class SettingsForm(forms.ModelForm):
                     help_text=mark_safe('Imports assignments from Google Classroom to TimeWeb. Some assignments are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.'),
                     required=False,
                 ),
-                "order": "before immediately_delete_completely_finished_assignments",
+                "order": "before gc_assignments_always_midnight",
             },
             "calendar_integration": {
                 "field": forms.BooleanField(
@@ -103,6 +103,7 @@ class SettingsForm(forms.ModelForm):
             "sorting_animation_threshold": "Only do the assignment sorting animation when there are this many assignments or less. Due to performance lag as the number of assignments increase, enter a higher number if your device is high-end and a lower number if your device is low-end.",
             "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished by your work inputs. Ignores assignments that are marked as completely finished from their due dates passing. Deleted assignments can be recovered and restored from the deleted assignments view.",
             "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",
+            "gc_assignments_always_midnight": mark_safe("This setting automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM (ignoring assignments due the day they are assigned). <b>Enable this setting with caution.</b><br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, this setting also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to 12:00 AM."),
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):

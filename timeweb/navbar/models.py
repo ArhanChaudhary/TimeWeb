@@ -57,6 +57,11 @@ APPEARANCES = (
 MAX_APPEARANCES_LENGTH = len(max([i[0] for i in APPEARANCES], key=len))
 
 class SettingsModel(models.Model):
+    # Group "Integration Configurations"
+    gc_assignments_always_midnight = models.BooleanField(
+        default=False,
+        verbose_name=_('Google Classroom 11:59 PM Due Time Fix'),
+    )
 
     # Group "Assignment Deletion"
     immediately_delete_completely_finished_assignments = models.BooleanField(
