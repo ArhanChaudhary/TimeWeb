@@ -339,7 +339,24 @@ def update_gc_courses(request):
     if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
         request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
         request.user.settingsmodel.save()
-        return create_gc_assignments(request)
+        # If old contains every element in new, then we don't need to create_gc_assignments again
+        # As if all the elements of new are in old, then there are new classes to import assignment from.
+
+        # Let's look at some example test cases:
+
+        # old_courses = [1,2,3,4]
+        # new_courses [1,2,3,4,5] (you join a class)
+        # In this case, create_gc_assignments again
+
+        # old_courses = [1,2,3,4]
+        # new_courses = [1,2,3] (you leave a class)
+        # In this case, don't create_gc_assignments again
+
+        # old_courses = [1,2,3,4]
+        # new_courses = [1,2,5] (you leave two classes and join a new one)
+        # In this case, create_gc_assignments again
+        if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
+            return create_gc_assignments(request)
     return HttpResponse(status=204)
 
 def simplify_courses(courses, include_name=True):
@@ -455,27 +472,36 @@ def create_gc_assignments(request):
                 blue_line_start = 0
             dynamic_start = blue_line_start
             gc_models_to_create.append(TimewebModel(
+                # these fields can be updated from changes in the api
+
+                # from api, can change
                 name=name,
                 assignment_date=assignment_date,
                 x=x,
                 due_time=due_time,
+                description=description,
+                # from app, depends on api
                 blue_line_start=blue_line_start,
+                dynamic_start=dynamic_start,
+
+                # these fields cannot be updated from changes in the api
+
+                # from api, cannot change
+                google_classroom_assignment_link=google_classroom_assignment_link,
+                tags=tags,
+                # from app
                 skew_ratio=request.user.settingsmodel.def_skew_ratio,
                 min_work_time=request.user.settingsmodel.def_min_work_time,
                 break_days=request.user.settingsmodel.def_break_days,
-                dynamic_start=dynamic_start,
-                description=description,
-                google_classroom_assignment_link=google_classroom_assignment_link,
-                tags=tags,
+                user=request.user,
                 needs_more_info=True,
                 is_google_classroom_assignment=True,
-                user=request.user,
-
-                # Assumptions
+                # assumptions
                 unit="Minute",
                 time_per_unit=1,
                 funct_round=5,
                 # y is missing
+                y=None,
             ))
 
     coursework_lazy = service.courses().courseWork()
