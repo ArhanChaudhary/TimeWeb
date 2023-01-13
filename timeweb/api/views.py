@@ -423,6 +423,8 @@ def create_gc_assignments(request):
                     continue
                 due_time = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
+            # We don't need to worry if there if this raises a not found error because the courses we
+            # request assignments from are the ones in request.user.settingsmodel.gc_courses_cache itself
             tags.insert(0, next(
                 i['name'] for i in request.user.settingsmodel.gc_courses_cache
                 if assignment['courseId'] == i['id']
