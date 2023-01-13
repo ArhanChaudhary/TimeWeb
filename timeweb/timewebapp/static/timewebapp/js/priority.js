@@ -429,11 +429,12 @@ class Priority {
                     }).css("margin-left", 2);
                 } else if (todo_is_completed || already_entered_work_input_for_today || current_work_input_is_break_day) {
                     status_image = 'finished';
+                    // although tiny, this space optimization can save an enture line
                     if (current_work_input_is_break_day) {
-                        status_message = 'Today isn\'t a working day for this assignment';
+                        status_message = 'Today is a break day for this assignment';
                     } else {
                         // we need to mention today or this can be interpreted as completely finished
-                        status_message = 'You\'re finished with this assignment\'s work for today';
+                        status_message = 'You\'re finished with this assignment\'s <span class="show-on-mobile">daily work</span><span class="hide-on-mobile">work for today</span>';
                     }
                     //hard
                     dom_status_image.attr({
