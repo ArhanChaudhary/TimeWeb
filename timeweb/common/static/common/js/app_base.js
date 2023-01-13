@@ -221,10 +221,9 @@ createGCAssignments: function() {
         url: '/api/create-gc-assignments',
         error: ajaxUtils.GCIntegrationError,
         success: function(response, textStatus, jqXHR) {
-            ajaxUtils.updateGCCourses();
-            if (!jqXHR) return; // In case manually called
             switch (jqXHR.status) {
                 case 204:
+                    ajaxUtils.updateGCCourses();
                     break;
 
                 case 205:
