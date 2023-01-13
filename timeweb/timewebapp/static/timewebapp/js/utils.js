@@ -472,17 +472,6 @@ addTagHandlers: function() {
                 utils.ui.close_on_success = false;
                 $this.find(".tag-add-input").blur();
             }
-            // Add tags to dat locally
-            sa.tags.push(...tag_names);
-
-            // There are too many conditions on whether to sort or not, so just sort every time
-
-            // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
-            // "important" and "not important" because they were designed to affect priority
-            // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
-                new Priority().sort();
-            // }
-
             // Close box and add tags visually
             dom_assignment.removeClass("open-tag-add-box");
             transitionCloseTagBox($this);
@@ -512,9 +501,16 @@ addTagHandlers: function() {
                     tag.prev().css("z-index", "");
                 });
             }            
-            // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
             if (!tag_names.size) return;
+            sa.tags.push(...tag_names);
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
+            // There are too many conditions on whether to sort or not, so just sort every time
+
+            // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
+            // "important" and "not important" because they were designed to affect priority
+            // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+                new Priority().sort();
+            // }
             tag_names = new Set();
             return;
         }
