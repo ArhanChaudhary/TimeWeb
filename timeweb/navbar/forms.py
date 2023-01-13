@@ -7,6 +7,7 @@ from colorfield.widgets import ColorWidget
 from .models import SettingsModel
 from django.forms.widgets import ClearableFileInput
 from django.utils.safestring import mark_safe
+from timewebapp.views import MAX_TAG_LENGTH
 
 class CustomImageFieldWidget(ClearableFileInput):
     clear_checkbox_label = _('Clear current image')
@@ -139,7 +140,11 @@ class SettingsForm(forms.ModelForm):
         # Weird {"field": None} logic because the default value is still evaluated even if the key is found for .get
         self.fields = {k: self.fields.get(k, SettingsForm.Meta.extra_fields.get(k, {"field": None})["field"]) for k in new_keyorder}
         self.label_suffix = ""
-
+    def clean_default_dropdown_tags(self):
+        default_dropdown_tags = self.cleaned_data["default_dropdown_tags"]
+        if any(len(tag) > MAX_TAG_LENGTH for tag in default_dropdown_tags):
+            raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
+        return default_dropdown_tags
 
 class ContactForm(BaseContactForm):
     body = forms.CharField(widget=forms.Textarea, label=_("Ask me anything"))

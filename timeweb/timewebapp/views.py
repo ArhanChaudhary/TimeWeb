@@ -20,8 +20,6 @@ from common.models import User
 from .models import TimewebModel
 from navbar.models import SettingsModel
 from .urls import RELOAD_VIEWS
-from .forms import TimewebForm
-from navbar.forms import SettingsForm
 from common.views import logger, CHANGELOGS
 
 # Signals
@@ -35,7 +33,11 @@ from django.utils.decorators import method_decorator
 from copy import deepcopy
 from ratelimit.decorators import ratelimit
 
+MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
+# needs to be down here due to circular imports
+from .forms import TimewebForm
+from navbar.forms import SettingsForm
 DELETED_ASSIGNMENTS_PER_PAGE = 70
 EXAMPLE_ASSIGNMENT = {
     "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
