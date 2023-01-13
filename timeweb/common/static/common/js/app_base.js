@@ -221,23 +221,15 @@ createGCAssignments: function() {
         url: '/api/create-gc-assignments',
         error: ajaxUtils.GCIntegrationError,
         success: function(response, textStatus, jqXHR) {
-            switch (jqXHR.status) {
-                case 204:
-                    ajaxUtils.updateGCCourses();
-                    break;
-
-                case 205:
-                    reloadWhenAppropriate();
-                    break;
-            }
+            if (jqXHR.status === 204)
+                $.ajax({
+                    type: "POST",
+                    url: '/api/update-gc-courses',
+                    error: ajaxUtils.GCIntegrationError,
+                });
+            else if (jqXHR.status === 205)
+                reloadWhenAppropriate();
         },
-    });
-},
-updateGCCourses: function() {
-    $.ajax({
-        type: "POST",
-        url: '/api/update-gc-courses',
-        error: ajaxUtils.GCIntegrationError,
     });
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
