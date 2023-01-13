@@ -459,7 +459,7 @@ addTagHandlers: function() {
                 }
                 return;
             }
-            tag_names = new Set(tag_names);
+            tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
 
             if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
                 $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
