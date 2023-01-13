@@ -115,7 +115,7 @@ def save_assignment(request):
 
             if not assignment: continue
             for key, value in assignment.items():
-                setattr(sm, key, value)
+                setattr(sm, key, validation_form.cleaned_data[key])
             sm.save()
     return HttpResponse(status=204)
 
