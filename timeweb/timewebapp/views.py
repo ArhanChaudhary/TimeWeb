@@ -32,6 +32,7 @@ from django.dispatch import receiver
 from django.forms.models import model_to_dict
 import common.utils as utils
 from django.utils.decorators import method_decorator
+from copy import deepcopy
 from ratelimit.decorators import ratelimit
 
 MAX_NUMBER_OF_TAGS = 5
@@ -234,7 +235,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 return HttpResponse(status=404)
                 
             # old_data is needed for readjustments
-            old_data = get_object_or_404(TimewebModel, pk=self.pk)
+            old_data = deepcopy(self.sm)
 
             # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
 
