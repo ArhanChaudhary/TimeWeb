@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 import common.utils as utils
+from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH
 
 class TimewebForm(forms.ModelForm):
 
@@ -107,6 +108,16 @@ class TimewebForm(forms.ModelForm):
         if self.request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             raise forms.ValidationError(_("You can't create nor edit assignments in the example account"))
         return name
+
+    def clean_tags(self):
+        tags = self.cleaned_data['tags']
+        if len(tags) > MAX_NUMBER_OF_TAGS:
+            raise forms.ValidationError(_("You have too many tags (>%(n)dtags)") % {"n": MAX_NUMBER_OF_TAGS})
+        if not (isinstance(tags, list) and all(isinstance(tag, str) for tag in tags)):
+            raise forms.ValidationError(_("Invalid tags"))
+        if any(len(tag) > MAX_TAG_LENGTH for tag in tags):
+            raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
+        return tags
 
     def clean(self):
         # A useful reference on how to correctly use form validation: https://stackoverflow.com/a/31729820/12230735

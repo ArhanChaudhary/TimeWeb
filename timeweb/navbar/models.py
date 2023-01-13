@@ -191,14 +191,17 @@ class SettingsModel(models.Model):
     )
 
     # Hidden
+    # Custom field validation in views: hardcoded enable or disable in change_setting
     oauth_token = models.JSONField(
         default=empty_dict,
         blank=True,
     )
+    # Custom field validation in views: excluded in SettingsForm.Meta.exclude in change_setting
     added_gc_assignment_ids = models.JSONField(
         default=empty_list,
         blank=True,
     )
+    # Custom field validation in views: excluded in SettingsForm.Meta.exclude in change_setting
     gc_courses_cache = models.JSONField(
         default=empty_list,
         blank=True,
