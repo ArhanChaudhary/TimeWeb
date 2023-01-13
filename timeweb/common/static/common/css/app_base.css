@@ -285,11 +285,12 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     display: inline-block;
     cursor: default !important;
     position: relative;
-    width: 14px;
-    height: 14px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: rgb(33,163,177) !important;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 17px;
     font-weight: 400;
     font-style: italic;
     font-family: "Serif";
@@ -297,7 +298,6 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     
     color: white;
     text-align: center;
-    line-height: 15px;
 }
 .info-button::after {
     content: "";

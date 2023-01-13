@@ -802,7 +802,7 @@ class Crud {
             
             Useful as a reminder system for assignments you don't want to fully submit to the assignment form`, 
         "after").css({
-            marginTop: -22,
+            marginTop: -23,
             marginLeft: "auto",
             marginRight: 7,
         });
@@ -811,23 +811,23 @@ class Crud {
             
             i.e. If this assignment is reading a book, enter "Page" or "Chapter"`, 
         "after").css({
-            marginTop: -22,
+            marginTop: -23,
             marginLeft: "auto",
             marginRight: 7,
         });
         $("#id_works").info('left',
             `This is also your initial work input, so changing this value will vertically translate all of your other work inputs accordingly`,
         "after").css({
-            marginRight: -14,
-            bottom: -10,
-            right: 20,
+            marginRight: -17,
+            bottom: -9,
+            right: 23,
         });
         $("#id_funct_round").info('left',
             "", // overridden in replaceUnit
         "after").css({
-            marginRight: -14,
-            bottom: -10,
-            right: 20,
+            marginRight: -17,
+            bottom: -9,
+            right: 23,
         });
         $("label[for=\"id_soft\"]").info('left',
             `Soft due dates are automatically incremented if you haven't finished the assignment by then`,
