@@ -117,6 +117,8 @@ class TimewebForm(forms.ModelForm):
     
     def clean_tags(self):
         tags = self.cleaned_data['tags']
+        if tags == None:
+            return tags
         if len(tags) > MAX_NUMBER_OF_TAGS:
             raise forms.ValidationError(_("You have too many tags (>%(n)dtags)") % {"n": MAX_NUMBER_OF_TAGS})
         if not (isinstance(tags, list) and all(isinstance(tag, str) for tag in tags)):
