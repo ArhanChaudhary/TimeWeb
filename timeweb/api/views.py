@@ -393,26 +393,26 @@ def create_gc_assignments(request):
         for assignment in course_coursework:
             # Load and interpret json data
             assignment_id = int(assignment['id'], 10)
-            assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
+            complete_assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
             try:
-                assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
+                complete_assignment_date = datetime.datetime.strptime(complete_assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
             except ValueError:
-                assignment_date = datetime.datetime.strptime(assignment_date,'%Y-%m-%dT%H:%M:%SZ')
-            assignment_date = utils.utc_to_local(request, assignment_date.replace(tzinfo=timezone.utc))
-            assignment_date = assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            x = assignment.get('dueDate')
+                complete_assignment_date = datetime.datetime.strptime(complete_assignment_date,'%Y-%m-%dT%H:%M:%SZ')
+            complete_assignment_date = utils.utc_to_local(request, complete_assignment_date.replace(tzinfo=timezone.utc))
+            assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            complete_x = assignment.get('dueDate')
             tags = []
-            if x:
+            if complete_x:
                 if "hours" in assignment['dueTime']:
                     assignment['dueTime']['hour'] = assignment['dueTime'].pop('hours')
                 if "minutes" in assignment['dueTime']:
                     assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
-                x = utils.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime'], tzinfo=timezone.utc))
-                if x < complete_date_now:
+                complete_x = utils.utc_to_local(request, datetime.datetime(**complete_x, **assignment['dueTime'], tzinfo=timezone.utc))
+                if complete_x < complete_date_now:
                     continue
 
-                due_time = datetime.time(x.hour, x.minute)
-                x = x.replace(hour=0, minute=0, second=0, microsecond=0)
+                due_time = datetime.time(complete_x.hour, complete_x.minute)
+                x = complete_x.replace(hour=0, minute=0, second=0, microsecond=0)
                     
                 if assignment_date >= x:
                     continue
@@ -422,6 +422,7 @@ def create_gc_assignments(request):
                 if utils.days_between_two_dates(date_now, assignment_date) > 60:
                     continue
                 due_time = None
+                x = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
             # We don't need to worry if there if this raises a not found error because the courses we
             # request assignments from are the ones in request.user.settingsmodel.gc_courses_cache itself
