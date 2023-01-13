@@ -176,11 +176,8 @@ def tag_delete(request):
 
     tag_names = data.getlist('tag_names[]')
     # Remove tag_names from sm.tags
-    old_len = len(sm.tags)
     sm.tags = [tag_name for tag_name in sm.tags if tag_name not in tag_names]
-    new_len = len(sm.tags)
-    if old_len != new_len:
-        sm.save()
+    sm.save()
 
     logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
