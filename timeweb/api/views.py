@@ -387,8 +387,8 @@ def create_gc_assignments(request):
             return
         if not course_coursework:
             return
-        date_now = utils.utc_to_local(request, timezone.now())
-        date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        complete_date_now = utils.utc_to_local(request, timezone.now())
+        date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         course_coursework = course_coursework['courseWork']
         for assignment in course_coursework:
             # Load and interpret json data
@@ -408,7 +408,7 @@ def create_gc_assignments(request):
                 if "minutes" in assignment['dueTime']:
                     assignment['dueTime']['minute'] = assignment['dueTime'].pop('minutes')
                 x = utils.utc_to_local(request, datetime.datetime(**x, **assignment['dueTime'], tzinfo=timezone.utc))
-                if x < date_now:
+                if x < complete_date_now:
                     continue
 
                 due_time = datetime.time(x.hour, x.minute)
