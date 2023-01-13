@@ -188,37 +188,38 @@ changeSetting: function(kwargs={}) {
         },
     });
 },
+GCIntegrationError: function(jqXHR) {
+    switch (jqXHR.status) {
+        case 302:
+            var reauthorization_url = jqXHR.responseText;
+            $.alert({
+                title: "Invalid credentials.",
+                content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the integration.",
+                buttons: {
+                    "disable integration": {
+                        action: function() {
+                            ajaxUtils.changeSetting({setting: "oauth_token", value: false});
+                        }
+                    },
+                    "authenticate again": {
+                        action: function() {
+                            reloadWhenAppropriate({href: reauthorization_url});
+                        }
+                    },
+                }
+            });
+            break;
+
+        default:
+            ajaxUtils.error.bind(this)(...arguments);
+    }
+},
 createGCAssignments: function() {
     if (!CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
     $.ajax({
         type: "POST",
         url: '/api/create-gc-assignments',
-        error: function(jqXHR) {
-            switch (jqXHR.status) {
-                case 302:
-                    var reauthorization_url = jqXHR.responseText;
-                    $.alert({
-                        title: "Invalid credentials.",
-                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the integration.",
-                        buttons: {
-                            "disable integration": {
-                                action: function() {
-                                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
-                                }
-                            },
-                            "authenticate again": {
-                                action: function() {
-                                    reloadWhenAppropriate({href: reauthorization_url});
-                                }
-                            },
-                        }
-                    });
-                    break;
-
-                default:
-                    ajaxUtils.error.bind(this)(...arguments);
-            }
-        },
+        error: ajaxUtils.GCIntegrationError,
         success: function(response, textStatus, jqXHR) {
             ajaxUtils.updateGCCourses();
             if (!jqXHR) return; // In case manually called
@@ -237,32 +238,7 @@ updateGCCourses: function() {
     $.ajax({
         type: "POST",
         url: '/api/update-gc-courses',
-        error: function(jqXHR) {
-            switch (jqXHR.status) {
-                case 302:
-                    var reauthorization_url = jqXHR.responseText;
-                    $.alert({
-                        title: "Invalid credentials.",
-                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the integration.",
-                        buttons: {
-                            "disable integration": {
-                                action: function() {
-                                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
-                                }
-                            },
-                            "authenticate again": {
-                                action: function() {
-                                    reloadWhenAppropriate({href: reauthorization_url});
-                                }
-                            },
-                        }
-                    });
-                    break;
-
-                default:
-                    ajaxUtils.error.bind(this)(...arguments);
-            }
-        },
+        error: ajaxUtils.GCIntegrationError,
     });
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
