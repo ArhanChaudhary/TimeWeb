@@ -58,6 +58,22 @@ DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "descrip
 # Make sure to change the logic comparing the old data too if a new field is expensive to equare
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
+INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
+    'immediately_delete_completely_finished_assignments', 'def_min_work_time', 'def_break_days',
+    'def_skew_ratio', 'loosely_enforce_minimum_work_times', 'one_graph_at_a_time',
+    'close_graph_after_work_input', 'show_priority', 'highest_priority_color', 'lowest_priority_color',
+    'assignment_sorting', 'default_dropdown_tags', 'display_working_days_left',
+    'horizontal_tag_position', 'vertical_tag_position', 'animation_speed',  'enable_tutorial',
+    'sorting_animation_threshold', 'timezone', 'seen_latest_changelog', 
+)
+EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
+    "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
+    "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
+    "gc_courses_cache", "background_image_text_shadow_width", "appearance", 
+)
+
+assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
+
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
     if created:
@@ -136,12 +152,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
 
         self.context['settings_model'] = request.user.settingsmodel
-        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=[
-             # Don't use *SettingsForm.Meta.exclude because this isn't a form
-            "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
-            "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
-            "gc_courses_cache",
-        ])
+        self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
         self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
         self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
