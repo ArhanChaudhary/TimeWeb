@@ -108,7 +108,13 @@ class TimewebForm(forms.ModelForm):
         if self.request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             raise forms.ValidationError(_("You can't create nor edit assignments in the example account"))
         return name
-
+    
+    def clean_works(self):
+        works = self.cleaned_data['works']
+        if not (isinstance(works, int) or isinstance(works, list) and all(isinstance(work, str) for work in works)):
+            raise forms.ValidationError(_("Invalid work inputs"))
+        return works
+    
     def clean_tags(self):
         tags = self.cleaned_data['tags']
         if len(tags) > MAX_NUMBER_OF_TAGS:
