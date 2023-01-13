@@ -371,8 +371,6 @@ def create_gc_assignments(request):
         else:
             request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
             request.user.settingsmodel.save()
-    date_now = utils.utc_to_local(request, timezone.now())
-    date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
 
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
@@ -389,6 +387,8 @@ def create_gc_assignments(request):
             return
         if not course_coursework:
             return
+        date_now = utils.utc_to_local(request, timezone.now())
+        date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         course_coursework = course_coursework['courseWork']
         for assignment in course_coursework:
             # Load and interpret json data
