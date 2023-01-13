@@ -327,7 +327,7 @@ EMAIL_PORT = 587
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
 DEFAULT_FROM_EMAIL = 'TimeWeb E-mail Service <timewebapp@gmail.com>'
 EMAIL_HOST_USER = 'timewebapp@gmail.com'
-MANAGERS = [('Arhan', 'timewebapp@gmail.com')]
+MANAGERS = [('Arhan', 'arhan.ch@gmail.com'), ('TimeWeb', 'timewebapp@gmail.com')]
 EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
 
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
