@@ -572,17 +572,14 @@ addTagHandlers: function() {
         tag_wrapper.addClass("keep-delete-open");
         
         const sa = utils.loadAssignmentData($this);
-        const data = {
-            pk: sa.id,
-            tag_names: [$this.attr("data-tag-deletion-name")],
-        }
+        const tag_name_to_delete = [$this.attr("data-tag-deletion-name")];
         // Remove data locally from dat
-        sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+        sa.tags = sa.tags.filter(tag_name => !tag_name_to_delete.includes(tag_name));
 
         // There are too many conditions on whether to sort or not, so just sort every time
 
         // GC class tags
-        // if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
+        // if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_name_to_delete.includes("Important") || tag_name_to_delete.includes("Not Important")) {
             new Priority().sort();
         // }
 
@@ -600,15 +597,7 @@ addTagHandlers: function() {
             tag_wrapper.remove();
         });
         $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
-        $.ajax({
-            type: "DELETE",
-            url: "/api/tag-delete",
-            data: data,
-            error: function() {
-                tag_wrapper.removeClass("keep-delete-open");
-                ajaxUtils.error.bind(this)(...arguments);
-            }
-        });
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
     }
     $(".tag-add").focusout(function() {
         const $this = $(this);

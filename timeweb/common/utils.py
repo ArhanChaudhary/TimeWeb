@@ -58,8 +58,9 @@ def safe_conversion(value, factor):
     return Decimal(ret)
 
 def utc_to_local(request, utctime):
-    assert request.user.settingsmodel.timezone or request.utc_offset, "User must have a timezone or utc_offset"
-    return utctime.astimezone(pytz.timezone(request.user.settingsmodel.timezone or request.utc_offset))
+    offset = request.user.settingsmodel.timezone or request.utc_offset
+    assert offset, "User must have a timezone or utc_offset"
+    return utctime.astimezone(pytz.timezone(offset))
 
 def app_static_factory(app_name):
     def app_static(url_path):

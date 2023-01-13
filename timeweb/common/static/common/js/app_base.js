@@ -285,7 +285,7 @@ sendBatchRequest: function(batchCallbackName, batchCallback) {
     delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
     delete ajaxUtils.batchRequest[batchCallbackName + "_callback"];
 },
-saveAssignment: function(batchRequestData) {
+saveAssignment: function(batchRequestData, postError) {
 
     // Send data along with the assignment's primary key
 
@@ -309,6 +309,7 @@ saveAssignment: function(batchRequestData) {
                     return;
                 }
             }
+            postError?.();
             ajaxUtils.error.bind(this)(...arguments);
         },
     });

@@ -89,7 +89,7 @@ def save_assignment(request):
 
     with transaction.atomic():
         # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
-        for sm in TimewebModel.objects.filter(pk__in=map(lambda sm: sm['id'], assignments), user=request.user):
+        for sm in TimewebModel.objects.filter(pk__in=(sm['id'] for sm in assignments), user=request.user):
             assignment = next(i for i in assignments if i.get('id') == sm.id)
 
             for key, value in assignment.items():
@@ -150,21 +150,6 @@ def change_setting(request):
 
     setattr(request.user.settingsmodel, setting, value)
     request.user.settingsmodel.save()
-    return HttpResponse(status=204)
-
-@require_http_methods(["DELETE"])
-def tag_delete(request):
-    data = QueryDict(request.body)
-
-    pk = data['pk']
-    sm = TimewebModel.objects.get(pk=pk, user=request.user)
-
-    tag_names = data.getlist('tag_names[]')
-    # Remove tag_names from sm.tags
-    sm.tags = [tag_name for tag_name in sm.tags if tag_name not in tag_names]
-    sm.save()
-
-    logger.info(f"User \"{request.user}\" deleted tags \"{tag_names}\" from \"{sm.name}\"")
     return HttpResponse(status=204)
 
 @require_http_methods(["POST"])
