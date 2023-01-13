@@ -15,11 +15,19 @@
             {% endif %}
         >
             /* 
-            NOTE:
-            !important is NEEDED for overriding gmail styling
+            Gmail specific stylings
             */
+
+            /* !important is NEEDED for overriding gmail styling */
             .submit-button {
                 color: white !important;
+            }
+            /* fonts */
+            #content-wrapper {
+                /* Cannot import fonts on mobile */
+                font-family: 'Roboto', Arial;
+                /* Hard to see on mobile */
+                font-size: 14px;
             }
 
 
