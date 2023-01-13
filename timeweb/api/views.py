@@ -152,21 +152,6 @@ def change_setting(request):
     request.user.settingsmodel.save()
     return HttpResponse(status=204)
 
-@require_http_methods(["POST"])
-def tag_add(request):
-    pk = request.POST['pk']
-    sm = TimewebModel.objects.get(pk=pk, user=request.user)
-
-    tag_names = request.POST.getlist('tag_names[]')
-    tag_names = [tag_name for tag_name in tag_names if tag_name not in sm.tags]
-    if len(sm.tags) + len(tag_names) > MAX_NUMBER_OF_TAGS: return HttpResponse(status=422)
-    if tag_names:
-        sm.tags.extend(tag_names)
-        sm.save()
-
-    logger.info(f"User \"{request.user}\" added tags \"{tag_names}\" to \"{sm.name}\"")
-    return HttpResponse(status=204)
-
 @require_http_methods(["DELETE"])
 def tag_delete(request):
     data = QueryDict(request.body)
@@ -364,9 +349,9 @@ def create_gc_assignments(request):
     # If there are no valid credentials available, let the user log in.
     if not credentials.valid:
         can_be_refreshed = credentials.expired and credentials.refresh_token
-        if not can_be_refreshed:
-            return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
         try:
+            if not can_be_refreshed:
+                raise RefreshError
             # Other errors can happen because of network or any other miscellaneous issues. Don't except these exceptions so they can be logged
             credentials.refresh(Request())
         except RefreshError:

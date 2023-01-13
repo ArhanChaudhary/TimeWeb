@@ -459,7 +459,7 @@ addTagHandlers: function() {
                 }
                 return;
             }
-            tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
+            tag_names = new Set(tag_names);
 
             if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
                 $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
@@ -514,15 +514,7 @@ addTagHandlers: function() {
             }            
             // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
             if (!tag_names.size) return;
-            $.ajax({
-                type: "POST",
-                url: "/api/tag-add",
-                data: {
-                    pk: sa.id,
-                    tag_names: [...tag_names],
-                },
-                error: ajaxUtils.error,
-            });
+            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
             tag_names = new Set();
             return;
         }
