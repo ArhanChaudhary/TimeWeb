@@ -226,6 +226,11 @@ createGCAssignments: function() {
                     type: "POST",
                     url: '/api/update-gc-courses',
                     error: ajaxUtils.GCIntegrationError,
+                    success: function(response, textStatus, jqXHR) {
+                        if (jqXHR.status === 204) {
+                        } else if (jqXHR.status === 205)
+                            reloadWhenAppropriate();
+                    },
                 });
             else if (jqXHR.status === 205)
                 reloadWhenAppropriate();

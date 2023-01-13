@@ -339,6 +339,7 @@ def update_gc_courses(request):
     if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
         request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
         request.user.settingsmodel.save()
+        return create_gc_assignments(request)
     return HttpResponse(status=204)
 
 def simplify_courses(courses, include_name=True):
