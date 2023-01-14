@@ -136,13 +136,15 @@ def change_setting(request):
     # however this makes the data "unbound" (A bound form is a form which is passed the users input) and validation to become impossible
     # We're going to have to make it bound because we want to validate it, but that means we need to create a bounded form from an existing settings model instance
     # This is a bit of a hack, but it works for now
-    model_fields = {i.name: getattr(request.user.settingsmodel, i.name) for i in SettingsModel._meta.get_fields() if not i.unique}
-    if setting not in model_fields or setting in SettingsForm.Meta.exclude:
+    valid_model_fields_to_change = [i.name for i in SettingsModel._meta.get_fields()
+            if not (i.unique or i.many_to_one or i.one_to_one or i.name in SettingsForm.Meta.exclude)]
+    validation_model_data = {i: getattr(request.user.settingsmodel, i) for i in valid_model_fields_to_change}
+    if setting not in validation_model_data:
         logger.warning(f"User \"{request.user}\" tried to change a setting that doesn't exist")
         return HttpResponse(f"The setting \"{setting}\" doesn't exist.", status=400)
         
-    model_fields[setting] = value
-    validation_form = SettingsForm(data=model_fields)
+    validation_model_data[setting] = value
+    validation_form = SettingsForm(data=validation_model_data)
     if not validation_form.is_valid():
         logger.warning(f"User \"{request.user}\" tried to change setting {setting} to an invalid value of {value}")
         logger.info(f"{validation_form.errors}")
