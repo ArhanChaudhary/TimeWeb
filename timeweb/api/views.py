@@ -102,14 +102,16 @@ def save_assignment(request):
                     assignment[key] = round(value, getattr(TimewebModel, key).field.decimal_places)
             
             # see api.change_setting for why 64baf5 doesn't work here
-            model_fields = model_to_dict(sm)
-            model_fields.update(assignment)
-            # After poking around a bit I found out that is_valid validates foreign keys with database hits which could bump up the number of database hits to O(n)
-            # aka a huge no no
-            del model_fields['user']
-            # do NOT setattr a primary key that would be a huge fricking mess
-            del assignment['id']
-            validation_form = TimewebForm(data=model_fields, request=request)
+            valid_model_fields_to_change = [i.name for i in TimewebModel._meta.get_fields()
+                 if not (i.unique or i.many_to_one or i.one_to_one or i.name in TimewebForm.Meta.exclude)]
+            assignment = {field: value for field, value in assignment.items() if field in valid_model_fields_to_change}
+
+            validation_model_data = {i: getattr(sm, i) for i in valid_model_fields_to_change}
+            validation_model_data.update(assignment)
+
+            validation_form = TimewebForm(data=validation_model_data, request=request)
+            # Note that is_valid validates foreign keys with database hits which could bump up the number of database hits to O(n)
+            # Not a problem for now because `user` is excluded in TimewebForm.Meta.exclude
             if not validation_form.is_valid():
                 assignment = {field: value for field, value in assignment.items() if field not in validation_form.errors}
 
