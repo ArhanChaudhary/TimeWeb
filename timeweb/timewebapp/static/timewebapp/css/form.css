@@ -341,7 +341,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     background-color: var(--background-color);
 }
 #form-wrapper .info-button::after {
-    transform: scale(2);
+    transform: scale(3);
 }
 #form-wrapper #submit-assignment-button {
     align-self: center;
