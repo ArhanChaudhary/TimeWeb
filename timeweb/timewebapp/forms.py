@@ -10,7 +10,16 @@ class TimewebForm(forms.ModelForm):
 
     class Meta:
         model = TimewebModel
-        fields = "__all__"
+        # these are fields that cannot be saved nor validated from the frontend,
+        # as they are handled and set internally
+        exclude = (
+            "needs_more_info",
+            "is_google_classroom_assignment",
+            "user",
+            "google_classroom_assignment_link",
+            "hidden",
+            "deletion_time",
+        )
         # time_per_unit should be first because of logic in views.py
         ADD_CHECKBOX_WIDGET_FIELDS = ["time_per_unit", "y", "x", "min_work_time","works", "funct_round"]
         widgets = {
@@ -21,10 +30,7 @@ class TimewebForm(forms.ModelForm):
             'skew_ratio': forms.HiddenInput(),
             'fixed_mode': forms.HiddenInput(),
             'dynamic_start': forms.HiddenInput(),
-            'needs_more_info': forms.HiddenInput(),
-            'is_google_classroom_assignment': forms.HiddenInput(),
             'tags': forms.HiddenInput(),
-            'user': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question", "class": "dont-mark-invalid-if-empty"}),
             'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
             # break_days also has dont-mark-invalid-if-empty just not here
@@ -34,11 +40,8 @@ class TimewebForm(forms.ModelForm):
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'has_alerted_due_date_passed_notice': forms.HiddenInput(),
-            'google_classroom_assignment_link': forms.HiddenInput(),
             'alert_due_date_incremented': forms.HiddenInput(),
-            'hidden': forms.HiddenInput(),
             'dont_hide_again': forms.HiddenInput(),
-            'deletion_time': forms.HiddenInput(),
         }
         error_messages = {
             'name': {
@@ -173,8 +176,8 @@ class TimewebForm(forms.ModelForm):
             self.add_error("y", forms.ValidationError(""))
 
         # if x or assignment date is none, the assignment needs more info
-        due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
         if x != None and assignment_date != None:
+            due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
             if complete_due_date <= assignment_date:
                 self.add_error("x",

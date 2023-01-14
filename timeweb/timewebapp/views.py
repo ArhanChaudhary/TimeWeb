@@ -519,6 +519,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
             request.session['just_updated_assignment_id'] = self.sm.pk
             for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS:
+                # this includes fields from TimewebForm.Meta.exclude
+                # keep it like this because form_valid may internally and manually change these fields
                 if field == "works" and getattr(old_data, field)[0] != getattr(self.sm, field)[0] or getattr(old_data, field) != getattr(self.sm, field):
                     request.session['refresh_dynamic_mode'] = self.sm.pk
                     break
