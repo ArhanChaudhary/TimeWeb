@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 import common.utils as utils
-from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH
 
 class TimewebForm(forms.ModelForm):
 
@@ -187,3 +186,6 @@ class TimewebForm(forms.ModelForm):
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
         return cleaned_data
+
+# Put at the bottom due to circular imports
+from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH
