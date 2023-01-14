@@ -52,12 +52,12 @@ EXAMPLE_ASSIGNMENT = {
     "dynamic_start": 0,
     "description": "Example assignment description"
 }
+# Make sure to change the logic comparing the old data too if a new field is expensive to equare
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
                                         "google_classroom_assignment_link", "has_alerted_due_date_passed_notice",
                                         "alert_due_date_incremented", "dont_hide_again", "deletion_time", "user", "needs_more_info")
-# Make sure to change the logic comparing the old data too if a new field is expensive to equare
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
 INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
@@ -76,6 +76,19 @@ EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
 )
 
 assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
+
+EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT = (
+    "google_classroom_assignment_link", "user", "hidden"
+)
+INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
+    "assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
+    "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "id", "name",
+    "soft", "unit", "description", "tags", "is_google_classroom_assignment",
+    "has_alerted_due_date_passed_notice", "alert_due_date_incremented", "dont_hide_again",
+    "deletion_time", "needs_more_info",
+)
+
+assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
@@ -99,7 +112,7 @@ def append_default_context(request):
         "EDITING_EXAMPLE_ACCOUNT": settings.EDITING_EXAMPLE_ACCOUNT,
         "DEBUG": settings.DEBUG,
         "ADD_CHECKBOX_WIDGET_FIELDS": TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS,
-        "RELOAD_VIEWS": list(map(lambda x: reverse(x), RELOAD_VIEWS)),
+        "RELOAD_VIEWS": [reverse(i) for i in RELOAD_VIEWS],
     }
     if request.session.pop("gc-init-failed", None):
         context["GC_API_INIT_FAILED"] = True
@@ -152,7 +165,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         else:
             timewebmodels = list(request.user.timewebmodel_set.filter(hidden=False))
         self.context['assignment_models'] = timewebmodels
-        self.context['assignment_models_as_json'] = list(map(lambda i: model_to_dict(i, exclude=["google_classroom_assignment_link", "user"]), timewebmodels))
+        self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
         self.context['settings_model'] = request.user.settingsmodel
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
