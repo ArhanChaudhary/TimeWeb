@@ -196,7 +196,7 @@ def simplify_course_name(tag_name):
             # in words or names, but make an exception to double or more dashes
 
             # this could indicate it was re subbed for a blank
-            pre_tag_name = re.sub(r"(.) ?--+ ?(.)", r"\1 \2", pre_tag_name, flags=re.IGNORECASE)
+            pre_tag_name = re.sub(r"(.) ?--+ ?(.)", r"\1 \2", pre_tag_name)
             pre_tag_name = " ".join(pre_tag_name.split())
             pre_tag_name = re.sub(r"\(\)", "", pre_tag_name)
             pre_tag_name = " ".join(pre_tag_name.split())
