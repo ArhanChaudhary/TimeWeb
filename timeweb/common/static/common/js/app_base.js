@@ -322,7 +322,7 @@ saveAssignment: function(batchRequestData, postError) {
 evaluateCurrentState: function() {
     $.ajax({
         type: "POST",
-        url: "/api/evalulate-current-state",
+        url: "/api/evaluate-current-state",
         success: function(response, textStatus, jqXHR) {
             if (!jqXHR) return; // In case manually called
             if (jqXHR.status !== 205 || ajaxUtils.evaluateCurrentState.showing_alert) return;
