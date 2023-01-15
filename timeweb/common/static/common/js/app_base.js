@@ -129,6 +129,10 @@ disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there
 error: function(response, textStatus) {
     if (ajaxUtils.silence_errors) return;
     assert(this.xhr); // Ensure "this" refers to a jquery ajax
+    if (response.status === 409) {
+        ajaxUtils.alertInvalidState();
+        return;
+    }
     let title;
     let content;
     switch (response.status) {
@@ -319,34 +323,32 @@ saveAssignment: function(batchRequestData, postError) {
         },
     });
 },
+alertInvalidState: function() {
+    if (ajaxUtils.evaluateCurrentState.showing_alert) return;
+    ajaxUtils.evaluateCurrentState.showing_alert = true;
+    $.alert({
+        title: "Your assignments are outdated.",
+        content: "You have modified your assignments on a different tab or device. Please reload the page to refresh your assignments.",
+        backgroundDismiss: false,
+        buttons: {
+            reload: {
+                action: reloadWhenAppropriate,
+            },
+        },
+        onDestroy: function() {
+            delete ajaxUtils.evaluateCurrentState.showing_alert;
+        },
+    });
+},
 evaluateCurrentState: function() {
     $.ajax({
         type: "POST",
         url: "/api/evaluate-current-state",
-        success: function(response, textStatus, jqXHR) {
-            if (!jqXHR) return; // In case manually called
-            if (jqXHR.status !== 205 || ajaxUtils.evaluateCurrentState.showing_alert) return;
-            ajaxUtils.evaluateCurrentState.showing_alert = true;
-            $.alert({
-                title: "Your assignments are outdated.",
-                content: "You have modified your assignments on a different tab or device. Please reload the page to refresh your assignments.",
-                backgroundDismiss: false,
-                buttons: {
-                    ignore: {
-
-                    },
-                    reload: {
-                        action: reloadWhenAppropriate,
-                    },
-                },
-                onDestroy: function() {
-                    delete ajaxUtils.evaluateCurrentState.showing_alert;
-                },
-            });
-        },
-        error: function() {
-            // lets make errors to this api call silent
-        },
+        error: function(response, textStatus) {
+            // lets make other errors to this api call silent
+            if (response.status !== 409) return;
+            ajaxUtils.alertInvalidState();
+        }
     });
 },
 }

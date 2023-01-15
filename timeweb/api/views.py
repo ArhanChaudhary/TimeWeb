@@ -156,17 +156,7 @@ def change_setting(request):
 
 @require_http_methods(["POST"])
 def evaluate_current_state(request):
-    # For accounts just created, the device_uuid will be None and then go to created_tab_after_last_api_call
-    # Here, the tab creation time will ALWAYS be after the account creation time, even if by barely, so it will return 200
-    same_device = request.POST['device_uuid'] == request.user.settingsmodel.device_uuid
-    if same_device:
-        return HttpResponse(status=200)
-
-    created_tab_after_last_api_call = int(request.POST['tab_creation_time'], 10)/1000 > request.user.settingsmodel.device_uuid_api_timestamp.timestamp()
-    if created_tab_after_last_api_call:
-        return HttpResponse(status=200)
-
-    return HttpResponse(status=205)
+    return HttpResponse(status=204)
 
 def simplify_course_name(tag_name):
     abbreviations = [

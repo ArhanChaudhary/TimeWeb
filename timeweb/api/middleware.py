@@ -17,14 +17,28 @@ class APIValidationMiddleware:
             return HttpResponse(status=401)
         if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             return HttpResponse(status=403)
-        if resolved.url_name in EXCLUDE_FROM_UPDATING_STATE:
-            return self.get_response(request)
-
-        res = self.get_response(request)
+        
         if request.method == "POST":
             device_uuid = request.POST['device_uuid']
+            tab_creation_time = request.POST['tab_creation_time']
         elif request.method in ("DELETE", "PATCH"):
-            device_uuid = QueryDict(request.body)['device_uuid']
+            body = QueryDict(request.body)
+            device_uuid = body['device_uuid']
+            tab_creation_time = body['tab_creation_time']
+
+        same_device = device_uuid == request.user.settingsmodel.device_uuid
+        created_tab_after_last_api_call = int(tab_creation_time, 10)/1000 > request.user.settingsmodel.device_uuid_api_timestamp.timestamp()
+        should_reload = not same_device and not created_tab_after_last_api_call
+        if should_reload:
+            # don't update device_uuid and device_uuid_api_timestamp
+            # this would mean we are communicating to the database that
+            # this invalid and outdated request was a valid api call
+            # that servers as the most recent api call
+            return HttpResponse(status=409)
+
+        res = self.get_response(request)
+        if resolved.url_name in EXCLUDE_FROM_UPDATING_STATE:
+            return res
         request.user.settingsmodel.device_uuid = device_uuid
         request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()
         request.user.settingsmodel.save()
