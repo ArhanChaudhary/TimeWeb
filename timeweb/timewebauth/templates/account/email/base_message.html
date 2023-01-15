@@ -73,7 +73,7 @@
     </head>
     <body>
         <div id="content-wrapper">
-            Hello {{ user_display }},
+            Hello{% if user_display %} {% endif %}{{ user_display }},
             <br>
             <br>
             {% block content %}{% endblock %}
