@@ -3,7 +3,7 @@ from django.http import HttpResponse, QueryDict
 from django.core.exceptions import RequestDataTooBig
 from django.urls import resolve
 from django.utils import timezone
-from .urls import EXCLUDE_FROM_STATE_EVALUATION
+from .urls import EXCLUDE_FROM_UPDATING_STATE
 
 class APIValidationMiddleware:
     def __init__(self, get_response):
@@ -17,7 +17,7 @@ class APIValidationMiddleware:
             return HttpResponse(status=401)
         if request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
             return HttpResponse(status=403)
-        if resolved.url_name in EXCLUDE_FROM_STATE_EVALUATION:
+        if resolved.url_name in EXCLUDE_FROM_UPDATING_STATE:
             return self.get_response(request)
 
         res = self.get_response(request)
