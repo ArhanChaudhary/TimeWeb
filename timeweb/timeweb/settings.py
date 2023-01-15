@@ -251,6 +251,11 @@ else:
         GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
             json.loads(key)
         )
+    # Note: this message is still valid even in DEBUG
+    # if someone else were to run this in DEBUG, the other
+    # if statement would change their staticfiles storage to
+    # local. This line is reached in prod, so if it can't find
+    # credentials, it will not work.
     else:
         print("GS_CREDENTIALS not found; background images will not work")
 # https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
