@@ -912,6 +912,7 @@ class Crud {
             });
     }
 }
+window.Crud = Crud;
 $(window).one("load", function() {
     new Crud().init();
 });
