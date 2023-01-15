@@ -772,6 +772,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 .assignment-header-button:focus, .assignment-header-button:hover {
     outline: 0;
     --background-color: rgb(173, 216, 230);
+    z-index: 1;
 }
 .assignment-header-button:active svg {
     transform: scale(0.95);
