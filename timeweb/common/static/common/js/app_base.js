@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // do NOT use originalOptions, IMPORTANT
         // re-trying the ajax does not preserve originalOptions,
         // so we must instread derive it from options
-        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(decodeURIComponent(options.data))), {
+        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(decodeURIComponent(options.data === undefined ? "" : options.data))), {
             device_uuid: window.DEVICE_UUID,
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
