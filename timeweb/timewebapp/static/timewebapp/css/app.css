@@ -318,7 +318,7 @@ main.background-image-exists {
     position: relative;
     padding: var(--vertical-assignment-padding) var(--horizontal-assignment-padding);
     align-items: center;
-    --arrow-margin-left: max(5px, calc(-2px + 2vw));
+    --arrow-margin-left: max(5px, calc(-5px + 2vw));
 }
 .left-side-of-header {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
@@ -326,7 +326,7 @@ main.background-image-exists {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: max(120px, calc(67px + 10vw));
+    --left-side-of-header-width: max(105px, calc(41px + 11vw));
 }
 .description {
     position: relative;
