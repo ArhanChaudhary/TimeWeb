@@ -695,24 +695,6 @@ class Priority {
                 if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
                 break;
-            // We do not need to worry about different status groups here
-            // if something is due today or tomorrow it will already be sorted
-            // like that anyways
-            case "Soonest Due Date First":
-                // b.due_date_minus_today === undefined: Treat undefined as positive infinity
-
-                // 5 < 10 => true
-                // 5 < undefined => false (the below makes this true)
-                
-                // 10 > 5 => true
-                // undefined > 5 => false (the below makes this true)
-                
-                // a.due_date_minus_today !== undefined: If both are undefined, skip this check
-
-                // we need a custom lt and gt comparator so we can deal with negative numbers
-                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
-                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
-                break;
         }
         
         let a_status_value = a.status_value;
@@ -764,6 +746,20 @@ class Priority {
                         // min to max
                         if (a.todays_work > b.todays_work) return 1;
                         if (a.todays_work < b.todays_work) return -1;
+                    case "Soonest Due Date First":
+                        // b.due_date_minus_today === undefined: Treat undefined as positive infinity
+        
+                        // 5 < 10 => true
+                        // 5 < undefined => false (the below makes this true)
+                        
+                        // 10 > 5 => true
+                        // undefined > 5 => false (the below makes this true)
+                        
+                        // a.due_date_minus_today !== undefined: If both are undefined, skip this check
+        
+                        // we need a custom lt and gt comparator so we can deal with negative numbers
+                        if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+                        if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
                     case "Most Priority First":
                     case "Tag Name A-Z":
                     case "Tag Name Z-A":
