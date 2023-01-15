@@ -407,12 +407,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 else:
                     # we already have x_num and y and we don't need to do any further processing
                     pass
-            old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
-                old_x_num += 1
-            old_ideal_blue_line_start = utils.days_between_two_dates(date_now, old_data.assignment_date)
             ideal_blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
+            if not (self.created_assignment or self.sm.needs_more_info):
+                old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
+                if old_data.due_time and (old_data.due_time.hour or old_data.due_time.minute):
+                    old_x_num += 1
+                old_ideal_blue_line_start = utils.days_between_two_dates(date_now, old_data.assignment_date)
             if (self.created_assignment or self.sm.needs_more_info or 
 
                 # if self.sm.blue_line_start >= x_num then blue_line_start is 0
