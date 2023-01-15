@@ -34,7 +34,7 @@ from django.db import transaction
 import common.utils as utils
 from common.views import logger
 from django.views.decorators.http import require_http_methods
-from re import sub as re_sub, IGNORECASE
+import re
 from math import floor
 # Reminder: do NOT use decorator_from_middleware, as it is only for old-style django middlewares
 
