@@ -762,7 +762,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     /* negate the variable pixel value */
     margin-top: calc(-1 * var(--vertical-assignment-padding));
     margin-bottom: calc(-1 * var(--vertical-assignment-padding));
-    margin-right: -4px;
+    margin-left: 1px;
+    margin-right: -3px;
     --horizontal-header-button-padding: 8px;
     padding: 0 var(--horizontal-header-button-padding);
     cursor: pointer;
@@ -1006,6 +1007,8 @@ main.finished-header-transition #extra-navs {
         --assignment-header-text-right-margin: 10px;
     }
     .assignment-header-button {
+        margin-left: 0px;
+        margin-right: -4px;
         --horizontal-header-button-padding: 6px;
     }
     .hide-on-mobile {
