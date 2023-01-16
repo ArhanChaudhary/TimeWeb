@@ -120,7 +120,12 @@ class TimewebForm(forms.ModelForm):
     def clean_tags(self):
         tags = self.cleaned_data['tags']
         if tags == None:
-            return tags
+            # to_python in JSONField.clean in save_assignment converts [] to None, but tags has a non-null constraint
+            # revert it back to []
+
+            # also works for when assignments are created (can even work with None too because of default=[] in tags)
+            # (dont actually use null for save_assignment)
+            return []
         if len(tags) > MAX_NUMBER_OF_TAGS:
             raise forms.ValidationError(_("You have too many tags (>%(n)dtags)") % {"n": MAX_NUMBER_OF_TAGS})
         if not (isinstance(tags, list) and all(isinstance(tag, str) for tag in tags)):
