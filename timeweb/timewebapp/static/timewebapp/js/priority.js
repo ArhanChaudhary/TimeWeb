@@ -743,10 +743,12 @@ class Priority {
                         // max to min
                         if (a.todays_work > b.todays_work) return -1;
                         if (a.todays_work < b.todays_work) return 1;
+                        break;
                     case "Least Work Today First":
                         // min to max
                         if (a.todays_work > b.todays_work) return 1;
                         if (a.todays_work < b.todays_work) return -1;
+                        break;
                     case "Soonest Due Date First":
                         // b.due_date_minus_today === undefined: Treat undefined as positive infinity
         
@@ -761,19 +763,18 @@ class Priority {
                         // we need a custom lt and gt comparator so we can deal with negative numbers
                         if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
                         if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
-                    case "Most Priority First":
-                    case "Tag Name A-Z":
-                    case "Tag Name Z-A":
-                    case "Soonest Due Date First":
-                        // max to min
-                        if (a.status_priority > b.status_priority) return -1;
-                        if (a.status_priority < b.status_priority) return 1;
                         break;
+                }
+                switch (SETTINGS.assignment_sorting) {
                     case "Least Priority First":
                         // min to max
                         if (a.status_priority > b.status_priority) return 1;
                         if (a.status_priority < b.status_priority) return -1;
                         break;
+                    default:
+                        // max to min (every other case)
+                        if (a.status_priority > b.status_priority) return -1;
+                        if (a.status_priority < b.status_priority) return 1;
                 }
                 break;
             case Priority.NOT_YET_ASSIGNED:
