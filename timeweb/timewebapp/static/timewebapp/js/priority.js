@@ -243,7 +243,8 @@ class Priority {
             
             if (sa.sa.tags.includes("Important")) {
                 var has_important_tag = true;
-            } else if (sa.sa.tags.includes("Not Important")) {
+            }
+            if (sa.sa.tags.includes("Not Important")) {
                 var has_not_important_tag = true;
             }
 
