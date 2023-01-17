@@ -381,7 +381,7 @@ main.background-image-exists {
 .assignment.open-assignment, .assignment.assignment-is-closing {
     padding-bottom: unset;
 }
-.assignment:not(.open-assignment) .title {
+.assignment .title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
