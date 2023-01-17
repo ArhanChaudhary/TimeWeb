@@ -141,6 +141,13 @@ class SettingsForm(forms.ModelForm):
         self.label_suffix = ""
     def clean_default_dropdown_tags(self):
         default_dropdown_tags = self.cleaned_data["default_dropdown_tags"]
+        if default_dropdown_tags == None:
+            # to_python in JSONField.clean in save_assignment converts [] to None, but tags has a non-null constraint
+            # revert it back to []
+
+            # also works for when assignments are created (can even work with None too because of default=[] in tags)
+            # (dont actually use null for save_assignment)
+            return []
         if any(len(tag) > MAX_TAG_LENGTH for tag in default_dropdown_tags):
             raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
         return default_dropdown_tags
