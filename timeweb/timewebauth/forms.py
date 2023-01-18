@@ -187,6 +187,13 @@ class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
         self.fields['email'].widget = forms.HiddenInput()
+    
+    def clean_email(self):
+        value = self.cleaned_data["email"]
+        value = get_adapter().clean_email(value)
+        if value and app_settings.UNIQUE_EMAIL:
+            value = self.validate_unique_email(value)
+        return value
 
 class UsernameResetForm(forms.ModelForm):
     class Meta:
