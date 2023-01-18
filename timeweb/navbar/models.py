@@ -122,7 +122,7 @@ class SettingsModel(models.Model):
     assignment_sorting = models.CharField(
         max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
         choices=ASSIGNMENT_SORTINGS,
-        default=("Normal"),
+        default=_("Most Priority First"),
         verbose_name=_('Assignment Sorting: '),
     )
     
