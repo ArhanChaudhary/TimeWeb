@@ -1,7 +1,20 @@
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
-from allauth.account.forms import *
+from allauth.account import app_settings
+from allauth.account.forms import (
+    LoginForm,
+    SignupForm,
+    AddEmailForm,
+    ChangePasswordForm,
+    ResetPasswordForm,
+    ResetPasswordKeyForm,
+    PasswordVerificationMixin,
+)
+from allauth.account.models import EmailAddress
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import filter_users_by_email
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django import forms
 from common.models import User
 from django.contrib import messages
 
