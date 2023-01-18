@@ -399,6 +399,7 @@ def create_gc_assignments(request):
                     minute=due_time.minute,
                     tzinfo=timezone.utc,
                 ))
+                due_time = complete_x.time()
                 if not (
                     # The due date must be after today
                     complete_x > complete_date_now and
