@@ -10,7 +10,9 @@ from django.conf import settings
 RELOAD_VIEWS = ('home', 'deleted_assignments', 'settings', 'account_login', )
 KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS = ("home", "example", "settings", "deleted_assignments",
     "user_guide", "account_change_password", "reset_username", "account_email", 
-    "socialaccount_connections", "serviceworker")
+    "socialaccount_connections", "serviceworker", 
+    # prevents non-app routes (such as /favicon-32x32.png) from logging you out
+    None)
 
 from . import views
 
