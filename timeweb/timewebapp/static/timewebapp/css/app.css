@@ -1009,7 +1009,6 @@ main.finished-header-transition #extra-navs {
     .assignment-header-button {
         margin-left: 0px;
         margin-right: -4px;
-        --horizontal-header-button-padding: 6px;
     }
     .hide-on-mobile {
         display: none;
