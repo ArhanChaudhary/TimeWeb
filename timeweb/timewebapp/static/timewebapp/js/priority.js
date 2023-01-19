@@ -417,7 +417,7 @@ class Priority {
                 if (incomplete_past_inputs || no_working_days) {
                     status_image = 'question_mark';
                     if (incomplete_past_inputs) {
-                        status_message = "Please enter your past work inputs to continue";
+                        status_message = "Please enter your past work inputs";
                         status_value = Priority.INCOMPLETE_WORKS;
                     } else {
                         status_message = 'This assignment has no more working days';
