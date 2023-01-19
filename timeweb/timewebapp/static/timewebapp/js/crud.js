@@ -891,7 +891,7 @@ class Crud {
             $.ajax({
                 type: "PATCH",
                 url: "/api/restore-assignment",
-                data: {assignments: [sa.id]},
+                data: {assignments: JSON.stringify([sa.id])},
                 success: success,
                 error: function() {
                     dom_assignment.removeClass("assignment-is-deleting");
@@ -903,7 +903,7 @@ class Crud {
             $.ajax({
                 type: "POST",
                 url: "/api/delete-assignment",
-                data: {assignments: [sa.id], actually_delete: VIEWING_DELETED_ASSIGNMENTS},
+                data: {assignments: JSON.stringify([sa.id]), actually_delete: VIEWING_DELETED_ASSIGNMENTS},
                 success: success,
                 error: function() {
                     dom_assignment.removeClass("assignment-is-deleting");

@@ -603,7 +603,7 @@ class Priority {
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",
-            data: {assignments: [...starred_assignment_ids_to_delete_after_sorting]},
+            data: {assignments: JSON.stringify([...starred_assignment_ids_to_delete_after_sorting])},
             success: success,
             error: ajaxUtils.error,
         });

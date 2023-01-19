@@ -305,7 +305,7 @@ setClickHandlers: {
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",
-            data: {assignments: assignment_ids_to_delete},
+            data: {assignments: JSON.stringify(assignment_ids_to_delete)},
             success: success,
             error: ajaxUtils.error,
         });
@@ -369,7 +369,7 @@ setClickHandlers: {
         $.ajax({
             type: "POST",
             url: "/api/delete-assignment",
-            data: {assignments: assignment_ids_to_delete},
+            data: {assignments: JSON.stringify(assignment_ids_to_delete)},
             success: success,
             error: ajaxUtils.error,
         });

@@ -58,7 +58,8 @@ from math import floor
 
 @require_http_methods(["POST"])
 def delete_assignment(request):
-    assignments = request.POST.getlist('assignments[]')
+    assignments = request.POST['assignments']
+    assignments = json.loads(assignments)
     if {"false": False, None: False, "true": True}[request.POST.get("actually_delete")]:
         TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
     else:
@@ -75,7 +76,8 @@ def delete_assignment(request):
 @require_http_methods(["PATCH"])
 def restore_assignment(request):
     data = QueryDict(request.body)
-    assignments = data.getlist('assignments[]')
+    assignments = data['assignments']
+    assignments = json.loads(assignments)
     TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=False)
     logger.info(f'User \"{request.user}\" restored {len(assignments)} assignments')
     return HttpResponse(status=204)
