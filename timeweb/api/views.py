@@ -61,7 +61,7 @@ def delete_assignment(request):
     assignments = request.POST['assignments']
     assignments = json.loads(assignments)
     if {"false": False, None: False, "true": True}[request.POST.get("actually_delete")]:
-        TimewebModel.objects.filter(pk__in=assignments, user=request.user).delete()
+        request.user.timewebmodel_set.filter(pk__in=assignments).delete()
     else:
         now = timezone.now()
         now = now.replace(microsecond=floor(now.microsecond / 100000) * 100000)
@@ -69,7 +69,7 @@ def delete_assignment(request):
         # Another reason to mark it as True every time is that the assignment can be marked with a star while its in the deleted view
         # but not when it was deleted and as a result dont_hide_again will be False and the assignment
         # will be immediately deleted when restored
-        TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=True, dont_hide_again=True, deletion_time=now)
+        request.user.timewebmodel_set.filter(pk__in=assignments).update(hidden=True, dont_hide_again=True, deletion_time=now)
     logger.info(f'User \"{request.user}\" deleted {len(assignments)} assignments')
     return HttpResponse(status=204)
     
@@ -78,7 +78,7 @@ def restore_assignment(request):
     data = QueryDict(request.body)
     assignments = data['assignments']
     assignments = json.loads(assignments)
-    TimewebModel.objects.filter(pk__in=assignments, user=request.user).update(hidden=False)
+    request.user.timewebmodel_set.filter(pk__in=assignments).update(hidden=False)
     logger.info(f'User \"{request.user}\" restored {len(assignments)} assignments')
     return HttpResponse(status=204)
     
@@ -89,7 +89,7 @@ def save_assignment(request):
 
     with transaction.atomic():
         # Remember that `assignment` and the below query can be different lengths and is thus not reliable to loop through index
-        for sm in TimewebModel.objects.filter(pk__in=(sm['id'] for sm in assignments), user=request.user):
+        for sm in request.user.timewebmodel_set.filter(pk__in=(sm['id'] for sm in assignments)):
             assignment = next(i for i in assignments if i.get('id') == sm.id)
 
             for key, value in assignment.items():

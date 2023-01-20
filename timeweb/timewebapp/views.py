@@ -243,7 +243,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             first_work = Decimal(str(self.sm.works or 0))
             self.sm.user = request.user
         elif self.updated_assignment:
-            self.sm = TimewebModel.objects.get(pk=self.pk, user=request.user)
+            self.sm = request.user.timewebmodel_set.get(pk=self.pk)
             old_data = deepcopy(self.sm)
 
             # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
