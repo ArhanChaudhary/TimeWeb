@@ -820,6 +820,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     gap: 4px;
 }
 .today-display-in-text hr {
+    border-width: 1.5px;
     display: inline-block;
     flex-grow: 1;
 }
