@@ -267,10 +267,10 @@ else:
     GC_CREDENTIALS_JSON = json.loads(GC_CREDENTIALS_JSON)
 
 if DEBUG or FIX_DEBUG_LOCALLY:
-    GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
+    GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback/"
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 else:
-    GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback"
+    GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback/"
 # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
