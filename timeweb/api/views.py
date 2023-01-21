@@ -552,6 +552,18 @@ def gc_auth_callback(request):
 
     # get the full URL that we are on, including all the "?param1=token&param2=key" parameters that google has sent us
     authorization_response = request.build_absolute_uri()
+
+    # convert http in authorization_response to https
+    # because timeweb runs on a reverse proxy, the requests seen
+    # by railway are http instead of https. We need to ensure the request
+    # is fully secure before bypassing the google https security checks
+    if (
+        authorization_response.startswith("http://") and
+        request.META["HTTP_X_FORWARDED_PROTO"] == "https" and
+        request.META["HTTP_ORIGIN"].startswith("https") and
+        json.loads(request.META["HTTP_CF_VISITOR"])['scheme'] == "https"
+    ):
+        authorization_response = "https://" + authorization_response[7:]
     # turn those parameters into a token
     try:
         flow.fetch_token(authorization_response=authorization_response)
