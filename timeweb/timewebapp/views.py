@@ -238,9 +238,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
             # Set defaults
             self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
-            # first_work is works[0]
-            # Convert this to a decimal object because it can be a float
-            first_work = Decimal(str(self.sm.works or 0))
+            first_work = Decimal(self.sm.works[0])
             self.sm.user = request.user
         elif self.updated_assignment:
             self.sm = request.user.timewebmodel_set.get(pk=self.pk)
@@ -255,7 +253,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.soft = self.form.cleaned_data.get("soft")
             self.sm.unit = self.form.cleaned_data.get("unit")
             self.sm.y = self.form.cleaned_data.get("y")
-            first_work = Decimal(str(self.form.cleaned_data.get("works") or 0))
+            first_work = Decimal(self.form.cleaned_data.get("works")[0])
             self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
             self.sm.description = self.form.cleaned_data.get("description")
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
@@ -324,8 +322,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # if y is empty and x was not predicted (x is a value)
             request.POST.get('y') == "" and 'x' in request.POST
         ):
-            # Works might become an int instead of a list but it doesnt really matter since it isnt being used
-            # However, the form doesn't repopulate on edit assignment because it calls works[0]. So, make works a list
             self.sm.works = [str(first_work)]
             self.sm.needs_more_info = True
         else:

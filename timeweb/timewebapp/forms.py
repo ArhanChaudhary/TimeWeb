@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 import common.utils as utils
+from decimal import Decimal
 
 class TimewebForm(forms.ModelForm):
 
@@ -113,7 +114,9 @@ class TimewebForm(forms.ModelForm):
     
     def clean_works(self):
         works = self.cleaned_data['works']
-        if not (isinstance(works, int) or isinstance(works, list) and all(isinstance(work, str) for work in works)):
+        if isinstance(works, int):
+            works = [str(works)]
+        if not isinstance(works, list) or not all(isinstance(work, str) for work in works):
             raise forms.ValidationError(_("Invalid work inputs"))
         return works
     
@@ -150,12 +153,13 @@ class TimewebForm(forms.ModelForm):
 
         y = cleaned_data.get("y")
         works = cleaned_data.get("works")
+        first_work = Decimal(works[0])
         x = cleaned_data.get("x")
         assignment_date = cleaned_data.get("assignment_date")
         blue_line_start = cleaned_data.get("blue_line_start")
         # save_assignment from the frontend for needs more info assignments can
         # have works defined but not blue_line_start and etc
-        if isinstance(works, list) and blue_line_start != None and x != None and assignment_date != None:
+        if blue_line_start != None and x != None and assignment_date != None:
             len_works = len(works) - 1
             x_num = utils.days_between_two_dates(x, assignment_date)
             if blue_line_start + len_works > x_num:
@@ -169,12 +173,12 @@ class TimewebForm(forms.ModelForm):
                 # ok, even with this check. While they won't get deleted server side, they will client side, and
                 # the user will eventually delete work inputs until before the due date and skip this error
                 self.add_error("works", forms.ValidationError("You have too many work inputs"))
-        elif works != None and y != None and works * normalize_works >= y * normalize_y >= 1:
+        elif y != None and first_work * normalize_works >= y * normalize_y >= 1:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)s can't be %(equal_to_or_greater_than)s the previous field's value of %(y)s"),code='invalid',params={
-                    'value': f"{works}{({1: 'm', 60: 'h'}[normalize_works] if comparing_time else '')}",
+                    'value': f"{first_work}{({1: 'm', 60: 'h'}[normalize_works] if comparing_time else '')}",
                     'y': f"{y}{({1: 'm', 60: 'h'}[normalize_y] if comparing_time else '')}",
-                    'equal_to_or_greater_than': "equal to" if works == y else "greater than",
+                    'equal_to_or_greater_than': "equal to" if first_work == y else "greater than",
                 })
             )
             self.add_error("y", forms.ValidationError(""))
