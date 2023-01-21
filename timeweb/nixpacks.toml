@@ -1,5 +1,2 @@
 [start]
 cmd = 'python manage.py migrate && gunicorn -b 0.0.0.0:$PORT --max-requests 1000 --workers 5 --threads 2 timeweb.wsgi'
-
-[phases.build]
-cmds = ["...", "echo \"$SA_PRIVATE_KEY\" > sa_private_key.json", "echo \"$GC_API_CREDENTIALS\" > gc_api_credentials.json"]
