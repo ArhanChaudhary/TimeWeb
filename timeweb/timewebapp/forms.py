@@ -114,6 +114,8 @@ class TimewebForm(forms.ModelForm):
     
     def clean_works(self):
         works = self.cleaned_data['works']
+        if works == None:
+            works = 0
         if isinstance(works, int):
             works = [str(works)]
         if not isinstance(works, list) or not all(isinstance(work, str) for work in works):
