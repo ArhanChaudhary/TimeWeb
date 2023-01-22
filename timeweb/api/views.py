@@ -435,6 +435,11 @@ def create_gc_assignments(request):
 
             # From create assignment
             blue_line_start = utils.days_between_two_dates(date_now, assignment_date)
+            # create assignment has the condition if blue_line_start >= x_num: blue_line_start = 0
+            # utils.days_between_two_dates(date_now, assignment_date) >= utils.days_between_two_dates(x, assignment_date)
+            # date_now - assignment_date >= x - assignment_date
+            # date_now >= x
+            # which cannot happen due to the above cheecks which continue if complete_x <= complete_date_now
             if blue_line_start < 0:
                 blue_line_start = 0
             dynamic_start = blue_line_start

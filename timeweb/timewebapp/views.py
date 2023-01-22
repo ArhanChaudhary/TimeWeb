@@ -405,6 +405,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     pass
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
+            
+            # TODO: modularize this part of the code
+            # while not done, make sure to appropriately update api.views for the 
+            # logic creating Google Classroom assignments
+
             ideal_blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
             if not (self.created_assignment or self.sm.needs_more_info):
                 old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
