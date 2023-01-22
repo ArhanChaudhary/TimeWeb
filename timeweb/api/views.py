@@ -425,7 +425,7 @@ def create_gc_assignments(request):
                 i['name'] for i in request.user.settingsmodel.gc_courses_cache
                 if assignment['courseId'] == i['id']
             ))
-            description = assignment.get('description', "")
+            description = assignment.get('description')
             google_classroom_assignment_link = assignment.get("alternateLink")
 
             # Assignment is valid to be created

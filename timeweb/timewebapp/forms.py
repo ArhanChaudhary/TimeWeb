@@ -138,6 +138,12 @@ class TimewebForm(forms.ModelForm):
         if any(len(tag) > MAX_TAG_LENGTH for tag in tags):
             raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
         return tags
+    
+    def clean_description(self):
+        description = self.cleaned_data['description']
+        if description == "":
+            description = None
+        return description
 
     def clean(self):
         # A useful reference on how to correctly use form validation: https://stackoverflow.com/a/31729820/12230735
