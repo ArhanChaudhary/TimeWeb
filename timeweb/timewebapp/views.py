@@ -409,7 +409,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # TODO: modularize this part of the code
             # while not done, make sure to appropriately update api.views for the 
             # logic creating Google Classroom assignments
-
             ideal_blue_line_start = utils.days_between_two_dates(date_now, self.sm.assignment_date)
             if not (self.created_assignment or self.sm.needs_more_info):
                 old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
@@ -420,7 +419,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
                 # if self.sm.blue_line_start >= x_num then blue_line_start is 0
                 old_ideal_blue_line_start >= old_x_num and 
-                not ideal_blue_line_start >= old_x_num or
+                not ideal_blue_line_start >= x_num or
 
                 # if blue_line_start < 0 then blue_line_start is 0
                 
