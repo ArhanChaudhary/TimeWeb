@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (GC_API_INIT_FAILED) {
         $.alert({
             title: "Could not enable the Google Classroom integration.",
-            content: "Authentication failed. Please try again.",
+            content: "Authorization failed. Please try again.",
             backgroundDismiss: false,
             buttons: {
                 ok: {
