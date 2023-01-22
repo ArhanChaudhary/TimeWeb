@@ -25,7 +25,12 @@ from google.auth.transport.requests import Request
 from google.auth.exceptions import RefreshError, TransportError
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
-from oauthlib.oauth2.rfc6749.errors import OAuth2Error, AccessDeniedError, InvalidGrantError
+from oauthlib.oauth2.rfc6749.errors import (
+    OAuth2Error,
+    AccessDeniedError,
+    InvalidGrantError,
+    MissingCodeError
+)
 from httplib2.error import ServerNotFoundError
 from googleapiclient.discovery_cache.base import Cache
 
@@ -540,6 +545,7 @@ def gc_auth_disable(request, *, save=True):
 @require_http_methods(["GET"])
 def gc_auth_callback(request):
     # Fail it early (for debugging
+    # print(request.build_absolute_uri())
     # request.session['gc-init-failed'] = True
     # return redirect("home")
     def callback_failed():
@@ -576,9 +582,11 @@ def gc_auth_callback(request):
     # turn those parameters into a token
     try:
         flow.fetch_token(authorization_response=authorization_response)
-    except (InvalidGrantError, AccessDeniedError):
-        # InvalidGrantError If the user needs parental permission and then clicks cancel
-        # AccessDeniedError If the user reloads (dont remember how but it has happened)
+    except (InvalidGrantError, AccessDeniedError, MissingCodeError):
+        # InvalidGrantError for bad requests
+        # AccessDeniedError If the user reloads (dont remember how but it has happened) or clicks cancel
+        # MissingCodeError if the user manually gets this route and forgets "code" in the url
+        # note that code is the only required url parameter
         return callback_failed()
     try:
         credentials = flow.credentials
@@ -602,7 +610,6 @@ def gc_auth_callback(request):
     except OAuth2Error as e:
         return callback_failed()
     courses = courses.get('courses', [])
-    # In case users don't input a code in the url or cancel
     if courses:
         try:
             service.courses().courseWork().list(courseId=courses[0]['id']).execute()
