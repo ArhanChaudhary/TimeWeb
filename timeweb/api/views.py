@@ -571,12 +571,13 @@ def gc_auth_callback(request):
     # is fully secure before bypassing the google https security checks
     # check if HTTP_X_FORWARDED_PROTO, HTTP_ORIGIN, and HTTP_CF_VISITOR are in request.META
     if os.environ.get("OAUTHLIB_INSECURE_TRANSPORT") != "1":
-        # TODO: prove that HTTP_X_FORWARDED_PROTO, HTTP_ORIGIN, and HTTP_CF_VISITOR will always be in request.META
+        # HTTP_ORIGIN isn't in request.META after the invalid credentials alert
+        # let's assume it's also possible for every other header to be missing to be safe
         if (
             authorization_response.startswith("http://") and
-            request.META["HTTP_X_FORWARDED_PROTO"] == "https" and
-            request.META["HTTP_ORIGIN"].startswith("https") and
-            json.loads(request.META["HTTP_CF_VISITOR"])['scheme'] == "https"
+            request.META.get("HTTP_X_FORWARDED_PROTO", "https") == "https" and
+            request.META.get("HTTP_ORIGIN", "https").startswith("https") and
+            json.loads(request.META.get("HTTP_CF_VISITOR", '{"scheme": "https"}'))['scheme'] == "https"
         ):
             authorization_response = "https://" + authorization_response[7:]
     # turn those parameters into a token
