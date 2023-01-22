@@ -35,6 +35,7 @@ import common.utils as utils
 from common.views import logger
 from django.views.decorators.http import require_http_methods
 import re
+import os
 from math import floor
 # Reminder: do NOT use decorator_from_middleware, as it is only for old-style django middlewares
 
@@ -562,13 +563,16 @@ def gc_auth_callback(request):
     # because timeweb runs on a reverse proxy, the requests seen
     # by railway are http instead of https. We need to ensure the request
     # is fully secure before bypassing the google https security checks
-    if (
-        authorization_response.startswith("http://") and
-        request.META["HTTP_X_FORWARDED_PROTO"] == "https" and
-        request.META["HTTP_ORIGIN"].startswith("https") and
-        json.loads(request.META["HTTP_CF_VISITOR"])['scheme'] == "https"
-    ):
-        authorization_response = "https://" + authorization_response[7:]
+    # check if HTTP_X_FORWARDED_PROTO, HTTP_ORIGIN, and HTTP_CF_VISITOR are in request.META
+    if os.environ.get("OAUTHLIB_INSECURE_TRANSPORT") != "1":
+        # TODO: prove that HTTP_X_FORWARDED_PROTO, HTTP_ORIGIN, and HTTP_CF_VISITOR will always be in request.META
+        if (
+            authorization_response.startswith("http://") and
+            request.META["HTTP_X_FORWARDED_PROTO"] == "https" and
+            request.META["HTTP_ORIGIN"].startswith("https") and
+            json.loads(request.META["HTTP_CF_VISITOR"])['scheme'] == "https"
+        ):
+            authorization_response = "https://" + authorization_response[7:]
     # turn those parameters into a token
     try:
         flow.fetch_token(authorization_response=authorization_response)
