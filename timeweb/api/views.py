@@ -583,24 +583,40 @@ def gc_auth_callback(request):
         # There is no access token for this session, did you call fetch_token?
         return callback_failed()
 
+    service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
+    # Ensure the user enabled both scopes
+    # let's avoid a batch request because
+    # 1) it takes like 1 second longer without
+    # 2) less verbose exception handling
+    # 3) i cant use an actual course id and instead fall back to the dunder string id every time
+    # 4) i am lazy
+
+    # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
+    # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
-        # Ensure the user enabled both scopes
-        service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
         courses = service.courses().list().execute()
-        service.courses().courseWork().list(courseId="easter egg!").execute()
-    except (HttpError, OAuth2Error) as e:
-        # If the error is an OAuth2Error, the init failed
-        # If the error is an HttpError and the access code is 403, the init failed
-        # If the error is an HttpError and the access code is 404, the init succeeded, as the course work execute line provides a dunder id so it can execute
-
-        # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
-        # I don't need to worry about Ratelimit errors here because such a situation would be very rare
-
-        # Let's use type instead of isinstance because I want an exact exception class match
-        if type(e) is OAuth2Error or type(e) is HttpError and e.resp.status == 403:
-            # In case users deny a permission or don't input a code in the url or cancel
-            return callback_failed()
+    except OAuth2Error as e:
+        return callback_failed()
     courses = courses.get('courses', [])
+    # In case users don't input a code in the url or cancel
+    if courses:
+        try:
+            service.courses().courseWork().list(courseId=courses[0]['id']).execute()
+        except (HttpError, OAuth2Error) as e:
+            return callback_failed()
+    else:
+        try:
+            service.courses().courseWork().list(courseId="easter egg").execute()
+        except (HttpError, OAuth2Error) as e:
+            if not (
+                # condition to ignore HttpError
+                # I don't have any courseId to test the permission 
+                # with, so I'll just use a dunder string id
+
+                # Let's also use type instead of isinstance because I want an exact exception class match
+                type(e) is HttpError and e.resp.status == 404
+            ):
+                return callback_failed()
     request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
