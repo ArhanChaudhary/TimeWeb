@@ -289,7 +289,7 @@ def update_gc_courses(request):
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list().execute()
+        courses = service.courses().list().execute(courseStates=["ACTIVE"])
     except RefreshError:
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     # If connection to the server randomly dies (could happen locally when wifi is off)
@@ -335,7 +335,7 @@ def simplify_courses(courses, include_name=True):
     return [{
                 "id": course["id"],
                 "name": simplify_course_name(course["name"]) if include_name else None,
-            } for course in courses if course["courseState"] != "ARCHIVED"]
+            } for course in courses]
 
 @require_http_methods(["POST"])
 def create_gc_assignments(request):
@@ -485,6 +485,8 @@ def create_gc_assignments(request):
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
     for course in request.user.settingsmodel.gc_courses_cache:
+        # NOTE: we don't need to set courseWorkStates because
+        # it defaults to "PUBLISHED"
         batch.add(coursework_lazy.list(courseId=course["id"]))
 
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
@@ -607,7 +609,7 @@ def gc_auth_callback(request):
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
-        courses = service.courses().list().execute()
+        courses = service.courses().list().execute(courseStates=["ACTIVE"])
     except OAuth2Error as e:
         return callback_failed()
     courses = courses.get('courses', [])
