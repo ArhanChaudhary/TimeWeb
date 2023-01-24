@@ -290,7 +290,7 @@ def update_gc_courses(request):
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
-        courses = service.courses().list().execute(courseStates=["ACTIVE"])
+        courses = service.courses().list(courseStates=["ACTIVE"]).execute()
     except RefreshError:
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     # If connection to the server randomly dies (could happen locally when wifi is off)
@@ -611,7 +611,7 @@ def gc_auth_callback(request):
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
-        courses = service.courses().list().execute(courseStates=["ACTIVE"])
+        courses = service.courses().list(courseStates=["ACTIVE"]).execute()
     except OAuth2Error:
         return callback_failed()
     courses = courses.get('courses', [])
