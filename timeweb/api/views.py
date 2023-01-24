@@ -23,6 +23,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.auth.exceptions import RefreshError, TransportError
+from requests.exceptions import ConnectionError
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
 from oauthlib.oauth2.rfc6749.errors import (
@@ -585,11 +586,12 @@ def gc_auth_callback(request):
     # turn those parameters into a token
     try:
         flow.fetch_token(authorization_response=authorization_response)
-    except (InvalidGrantError, AccessDeniedError, MissingCodeError):
+    except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError):
         # InvalidGrantError for bad requests
         # AccessDeniedError If the user reloads (dont remember how but it has happened) or clicks cancel
         # MissingCodeError if the user manually gets this route and forgets "code" in the url
         # note that code is the only required url parameter
+        # ConnectionError if the wifi randomly dies (could happen when offline)
         return callback_failed()
     try:
         credentials = flow.credentials
@@ -610,13 +612,13 @@ def gc_auth_callback(request):
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
         courses = service.courses().list().execute(courseStates=["ACTIVE"])
-    except OAuth2Error as e:
+    except OAuth2Error:
         return callback_failed()
     courses = courses.get('courses', [])
     if courses:
         try:
             service.courses().courseWork().list(courseId=courses[0]['id']).execute()
-        except (HttpError, OAuth2Error) as e:
+        except (HttpError, OAuth2Error):
             return callback_failed()
     else:
         try:
