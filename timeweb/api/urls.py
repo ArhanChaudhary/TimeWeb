@@ -12,7 +12,6 @@ urlpatterns = [
     path("gc-auth-callback/", views.gc_auth_callback, name="gc_auth_callback"),
 ]
 INCLUDE_IN_STATE_EVALUATION = ("delete_assignment", "restore_assignment", "save_assignment", 
-    "change_setting", )
-EXCLUDE_FROM_UPDATING_STATE = ("evaluate_changed_state", "create_gc_assignments", "update_gc_courses", 
-    "gc_auth_callback", )
+    "change_setting", "create_gc_assignments" )
+EXCLUDE_FROM_UPDATING_STATE = ("evaluate_changed_state", "update_gc_courses", "gc_auth_callback", )
 assert len(INCLUDE_IN_STATE_EVALUATION) + len(EXCLUDE_FROM_UPDATING_STATE) == len(urlpatterns), "update this"
