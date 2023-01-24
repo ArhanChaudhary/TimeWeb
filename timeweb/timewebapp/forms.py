@@ -141,9 +141,16 @@ class TimewebForm(forms.ModelForm):
     
     def clean_description(self):
         description = self.cleaned_data['description']
+        # for some reason textfield's empty_value is "" instead of None
         if description == "":
             description = None
         return description
+    
+    def clean_funct_round(self):
+        funct_round = self.cleaned_data['funct_round']
+        if funct_round == None:
+            funct_round = Decimal(1)
+        return funct_round
 
     def clean(self):
         # A useful reference on how to correctly use form validation: https://stackoverflow.com/a/31729820/12230735

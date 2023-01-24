@@ -259,14 +259,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
-        # I dunno why I put this here but it's been here for a while
-        # and i'll have this as a safety precaution
-        if self.sm.assignment_date:
-            self.sm.assignment_date = self.sm.assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        if self.sm.x:
-            self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0)
-        if not self.sm.funct_round:
-            self.sm.funct_round = Decimal(1)
         if not self.sm.unit:
             if self.form.cleaned_data.get(f"y-widget-checkbox"):
                 self.sm.unit = "Hour"
