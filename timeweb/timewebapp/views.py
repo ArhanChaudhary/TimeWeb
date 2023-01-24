@@ -259,12 +259,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
-        if not self.sm.unit:
-            if self.form.cleaned_data.get(f"y-widget-checkbox"):
-                self.sm.unit = "Hour"
-            else:
-                self.sm.unit = "Minute"
-
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             try:
                 if field in ("x", "y"):

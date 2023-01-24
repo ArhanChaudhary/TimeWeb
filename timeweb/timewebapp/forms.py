@@ -172,6 +172,7 @@ class TimewebForm(forms.ModelForm):
         x = cleaned_data.get("x")
         assignment_date = cleaned_data.get("assignment_date")
         blue_line_start = cleaned_data.get("blue_line_start")
+        unit = cleaned_data.get("unit")
         # save_assignment from the frontend for needs more info assignments can
         # have works defined but not blue_line_start and etc
         if blue_line_start != None and x != None and assignment_date != None:
@@ -209,6 +210,11 @@ class TimewebForm(forms.ModelForm):
                     })
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
+        if unit == None:
+            if cleaned_data.get("y-widget-checkbox"):
+                cleaned_data['unit'] = "Hour"
+            else:
+                cleaned_data['unit'] = "Minute"
         return cleaned_data
 
 # Put at the bottom due to circular imports
