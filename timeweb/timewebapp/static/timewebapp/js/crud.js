@@ -500,14 +500,6 @@ class Crud {
         // Populate form on edit
         $('.update-button').parent().click(function() {
             const sa = utils.loadAssignmentData($(this));
-
-            if (sa.name === EXAMPLE_ASSIGNMENT_NAME) {
-                $.alert({
-                    title: "You cannot modify the example assignment.",
-                    content: "Don't worry, you can modify everything else."
-                });
-                return;
-            }
             $("#new-title").text("Edit Assignment");
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));

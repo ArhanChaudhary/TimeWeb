@@ -1,10 +1,13 @@
 from django import forms
 from .models import TimewebModel
+from .views import EXAMPLE_ASSIGNMENT
 from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
 import common.utils as utils
 from decimal import Decimal
+from django.utils import timezone
+import common.utils as utils
 
 class TimewebForm(forms.ModelForm):
 
@@ -173,6 +176,7 @@ class TimewebForm(forms.ModelForm):
         assignment_date = cleaned_data.get("assignment_date")
         blue_line_start = cleaned_data.get("blue_line_start")
         unit = cleaned_data.get("unit")
+        name = cleaned_data.get("name")
         # save_assignment from the frontend for needs more info assignments can
         # have works defined but not blue_line_start and etc
         if blue_line_start != None and x != None and assignment_date != None:
@@ -210,6 +214,8 @@ class TimewebForm(forms.ModelForm):
                     })
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
+        if name == EXAMPLE_ASSIGNMENT["name"] and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc) != assignment_date:
+            self.add_error("assignment_date", forms.ValidationError(_("You cannot change this field of the example assignment")))
         if unit == None:
             if cleaned_data.get("y-widget-checkbox"):
                 cleaned_data['unit'] = "Hour"

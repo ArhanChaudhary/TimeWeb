@@ -34,10 +34,6 @@ from ratelimit.decorators import ratelimit
 
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
-# needs to be down here due to circular imports
-from .forms import TimewebForm
-from navbar.forms import SettingsForm
-DELETED_ASSIGNMENTS_PER_PAGE = 70
 EXAMPLE_ASSIGNMENT = {
     "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
     "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
@@ -52,6 +48,10 @@ EXAMPLE_ASSIGNMENT = {
     "dynamic_start": 0,
     "description": "Example assignment description"
 }
+# needs to be down here due to circular imports
+from .forms import TimewebForm
+from navbar.forms import SettingsForm
+DELETED_ASSIGNMENTS_PER_PAGE = 70
 # Make sure to change the logic comparing the old data too if a new field is expensive to equare
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
@@ -200,6 +200,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.context['refresh_dynamic_mode'] = request.session.pop("refresh_dynamic_mode")
 
             if invalid_form_context := request.session.pop('invalid_form_context', None):
+                request.utc_offset = request.session.pop('utc_offset')
                 form = TimewebForm(data=QueryDict(invalid_form_context['form']), request=request)
                 assert not form.is_valid(), f"{form.data}, {form.errors}"
                 for field in form.errors:
@@ -245,6 +246,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             old_data = deepcopy(self.sm)
 
             # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
+            # Excluded: id, blue_line_start, skew_ratio, works, fixed_mode, dynamic_start, tags, has_alerted_due_date_passed_notice, alert_due_date_incremented, dont_hide_again
 
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
@@ -543,6 +545,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form.data.urlencode() # TimewebForm is not json serializable
         request.session['invalid_form_context'] = self.context
+        request.session['utc_offset'] = request.POST.get('utc_offset')
         return redirect("home")
 
 try:
