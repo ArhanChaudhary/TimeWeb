@@ -249,8 +249,10 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     padding-left: var(--magic-wand-width);
 }
 #form-wrapper .field-wrapper.has-widget > input {
-    width: initial;
     flex-grow: 1;
+}
+#form-wrapper .field-wrapper.has-widget:not(.disabled-field) > input {
+    width: initial;
     border-top-right-radius: unset;
     border-bottom-right-radius: unset;
 }
