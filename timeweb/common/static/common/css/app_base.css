@@ -342,11 +342,11 @@ select, .daterangepicker .drp-buttons .cancelBtn {
 }
 .info-button-text.info-right {
     left: calc(100% + 14px);
-    transform: translateY(-50%) translateY(-7px);
+    transform: translateY(-50%) translateY(-8.5px);
 }
 .info-button-text.info-left {
     right: calc(100% + 14px);
-    transform: translateY(-50%) translateY(-7px);
+    transform: translateY(-50%) translateY(-8.5px);
 }
 .info-button-text.info-top {
     bottom: calc(100% + 14px);
