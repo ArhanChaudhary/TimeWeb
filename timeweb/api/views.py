@@ -17,6 +17,7 @@ from navbar.forms import SettingsForm
 # Formatting
 from django.utils.text import Truncator
 import json
+import zoneinfo
 
 # Google API
 from googleapiclient.discovery import build
@@ -102,7 +103,7 @@ def save_assignment(request):
             for key, value in assignment.items():
                 if key == "x":
                     # Useful reference https://blog.ganssle.io/articles/2019/11/utcnow.html
-                    assignment[key] = datetime.datetime.fromtimestamp(value, timezone.utc)
+                    assignment[key] = datetime.datetime.fromtimestamp(value, zoneinfo.ZoneInfo(request.utc_offset)).replace(tzinfo=timezone.utc)
                 elif key == "due_time":
                     assignment[key] = datetime.time(**value)
                 if isinstance(value, float):
@@ -450,6 +451,10 @@ def create_gc_assignments(request):
             if blue_line_start < 0:
                 blue_line_start = 0
             dynamic_start = blue_line_start
+            # we store these in utc
+            # convert at the end so it is easier to use with calculations with date_now
+            x = x.replace(tzinfo=timezone.utc)
+            assignment_date = assignment_date.replace(tzinfo=timezone.utc)
             gc_models_to_create.append(TimewebModel(
                 # these fields can be updated from changes in the api
 

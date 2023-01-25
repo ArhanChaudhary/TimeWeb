@@ -1198,10 +1198,6 @@ window.dat = JSON.parse(document.getElementById("assignment-models").textContent
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
-        // Don't really know what to do for assignment dates on different tzs (since they are stored in utc) so i'll just round it to the nearest day
-        // Add half a day and flooring it rounds it
-        sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
-        sa.assignment_date.setHours(0,0,0,0);
     } else {
         sa.assignment_date = new Date(date_now.valueOf());
         sa.fake_assignment_date = true;
@@ -1211,16 +1207,13 @@ for (let sa of dat) {
         sa.due_time = sa.due_time.split(":");
         sa.due_time = {
             hour: +sa.due_time[0],
+
             minute: +sa.due_time[1],
         }
     }
     // Don't do Number.isFinite(x) because this is the raw value
     if (sa.x) {
-        sa.x = new Date(sa.x);
-        // floor(date + 0.5) is the same as round(date)
-        sa.x.setHours(sa.x.getHours() + 24/2);
-        sa.x.setHours(0, 0, 0, 0);
-        
+        sa.x = new Date(sa.x);        
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
