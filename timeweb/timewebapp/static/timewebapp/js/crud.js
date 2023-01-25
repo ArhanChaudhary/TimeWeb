@@ -643,15 +643,19 @@ class Crud {
             }
         });
 
-        $(".field-widget-checkbox").on('input', function() {
-            let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
-            if (["", "Predicted"].includes(widget_input.val())) return;
-            if ($(this).prop("checked")) {
-                widget_input.val(Crud.minutesToHours(widget_input.val()));
-            } else {
-                widget_input.val(Crud.hoursToMinutes(widget_input.val()));
-            }
-        });
+        // Auto-converts mintues to hours and vice versa
+        // Removed due to generally just being annoying
+        // uncomment if needed
+
+        // $(".field-widget-checkbox").on('input', function() {
+        //     let widget_input = $(this).prevAll("input:not([id^=\"initial\"]):first");
+        //     if (["", "Predicted"].includes(widget_input.val())) return;
+        //     if ($(this).prop("checked")) {
+        //         widget_input.val(Crud.minutesToHours(widget_input.val()));
+        //     } else {
+        //         widget_input.val(Crud.hoursToMinutes(widget_input.val()));
+        //     }
+        // });
         $("#id_description").expandableTextareaHeight();
         Crud.one_unit_of_work_alert_already_shown = false;
         Crud.alerted_early_due_time = false;
