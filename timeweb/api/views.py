@@ -615,11 +615,18 @@ def gc_auth_callback(request):
     except OAuth2Error:
         return callback_failed()
     courses = courses.get('courses', [])
+    # Let's use type instead of isinstance because I want an exact exception class match
     if courses:
         try:
             service.courses().courseWork().list(courseId=courses[0]['id']).execute()
-        except (HttpError, OAuth2Error):
-            return callback_failed()
+        except (HttpError, OAuth2Error) as e:
+            if not (
+                # condition to ignore HttpError
+                # if you are the owner of a class,
+                # this can throw 403s
+                type(e) is HttpError and e.resp.status == 403
+            ):
+                return callback_failed()
     else:
         try:
             service.courses().courseWork().list(courseId="easter egg").execute()
@@ -628,8 +635,6 @@ def gc_auth_callback(request):
                 # condition to ignore HttpError
                 # I don't have any courseId to test the permission 
                 # with, so I'll just use a dunder string id
-
-                # Let's also use type instead of isinstance because I want an exact exception class match
                 type(e) is HttpError and e.resp.status == 404
             ):
                 return callback_failed()
