@@ -409,11 +409,11 @@ def create_gc_assignments(request):
                     minute=assignment['dueTime'].get('minutes', 0),
                     tzinfo=timezone.utc,
                 ))
-                breakpoint()
                 # Do this after utc_to_local to ensure I am checking local time
                 if (
-                    # base condition for changing the due time to 12:00
+                    # is setting enabled?
                     request.user.settingsmodel.gc_assignments_always_midnight and 
+                    # is it due at 11:59 PM?
                     complete_x.hour == 23 and complete_x.minute == 59 and 
                     # extra condtion #1: the google classroom assignment cannot be due later today
                     # we don't want to do this as the information would then be inaccurate to the user
@@ -467,8 +467,10 @@ def create_gc_assignments(request):
             dynamic_start = blue_line_start
             # we store these in utc
             # convert at the end so it is easier to use with calculations with date_now
-            x = x.replace(tzinfo=timezone.utc)
-            assignment_date = assignment_date.replace(tzinfo=timezone.utc)
+            if x:
+                x = x.replace(tzinfo=timezone.utc)
+            if assignment_date:
+                assignment_date = assignment_date.replace(tzinfo=timezone.utc)
             gc_models_to_create.append(TimewebModel(
                 # these fields can be updated from changes in the api
 
