@@ -1,6 +1,5 @@
 from django import forms
 from .models import TimewebModel
-from .views import EXAMPLE_ASSIGNMENT
 from django.utils.translation import gettext_lazy as _
 import datetime
 from django.conf import settings
@@ -224,4 +223,4 @@ class TimewebForm(forms.ModelForm):
         return cleaned_data
 
 # Put at the bottom due to circular imports
-from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH
+from .views import MAX_NUMBER_OF_TAGS, MAX_TAG_LENGTH, EXAMPLE_ASSIGNMENT
