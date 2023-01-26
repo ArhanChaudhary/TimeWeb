@@ -406,8 +406,19 @@ def create_gc_assignments(request):
                     minute=assignment['dueTime'].get('minutes', 0),
                     tzinfo=timezone.utc,
                 ))
+                breakpoint()
                 # Do this after utc_to_local to ensure I am checking local time
-                if request.user.settingsmodel.gc_assignments_always_midnight and complete_x.hour == 23 and complete_x.minute == 59:
+                if (
+                    # base condition for changing the due time to 12:00
+                    request.user.settingsmodel.gc_assignments_always_midnight and 
+                    complete_x.hour == 23 and complete_x.minute == 59 and 
+                    # extra condtion #1: the google classroom assignment cannot be due later today
+                    # we don't want to do this as the information would then be inaccurate to the user
+                    complete_x.replace(hour=0, minute=0) != date_now and
+                    # extra condtion #2: the google classroom assignment must not be due on its assignment date
+                    # this is applicable for assignments due in the future
+                    complete_x.replace(hour=0, minute=0) != assignment_date
+                ):
                     complete_x = complete_x.replace(hour=0, minute=0)
                 due_time = complete_x.time()
                 if not (
