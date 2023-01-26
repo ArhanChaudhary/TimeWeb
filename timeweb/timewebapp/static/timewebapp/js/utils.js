@@ -1198,6 +1198,16 @@ window.dat = JSON.parse(document.getElementById("assignment-models").textContent
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
+        // TODO: don't use epoch shifting
+        // Reference: https://stackoverflow.com/questions/15141762/how-to-initialize-a-javascript-date-to-a-particular-time-zone
+        sa.assignment_date = new Date(sa.assignment_date
+            .getUTCFullYear(), sa.assignment_date
+            .getUTCMonth(), sa.assignment_date
+            .getUTCDate(), sa.assignment_date
+            .getUTCHours(), sa.assignment_date
+            .getUTCMinutes(), sa.assignment_date
+            .getUTCSeconds(), sa.assignment_date
+            .getUTCMilliseconds());
     } else {
         sa.assignment_date = new Date(date_now.valueOf());
         sa.fake_assignment_date = true;
@@ -1213,7 +1223,15 @@ for (let sa of dat) {
     }
     // Don't do Number.isFinite(x) because this is the raw value
     if (sa.x) {
-        sa.x = new Date(sa.x);        
+        sa.x = new Date(sa.x);
+        sa.x = new Date(sa.x
+            .getUTCFullYear(), sa.x
+            .getUTCMonth(), sa.x
+            .getUTCDate(), sa.x
+            .getUTCHours(), sa.x
+            .getUTCMinutes(), sa.x
+            .getUTCSeconds(), sa.x
+            .getUTCMilliseconds());
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
