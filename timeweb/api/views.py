@@ -383,8 +383,11 @@ def create_gc_assignments(request):
         date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         course_coursework = course_coursework['courseWork']
         for assignment in course_coursework:
-            # Load and interpret json data
             assignment_id = int(assignment['id'], 10)
+            # NOTE: scheduled assignments logically don't show up on the API
+            # this implies that assignments due in the future cannot be created with the Google Classroom API
+            # I am still going to assume this is possible with my validation logic and also check for "scheduledTime"
+            # for forward compatibility and to be safe
             complete_assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
             try:
                 complete_assignment_date = datetime.datetime.strptime(complete_assignment_date,'%Y-%m-%dT%H:%M:%S.%fZ')
