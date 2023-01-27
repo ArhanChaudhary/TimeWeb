@@ -126,26 +126,26 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     box-sizing: border-box;
 }
 #form-wrapper #selected-form-tab-styling {
-    border-top: 1px solid var(--color);
-    border-left: 1px solid var(--color);
-    border-right: 1px solid var(--color);
+    border-top: var(--field-wrapper-border);
+    border-left: var(--field-wrapper-border);
+    border-right: var(--field-wrapper-border);
     width: calc(50% - var(--horizontal-field-group-tab-padding));
     margin: 0 -1px;
     border-top-right-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
 }
 #form-wrapper .selected-form-tab-styling-line {
-    border-bottom: 1px solid var(--color);
+    border-bottom: var(--field-wrapper-border);
     align-self: flex-end;
     width: calc(50% + 1px);
 }
 #form-wrapper #first-tab-line {
     border-bottom-right-radius: var(--border-radius);
-    border-right: 1px solid var(--color);
+    border-right: var(--field-wrapper-border);
 }
 #form-wrapper #second-tab-line {
     border-bottom-left-radius: var(--border-radius);
-    border-left: 1px solid var(--color);
+    border-left: var(--field-wrapper-border);
 }
 #field-group-picker-styling * {
     transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
@@ -241,6 +241,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper #fields-wrapper {
     --magic-wand-width: 34px;
+    --field-wrapper-border: 1px solid var(--color);
 }
 #form-wrapper #id_name {
     padding-right: 26px;
@@ -273,7 +274,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper .field-wrapper > textarea,
 #break-days-wrapper {
     margin-top: 2px;
-    border: 1px solid var(--color);
+    border: var(--field-wrapper-border);
     box-sizing: border-box; 
     border-radius: 3px;
     height: var(--field-height);
