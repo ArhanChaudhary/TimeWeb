@@ -252,10 +252,16 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper .field-wrapper.has-widget > input {
     flex-grow: 1;
 }
-#form-wrapper .field-wrapper.has-widget:not(.disabled-field) > input {
+#form-wrapper .field-wrapper.has-widget:not(.disabled-field.disable-widget) > input {
     width: initial;
-    border-top-right-radius: unset;
-    border-bottom-right-radius: unset;
+    border-top-right-radius: initial;
+    border-bottom-right-radius: initial;
+}
+#form-wrapper .field-wrapper.has-widget.disabled-field:not(.disable-widget) > input:first-of-type {
+    border-right: none;
+}
+#form-wrapper .field-wrapper.has-widget.disabled-field:not(.disable-widget) > label:last-of-type {
+    border-left: var(--field-wrapper-border);
 }
 #form-wrapper .field-widget-checkbox:not(#id_soft) {
     position: absolute;
@@ -322,7 +328,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     /* for invalid fields */
     box-shadow: none;
 }
-#form-wrapper .field-wrapper.disabled-field .field-widget {
+#form-wrapper .field-wrapper.disabled-field.disable-widget .field-widget {
     display: none;
 }
 #form-wrapper .field-wrapper > input {

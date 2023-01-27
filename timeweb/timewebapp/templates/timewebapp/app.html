@@ -69,7 +69,8 @@
 
             <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
               {% comment %} tells crud.js the field was predicted {% endcomment %}
-              {% if field.name == 'x' and x_was_predicted or field.name == 'y' and y_was_predicted %} disabled-field {% endif %}" 
+              {% if field.name == 'x' and x_was_predicted or field.name == 'y' and y_was_predicted %} disabled-field {% endif %}
+              {% if field.name == 'y' %} disable-widget {% endif %}" 
             id="id-{{ field.name }}-field-wrapper">
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Work Days</label>
