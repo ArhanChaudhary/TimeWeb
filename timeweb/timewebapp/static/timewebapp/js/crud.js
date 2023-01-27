@@ -589,11 +589,12 @@ class Crud {
             const field_wrapper = $(this).parents(".field-wrapper");
             const field_wrapper_input = field_wrapper.find(Crud.ALL_FOCUSABLE_FORM_INPUTS).not(".field-widget-checkbox");
             field_wrapper.toggleClass("disabled-field");
+            const was_just_disabled = field_wrapper.hasClass("disabled-field");
 
             if (field_wrapper.attr("original-type") === undefined)
                 field_wrapper.attr("original-type", field_wrapper_input.attr("type"));
-            field_wrapper_input.attr("type", field_wrapper.hasClass("disabled-field") ? "text" : field_wrapper.attr("original-type"));
-            field_wrapper_input.prop("disabled", field_wrapper.hasClass("disabled-field")).val(field_wrapper.hasClass("disabled-field") ? "Predicted" : "");
+            field_wrapper_input.attr("type", was_just_disabled ? "text" : field_wrapper.attr("original-type"));
+            field_wrapper_input.prop("disabled", was_just_disabled).val(was_just_disabled ? "Predicted" : "");
         });
         let preventRecursion;
         $("#fields-wrapper").find(Crud.ALL_FOCUSABLE_FORM_INPUTS).on('focus', e => {
