@@ -2,6 +2,7 @@
     display: flex;
     font-size: 17px;
     flex-flow: column;
+    --field-wrapper-border: 1px solid var(--color);
     --vertical-form-padding: 5px;
     --horizontal-form-padding: 4px;
     --error-note-color: hsl(353deg, 77%, 50%);
@@ -241,7 +242,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper #fields-wrapper {
     --magic-wand-width: 34px;
-    --field-wrapper-border: 1px solid var(--color);
 }
 #form-wrapper #id_name {
     padding-right: 26px;
