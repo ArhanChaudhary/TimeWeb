@@ -593,6 +593,24 @@ class Crud {
 
             if (field_wrapper.attr("original-type") === undefined)
                 field_wrapper.attr("original-type", field_wrapper_input.attr("type"));
+            // If you predict the field while the unit is hour, the unit is hidden but actually stays as hour in the html
+            // and is sent in the submit assignment. The prediction logic relies on the unit being minute, so we can't
+            // allow this to happen
+            // Conditions to manually set the unit to hour:
+            if (
+                // just clicked the predict button
+                was_just_disabled &&
+                // is the y field
+                field_wrapper_input.is("#id_y") &&
+                // the unit is hour
+
+                // use .find instead of .children because the input can be inside the label
+                // it's fine if this is true when unit isnt of time and was instead set to "Hour" before manually
+                // entering a unit. It will have no affect because replaceUnit will internally define unit to anyways
+                // be the field's value
+                field_wrapper.find(".field-widget-checkbox").prop("checked")
+            )
+                field_wrapper.children(".field-widget").click();
             field_wrapper_input.attr("type", was_just_disabled ? "text" : field_wrapper.attr("original-type"));
             field_wrapper_input.prop("disabled", was_just_disabled).val(was_just_disabled ? "Predicted" : "");
         });

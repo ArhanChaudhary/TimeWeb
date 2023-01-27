@@ -216,6 +216,13 @@ class TimewebForm(forms.ModelForm):
         if name == EXAMPLE_ASSIGNMENT["name"] and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc) != assignment_date:
             self.add_error("assignment_date", forms.ValidationError(_("You cannot change this field of the example assignment")))
         if unit == None:
+            # NOTE: do not do this from the backend!
+            # # if y was predicted, always use minute
+            # if cleaned_data.get("y-widget-checkbox") and "y" in self.request.POST:
+
+            # it messes up time_per_unit and funt_round
+            # (i.e time_per_unit can be 60 and funct_roun can be 30 and unit is
+            # set to minute)
             if cleaned_data.get("y-widget-checkbox"):
                 cleaned_data['unit'] = "Hour"
             else:
