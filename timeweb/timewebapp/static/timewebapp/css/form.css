@@ -261,7 +261,26 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     /* don't use left: -100vw; because it breaks on smaller vws */
     left: -9999px;
 }
-#form-wrapper .field-widget {
+#form-wrapper input:not(.field-widget-checkbox),
+#form-wrapper textarea {
+    padding: var(--vertical-form-padding) var(--horizontal-form-padding);
+    width: 100%;
+    /* Style meant to be overwritten */
+    border: none;
+}
+#form-wrapper .field-wrapper > input,
+#form-wrapper .field-wrapper > .field-widget,
+#form-wrapper .field-wrapper > textarea,
+#break-days-wrapper {
+    margin-top: 2px;
+    border: 1px solid var(--color);
+    box-sizing: border-box; 
+    border-radius: 3px;
+    height: var(--field-height);
+    --background-color: white;
+    background-color: var(--background-color);
+}
+#form-wrapper .field-wrapper > .field-widget {
     cursor: pointer;
     position: relative;
     display: flex;
@@ -273,10 +292,10 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
             user-select: none;
     padding-right: 6px;
     padding-left: 6px;
-    border-left: none !important;
-    border-top-left-radius: unset !important;
-    border-bottom-left-radius: unset !important;
-    --background-color: var(--field-widget-background-color) !important;
+    border-left: none;
+    border-top-left-radius: unset;
+    border-bottom-left-radius: unset;
+    --background-color: var(--field-widget-background-color);
 }
 #form-wrapper .field-widget-checkbox:not(:checked) ~ .field-widget::after {
     content: "Minutes";
@@ -322,25 +341,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     /* So .hide-field isnt over this when it has a lot of negative margin 
     We can't set the z-index to -1 for .hide-field or else the opacity transition breaks */
     z-index: 1;
-}
-#form-wrapper input:not(.field-widget-checkbox),
-#form-wrapper textarea {
-    padding: var(--vertical-form-padding) var(--horizontal-form-padding);
-    width: 100%;
-    /* Style meant to be overwritten */
-    border: none;
-}
-#form-wrapper .field-wrapper > input,
-#form-wrapper .field-wrapper > .field-widget,
-#form-wrapper .field-wrapper > textarea,
-#break-days-wrapper {
-    margin-top: 2px;
-    border: 1px solid var(--color);
-    box-sizing: border-box; 
-    border-radius: 3px;
-    height: var(--field-height);
-    --background-color: white;
-    background-color: var(--background-color);
 }
 #form-wrapper .info-button::after {
     transform: scale(3);
