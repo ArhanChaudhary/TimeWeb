@@ -179,7 +179,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
 
     def get(self, request):
-        self.context['form'] = TimewebForm(request=request)
         if request.path == reverse("deleted_assignments"):
             self.add_user_models_to_context(request, view_hidden=True)
             self.context["view_deleted_assignments_in_app_view"] = True
@@ -209,6 +208,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
                 invalid_form_context['form'] = form
                 self.context.update(invalid_form_context)
+        if 'form' not in self.context:
+            self.context['form'] = TimewebForm(request=request)
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
 
