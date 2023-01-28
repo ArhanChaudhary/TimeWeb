@@ -205,6 +205,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 assert not form.is_valid(), f"{form.data}, {form.errors}"
                 for field in form.errors:
                     form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + ' invalid'
+                # we need to undo what happens in TimewebForm.__init__ to ensure the due time is
+                # included in the invalid form
+                _mutable = form.data._mutable
+                form.data._mutable = True
+                form.data['x'] += " " + form.data['due_time']
+                del form.data['due_time']
+                form.data._mutable = _mutable
 
                 invalid_form_context['form'] = form
                 self.context.update(invalid_form_context)
