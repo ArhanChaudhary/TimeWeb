@@ -367,15 +367,14 @@ def create_gc_assignments(request):
     def add_gc_assignments_from_response(response_id, course_coursework, exception):
         # it is possible for this function to process courses that are in the cache but archived
         # this does not matter
-        if type(exception) is HttpError:
+        if exception is not None:
             # 403 if you are a teacher of a class
             # 404 if the cached courses are outdated and a course has been deleted
             # 429 if you are ratelimited, don't care
-            if exception.status_code in (403, 404, 429):
+            if type(exception) is HttpError and exception.status_code in (403, 404, 429):
                 logger.warning(exception)
             else:
                 logger.error(exception)
-            return
         if course_coursework is None:
             return
         complete_date_now = utils.utc_to_local(request, timezone.now())
