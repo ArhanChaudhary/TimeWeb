@@ -200,8 +200,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.context['refresh_dynamic_mode'] = request.session.pop("refresh_dynamic_mode")
 
             if invalid_form_context := request.session.pop('invalid_form_context', None):
-                request.utc_offset = request.session.pop('utc_offset')
-                form = TimewebForm(data=QueryDict(invalid_form_context['form']), request=request)
+                parsed = QueryDict(invalid_form_context['form'])
+                request.utc_offset = parsed['utc_offset']
+                form = TimewebForm(data=parsed, request=request)
                 assert not form.is_valid(), f"{form.data}, {form.errors}"
                 for field in form.errors:
                     form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + ' invalid'
@@ -545,7 +546,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form.data.urlencode() # TimewebForm is not json serializable
         request.session['invalid_form_context'] = self.context
-        request.session['utc_offset'] = request.POST.get('utc_offset')
         return redirect("home")
 
 try:
