@@ -141,7 +141,7 @@ class SettingsForm(forms.ModelForm):
         self.label_suffix = ""
     def clean_default_dropdown_tags(self):
         default_dropdown_tags = self.cleaned_data["default_dropdown_tags"]
-        if default_dropdown_tags == None:
+        if default_dropdown_tags is None:
             # to_python in JSONField.clean in save_assignment converts [] to None, but tags has a non-null constraint
             # revert it back to []
 

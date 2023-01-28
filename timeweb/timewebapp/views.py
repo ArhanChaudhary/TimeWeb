@@ -5,7 +5,7 @@
 # Abstractions
 from django.shortcuts import redirect, reverse
 from django.utils.translation import gettext as _
-from django.http import HttpResponse, QueryDict
+from django.http import QueryDict
 from django.contrib.auth import logout, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
@@ -322,8 +322,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.assignment_date -= original_date_now - date_now
                 self.sm.x -= original_date_now - date_now
             min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
-            if self.sm.x == None:
-                if self.sm.y == None:
+            if self.sm.x is None:
+                if self.sm.y is None:
                     # won't ever run because it will be marked as needs more info earlier
                     pass
                 else:
@@ -384,7 +384,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
             else:
                 x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
-                if self.sm.y == None:
+                if self.sm.y is None:
                     complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
                     # the prediction for due date is ceiled so also ceil the prediction for y for consistency
                     self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)

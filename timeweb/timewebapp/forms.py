@@ -116,7 +116,7 @@ class TimewebForm(forms.ModelForm):
     
     def clean_works(self):
         works = self.cleaned_data['works']
-        if works == None:
+        if works is None:
             works = 0
         if isinstance(works, int):
             works = [str(works)]
@@ -126,7 +126,7 @@ class TimewebForm(forms.ModelForm):
     
     def clean_tags(self):
         tags = self.cleaned_data['tags']
-        if tags == None:
+        if tags is None:
             # to_python in JSONField.clean in save_assignment converts [] to None, but tags has a non-null constraint
             # revert it back to []
 
@@ -150,7 +150,7 @@ class TimewebForm(forms.ModelForm):
     
     def clean_funct_round(self):
         funct_round = self.cleaned_data['funct_round']
-        if funct_round == None:
+        if funct_round is None:
             funct_round = Decimal(1)
         return funct_round
 
@@ -215,7 +215,7 @@ class TimewebForm(forms.ModelForm):
                 self.add_error("assignment_date", forms.ValidationError(""))
         if name == EXAMPLE_ASSIGNMENT["name"] and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc) != assignment_date:
             self.add_error("assignment_date", forms.ValidationError(_("You cannot change this field of the example assignment")))
-        if unit == None:
+        if unit is None:
             # NOTE: do not do this from the backend!
             # # if y was predicted, always use minute
             # if cleaned_data.get("y-widget-checkbox") and "y" in self.request.POST:
