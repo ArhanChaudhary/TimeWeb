@@ -38,6 +38,7 @@ from googleapiclient.discovery_cache.base import Cache
 # Misc
 from django.db import transaction
 import common.utils as utils
+import timewebapp.utils as app_utils
 from common.views import logger
 from django.views.decorators.http import require_http_methods
 import re
@@ -434,11 +435,13 @@ def create_gc_assignments(request):
                 x = complete_x.replace(hour=0, minute=0)
                 if date_now == x:
                     tags.append("Important")
+                x_num = utils.days_between_two_dates(x, assignment_date)
             else:
                 if utils.days_between_two_dates(date_now, assignment_date) > 60:
                     continue
                 due_time = None
                 x = None
+                x_num = None
             name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
             # We don't need to worry if there if this raises a not found error because the courses we
             # request assignments from are the ones in request.user.settingsmodel.gc_courses_cache itself
@@ -453,16 +456,14 @@ def create_gc_assignments(request):
             new_gc_assignment_ids.add(assignment_id)
             if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
                 continue
-
-            # From create assignment
-            blue_line_start = utils.days_between_two_dates(date_now, assignment_date)
-            # create assignment has the condition if blue_line_start >= x_num: blue_line_start = 0
-            # utils.days_between_two_dates(date_now, assignment_date) >= utils.days_between_two_dates(x, assignment_date)
-            # date_now - assignment_date >= x - assignment_date
-            # date_now >= x
-            # which cannot happen due to the above cheecks which continue if complete_x <= complete_date_now
-            if blue_line_start < 0:
-                blue_line_start = 0
+            adjusted_blue_line = app_utils.adjust_blue_line(request,
+                old_data=None,
+                assignment_date=assignment_date,
+                x_num=x_num,
+                needs_more_info=True,
+                blue_line_start=None,
+            )
+            blue_line_start = adjusted_blue_line['blue_line_start']
             dynamic_start = blue_line_start
             # we store these in utc
             # convert at the end so it is easier to use with calculations with date_now
