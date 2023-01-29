@@ -337,74 +337,67 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.x -= original_date_now - date_now
             min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
             if self.sm.x is None:
-                if self.sm.y is None:
-                    # won't ever run because it will be marked as needs more info earlier
-                    pass
+                # The purpose of this part of the code is to take into account the adjusted assignment date
+                # and make it look like the graph smoothly "chops off" previous work inputs
+                # some mathy legacy reference:
+
+                # ctime * (y - new_first_work) = min_work_time_funct_round * x
+                # x = ctime * (y - new_first_work) / min_work_time_funct_round
+                # Solve for new_first_work:
+                # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                # new_first_work is when n = removed_works_start
+                # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
+
+                # TODO: There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
+                # This is a condition from the below code that redefines works
+                # However it does not take into account capping removed_works_end at end_of_works
+                # However, end_of_works is dependent on x, creating a deadlock
+                # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
+                if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
+                    new_first_work = first_work
+                elif self.updated_assignment:
+                    new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
+                # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
+                work_day_count = ceil((self.sm.y - new_first_work) / min_work_time_funct_round)
+
+                if not work_day_count or len(self.sm.break_days) == 7:
+                    x_num = 1
+                elif self.sm.break_days:
+                    mods = utils.calc_mod_days(self)
+
+                    # Terrible implementation of inversing calcModDays
+                    guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
+                    while 1:
+                        guess_x += 1
+                        if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == work_day_count:
+                            x_num = max(1, guess_x)
+                            break
                 else:
-                    # The purpose of this part of the code is to take into account the adjusted assignment date
-                    # and make it look like the graph smoothly "chops off" previous work inputs
-                    # some mathy legacy reference:
-
-                    # ctime * (y - new_first_work) = min_work_time_funct_round * x
-                    # x = ctime * (y - new_first_work) / min_work_time_funct_round
-                    # Solve for new_first_work:
-                    # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
-                    # new_first_work is when n = removed_works_start
-                    # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
-
-                    # TODO: There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
-                    # This is a condition from the below code that redefines works
-                    # However it does not take into account capping removed_works_end at end_of_works
-                    # However, end_of_works is dependent on x, creating a deadlock
-                    # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
-                    if self.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
-                        new_first_work = first_work
-                    elif self.updated_assignment:
-                        new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
-                    # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
-                    work_day_count = ceil((self.sm.y - new_first_work) / min_work_time_funct_round)
-
-                    if not work_day_count or len(self.sm.break_days) == 7:
-                        x_num = 1
-                    elif self.sm.break_days:
-                        mods = utils.calc_mod_days(self)
-
-                        # Terrible implementation of inversing calcModDays
-                        guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
-                        while 1:
-                            guess_x += 1
-                            if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == work_day_count:
-                                x_num = max(1, guess_x)
-                                break
-                    else:
-                        x_num = work_day_count
-                    # Make sure assignments arent finished by x_num
-                    # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
-                    if self.sm.assignment_date < date_now:
-                        # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
-                        # x_num = (date_now - self.sm.assignment_date).days + x_num
-                        # x_num += (date_now - self.sm.assignment_date).days
-                        x_num += utils.days_between_two_dates(date_now, self.sm.assignment_date)
-                        # There is no need to modify blue_line_start by this addition because it is adjusted earlier
-                        # To see why this is the case, let's think about this abstractly.
-                        # We are adding x_num to the due date, and the due date is after the assignment date and,
-                        # deductively, after the x position of the start of the blue line. Since we are only adding
-                        # to the end of the assignment, away from all of these affect variables, this addition should,
-                        #  in theory, not affect blue_line_start.
-                    try:
-                        self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
-                    except OverflowError:
-                        self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                        self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+                    x_num = work_day_count
+                # Make sure assignments arent finished by x_num
+                # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
+                if self.sm.assignment_date < date_now:
+                    # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
+                    # x_num = (date_now - self.sm.assignment_date).days + x_num
+                    # x_num += (date_now - self.sm.assignment_date).days
+                    x_num += utils.days_between_two_dates(date_now, self.sm.assignment_date)
+                    # There is no need to modify blue_line_start by this addition because it is adjusted earlier
+                    # To see why this is the case, let's think about this abstractly.
+                    # We are adding x_num to the due date, and the due date is after the assignment date and,
+                    # deductively, after the x position of the start of the blue line. Since we are only adding
+                    # to the end of the assignment, away from all of these affect variables, this addition should,
+                    #  in theory, not affect blue_line_start.
+                try:
+                    self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
+                except OverflowError:
+                    self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
+                    self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
             else:
                 x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
-                if self.sm.y is None:
-                    complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
-                    # the prediction for due date is ceiled so also ceil the prediction for y for consistency
-                    self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
-                else:
-                    # we already have x_num and y and we don't need to do any further processing
-                    pass
+            if self.sm.y is None:
+                complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
+                # the prediction for due date is ceiled so also ceil the prediction for y for consistency
+                self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
             
