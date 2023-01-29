@@ -339,28 +339,33 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.assignment_date -= original_date_now - date_now
                 self.sm.x -= original_date_now - date_now
             min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
+            # NOTE: (self.sm.x is None and self.sm.y is None) is impossible
             if self.sm.x is None:
-                # The purpose of this part of the code is to take into account the adjusted assignment date
-                # and make it look like the graph smoothly "chops off" previous work inputs
-                # some mathy legacy reference:
-
-                # ctime * (y - new_first_work) = min_work_time_funct_round * x
-                # x = ctime * (y - new_first_work) / min_work_time_funct_round
-                # Solve for new_first_work:
-                # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
-                # new_first_work is when n = removed_works_start
-                # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
-
-                # TODO: There could very possibly be a bug with the last expression, removed_works_start <= removed_works_end
-                # This is a condition from the below code that redefines works
-                # However it does not take into account capping removed_works_end at end_of_works
-                # However, end_of_works is dependent on x, creating a deadlock
-                # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
-                if request.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
+                if request.created_assignment or self.sm.needs_more_info:
                     new_first_work = first_work
                 else:
                     assert request.updated_assignment
-                    new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
+                    adjusted_blue_line = app_utils.adjust_blue_line(request,
+                        old_data=old_data,
+                        assignment_date=self.sm.assignment_date,
+                        x_num=None,
+                        needs_more_info=False,
+                        blue_line_start=self.sm.blue_line_start,
+                    )
+                    removed_works_start = adjusted_blue_line['removed_works_start']
+                    removed_works_end = adjusted_blue_line['removed_works_end']
+                    actual_len_works = removed_works_end + 1 - removed_works_start
+                    len_works = actual_len_works - 1
+                    if len_works >= 0:
+                        # ctime * (y - new_first_work) = min_work_time_funct_round * x
+                        # x = ctime * (y - new_first_work) / min_work_time_funct_round
+                        # Solve for new_first_work:
+                        # works = [old_data.works[n] - old_data.works[0] + first_work for n in range(removed_works_start,removed_works_end+1)]
+                        # new_first_work is when n = removed_works_start
+                        # new_first_work = old_data.works[removed_works_start] - old_data.works[0] + first_work
+                        new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
+                    else:
+                        new_first_work = first_work
                 # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
                 work_day_count = ceil((self.sm.y - new_first_work) / min_work_time_funct_round)
 
@@ -399,10 +404,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
             else:
                 x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
-            if self.sm.y is None:
-                complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
-                # the prediction for due date is ceiled so also ceil the prediction for y for consistency
-                self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
+            complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
             adjusted_blue_line = app_utils.adjust_blue_line(request,
@@ -412,6 +414,9 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 needs_more_info=False,
                 blue_line_start=self.sm.blue_line_start,
             )
+            if self.sm.y is None:
+                # the prediction for due date is ceiled so also ceil the prediction for y for consistency
+                self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
             self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
