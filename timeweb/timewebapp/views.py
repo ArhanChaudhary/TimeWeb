@@ -252,7 +252,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
             first_work = Decimal(self.sm.works[0])
             self.sm.user = request.user
-        elif request.updated_assignment:
+        else:
+            assert request.updated_assignment
             self.sm = request.user.timewebmodel_set.get(pk=self.pk)
             old_data = deepcopy(self.sm)
 
@@ -357,7 +358,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # This requires too much thinking to fix, so I'm just going to leave it as is and pray this is satisfactory enough
                 if request.created_assignment or self.sm.needs_more_info or not removed_works_start <= removed_works_end:
                     new_first_work = first_work
-                elif request.updated_assignment:
+                else:
+                    assert request.updated_assignment
                     new_first_work = Decimal(old_data.works[removed_works_start]) - Decimal(old_data.works[0]) + first_work
                 # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
                 work_day_count = ceil((self.sm.y - new_first_work) / min_work_time_funct_round)
@@ -414,7 +416,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]
-            elif request.updated_assignment:
+            else:
+                assert request.updated_assignment
                 self.sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
                 if self.sm.dynamic_start < 0:
                     self.sm.dynamic_start = 0
@@ -485,7 +488,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if request.created_assignment:
             logger.info(f'User \"{request.user}\" created assignment "{self.sm.name}"')
             request.session["just_created_assignment_id"] = self.sm.pk
-        elif request.updated_assignment:
+        else:
+            assert request.updated_assignment
             logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
             request.session['just_updated_assignment_id'] = self.sm.pk
             for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS:
@@ -507,7 +511,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['y_was_predicted'] = 'y' not in request.POST
         if request.created_assignment:
             self.context['submit'] = 'Create Assignment'
-        elif request.updated_assignment:
+        else:
+            assert request.updated_assignment
             self.context['invalid_form_pk'] = self.pk
             self.context['submit'] = 'Edit Assignment'
         self.context['form'] = self.form.data.urlencode() # TimewebForm is not json serializable
