@@ -392,6 +392,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 except OverflowError:
                     self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
                     self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+                    x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
             else:
                 x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
             if self.sm.y is None:
