@@ -1,4 +1,6 @@
 from decimal import Decimal
+import common.utils as utils
+from django.utils import timezone
 
 def calc_mod_days(self):
     # Note to future self: I have rigorously tested the inclusion of +1 and it is needed
@@ -54,3 +56,66 @@ def deletion_time_fix():
             while not is_unique(assignment.deletion_time):
                 assignment.deletion_time += datetime.timedelta(microseconds=100000)
                 assignment.save()
+
+def adjust_blue_line(request, *, sm, old_data, x_num):
+    date_now = utils.utc_to_local(request, timezone.now())
+    date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+    ideal_blue_line_start = utils.days_between_two_dates(date_now, sm.assignment_date)
+    if old_data is None or sm.needs_more_info:
+        blue_line_start = ideal_blue_line_start
+    else:
+        old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
+        if old_data.due_time and (old_data.due_time.hour or old_data.due_time.minute):
+            old_x_num += 1
+        old_ideal_blue_line_start = utils.days_between_two_dates(date_now, old_data.assignment_date)
+        if (
+            # if self.blue_line_start >= x_num then blue_line_start is 0
+            old_ideal_blue_line_start >= old_x_num and 
+            not ideal_blue_line_start >= x_num or
+
+            # if blue_line_start < 0 then blue_line_start is 0
+            
+            # Note: this action does NOT affect works, even if it may be
+            # more mathematically logical to do so
+
+            # For context, what is happening here is blue_line_start is being
+            # forced back to today for an assignment that used to have an
+            # assignment date in the future. This should in theory affect
+            # works by clearing it, as every day is now offset. But practically,
+            # users are unlike to actually want this to happen.
+            # 1) they probably don't care about the offset
+            # 2) it would be extremely frustrating to have their work inputs cleared
+            # 3) they might have assigned in the future in the first place by typo or testing
+            old_ideal_blue_line_start < 0 and
+            not ideal_blue_line_start < 0
+        ):
+            blue_line_start = ideal_blue_line_start
+        else:
+            blue_line_start = sm.blue_line_start + utils.days_between_two_dates(old_data.assignment_date, sm.assignment_date)
+    if sm.blue_line_start < 0:
+        removed_works_start = -sm.blue_line_start # translates x position 0 so that it can be used to accessing works
+        blue_line_start = 0
+    else:
+        removed_works_start = 0
+    capped_at_x_num = blue_line_start >= x_num
+    if capped_at_x_num:
+        blue_line_start = 0
+    
+    if old_data is None:
+        removed_works_end = None
+    else:
+        removed_works_end = len(old_data.works) - 1
+        actual_len_works = removed_works_end + 1 - removed_works_start
+        len_works = actual_len_works - 1
+        # If the edited due date cuts off some of the work inputs
+        if len_works + sm.sm.blue_line_start > x_num:
+            # (removed_works_end + 1 - removed_works_start) - 1 + self.sm.blue_line_start > x_num
+            # removed_works_end - removed_works_start + self.sm.blue_line_start > x_num
+            # removed_works_end > x_num + removed_works_start - self.sm.blue_line_start
+            removed_works_end = x_num + removed_works_start - sm.sm.blue_line_start
+    return {
+        'blue_line_start': blue_line_start,
+        'removed_works_start': removed_works_start,
+        'removed_works_end': removed_works_end,
+        'capped_at_x_num': capped_at_x_num,
+    }
