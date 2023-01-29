@@ -372,7 +372,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if not work_day_count or len(self.sm.break_days) == 7:
                     x_num = 1
                 elif self.sm.break_days:
-                    mods = app_utils.calc_mod_days(self)
+                    mods = app_utils.calc_mod_days(
+                        assignment_date=self.sm.assignment_date,
+                        blue_line_start=self.sm.blue_line_start,
+                        break_days=self.sm.break_days
+                    )
 
                     # Terrible implementation of inversing calcModDays
                     guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1

@@ -2,14 +2,14 @@ from decimal import Decimal
 import common.utils as utils
 from django.utils import timezone
 
-def calc_mod_days(self):
+def calc_mod_days(*, assignment_date, blue_line_start, break_days):
     # Note to future self: I have rigorously tested the inclusion of +1 and it is needed
-    assign_day_of_week = self.sm.assignment_date.weekday() + 1 # js moment
-    red_line_start_x = self.sm.blue_line_start
+    assign_day_of_week = assignment_date.weekday() + 1 # js moment
+    red_line_start_x = blue_line_start
     mods = [0]
     mod_counter = 0
     for mod_day in range(6):
-        if str((assign_day_of_week + red_line_start_x + mod_day) % 7) in self.sm.break_days:
+        if str((assign_day_of_week + red_line_start_x + mod_day) % 7) in break_days:
             mod_counter += 1
         mods.append(mod_counter)
     mods = tuple(mods)
