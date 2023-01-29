@@ -403,7 +403,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
                 x_num += 1
-            adjusted_blue_line = app_utils.adjust_blue_line(request, sm=self, old_data=old_data, x_num=x_num)
+            adjusted_blue_line = app_utils.adjust_blue_line(request,
+                old_data=old_data,
+                assignment_date=self.sm.assignment_date,
+                x_num=x_num,
+                needs_more_info=False,
+                blue_line_start=self.sm.blue_line_start,
+            )
             self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start

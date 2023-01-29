@@ -57,11 +57,12 @@ def deletion_time_fix():
                 assignment.deletion_time += datetime.timedelta(microseconds=100000)
                 assignment.save()
 
-def adjust_blue_line(request, *, sm, old_data, x_num):
+def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_info, blue_line_start):
+    assert assignment_date is not None
     date_now = utils.utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-    ideal_blue_line_start = utils.days_between_two_dates(date_now, sm.assignment_date)
-    if old_data is None or sm.needs_more_info:
+    ideal_blue_line_start = utils.days_between_two_dates(date_now, assignment_date)
+    if old_data is None or needs_more_info:
         blue_line_start = ideal_blue_line_start
     else:
         old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
@@ -91,9 +92,9 @@ def adjust_blue_line(request, *, sm, old_data, x_num):
         ):
             blue_line_start = ideal_blue_line_start
         else:
-            blue_line_start = sm.blue_line_start + utils.days_between_two_dates(old_data.assignment_date, sm.assignment_date)
-    if sm.blue_line_start < 0:
-        removed_works_start = -sm.blue_line_start # translates x position 0 so that it can be used to accessing works
+            blue_line_start = blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
+    if blue_line_start < 0:
+        removed_works_start = -blue_line_start # translates x position 0 so that it can be used to accessing works
         blue_line_start = 0
     else:
         removed_works_start = 0
@@ -108,11 +109,11 @@ def adjust_blue_line(request, *, sm, old_data, x_num):
         actual_len_works = removed_works_end + 1 - removed_works_start
         len_works = actual_len_works - 1
         # If the edited due date cuts off some of the work inputs
-        if len_works + sm.sm.blue_line_start > x_num:
+        if len_works + blue_line_start > x_num:
             # (removed_works_end + 1 - removed_works_start) - 1 + self.sm.blue_line_start > x_num
             # removed_works_end - removed_works_start + self.sm.blue_line_start > x_num
             # removed_works_end > x_num + removed_works_start - self.sm.blue_line_start
-            removed_works_end = x_num + removed_works_start - sm.sm.blue_line_start
+            removed_works_end = x_num + removed_works_start - blue_line_start
     return {
         'blue_line_start': blue_line_start,
         'removed_works_start': removed_works_start,
