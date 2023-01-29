@@ -28,6 +28,7 @@ from django.dispatch import receiver
 # Misc
 from django.forms.models import model_to_dict
 import common.utils as utils
+from . import utils as app_utils
 from django.utils.decorators import method_decorator
 from copy import deepcopy
 from ratelimit.decorators import ratelimit
@@ -296,22 +297,22 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 +-----------------+--------+-------------------------+--------------------------+--------------+
                     '''
                     if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        setattr(self.sm, field, utils.minutes_to_hours(getattr(self.sm, field)))
+                        setattr(self.sm, field, app_utils.minutes_to_hours(getattr(self.sm, field)))
                     elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        setattr(self.sm, field, utils.hours_to_minutes(getattr(self.sm, field)))
+                        setattr(self.sm, field, app_utils.hours_to_minutes(getattr(self.sm, field)))
                 elif field == "works":
                     # NOTE: changing just funct_round unit should not affect the rest of works
                     # so it is safe to do this and not include it as a condition where works is
                     # redefined if unit changes from minute to hour or vice versa
                     if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        first_work = utils.minutes_to_hours(first_work)
+                        first_work = app_utils.minutes_to_hours(first_work)
                     elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        first_work = utils.hours_to_minutes(first_work)
+                        first_work = app_utils.hours_to_minutes(first_work)
                 elif field in ("min_work_time", "time_per_unit"):
                     if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                        setattr(self.sm, field, utils.hours_to_minutes(getattr(self.sm, field)))
+                        setattr(self.sm, field, app_utils.hours_to_minutes(getattr(self.sm, field)))
                     if field in ("min_work_time", ):
-                        setattr(self.sm, field, utils.safe_conversion(getattr(self.sm, field), 1 / self.sm.time_per_unit))
+                        setattr(self.sm, field, app_utils.safe_conversion(getattr(self.sm, field), 1 / self.sm.time_per_unit))
             except TypeError:
                 pass
 
@@ -363,7 +364,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if not work_day_count or len(self.sm.break_days) == 7:
                     x_num = 1
                 elif self.sm.break_days:
-                    mods = utils.calc_mod_days(self)
+                    mods = app_utils.calc_mod_days(self)
 
                     # Terrible implementation of inversing calcModDays
                     guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
@@ -482,11 +483,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if len_works >= 0:
                     unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
                     unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
-                    # utils.minutes_to_hours and utils.hours_to_minutes are not needed because i want this to be an accurate conversion
+                    # app_utils.minutes_to_hours and app_utils.hours_to_minutes are not needed because i want this to be an accurate conversion
                     if unit_changed_from_hour_to_minute:
-                        old_data.works = [str(utils.hours_to_minutes(Decimal(i))) for i in old_data.works]
+                        old_data.works = [str(app_utils.hours_to_minutes(Decimal(i))) for i in old_data.works]
                     elif unit_changed_from_minute_to_hour:
-                        old_data.works = [str(utils.minutes_to_hours(Decimal(i))) for i in old_data.works]
+                        old_data.works = [str(app_utils.minutes_to_hours(Decimal(i))) for i in old_data.works]
                     # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                     works_displacement = Decimal(old_data.works[0]) - first_work
                     if not (

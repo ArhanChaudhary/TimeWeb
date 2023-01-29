@@ -1,5 +1,5 @@
 import re
-import pytz
+from django.utils import timezone
 from django.shortcuts import redirect
 from ratelimit.exceptions import Ratelimited
 from django.http import HttpResponseForbidden, HttpResponse
@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from common.views import logger
 from django.db.utils import OperationalError
-from decimal import Decimal
 
 def get_client_ip(group, request):
     if 'HTTP_CF_CONNECTING_IP' in request.META:
@@ -28,73 +27,18 @@ def _403_or_429(request, exception=None):
         return HttpResponse('You are being ratelimited, try again in a few seconds or minutes. Here\'s a cookie 🍪 to cheer you up.', status=429)
     return HttpResponseForbidden("Forbidden, here's a cookie 🍪 to cheer you up")
 
-def calc_mod_days(self):
-    # Note to future self: I have rigorously tested the inclusion of +1 and it is needed
-    assign_day_of_week = self.sm.assignment_date.weekday() + 1 # js moment
-    red_line_start_x = self.sm.blue_line_start
-    mods = [0]
-    mod_counter = 0
-    for mod_day in range(6):
-        if str((assign_day_of_week + red_line_start_x + mod_day) % 7) in self.sm.break_days:
-            mod_counter += 1
-        mods.append(mod_counter)
-    mods = tuple(mods)
-    return mods
-
 def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
-
-# IMPORTANT
-# Make sure these three function mirror the corresponding frontend logic
-hours_to_minutes = lambda hours: safe_conversion(hours, 60)
-minutes_to_hours = lambda minutes: safe_conversion(minutes, 1/60)
-def safe_conversion(value, factor):
-    value = Decimal(value)
-    factor = Decimal(factor)
-    if factor < 1 or factor == 1:
-        ret = round(value * factor * 100) / 100;
-    elif factor > 1:
-        ret = round(value * factor)
-    return Decimal(ret)
 
 def utc_to_local(request, utctime):
     offset = request.user.settingsmodel.timezone or request.utc_offset
     assert offset, "User must have a timezone or utc_offset"
-    return utctime.astimezone(pytz.timezone(offset))
+    return utctime.astimezone(timezone.zoneinfo.ZoneInfo(offset))
 
 def app_static_factory(app_name):
     def app_static(url_path):
         return f"/static/{app_name}/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{app_name}/{url_path}'
     return app_static
-
-def update_seen_latest_changelog():
-    """
-    This function is manually invoked so every user is notified of the latest changelog
-    """
-    from navbar.models import SettingsModel
-    settings_models = SettingsModel.objects.all()
-    for model in settings_models:
-        if model.seen_latest_changelog and not model.enable_tutorial:
-            model.seen_latest_changelog = False
-    SettingsModel.objects.bulk_update(settings_models, ['seen_latest_changelog'])
-
-def deletion_time_fix():
-    """
-    This function is manually invoked to ensure all deletion times are unique
-    """
-    from .models import User
-    import datetime
-    users = User.objects.all()
-    for user in users:
-        hidden = user.timewebmodel_set.filter(hidden=True)
-        if hidden.count() <= 1: continue
-
-        def is_unique(time):
-            return user.timewebmodel_set.filter(hidden=True).filter(deletion_time=time).count() == 1
-        for assignment in hidden:
-            while not is_unique(assignment.deletion_time):
-                assignment.deletion_time += datetime.timedelta(microseconds=100000)
-                assignment.save()
 
 try:
     current_site = Site.objects.get(domain="localhost" if (settings.DEBUG or settings.FIX_DEBUG_LOCALLY) else "timeweb.io")
