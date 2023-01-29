@@ -112,7 +112,9 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
         if capped_at_x_num:
             blue_line_start = 0
     
-    if old_data is None:
+    # NOTE: these conditions are derived from the if statement criteria from older commits on how to reach
+    # removed_works_end
+    if needs_more_info or old_data is None or capped_at_x_num:
         removed_works_end = None
     else:
         removed_works_end = len(old_data.works) - 1
