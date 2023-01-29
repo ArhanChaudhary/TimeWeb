@@ -70,10 +70,6 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
             old_x_num += 1
         old_ideal_blue_line_start = utils.days_between_two_dates(date_now, old_data.assignment_date)
         if (
-            # if self.blue_line_start >= x_num then blue_line_start is 0
-            old_ideal_blue_line_start >= old_x_num and 
-            not ideal_blue_line_start >= x_num or
-
             # if blue_line_start < 0 then blue_line_start is 0
             
             # Note: this action does NOT affect works, even if it may be
@@ -91,6 +87,16 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
             not ideal_blue_line_start < 0
         ):
             blue_line_start = ideal_blue_line_start
+        elif x_num is None:
+            # if x_num isn't there then just ignore the old x_num condition lol
+            # TODO: this is deffo going to cause bugs in the future but idrc rn :DDD
+            blue_line_start = blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
+        elif (
+            # if self.blue_line_start >= x_num then blue_line_start is 0
+            old_ideal_blue_line_start >= old_x_num and 
+            not ideal_blue_line_start >= x_num
+        ):
+            blue_line_start = ideal_blue_line_start
         else:
             blue_line_start = blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
     if blue_line_start < 0:
@@ -98,9 +104,13 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
         blue_line_start = 0
     else:
         removed_works_start = 0
-    capped_at_x_num = blue_line_start >= x_num
-    if capped_at_x_num:
-        blue_line_start = 0
+    if x_num is None:
+        capped_at_x_num = None
+    else:
+        # TODO: do I need to account for this?
+        capped_at_x_num = blue_line_start >= x_num
+        if capped_at_x_num:
+            blue_line_start = 0
     
     if old_data is None:
         removed_works_end = None
@@ -109,14 +119,17 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
         actual_len_works = removed_works_end + 1 - removed_works_start
         len_works = actual_len_works - 1
         # If the edited due date cuts off some of the work inputs
-        if len_works + blue_line_start > x_num:
+        # TODO: do I need to account for this?
+        if x_num is not None and len_works + blue_line_start > x_num:
             # (removed_works_end + 1 - removed_works_start) - 1 + self.sm.blue_line_start > x_num
             # removed_works_end - removed_works_start + self.sm.blue_line_start > x_num
             # removed_works_end > x_num + removed_works_start - self.sm.blue_line_start
             removed_works_end = x_num + removed_works_start - blue_line_start
-    return {
+    ret = {
         'blue_line_start': blue_line_start,
         'removed_works_start': removed_works_start,
         'removed_works_end': removed_works_end,
         'capped_at_x_num': capped_at_x_num,
     }
+    ret = {k: v for k, v in ret.items() if v is not None}
+    return ret
