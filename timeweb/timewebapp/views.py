@@ -404,9 +404,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
             else:
                 x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
-            complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
             if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
+                complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
                 x_num += 1
+            else:
+                complete_x_num = x_num
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=old_data,
                 assignment_date=self.sm.assignment_date,
