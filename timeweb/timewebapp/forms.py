@@ -153,6 +153,20 @@ class TimewebForm(forms.ModelForm):
         if funct_round is None:
             funct_round = Decimal(1)
         return funct_round
+    
+    def clean_assignment_date(self):
+        assignment_date = self.cleaned_data['assignment_date']
+        if assignment_date is None:
+            return None
+        assignment_date = assignment_date.replace(tzinfo=timezone.zoneinfo.ZoneInfo(self.request.utc_offset))
+        return assignment_date
+    
+    def clean_x(self):
+        x = self.cleaned_data['x']
+        if x is None:
+            return None
+        x = x.replace(tzinfo=timezone.zoneinfo.ZoneInfo(self.request.utc_offset))
+        return x
 
     def clean(self):
         # A useful reference on how to correctly use form validation: https://stackoverflow.com/a/31729820/12230735
@@ -213,7 +227,7 @@ class TimewebForm(forms.ModelForm):
                     })
                 )
                 self.add_error("assignment_date", forms.ValidationError(""))
-        if name == EXAMPLE_ASSIGNMENT["name"] and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc) != assignment_date:
+        if name == EXAMPLE_ASSIGNMENT["name"] and utils.utc_to_local(self.request, timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0) != assignment_date:
             self.add_error("assignment_date", forms.ValidationError(_("You cannot change this field of the example assignment")))
         if unit is None:
             # NOTE: do not do this from the backend!

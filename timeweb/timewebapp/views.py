@@ -92,17 +92,17 @@ assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNME
 
 @receiver(post_save, sender=User)
 def create_settings_model_and_example(sender, instance, created, **kwargs):
-    if created:
-        # The front end adjusts the assignment and due date, so we don't need to worry about using utils.utc_to_local instead of localtime
-        date_now = timezone.localtime(timezone.now())
-        date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        TimewebModel.objects.create(**EXAMPLE_ASSIGNMENT | {
-            "assignment_date": date_now,
-            "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
-            "user": instance,
-        })
-        SettingsModel.objects.create(user=instance)
-        logger.info(f'Created settings model for user "{instance.username}"')
+    if not created: return
+    # ensure this is UTC for assignment_date and x
+    # The front end adjusts the assignment and due date, so we don't need to worry about this being accurate
+    date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    TimewebModel.objects.create(**EXAMPLE_ASSIGNMENT | {
+        "assignment_date": date_now,
+        "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
+        "user": instance,
+    })
+    SettingsModel.objects.create(user=instance)
+    logger.info(f'Created settings model for user "{instance.username}"')
 
 def append_default_context(request):
     context = {
@@ -270,6 +270,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.funct_round = self.form.cleaned_data.get("funct_round")
             self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
             self.sm.break_days = self.form.cleaned_data.get("break_days")
+
+            if old_data.assignment_date:
+                old_data.assignment_date = old_data.assignment_date.replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+            if old_data.x:
+                old_data.x = old_data.x.replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
         for field in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             try:
                 if field in ("x", "y"):
@@ -390,7 +395,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
                     except OverflowError:
                         self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                        self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+                        self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
             else:
                 x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
                 if self.sm.y is None:
@@ -523,6 +528,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         # )):
         #     self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
 
+        if self.sm.assignment_date:
+            self.sm.assignment_date = self.sm.assignment_date.replace(tzinfo=timezone.utc)
+        if self.sm.x:
+            self.sm.x = self.sm.x.replace(tzinfo=timezone.utc)
         self.sm.save()
         if self.created_assignment:
             logger.info(f'User \"{request.user}\" created assignment "{self.sm.name}"')
