@@ -375,14 +375,13 @@ def create_gc_assignments(request):
                 logger.warning(exception)
             else:
                 logger.error(exception)
-        if course_coursework is None:
+        if course_coursework in (None, {}):
             return
         complete_date_now = utils.utc_to_local(request, timezone.now())
         # Note about timezones: use the local tz because date_now repesents the date at the user's location
         # This makes comparison logic worrk
         date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        course_coursework = course_coursework['courseWork']
-        for assignment in course_coursework:
+        for assignment in course_coursework['courseWork']:
             assignment_id = int(assignment['id'], 10)
             # NOTE: scheduled assignments logically don't show up on the API
             # this implies that assignments due in the future cannot be created with the Google Classroom API
