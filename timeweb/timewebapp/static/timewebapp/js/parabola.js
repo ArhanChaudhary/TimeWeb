@@ -309,8 +309,66 @@ Assignment.prototype.funct = function (x, params = { translateX: true }) {
     // Return translated y coordinate
     return mathUtils.precisionRound(output + this.red_line_start_y, 10);
 }
+// This function helps account for break days
 Assignment.prototype.calcModDays = function () {
-    // explain this later
+    // Let's say you want to call f(x) on some day in an assignment. It isn't as simple as using the raw x-coordinate,
+    // as the user can enter break days and stretch the domain of the function along more days in the assignment. The 
+    // plan is to reverse this stretch by subtracting the number of break days between x and 0 and then call f(x) to
+    // get our desired output. Now, we need to devise a way to find the number of any chosen weekday between two dates.
+      
+    // For demonstration, I will choose the starting date to be the Monday 1st of January, the ending date to be
+    // Wednesday 31st of January, and the chosen weekday to be Tuesday. The first way I thought of to find the number of
+    // any chosen weekday between two dates is to loop through every single day between the start and the end. Then, add
+    // one to a counter variable if that day is one of the chosen weekdays. This clearly did not work out because it is
+    // extremely inefficient over long periods of time
+
+    // To make explaining my second attempt simpler, instead of thinking as the ending date to be January 31,
+    // think of the end date to be the amount of days between the end date and the start date, in this case 30
+    // I know in each 7 consecutive days of the 30 days, there will always be exactly on tuesday
+    // I can take advantage of this property by splitting the 30 days into 7 days at a time like this:
+    // 30 days --> 7 days + 7 days + 7 days + 7 days + 2 days
+    // I know in each of those 7 days there will be one tuesday
+    // And since there are four 7 days, I know there are at least 4 tuesdays between January 1 and January 31
+    // This logic is encapsulated in this expression: `x -= Math.floor(x / 7) * this.sa.break_days.length`
+    // Finally, what about the remaining 2 days? What if those days contain a 5th tuesday?
+    // That problem is solved with `mods`, which simply goes through the remanding days and determines if there is a
+    // tuesday and adds to the counter if there is
+
+    // What if I have multiple chosen weekdays, for example tuesday and wednesday?
+    // The same logic still works. I know two of 7 consecutive days will always be either tuesday or wednesday
+    // If I break the 30 days down again:
+    // 30 days --> 7 days + 7 days + 7 days + 7 days + 2 days
+    // Instead of one for every 7 days, I know there are two tuesday or wednesdays for every 7 days
+    // So, I know there are at least 8 tuesdays or wednesdays between January 1 and January 31
+    // From above, just multiply the 4 tuesdays by two to get 8 tuesdays and wednesdays
+    // Then, the tuple mods handles the last two days to get a result of 10 tuesdays or wednesdays
+
+    // Now to demonstrate how to unstretch the domain once the number of break days until x is known
+    // I know there are 10 tuesdays and wednesdays between January 1 and January 31 by using the above algorithm
+    // The next step is to remove all the not working days from the 30 days
+    // So, instead of 30 days, subtract 10 and get 20 days
+    // The reason why this is done is because you are not supposed to do work on the not working days
+    // Then, setParabolaValues() function defines a and b variables for the parabola that pass through 20 days instead of 30
+    // Lastly, the not working days are "added back in"
+    // In this example, days 8 and 9 are tuesdays and wednesdays
+    // f(6) is the 6th value on the parabola
+    // f(7) is the 7th value on the parabola
+    // Since day 8 is a tuesday, meaning you won't do any work, f(8) will also be the 7th value on the parabola
+    // Since day 9 is a wednesday, meaning you still won't do any work, f(9) will also be the 7th value on the parabola
+    // Then f(10) is the 8th value on the parabola and f(11) is the 9th value on the parabola and so on
+    // For any f(n), it subtracts the amount of not working days between the starting date and the starting date plus n days
+    // This in a way "adds back in" in the not working days
+    // The final expression to further encapsulate this logic is `x -= Math.floor(x / 7) * this.sa.break_days.length + mods[x % 7];`
+
+    // Lastly, some rules to follow when using mods
+    // 1) the `x` in `Math.floor(x / 7)` and `mods[x % 7]` must be the same
+    // it fundamentally does not make sense for them to be difference, as what is happening is you are first finding
+    // how many 7s fit into x and then using the remainder of the same number to add the remaining days
+    // think of this.red_line_start_x as a reference for s.red_line_start_x must be a reference point
+    // 2) think of `red_line_start_x` as a reference point
+    // mods starts at red_line_start_x and so `Math.floor(x / 7)` must also "start" there at the correct frame of reference
+    // 3) for this reason, mods cannot have a fixed red_line_start_x reference point, because then otherwise the 7s
+    // wouldn't be able to properly fit into x
     let mods = [0],
         mod_counter = 0;
     for (let mod_day = 0; mod_day < 6; mod_day++) {
