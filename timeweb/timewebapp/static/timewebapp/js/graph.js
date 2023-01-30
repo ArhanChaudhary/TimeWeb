@@ -14,8 +14,11 @@ class Assignment {
         if (!y1) return 0;
 
         // this isn't always accurate with due times but i dont think anyone in the entire universe could care less; its 2 am and im tired and i just want to get an A on my physics exam im sorry but i realized after wasting like half an hour trying to find a goddamn solution that no user using timeweb will *ever* care at all that the skew ratio doesnt flatten out completely using arrow keys, in fact which users will even know that arrow keys exist, who the hell also cares about timeweb enough to actually use it, what am i doing with my life
+        const old_red_line_start_x = this.red_line_start_x;
+        this.red_line_start_x = 0;
         const mods = this.calcModDays();
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+        this.red_line_start_x = old_red_line_start_x;
         /*
         skew_ratio = (a + b) * x1 / y1; 
         skew_ratio = this.funct(1) * x1 / y1;
@@ -123,8 +126,11 @@ class Assignment {
         if (!in_dynamic_mode) return false;
 
         const len_works = this.sa.works.length - 1;
+        const original_red_line_start_x = this.red_line_start_x;
+        this.red_line_start_x = this.sa.blue_line_start;
         const mods = this.calcModDays();
-        const len_works_without_break_days = len_works - (Math.floor(len_works / 7) * this.sa.break_days.length + mods[(len_works + this.sa.blue_line_start) % 7]);
+        this.red_line_start_x = original_red_line_start_x;
+        const len_works_without_break_days = len_works - (Math.floor(len_works / 7) * this.sa.break_days.length + mods[len_works % 7]);
         const too_many_work_inputs = len_works_without_break_days > Assignment.MAX_WORK_INPUTS_AUTOTUNE;
         if (too_many_work_inputs) return false;
 
