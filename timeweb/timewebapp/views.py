@@ -341,7 +341,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # NOTE: (self.sm.x is None and self.sm.y is None) is impossible
             if self.sm.x is None:
                 if request.created_assignment or self.sm.needs_more_info:
-                    adjusted_blue_line = app_utils.adjust_blue_line(request,
+                    adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
                         x_num=None,
@@ -350,13 +350,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     )
                     mods = app_utils.calc_mod_days(
                         assignment_date=self.sm.assignment_date,
-                        blue_line_start=adjusted_blue_line['blue_line_start'],
+                        blue_line_start=adjusted_blue_line_partial['blue_line_start'],
                         break_days=self.sm.break_days
                     )
                     new_first_work = first_work
                 else:
                     assert request.updated_assignment
-                    adjusted_blue_line = app_utils.adjust_blue_line(request,
+                    adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
                         x_num=None,
@@ -368,8 +368,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         blue_line_start=self.sm.blue_line_start,
                         break_days=self.sm.break_days
                     )
-                    removed_works_start = adjusted_blue_line['removed_works_start']
-                    removed_works_end = adjusted_blue_line['removed_works_end']
+                    removed_works_start = adjusted_blue_line_partial['removed_works_start']
+                    removed_works_end = adjusted_blue_line_partial['removed_works_end']
                     actual_len_works = removed_works_end + 1 - removed_works_start
                     len_works = actual_len_works - 1
                     if len_works >= 0:
