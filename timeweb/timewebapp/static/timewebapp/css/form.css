@@ -2,11 +2,13 @@
     display: flex;
     font-size: 17px;
     flex-flow: column;
-    --field-wrapper-border: 1px solid var(--color);
     --vertical-form-padding: 5px;
     --horizontal-form-padding: 4px;
     --error-note-color: hsl(353deg, 77%, 50%);
     --field-widget-background-color: hsl(0, 0%, 97%);
+}
+#form-wrapper form, #break-days-wrapper {
+    --field-wrapper-border: 1px solid var(--color);
 }
 /* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
