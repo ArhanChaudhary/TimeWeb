@@ -378,10 +378,26 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     )
 
                     # Terrible implementation of inversing calcModDays
+
+                    # For reference, look at this:
+                    # x    0 1 2 3 4 5 6 7 | 8 9 10 11 12 13 14 | 15 16 17 18 19 20 21
+                    # f(x) 0 0 0 0 0 0 3 6 | 6 6 6  6  6  9  12 | 12 12 15
+                    # The goal is to find the week before the value and guess and check each day of the next week for the first value that results in x (without not working days)
+                    # Pretend x = 5 from the above example, which represents the number of days the user will work or x (without not working days)
+                    # For every week in this example, the user works 2 days
+                    # So, find how many 2 days fit into x = 5 and multiply that number by 7 
+
+                    # Since we want to find the week before the value, round x down to the nearest (7 - len_nwd), or 2 in this example
+                    # that would simplify it to be 7*floor(x/(7-len_nwd))*(7-len_nwd)/(7-len_nwd)
+                    # 7*floor(x/(7-len_nwd))
+                    
+                    # I subtract one at the end of the assignment for the for loop
+                    # And I subtract one in the middle of the equation to fix a wrong week bug that isn't worth fixing
                     guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
                     while 1:
                         guess_x += 1
-                        if guess_x - guess_x // 7 * len(self.sm.break_days) - mods[guess_x % 7] == work_day_count:
+                        # logic stolen from Assignment.funct
+                        if guess_x - (guess_x // 7 * len(self.sm.break_days) + mods[guess_x % 7]) == work_day_count:
                             x_num = max(1, guess_x)
                             break
                 else:
