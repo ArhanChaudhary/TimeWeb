@@ -341,6 +341,18 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # NOTE: (self.sm.x is None and self.sm.y is None) is impossible
             if self.sm.x is None:
                 if request.created_assignment or self.sm.needs_more_info:
+                    adjusted_blue_line = app_utils.adjust_blue_line(request,
+                        old_data=old_data,
+                        assignment_date=self.sm.assignment_date,
+                        x_num=None,
+                        needs_more_info=False,
+                        blue_line_start=None,
+                    )
+                    mods = app_utils.calc_mod_days(
+                        assignment_date=self.sm.assignment_date,
+                        blue_line_start=adjusted_blue_line['blue_line_start'],
+                        break_days=self.sm.break_days
+                    )
                     new_first_work = first_work
                 else:
                     assert request.updated_assignment
@@ -350,6 +362,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         x_num=None,
                         needs_more_info=False,
                         blue_line_start=self.sm.blue_line_start,
+                    )
+                    mods = app_utils.calc_mod_days(
+                        assignment_date=self.sm.assignment_date,
+                        blue_line_start=self.sm.blue_line_start,
+                        break_days=self.sm.break_days
                     )
                     removed_works_start = adjusted_blue_line['removed_works_start']
                     removed_works_end = adjusted_blue_line['removed_works_end']
@@ -371,12 +388,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 if not work_day_count or len(self.sm.break_days) == 7:
                     x_num = 1
                 elif self.sm.break_days:
-                    mods = app_utils.calc_mod_days(
-                        assignment_date=self.sm.assignment_date,
-                        blue_line_start=self.sm.blue_line_start,
-                        break_days=self.sm.break_days
-                    )
-
                     # Terrible implementation of inversing calcModDays
 
                     # For reference, look at this:
@@ -435,6 +446,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 needs_more_info=False,
                 blue_line_start=self.sm.blue_line_start,
             )
+            self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.y is None:
                 mods = app_utils.calc_mod_days(
                     assignment_date=self.sm.assignment_date,
@@ -456,7 +468,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     complete_work_day_count = ceil(complete_work_day_count)
                 # the prediction for due date is ceiled so also ceil the prediction for y for consistency
                 self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
-            self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]
