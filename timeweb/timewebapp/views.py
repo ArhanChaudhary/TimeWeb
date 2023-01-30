@@ -284,19 +284,18 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     pass
                 elif field == "funct_round":
                     '''
-                    why did i waste so much time making this
-
-+-----------------+--------+-------------------------+--------------------------+--------------+
-| decision matrix |        |                         |     funct_round unit     |              |
-+-----------------+--------+-------------------------+--------------------------+--------------+
-|                 |        | minute                  | hour                     | other        |
-+-----------------+--------+-------------------------+--------------------------+--------------+
-|                 | minute | pass                    | multiply step size by 60 | not possible |
-+-----------------+--------+-------------------------+--------------------------+--------------+
-| unit            | hour   | divide step size by 60  | pass                     | not possible |
-+-----------------+--------+-------------------------+--------------------------+--------------+
-|                 | other  | not possible            | not possible             | pass         |
-+-----------------+--------+-------------------------+--------------------------+--------------+
+                    step size transform decision matrix
+                    +------+--------+--------+----------------+-------+
+                    |      |        |        | step size unit |       |
+                    +------+--------+--------+----------------+-------+
+                    |      |        | minute | hour           | other |
+                    +------+--------+--------+----------------+-------+
+                    |      | minute | pass   | *60            | NA    |
+                    +------+--------+--------+----------------+-------+
+                    | unit | hour   | /60    | pass           | NA    |
+                    +------+--------+--------+----------------+-------+
+                    |      | other  | NA     | NA             | pass  |
+                    +------+--------+--------+----------------+-------+
                     '''
                     if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
                         setattr(self.sm, field, app_utils.minutes_to_hours(getattr(self.sm, field)))
@@ -421,8 +420,26 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 blue_line_start=self.sm.blue_line_start,
             )
             if self.sm.y is None:
+                mods = app_utils.calc_mod_days(
+                    assignment_date=self.sm.assignment_date,
+                    blue_line_start=self.sm.blue_line_start,
+                    break_days=self.sm.break_days
+                )
+                # logic stolen from parabola.js:
+
+                # let x1 = this.sa.complete_x - this.red_line_start_x,
+                # x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
+                # if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
+                #     x1 = Math.ceil(x1);
+                # }
+
+                complete_work_day_count = complete_x_num - self.sm.blue_line_start
+                complete_work_day_count -= floor((x_num - self.sm.blue_line_start) / 7) * len(self.sm.break_days) + mods[(x_num - self.sm.blue_line_start) % 7]
+                # first +1 for js
+                if str((self.sm.assignment_date.weekday()+1 + floor(complete_x_num)) % 7) in self.sm.break_days:
+                    complete_work_day_count = ceil(complete_work_day_count)
                 # the prediction for due date is ceiled so also ceil the prediction for y for consistency
-                self.sm.y = ceil(min_work_time_funct_round * complete_work_day_count)
+                self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
             self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
