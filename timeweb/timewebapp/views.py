@@ -466,8 +466,14 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # first +1 for js
                 if str((self.sm.assignment_date.weekday()+1 + floor(complete_x_num)) % 7) in self.sm.break_days:
                     complete_work_day_count = ceil(complete_work_day_count)
-                # the prediction for due date is ceiled so also ceil the prediction for y for consistency
+                # we need to ceil (the prediction for due date is ceiled so also ceil the prediction for y for consistency) 
+                # to the nearest funct_round in the case of fractional values of complete_work_day_count that may not
+                # multiply to a multiple of funct_round
                 self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
+                # NOTE: do not convert to hours here because funct_round can change and mess up the min_work_time of the user inputted prediction algorithm
+                # for example say the min work time is 15 minutes and complete_work_day_count is 6. Then y would be set to 90 minutes
+                # This would be true under should_convert_to_hours, so say y is converted to 1.5 hours.
+                # Now, the funct_round is 0.5 hours and instead of having 6 work days, we have 3 work days with a different min work time than the user desires
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]

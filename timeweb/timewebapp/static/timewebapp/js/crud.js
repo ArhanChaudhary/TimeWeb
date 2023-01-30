@@ -1,6 +1,6 @@
 class Crud {
     // IMPORTANT
-    // Make sure this mirrors the corresponding backend logic
+    // Make sure these five functions mirror the corresponding backend logic
     static hoursToMinutes = hours => Crud.safeConversion(hours, 60);
     static minutesToHours = minutes => Crud.safeConversion(minutes, 1/60);
     static safeConversion = (value, factor) => {
