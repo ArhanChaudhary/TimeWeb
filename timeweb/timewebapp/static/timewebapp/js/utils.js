@@ -1171,9 +1171,22 @@ SETTINGS.animation_speed = +SETTINGS.animation_speed;
 if (!SETTINGS.seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
+        const update_wrapper = document.createElement("ul");
+        for (const update of latest_changelog.updates) {
+            const li = document.createElement("li");
+            li.innerHTML = update;
+            update_wrapper.appendChild(li);
+        }
+        const bugfixes_wrapper = document.createElement("ul");
+        for (const bugfix of latest_changelog.bugfixes) {
+            const li = document.createElement("li");
+            li.innerHTML = bugfix;
+            bugfixes_wrapper.appendChild(li);
+        }
+        update_wrapper.appendChild(bugfixes_wrapper);
         const jconfirm = $.alert({
-            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version}`,
-            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
+            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version} (${latest_changelog.date})`,
+            content: update_wrapper.outerHTML + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;
