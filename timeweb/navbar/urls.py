@@ -7,7 +7,7 @@ app_static = utils.app_static_factory(__package__)
 
 urlpatterns = [
     path('settings/', views.SettingsView.as_view(), name='settings'),
-    path('blog/', views.BlogView.as_view(), name='blog'),
+    # path('blog/', views.BlogView.as_view(), name='blog'),
     path('user-guide/', views.UserguideView.as_view(), name='user_guide'),
     path('changelog/', views.ChangelogView.as_view(), name='changelog'),
     path('policies/', RedirectView.as_view(url=app_static('policies/policies.html')), name='policies'),
