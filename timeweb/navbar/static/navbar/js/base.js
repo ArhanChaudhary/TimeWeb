@@ -31,8 +31,14 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     $("#doc-container").scroll(function() {
+        let min;
         $(".major-category").each(function() {
-            $(this).toggleClass("isSticky", $(this).position().top === 0);
+            const top = $(this).position().top;
+            if (min === undefined || top < min)
+                min = top;
+        });
+        $(".major-category").each(function() {
+            $(this).toggleClass("isSticky", $(this).position().top === min);
         });
         $(".major-category.isSticky").last().removeClass("isSticky");
     });
