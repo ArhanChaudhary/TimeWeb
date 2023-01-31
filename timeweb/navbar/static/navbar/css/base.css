@@ -216,9 +216,6 @@ details > .img-ignore-padding-container img {
 .label-question {
     --label-color: rgb(150, 232, 253);
 }
-.minor-category, .label-question, .minor-minor-category {
-    scroll-margin-top: 75px;
-}
 .label-question {
     display: block;
     position: relative;
