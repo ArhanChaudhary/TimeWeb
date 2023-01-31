@@ -18,7 +18,7 @@ def calc_mod_days(*, assignment_date, blue_line_start, break_days):
 # IMPORTANT
 # Make sure these five function mirror the corresponding frontend logic
 hours_to_minutes = lambda hours: safe_conversion(hours, 60)
-minutes_to_hours = lambda minutes: safe_conversion(minutes, "1/60")
+minutes_to_hours = lambda minutes: safe_conversion(minutes, Decimal(1) / Decimal(60))
 def should_convert_to_hours(minutes):
     as_hours = minutes_to_hours(minutes)
     return as_hours >= 1 and as_hours % Decimal("0.5") == 0
