@@ -76,7 +76,7 @@ original_favicon.webp
 original_maskable_favicon.webp
 Original splash screens
 example_assignment_load.py
-pre_changelogs.py
+pre_changelogs.json
 shell_context.py
 
 # Flask stuff:
