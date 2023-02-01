@@ -470,10 +470,60 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # to the nearest funct_round in the case of fractional values of complete_work_day_count that may not
                 # multiply to a multiple of funct_round
                 self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
-                # NOTE: do not convert to hours here because funct_round can change and mess up the min_work_time of the user inputted prediction algorithm
-                # for example say the min work time is 15 minutes and complete_work_day_count is 6. Then y would be set to 90 minutes
-                # This would be true under should_convert_to_hours, so say y is converted to 1.5 hours.
-                # Now, the funct_round is 0.5 hours and instead of having 6 work days, we have 3 work days with a different min work time than the user desires
+                # if min work time is for example 1 hour and work_day_count is 7 days, the user would ideally want to see
+                # unit as "hour" and y as 7 hours instead of "minute" and 420 minutes
+                if self.sm.unit == "Minute" and app_utils.should_convert_to_hours(self.sm.y):
+                    # so far all in the scope of minutes to define new_min_work_time_funct_round
+                    new_unit = "Minute"
+                    new_y = self.sm.y
+                    new_time_per_unit = Decimal(3600)
+                    new_funct_round = Decimal(30)
+                    new_min_work_time = self.sm.min_work_time
+
+                    new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
+                    if new_min_work_time_funct_round <= min_work_time_funct_round:
+                        # Now convert to scope of hours
+                        new_unit = "Hour"
+                        new_y = app_utils.minutes_to_hours(new_y)
+                        new_time_per_unit = app_utils.minutes_to_hours(new_time_per_unit)
+                        new_funct_round = app_utils.minutes_to_hours(new_funct_round)
+                        new_min_work_time = app_utils.minutes_to_hours(new_min_work_time)
+                        self.sm.unit = new_unit
+                        self.sm.y = new_y
+                        self.sm.time_per_unit = new_time_per_unit
+                        self.sm.funct_round = new_funct_round
+                        self.sm.min_work_time = new_min_work_time
+                    
+                    # In case I need a reference:
+
+                    # # we need to simulate the logic that happens when you first change the unit from minute to hour on
+                    # # the frontend
+
+                    # # if (!["hour", undefined].includes(that.old_unit_value)) {
+                    # #     $("#funct_round-widget-checkbox").prop("checked", false);
+                    # #     $("#id_funct_round").val(30);
+                    # # }
+                    # # $("#id_time_per_unit").val(1);
+                    # # $("#time_per_unit-widget-checkbox").prop("checked", true);
+                    # new_funct_round = Decimal(30)
+                    # new_time_per_unit = Decimal(1)
+                    # # now to simulate the big conversion for loop:
+                    # # time_per_unit changes,
+                    # new_time_per_unit = app_utils.hours_to_minutes(new_time_per_unit)
+                    # # x doesn't change
+                    # # y doesn't change
+                    # # min_work_time changes,
+                    # # Undo the 1 / self.sm.time_per_unit, true original min work time in minutes
+                    # self.sm.min_work_time = self.sm.min_work_time * self.sm.time_per_unit
+                    # # Redo that but with new_time_per_unit, new min work time in terms of time_per_unit
+                    # self.sm.min_work_time = self.sm.min_work_time / new_time_per_unit
+                    # # works doesn't change
+                    # new_funct_round = app_utils.minutes_to_hours(new_funct_round)
+
+                    # current_min_work_time_funct_round_minutes = min_work_time_funct_round * self.sm.time_per_unit
+                    # new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
+                    # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
+                    
             if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]
