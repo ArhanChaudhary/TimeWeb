@@ -456,21 +456,19 @@ class Priority {
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
                 const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                if ([0, 1].includes(due_date_minus_today_floor)) {
-                    if (status_value === Priority.UNFINISHED_FOR_TODAY) {
-                        // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
-                        // when it in fact displays no useful information
-                        if (due_date_minus_today_floor === 0) {
-                            // hurry the F*CK up >:(
-                            that.display_due_today_completion_time = true;
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
-                        } else if (due_date_minus_today_floor === 1) {
-                            that.display_due_tomorrow_completion_time = true;
-                            if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
-                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
-                            else
-                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
-                        }
+                if ([0, 1].includes(due_date_minus_today_floor) && status_value === Priority.UNFINISHED_FOR_TODAY) {
+                    // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
+                    // when it in fact displays no useful information
+                    if (due_date_minus_today_floor === 0) {
+                        // hurry the F*CK up >:(
+                        that.display_due_today_completion_time = true;
+                        status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
+                    } else if (due_date_minus_today_floor === 1) {
+                        that.display_due_tomorrow_completion_time = true;
+                        if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
+                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
+                        else
+                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
                     that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
