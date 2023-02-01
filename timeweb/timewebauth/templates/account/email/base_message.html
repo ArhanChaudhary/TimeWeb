@@ -77,8 +77,7 @@
     </head>
     <body>
         <div id="content-wrapper">
-            Hello{% if user_display %} {% endif %}{{ user_display }},
-            <br>
+            <p>Hello{% if user_display %} {% endif %}{{ user_display }},</p>
             <br>
             {% block content %}{% endblock %}
             <p>

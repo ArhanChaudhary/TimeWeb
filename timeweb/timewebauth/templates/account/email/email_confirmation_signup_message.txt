@@ -1,1 +1,7 @@
-{% include "account/email/email_confirmation_message.txt" %}
+{% extends "account/email/base_message.txt" %}
+{% load account %}
+{% user_display user as user_display %}
+
+{% block content %}Please verify that your e-mail address was used to register for your TimeWeb
+account:
+{{ activate_url }}{% endblock %}

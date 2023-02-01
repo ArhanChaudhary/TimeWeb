@@ -1,12 +1,10 @@
 {% extends "account/email/base_message.txt" %}
-{% load i18n %}
 
-{% block content %}{% autoescape off %}{% blocktrans %}You are receiving this e-mail because you or someone else has requested a
-password for your user account. However, we do not have any record of a user
-with email {{ email }} in our database.
+{% block content %}You're receiving this e-mail because you or someone else has requested a
+password reset for your TimeWeb account. However, a user with email {{ email }}
+does not exist.
 
-This mail can be safely ignored if you did not request a password reset.
+You can safely ignore this if it wasn't you.
 
-If it was you, you can sign up for an account using the link below.{% endblocktrans %}
-
-{{ signup_url }}{% endautoescape %}{% endblock %}
+If it was you, please sign up for a TimeWeb account:
+{{ signup_url }}{% endblock %}
