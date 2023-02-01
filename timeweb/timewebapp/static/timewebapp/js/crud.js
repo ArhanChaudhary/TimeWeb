@@ -4,6 +4,7 @@ class Crud {
     static hoursToMinutes = hours => Crud.safeConversion(hours, 60);
     static minutesToHours = minutes => Crud.safeConversion(minutes, 1/60);
     static safeConversion = (value, factor) => {
+        if (!Number.isFinite(value)) return value;
         if (factor < 1 || factor === 1) {
             return Math.round(value * factor * 100) / 100;
         } else if (factor > 1) {
