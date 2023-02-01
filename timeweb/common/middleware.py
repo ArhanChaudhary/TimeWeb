@@ -44,7 +44,9 @@ class CommonRatelimit:
 
     def __call__(self, request):
         resolved = resolve(request.path)
-        if not (settings.DEBUG and resolved.app_name == "pwa"):
+        # mostly static urls if the url app name is ""
+        # (do not block things like /favicon.ico)
+        if resolved.app_name != "":
             if resolved.app_name == "api":
                 group = "api"
             else:
