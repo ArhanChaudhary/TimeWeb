@@ -207,18 +207,10 @@ setClickHandlers: {
             }
 
             if (!dom_assignment.hasClass("open-assignment")) {
-                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement()
+                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement();
             }
-            if ($this.hasClass("slashed")) {
-                dom_assignment.find(".delete-work-input-button").click();
-            } else {
-                dom_assignment.find(".work-input-textbox").val("fin");
-                dom_assignment.find(".submit-work-button").click();
-                // The "Close graph after work input" setting handles all of this ux for us
-                // if (dom_assignment.hasClass('open-assignment') && $this.hasClass("slashed")) {
-                //     dom_assignment.click();
-                // }
-            }
+            dom_assignment.find(".work-input-textbox").val("fin");
+            dom_assignment.find(".submit-work-button").click();
         });
     },
     assignmentsHeaderUI: function() {

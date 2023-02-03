@@ -500,15 +500,16 @@ class Priority {
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
-            const tick_image = already_entered_work_input_for_today ? "slashed_tick" : "tick";
             assignment_header_tick_svg.parents(".assignment-header-button").toggle(
-                !(
-                    [Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG, Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED].includes(status_value)
-                    // don't show a check mark or star icon and an unslashed tick
-                    || [Priority.FINISHED_FOR_TODAY, Priority.COMPLETELY_FINISHED].includes(status_value) && !already_entered_work_input_for_today
-                )
-            ).toggleClass("slashed", already_entered_work_input_for_today);
-            let href = `#${tick_image}-svg`;
+                ![
+                    Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
+                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
+                    Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED,
+                    Priority.FINISHED_FOR_TODAY,
+                    Priority.COMPLETELY_FINISHED
+                ].includes(status_value) && !already_entered_work_input_for_today
+            );
+            let href = `#tick-svg`;
             assignment_header_tick_svg.find("use").attr("href", href);
             assignment_header_tick_svg.attr("viewBox", (function() {
                 if (!Priority.BBoxCache)
