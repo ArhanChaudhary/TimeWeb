@@ -21,19 +21,19 @@ import json
 # Google API
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow
-from google.auth.transport.requests import Request
-from google.auth.exceptions import RefreshError, TransportError
-from requests.exceptions import ConnectionError
 from google.oauth2.credentials import Credentials
-from googleapiclient.errors import HttpError
+from google.auth.transport.requests import Request
+from googleapiclient.discovery_cache.base import Cache
 from oauthlib.oauth2.rfc6749.errors import (
     OAuth2Error,
     AccessDeniedError,
     InvalidGrantError,
     MissingCodeError
 )
+from googleapiclient.errors import HttpError
+from google.auth.exceptions import RefreshError, TransportError
+from requests.exceptions import ConnectionError
 from httplib2.error import ServerNotFoundError
-from googleapiclient.discovery_cache.base import Cache
 
 # Misc
 from django.db import transaction
@@ -295,7 +295,7 @@ def update_gc_courses(request):
     except RefreshError:
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     # If connection to the server randomly dies (could happen locally when wifi is off)
-    except ServerNotFoundError:
+    except (ServerNotFoundError, TimeoutError):
         return HttpResponse(status=204)
     except HttpError as e:
         if e.status_code == 429:
@@ -515,7 +515,7 @@ def create_gc_assignments(request):
     except RefreshError:
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     # If connection to the server randomly dies (could happen locally when wifi is off)
-    except ServerNotFoundError:
+    except (ServerNotFoundError, TimeoutError):
         return HttpResponse(status=204)
     if not gc_models_to_create: return HttpResponse(status=204)
     TimewebModel.objects.bulk_create(gc_models_to_create)
@@ -624,14 +624,14 @@ def gc_auth_callback(request):
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
         courses = service.courses().list(courseStates=["ACTIVE"]).execute()
-    except OAuth2Error:
+    except (OAuth2Error, TimeoutError):
         return callback_failed()
     courses = courses.get('courses', [])
     # Let's use type instead of isinstance because I want an exact exception class match
     if courses:
         try:
             service.courses().courseWork().list(courseId=courses[0]['id']).execute()
-        except (HttpError, OAuth2Error) as e:
+        except (HttpError, OAuth2Error, TimeoutError) as e:
             if not (
                 # condition to ignore HttpError
                 # if you are the owner of a class,
@@ -642,7 +642,7 @@ def gc_auth_callback(request):
     else:
         try:
             service.courses().courseWork().list(courseId="easter egg").execute()
-        except (HttpError, OAuth2Error) as e:
+        except (HttpError, OAuth2Error, TimeoutError) as e:
             if not (
                 # condition to ignore HttpError
                 # I don't have any courseId to test the permission 
