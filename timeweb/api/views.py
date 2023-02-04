@@ -617,8 +617,7 @@ def gc_auth_callback(request):
     # let's avoid a batch request because
     # 1) it takes like 1 second longer without
     # 2) less verbose exception handling
-    # 3) i cant use an actual course id and instead fall back to the dunder string id every time
-    # 4) i am lazy
+    # 3) i am lazy
 
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
@@ -628,7 +627,10 @@ def gc_auth_callback(request):
         return callback_failed()
     courses = courses.get('courses', [])
     # Let's use type instead of isinstance because I want an exact exception class match
-    if courses:
+    if courses and 0:
+        # NOTE: on second thought, we don't actually want to do this because it may take long if the course has a lot of
+        # coursework
+        # Keep this here in case for future reference
         try:
             service.courses().courseWork().list(courseId=courses[0]['id']).execute()
         except (HttpError, OAuth2Error, TimeoutError) as e:
