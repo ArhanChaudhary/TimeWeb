@@ -233,7 +233,9 @@ def simplify_course_name(tag_name):
         # year
 
         # 2022 - 2023
-        r"(?<!\d)(20\d\d( | - |-|/)20|\d\d( | - |-|/)|20\d\d( | - |-|/))\d\d(?!\d)",
+        # 2022 - 023
+        # 2022 - 3
+        r"(?<!\d)(20)?\d\d( | - |-|/)(20)?\d?\d(?!\d)",
         # 2022 American Lit
         r"^20\d\d(?!\d)",
         # American Lit 2022
