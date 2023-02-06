@@ -1067,7 +1067,7 @@ navClickHandlers: function() {
         },
         {
             title: "Special thanks to Andrew Sun",
-            content: `om g andrew suS (!!) +gets 100 we,b coin .`,
+            content: `om g andrew mega suS (!!) +gets 100 we,b coin .`,
         },
         {
             title: "And most importantly, my mom and my dad <3",
