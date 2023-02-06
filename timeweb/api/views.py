@@ -195,22 +195,24 @@ def simplify_course_name(tag_name):
         tag_name = re.sub(abbreviation[0], abbreviation[1], tag_name, flags=re.IGNORECASE)
 
     def tag_name_re_subs(regexes, tag_name):
-        tag_name = ' '.join(tag_name.split())
-        for regex in regexes:
-            pre_tag_name = re.sub(regex, "", tag_name, flags=re.IGNORECASE)
-            pre_tag_name = " ".join(pre_tag_name.split())
-            # if there is something like a-- b then replace it when a b
+        tag_name = " ".join(tag_name.split())
+        tag_name_post_re_subs = (
+            # if there is something like "a-- b" then replace it when "a b"
             # a dash is not usually treated as a space, such as when it's used
             # in words or names, but make an exception to double or more dashes
 
             # this could indicate it was re subbed for a blank
-            pre_tag_name = re.sub(r"(.) ?--+ ?(.)", r"\1 \2", pre_tag_name)
+            (r"(.) ?--+ ?(.)", r"\1 \2"),
+            (r"\(\)", ""),
+            # if the string is instead something like "a--" or "a -" or "--a" or "- a" then remove it
+            (r"^-+ ?| ?-+$", ""),
+        )
+        for regex in regexes:
+            pre_tag_name = re.sub(regex, "", tag_name, flags=re.IGNORECASE)
             pre_tag_name = " ".join(pre_tag_name.split())
-            pre_tag_name = re.sub(r"\(\)", "", pre_tag_name)
-            pre_tag_name = " ".join(pre_tag_name.split())
-            # if the string is instead something like a-- or a - or --a or - a then remove it
-            pre_tag_name = re.sub(r"^-+ ?| ?-+$", "", pre_tag_name)
-            pre_tag_name = " ".join(pre_tag_name.split())
+            for post_re_sub in tag_name_post_re_subs:
+                pre_tag_name = re.sub(*post_re_sub, pre_tag_name, flags=re.IGNORECASE)
+                pre_tag_name = " ".join(pre_tag_name.split())
             if not pre_tag_name or len(tag_name) < 10:
                 return tag_name
             tag_name = pre_tag_name
