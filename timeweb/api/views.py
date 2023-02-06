@@ -5,6 +5,10 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.http import HttpResponse, QueryDict
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+from django.db import transaction
+from math import floor
+from common.views import logger
 import datetime
 
 # App stuff
@@ -13,6 +17,8 @@ from timewebapp.models import TimewebModel
 from navbar.models import SettingsModel
 from timewebapp.forms import TimewebForm
 from navbar.forms import SettingsForm
+import common.utils as utils
+import timewebapp.utils as app_utils
 
 # Google API
 from google.oauth2.credentials import Credentials
@@ -32,16 +38,10 @@ from oauthlib.oauth2.rfc6749.errors import (
 )
 
 # Misc
-from django.db import transaction
-import common.utils as utils
-import timewebapp.utils as app_utils
-from common.views import logger
-from django.views.decorators.http import require_http_methods
+from django.utils.text import Truncator
 import re
 import os
-from django.utils.text import Truncator
 import json
-from math import floor
 # Reminder: do NOT use decorator_from_middleware, as it is only for old-style django middlewares
 
 # Unused but I'll keep it here just in case
