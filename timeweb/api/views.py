@@ -457,9 +457,7 @@ def create_gc_assignments(request):
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=None,
                 assignment_date=assignment_date,
-                x_num=x_num,
-                needs_more_info=True,
-                blue_line_start=None,
+                x_num=x_num
             )
             blue_line_start = adjusted_blue_line['blue_line_start']
             dynamic_start = blue_line_start

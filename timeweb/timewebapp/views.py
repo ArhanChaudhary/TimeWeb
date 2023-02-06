@@ -345,9 +345,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
-                        x_num=None,
-                        needs_more_info=getattr(old_data, "needs_more_info", False),
-                        blue_line_start=None,
+                        x_num=None
                     )
                     mods = app_utils.calc_mod_days(
                         assignment_date=self.sm.assignment_date,
@@ -360,13 +358,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
-                        x_num=None,
-                        needs_more_info=getattr(old_data, "needs_more_info", False),
-                        blue_line_start=getattr(old_data, "blue_line_start", None),
+                        x_num=None
                     )
                     mods = app_utils.calc_mod_days(
                         assignment_date=self.sm.assignment_date,
-                        blue_line_start=getattr(old_data, "blue_line_start", None),
+                        blue_line_start=old_data.blue_line_start,
                         break_days=self.sm.break_days
                     )
                     removed_works_start = adjusted_blue_line_partial['removed_works_start']
@@ -443,9 +439,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=old_data,
                 assignment_date=self.sm.assignment_date,
-                x_num=x_num,
-                needs_more_info=getattr(old_data, 'needs_more_info', False),
-                blue_line_start=getattr(old_data, "blue_line_start", None),
+                x_num=x_num
             )
             self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.y is None:

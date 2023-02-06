@@ -73,18 +73,19 @@ def deletion_time_fix():
                 assignment.deletion_time += datetime.timedelta(microseconds=100000)
                 assignment.save()
 
-def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_info, blue_line_start):
+def adjust_blue_line(request, *, old_data, assignment_date, x_num):
     assert assignment_date is not None
     date_now = utils.utc_to_local(request, timezone.now())
     date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
     ideal_blue_line_start = utils.days_between_two_dates(date_now, assignment_date)
-    if old_data is None or needs_more_info:
+    if old_data is None or old_data.needs_more_info:
         blue_line_start = ideal_blue_line_start
     else:
         old_x_num = utils.days_between_two_dates(old_data.x, old_data.assignment_date)
         if old_data.due_time and (old_data.due_time.hour or old_data.due_time.minute):
             old_x_num += 1
         old_ideal_blue_line_start = utils.days_between_two_dates(date_now, old_data.assignment_date)
+        old_blue_line_start = old_data.blue_line_start
         if (
             # if blue_line_start < 0 then blue_line_start is 0
             
@@ -106,7 +107,7 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
         elif x_num is None:
             # if x_num isn't there then just ignore the old x_num condition lol
             # TODO: this is deffo going to cause bugs in the future but idrc rn :DDD
-            blue_line_start += utils.days_between_two_dates(old_data.assignment_date, assignment_date)
+            blue_line_start = old_blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
         elif (
             # if self.blue_line_start >= x_num then blue_line_start is 0
             old_ideal_blue_line_start >= old_x_num and 
@@ -114,7 +115,7 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
         ):
             blue_line_start = ideal_blue_line_start
         else:
-            blue_line_start = blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
+            blue_line_start = old_blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
     if blue_line_start < 0:
         removed_works_start = -blue_line_start # translates x position 0 so that it can be used to accessing works
         blue_line_start = 0
@@ -130,7 +131,7 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
     
     # NOTE: these conditions are derived from the if statement criteria from older commits on how to reach
     # removed_works_end
-    if needs_more_info or old_data is None or capped_at_x_num:
+    if old_data is None or old_data.needs_more_info or capped_at_x_num:
         removed_works_end = None
     else:
         removed_works_end = len(old_data.works) - 1
