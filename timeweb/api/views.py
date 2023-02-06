@@ -14,26 +14,22 @@ from navbar.models import SettingsModel
 from timewebapp.forms import TimewebForm
 from navbar.forms import SettingsForm
 
-# Formatting
-from django.utils.text import Truncator
-import json
-
 # Google API
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import Flow
+from google.auth.exceptions import RefreshError, TransportError
+from googleapiclient.discovery import build
 from googleapiclient.discovery_cache.base import Cache
+from googleapiclient.errors import HttpError
+from requests.exceptions import ConnectionError
+from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
     OAuth2Error,
     AccessDeniedError,
     InvalidGrantError,
     MissingCodeError
 )
-from googleapiclient.errors import HttpError
-from google.auth.exceptions import RefreshError, TransportError
-from requests.exceptions import ConnectionError
-from httplib2.error import ServerNotFoundError
 
 # Misc
 from django.db import transaction
@@ -43,6 +39,8 @@ from common.views import logger
 from django.views.decorators.http import require_http_methods
 import re
 import os
+from django.utils.text import Truncator
+import json
 from math import floor
 # Reminder: do NOT use decorator_from_middleware, as it is only for old-style django middlewares
 
