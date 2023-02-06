@@ -389,6 +389,9 @@ def create_gc_assignments(request, order=None):
                 logger.error(exception)
         if course_coursework in (None, {}):
             return
+        # NOTE: there is no point trying to waste brain cells trying to return early if ascending order
+        # course_coursework repeats the same assignments as in the descending order response as the loop
+        # continues if an assignment has already been added
         def parse_coursework_dates(assignment):
             # NOTE: scheduled assignments logically don't show up on the API
             # this implies that assignments due in the future cannot be created with the Google Classroom API
