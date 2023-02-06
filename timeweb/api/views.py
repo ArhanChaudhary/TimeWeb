@@ -63,6 +63,9 @@ import json
 #     logger.info(f"User \"{request.user}\" updated tag \"{old_tag_name}\" to \"{new_tag_name}\"")
 #     return HttpResponse(status=204)
 
+MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
+MAX_ASCENDING_COURSEWORK_PAGE_SIZE = 35
+
 @require_http_methods(["POST"])
 def delete_assignment(request):
     assignments = request.POST['assignments']
@@ -338,7 +341,7 @@ def update_gc_courses(request):
         # new_courses = [1,2,5] (you leave two classes and join a new one)
         # In this case, create_gc_assignments again
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
-            return create_gc_assignments(request)
+            return create_gc_assignments(request, "descending")
     return HttpResponse(status=200)
 
 def simplify_courses(courses, include_name=True):
@@ -348,7 +351,7 @@ def simplify_courses(courses, include_name=True):
             } for course in courses]
 
 @require_http_methods(["POST"])
-def create_gc_assignments(request):
+def create_gc_assignments(request, order=None):
     if 'token' not in request.user.settingsmodel.oauth_token: return HttpResponse(status=401)
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -428,8 +431,48 @@ def create_gc_assignments(request):
         # Note about timezones: use the local tz because date_now repesents the date at the user's location
         # This makes comparison logic work
         date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        for assignment in course_coursework['courseWork']:
+        course_coursework = course_coursework['courseWork']
+        now_search_left = 0
+        now_search_right = len(course_coursework)
+        while now_search_left < now_search_right:
+            mid = (now_search_left + now_search_right) // 2
+            assignment = course_coursework[mid]
+            complete_assignment_date, complete_x = parse_coursework_dates(assignment)
+            if complete_x:
+                due_before_today = complete_x <= complete_date_now
+            else:
+                due_before_today = True
+            if due_before_today and order == "desc" or not due_before_today and order == "asc":
+                now_search_right = mid
+            else:
+                now_search_left = mid + 1
+        none_search_left = 0
+        none_search_right = len(course_coursework)
+        while none_search_left < none_search_right:
+            mid = (none_search_left + none_search_right) // 2
+            assignment = course_coursework[mid]
+            complete_assignment_date, complete_x = parse_coursework_dates(assignment)
+            if complete_x and order == "desc" or not complete_x and order == "asc":
+                none_search_left = mid + 1
+            else:
+                none_search_right = mid
+        # import pprint
+        # pprint.pprint([i.get('dueDate') for i in course_coursework])
+        # if order == "desc":
+        #     pprint.pprint([i.get('dueDate') for i in course_coursework[:now_search_left]])
+        #     pprint.pprint([i.get('dueDate') for i in course_coursework[none_search_left:]])
+        # elif order == "asc":
+        #     pprint.pprint([i.get('dueDate') for i in course_coursework[now_search_left:]])
+        #     pprint.pprint([i.get('dueDate') for i in course_coursework[:none_search_left]])
+        # breakpoint()
+        if order == "desc":
+            course_coursework = course_coursework[:now_search_left] + course_coursework[none_search_left:]
+        elif order == "asc":
+            course_coursework = course_coursework[now_search_left:] + course_coursework[:none_search_left]
+        for assignment in course_coursework:
             assignment_id = int(assignment['id'], 10)
+            if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
+                continue
             complete_assignment_date, complete_x = parse_coursework_dates(assignment)
             assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
             tags = []
@@ -456,11 +499,6 @@ def create_gc_assignments(request):
             ))
             description = assignment.get('description')
             google_classroom_assignment_link = assignment.get("alternateLink")
-
-            # Assignment is valid to be created
-            new_gc_assignment_ids.add(assignment_id)
-            if assignment_id in request.user.settingsmodel.added_gc_assignment_ids:
-                continue
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=None,
                 assignment_date=assignment_date,
@@ -488,20 +526,39 @@ def create_gc_assignments(request):
                 "google_classroom_assignment_link": google_classroom_assignment_link,
                 "tags": tags,
             })
+            # we need to save every id we come across for now because pageSize is now limited
+            # TODO: find a better system that doesn't accumulate everything
+            request.user.settingsmodel.added_gc_assignment_ids.append(assignment_id)
+    # I have noticed that it can take up to **30 seconds** to load all assignments in especially active
+    # classes, so the goal of the whole order shenanigan is to speed up loading assignments from large
+    # classes while also at the same time not overlooking assignments that need to be added
 
+    # According to https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#body.QUERY_PARAMETERS.order_by
+    # we can sort by "dueDate desc" or due date in descending order and
+    # According to https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#body.QUERY_PARAMETERS.page_size
+    # we can also limit the maximum number of assignments returned
+    # this is great, as now we can sort by due date in descending order to only get the assignments due after today
+
+    # However, there is a slight limitation in the API
+    # Ordering by due date descending puts assignments without due dates at the very bottom, so if we limit the number
+    # of assignments its possible for them to get overlooked
+    # So, we are forced to make a second request this time in ascending order to add assignments without due dates
+    order = {"descending": "desc", "ascending": "asc"}[request.POST.get('order', order)]
+    page_size = {
+        "desc": MAX_DESCENDING_COURSEWORK_PAGE_SIZE,
+        "asc": MAX_ASCENDING_COURSEWORK_PAGE_SIZE,
+    }[order]
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
     for course in request.user.settingsmodel.gc_courses_cache:
         # NOTE: we don't need to set courseWorkStates because
         # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
         # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
-        batch.add(coursework_lazy.list(courseId=course["id"]))
+        batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
 
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
-    # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
-    new_gc_assignment_ids = set()
     gc_model_data = []
     try:
         batch.execute()
@@ -536,7 +593,6 @@ def create_gc_assignments(request):
         "y": None,
     }
     TimewebModel.objects.bulk_create(TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data)
-    request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
     request.user.settingsmodel.save()
     return HttpResponse(status=205)
 
@@ -647,7 +703,7 @@ def gc_auth_callback(request):
         # coursework
         # Keep this here in case for future reference
         try:
-            service.courses().courseWork().list(courseId=courses[0]['id']).execute()
+            service.courses().courseWork().list(courseId=courses[0]['id'], orderBy="dueDate desc", pageSize=MAX_DESCENDING_COURSEWORK_PAGE_SIZE).execute()
         except (HttpError, OAuth2Error, TimeoutError) as e:
             if not (
                 # condition to ignore HttpError
@@ -658,7 +714,7 @@ def gc_auth_callback(request):
                 return callback_failed()
     else:
         try:
-            service.courses().courseWork().list(courseId="easter egg").execute()
+            service.courses().courseWork().list(courseId="easter egg", orderBy="dueDate desc", pageSize=MAX_DESCENDING_COURSEWORK_PAGE_SIZE).execute()
         except (HttpError, OAuth2Error, TimeoutError) as e:
             if not (
                 # condition to ignore HttpError
