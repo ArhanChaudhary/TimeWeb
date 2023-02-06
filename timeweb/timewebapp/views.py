@@ -345,7 +345,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
                         x_num=None,
-                        needs_more_info=False,
+                        needs_more_info=self.sm.needs_more_info,
                         blue_line_start=None,
                     )
                     mods = app_utils.calc_mod_days(
@@ -360,7 +360,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
                         x_num=None,
-                        needs_more_info=False,
+                        needs_more_info=self.sm.needs_more_info,
                         blue_line_start=self.sm.blue_line_start,
                     )
                     mods = app_utils.calc_mod_days(
@@ -443,7 +443,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 old_data=old_data,
                 assignment_date=self.sm.assignment_date,
                 x_num=x_num,
-                needs_more_info=False,
+                needs_more_info=self.sm.needs_more_info,
                 blue_line_start=self.sm.blue_line_start,
             )
             self.sm.blue_line_start = adjusted_blue_line['blue_line_start']

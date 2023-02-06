@@ -106,7 +106,7 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num, needs_more_in
         elif x_num is None:
             # if x_num isn't there then just ignore the old x_num condition lol
             # TODO: this is deffo going to cause bugs in the future but idrc rn :DDD
-            blue_line_start = blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
+            blue_line_start += utils.days_between_two_dates(old_data.assignment_date, assignment_date)
         elif (
             # if self.blue_line_start >= x_num then blue_line_start is 0
             old_ideal_blue_line_start >= old_x_num and 
