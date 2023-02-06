@@ -1011,6 +1011,10 @@ main.finished-header-transition #extra-navs {
         margin-left: 0px;
         margin-right: -4px;
     }
+    .status-image {
+        position: absolute;
+        visibility: hidden;
+    }
     .align-to-status-message-container {
         margin-left: -3px;
     }
