@@ -521,8 +521,6 @@ def create_gc_assignments(request):
     TimewebModel.objects.bulk_create(gc_models_to_create)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
     request.user.settingsmodel.save()
-
-    request.session["already_created_gc_assignments_from_frontend"] = True
     return HttpResponse(status=205)
 
 def generate_gc_authorization_url(request, *, next_url, current_url):
