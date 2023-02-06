@@ -197,12 +197,12 @@ def simplify_course_name(tag_name):
     def tag_name_re_subs(regexes, tag_name):
         tag_name = " ".join(tag_name.split())
         tag_name_post_re_subs = (
-            # if there is something like "a-- b" then replace it when "a b"
+            # if there is something like "a--b" or "a -b" then replace it when "a b"
             # a dash is not usually treated as a space, such as when it's used
             # in words or names, but make an exception to double or more dashes
 
             # this could indicate it was re subbed for a blank
-            (r"(.) ?--+ ?(.)", r"\1 \2"),
+            (r"(.)( -+|-+ | -+ |--+)(.)", r"\1 \3"),
             (r"\(\)", ""),
             # if the string is instead something like "a--" or "a -" or "--a" or "- a" then remove it
             (r"^-+ ?| ?-+$", ""),
