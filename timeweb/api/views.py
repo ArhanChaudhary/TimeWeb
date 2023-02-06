@@ -435,7 +435,7 @@ def create_gc_assignments(request):
                     tags.append("Important")
                 x_num = utils.days_between_two_dates(x, assignment_date)
             else:
-                if utils.days_between_two_dates(date_now, assignment_date) > 60:
+                if utils.days_between_two_dates(date_now, assignment_date) > 30:
                     continue
                 due_time = None
                 x = None
