@@ -79,7 +79,13 @@ def delete_assignment(request):
         # Another reason to mark it as True every time is that the assignment can be marked with a star while its in the deleted view
         # but not when it was deleted and as a result dont_hide_again will be False and the assignment
         # will be immediately deleted when restored
-        request.user.timewebmodel_set.filter(pk__in=assignments).update(hidden=True, dont_hide_again=True, deletion_time=now)
+        with transaction.atomic():
+            for assignment in request.user.timewebmodel_set.filter(pk__in=assignments):
+                assignment.hidden = True
+                assignment.dont_hide_again = True
+                assignment.deletion_time = now
+                now += datetime.timedelta(microseconds=100000)
+                assignment.save()
     logger.info(f'User \"{request.user}\" deleted {len(assignments)} assignments')
     return HttpResponse(status=204)
     
