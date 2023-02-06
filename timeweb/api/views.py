@@ -420,7 +420,7 @@ def create_gc_assignments(request):
             return (complete_assignment_date, complete_x)
         complete_date_now = utils.utc_to_local(request, timezone.now())
         # Note about timezones: use the local tz because date_now repesents the date at the user's location
-        # This makes comparison logic worrk
+        # This makes comparison logic work
         date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         for assignment in course_coursework['courseWork']:
             assignment_id = int(assignment['id'], 10)
@@ -468,7 +468,7 @@ def create_gc_assignments(request):
                 x = x.replace(tzinfo=timezone.utc)
             if assignment_date:
                 assignment_date = assignment_date.replace(tzinfo=timezone.utc)
-            gc_models_to_create.append(TimewebModel(
+            gc_model_data.append(TimewebModel(
                 # these fields can be updated from changes in the api
 
                 # from api, can change
@@ -511,7 +511,7 @@ def create_gc_assignments(request):
 
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
     new_gc_assignment_ids = set()
-    gc_models_to_create = []
+    gc_model_data = []
     try:
         batch.execute()
     except RefreshError:
@@ -519,8 +519,9 @@ def create_gc_assignments(request):
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
         return HttpResponse(status=204)
-    if not gc_models_to_create: return HttpResponse(status=204)
-    TimewebModel.objects.bulk_create(gc_models_to_create)
+    if not gc_model_data:
+        return HttpResponse(status=204)
+    TimewebModel.objects.bulk_create(gc_model_data)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
     request.user.settingsmodel.save()
     return HttpResponse(status=205)
