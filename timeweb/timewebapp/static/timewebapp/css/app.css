@@ -1011,6 +1011,9 @@ main.finished-header-transition #extra-navs {
         margin-left: 0px;
         margin-right: -4px;
     }
+    .align-to-status-message-container {
+        margin-left: -3px;
+    }
     .hide-on-mobile {
         display: none;
     }
