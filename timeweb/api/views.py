@@ -504,7 +504,8 @@ def create_gc_assignments(request):
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
     for course in request.user.settingsmodel.gc_courses_cache:
         # NOTE: we don't need to set courseWorkStates because
-        # it defaults to "PUBLISHED"
+        # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
+        # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
         batch.add(coursework_lazy.list(courseId=course["id"]))
 
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
