@@ -251,6 +251,8 @@ createGCAssignments: function() {
         } else if (jqXHR.status === 205) {
             sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
             reloadWhenAppropriate();
+        } else if (jqXHR.status === 200) {
+
         }
     }
     ajaxCallback(undefined, undefined, {status: 204});

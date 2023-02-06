@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from django.http import HttpResponse, QueryDict
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django.core.cache import cache
 from django.db import transaction
 from math import floor
 from common.views import logger
@@ -313,6 +314,11 @@ def update_gc_courses(request):
     old_courses = request.user.settingsmodel.gc_courses_cache
     new_courses = simplify_courses(courses, include_name=False)
     if len(old_courses) != len(new_courses) or any(old_course["id"] != new_course["id"] for old_course, new_course in zip(old_courses, new_courses)):
+        # NOTE: request.user.settingsmodel is thread-safe
+        # i.e if one thread calls .save while another thread is still blocked in the api request call,
+        # the value of gc_courses_cache won't be affected by the .save and will still retain the original old value
+        # this makes it so that we don't need to use a similar caching system to the one used in create_gc_assignments
+        # as broken pipes no longer won't reload the user
         request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
         request.user.settingsmodel.save()
         # If old contains every element in new, then we don't need to create_gc_assignments again
@@ -333,7 +339,7 @@ def update_gc_courses(request):
         # In this case, create_gc_assignments again
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
             return create_gc_assignments(request)
-    return HttpResponse(status=204)
+    return HttpResponse(status=200)
 
 def simplify_courses(courses, include_name=True):
     return [{
@@ -491,6 +497,9 @@ def create_gc_assignments(request):
         # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
         batch.add(coursework_lazy.list(courseId=course["id"]))
 
+    concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
+    thread_timestamp = datetime.datetime.now().timestamp()
+    cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
     # Rebuild added_gc_assignment_ids because assignments may have been added or deleted
     new_gc_assignment_ids = set()
     gc_model_data = []
@@ -500,7 +509,15 @@ def create_gc_assignments(request):
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
-        return HttpResponse(status=204)
+        pass
+    cached_timestamp = cache.get(concurrent_request_key)
+    if cached_timestamp != thread_timestamp:
+        # The reason why we have to prevent concurrent requests is because although
+        # request.user.settingsmodel.save() is thread-safe, bulk_create runs directly
+        # through the ORM is not
+        # refer to the explanation in create_gc_assignments for more context
+        return HttpResponse(status=200)
+    cache.delete(concurrent_request_key)
     if not gc_model_data:
         return HttpResponse(status=204)
     static_gc_model_fields = {
