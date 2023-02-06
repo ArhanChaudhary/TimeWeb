@@ -1,5 +1,6 @@
 from decimal import Decimal
 import common.utils as utils
+from django.db import transaction
 from django.utils import timezone
 
 def calc_mod_days(*, assignment_date, blue_line_start, break_days):
@@ -59,19 +60,21 @@ def deletion_time_fix():
     """
     This function is manually invoked to ensure all deletion times are unique
     """
-    from .models import User
+    from common.models import User
     import datetime
-    users = User.objects.all()
-    for user in users:
-        hidden = user.timewebmodel_set.filter(hidden=True)
-        if hidden.count() <= 1: continue
+    with transaction.atomic():
+        users = User.objects.all()
+        for user in users:
+            hidden = user.timewebmodel_set.filter(hidden=True)
+            if hidden.count() <= 1: continue
 
-        def is_unique(time):
-            return user.timewebmodel_set.filter(hidden=True).filter(deletion_time=time).count() == 1
-        for assignment in hidden:
-            while not is_unique(assignment.deletion_time):
-                assignment.deletion_time += datetime.timedelta(microseconds=100000)
-                assignment.save()
+            def is_unique(time):
+                return user.timewebmodel_set.filter(hidden=True).filter(deletion_time=time).count() == 1
+            for assignment in hidden:
+                while not is_unique(assignment.deletion_time):
+                    print("Fixing", assignment)
+                    assignment.deletion_time += datetime.timedelta(microseconds=100000)
+                    assignment.save()
 
 def adjust_blue_line(request, *, old_data, assignment_date, x_num):
     assert assignment_date is not None
