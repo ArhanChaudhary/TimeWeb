@@ -468,38 +468,38 @@ def create_gc_assignments(request):
                 x = x.replace(tzinfo=timezone.utc)
             if assignment_date:
                 assignment_date = assignment_date.replace(tzinfo=timezone.utc)
-            gc_model_data.append(TimewebModel(
+            gc_model_data.append({
                 # these fields can be updated from changes in the api
 
                 # from api, can change
-                name=name,
-                assignment_date=assignment_date,
-                x=x,
-                due_time=due_time,
-                description=description,
+                "name": name,
+                "assignment_date": assignment_date,
+                "x": x,
+                "due_time": due_time,
+                "description": description,
                 # from app, depends on api
-                blue_line_start=blue_line_start,
-                dynamic_start=dynamic_start,
+                "blue_line_start": blue_line_start,
+                "dynamic_start": dynamic_start,
 
                 # these fields cannot be updated from changes in the api
 
                 # from api, cannot change
-                google_classroom_assignment_link=google_classroom_assignment_link,
-                tags=tags,
+                "google_classroom_assignment_link": google_classroom_assignment_link,
+                "tags": tags,
                 # from app
-                skew_ratio=request.user.settingsmodel.def_skew_ratio,
-                min_work_time=request.user.settingsmodel.def_min_work_time,
-                break_days=request.user.settingsmodel.def_break_days,
-                user=request.user,
-                needs_more_info=True,
-                is_google_classroom_assignment=True,
+                "skew_ratio": request.user.settingsmodel.def_skew_ratio,
+                "min_work_time": request.user.settingsmodel.def_min_work_time,
+                "break_days": request.user.settingsmodel.def_break_days,
+                "user": request.user,
+                "needs_more_info": True,
+                "is_google_classroom_assignment": True,
                 # assumptions
-                unit="Minute",
-                time_per_unit=1,
-                funct_round=5,
+                "unit": "Minute",
+                "time_per_unit": 1,
+                "funct_round": 5,
                 # y is missing
-                y=None,
-            ))
+                "y": None,
+            })
 
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
@@ -521,7 +521,7 @@ def create_gc_assignments(request):
         return HttpResponse(status=204)
     if not gc_model_data:
         return HttpResponse(status=204)
-    TimewebModel.objects.bulk_create(gc_model_data)
+    TimewebModel.objects.bulk_create(TimewebModel(**assignment) for assignment in gc_model_data)
     request.user.settingsmodel.added_gc_assignment_ids = list(new_gc_assignment_ids)
     request.user.settingsmodel.save()
     return HttpResponse(status=205)
