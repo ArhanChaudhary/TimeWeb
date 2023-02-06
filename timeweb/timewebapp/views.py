@@ -326,9 +326,10 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             # if y is empty and x was not predicted (x is a value)
             request.POST.get('y') == "" and 'x' in request.POST
         ):
-            self.sm.works = [str(first_work)]
             self.sm.needs_more_info = True
+            self.sm.works = [str(first_work)]
         else:
+            self.sm.needs_more_info = False
             date_now = utils.utc_to_local(request, timezone.now())
             date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
             if settings.EDITING_EXAMPLE_ACCOUNT:
@@ -340,12 +341,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
             # NOTE: (self.sm.x is None and self.sm.y is None) is impossible
             if self.sm.x is None:
-                if request.created_assignment or self.sm.needs_more_info:
+                if request.created_assignment or old_data.needs_more_info:
                     adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
                         x_num=None,
-                        needs_more_info=self.sm.needs_more_info,
+                        needs_more_info=getattr(old_data, "needs_more_info", False),
                         blue_line_start=None,
                     )
                     mods = app_utils.calc_mod_days(
@@ -360,12 +361,12 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                         old_data=old_data,
                         assignment_date=self.sm.assignment_date,
                         x_num=None,
-                        needs_more_info=self.sm.needs_more_info,
-                        blue_line_start=self.sm.blue_line_start,
+                        needs_more_info=getattr(old_data, "needs_more_info", False),
+                        blue_line_start=getattr(old_data, "blue_line_start", None),
                     )
                     mods = app_utils.calc_mod_days(
                         assignment_date=self.sm.assignment_date,
-                        blue_line_start=self.sm.blue_line_start,
+                        blue_line_start=getattr(old_data, "blue_line_start", None),
                         break_days=self.sm.break_days
                     )
                     removed_works_start = adjusted_blue_line_partial['removed_works_start']
@@ -443,8 +444,8 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 old_data=old_data,
                 assignment_date=self.sm.assignment_date,
                 x_num=x_num,
-                needs_more_info=self.sm.needs_more_info,
-                blue_line_start=self.sm.blue_line_start,
+                needs_more_info=getattr(old_data, 'needs_more_info', False),
+                blue_line_start=getattr(old_data, "blue_line_start", None),
             )
             self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
             if self.sm.y is None:
@@ -524,7 +525,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
                     # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
                     
-            if self.sm.needs_more_info or request.created_assignment or adjusted_blue_line['capped_at_x_num']:
+            if request.created_assignment or old_data.needs_more_info or adjusted_blue_line['capped_at_x_num']:
                 self.sm.dynamic_start = self.sm.blue_line_start
                 self.sm.works = [str(first_work)]
             else:
@@ -576,7 +577,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # ensures assignments don't immediately delete after editing a y value
                     # less than the last work input
                     self.sm.dont_hide_again = True
-            self.sm.needs_more_info = False
 
         # This could be too annoying; don't do this
 
