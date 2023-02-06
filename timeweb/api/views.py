@@ -380,12 +380,7 @@ def create_gc_assignments(request):
                 logger.error(exception)
         if course_coursework in (None, {}):
             return
-        complete_date_now = utils.utc_to_local(request, timezone.now())
-        # Note about timezones: use the local tz because date_now repesents the date at the user's location
-        # This makes comparison logic worrk
-        date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
-        for assignment in course_coursework['courseWork']:
-            assignment_id = int(assignment['id'], 10)
+        def parse_coursework_dates(assignment):
             # NOTE: scheduled assignments logically don't show up on the API
             # this implies that assignments due in the future cannot be created with the Google Classroom API
             # I am still going to assume this is possible with my validation logic and also check for "scheduledTime"
@@ -393,7 +388,6 @@ def create_gc_assignments(request):
             complete_assignment_date = assignment.get('scheduledTime', assignment['creationTime'])
             complete_assignment_date = utils.utc_to_local(request, datetime.datetime.fromisoformat(complete_assignment_date.replace('Z', '+00:00')))
             assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
-            tags = []
             if 'dueDate' in assignment:
                 # From https://developers.google.com/classroom/reference/rest/v1/courses.courseWork#CourseWork.FIELDS.due_time
                 # "This[the due time] must be specified if dueDate is specified."
@@ -421,15 +415,22 @@ def create_gc_assignments(request):
                     complete_x.replace(hour=0, minute=0) != assignment_date
                 ):
                     complete_x = complete_x.replace(hour=0, minute=0)
-                due_time = complete_x.time()
-                if not (
-                    # The due date must be after today
-                    complete_x > complete_date_now and
-                    # The due date must be after the assignment date 
-                    complete_x > complete_assignment_date
-                ):
+            else:
+                complete_x = None
+            return (complete_assignment_date, complete_x)
+        complete_date_now = utils.utc_to_local(request, timezone.now())
+        # Note about timezones: use the local tz because date_now repesents the date at the user's location
+        # This makes comparison logic worrk
+        date_now = complete_date_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        for assignment in course_coursework['courseWork']:
+            assignment_id = int(assignment['id'], 10)
+            complete_assignment_date, complete_x = parse_coursework_dates(assignment)
+            assignment_date = complete_assignment_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            tags = []
+            if complete_x:
+                if complete_x <= complete_assignment_date:
                     continue
-
+                due_time = complete_x.time()
                 x = complete_x.replace(hour=0, minute=0)
                 if date_now == x:
                     tags.append("Important")
