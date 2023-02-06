@@ -176,9 +176,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         if not request.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]
 
-        if not request.session.pop("already_created_gc_assignments_from_frontend", None):
-            self.context['CREATING_GC_ASSIGNMENTS_FROM_FRONTEND'] = 'token' in request.user.settingsmodel.oauth_token
-
     def get(self, request):
         if request.path == reverse("deleted_assignments"):
             self.add_user_models_to_context(request, view_hidden=True)

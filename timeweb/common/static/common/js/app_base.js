@@ -198,6 +198,7 @@ changeSetting: function(kwargs={}) {
     });
 },
 GCIntegrationError: function(jqXHR) {
+    sessionStorage.removeItem("ajaxs");
     switch (jqXHR.status) {
         case 302:
             var reauthorization_url = jqXHR.responseText;
@@ -224,27 +225,35 @@ GCIntegrationError: function(jqXHR) {
     }
 },
 createGCAssignments: function() {
-    if (!CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
-    $.ajax({
-        type: "POST",
-        url: '/api/create-gc-assignments',
-        error: ajaxUtils.GCIntegrationError,
-        success: function(response, textStatus, jqXHR) {
-            if (jqXHR.status === 204)
-                $.ajax({
-                    type: "POST",
-                    url: '/api/update-gc-courses',
-                    error: ajaxUtils.GCIntegrationError,
-                    success: function(response, textStatus, jqXHR) {
-                        if (jqXHR.status === 204) {
-                        } else if (jqXHR.status === 205)
-                            reloadWhenAppropriate();
-                    },
-                });
-            else if (jqXHR.status === 205)
-                reloadWhenAppropriate();
-        },
-    });
+    let ajaxs = JSON.parse(sessionStorage.getItem("ajaxs")) || [
+        {type: "POST", url: '/api/create-gc-assignments'},
+        {type: "POST", url: '/api/update-gc-courses'},
+    ];
+    let ajaxCallback = function(response, textStatus, jqXHR) {
+        if (jqXHR.status === 204) {
+            // If the last ajaxs ajax reloads, ajaxs in sessionStorage will be []
+            // .shift on an empty array returns undefined, which is truthy
+            // So, it won't redo all the ajaxs, eliminating the need for a
+            // request session to manually prevent the ajaxs from being redone
+            // aka the legacy variable CREATING_GC_ASSIGNMENTS_FROM_FRONTEND
+            let ajax = ajaxs.shift();
+            if (!ajax) {
+                sessionStorage.removeItem("ajaxs");
+                return;
+            }
+            $.ajax({
+                type: ajax.type,
+                url: ajax.url,
+                data: ajax.data,
+                error: ajaxUtils.GCIntegrationError,
+                success: ajaxCallback,
+            });
+        } else if (jqXHR.status === 205) {
+            sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
+            reloadWhenAppropriate();
+        }
+    }
+    ajaxCallback(undefined, undefined, {status: 204});
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
     switch (batchCallbackName) {
