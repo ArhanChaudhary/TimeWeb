@@ -12,7 +12,6 @@ class AppSitemap(Sitemap):
             'account_login',
             'account_signup',
             'contact_form',
-            'blog',
             'user_guide',
         ]
 
