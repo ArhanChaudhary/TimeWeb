@@ -3,7 +3,7 @@
 {% block head_title %}Sign Up{% endblock %}
 
 {% block content %}
-  {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+  {% include "socialaccount/snippets/provider_list.html" with process="login" label="sign up" %}
   <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
     {% csrf_token %}
     <hr>
