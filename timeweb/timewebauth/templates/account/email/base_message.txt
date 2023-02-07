@@ -1,6 +1,6 @@
 {% load account %}
 {% user_display user as user_display %}
-Hello {{ user_display }},
+Hello{% if user_display %} {% endif %}{{ user_display }},
 
 
 {% block content %}{% endblock %}

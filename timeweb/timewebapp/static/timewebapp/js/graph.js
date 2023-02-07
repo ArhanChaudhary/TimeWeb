@@ -5,10 +5,6 @@ class Assignment {
         this.assign_day_of_week = this.sa.assignment_date?.getDay();
         this.red_line_start_x = this.sa.fixed_mode ? 0 : this.sa.dynamic_start; // X-coordinate of the start of the red line
         this.red_line_start_y = this.sa.fixed_mode ? 0 : this.sa.works[this.red_line_start_x - this.sa.blue_line_start]; // Y-coordinate of the start of the red line
-        if (!Number.isFinite(this.red_line_start_x) || !Number.isFinite(this.red_line_start_y)) {
-            this.red_line_start_x = undefined;
-            this.red_line_start_y = undefined;
-        }
         this.min_work_time_funct_round = this.sa.min_work_time ? Math.ceil(this.sa.min_work_time / this.sa.funct_round) * this.sa.funct_round : this.sa.funct_round; // LCM of min_work_time and funct_round
         if (this.sa.unit) this.unit_is_of_time = ["minute", "hour"].includes(pluralize(this.sa.unit, 1).toLowerCase());
     }
@@ -18,8 +14,11 @@ class Assignment {
         if (!y1) return 0;
 
         // this isn't always accurate with due times but i dont think anyone in the entire universe could care less; its 2 am and im tired and i just want to get an A on my physics exam im sorry but i realized after wasting like half an hour trying to find a goddamn solution that no user using timeweb will *ever* care at all that the skew ratio doesnt flatten out completely using arrow keys, in fact which users will even know that arrow keys exist, who the hell also cares about timeweb enough to actually use it, what am i doing with my life
+        const old_red_line_start_x = this.red_line_start_x;
+        this.red_line_start_x = 0;
         const mods = this.calcModDays();
         x1 -= Math.floor(x1 / 7) * this.sa.break_days.length + mods[x1 % 7];
+        this.red_line_start_x = old_red_line_start_x;
         /*
         skew_ratio = (a + b) * x1 / y1; 
         skew_ratio = this.funct(1) * x1 / y1;
@@ -28,32 +27,57 @@ class Assignment {
         const skew_ratio_bound = mathUtils.precisionRound((y1 + this.min_work_time_funct_round) * x1 / y1, 10);
         return skew_ratio_bound;
     }
-    setDynamicStartIfInDynamicMode(params={ ajax: true }) {
-        if (this.sa.fixed_mode) return;
-
+    setDynamicStart(params={ dont_ajax: false }) {
         const old_dynamic_start = this.sa.dynamic_start;
         const len_works = this.sa.works.length - 1;
 
         let low = this.sa.blue_line_start;
         let high = len_works + this.sa.blue_line_start;// - (len_works + this.sa.blue_line_start === this.sa.x); // If users enter a value >y on the last day dont change dynamic start because the graph may display info for the day after the due date; however this doesn't happen because the assignment is completed
-        while (low < high) {
-            const mid = Math.floor((low + high) / 2);
-            this.red_line_start_x = mid;
+
+        this.iter = 0;
+        for (this.red_line_start_x = low; this.red_line_start_x <= high; this.red_line_start_x++) {
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
             this.setParabolaValues();
+            if (this.redLineStartXIsValid() || 
+                // don't do the increment on the last iteration       
+                this.red_line_start_x === high) break;
 
-            if (this.redLineStartXIsValid()) {
-                high = mid;
-            } else {
-                low = mid + 1;
+            if (this.iter > 20000) {
+                low = this.red_line_start_x;
+                while (low < high) {
+                    const mid = Math.floor((low + high) / 2);
+                    this.red_line_start_x = mid;
+                    this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                    this.setParabolaValues();
+        
+                    if (this.redLineStartXIsValid()) {
+                        high = mid;
+                    } else {
+                        low = mid + 1;
+                    }
+                }
+                this.red_line_start_x = low;
+                break;
             }
         }
-        this.red_line_start_x = low;
+
+        // high-first approach:
+
+        // for (this.red_line_start_x = high - 1; this.red_line_start_x >= this.sa.blue_line_start; this.red_line_start_x--) {
+        //     this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        //     this.setParabolaValues();
+        //     if (!this.redLineStartXIsValid()) break;
+        // }
+        // // ++ for three cases:
+        // // if for loop doesnt run, do ++ to fix red_line_start_x
+        // // if for loop finds, do ++ because current red_line_start_x has the work input that isnt the same as todo
+        // // if for loop doesnt find, do ++; red_line_start_x is less than blue_line_start which is illegal
+        // this.red_line_start_x++;
         this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
         this.sa.dynamic_start = this.red_line_start_x;
 
         // !this.sa.needs_more_info probably isn't needed but just in case as a safety mechanism for priority.js
-        params.ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
+        !params.dont_ajax && !this.sa.needs_more_info && old_dynamic_start !== this.sa.dynamic_start && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {dynamic_start: this.sa.dynamic_start, id: this.sa.id});
         // If we don't call this again then the a and b values will be stuck at the binary search from when it was called in the earlier loop
         this.setParabolaValues();
     }
@@ -63,18 +87,88 @@ class Assignment {
 
         // checks if every work input is the same as the red line for all work inputs greater than red_line_start_x
         const len_works = this.sa.works.length - 1;
-        let next_funct = this.funct(this.red_line_start_x),
-            next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
-        for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
-            const this_funct = next_funct,
-                this_work = next_work;
-            next_funct = this.funct(i + 1),
-            next_work = this.sa.works[i - this.sa.blue_line_start + 1];
-            if (next_funct - this_funct !== next_work - this_work) {
+        let prev_funct = this.funct(len_works + this.sa.blue_line_start),
+            prev_work = this.sa.works[len_works];
+        for (let i = len_works + this.sa.blue_line_start; i > this.red_line_start_x; i--) {
+            const this_funct = prev_funct,
+                this_work = prev_work;
+            prev_funct = this.funct(i - 1),
+            prev_work = this.sa.works[i - this.sa.blue_line_start - 1];
+            this.iter++;
+            const valid = this_work === this_funct && prev_work === prev_funct;
+            if (!valid) {
                 return false;
             }
         }
         return true;
+
+        // high-first approach
+        // const len_works = this.sa.works.length - 1;
+        // let next_funct = this.funct(this.red_line_start_x),
+        //     next_work = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+        // for (let i = this.red_line_start_x; i < len_works + this.sa.blue_line_start; i++) {
+        //     const this_funct = next_funct,
+        //         this_work = next_work;
+        //     next_funct = this.funct(i + 1),
+        //     next_work = this.sa.works[i - this.sa.blue_line_start + 1];
+        //     this.iter++;
+        //     if (next_funct - this_funct !== next_work - this_work) {
+        //         return false;
+        //     }
+        // }
+        // return true;
+    }
+    shouldAutotune(params={ skip_break_days_check: false, extra_conditions: [] }) {
+        const extra_conditions_all_true = (params.extra_conditions || []).every(condition => condition);
+        if (!extra_conditions_all_true) return false;
+
+        const in_dynamic_mode = !this.sa.fixed_mode;
+        if (!in_dynamic_mode) return false;
+
+        const len_works = this.sa.works.length - 1;
+        const original_red_line_start_x = this.red_line_start_x;
+        this.red_line_start_x = this.sa.blue_line_start;
+        const mods = this.calcModDays();
+        this.red_line_start_x = original_red_line_start_x;
+        const len_works_without_break_days = len_works - (Math.floor(len_works / 7) * this.sa.break_days.length + mods[len_works % 7]);
+        const too_many_work_inputs = len_works_without_break_days > Assignment.MAX_WORK_INPUTS_AUTOTUNE;
+        if (too_many_work_inputs) return false;
+
+        if (!params.skip_break_days_check) {
+            // i dont want any work inputs whatsoever to have ANY effect on the curvature of the red line on a break day
+            const on_break_day = this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7);
+            if (on_break_day) return false;
+        }
+
+        return true;
+    }
+    refreshDynamicMode({ params={ inverse: false }, shouldAutotuneParams=undefined } = {}) {
+        if (params.inverse) {
+            if (this.shouldAutotune()) {
+                const WLS = this.WLSWorkInputs();
+                if (!Number.isNaN(WLS)) {
+                    for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS - 1; i++) {
+                        this.autotuneSkewRatio(WLS, {inverse: true});
+                        this.setDynamicStart();
+                    }
+                    this.autotuneSkewRatio(WLS, {inverse: true});
+                }
+            }
+            this.sa.works.pop();
+            this.setDynamicStart();
+            return;
+        }
+
+        if (this.shouldAutotune(shouldAutotuneParams)) {
+            const WLS = this.WLSWorkInputs();
+            if (!Number.isNaN(WLS)) {
+                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
+                    this.setDynamicStart();
+                    this.autotuneSkewRatio(WLS, {inverse: false});
+                }
+            }
+        }
+        this.setDynamicStart();
     }
     // make sure to properly set red_line_start_x before running this function
     incrementDueDate() {
@@ -91,8 +185,53 @@ class Assignment {
 
         this.sa.alert_due_date_incremented = true;
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+
+        this.sa.skew_ratio = 1;
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
     }
-    getWorkingDaysRemaining(params={reference: null, floor_due_time: false}) {
+    getWorkingDaysRemaining(params={reference: null, floor_due_time: false, diffcheck: false}) {
+        if (params.diffcheck) {
+            let working_days = 0;
+            let diff;            
+            let len_works = this.sa.works.length - 1;
+            let i;
+            switch (params.reference) {
+                case "today": {
+                    i = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
+                    break;
+                }
+                case "blue line end":
+                case "visual red line start": {
+                    // First point the red line is drawn on, taken from draw()
+                    // If in fixed mode, choose this anyways
+                    i = this.sa.blue_line_start + len_works;
+                    break;
+                }
+            }
+            let this_funct;
+            let next_funct = this.funct(i);
+            if (next_funct === undefined || Number.isNaN(next_funct)) return NaN;
+            for (; i < (params.floor_due_time ? Math.floor(this.sa.complete_x) : this.sa.x); i++) {
+                if (this.sa.break_days.includes((this.assign_day_of_week + i) % 7)) {
+                    continue;
+                }
+
+                this_funct = next_funct;
+                // if the assignment is somehow invalid and this.red_line_start_y is ever undefined
+                // from this.red_line_start_x being longer than this.sa.works, undefined values crash
+                // sigFigSubtract. Return NaN to silently fail instead.
+                next_funct = this.funct(i + 1);
+                if (next_funct === undefined || Number.isNaN(next_funct)) return NaN;
+                diff = mathUtils.sigFigSubtract(next_funct, this_funct);
+                if (diff !== 0) {
+                    working_days++;
+                    if (next_funct === this.sa.y) {
+                        break;
+                    }
+                }
+            }
+            return working_days;
+        }
         const original_red_line_start_x = this.red_line_start_x;
         switch (params.reference) {
             case "today": {
@@ -127,6 +266,7 @@ class Assignment {
         return x1;
     }
 }
+window.Assignment = Assignment;
 class VisualAssignment extends Assignment {
     static CLOSE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
     static MOUSE_POSITION_TRANSFORM = {x: 0.1, y: -1.3} // Adjusts the mouse position by a few pixels to make it visually more accurate
@@ -194,12 +334,6 @@ class VisualAssignment extends Assignment {
             this.height = this.fixed_graph.height();
             assignment_footer.hide();
         }
-        //hard
-        if (this.width > 500) {
-            VisualAssignment.font_size = 13.9;
-        } else {
-            VisualAssignment.font_size = Math.round((this.width + 450) / 47 * 0.6875);
-        }
         this.wCon = (this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / this.sa.complete_x;
         this.hCon = (this.height - 55) / this.sa.y;
         this.graph[0].width = this.width * this.scale;
@@ -209,9 +343,10 @@ class VisualAssignment extends Assignment {
         if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
             this.drawFixed();
             this.draw();
+            // Don't hide graph hover point label on set skew ratio end if enabled
             if (!e.isTrigger) {
                 const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.addClass("hide-label");
+                hover_point_label.removeClass("move-left").addClass("hide-label");
             }
         }
     }
@@ -248,7 +383,7 @@ class VisualAssignment extends Assignment {
 
             const mods = this.calcModDays();
             x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-            if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+            if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
                 x1 = Math.ceil(x1);
             }
 
@@ -286,7 +421,8 @@ class VisualAssignment extends Assignment {
             } else if (x2 >= x1) {
                 this.sa.skew_ratio = 2 - skew_ratio_bound;
             }
-            this.setDynamicStartIfInDynamicMode({ ajax: false });
+            if (!this.sa.fixed_mode)
+                this.setDynamicStart({ dont_ajax: true });
             this.mousemove(e, iteration_number + 1);
         } else {
             this.draw(raw_x, raw_y);
@@ -321,7 +457,7 @@ class VisualAssignment extends Assignment {
 
         const mods = this.calcModDays();
         x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+        if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
             x1 = Math.ceil(x1);
         }
 
@@ -369,8 +505,8 @@ class VisualAssignment extends Assignment {
         } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && this.pressed_arrow_key === "ArrowDown") {
             this.sa.skew_ratio = skew_ratio_bound;
         }
-
-        this.setDynamicStartIfInDynamicMode();
+        if (!this.sa.fixed_mode)
+            this.setDynamicStart();
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
         new Priority().sort();
     }
@@ -413,6 +549,7 @@ class VisualAssignment extends Assignment {
         const assignment_container = this.dom_assignment.parents(".assignment-container");
 
         // draw() always runs setParabolaValues but I'll leave it like this because it's easier to maintain and for forward compatibility
+        // TODO: find and test some condition (like if set_skew_ratio is false) to not run setParabolaValues or else it this is really inefficient
         this.setParabolaValues();
 
         // Number.isFinite(raw_x) && Number.isFinite(raw_y) is needed because resize() can call draw() while draw_mouse_point is true but not pass any mouse coordinates, from for example resizing the browser
@@ -463,7 +600,7 @@ class VisualAssignment extends Assignment {
         screen.strokeStyle = utils.formatting.RGBToString(VisualAssignment.RED_LINE_COLOR);
         screen.lineWidth = radius;
         screen.beginPath();
-        for (let point_x = (this.sa.fixed_mode || DEBUG) ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
+        for (let point_x = /*(*/this.sa.fixed_mode/* || DEBUG)*/ ? this.red_line_start_x : this.sa.blue_line_start + len_works; point_x < line_end; point_x += Math.ceil(1 / this.wCon)) {
             let point_y = this.funct(point_x);
             circle_x = point_x * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
             if (circle_x > this.width - 5) {
@@ -510,17 +647,16 @@ class VisualAssignment extends Assignment {
             const point_y = Math.max(VisualAssignment.MINIMUM_CIRCLE_Y, this.height - funct_mouse_x * this.hCon - 50);
             // converting from minutes to hours can result in hidden decimal places, so we round so the user isnt overwhelmed
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${Math.floor(funct_mouse_x * 100) / 100})`;
-            if (hover_point_label.hasClass("initial-position")) {
+            if (hover_point_label.hasClass("hide-label")) {
                 hover_point_label.addClass("disable-hover-point-label-transition");
             }
-            hover_point_label.removeClass("hide-label");
             hover_point_label.css("--x", point_x);
             hover_point_label.css("--y", point_y);
             hover_point_label.text(point_str);
             hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width + 8 > this.width - 5);
-            if (hover_point_label.hasClass("initial-position")) {
+            if (hover_point_label.hasClass("hide-label")) {
                 hover_point_label[0].offsetHeight;
-                hover_point_label.removeClass("disable-hover-point-label-transition initial-position");
+                hover_point_label.removeClass("disable-hover-point-label-transition hide-label");
             }
             screen.beginPath();
 
@@ -543,7 +679,6 @@ class VisualAssignment extends Assignment {
         }
         
         screen.textAlign = "center";
-        VisualAssignment.setCanvasFont(screen, VisualAssignment.font_size);
         const center = (str, y_pos) => screen.fillText(str, (VisualAssignment.GRAPH_Y_AXIS_MARGIN+10+this.width)/2, screen.text_height * y_pos - 2);
         if (!assignment_container.hasClass("finished")) {
             let displayed_day;
@@ -575,13 +710,19 @@ class VisualAssignment extends Assignment {
             }
 
             if (displayed_day.valueOf() !== date_now.valueOf()) {
-                center(str_day, 1);
-                center(`${pluralize(this.sa.unit, 2)} to Complete for this Day: ${todo} (${utils.formatting.formatMinutes(todo * this.sa.time_per_unit)})`, 2);
+                center(str_day + ":", 1);
+                center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, this, false), 2);
             }
         }
         screen.scale(1 / this.scale, 1 / this.scale);
     }
     static GRAPH_Y_AXIS_MARGIN = 55;
+    static SMALLER_SMALLER_MARGIN_X = 11;
+    static SMALLER_BIGGER_MARGIN_X = 7;
+    static BIGGER_BIGGER_MARGIN_X = 19;
+    static SMALLER_SMALLER_MARGIN_Y = 6;
+    static SMALLER_BIGGER_MARGIN_Y = 2;
+    static BIGGER_BIGGER_MARGIN_Y = 7;
     //hard (the entire function)
     drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
@@ -611,91 +752,256 @@ class VisualAssignment extends Assignment {
         } else {
             var text = `${pluralize(this.sa.unit)} (${utils.formatting.formatMinutes(this.sa.time_per_unit)} per ${pluralize(this.sa.unit,1)})`;
         }
-        let margin = 20;
-        if (screen.measureText(text).width + margin * 2 > this.height - 50) {
+        let vertical_text_margin = 20;
+        if (screen.measureText(text).width + vertical_text_margin * 2 > this.height - 50) {
             text = pluralize(this.sa.unit);
         }
         screen.fillText(text, -(this.height - 50) / 2, 17);
         screen.rotate(Math.PI / 2);
 
         VisualAssignment.setCanvasFont(screen, 13.75);
-        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - VisualAssignment.GRAPH_Y_AXIS_MARGIN + 60) / 100));
+        const rounded_complete_x = Math.max(Math.floor(this.sa.complete_x * 100), 1) / 100;
+        const x_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.complete_x))) * Math.ceil(this.sa.complete_x.toString()[0] / Math.ceil((this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / 150));
+        const draw_big_index_at_complete_x = this.sa.complete_x % x_axis_scale === 0 || this.sa.complete_x < 10;
         const small_x_axis_scale = x_axis_scale / 5;
         const label_smaller_x_indicies = screen.measureText(Math.floor(this.sa.complete_x)).width * 1.9 < small_x_axis_scale * this.wCon;
+        let small_last_number_left;
         if (this.sa.complete_x >= 10) {
             gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
             gradient.addColorStop(0, "gainsboro");
             gradient.addColorStop(1, "silver");
-            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.complete_x / small_x_axis_scale); smaller_index++) {
-                if (smaller_index % 5) {
-                    const displayed_number = smaller_index * small_x_axis_scale;
-                    screen.fillStyle = gradient; // Line color
-                    screen.fillRect(displayed_number * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 8.5, 0, 2, this.height - 50); // Draws line index
+
+            /**
+                mod x_axis_scale is 0
+                mod small_x_axis_scale is 0
+                (x=20)
+                +-----+-------+------------+---------------+
+                |     |       |            | Label size    |
+                +-----+-------+------------+---------------+
+                |     |       | big        | small         |
+                +-----+-------+------------+---------------+
+                |     | int   | x=8: big   | x=20: big     |
+                +-----+-------+------------+---------------+
+                | Day | float | impossible | impossible    |
+                +-----+-------+------------+---------------+
+
+                (IMPOSSIBLE)
+                mod x_axis_scale is 0
+                mod small_x_axis_scale is 0
+
+                mod x_axis_scale is non-0
+                mod small_x_axis_scale is 0 or non-0
+                (x=13)
+                +-----+-------+------------+---------------+
+                |     |       |            | Label size    |
+                +-----+-------+------------+---------------+
+                |     |       | big        | small         |
+                +-----+-------+------------+---------------+
+                |     | int   | impossible | x=13: small   |
+                +-----+-------+------------+---------------+
+                | Day | float | x=7.5: big | x=13.5: small |
+                +-----+-------+------------+---------------+
+                logic: if mod x_axis_scale == 0: big, elif x < 10: big, else: small
+            */
+
+            let smaller_index;
+            let number_x_pos;
+            let numberwidth;
+
+            if (!draw_big_index_at_complete_x) {
+                smaller_index = rounded_complete_x;
+                // don't include `if (smaller_index / small_x_axis_scale % 5 !== 0) {` due to the following logic:
+
+                // smaller_index / small_x_axis_scale % 5
+                // =5 * smaller_index / x_axis_scale % 5
+                // =Number.isInteger(smaller_index / x_axis_scale)
+                // =Number.isInteger(this.sa.complete_x / x_axis_scale)
+                // =this.sa.complete_x / x_axis_scale % 1 === 0
+                // =this.sa.complete_x % x_axis_scale === 0
+                // =draw_big_index_at_complete_x
+                screen.fillStyle = gradient; // Line color
+                screen.fillRect(smaller_index * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 8.5, 0, 2, this.height - 50);
+                // we don't care if nothing else is drawn, we need to draw the due date label
+                // if (label_smaller_x_indicies) {
+                numberwidth = screen.measureText(smaller_index).width;
+                number_x_pos = this.width - numberwidth / 2 - 2.5;
+                screen.fillStyle = "rgb(80,80,80)"; // Number color
+                screen.fillText(smaller_index, number_x_pos, this.height - 10 - 17);
+                small_last_number_left = number_x_pos - numberwidth / 2;
+                // }
+                // }
+            }
+            let first_loop = true;
+            for (smaller_index = Math.ceil(this.sa.complete_x / small_x_axis_scale - 1) * small_x_axis_scale; smaller_index > 0; smaller_index -= small_x_axis_scale) {
+                if (smaller_index / small_x_axis_scale % 5 === 0) continue
+
+                number_x_pos = smaller_index * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
+                screen.fillStyle = gradient; // Line color
+                screen.fillRect(number_x_pos - 1.5, 0, 2, this.height - 50); // Draws line index
+                if (!label_smaller_x_indicies) continue;
+
+                if (!first_loop) {
                     screen.fillStyle = "rgb(80,80,80)"; // Number color
-                    if (label_smaller_x_indicies) {
-                        const numberwidth = screen.measureText(displayed_number).width;
-                        let number_x_pos = displayed_number * this.wCon + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10;
-                        if (number_x_pos + numberwidth / 2 > this.width - 2.5) {
-                            number_x_pos = this.width - numberwidth / 2 - 2.5;
-                        }
-                        screen.fillText(displayed_number, number_x_pos, this.height - 10 - 17);
-                    }
+                    screen.fillText(smaller_index, number_x_pos, this.height - 10 - 17);
+                    continue;
                 }
+
+                numberwidth = screen.measureText(smaller_index).width;
+                if (draw_big_index_at_complete_x) {
+                    small_last_number_left = number_x_pos - numberwidth / 2;
+                    screen.fillStyle = "rgb(80,80,80)"; // Number color
+                    screen.fillText(smaller_index, number_x_pos, this.height - 10 - 17);
+                } else if (small_last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.SMALLER_SMALLER_MARGIN_X) {
+                    screen.fillStyle = "rgb(80,80,80)"; // Number color
+                    screen.fillText(smaller_index, number_x_pos, this.height - 10 - 17);
+                }
+                first_loop = false;
             }
         }
         VisualAssignment.setCanvasFont(screen, 12);
         screen.textAlign = "right";
-        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 100) / 100));
+
+        const y_axis_scale = Math.pow(10, Math.floor(Math.log10(this.sa.y))) * Math.ceil(this.sa.y.toString()[0] / Math.ceil((this.height - 55) / 125));
+        const draw_big_index_at_y = this.sa.y % y_axis_scale === 0 || this.sa.y < 10;
         const small_y_axis_scale = y_axis_scale / 5;
-        const label_smaller_y_indicies = screen.text_height * 1.8 < small_y_axis_scale * this.hCon;
+        const label_smaller_y_indicies = screen.text_height * 2.1 < small_y_axis_scale * this.hCon;
+        let small_last_number_bottom;
         if (this.sa.y >= 10) {
-            for (let smaller_index = 1; smaller_index <= Math.floor(this.sa.y / small_y_axis_scale); smaller_index++) {
-                const displayed_number = smaller_index * small_y_axis_scale;
-                if (smaller_index % 5) {
-                    const gradient_percent = 1 - (displayed_number * this.hCon) / (this.height - 50);
-                    screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
-                    screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - 51.5 - displayed_number * this.hCon, this.width - 50, 2);
+            let smaller_index;
+            let number_y_pos;
+
+            if (!draw_big_index_at_y) {
+                smaller_index = this.sa.y;
+
+                const gradient_percent = 1 - (smaller_index * this.hCon) / (this.height - 50);
+                screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - smaller_index * this.hCon - 51.5, this.width - 50, 2);
+                
+                number_y_pos = 4;
+                screen.fillStyle = "rgb(80,80,80)";
+                screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                small_last_number_bottom = number_y_pos + screen.text_height / 2;
+            }
+            let first_loop = true;
+            for (let smaller_index = Math.ceil(this.sa.y / small_y_axis_scale - 1) * small_y_axis_scale; smaller_index > 0; smaller_index -= small_y_axis_scale) {
+                if (smaller_index / small_y_axis_scale % 5 === 0) continue;
+
+                const gradient_percent = 1 - (smaller_index * this.hCon) / (this.height - 50);
+                number_y_pos = this.height - smaller_index * this.hCon - 54;
+                screen.fillStyle = `rgb(${220-16*gradient_percent},${220-16*gradient_percent},${220-16*gradient_percent})`;
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, number_y_pos + 2.5, this.width - 50, 2);
+                if (!label_smaller_y_indicies) continue;
+                
+                if (!first_loop) {
                     screen.fillStyle = "rgb(80,80,80)";
-                    if (label_smaller_y_indicies) {
-                        let number_y_pos = this.height - displayed_number * this.hCon - 54 + screen.text_height / 2;
-                        if (number_y_pos < 4 + screen.text_height / 2) {
-                            number_y_pos = 4 + screen.text_height / 2;
-                        }
-                        screen.fillText(displayed_number, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos);
-                    }
+                    screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                    continue;
                 }
+
+                if (draw_big_index_at_y) {
+                    small_last_number_bottom = number_y_pos + screen.text_height / 2;
+                    screen.fillStyle = "rgb(80,80,80)";
+                    screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                } else if ((number_y_pos - screen.text_height / 2) - small_last_number_bottom > VisualAssignment.SMALLER_SMALLER_MARGIN_Y) {
+                    screen.fillStyle = "rgb(80,80,80)";
+                    screen.fillText(smaller_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                }
+                first_loop = false;
             }
         }
         VisualAssignment.setCanvasFont(screen, label_smaller_y_indicies ? 15 : 16.5);
-        for (let bigger_index = Math.ceil(this.sa.y - this.sa.y % y_axis_scale); bigger_index > 0; bigger_index -= y_axis_scale) {
-            if (bigger_index * 2 < y_axis_scale) {
-                // roundoff errors
-                break;
+        {
+            let bigger_index;
+            let number_y_pos;
+            let last_number_bottom;
+
+            if (draw_big_index_at_y) {
+                bigger_index = this.sa.y;
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
+                number_y_pos = 5;
+                screen.fillStyle = "black";
+                screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                last_number_bottom = number_y_pos + screen.text_height / 2;
             }
-            screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, this.height - bigger_index * this.hCon - 52.5, this.width - 50, 5);
-            screen.fillStyle = "black";
-            let number_y_pos = this.height - bigger_index * this.hCon - 54 + screen.text_height / 2;
-            if (number_y_pos < 5 + screen.text_height / 2) {
-                number_y_pos = 5 + screen.text_height / 2;
+            let first_loop = true;
+            for (bigger_index = Math.ceil(this.sa.y / y_axis_scale - 1) * y_axis_scale; bigger_index > 0; bigger_index -= y_axis_scale) {
+                number_y_pos = this.height - bigger_index * this.hCon - 54;
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10, number_y_pos + 1.5, this.width - 50, 5);
+
+                if (!first_loop) {
+                    screen.fillStyle = "black";
+                    screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                    continue;
+                }
+
+                if (
+                    (
+                        small_last_number_bottom === undefined || 
+                        (number_y_pos - screen.text_height / 2) - small_last_number_bottom > VisualAssignment.SMALLER_BIGGER_MARGIN_Y
+                    ) && (
+                        !draw_big_index_at_y ||
+                        (number_y_pos - screen.text_height / 2) - last_number_bottom > VisualAssignment.BIGGER_BIGGER_MARGIN_Y
+                    )
+                ) {
+                    screen.fillStyle = "black";
+                    screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos + screen.text_height / 2);
+                }
+                first_loop = false;
             }
-            screen.fillText(bigger_index, VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, number_y_pos);
         }
+        screen.fillStyle = "black";
         screen.fillText("0", VisualAssignment.GRAPH_Y_AXIS_MARGIN - 2, this.height - 53.5);
 
         screen.textAlign = "center";
         VisualAssignment.setCanvasFont(screen, 16.5);
-        for (let bigger_index = Math.ceil(this.sa.complete_x - this.sa.complete_x % x_axis_scale); bigger_index > 0; bigger_index -= x_axis_scale) {
-            screen.fillStyle = "rgb(205,205,205)";
-            screen.fillRect(bigger_index * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5), 0, 5, this.height - 50);
-            screen.fillStyle = "black";
-            const numberwidth = screen.measureText(bigger_index).width;
-            let number_x_pos = bigger_index * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10);
-            if (number_x_pos + numberwidth / 2 > this.width - 2) {
+        {
+            let bigger_index;
+            let number_x_pos;
+            let numberwidth;
+            let last_number_left;
+
+            if (draw_big_index_at_complete_x) {
+                bigger_index = rounded_complete_x;
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(this.sa.complete_x * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 7.5), 0, 5, this.height - 50);
+                numberwidth = screen.measureText(bigger_index).width;
                 number_x_pos = this.width - numberwidth / 2 - 2;
+                screen.fillStyle = "black";
+                screen.fillText(bigger_index, number_x_pos, this.height - 40 + 15);
+                last_number_left = number_x_pos - numberwidth / 2;
             }
-            screen.fillText(bigger_index, number_x_pos, this.height - 40 + 15);
+            let first_loop = true;
+            for (bigger_index = Math.ceil(this.sa.complete_x / x_axis_scale - 1) * x_axis_scale; bigger_index > 0; bigger_index -= x_axis_scale) {
+                number_x_pos = bigger_index * this.wCon + (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 10);
+                screen.fillStyle = "rgb(205,205,205)";
+                screen.fillRect(number_x_pos - 2.5, 0, 5, this.height - 50);
+
+                if (!first_loop) {
+                    screen.fillStyle = "black";
+                    screen.fillText(bigger_index, number_x_pos, this.height - 40 + 15);
+                    continue;
+                }
+
+                numberwidth = screen.measureText(bigger_index).width;
+                if (
+                    (
+                        small_last_number_left === undefined || // small_last_number_left has an opportunity to be defined despite the evaluation of draw_big_index_at_complete_x
+                        small_last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.SMALLER_BIGGER_MARGIN_X
+                    ) && (
+
+                        !draw_big_index_at_complete_x ||
+                        last_number_left - (number_x_pos + numberwidth / 2) > VisualAssignment.BIGGER_BIGGER_MARGIN_X
+                    )
+                ) {
+                    screen.fillStyle = "black";
+                    screen.fillText(bigger_index, number_x_pos, this.height - 40 + 15);
+                }
+                first_loop = false;
+            }
         }
+        screen.fillStyle = "black";
         screen.fillText("0", VisualAssignment.GRAPH_Y_AXIS_MARGIN + 16.5, this.height - 40 + 15);
         const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(utils.getRawDateNow(), this.sa.assignment_date, {round: false});
         if (today_minus_assignment_date >= 0 && today_minus_assignment_date <= this.sa.complete_x) {
@@ -715,7 +1021,7 @@ class VisualAssignment extends Assignment {
             if (today_x > this.width - 12.5) {
                 today_x = this.width - 12.5;
             }
-            screen.fillStyle = "rgb(150,150,150)";
+            screen.fillStyle = "rgb(205,205,205)";
             screen.fillRect(today_x, 0, 5, this.height - 50);
             screen.fillStyle = "black";
             screen.rotate(Math.PI / 2);
@@ -826,7 +1132,7 @@ class VisualAssignment extends Assignment {
                 }
             }
         });
-        $(window).resize(this.resize.bind(this));
+        $(window).on("resize redrawGraphs", this.resize.bind(this));
 
         if (VIEWING_DELETED_ASSIGNMENTS) return; // EVERYTHING PAST THIS POINT ONLY RUNS IF VIEWING_DELETED_ASSIGNMENTS IS FALSE
 
@@ -998,13 +1304,15 @@ class VisualAssignment extends Assignment {
                 VisualAssignment.flashNotApplicable(delete_work_input_button);
                 return;
             }
-            this.sa.works.pop();
-            len_works--;
-            for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                this.setDynamicStartIfInDynamicMode();
-                this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+            // Check out parabola.js for an explanation of what happens here
+
+            // Make sure to update submit_work_input_button if this is changed
+            if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
+                this.refreshDynamicMode({ params: { inverse: true } });
+            } else {
+                this.sa.works.pop();
             }
-            this.setDynamicStartIfInDynamicMode();
+            len_works--;
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
             new Priority().sort();
         });
@@ -1056,7 +1364,7 @@ class VisualAssignment extends Assignment {
             let not_applicable_message_description;
             if (!work_input_textbox.val()) {
                 not_applicable_message_title = "Enter a Value.";
-                not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"/user-guide#standard-assignment-graph-controls\">user guide</a>) into the textbox to submit a work input."
+                not_applicable_message_description = "Please enter a number or keyword (which can be found in the <a href=\"/user-guide#standard-assignment-graph-controls\" target=\"_blank\">user guide</a>) into the textbox to submit a work input."
             } else if (last_work_input >= this.sa.y) {
                 not_applicable_message_title = "Already Finished.";
                 not_applicable_message_description = "You've already finished this assignment, so you can't enter any more work inputs.";
@@ -1125,27 +1433,28 @@ class VisualAssignment extends Assignment {
             }
 
             if (use_in_progress) {
-                if (this.sa.works[len_works] === last_work_input) return; // Pointless input
-                len_works--;
-                this.sa.works.pop();
+                if (this.sa.works[len_works] === last_work_input) return; // Pointless input (input_done === 0)
 
                 // Attempts to undo the last work input to ensure the autotune isn't double dipped
-                // Note that the invsering of the autotune algorithm is still not perfect, but usable
-                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                    this.setDynamicStartIfInDynamicMode();
-                    this.autotuneSkewRatioIfInDynamicMode({ inverse: false });
+                // Note that the inversing of the autotune algorithm is still not perfect, but usable
+
+                // Make sure to update delete_work_input_button if this is changed
+                if (len_works + this.sa.blue_line_start === this.sa.dynamic_start && !this.sa.fixed_mode) {
+                    this.refreshDynamicMode({ params: { inverse: true } });
+                } else {
+                    this.sa.works.pop();
                 }
-                this.setDynamicStartIfInDynamicMode();
+                len_works--;
             }
-            len_works++;
             this.sa.works.push(last_work_input);
+            len_works++;
 
             // this.sa.x + 1 because the user can enter an earlier due date and cut off works at the due date, which messes up soft due dates without this
             if ([this.sa.x, this.sa.x + 1].includes(len_works + this.sa.blue_line_start) && last_work_input < this.sa.y
                 && this.sa.soft)
                 this.incrementDueDate();
             // Will never run if incrementDueDate() is called
-            if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
+            else if (len_works + this.sa.blue_line_start === this.sa.x + 1) {
                 this.sa.works.pop();
                 not_applicable_message_title = "End of Assignment.";
                 not_applicable_message_description = "You've reached the end of this assignment; there are no more work inputs to submit.";
@@ -1156,28 +1465,38 @@ class VisualAssignment extends Assignment {
                 });
                 return;
             }
+
+            // This check does nothing 100% of the time as todo is anyways 0 for break days
+
+            // if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works - 1) % 7)) {
+            //     todo = 0;
+            // }
             
-            // +Add this check for setDynamicModeIfInDynamicMode
+            // +Add this check for setDynamicMode
             // -Old dynamic_starts, although still valid, may not be the closest value to len_works + this.sa.blue_line_start, and this can cause inconsistencies
-            // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode
-            // Autotune and setDynamicStartIfInDynamicMode somewhat fix this but fails with high minimum work times
+            // +However, removing this check causes low skew ratios to become extremely inaccurate in dynamic mode,
+                // Autotune and setDynamicStart somewhat fix this but fails with high minimum work times
             // -However, this isn't really that much of a problem; I can just call this a "feature" of dynamic mode in that it tries to make stuff linear. Disabling this makes dynamic mode completely deterministic in its red line start
+            // +nm we kinda need this check or else dynamic mode makes like no sense at all, screw those "inconsistencies" i mentioned earlier i dont wanna make stuff unexpected for the user;
+                // these inconsistencies are frankly not really that relevant, and dynamic mode is fine to not be completely deterministic
+                // the fact that setDynamicStart uses a linear search algorithm now
+                // almost guarantees calling it again will yield the same, current dynamic start
 
-            // Remember to add this check to the above autotune if I decide to add this back
+            // don't also forget to add this check to autofill all work done AND autofill no work done if i decide to remove it
+            // don't also forget to rework delete_work_input_button and parabola.js if i decide to remove/modify it
 
-            // Also remember to add this code if this is added back:
-            // let todo_for_blue_line_end = this.funct(len_works + this.sa.blue_line_start + 1) - last_work_input;
-            // if (this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + len_works) % 7)) {
-            //     todo_for_blue_line_end = 0;
-            // }
-            
-            // if (input_done !== todo_for_blue_line_end) {
-                for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-                    this.setDynamicStartIfInDynamicMode();
-                    this.autotuneSkewRatioIfInDynamicMode();
-                }
-                this.setDynamicStartIfInDynamicMode();
-            // }
+            // TODO: say you have two assignments with the same x1 value but assignment 2 has break days. Say todo is 0.5, and you complete
+            // two units of work on the first assignment. This will cause the curvatuve to autotune. However, if you complete 1.5 units
+            // during the second assignment's break days, and then 0.5 units of work on a work day, the curvature won't autotune because
+            // input_done === todo, but works_without_break_days is the same as assignment #1. There are three approaches I can take to this
+            // problem:
+            // 1) Don't autotune in this case, as autotuning would violate the input_done !== todo functionality of dynamic mode
+            // 2) Autotune in this case, as break days are supposed to be completely ignored from the code's perspective
+            // 3) Ignore this because this is an insanely irrelevant edge case that I am stupidly overthinking and wasting time on
+            // Currently going w/option 3 8')
+            if (input_done !== todo && !this.sa.fixed_mode) {
+                this.refreshDynamicMode();
+            }
 
             ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {works: this.sa.works.map(String), id: this.sa.id});
             
@@ -1196,7 +1515,8 @@ class VisualAssignment extends Assignment {
                 this.set_skew_ratio_using_graph = false;
                 this.sa.skew_ratio = original_skew_ratio;
                 original_skew_ratio = undefined;
-                this.setDynamicStartIfInDynamicMode();
+                if (!this.sa.fixed_mode)
+                    this.setDynamicStart();
                 this.draw();
                 // No need to ajax since skew ratio is the same
                 return;
@@ -1236,10 +1556,10 @@ class VisualAssignment extends Assignment {
             } else {
                 this.red_line_start_x = this.sa.dynamic_start;
                 this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
+                // Don't sa.autotuneSkewRatio() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
+                // However, we still need to call setDynamicStart() to compensate if the skew ratio in fixed mode was modified
+                this.setDynamicStart();
             }
-            // Don't sa.autotuneSkewRatioIfInDynamicMode() because we don't want to change the skew ratio when the user hasn't submitted any work inputs
-            // However, we still need to call setDynamicStartIfInDynamicMode() to compensate if the skew ratio in fixed mode was modified
-            this.setDynamicStartIfInDynamicMode();
             new Priority().sort();
         }).text(fixed_mode_button.attr(`data-${this.sa.fixed_mode ? "dynamic" : "fixed"}-mode-label`));
         }
@@ -1249,13 +1569,11 @@ class VisualAssignment extends Assignment {
     positionTags() {
         const dom_tags = this.dom_assignment.find(".tags");
         if (VIEWING_DELETED_ASSIGNMENTS) {
-            if (SETTINGS.horizontal_tag_position === "Left" && SETTINGS.vertical_tag_position === "Top") {
-                SETTINGS.horizontal_tag_position = "Middle";
-                dom_tags.removeClass("tags-left").addClass("tags-middle");
-            } else if (SETTINGS.horizontal_tag_position === "Middle" && SETTINGS.vertical_tag_position === "Bottom") {
+            // we don't want to remove tags-left etc because of might mess up css positioning
+            if (SETTINGS.horizontal_tag_position === "Middle")
                 SETTINGS.horizontal_tag_position = "Left";
+            if (dom_tags.hasClass("tags-middle"))
                 dom_tags.removeClass("tags-middle").addClass("tags-left");
-            }
         }
         switch (SETTINGS.horizontal_tag_position) {
             case "Left": {
@@ -1273,12 +1591,20 @@ class VisualAssignment extends Assignment {
                 let title_top = dom_left_side_of_header[0].offsetTop;
                 let title_height = dom_left_side_of_header.height();
                 if (SETTINGS.vertical_tag_position === "Bottom") {
-                    // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
-                    title_height += Math.max(0, dom_title.getPseudoStyle("::after", "height") - parseFloat(dom_title.css("--smush-daysleft")));
+                    var pseudo_height = dom_title.getPseudoStyle("::after", "height");
+                    if (pseudo_height === "auto") {
+                        pseudo_height = 0;
+                    }
+                    pseudo_height -= parseFloat(dom_title.css("--smush-daysleft"));
                 } else if (SETTINGS.vertical_tag_position === "Top") {
-                    // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
-                    title_height += Math.max(0, dom_title.getPseudoStyle("::before", "height") - parseFloat(dom_title.css("--smush-priority")));
+                    var pseudo_height = dom_title.getPseudoStyle("::before", "height");
+                    if (pseudo_height === "auto") {
+                        pseudo_height = 0;
+                    }
+                    pseudo_height -= parseFloat(dom_title.css("--smush-priority"))
                 }
+                // Use Math.max so the height doesnt get subtracted if the psuedo element's height is 0
+                title_height += Math.max(0, pseudo_height);
 
                 // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
                 const padding_to_add = title_top + title_height - tag_top + parseFloat(dom_tags.css("--tags-left--margin-bottom"));
@@ -1301,6 +1627,8 @@ class VisualAssignment extends Assignment {
         }
     }
     displayTruncateWarning() {
+        // remove for now
+        return;
         const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
         dom_left_side_of_header.toggleClass("display-truncate-warning", dom_left_side_of_header.find(".description").hasOverflown());
     }
@@ -1308,6 +1636,7 @@ class VisualAssignment extends Assignment {
         return !this.sa.needs_more_info;
     }
 }
+window.VisualAssignment = VisualAssignment;
 let already_ran_tutorial = false;
 let prevent_click = false;
 $(function() {

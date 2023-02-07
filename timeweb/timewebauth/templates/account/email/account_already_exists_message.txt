@@ -1,0 +1,8 @@
+{% extends "account/email/base_message.txt" %}
+
+{% block content %}You are receiving this e-mail because you or someone else tried to signup for a
+TimeWeb account using your e-mail address.
+
+However, an account using this address already exists. In case you forgot,
+please reset your password to recover your account:
+{{ password_reset_url }}{% endblock %}

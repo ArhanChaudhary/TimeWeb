@@ -6,23 +6,52 @@ from django import forms
 from colorfield.widgets import ColorWidget
 from .models import SettingsModel
 from django.forms.widgets import ClearableFileInput
+from django.utils.safestring import mark_safe
 
 class CustomImageFieldWidget(ClearableFileInput):
-    clear_checkbox_label = _('Clear image')
-    input_text = _('Change image')
+    clear_checkbox_label = _('Clear current image')
+    input_text = _('Change current image')
     template_name = 'navbar/widgets/clearable_file_input.html'
 
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = SettingsModel
-        exclude = ("oauth_token", "added_gc_assignment_ids", "user")
+        exclude = ("oauth_token", "added_gc_assignment_ids", "user", "gc_courses_cache", "device_uuid", "device_uuid_api_timestamp")
         extra_fields = {
             "enable_gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
+                    help_text=mark_safe('Imports assignments from Google Classroom to TimeWeb. Some assignments are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.'),
                     required=False,
                 ),
-                "order": "before immediately_delete_completely_finished_assignments",
+                "order": "before gc_assignments_always_midnight",
+            },
+            "calendar_integration": {
+                "field": forms.BooleanField(
+                    label="Google Calendar Integration",
+                    required=False,
+                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    help_text="Not yet implemented.",
+                ),
+                "order": "after enable_gc_integration",
+            },
+            "notifications_integration": {
+                "field": forms.BooleanField(
+                    label="Notifications Integration",
+                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    help_text="Not yet implemented.",
+                    required=False,
+                ),
+                "order": "after calendar_integration",
+            },
+            "canvas_integration": {
+                "field": forms.BooleanField(
+                    label="Canvas Integration",
+                    help_text="Not yet implemented.",
+                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    required=False,
+                ),
+                "order": "after notifications_integration",
             },
             "view_deleted_assignments": {
                 "field": forms.BooleanField(
@@ -42,6 +71,9 @@ class SettingsForm(forms.ModelForm):
             'default_dropdown_tags': forms.Textarea(attrs={"rows": "", "cols": ""}),
             'background_image': CustomImageFieldWidget(),
             'seen_latest_changelog': forms.HiddenInput(),
+            'nudge_calendar': forms.HiddenInput(),
+            'nudge_notifications': forms.HiddenInput(),
+            'nudge_canvas': forms.HiddenInput(),
         }
         error_messages = {
             'def_min_work_time': {
@@ -59,15 +91,19 @@ class SettingsForm(forms.ModelForm):
         }
         help_texts = {
             "def_skew_ratio": "Set this value to 0 to make it linear.",
+            "def_min_work_time": "Enter this value in minutes. If you typically complete longer periods of work at a time, set this to a high value (such as 60 minutes or 90 minutes).",
             "loosely_enforce_minimum_work_times": "Ignores every assignments' minimum work time on their first and last working days in exchange for making their work distributions smoother. Recommended to be turned on.",
             "show_priority": "Displays the priority percentage and color for every assignment.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
+            "appearance": "Lesser dark mode doesn't color your assignment titles.",
             "animation_speed": "Controls the speed of most animations.",
-            "timezone": "Backend calculations use your browser's timezone. If your browser doesn't imply your timezone, choose your timezone here.",
+            "timezone": "Backend calculations use your browser's timezone. Choose your timezone here if you wish to change it.",
             "sorting_animation_threshold": "Only do the assignment sorting animation when there are this many assignments or less. Due to performance lag as the number of assignments increase, enter a higher number if your device is high-end and a lower number if your device is low-end.",
-            "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished (marked with a star icon). Deleted assignments can be recovered and restored from the deleted assignments view.",
+            "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished by your work inputs. Ignores assignments that are marked as completely finished from their due dates passing. Deleted assignments can be recovered and restored from the deleted assignments view.",
+            "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",
+            "gc_assignments_always_midnight": mark_safe("Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM.<br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to 12:00 AM.<br><br>Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created."),
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):
@@ -87,16 +123,37 @@ class SettingsForm(forms.ModelForm):
         
         assert len(extra_fields_after_map) + len(extra_fields_before_map) == len(SettingsForm.Meta.extra_fields), "invalid order in extra_fields"
 
-        new_keyorder = list(self.fields.keys())
-        for k, v in extra_fields_after_map.items():
-            new_keyorder.insert(new_keyorder.index(k) + 1, v)
-        for k, v in reversed(extra_fields_before_map.items()):
-            new_keyorder.insert(new_keyorder.index(k), v)
+        try:
+            new_keyorder = list(self.fields.keys())
+            for k, v in extra_fields_after_map.items():
+                new_keyorder.insert(new_keyorder.index(k) + 1, v)
+            for k, v in reversed(extra_fields_before_map.items()):
+                new_keyorder.insert(new_keyorder.index(k), v)
+        except ValueError:
+            new_keyorder = list(self.fields.keys())
+            for k, v in reversed(extra_fields_before_map.items()):
+                new_keyorder.insert(new_keyorder.index(k), v)
+            for k, v in extra_fields_after_map.items():
+                new_keyorder.insert(new_keyorder.index(k) + 1, v)
         # Rebuild the form with the new keyorder
         # Weird {"field": None} logic because the default value is still evaluated even if the key is found for .get
         self.fields = {k: self.fields.get(k, SettingsForm.Meta.extra_fields.get(k, {"field": None})["field"]) for k in new_keyorder}
         self.label_suffix = ""
+    def clean_default_dropdown_tags(self):
+        default_dropdown_tags = self.cleaned_data["default_dropdown_tags"]
+        if default_dropdown_tags is None:
+            # to_python in JSONField.clean in save_assignment converts [] to None, but tags has a non-null constraint
+            # revert it back to []
 
+            # also works for when assignments are created (can even work with None too because of default=[] in tags)
+            # (dont actually use null for save_assignment)
+            return []
+        if any(len(tag) > MAX_TAG_LENGTH for tag in default_dropdown_tags):
+            raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
+        return default_dropdown_tags
+
+# needs to be down here due to circular imports
+from timewebapp.views import MAX_TAG_LENGTH
 
 class ContactForm(BaseContactForm):
     body = forms.CharField(widget=forms.Textarea, label=_("Ask me anything"))

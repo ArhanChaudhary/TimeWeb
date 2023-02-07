@@ -1,4 +1,4 @@
-utils = {
+window.utils = {
 formatting: {
 stringifyDate: function(date) {
     if (!date instanceof Date) return "";
@@ -14,6 +14,24 @@ formatMinutes: function(total_minutes) {
     if (!hour) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
     if (!minute) return hour + "h";
     return hour + "h " + minute + "m";
+},
+formatSeconds: function(total_seconds) {
+    // https://stackoverflow.com/questions/30679279/how-to-convert-seconds-into-year-month-days-hours-minutes-respectively
+    let y = Math.floor(total_seconds / 31536000);
+    let mo = Math.floor((total_seconds % 31536000) / 2628000);
+    let d = Math.floor(((total_seconds % 31536000) % 2628000) / 86400);
+    let h = Math.floor((total_seconds % (3600 * 24)) / 3600);
+    let m = Math.floor((total_seconds % 3600) / 60);
+    let s = Math.floor(total_seconds % 60);
+
+    let yDisplay = y > 0 ? y + "y" : "";
+    let moDisplay = mo > 0 ? mo + "mo" : "";
+    let dDisplay = d > 0 ? d + "d" : "";
+    let hDisplay = h > 0 ? h + "h" : "";
+    let mDisplay = m > 0 ? m + "m" : "";
+    let sDisplay = s > 0 ? s + "s" : "";
+    let displays = [yDisplay, moDisplay, dDisplay, hDisplay, mDisplay, sDisplay];
+    return displays.filter(d => d).slice(0, 2).join(" ");
 },
 // https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
 hexToRGB: function(hex) {
@@ -116,6 +134,9 @@ getReversibilityStatus: function() {
 ui: {
 tickClock: function() {
     const now = utils.getRawDateNow();
+    if (utils.ui.tickClock.oldNow === undefined) {
+        utils.ui.tickClock.oldNow = now;
+    }
     const estimated_completion_time = new Date(now.valueOf());
     const minute_value = estimated_completion_time.getMinutes();
 
@@ -127,12 +148,51 @@ tickClock: function() {
     // https://stackoverflow.com/questions/42879023/remove-leading-zeros-from-time-format
     str = str.replace(/^[0:]+(?=\d[\d:]{3})/,"");
     $("#estimated-completion-time").text(` (${str})`);
-    utils.ui.old_minute_value = minute_value;
+    if (!VIEWING_DELETED_ASSIGNMENTS &&
+        // Don't tickClock in simulation or else Priority.sort calls tickClock which calls Priority.sort again
+        // this messes up current_translate_value *= 0.9
+        !utils.in_simulation) {
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        if (midnight.valueOf() !== date_now.valueOf()) {
+            // Don't reload in the next day to preserve changes made in the simulation
+            // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
+            if (utils.in_simulation || isExampleAccount) return;
+            reloadWhenAppropriate();
+        }
 
-    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    if (midnight.valueOf() !== date_now.valueOf()) {
-        if (utils.in_simulation || isExampleAccount) return;
-        reloadWhenAppropriate();
+        // We can't simply define a setTimeout until every assignment's due date. Here's why:
+        // 1) Due dates can be changed if an assignment is soft, outdating the setTimeout
+        // 2) setTimeouts may not run if a device is on sleep or powered off, considering there is only one opportunity for it to run
+        let now_due_dates_passed = 0;
+        for (let sa of dat) {
+            let complete_due_date = new Date(sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.complete_x));
+            if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
+                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            }
+
+            if (complete_due_date.valueOf() <= now.valueOf()) {
+                now_due_dates_passed++;
+            }
+        }
+
+        let old_now_due_dates_passed = 0;
+        for (let sa of dat) {
+            let complete_due_date = new Date(sa.assignment_date.valueOf());
+            complete_due_date.setDate(complete_due_date.getDate() + Math.floor(sa.complete_x));
+            if (sa.due_time && (sa.due_time.hour || sa.due_time.minute)) {
+                complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.due_time.hour * 60 + sa.due_time.minute);
+            }
+
+            if (complete_due_date.valueOf() <= utils.ui.tickClock.oldNow.valueOf()) {
+                old_now_due_dates_passed++;
+            }
+        }
+        utils.ui.tickClock.oldNow = now;
+
+        if (old_now_due_dates_passed !== now_due_dates_passed) {
+            new Priority().sort();
+        }      
     }
 },
 setClickHandlers: {
@@ -146,16 +206,11 @@ setClickHandlers: {
                 new VisualAssignment(dom_assignment).initUI();
             }
 
-            if ($this.hasClass("slashed")) {
-                dom_assignment.find(".delete-work-input-button").click();
-            } else {
-                dom_assignment.find(".work-input-textbox").val("fin");
-                dom_assignment.find(".submit-work-button").click();
-                // The "Close graph after work input" setting handles all of this ux for us
-                // if (dom_assignment.hasClass('open-assignment') && $this.hasClass("slashed")) {
-                //     dom_assignment.click();
-                // }
+            if (!dom_assignment.hasClass("open-assignment")) {
+                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement();
             }
+            dom_assignment.find(".work-input-textbox").val("fin");
+            dom_assignment.find(".submit-work-button").click();
         });
     },
     assignmentsHeaderUI: function() {
@@ -210,6 +265,13 @@ setClickHandlers: {
             });
 
         });
+        let raw_date_now = new Date();
+        if (raw_date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && raw_date_now.getHours() < 4) {
+            // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
+            // this alert is for fellow insomniacs who lose track of time
+            $("#current-date-container").append("<span id=\"currently-has-changed-notice\">(has changed)</span>");
+        }
+        localStorage.setItem("last_visit", raw_date_now.valueOf());
     },
 
     assignmentSorting: function() {
@@ -220,122 +282,119 @@ setClickHandlers: {
         });
     },
 
-    deleteAllStarredAssignments: function() {
-        $("#delete-starred-assignments .generic-button").click(function() {
-            $.confirm({
-                title: `Are you sure you want to delete ${$(".finished").length} starred ${pluralize("assignment", $(".finished").length)}?`,
-                content: utils.formatting.getReversibilityStatus(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            const assignment_ids_to_delete = $(".assignment-container.finished").map(function() {
-                                const dom_assignment = $(this).children(".assignment");
-                                const _sa = utils.loadAssignmentData(dom_assignment);
-                                return _sa.id;
-                            }).toArray();
-                            const success = function() {
-                                new Crud().transitionDeleteAssignment($(".finished > .assignment"));
-                            }
-                            if (ajaxUtils.disable_ajax) {
-                                success();
-                                return;
-                            }
-                            $.ajax({
-                                type: "POST",
-                                url: "/api/delete-assignment",
-                                data: {assignments: assignment_ids_to_delete},
-                                success: success,
-                                error: ajaxUtils.error,
-                            });
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
-                }
-            });
+    shortcuts: function() {
+        const shortcuts = [
+{
+    selector: ".delete-starred-assignments .generic-button",
+    // cannot use arrow function to preserve `this`
+    confirmAction: function(params) {
+        const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
+            return utils.loadAssignmentData($(this)).id;
+        }).toArray();
+        const success = function() {
+            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+        }
+        $.ajax({
+            type: "POST",
+            url: "/api/delete-assignment",
+            data: {assignments: JSON.stringify(assignment_ids_to_delete)},
+            success: success,
+            error: ajaxUtils.error,
         });
     },
-
-    autofillWorkDone: function() {
-        $("#autofill-work-done .generic-button:not(select)").click(function(e) {
-            $.confirm({
-                title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done?`,
-                content: (function() {
-                    switch ($("#autofill-selection").val()) {
-                        case "No":
-                            return "Assumes you haven't done anything since your last work input and autofills in no work done until today";
-                        case "All":
-                            return "Assumes you followed your work schedule since your last work input and autofills in all work done until today";
-                    }
-                })(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            const params = {};
-                            params[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = true;
-                            new Priority().sort(params);
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
+    generateJConfirmParams: function(params) {
+        return {
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} starred ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            content: utils.formatting.getReversibilityStatus(),
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: () => this.confirmAction(params),
+                },
+                cancel: function() {
+                    
                 }
-            });
+            },
+        }
+    },
+},
+{
+    selector: ".autofill-work-done .generic-button:not(select)",
+    confirmAction: function(params) {
+        const params2 = {};
+        params2[`autofill_${$("#autofill-selection").val().toLowerCase()}_work_done`] = params.assignments_in_wrapper;
+        new Priority().sort(params2);
+    },
+    generateJConfirmParams: function(params) {
+        return {
+            title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done for ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            content: (function() {
+                switch ($("#autofill-selection").val()) {
+                    case "No":
+                        return "Assumes you haven't done anything since your last work input and autofills in no work done until today";
+                    case "All":
+                        return "Assumes you followed your work schedule since your last work input and autofills in all work done until today";
+                }
+            })(),
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: () => this.confirmAction(params),
+                },
+                cancel: function() {
+                    
+                }
+            }
+        }
+    },
+},
+{
+    selector: ".delete-gc-assignments-from-class .generic-button",
+    confirmAction: function(params) {
+        const success = function() {
+            params.$this.off("click");
+            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+        }
+        const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
+            return utils.loadAssignmentData($(this)).id;
+        }).toArray();
+        $.ajax({
+            type: "POST",
+            url: "/api/delete-assignment",
+            data: {assignments: JSON.stringify(assignment_ids_to_delete)},
+            success: success,
+            error: ajaxUtils.error,
         });
     },
+    generateJConfirmParams: function(params) {
+        return {
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)} from class "${utils.loadAssignmentData(params.assignment_container.children(".assignment")).tags[0]}"?<br>(A Google Classroom assignment's first tag is considered its class name)`,
+            content: utils.formatting.getReversibilityStatus(),
+            buttons: {
+                confirm: {
+                    keys: ['Enter'],
+                    action: () => this.confirmAction(params),
+                },
+                cancel: function() {
+                    
+                }
+            }
+        }
+    }
+}
+        ];
 
-    deleteAssignmentsFromClass: function() {
         $(document).click(function(e) {
             let $this = $(e.target);
-            if (!($this.hasClass("generic-button") && $this.parents(".delete-gc-assignments-from-class").length)) return;
-            const assignment_container = $this.parents(".assignment-container");
-            const dom_assignment = assignment_container.children(".assignment");
-            const sa = utils.loadAssignmentData(dom_assignment);
-            if (assignment_container.hasClass("last-add-line-wrapper")) {
-                var assignments_to_delete = assignment_container;
-            } else {
-                const end_of_line_wrapper = assignment_container.nextAll(".assignment-container.last-add-line-wrapper").first();
-                // Adding a filter to ensure nextUntil doesn't accidentally delete external assignments isn't necessary because this shortcut should never get broken up and the wrapper should remain continuous
-                var assignments_to_delete = assignment_container.nextUntil(end_of_line_wrapper).addBack().add(end_of_line_wrapper);//.filter(assignment_container => 
-            }
-            assignments_to_delete = assignments_to_delete.children(".assignment");
-            $.confirm({
-                title: `Are you sure you want to delete ${assignments_to_delete.length} ${pluralize("assignment", assignments_to_delete.length)} from class "${sa.tags[0]}"?<br>(An assignment's class name is its first tag)`,
-                content: utils.formatting.getReversibilityStatus(),
-                buttons: {
-                    confirm: {
-                        keys: ['Enter'],
-                        action: function() {
-                            const success = function() {
-                                $this.off("click");
-                                new Crud().transitionDeleteAssignment(assignments_to_delete);
-                            }
-        
-                            if (ajaxUtils.disable_ajax) {
-                                success();
-                                return;
-                            }
+            const shortcut = shortcuts.find(s => $this.is(s.selector));
+            if (!shortcut) return;
 
-                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                                return utils.loadAssignmentData(dom_assignment).id;
-                            }).toArray();
-                            $.ajax({
-                                type: "POST",
-                                url: "/api/delete-assignment",
-                                data: {assignments: assignment_ids_to_delete},
-                                success: success,
-                                error: ajaxUtils.error,
-                            });
-                        }
-                    },
-                    cancel: function() {
-                        
-                    }
-                }
-            });
+            const assignment_container = $this.parents(".assignment-container");
+            const assignments_in_wrapper = utils.inLineWrapperQuery(assignment_container).children(".assignment");
+            if (e.shiftKey)
+                shortcut.confirmAction({assignments_in_wrapper, $this});
+            else
+                $.confirm(shortcut.generateJConfirmParams({assignments_in_wrapper, assignment_container, $this}));
         });
     },
 },
@@ -358,7 +417,7 @@ addTagHandlers: function() {
             tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
         });
     }
-    // might be easier to attach the click to $(document) but will do later
+    // TODO: might be easier to attach the click to $(document) but will do later
     $(".tag-add").click(tagAddClick);
     let tag_names = new Set();
     function tagAddClick(e) {
@@ -400,69 +459,51 @@ addTagHandlers: function() {
                 tag_names = new Set();
                 return;
             }
-            const success = function() {
-                if (utils.ui.close_on_success) {
-                    utils.ui.close_on_success = false;
-                    $this.find(".tag-add-input").blur();
-                }
-                // Add tags to dat locally
-                sa.tags.push(...tag_names);
 
-                // There are too many conditions on whether to sort or not, so just sort every time
-
-                // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
-                // "important" and "not important" because they were designed to affect priority
-                // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
-                    new Priority().sort();
-                // }
-
-                // Close box and add tags visually
-                dom_assignment.removeClass("open-tag-add-box");
-                transitionCloseTagBox($this);
-                for (let tag_name of tag_names) {
-                    const tag = $($("#tag-template").html());
-                    tag.find(".tag-name").text(tag_name);
-                    tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
-                    tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
-
-                    tag.addClass("tag-add-transition-disabler");
-                    // Need to use jquery instead of css to set marginLeft
-                    tag.css({
-                        marginLeft: -tag.outerWidth(true),
-                        opacity: "0",
-                        transform: "scale(0.6)",
-                    });
-                    tag[0].offsetHeight;
-                    tag.removeClass("tag-add-transition-disabler");
-                    tag.css({
-                        marginLeft: "",
-                        opacity: "",
-                        transform: "",
-                    });
-
-                    tag.prev().css("z-index", "1");
-                    tag.one("transitionend", function() {
-                        tag.prev().css("z-index", "");
-                    });
-                }
-                tag_names = new Set();
+            if (utils.ui.close_on_success) {
+                utils.ui.close_on_success = false;
+                $this.find(".tag-add-input").blur();
             }
-            
-            // !tag_names.length to not send an ajax if removing duplicates yield an empty tag list
-            if (ajaxUtils.disable_ajax || !tag_names.size) {
-                success();
-                return;
-            }
-            $.ajax({
-                type: "POST",
-                url: "/api/tag-add",
-                data: {
-                    pk: sa.id,
-                    tag_names: [...tag_names],
-                },
-                success: success,
-                error: ajaxUtils.error,
-            });
+            // Close box and add tags visually
+            dom_assignment.removeClass("open-tag-add-box");
+            transitionCloseTagBox($this);
+            for (let tag_name of tag_names) {
+                const tag = $($("#tag-template").html());
+                tag.find(".tag-name").text(tag_name);
+                tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
+                tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
+
+                tag.addClass("tag-add-transition-disabler");
+                // Need to use jquery instead of css to set marginLeft
+                tag.css({
+                    marginLeft: -tag.outerWidth(true),
+                    opacity: "0",
+                    transform: "scale(0.6)",
+                });
+                tag[0].offsetHeight;
+                tag.removeClass("tag-add-transition-disabler");
+                tag.css({
+                    marginLeft: "",
+                    opacity: "",
+                    transform: "",
+                });
+
+                tag.prev().css("z-index", "1");
+                tag.one("transitionend", function() {
+                    tag.prev().css("z-index", "");
+                });
+            }            
+            if (!tag_names.size) return;
+            sa.tags.push(...tag_names);
+            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
+            // There are too many conditions on whether to sort or not, so just sort every time
+
+            // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
+            // "important" and "not important" because they were designed to affect priority
+            // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+                new Priority().sort();
+            // }
+            tag_names = new Set();
             return;
         }
         // Tag add textbox was selected or tags were selected
@@ -523,50 +564,32 @@ addTagHandlers: function() {
         tag_wrapper.addClass("keep-delete-open");
         
         const sa = utils.loadAssignmentData($this);
-        const data = {
-            pk: sa.id,
-            tag_names: [$this.attr("data-tag-deletion-name")],
-        }
-        const success = function() {
-            // Remove data locally from dat
-            sa.tags = sa.tags.filter(tag_name => !data.tag_names.includes(tag_name));
+        const tag_name_to_delete = [$this.attr("data-tag-deletion-name")];
+        // Remove data locally from dat
+        sa.tags = sa.tags.filter(tag_name => !tag_name_to_delete.includes(tag_name));
 
-            // There are too many conditions on whether to sort or not, so just sort every time
+        // There are too many conditions on whether to sort or not, so just sort every time
 
-            // GC class tags
-            // if (sa.is_google_classroom_assignment && sa.needs_more_info || data.tag_names.includes("Important") || data.tag_names.includes("Not Important")) {
-                new Priority().sort();
-            // }
+        // GC class tags
+        // if (sa.is_google_classroom_assignment && sa.needs_more_info || tag_name_to_delete.includes("Important") || tag_name_to_delete.includes("Not Important")) {
+            new Priority().sort();
+        // }
 
-            tag_wrapper.addClass("tag-is-deleting");
-            // Transition the deletion
-            // Need to use jquery to set css for marginLeft
-            tag_wrapper.css({
-                marginLeft: -tag_wrapper.outerWidth(true),
-                opacity: "0",
-                transform: "scale(0.6)",
-            });
-            tag_wrapper.prev().css("z-index", "1");
-            tag_wrapper.one("transitionend", function() {
-                tag_wrapper.prev().css("z-index", "");
-                tag_wrapper.remove();
-            });
-            $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
-        }
-        if (ajaxUtils.disable_ajax) {
-            success();
-            return;
-        }
-        $.ajax({
-            type: "DELETE",
-            url: "/api/tag-delete",
-            data: data,
-            success: success,
-            error: function() {
-                tag_wrapper.removeClass("keep-delete-open");
-                ajaxUtils.error.bind(this)(...arguments);
-            }
+        tag_wrapper.addClass("tag-is-deleting");
+        // Transition the deletion
+        // Need to use jquery to set css for marginLeft
+        tag_wrapper.css({
+            marginLeft: -tag_wrapper.outerWidth(true),
+            opacity: "0",
+            transform: "scale(0.6)",
         });
+        tag_wrapper.prev().css("z-index", "1");
+        tag_wrapper.one("transitionend", function() {
+            tag_wrapper.prev().css("z-index", "");
+            tag_wrapper.remove();
+        });
+        $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
     }
     $(".tag-add").focusout(function() {
         const $this = $(this);
@@ -584,6 +607,11 @@ addTagHandlers: function() {
     });
     $(".tag-sortable-container").sortable({
         animation: 150,
+        // some mobile phones consider a tap to be a drag,
+        // preventing tag deletion
+        delay: 200,
+        delayOnTouchOnly: true,
+
         ghostClass: "ghost",
         direction: "horizontal",
         onMove: function(e) {
@@ -613,7 +641,10 @@ addTagHandlers: function() {
 setKeybinds: function() {
 $(document).keydown(function(e) {
 if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["e", "Backspace", "s", "f", "n"].includes(e.key)) return;
+    || VIEWING_DELETED_ASSIGNMENTS && ["Backspace", "s", "f", "n"].includes(e.key)
+    || e.originalEvent.repeat && ["Backspace", "s", "f", "0"].includes(e.key)) return;
+const form_is_showing = $("#overlay").is(":visible");
+const form_is_hidden = !form_is_showing;
 switch (e.key) {
     case "n":
     case "e":
@@ -623,15 +654,17 @@ switch (e.key) {
     case "Backspace":
     case "s":
     case "f":
+    case "0":
     case "o":
     case "c":
     case "t":
-        if ($(document.activeElement).prop("tagName").toLowerCase() !== "input")
+        if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
         switch (e.key) {
             case "n":
-                setTimeout(() => { // Fix typing on the assignment form itself
-                    !$("#overlay").is(":visible") && $("#image-new-container").click();
-                }, 0);
+                if (form_is_showing) return;
+                $("#image-new-container").click();
+                // Fix typing on the assignment form itself
+                e.preventDefault();
                 break;
             case "t":
                 $("#assignments-container").scrollTop(0);
@@ -643,6 +676,7 @@ switch (e.key) {
             case "Backspace":
             case "s":
             case "f":
+            case "0":
             case "o":
             case "c":
                 let assignment_container = $(":hover").filter(".assignment-container");
@@ -658,10 +692,10 @@ switch (e.key) {
                             dom_assignment.click();
                             break;
                         case "e":
+                            if (form_is_showing) return;
+                            assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
                             // Fix typing on the assignment form itself
-                            setTimeout(function() {
-                                assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                            }, 0);
+                            e.preventDefault();
                             break;
                         case "d":
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
@@ -670,6 +704,7 @@ switch (e.key) {
                             const click_delete_button = $.Event("click");
                             click_delete_button.shiftKey = e.shiftKey;
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
+                            break;
                         }
                         case "r":
                             assignment_container.find(".restore-button").parents(".assignment-header-button").focus().click();
@@ -677,8 +712,17 @@ switch (e.key) {
                         case "f":
                             assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
                             break;
+                        case "0":
+                            if (!dom_assignment.hasClass("open-assignment")) {
+                                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement()
+                            }
+                            dom_assignment.find(".work-input-textbox").val("0");
+                            dom_assignment.find(".submit-work-button").click();
+                            break;
                         case "Backspace":
                         case "s":
+                            // I would animate the arrow for Backspace too but 
+                            // that only works when an assignment is open
                             if (dom_assignment.hasClass("open-assignment")) {
                             switch (e.key) {
                                 case "Backspace":
@@ -690,8 +734,10 @@ switch (e.key) {
                             }
                             // We can't use a normal .click().focus() or else
                             // a graph button out of view scrolls it all the way to the middle of the page
-                            graph_button[0].scrollIntoView({block: "nearest"});
                             graph_button.click();
+                            // scroll AFTER it is clicked, the click even may call Priority.sort and further
+                            // alter the position of the graph button
+                            graph_button[0].scrollIntoView({block: "nearest"});
                             setTimeout(() => graph_button.focus(), 0);
                             }
                             break;
@@ -701,74 +747,16 @@ switch (e.key) {
         }
         break;
     case "Escape":
+        // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
         new Crud().hideForm();
         break;
     case "ArrowDown":
     case "ArrowUp":
+        if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
         const open_assignmens_on_screen = $(".open-assignment").filter(function() {
             return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
         });
-        if (e.shiftKey) {
-            if (e.key === "ArrowDown") {
-                // If there is an open assignment in view, select that one and 
-                const first_open_assignment = $(".assignment.open-assignment").first();
-                if (first_open_assignment.length) {
-                    var assignment_to_be_opened = first_open_assignment.parents(".assignment-container").nextAll(".assignment-container").children(".assignment")
-                        .filter(function() {
-                            return new VisualAssignment($(this)).canOpenAssignment();
-                        }).first();
-                    first_open_assignment[0].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                    });
-                } else {
-                    var assignment_to_be_opened = $(".assignment")
-                        .filter(function() {
-                            return new VisualAssignment($(this)).canOpenAssignment();
-                        }).first();
-                    if (!assignment_to_be_opened.length) return;
-                    assignment_to_be_opened[0].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                    });
-                }
-                first_open_assignment.click();
-                if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                    assignment_to_be_opened.click();
-                }
-            } else if (e.key === "ArrowUp") {
-                // If there is an open assignment in view, select that one and 
-                const last_open_assignment = $(".assignment.open-assignment").last();
-                if (last_open_assignment.length) {
-                    var assignment_to_be_opened = last_open_assignment.parents(".assignment-container").prevAll(".assignment-container").children(".assignment")
-                        .filter(function() {
-                            return new VisualAssignment($(this)).canOpenAssignment();
-                        }).first();
-                    if (assignment_to_be_opened.length) {
-                        assignment_to_be_opened[0].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                        });
-                    }
-                } else {
-                    var assignment_to_be_opened = $(".assignment")
-                        .filter(function() {
-                            return new VisualAssignment($(this)).canOpenAssignment();
-                        }).last();
-                    if (!assignment_to_be_opened.length) return;
-                }
-                last_open_assignment.click();
-                if (!assignment_to_be_opened.hasClass("open-assignment")) {
-                    assignment_to_be_opened.click();
-                }
-                if (!last_open_assignment.length) {
-                    assignment_to_be_opened[0].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'end',
-                    });        
-                }
-            }
-        } else if (open_assignmens_on_screen.length !== 0) {
+        if (open_assignmens_on_screen.length !== 0) {
             // Prevent arrow scroll
             e.preventDefault();
         } else {
@@ -866,7 +854,7 @@ graphAlertTutorial: function(days_until_due) {
     $(document.activeElement).blur();
 
     $.alert({
-        title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
+        title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\" target=\"_blank\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
         content: "Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.",
         backgroundDismiss: false,
         alignTop: true, // alignTop is a custom extension
@@ -955,7 +943,8 @@ saveAndLoadStates: function() {
     // Saves current open assignments and scroll position to localstorage and sessionstorage if refreshed or redirected
     // Use beforeunload instead of unload or else the loading screen triggers and $("#assignments-container").scrollTop() becomes 0
     $(window).on('beforeunload', function() {
-        if (!SETTINGS.enable_tutorial) {
+        sessionStorage.setItem("login_email", ACCOUNT_EMAIL);
+        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
                 $(".assignment.open-assignment").map(function() {
@@ -963,7 +952,7 @@ saveAndLoadStates: function() {
                 }).toArray()
             ));
             // Save scroll position
-            localStorage.setItem("scroll", $("#assignments-container").scrollTop());
+            sessionStorage.setItem("scroll", $("#assignments-container").scrollTop());
         }
         let block = false;
         // Send all queued ajax requests
@@ -987,31 +976,32 @@ saveAndLoadStates: function() {
 
     // Ensure fonts load for the graph
     document.fonts.ready.then(function() {
-        if (!SETTINGS.enable_tutorial) 
+        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS)
             // setTimeout so the assignments are clicked after the click handlers are set
             setTimeout(function() {
                 // Reopen closed assignments
                 if ("open_assignments" in sessionStorage) {
                     const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".assignment").filter(function() {
-                        return open_assignments.includes($(this).attr("data-assignment-id"));
-                    }).click();
+                    $(".assignment").each(function() {
+                        const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
+                        if (!was_open) return;
+
+                        // if you edit an open assignment and make it needs more info
+                        // ensure it isn't clicked
+                        const dom_assignment = $(this);
+                        const sa = new VisualAssignment(dom_assignment);
+                        if (sa.canOpenAssignment()) {
+                            dom_assignment.click();
+                        }
+                    });
                 }
 
                 // Scroll to original position
                 // Needs to scroll after assignments are opened
-                if ("scroll" in localStorage) {
-                    $("#assignments-container").scrollTop(localStorage.getItem("scroll"));
-                    localStorage.removeItem("scroll");
+                if ("scroll" in sessionStorage) {
+                    $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
                 }
             }, 0);
-        let date_now = new Date();
-        if (date_now.getDate() - new Date(+localStorage.getItem("last_visit")).getDate() === 1 && date_now.getHours() < 4) {
-            // if it's been a day since the last visit and it's before 4am, remind them that the current date has changed
-            // this alert is for fellow insomniacs who lose track of time
-            $("#current-date-container").append("<span id=\"currently-has-changed-notice\">(has changed)</span>");
-        }
-        localStorage.setItem("last_visit", date_now.valueOf());
     });
 },
 navClickHandlers: function() {
@@ -1032,36 +1022,39 @@ navClickHandlers: function() {
                     entirety of its beta and alpha phases.`,
         },
         {
-            title: "Special thanks to Charles P.",
-            content: `for designing TimeWeb's <a href="/favicon.ico">favicon</a>.`,
+            title: "Special thanks to Jeffery Zhang",
+            content: `for being one of my best friends through all of high school and for having the patience, interest, and intelligence to pioneer a core part of TimeWeb's <a href="
+                    https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
         },
         {
-            title: "Special thanks to Jeffery Zhang",
-            content: `for having the patience, interest, and intelligence to pioneer a core part of TimeWeb's <a href="
-                    https://github.com/ArhanChaudhary/TimeWeb/issues/3" target="_blank">curvature autotuning regression algorithm</a>.`,
+            title: "Special thanks to Ansh Bhatagnar",
+            content: `for carrying my sanity during history and math class and for being the most fun idiot to joke around and talk to. For also carrying my
+                    motivation over many study voice calls.`,
         },
         {
             title: "Special thanks to Adrian Zhang",
             content: `for being the coolest coder friend to relate and talk to and for somehow not going insane from listening to all of my ramblings
                     about school and life.`,
         },
-        {
-            title: "Special thanks to Rohan \"Baguette\" Bhagat",
-            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known for a
-                    long time and can feel comfortable talking and relating to about anything).`,
-        },
+        
         {
             title: "Special thanks to Vikram Srinivasan",
-            content: `for helping with the initial draft of TimeWeb's v1.8.0 user interface redesign.`,
+            content: `for being a reliable advisor for many of TimeWeb's core designs and functionalities, such as the initial draft of the
+                    v1.8.0 user interface redesign, and for being an active and playful member of TimeWeb's community. Special thanks to his
+                    phone, too, for being a constant victim to my testing.`,
+        },
+        {
+            title: "Special thanks to Rohan \"Baguette\" Bhagat",
+            content: `for being really annoying and teaching me the value of patience !1!! 😊 😊 (no but seriously for being someone I've known since middle school and can feel comfortable talking and relating to about anything.`,
+        },
+        {
+            title: "Special thanks to Charles P.",
+            content: `for designing TimeWeb's <a href="/favicon.ico">favicon</a>.`,
         },
         {
             title: "Special thanks to Rishi Jani",
             content: `for being someone genuine to talk to during 2020 and for continuing to support me all the way from the creation of TimeWeb in its
                     pre-alpha to today and onwards.`,
-        },
-        {
-            title: "Special thanks to Ansh Bhatagnar",
-            content: `for carrying my sanity during history and math class and for being the most fun idiot to joke around and talk to.`,
         },
         {
             title: "Special thanks to Abhik Mullick",
@@ -1070,7 +1063,11 @@ navClickHandlers: function() {
         },
         {
             title: "Special thanks to Shantanu Bulbule",
-            content: `for creating the legendary <a href="#">TIMEWEB CAR</a> :D.`,
+            content: `for creating the legendary <a href="https://imgur.com/a/OPU1Xcd" target="_blank">TIMEWEB CAR</a> :D.`,
+        },
+        {
+            title: "Special thanks to Andrew Sun",
+            content: `om g andrew mega suS (!!) +gets 100 we,b coin .`,
         },
         {
             title: "And most importantly, my mom and my dad <3",
@@ -1110,50 +1107,78 @@ navClickHandlers: function() {
 
 }
 },
-reloadAtMidnight: function() {
-    // Reloads the page after midnight hour to update the graph
-    const now = utils.getRawDateNow();
-    // this is essentially doing floor() + 1
-    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const reload_time = midnight.getTime() + 1000 * 60 * 60 * 24;
-    if (now.getTime() < reload_time) {
-        setTimeout(function() {
-            // Don't reload in the next day to preserve changes made in the simulation
-            // Don't reload in the example account because date_now set in the example account causes an infinite reload loop
-            if (utils.in_simulation || isExampleAccount) return;
-            reloadWhenAppropriate();
-        }, reload_time - now.getTime() + utils.SCHEDULED_TIMEOUT_DELAY);
-    }
-},
 loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
     if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
     return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
 },
-getRawDateNow: function(params={ accurate_in_simulation: true, initial_define: false }) {
-    if (SETTINGS.timezone) {
-        var raw_date_now = new Date(new Date().toLocaleString([], {timeZone: SETTINGS.timezone}));
-    } else {
-        var raw_date_now = new Date();
-    }
-    if (params.accurate_in_simulation && !params.initial_define) {
+getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
+    let raw_date_now = new Date();
+    if (SETTINGS.timezone) 
+        raw_date_now = new Date(raw_date_now.toLocaleString([], {timeZone: SETTINGS.timezone}));
+    if (!params.dont_stem_off_date_now) {
         let complete_date_now = new Date(date_now.valueOf());
-        complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), 0, 0);
+        if (utils.in_simulation) {
+            // lock simulation date to 12:00 AM to prevent assignments with due times from being completed
+            complete_date_now.setHours(0, 0, 0, 0);
+        } else {
+            // precision up to seconds or else deleted assignments view sometimes displays a 
+            // negative "deleted ago" date
+            complete_date_now.setHours(raw_date_now.getHours(), raw_date_now.getMinutes(), raw_date_now.getSeconds(), 0);
+        }
         return complete_date_now;
     } else {
         return raw_date_now;
     }
 },
-SCHEDULED_TIMEOUT_DELAY: 5000,
+flexboxOrderQuery: $query => $($($query).toArray().sort((a, b) => {
+    // we cannot fill in the indexes of an array with $query.length
+    // because it isn't guaranteed order numbers will be consecutive
+    // (for example such as when assignments are deleted)
+    const a_order = +$(a).css("order");
+    const b_order = +$(b).css("order");
+    if (a_order == b_order) return 0;
+    if (a_order > b_order) return 1;
+    if (a_order < b_order) return -1;
+})),
+inLineWrapperQuery: function($first_assignment_container) {
+    let in_wrapper = false;
+    let ret = $();
+    utils.flexboxOrderQuery(".assignment-container").each(function() {
+        if ($(this).is($first_assignment_container)) {
+            in_wrapper = true;
+        }
+        if (in_wrapper) {
+            ret = ret.add(this);
+            if ($(this).hasClass("last-add-line-wrapper")) {
+                return false; // break
+            }
+        }
+    });
+    return ret;
+},
 }
 
-SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+window.SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
 SETTINGS.animation_speed = +SETTINGS.animation_speed;
 if (!SETTINGS.seen_latest_changelog) {
     latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
     setTimeout(function() {
+        const update_wrapper = document.createElement("ul");
+        for (const update of latest_changelog.updates) {
+            const li = document.createElement("li");
+            li.innerHTML = update;
+            update_wrapper.appendChild(li);
+        }
+        const bugfixes_wrapper = document.createElement("ul");
+        for (const bugfix of latest_changelog.bugfixes) {
+            const li = document.createElement("li");
+            li.innerHTML = bugfix;
+            bugfixes_wrapper.appendChild(li);
+        }
+        update_wrapper.appendChild(bugfixes_wrapper);
         const jconfirm = $.alert({
-            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version}`,
-            content: latest_changelog.updates + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
+            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version} (${latest_changelog.date})`,
+            content: update_wrapper.outerHTML + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
             backgroundDismiss: false,
             onClose: function() {
                 SETTINGS.seen_latest_changelog = true;
@@ -1167,21 +1192,27 @@ if (!SETTINGS.seen_latest_changelog) {
     }, 500);
 }
 SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-date_now = new Date(utils.getRawDateNow({ initial_define: true }).toDateString());
+window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
 SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
 SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
 if (isExampleAccount) {
     x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
 }
 // Load in assignment data
-dat = JSON.parse(document.getElementById("assignment-models").textContent);
+window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
-        // Don't really know what to do for assignment dates on different tzs (since they are stored in utc) so i'll just round it to the nearest day
-        // Add half a day and flooring it rounds it
-        sa.assignment_date = new Date(sa.assignment_date.valueOf() + 12*60*60*1000);
-        sa.assignment_date.setHours(0,0,0,0);
+        // TODO: don't use epoch shifting
+        // Reference: https://stackoverflow.com/questions/15141762/how-to-initialize-a-javascript-date-to-a-particular-time-zone
+        sa.assignment_date = new Date(sa.assignment_date
+            .getUTCFullYear(), sa.assignment_date
+            .getUTCMonth(), sa.assignment_date
+            .getUTCDate(), sa.assignment_date
+            .getUTCHours(), sa.assignment_date
+            .getUTCMinutes(), sa.assignment_date
+            .getUTCSeconds(), sa.assignment_date
+            .getUTCMilliseconds());
     } else {
         sa.assignment_date = new Date(date_now.valueOf());
         sa.fake_assignment_date = true;
@@ -1191,27 +1222,23 @@ for (let sa of dat) {
         sa.due_time = sa.due_time.split(":");
         sa.due_time = {
             hour: +sa.due_time[0],
+
             minute: +sa.due_time[1],
         }
     }
     // Don't do Number.isFinite(x) because this is the raw value
     if (sa.x) {
         sa.x = new Date(sa.x);
-        // floor(date + 0.5) is the same as round(date)
-        sa.x.setHours(sa.x.getHours() + 24/2);
-        sa.x.setHours(0, 0, 0, 0);
-        
+        sa.x = new Date(sa.x
+            .getUTCFullYear(), sa.x
+            .getUTCMonth(), sa.x
+            .getUTCDate(), sa.x
+            .getUTCHours(), sa.x
+            .getUTCMinutes(), sa.x
+            .getUTCSeconds(), sa.x
+            .getUTCMilliseconds());
         if (sa.due_time) {
             let complete_due_date = new Date(sa.x.getFullYear(), sa.x.getMonth(), sa.x.getDate(), sa.due_time.hour, sa.due_time.minute);
-            let raw_date_now = new Date(utils.getRawDateNow().valueOf());
-            let time_diff = complete_due_date - raw_date_now;
-            if (time_diff + utils.SCHEDULED_TIMEOUT_DELAY > 0 && !VIEWING_DELETED_ASSIGNMENTS)
-                $(window).one("load", function() {
-                    setTimeout(function() {
-                        new Priority().sort();
-                    // Hardcoded delay if setTimeout isn't accurate
-                    }, time_diff + utils.SCHEDULED_TIMEOUT_DELAY);
-                });
             // If the due date exists but the assignment date doesn't meaning assignment needs more info, set the due date number to the due date and today
             sa.x = mathUtils.daysBetweenTwoDates(sa.x, sa.assignment_date);
             sa.complete_x = mathUtils.daysBetweenTwoDates(complete_due_date, sa.assignment_date, {round: false});
@@ -1234,13 +1261,18 @@ for (let sa of dat) {
             sa.fake_assignment_date = false; // probably isnt needed but ill keep this here anyways
         }
     }
-    // Repopulating the form
+    if (VIEWING_DELETED_ASSIGNMENTS) {
+        sa.deletion_time = new Date(sa.deletion_time);
+    }
+    // Repopulating the form (min work time is capped and divided)
     sa.original_min_work_time = +sa.min_work_time;
+    if (!Number.isFinite(sa.original_min_work_time) || sa.original_min_work_time === 0)
+        sa.original_min_work_time = '';
 
     if (sa.y) sa.y = +sa.y;
     if (sa.time_per_unit) sa.time_per_unit = +sa.time_per_unit;
     if (sa.funct_round) sa.funct_round = +sa.funct_round;
-    if (sa.min_work_time) sa.min_work_time /= sa.time_per_unit; // Converts min_work_time to int if string or null
+    if (sa.min_work_time) sa.min_work_time = +sa.min_work_time;
     if (sa.skew_ratio) sa.skew_ratio = +sa.skew_ratio;
     sa.works = sa.works.map(Number);
     sa.break_days = sa.break_days.map(Number);
@@ -1291,27 +1323,37 @@ for (let sa of dat) {
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {
-        utils.reloadAtMidnight();
         if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
         utils.ui.setClickHandlers.tickButtons();
         utils.ui.setClickHandlers.assignmentsHeaderUI();
         utils.ui.setClickHandlers.assignmentSorting();
-        utils.ui.setClickHandlers.autofillWorkDone();
     }
-    utils.ui.setClickHandlers.deleteAllStarredAssignments();
-    utils.ui.setClickHandlers.deleteAssignmentsFromClass();
-    utils.ui.addTagHandlers();
+    utils.ui.setClickHandlers.shortcuts();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();
     utils.ui.setAssignmentScaleUtils();
-    utils.ui.setAnimationSpeed();
+    setTimeout(() => {
+        utils.ui.addTagHandlers();
+        utils.ui.setAnimationSpeed();
+    }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();
+    $(window).on("focus", ajaxUtils.evaluateCurrentState);
     // https://stackoverflow.com/questions/23449917/run-js-function-every-new-minute
     let secondsRemaining = (60 - new Date().getSeconds()) * 1000;
+
+    let minuteCounter = 0;
     setTimeout(function() {
         utils.ui.tickClock();
-        setInterval(utils.ui.tickClock, 60000);
-        setInterval(() => $(window).trigger("resize"), 60000*60);
+        setInterval(() => {
+            utils.ui.tickClock();
+            minuteCounter++;
+            if (minuteCounter !== 60) return;
+
+            minuteCounter = 0;
+            $(window).trigger("resize");
+            ajaxUtils.evaluateCurrentState();
+            if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
+        }, 60 * 1000);
     }, secondsRemaining);
 });

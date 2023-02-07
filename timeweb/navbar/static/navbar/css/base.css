@@ -2,7 +2,7 @@ body {
     --roboto-font-weight: 700;
 }
 #flex-container {
-    height: calc(100vh - 70px);
+    height: calc(var(--100vh) - 70px);
     /* Cancel out paddings */
     margin-top: -10px;
     margin-bottom: -10px;
@@ -194,11 +194,11 @@ details > .img-ignore-padding-container img {
 }
 
 #assignment-graph-image {
-    content: url(https://storage.googleapis.com/twstatic/navbar/images/wide_assignment_graph.webp);
+    content: url("../images/wide_assignment_graph.webp");
 }
 @media screen and (max-width: 790px) {
     #assignment-graph-image {
-        content: url(https://storage.googleapis.com/twstatic/navbar/images/narrow_assignment_graph.webp);
+        content: url("../images/narrow_assignment_graph.webp");
     }
 }
 .minor-category {
@@ -215,9 +215,6 @@ details > .img-ignore-padding-container img {
 }
 .label-question {
     --label-color: rgb(150, 232, 253);
-}
-.minor-category, .label-question, .minor-minor-category {
-    scroll-margin-top: 75px;
 }
 .label-question {
     display: block;

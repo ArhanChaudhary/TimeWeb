@@ -1,0 +1,1 @@
+{% extends "account/email/password_reset_key_subject.txt" %}

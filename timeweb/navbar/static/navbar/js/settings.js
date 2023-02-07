@@ -58,10 +58,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // d256f25 should have fixed this but it's stupidly inconsistent
     $("option:not([value])").attr("value", "");
 
+    let hasSubmitted = false;
     if (GC_API_INIT_FAILED) {
         $.alert({
             title: "Could not enable the Google Classroom integration.",
-            content: "Authentication failed. Please try again.",
+            content: "Authorization failed. Please try again.",
             backgroundDismiss: false,
             buttons: {
                 ok: {
@@ -77,35 +78,73 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    let hasSubmitted = false;
     $("#logo-container").click(function(e) {
         e.preventDefault();
-        if (hasSubmitted) return;
+        $("#submit-settings-button").click();
+    });
+    $("#submit-settings-button").click(function() {
+		if (hasSubmitted) return false;
         $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
         hasSubmitted = true;
-        $("main form")[0].submit();
     });
     // or else logging out will display the "you form changes my not been saved" alert
-    $("header form").submit(function() {
+    $("form:not(#settings-form)").submit(function() {
         hasSubmitted = true;
     });
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
-    window.onbeforeunload = function(e) {
-        if (hasSubmitted) return;
+    window.addEventListener("beforeunload", function(e) {
+        if (hasSubmitted || window.ignore_reload_alert) return;
 
         e.preventDefault();
         $("#logo-container").removeAttr("tabindex").focus();
+
+        window.disable_loading = true;
+        setTimeout(function() {
+            window.disable_loading = false;
+        }, 0);
         return e.returnValue = "Your settings may be lost.";
-    };
+    });
     let single_action_label_timeout;
-    $(".single-action-label").click(function() {
+    $(".immediate-action").click(function() {
         clearTimeout(single_action_label_timeout);
         single_action_label_timeout = setTimeout(() => {
             // the timeout and the if statement allow for double or quadruple clicking to cancel the action
             if ($(this).parents(".right-side-of-field").find("input").is(":checked"))
-                $("#logo-container").click();
+				$("#submit-settings-button").click();
         }, 700);
+    });
+    $(".not-yet-implemented").click(function() {
+        if (!$(this).prop("checked")) return;
+        setTimeout(() => {
+            $(this).prop("checked", false);
+            $.alert({
+                title: "Not yet implemented",
+                content: `This integration hasn't yet been implemented but is planned for a future release. If you want to want this feature sooner, 
+                        you can peer pressure me by sending me a nudge.`,
+                buttons: {
+                    ok: {
+
+                    },
+                    nudge: {
+                        action: () => {
+                            switch ($(this).attr("id")) {
+                                case "id_calendar_integration":
+                                    var setting = "nudge_calendar";
+                                    break;
+                                case "id_notifications_integration":
+                                    var setting = "nudge_notifications";
+                                    break;
+                                case "id_canvas_integration":
+                                    var setting = "nudge_canvas";
+                                    break;
+                            }
+                            ajaxUtils.changeSetting({setting: setting, value: true});
+                        },
+                    },
+                }
+            });
+        }, 500);
     });
 });
 $(window).one("load", function() {

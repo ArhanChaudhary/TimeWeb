@@ -1,0 +1,10 @@
+{% extends "account/email/base_message.txt" %}
+
+{% block content %}You're receiving this e-mail because you or someone else has requested a
+password reset for your TimeWeb account. However, a user with email {{ email }}
+does not exist.
+
+You can safely ignore this if it wasn't you.
+
+If it was you, please sign up for a TimeWeb account:
+{{ signup_url }}{% endblock %}

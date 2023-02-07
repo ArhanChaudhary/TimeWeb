@@ -36,8 +36,10 @@ Assignment.prototype.setParabolaValues = function () {
         y1 = this.sa.y - this.red_line_start_y;
 
     const mods = this.calcModDays();
+    // if x1 is negative (can happen when autofilling no work done for an assignment with a soft due date) then mods[-1] will make this NaN
+    // and trigger the zero division if statement below
     x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-    if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+    if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
         x1 = Math.ceil(x1);
     }
 
@@ -106,7 +108,6 @@ Assignment.prototype.setParabolaValues = function () {
 
     left = 0;
     right = Math.ceil(this.return_y_cutoff);
-    // TODO: https://github.com/ArhanChaudhary/TimeWeb/issues/5
     while (left < right) {
         const mid = left + Math.floor((right - left) / 2);
 
@@ -162,8 +163,30 @@ Assignment.prototype.setParabolaValues = function () {
 
 
     if (this.sa.due_time && (this.sa.due_time.hour || this.sa.due_time.minute)
-        // this could be a quite controversial decision to disable this check; I'll let my message in #suggestions do the talking:
-        // https://canary.discord.com/channels/832155860306362438/842171586295758858/997343202292023356
+        // "TimeWeb is already able to recognize and manipulate the red line to nullify work inputs at midnight."
+
+        // After giving the replied to suggestion a lot of thought, I am considering perhaps removing this check and allowing for the 
+        // graph to generate bogus schedules that assign work between 12:00 AM and 8:00 AM. The following will explain my reasoning for
+        // why this check should be removed:
+
+        // 1) It discourages users to set due dates at times such as 8 AM
+
+        // title. the replied to suggestion explains all of the issues with setting a due date at 8 AM. After seeing that they have to 
+        // work between midnight and 8 AM, users will feel inclined to fix this by changing their due date back to 12 AM, which is what I 
+        // want. Not removing this check makes the graph seem less wrong; the user might now think that it's OK to enter a due date at a 
+        // time such as 8 AM when they see a work schedule that isn't messed up.
+
+        // 2) It makes it harder to say you want to work on the last day
+
+        // If I don't remove this check and always nullify work inputs at midnight, it could be quite frustrating to the user. What if they
+        // want to work between 12:00 AM and 8:00 AM, but TimeWeb doesn't allow them and instead assigns nullifies the amount of work to do
+        // in that timeframe?
+
+        // 3) Compromises can be made
+
+        // It doesn't have to be an either/or decision — I can incorporate advantages from both sides of the suggestion that reduce
+        // the risk of removing this check. I can warn the user before submitting the creation of an assignment if they enter a due time 
+        // between 12:00 AM - 11:59 AM and very clearly describe the dangers of setting a due time that early.
         && 0) {
         // With early due times, return_y_cutoff may be on the last day, resulting in situations where you would have to work past midnight until the due time
         // To help prevent this, we need to see if working on the last day would result in a slope that violates the minimum work time (NOT min_work_time_funct_round because the user only cares about 
@@ -286,8 +309,66 @@ Assignment.prototype.funct = function (x, params = { translateX: true }) {
     // Return translated y coordinate
     return mathUtils.precisionRound(output + this.red_line_start_y, 10);
 }
+// This function helps account for break days
 Assignment.prototype.calcModDays = function () {
-    // explain this later
+    // Let's say you want to call f(x) on some day in an assignment. It isn't as simple as using the raw x-coordinate,
+    // as the user can enter break days and stretch the domain of the function along more days in the assignment. The 
+    // plan is to reverse this stretch by subtracting the number of break days between x and 0 and then call f(x) to
+    // get our desired output. Now, we need to devise a way to find the number of any chosen weekday between two dates.
+      
+    // For demonstration, I will choose the starting date to be the Monday 1st of January, the ending date to be
+    // Wednesday 31st of January, and the chosen weekday to be Tuesday. The first way I thought of to find the number of
+    // any chosen weekday between two dates is to loop through every single day between the start and the end. Then, add
+    // one to a counter variable if that day is one of the chosen weekdays. This clearly did not work out because it is
+    // extremely inefficient over long periods of time
+
+    // To make explaining my second attempt simpler, instead of thinking as the ending date to be January 31,
+    // think of the end date to be the amount of days between the end date and the start date, in this case 30
+    // I know in each 7 consecutive days of the 30 days, there will always be exactly on tuesday
+    // I can take advantage of this property by splitting the 30 days into 7 days at a time like this:
+    // 30 days --> 7 days + 7 days + 7 days + 7 days + 2 days
+    // I know in each of those 7 days there will be one tuesday
+    // And since there are four 7 days, I know there are at least 4 tuesdays between January 1 and January 31
+    // This logic is encapsulated in this expression: `x -= Math.floor(x / 7) * this.sa.break_days.length`
+    // Finally, what about the remaining 2 days? What if those days contain a 5th tuesday?
+    // That problem is solved with `mods`, which simply goes through the remanding days and determines if there is a
+    // tuesday and adds to the counter if there is
+
+    // What if I have multiple chosen weekdays, for example tuesday and wednesday?
+    // The same logic still works. I know two of 7 consecutive days will always be either tuesday or wednesday
+    // If I break the 30 days down again:
+    // 30 days --> 7 days + 7 days + 7 days + 7 days + 2 days
+    // Instead of one for every 7 days, I know there are two tuesday or wednesdays for every 7 days
+    // So, I know there are at least 8 tuesdays or wednesdays between January 1 and January 31
+    // From above, just multiply the 4 tuesdays by two to get 8 tuesdays and wednesdays
+    // Then, the tuple mods handles the last two days to get a result of 10 tuesdays or wednesdays
+
+    // Now to demonstrate how to unstretch the domain once the number of break days until x is known
+    // I know there are 10 tuesdays and wednesdays between January 1 and January 31 by using the above algorithm
+    // The next step is to remove all the not working days from the 30 days
+    // So, instead of 30 days, subtract 10 and get 20 days
+    // The reason why this is done is because you are not supposed to do work on the not working days
+    // Then, setParabolaValues() function defines a and b variables for the parabola that pass through 20 days instead of 30
+    // Lastly, the not working days are "added back in"
+    // In this example, days 8 and 9 are tuesdays and wednesdays
+    // f(6) is the 6th value on the parabola
+    // f(7) is the 7th value on the parabola
+    // Since day 8 is a tuesday, meaning you won't do any work, f(8) will also be the 7th value on the parabola
+    // Since day 9 is a wednesday, meaning you still won't do any work, f(9) will also be the 7th value on the parabola
+    // Then f(10) is the 8th value on the parabola and f(11) is the 9th value on the parabola and so on
+    // For any f(n), it subtracts the amount of not working days between the starting date and the starting date plus n days
+    // This in a way "adds back in" in the not working days
+    // The final expression to further encapsulate this logic is `x -= Math.floor(x / 7) * this.sa.break_days.length + mods[x % 7];`
+
+    // Lastly, some rules to follow when using mods
+    // 1) the `x` in `Math.floor(x / 7)` and `mods[x % 7]` must be the same
+    // it fundamentally does not make sense for them to be difference, as what is happening is you are first finding
+    // how many 7s fit into x and then using the remainder of the same number to add the remaining days
+    // think of this.red_line_start_x as a reference for s.red_line_start_x must be a reference point
+    // 2) think of `red_line_start_x` as a reference point
+    // mods starts at red_line_start_x and so `Math.floor(x / 7)` must also "start" there at the correct frame of reference
+    // 3) for this reason, mods cannot have a fixed red_line_start_x reference point, because then otherwise the 7s
+    // wouldn't be able to properly fit into x
     let mods = [0],
         mod_counter = 0;
     for (let mod_day = 0; mod_day < 6; mod_day++) {
@@ -317,7 +398,6 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function (point_1, point_
 
     let first_slope = y1 / x1;
     let second_slope = (y2 - y1) / (x2 - x1);
-    // TODO: very buggy (roundoff errors) but should work 99.9% of the time
     if (second_slope === 0 && first_slope === 0 || second_slope !== 0 && Math.abs(first_slope / second_slope - 1) < 0.0000001)
         // note: cases where a and b are Infinity are false for the above check
 
@@ -326,13 +406,12 @@ Assignment.prototype.calcAandBfromOriginAndTwoPoints = function (point_1, point_
     return { a, b };
 }
 Assignment.MAX_WORK_INPUTS_AUTOTUNE = 1000;
-Assignment.THIRD_POINT_STEP = 0.01;
-Assignment.MATRIX_ENDS_WEIGHT = 10000;
+Assignment.MATRIX_ENDS_WEIGHT = 100000;
 
-// There is a deadlock netween autotuneSkewRatioIfInDynamicMode and setDynamicStartInDynamicMode:
+// There is a deadlock netween autotuneSkewRatio and setDynamicStart:
 // When dynamic start is set, skew ratio needs to be re-autotuned
 // But when skew ratio is re-autotuned, it may mess up dynamic start
-// This variable is the number of iterations setDynamicStartInDynamicMode and autotuneSkewRatioIfInDynamicMode should be run
+// This variable is the number of iterations setDynamicStart and autotuneSkewRatio should be run
 
 // There's a chance this might not even be needed but it seems to provide a more accurate skew ratio
 // Resetting the dynamic mode start still might produce different autotuned_skew_ratio values because the dynamic start is changing,
@@ -396,7 +475,7 @@ still imply. for the purposes of understanding the algorithm, assume that this i
 the goal of the algorithm is to automatically edit the curvature in the most ideal way possible
 in scenarios like these
 */
-Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inverse: true }) {
+Assignment.prototype.WLSWorkInputs = function() {
     /*
     TABLE OF CONTENTS
     the goal of the autotuning algorithm is to modify the curvature of an assignment such that:
@@ -410,11 +489,7 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
     algorithm is run many times for a single auototune
     5. Autotunes the auotuned curvature closer to linear the end of the assignment gets closer
     6. Autotunes the curvature closer to the inverse of the autotuned curvature
-    */
-    if (this.sa.fixed_mode) return;
-    const old_skew_ratio = this.sa.skew_ratio;
 
-    /*
     STEP 1: Weighted Least Squares Regression
     Let's remind ourselves the end goal:
     we want to change the curvature from this:
@@ -456,7 +531,6 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         return !this.sa.break_days.includes((this.assign_day_of_week + this.sa.blue_line_start + work_input_index - 1) % 7) || work_input_index === 0;
     }.bind(this));
     const len_works_without_break_days = works_without_break_days.length - 1;
-
     const original_red_line_start_x = this.red_line_start_x;
     const original_red_line_start_y = this.red_line_start_y;
     // red_line_start_x needs to be set for calcModDays to be accurate
@@ -468,16 +542,22 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
     
     const mods = this.calcModDays();
     x1_from_blue_line_start -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7];
-    if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+    if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
         x1_from_blue_line_start = Math.ceil(x1_from_blue_line_start);
     }
-
+    
     // number of work inputs to do between the start of the red line and the due date
     let y1_from_blue_line_start = this.sa.y - this.red_line_start_y;
 
-    // Roundoff errors
-    if (x1_from_blue_line_start > Assignment.MAX_WORK_INPUTS_AUTOTUNE) return;
+    this.red_line_start_x = original_red_line_start_x;
+    this.red_line_start_y = original_red_line_start_y;
 
+    // Leads to zero divisions later on and NaN curvature values
+    // Can happen when you don't complete an assignment by its due date
+    // We don't need to add this to shouldAutotune because the scenarios in which this will happen are irrelevant
+    // NOTE: probably not actually be needed if it is never equal to 0
+    if (x1_from_blue_line_start === 0) return NaN;
+    
     // Thanks to RedBlueBird (https://github.com/RedBlueBird) for the actual WLS!
     // https://github.com/ArhanChaudhary/TimeWeb/issues/3
     // Start of contribution
@@ -494,10 +574,10 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         x_matrix.push([x1_from_blue_line_start, Math.pow(x1_from_blue_line_start, 2)]);
         y_matrix.push([y1_from_blue_line_start]);
     }
-
-    let autotuned_skew_ratio;
     // A parabola cant be defined with less than 3 points
-    if (y_matrix.length >= 3) {
+    if (y_matrix.length < 3) {
+        var parabola = NaN;
+    } else {
         const X = new mlMatrix.Matrix(x_matrix);
         const Y = new mlMatrix.Matrix(y_matrix);
 
@@ -506,11 +586,41 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         T.data[T.data.length - 1][1] *= Assignment.MATRIX_ENDS_WEIGHT;
         T = T.transpose();
 
-        result = mlMatrix.inverse(T.mmul(X)).mmul(T).mmul(Y)
-        let a = result.data[1][0];
-        let b = result.data[0][0];
+        const result = mlMatrix.inverse(T.mmul(X)).mmul(T).mmul(Y);
+        const a = result.data[1][0];
+        const b = result.data[0][0];
+        var parabola = {a, b};
         // End of contribution
+    }
+    return { parabola, len_works_without_break_days, x1_from_blue_line_start, y1_from_blue_line_start };
+}
 
+Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_factor } */, inverseOption/* = { inverse } */) {
+    assert(inverseOption.inverse === true || inverseOption.inverse === false, "inverseOption.inverse must be either true or false");
+    const old_skew_ratio = this.sa.skew_ratio;
+    /*
+    STEP 3: Defining an autotune factor
+    With only one work input, the regression algorithm is heavily skewed towards that one
+    work input, resulting in nonsensical curvatures such as these:
+    https://cdn.discordapp.com/attachments/834305828487561216/872673400257118228/Screen_Recording_2021-08-04_at_7.51.42_PM.mov
+
+    We need some sort of way to make this algorithm less influential at the start and more
+    influential at the end by defining an autotuning factor
+    
+    (which when closer to 0, will be more inclined to retain the original curvature value,
+    and when closer 1, will be more inclined to change to the new curvature value)
+
+    Defining such a factor is more simple that you think:
+    autotune factor = number of work inputs / number of working days between the start of
+    the blue line and the due date
+
+    forming a linear gradient that successfully mitigates this issue
+    */
+    let autotune_factor = wls.len_works_without_break_days / wls.x1_from_blue_line_start;
+    if (Number.isNaN(wls.parabola)) {
+        // A parabola cannot be defined by two or less points; instead connect a line
+        var autotuned_skew_ratio = 1;
+    } else {
         /*
         STEP 2: Transferring the curvature
         Our WLS algorithm generates a parabola form the origin to (x, y), but as it turns out
@@ -529,75 +639,74 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         Thankfully, the efforts put into WLS aren't in vain. Perhaps we can find a better way
         to transfer the WLS curvature to the red line...
 
-        as a reminder, the red line needs only one more control point to create a
-        complete parabola. What if we use (x-0.01, f(x-0.01)) on the green line as our 
-        third point?
+        We want a parabola where the derivative at the due date is the same for both lines. It turns out,
+        That is enough information to create a unique parabola! Here's how we do it:
 
-        the precise logic of translating the parabola and untranslating it is hard to wrap
-        your head around, so I've created a desmos graph to clearly demonstrate how this works
-        https://www.desmos.com/calculator/fxznq4cjka
+        let x = x1_from_blue_line_start
+        let y = y1_from_blue_line_start
+        let x1 = this.sa.complete_x - this.red_line_start_x
+        let y1 = this.sa.complete_x - this.sa.works[0]
+        let a = a
+        let b = b
+        let a1 = new a
+        let b1 = new b
 
-        Notice the three points that form the red line (in this case colored purple) — the
-        green point, the black point, and the red point right next to the black point
-        (bit hard to see):
-        https://cdn.discordapp.com/attachments/836818352160243722/991803369347883008/unknown.png
+        Since the derivative is a constant, let's make it a variable for simplicity. Use the parabola from
+        the origin to (x, y) as the dervative is 2ax + b and we dont have the new a and b yet:
+        s = 2ax + b
+
+        We want the derivative at the due date to be the same for both lines, so we can set the derivative
+        of the new parabola to the derivative of the old parabola:
+        2(a1)x1 + b1 = s
+
+        And we can now create a system of equations to find the new a and b:
+        2(a1)x1 + b1 = s
+        (a1)(x1)^2 + (b1)(x1) = y1
+
+        We can now solve for a1 and b1:
+        b1 = s - 2(a1)x1
+        (a1)(x1)^2 + (s - 2(a1)x1)(x1) = y1
+        (a1)(x1)^2 + s(x1) - 2(a1)(x1)^2 = y1
+        -(a1)(x1)^2 + s(x1) = y1
+        -(a1)(x1)^2 = y1 - s(x1)
+        (a1)(x1)^2 = s(x1) - y1
+        a1 = (s(x1) - y1)/(x1)^2
+
+        b1 = s - 2(a1)x1
+        b1 = s - 2((s(x1) - y1)/(x1)^2)x1
+        b1 = s - 2(s(x1) - y1)/(x1)
+        b1 = s + 2(y1 - s(x1))/(x1)
+        b1 = s + (2(y1) - 2s(x1))/(x1)
+        b1 = s + 2(y1)/(x1) - 2s(x1)/(x1)
+        b1 = s - 2s + 2(y1)/(x1)
+        b1 = 2(y1)/(x1) - s
+
+        Test casing: https://www.desmos.com/calculator/pfpb5x0hsc
         */
-
-        let x2 = x1_from_blue_line_start - Assignment.THIRD_POINT_STEP;
-        let y2 = x2 * (a * x2 + b);
 
         // Change the scope of the skew ratio to x1 ("transfer" the skew ratio value from
         // x1_from_blue_line_start to x1)
-        this.red_line_start_x = original_red_line_start_x;
-        this.red_line_start_y = original_red_line_start_y;
         let x1 = this.sa.complete_x - this.red_line_start_x;
         let y1 = this.sa.y - this.red_line_start_y;
 
         const mods = this.calcModDays();
         x1 -= Math.floor((this.sa.x - this.red_line_start_x) / 7) * this.sa.break_days.length + mods[(this.sa.x - this.red_line_start_x) % 7]; // Handles break days, explained later
-        if (this.sa.break_days.includes(this.assign_day_of_week + Math.floor(this.sa.complete_x))) {
+        if (this.sa.break_days.includes((this.assign_day_of_week + Math.floor(this.sa.complete_x)) % 7)) {
             x1 = Math.ceil(x1);
         }
 
-        // x1_from_blue_line_start - x1 simplifies to red_line_start_x - blue_line_start
-        // y1_from_blue_line_start - y1 simplifies to red_line_start_y - works[0]
-        // Translate the point to the scope of x1
-        x2 -= x1_from_blue_line_start - x1;
-        y2 -= y1_from_blue_line_start - y1;
-        const parabola = this.calcAandBfromOriginAndTwoPoints([x2, y2], [x1, y1]);
-        autotuned_skew_ratio = (parabola.a + parabola.b) * x1 / y1;
+        const slope = 2 * wls.parabola.a * wls.x1_from_blue_line_start + wls.parabola.b;
+        const transferred_parabola = {
+            // https://www.desmos.com/calculator/pfpb5x0hsc
+            a: (wls.x1_from_blue_line_start * slope - wls.y1_from_blue_line_start) / Math.pow(wls.x1_from_blue_line_start, 2),
+            b: 2 * wls.y1_from_blue_line_start / wls.x1_from_blue_line_start - slope,
+        };
+        var autotuned_skew_ratio = (transferred_parabola.a + transferred_parabola.b) * x1 / y1;
 
         // Zero division somewhere
         if (!Number.isFinite(autotuned_skew_ratio)) return;
-
-    } else {
-        // A parabola cannot be defined by two or less points; instead connect a line
-        autotuned_skew_ratio = 1;
     }
-    if (params.inverse) {
-        /*
-        STEP 3: Defining an autotune factor
-        With only one work input, the regression algorithm is heavily skewed towards that one
-        work input, resulting in nonsensical curvatures such as these:
-        https://cdn.discordapp.com/attachments/834305828487561216/872673400257118228/Screen_Recording_2021-08-04_at_7.51.42_PM.mov
-
-        We need some sort of way to make this algorithm less influential at the start and more
-        influential at the end by defining an autotuning factor
-        
-        (which when closer to 0, will be more inclined to retain the original curvature value,
-        and when closer 1, will be more inclined to change to the new curvature value)
-
-        Defining such a factor is more simple that you think:
-        autotune factor = number of work inputs / number of working days between the start of
-        the red line and the due date
-
-        forming a linear gradient that successfully mitigates this issue
-        */
-
-        // Math.min(..., 1) to make sure the autotune factor is never greater than 1 (this 
-        // can happen with due times)
-        var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
-
+    if (!inverseOption.inverse) {
         /*
         STEP 4: Nullifying repeated iterations
         The algorithms to autotune the curvature and the start of the red line have an
@@ -609,10 +718,10 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         The key takeaway is the fact that I have to loop through and repeat these two functions
         many times:
         for (let i = 0; i < Assignment.AUTOTUNE_ITERATIONS; i++) {
-            this.setDynamicStartIfInDynamicMode();
+            this.setDynamicStart();
             this.autotuneSkewRatio();
         }
-        this.setDynamicStartIfInDynamicMode();
+        this.setDynamicStart();
 
         The problem with this is rerunning the autotuning algorithm is that it magnifies 
         the curvature by double dipping this algorithm
@@ -679,8 +788,13 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
 
         this step of the algorithm simply autotunes the already autotuned curvature
         closer to linear as there are fewer work inputs left to input in an assignment
+
+        TODO: only after had I written step 4 did I realize that it DOESN'T TAKE INTO ACCOUNT STEP 5 (/facepalm)
+        I spent nearly two days trying to rederive the equation and i got quartic equations :((
+        I'm not going to re-paste the derivations as you're better off not seeing them lol
+        So a really really ugly way untested patch is to cube root the autotune factor to upscale this step
         */
-        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * Math.pow(autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
 
         /**
         STEP 6: Reflecting the entire parabola
@@ -710,17 +824,86 @@ Assignment.prototype.autotuneSkewRatioIfInDynamicMode = function (params = { inv
         */
 
         autotuned_skew_ratio = 2 - autotuned_skew_ratio;
+        // The part of step 3 that actually autotunes the skew ratio
+        this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
+    /*
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * Math.sqrt(autotune_factor);
+    autotuned_skew_ratio = 2 - autotuned_skew_ratio;
+    this.sa.skew_ratio = this.sa.skew_ratio + (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
 
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+    autotuned_skew_ratio = autotuned_skew_ratio + (1 - autotuned_skew_ratio) * Math.sqrt(autotune_factor);
+    new_skew_ratio = old_skew_ratio + (2 - autotuned_skew_ratio - old_skew_ratio) * autotune_factor;
+
+    var autotune_factor = len_works_without_break_days / x1_from_blue_line_start;
+    autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
+    new_skew_ratio = old_skew_ratio + (2 - (autotuned_skew_ratio + (1 - autotuned_skew_ratio) * Math.sqrt(autotune_factor)) - old_skew_ratio) * autotune_factor;
+
+    let n = new_skew_ratio
+    let o = old_skew_ratio
+    let a = autotuned_skew_ratio
+    let l = len_works_without_break_days
+    let x = x1_from_blue_line_start
+    let i = Assignment.AUTOTUNE_ITERATIONS
+    let f = 1 - Math.pow(1 - l/x, 1 / i);
+
+    n = o + (2 - (a + (1 - a) * f^(1/i)) - o) * f;
+
+    The inverse algorithm solves for o:
+
+    n = o + (2 - (a + (1 - a)f^(1/i)) - o)f
+    n = o + 2f - (a + (1 - a)f^(1/i))f - of
+    n = o - of + 2f - (a + (1 - a)f^(1/i))f
+    n = o(1 - f) + 2f - (a + (1 - a)f^(1/i))f
+    n - 2f + (a + (1 - a)f^(1/i))f = o(1 - f)
+    (n - 2f + (a + (1 - a)f^(1/i))f)/(1-f) = o
+    o = (n - 2f + (a + f^(1/i) - f^(1/i)a)f)/(1-f)
+    o = (n - 2f + af + f^(1+1/i) - af^(1+1/i))/(1-f)
+    o = (n - 2f + af + f^(1+1/i)(1 - a))/(1-f)
+    o = (n + f(-2 + a) + f^(1+1/i)(1 - a))/(1-f)
+    o = (f^(1+1/i)(1 - a) + f(a - 2) + n)/(1-f) for f != 1
+
+    Solve for when f === 1 for edge case handling:
+    Assume 1 - Math.pow(1 - r, 1 / i) = 1
+    1 - (1 - r)^(1/i) != 1
+    (1 - r)^(1/i) != 0
+    (1 - r)^(1/i) != 0
+    a^b = 0
+    Since b is a positive rational number, a = 0 for a^b = 0
+    1 - r = 0
+    r = 1
+    */
+    } else if (autotune_factor === 1) {
+        this.sa.skew_ratio = 1;
     } else {
-        // TODO: improve non inverse algorithm; this one currently works but not as well as I want
-        var autotune_factor = Math.min(works_without_break_days.length / x1_from_blue_line_start, 1);
+        /*
+        This algorithm isn't perfect due to an unfortunate implementation quirk of todo !== input_done in
+        submit_work_input_button. Let's say the current skew ratio is A, you don't have to do work today, and
+        you input no work done for today. The skew ratio will stay at A because of the todo !== input_done
+        check. Now, say the current skew ratio is B but you do have to do work for today. If you enter no work
+        done, it is possible for the skew ratio to autotune to the exact value of A. That means that there isn't
+        a one-to-one mapping of the autotuning algorithm when you submit work inputs, and this also means that
+        the inverse algorithm doesn't know which mapping to use. In the current implementation of
+        delete_work_input_button, it just assumes the first scenario mapping, regardless whether or not it was
+        the actual path taken to reach skew ratio A. Of course, this leads to the skew ratio sometimes being
+        significantly off from the actual original skew ratio, but alas this is the best we can do for now.
+
+        TODO: Perhaps we *could* fix this by saving a list of input values for when let's say scenarios 1 or 2 was
+        taken. Maybe that's an idea for the future.
+
+        Another inaccuracy of this inversing algorithm is the fact that it doesn't use the same red_line_start_x
+        values as it repeatedly calls setDynamicStartInDynamic mode. Thankfully, this doesn't seem to big of an
+        issue compared to the above issue.
+        */
         autotune_factor = 1 - Math.pow(1 - autotune_factor, 1 / Assignment.AUTOTUNE_ITERATIONS);
-        autotuned_skew_ratio += (1 - autotuned_skew_ratio) * autotune_factor;
+        this.sa.skew_ratio = (Math.pow(autotune_factor, 1 + 1 / Assignment.AUTOTUNE_ITERATIONS) * (1 - autotuned_skew_ratio) + autotune_factor * (autotuned_skew_ratio - 2) + this.sa.skew_ratio) / (1 - autotune_factor);
     }
-    // The part of step 3 that actually autotunes the skew ratio
-    this.sa.skew_ratio += (autotuned_skew_ratio - this.sa.skew_ratio) * autotune_factor;
     const skew_ratio_bound = this.calcSkewRatioBound();
     this.sa.skew_ratio = mathUtils.clamp(2 - skew_ratio_bound, this.sa.skew_ratio, skew_ratio_bound);
-    // !this.sa.needs_more_info probably isn't needed, but just in case as a safety meachanism
-    !this.sa.needs_more_info && this.sa.skew_ratio !== old_skew_ratio && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, { skew_ratio: this.sa.skew_ratio, id: this.sa.id });
+
+    if (this.sa.skew_ratio !== old_skew_ratio)
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, { skew_ratio: this.sa.skew_ratio, id: this.sa.id });
 }

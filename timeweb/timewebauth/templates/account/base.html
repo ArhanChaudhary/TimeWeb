@@ -40,16 +40,6 @@
       </div>
       {% block content %}{% endblock %}
     </div>
-    <div id="loading-container">
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-      <div class="loading-circle"></div>
-    </div>
   </main>
   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="goo-svg">
     <defs>
@@ -65,7 +55,7 @@
     </defs>
   </svg>
   <template id="password-widget-icons">
-    <img src="{% static 'timewebauth/images/hide.webp' %}" class="password-image show-password-image" width="22">
-    <img src="{% static 'timewebauth/images/show.webp' %}" class="password-image hide-password-image" width="22">
+    <img alt src="{% static 'timewebauth/images/hide.webp' %}" class="password-image show-password-image" width="22">
+    <img alt src="{% static 'timewebauth/images/show.webp' %}" class="password-image hide-password-image" width="22">
   </template>
 {% endblock %}

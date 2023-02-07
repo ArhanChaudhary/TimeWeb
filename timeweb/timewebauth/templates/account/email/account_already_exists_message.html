@@ -1,0 +1,11 @@
+{% extends "account/email/base_message.html" %}
+
+{% block content %}
+<p>You are receiving this e-mail because you or someone else tried to signup for a 
+TimeWeb account using your e-mail address.</p>
+
+<p>However, an account using this address already exists. In case you forgot,
+please reset your password to recover your account:</p>
+
+<a class="submit-button" href="{{ password_reset_url }}">Reset Password<</a>
+{% endblock %}

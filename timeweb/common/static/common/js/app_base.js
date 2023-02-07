@@ -1,12 +1,32 @@
+window.TAB_CREATION_TIME = new Date().valueOf();
+window.DEVICE_UUID = Math.random().toString(16).slice(2, 10);
 document.addEventListener("DOMContentLoaded", function() {
     $.ajaxSetup({
         headers: {
             'X-CSRFToken': $("input[name=\"csrfmiddlewaretoken\"]").first().val()
         },
     });
+    $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+        if (ajaxUtils?.disable_ajax) {
+            options.success?.();
+            jqXHR.abort();
+            return;
+        }
+        if (!options.url.startsWith("/api")) return;
+        // do NOT use originalOptions, IMPORTANT
+        // re-trying the ajax does not preserve originalOptions,
+        // so we must instread derive it from options
+        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(decodeURIComponent(options.data === undefined ? "" : options.data))), {
+            device_uuid: window.DEVICE_UUID,
+            tab_creation_time: window.TAB_CREATION_TIME,
+            utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }));
+        options.url += options.url.endsWith("/") ? "" : "/";
+    });
 });
 $(function() {
-    $(window).on("focus", () => $(window).trigger("resize"));
+    // likely not needed (?)
+    // $(window).on("focus", () => $(window).trigger("resize"));
     $(document).keydown(function(e) {
         switch (e.key) {
             case "Enter": {
@@ -31,20 +51,22 @@ $(function() {
         }
     });
     $("input").on("show.daterangepicker", function(e, picker) {
-        function dothething(_minuteselect) {
-            _minuteselect.on("change", function() {
+        function dothething(_timeselects) {
+            _timeselects.on("change", function() {
                 setTimeout(function() {
                     // idk why but theres always a new minuteselect element when its changed
                     const minuteselect = picker.container.find(".minuteselect:visible");
                     minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-                    dothething(minuteselect);
+                    const timeselects = picker.container.find(".calendar-time > select:visible");
+                    dothething(timeselects);
                 }, 0);
             });
         }
         // There's a random invisible datepicker, so only query the one that's visible
         const minuteselect = picker.container.find(".minuteselect:visible");
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-        dothething(minuteselect);
+        const timeselects = picker.container.find(".calendar-time > select:visible");
+        dothething(timeselects);
     // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
     }).on('blur', function(e) {
         // Can't use relatedTarget because it needs to be on an element with a tabindex, which the daterangepicker doesn't have
@@ -59,7 +81,36 @@ $(function() {
         if (wasOpen)
             $("#username").blur();
     });
+    $("#account-dropdown").css("display", "block");
+    $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
+    $("#account-dropdown").css("display", "");
 
+    function resetHeaderLayout() {
+        const username = $("#user-greeting #username"),
+            logo = $("#logo-container"),
+            welcome = $("#welcome"),
+            plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
+            newassignmenttext = $("#new-assignment-text");
+    
+        logo.css({
+            left: '',
+            transform: '',
+        });
+        logo.find("img").css("width", "");
+        welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+        newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+    
+        if (!collision(username, logo, { margin: 30 })) return;
+        logo.css({
+            left: 5 + plus_button_width,
+            transform: "none",
+        });
+        welcome.toggle(!collision(welcome, logo, { margin: 30 }));
+    
+        if (!collision(username, logo, { margin: 10 })) return;
+        // compress the logo
+        logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+    }
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);
         resetHeaderLayout();
@@ -72,12 +123,16 @@ $(function() {
 // I'm not really sure how to ensure I do this for forward compatibility so I just hope I'll stumble upon this text again or
 // Somehow remember this in the future /shrug
 
-isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
-ajaxUtils = {
+window.isExampleAccount = ACCOUNT_EMAIL === EXAMPLE_ACCOUNT_EMAIL || EDITING_EXAMPLE_ACCOUNT;
+window.ajaxUtils = {
 disable_ajax: isExampleAccount && !EDITING_EXAMPLE_ACCOUNT, // Even though there is a server side validation for disabling ajax on the example account, initally disable it locally to ensure things don't also get changed locally
 error: function(response, textStatus) {
     if (ajaxUtils.silence_errors) return;
     assert(this.xhr); // Ensure "this" refers to a jquery ajax
+    if (response.status === 409) {
+        ajaxUtils.alertInvalidState();
+        return;
+    }
     let title;
     let content;
     switch (response.status) {
@@ -98,7 +153,7 @@ error: function(response, textStatus) {
             content = "Please <a href=\"/contact\">contact us</a> if you see this, and try to provide context on how the issue happened.";
             break;
         default:
-            title = `<p>Whoops, we've encountered an error${textStatus === "error" ? "" : ` of type "${textStatus}"`} while trying to connect with the server:</p>${response.responseText||response.statusText}`;
+            title = `Whoops, we've encountered an error${textStatus === "error" ? "" : ` of type "${textStatus}"`} while trying to connect with the server:<br><br>${response.responseText||response.statusText}`;
     }
     $.alert({
         title: title,
@@ -122,7 +177,6 @@ error: function(response, textStatus) {
     });
 },
 changeSetting: function(kwargs={}) {
-    if (ajaxUtils.disable_ajax) return;
     $.ajax({
         type: "PATCH",
         url: "/api/change-setting",
@@ -143,52 +197,72 @@ changeSetting: function(kwargs={}) {
         },
     });
 },
-createGCAssignments: function() {
-    if (ajaxUtils.disable_ajax || !CREATING_GC_ASSIGNMENTS_FROM_FRONTEND) return;
-    $.ajax({
-        type: "POST",
-        url: '/api/create-gc-assignments',
-        error: function(jqXHR) {
-            switch (jqXHR.status) {
-                case 302:
-                    var reauthorization_url = jqXHR.responseText;
-                    $.alert({
-                        title: "Invalid credentials.",
-                        content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable its integration.",
-                        buttons: {
-                            "disable integration": {
-                                action: function() {
-                                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
-                                }
-                            },
-                            "authenticate again": {
-                                action: function() {
-                                    reloadWhenAppropriate({href: reauthorization_url});
-                                }
-                            },
+GCIntegrationError: function(jqXHR) {
+    sessionStorage.removeItem("ajaxs");
+    switch (jqXHR.status) {
+        case 302:
+            var reauthorization_url = jqXHR.responseText;
+            $.alert({
+                title: "Invalid credentials.",
+                content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
+                buttons: {
+                    ok: {
+
+                    },
+                    "disable integration": {
+                        action: function() {
+                            ajaxUtils.changeSetting({setting: "oauth_token", value: false});
                         }
-                    });
-                    break;
+                    },
+                    reauthenticate: {
+                        action: function() {
+                            reloadWhenAppropriate({href: reauthorization_url});
+                        }
+                    },
+                }
+            });
+            break;
 
-                default:
-                    ajaxUtils.error.bind(this)(...arguments);
+        default:
+            ajaxUtils.error.bind(this)(...arguments);
+    }
+},
+createGCAssignments: function() {
+    let ajaxs = JSON.parse(sessionStorage.getItem("ajaxs")) || [
+        {type: "POST", url: '/api/create-gc-assignments', data: {order: "descending"}},
+        {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
+        {type: "POST", url: '/api/update-gc-courses'},
+        {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
+    ];
+    let ajaxCallback = function(response, textStatus, jqXHR) {
+        if (jqXHR.status === 204) {
+            // If the last ajaxs ajax reloads, ajaxs in sessionStorage will be []
+            // .shift on an empty array returns undefined, which is truthy
+            // So, it won't redo all the ajaxs, eliminating the need for a
+            // request session to manually prevent the ajaxs from being redone
+            // aka the legacy variable CREATING_GC_ASSIGNMENTS_FROM_FRONTEND
+            let ajax = ajaxs.shift();
+            if (!ajax) {
+                sessionStorage.removeItem("ajaxs");
+                return;
             }
-        },
-        success: function(response, textStatus, jqXHR) {
-            switch (jqXHR.status) {
-                case 204:
-                    break;
+            $.ajax({
+                type: ajax.type,
+                url: ajax.url,
+                data: ajax.data,
+                error: ajaxUtils.GCIntegrationError,
+                success: ajaxCallback,
+            });
+        } else if (jqXHR.status === 205) {
+            sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
+            reloadWhenAppropriate();
+        } else if (jqXHR.status === 200) {
 
-                case 205:
-                    reloadWhenAppropriate();
-                    break;
-            }
-        },
-    });
+        }
+    }
+    ajaxCallback(undefined, undefined, {status: 204});
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
-    if (ajaxUtils.disable_ajax) return;
-
     switch (batchCallbackName) {
         case "changeSetting": {
             if (!ajaxUtils.batchRequest[batchCallbackName]) {
@@ -236,7 +310,7 @@ sendBatchRequest: function(batchCallbackName, batchCallback) {
     delete ajaxUtils.batchRequest[batchCallbackName + "_timeout"];
     delete ajaxUtils.batchRequest[batchCallbackName + "_callback"];
 },
-saveAssignment: function(batchRequestData) {
+saveAssignment: function(batchRequestData, postError) {
 
     // Send data along with the assignment's primary key
 
@@ -252,19 +326,53 @@ saveAssignment: function(batchRequestData) {
                 case 413: {
                     $.alert({
                         title: "Too much data to save.",
-                        content: "If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.",
+                        content: `If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.<br><br>
+                        
+                        We understand if this may be frustrating, so feel free to <a href=\"/contact\">contact us</a> for personal assistance.`,
                         backgroundDismiss: false,
                     });
                     return;
                 }
             }
+            postError?.();
             ajaxUtils.error.bind(this)(...arguments);
         },
     });
 },
+alertInvalidState: function() {
+    if (ajaxUtils.evaluateCurrentState.showing_alert) return;
+    ajaxUtils.evaluateCurrentState.showing_alert = true;
+    $.alert({
+        title: "Your assignments are outdated.",
+        content: "You have modified your assignments on a different tab or device. Please reload the page to refresh your assignments.",
+        backgroundDismiss: false,
+        buttons: {
+            ignore: {
+
+            },
+            reload: {
+                action: reloadWhenAppropriate,
+            },
+        },
+        onDestroy: function() {
+            delete ajaxUtils.evaluateCurrentState.showing_alert;
+        },
+    });
+},
+evaluateCurrentState: function() {
+    $.ajax({
+        type: "POST",
+        url: "/api/evaluate-current-state",
+        error: function(response, textStatus) {
+            // lets make other errors to this api call silent
+            if (response.status !== 409) return;
+            ajaxUtils.alertInvalidState();
+        }
+    });
+},
 }
 
-mathUtils = {
+window.mathUtils = {
     // https://stackoverflow.com/questions/1458633/how-to-deal-with-floating-point-number-precision-in-javascript
     precisionRound: function(number, precision) {
         const factor = Math.pow(10, precision);
@@ -296,7 +404,7 @@ mathUtils = {
     }
 }
 // https://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
-function collision($div1, $div2, params={ margin: 0}) {
+window.collision = function($div1, $div2, params={ margin: 0}) {
     if ($div1.css("display") == "none") {
         var hide_$div1 = true;
         $div1.show();
@@ -321,35 +429,8 @@ function collision($div1, $div2, params={ margin: 0}) {
     if (bottom1 + params.margin < top2 || top1 - params.margin > bottom2 || right1 + params.margin < left2 || left1 - params.margin > right2) return false;
     return true;
 }
-function resetHeaderLayout() {
-    const username = $("#user-greeting #username"),
-        logo = $("#logo-container"),
-        welcome = $("#welcome"),
-        plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
-        newassignmenttext = $("#new-assignment-text");
-
-    logo.css({
-        left: '',
-        transform: '',
-    });
-    logo.find("img").css("width", "");
-    welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-    newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
-
-    if (!collision(username, logo, { margin: 30 })) return;
-    logo.css({
-        left: 5 + plus_button_width,
-        transform: "none",
-    });
-    welcome.toggle(!collision(welcome, logo, { margin: 30 }));
-
-    if (!collision(username, logo, { margin: 10 })) return;
-    // compress the logo
-    logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
-}
-
-reloadResolver = null;
-function reloadWhenAppropriate(params={href: null}) {
+window.reloadResolver = null;
+window.reloadWhenAppropriate = function(params={href: null}) {
     new Promise(function(resolve) {
         if ($(".jconfirm").length) {
             reloadResolver = resolve;

@@ -1,7 +1,20 @@
 from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
-from allauth.account.forms import *
+from allauth.account import app_settings
+from allauth.account.forms import (
+    LoginForm,
+    SignupForm,
+    AddEmailForm,
+    ChangePasswordForm,
+    ResetPasswordForm,
+    ResetPasswordKeyForm,
+    PasswordVerificationMixin,
+)
+from allauth.account.models import EmailAddress
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import filter_users_by_email
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django import forms
 from common.models import User
 from django.contrib import messages
 
@@ -88,7 +101,7 @@ class LabeledAddEmailForm(AddEmailForm):
         users = filter_users_by_email(value)
         on_this_account = [u for u in users if u.pk == self.user.pk]
         on_diff_account = [u for u in users if u.pk != self.user.pk]
-        on_example_account = value == settings.EXAMPLE_ACCOUNT_EMAIL
+        on_example_account = self.user.email == settings.EXAMPLE_ACCOUNT_EMAIL
 
         if on_example_account:
             raise forms.ValidationError(errors["example_account"])
@@ -111,7 +124,7 @@ class LabeledChangePasswordForm(ChangePasswordForm):
         self.label_suffix = ""
 
     def clean(self, *args, **kwargs):
-        if str(self.user) == settings.EXAMPLE_ACCOUNT_EMAIL:
+        if self.user.email == settings.EXAMPLE_ACCOUNT_EMAIL:
             raise forms.ValidationError(_("You cannot modify the example account"))
         return LabeledTwoPasswordForm.clean(self)
 
@@ -174,6 +187,13 @@ class LabeledSocialaccountSignupForm(SocialaccountSignupForm):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""
         self.fields['email'].widget = forms.HiddenInput()
+    
+    def clean_email(self):
+        value = self.cleaned_data["email"]
+        value = get_adapter().clean_email(value)
+        if value and app_settings.UNIQUE_EMAIL:
+            value = self.validate_unique_email(value)
+        return value
 
 class UsernameResetForm(forms.ModelForm):
     class Meta:

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone as _timezone
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from timezone_field import TimeZoneField
@@ -13,37 +14,54 @@ HORIZONTAL_TAG_POSITIONS = (
     ("Middle", "Middle"),
     ("Right", "Right"),
 )
-MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in HORIZONTAL_TAG_POSITIONS], key=len))
+MAX_HORIZONTAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in HORIZONTAL_TAG_POSITIONS], key=len))
 
 VERTICAL_TAG_POSITIONS = (
     ("Top", "Top"),
     ("Bottom", "Bottom"),
 )
-MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[1] for i in VERTICAL_TAG_POSITIONS], key=len))
+MAX_VERTICAL_TAG_POSITIONS_LENGTH = len(max([i[0] for i in VERTICAL_TAG_POSITIONS], key=len))
 
 ASSIGNMENT_SORTINGS = (
-    ("Normal", "Normal"),
-    ("Reversed", "Reversed"),
-    ("Tag Name", "Tag Name"),
+    ("Most Priority First", "Most Priority First"),
+    ("Least Priority First", "Least Priority First"),
+    ("Most Work Today First", "Most Work Today First"),
+    ("Least Work Today First", "Least Work Today First"),
+    ("Soonest Due Date First", "Soonest Due Date First"),
+    ("Tag Name A-Z", "Tag Name A-Z"),
+    ("Tag Name Z-A", "Tag Name Z-A")
 )
-MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[1] for i in ASSIGNMENT_SORTINGS], key=len))
+MAX_ASSIGNMENT_SORTINGS_LENGTH = len(max([i[0] for i in ASSIGNMENT_SORTINGS], key=len))
+
+BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH = (
+    ("none", "None"),
+    ("thin", "Thin"),
+    ("normal", "Normal"),
+    ("thick", "Thick"),
+)
+MAX_BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH_LENGTH = len(max([i[0] for i in BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH], key=len))
 
 ANIMATION_SPEED = (
     ("1", "Normal (1x)"),
     ("0.5", "Fast (2x)"),
     ("0", "None (No animation)"),
 )
-MAX_ANIMATION_SPEED_LENGTH = len(max([i[1] for i in ANIMATION_SPEED], key=len))
+MAX_ANIMATION_SPEED_LENGTH = len(max([i[0] for i in ANIMATION_SPEED], key=len))
 
 APPEARANCES = (
     ("automatic", "Sync with device"),
     ("light", "Light Mode"),
     ("dark", "Dark Mode"),
-    ("fancy dark", "𝐹𝒶𝓃𝒸𝓎 Dark Mode"),
+    ("lesser dark", "Lesser Dark Mode"),
 )
-MAX_APPEARANCES_LENGTH = len(max([i[1] for i in APPEARANCES], key=len))
+MAX_APPEARANCES_LENGTH = len(max([i[0] for i in APPEARANCES], key=len))
 
 class SettingsModel(models.Model):
+    # Group "Integration Configurations"
+    gc_assignments_always_midnight = models.BooleanField(
+        default=False,
+        verbose_name=_('Google Classroom 11:59 PM Due Time Fix'),
+    )
 
     # Group "Assignment Deletion"
     immediately_delete_completely_finished_assignments = models.BooleanField(
@@ -104,7 +122,7 @@ class SettingsModel(models.Model):
     assignment_sorting = models.CharField(
         max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
         choices=ASSIGNMENT_SORTINGS,
-        default=("Normal"),
+        default=_("Most Priority First"),
         verbose_name=_('Assignment Sorting: '),
     )
     
@@ -113,6 +131,10 @@ class SettingsModel(models.Model):
         default=empty_list,
         blank=True,
         verbose_name=_('Default Dropdown Tags'),
+    )
+    display_working_days_left = models.BooleanField(
+        default=False,
+        verbose_name=('Display Number of Working Days Left'),
     )
     horizontal_tag_position = models.CharField(
         max_length=MAX_HORIZONTAL_TAG_POSITIONS_LENGTH,
@@ -140,6 +162,12 @@ class SettingsModel(models.Model):
         blank=True,
         verbose_name=_('Background Image'),
     )
+    background_image_text_shadow_width = models.CharField(
+        max_length=MAX_BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH_LENGTH,
+        choices=BACKGROUND_IMAGE_TEXT_SHADOW_WIDTH,
+        default=_("normal"),
+        verbose_name=_('Background Image Text Shadow Width'),
+    )
     animation_speed = models.CharField(
         max_length=MAX_ANIMATION_SPEED_LENGTH,
         choices=ANIMATION_SPEED,
@@ -153,7 +181,7 @@ class SettingsModel(models.Model):
         verbose_name=_('Tutorial'),
     )
     sorting_animation_threshold = models.IntegerField(
-        default=15,
+        default=50,
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
         verbose_name=_('Sorting Animation Threshold'),
     )
@@ -163,16 +191,32 @@ class SettingsModel(models.Model):
     )
 
     # Hidden
+    # Custom field validation in views: hardcoded enable or disable in change_setting
     oauth_token = models.JSONField(
         default=empty_dict,
         blank=True,
     )
+    # Custom field validation in views: excluded in SettingsForm.Meta.exclude in change_setting
     added_gc_assignment_ids = models.JSONField(
+        default=empty_list,
+        blank=True,
+    )
+    # Custom field validation in views: excluded in SettingsForm.Meta.exclude in change_setting
+    gc_courses_cache = models.JSONField(
         default=empty_list,
         blank=True,
     )
     seen_latest_changelog = models.BooleanField(
         default=True,
+    )
+    nudge_calendar = models.BooleanField(
+        default=False,
+    )
+    nudge_notifications = models.BooleanField(
+        default=False,
+    )
+    nudge_canvas = models.BooleanField(
+        default=False,
     )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -180,6 +224,16 @@ class SettingsModel(models.Model):
         # allow change setting form validation without a user
         null=True,
         blank=True,
+    )
+    device_uuid = models.CharField(
+        max_length=8,
+        null=True,
+        blank=True,
+    )
+    device_uuid_api_timestamp = models.DateTimeField(
+        null=True,
+        blank=True,
+        default=_timezone.now,
     )
     def __str__(self):
         return self.user.username

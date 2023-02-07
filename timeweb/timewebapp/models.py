@@ -75,10 +75,13 @@ class TimewebModel(models.Model):
         blank=True,
         null=True,
     )
-    description = models.TextField(
-        null=True,
+    min_work_time = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0"),_("The minimum work time must be positive or zero"))],
         blank=True,
-        verbose_name=_('Assignment Description'),
+        null=True,
+        verbose_name=_('Minimum Daily Work Time'),
     )
     unit = models.CharField(
         null=True,
@@ -105,13 +108,11 @@ class TimewebModel(models.Model):
         null=True,
         verbose_name=_('Step Size'),
     )
-    min_work_time = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal("0"),_("The minimum work time must be positive or zero"))],
-        blank=True,
+    # order description above break_days or else it just looks really awkward of break_days isn't last
+    description = models.TextField(
         null=True,
-        verbose_name=_('Minimum Daily Work Time'),
+        blank=True,
+        verbose_name=_('Assignment Description'),
     )
     break_days = MultiSelectField(
         choices=WEEKDAYS,
@@ -152,6 +153,10 @@ class TimewebModel(models.Model):
     )
     dont_hide_again = models.BooleanField(
         default=False,
+    )
+    deletion_time = models.DateTimeField(
+        null=True,
+        blank=True,
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

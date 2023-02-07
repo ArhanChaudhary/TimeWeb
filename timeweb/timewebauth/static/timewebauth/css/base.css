@@ -120,7 +120,7 @@ body {
 }
 @-webkit-keyframes bubbleUp {
     from {
-        transform: translateY(100vh);
+        transform: translateY(var(--100vh));
     }
     to {
         transform: translateY(-100%);
@@ -128,7 +128,7 @@ body {
 }
 @keyframes bubbleUp {
     from {
-        transform: translateY(100vh);
+        transform: translateY(var(--100vh));
     }
     to {
         transform: translateY(-100%);
@@ -200,7 +200,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: var(--100vh);
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }

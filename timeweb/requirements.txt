@@ -1,20 +1,20 @@
 asgiref==3.4.1
 beautifulsoup4==4.11.1
 cachetools==4.2.2
-certifi==2021.5.30
+certifi==2022.12.7
 cffi==1.15.0
 chardet==4.0.0
 charset-normalizer==2.0.4
 cryptography==36.0.0
 defusedxml==0.7.1
-Django==4.0.6
-django-allauth==0.49.0
+Django==4.0.9
+django-allauth==0.52.0
 django-cleanup==5.2.0
 django-colorfield==0.4.3
 django-contact-form==1.9
 django-csp==3.7
 django-livereload-server==0.4
-django-minify-html @ git+https://github.com/adamchainz/django-minify-html.git@234467bcfa4670b7d50e51bdba685c7f977b79df
+django-minify-html==1.4.0
 django-multiselectfield==0.1.12
 django-pwa @ git+https://github.com/ArhanChaudhary/django-pwa.git@060de0e83e9798d1001f75087a693c4d7dd1dda8
 django-ratelimit==3.0.1
@@ -34,11 +34,11 @@ gunicorn==20.1.0
 html5lib==1.1
 httplib2==0.19.1
 idna==3.2
-minify_html==0.8.0
-oauthlib==3.1.1
+minify_html==0.10.7
+oauthlib==3.2.2
 packaging==21.0
-Pillow==9.0.1
-protobuf==3.17.3
+Pillow==9.3.0
+protobuf==3.18.3
 psycopg2==2.9.3
 psycopg2-binary==2.9.3
 pyasn1==0.4.8

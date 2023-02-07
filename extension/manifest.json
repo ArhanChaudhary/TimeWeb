@@ -3,12 +3,12 @@
     "manifest_version": 3,
     "version": "2.0.0",
 
-    "description": "Are your planners just not enough for all of your work? Say no more. Introducing TimeWeb — The new way to manage your time.",
+    "description": "TimeWeb is a time management app that visualizes, quantifies, and prioritizes your assignments' work.",
     "icons": {
-        "16": "16.png",
-        "32": "32.png",
-        "48": "48.png",
-        "128": "128.png"
+        "16": "16.webp",
+        "32": "32.webp",
+        "48": "48.webp",
+        "128": "128.webp"
     },
     
     "background": {

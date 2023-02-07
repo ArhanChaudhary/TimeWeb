@@ -16,10 +16,7 @@ body {
     background-color: var(--body-background);
 }
 select {
-    color: var(--color); /* doesn't inherit properly */
-
     -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
     cursor: pointer;
     padding: 2px 16px 2px 4px !important;
@@ -31,8 +28,7 @@ select, .daterangepicker select:not(#dummyforspecifityurmomisprettythick) {
     /* safari is really mean (https://stackoverflow.com/questions/7638677/how-can-i-remove-the-gloss-on-a-select-element-in-safari-on-mac) */
     background: var(--dropdown-arrow) no-repeat;
     background-color: var(--primary);
-    --border-color: var(--primary);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color);
     background-size: 10px;
     background-position: right 3px top 55%;
     background-repeat: no-repeat;
@@ -47,6 +43,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 input[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 header {
@@ -101,7 +98,7 @@ header > * {
 }
 main {
     position: relative; /* Needed for positioning the background image */
-    height: 100vh;
+    height: var(--100vh);
     padding: calc(10px + var(--header-height)) 20px 0;
     overflow-y: auto;
     box-shadow: inset 20px 0 0 0 var(--primary), inset -20px 0 0 0 var(--primary);
@@ -111,7 +108,7 @@ main {
 }
 main.finished-header-transition {
     padding: 10px 20px 0;
-    height: calc(100vh - var(--header-height));
+    height: calc(var(--100vh) - var(--header-height));
     margin-top: var(--header-height);
 }
 .generic-button, ::file-selector-button {
@@ -131,6 +128,10 @@ main.finished-header-transition {
     border-color: hsl(0, 0%, 58%);
     font-size: 13px;
 }
+select, .daterangepicker .drp-buttons .cancelBtn {
+    color: var(--color); /* doesn't inherit properly */
+}
+
 ::file-selector-button {
     border-color: var(--color);
 }
@@ -156,9 +157,6 @@ main.finished-header-transition {
 
     border-color: transparent;
     background-color: #357ebd;
-    color: #fff;
-}
-.daterangepicker .drp-buttons .cancelBtn {
     color: #fff;
 }
 #logo-container {
@@ -230,6 +228,8 @@ main.finished-header-transition {
     transform: translate(50%, 16px);
     white-space: nowrap;
     border: 3px solid transparent;
+    --margin-right: 0px;
+    margin-right: var(--margin-right);
     -webkit-text-fill-color: currentcolor;
 }
 #username:focus-within #account-dropdown {
@@ -242,7 +242,7 @@ main.finished-header-transition {
     border-color: transparent transparent rgb(43, 56, 68) transparent;
     bottom: 100%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateX(var(--margin-right));
     position: absolute;
 }
 #account-dropdown :hover,
@@ -285,11 +285,12 @@ main.finished-header-transition {
     display: inline-block;
     cursor: default !important;
     position: relative;
-    width: 14px;
-    height: 14px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: rgb(33,163,177) !important;
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 17px;
     font-weight: 400;
     font-style: italic;
     font-family: "Serif";
@@ -297,7 +298,6 @@ main.finished-header-transition {
     
     color: white;
     text-align: center;
-    line-height: 15px;
 }
 .info-button::after {
     content: "";
@@ -334,19 +334,19 @@ main.finished-header-transition {
     display: block;
     text-align: left;
     padding: 0 !important;
-    font-size: 13px;
-    line-height: 14px;
+    font-size: 14px;
+    line-height: 15px;
     font-style: normal;
     white-space: pre-line;
     opacity: 0;
 }
 .info-button-text.info-right {
     left: calc(100% + 14px);
-    transform: translateY(-50%) translateY(-7px);
+    transform: translateY(-50%) translateY(-8.5px);
 }
 .info-button-text.info-left {
     right: calc(100% + 14px);
-    transform: translateY(-50%) translateY(-7px);
+    transform: translateY(-50%) translateY(-8.5px);
 }
 .info-button-text.info-top {
     bottom: calc(100% + 14px);
@@ -426,6 +426,26 @@ main.finished-header-transition {
     /* color from the jconfirm library when button is hovered */
     background-color: #2980b9;
     box-shadow: 0 0 0 1px #2980b9;
+}
+.jconfirm a {
+    color: rgb(0, 0, 238);
+}
+.jconfirm a:visited {
+    color: rgb(85, 26, 139);
+}
+@media (prefers-color-scheme: dark) {
+    .jconfirm a {
+        color: rgb(158, 158, 255);
+    }
+    .jconfirm a:visited {
+        color: rgb(208, 173, 240);
+    }
+}
+body.dark .jconfirm a {
+    color: rgb(158, 158, 255);
+}
+body.dark .jconfirm a:visited {
+    color: rgb(208, 173, 240);
 }
 @media screen and (max-width: 700px) {
     .jconfirm .jconfirm-box {

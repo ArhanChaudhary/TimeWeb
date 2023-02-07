@@ -2,7 +2,7 @@ $(function() {
 
     // Reset storages from saveAndLoadStates from util.js
     sessionStorage.removeItem("open_assignments");
-    localStorage.removeItem("scroll");
+    sessionStorage.removeItem("scroll");
     localStorage.removeItem("last_visit");
 
     $(".socialaccount-container").click(function() {

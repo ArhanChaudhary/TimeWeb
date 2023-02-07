@@ -61,6 +61,9 @@ main.background-image-exists {
 #assignments-container.viewing-deleted-assignments .graph-footer {
     height: var(--assignment-margin-bottom);
 }
+#assignments-container.viewing-deleted-assignments .assignment {
+    --priority-color: var(--color);
+}
 #assignments-container.viewing-deleted-assignments .left-side-of-header {
     --left-side-of-header-width: initial;
 }
@@ -69,12 +72,16 @@ main.background-image-exists {
 }
 #assignments-container.viewing-deleted-assignments #no-assignments-message {
     padding: 0 var(--outer-assignment-horizontal-padding);
-    font-size: 17px;
+    font-size: 18px;
 }
 #extra-navs-positioner {
     box-sizing: border-box;
-    min-height: calc(100vh - var(--header-height) - 10px);
+    min-height: calc(var(--100vh) - var(--header-height) - 10px);
     position: relative;
+}
+#extra-navs-positioner > span {
+    display: flex;
+    flex-flow: column;
 }
 #background-image {
     bottom: 0;
@@ -92,7 +99,7 @@ main.background-image-exists {
 }
 #assignments-header {
     position: relative;
-    font-size: 17px;
+    font-size: 18px;
     z-index: 1001;
     padding: 0 var(--outer-assignment-horizontal-padding);
     display: flex;
@@ -126,7 +133,7 @@ main.background-image-exists {
     order: 1;
     gap: 3px;
     margin-left: auto;
-    padding-left: 15px;
+    padding-left: 35px;
 }
 #id_assignment_sorting {
     padding-top: 1px !important;
@@ -147,14 +154,10 @@ main.background-image-exists {
 .assignment-container {
     /* I remember the 2s was here for an important reason but i have no clue what */
     transition: transform 2s ease-in-out;
-    font-size: 12pt;
+    font-size: 17px;
     position: relative;
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
 }
 .assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
     transition: none !important;
@@ -178,7 +181,8 @@ main.background-image-exists {
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring a {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
@@ -200,20 +204,20 @@ main.background-image-exists {
     transition: background-color calc(var(--priority-color-transition-speed) * var(--animation-speed));
 }
 #tutorial-click-assignment-to-open {
-    font-size: 17px;
+    font-size: 18px;
     scroll-margin: 30px;
 }
 .shortcut {
     position: relative;
-    display: none;
+    display: flex;
     justify-content: space-evenly;
     align-items: center;
     --margin-top-and-bottom: var(--outer-assignment-vertical-padding);
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
 }
-.assignment-container .shortcut {
-    display: flex;
+.assignment-container.add-shortcut-margin {
+    margin-top: 5px;
 }
 .shortcut-text {
     white-space: nowrap;
@@ -237,7 +241,7 @@ main.background-image-exists {
     padding-top: 1px !important;
     padding-bottom: 1px !important;
     vertical-align: top;
-    font-size: 10pt;
+    font-size: 14px;
 }
 .shortcut .generic-button {
     margin-top: 1px;
@@ -314,7 +318,7 @@ main.background-image-exists {
     position: relative;
     padding: var(--vertical-assignment-padding) var(--horizontal-assignment-padding);
     align-items: center;
-    --arrow-margin-left: max(5px,calc(-5px + 2vw));
+    --arrow-margin-left: max(5px, calc(-5px + 2vw));
 }
 .left-side-of-header {
     display: flex; /* things position weirdly when assignments are open without this for some reason */
@@ -322,11 +326,7 @@ main.background-image-exists {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: calc(40px + 11vw);
-}
-.fancy-coloring {
-    color: var(--priority-color);
-    transition: color calc(var(--priority-color-transition-speed) * var(--animation-speed));
+    --left-side-of-header-width: max(105px, calc(35px + 12vw));
 }
 .description {
     position: relative;
@@ -335,7 +335,7 @@ main.background-image-exists {
     opacity achieves this
     reference: https://stackoverflow.com/questions/16148007/which-css-properties-create-a-stacking-context */
 
-    /* Opacity should also be used to ensure fancy dark mode appearance works */
+    /* Opacity should also be used to ensure the dark mode text coloring appearance works */
     opacity: var(--description-opacity);
     transform: translateY(-2px);
     min-width: var(--left-side-of-header-width);
@@ -351,18 +351,19 @@ main.background-image-exists {
 }
 .left-side-of-header .title .title-link-anchor {
     color: var(--color);
-    display: none;
 }
 .left-side-of-header .title .title-link-icon {
     margin-bottom: -2.5px;
     border-bottom: 1.5px solid var(--color);
     padding-bottom: 3px;
+    transition: inherit;
+    transition-property: border-bottom-color;
 }
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 8;
+    -webkit-line-clamp: 3;
     overflow: hidden;
 }
 .assignment.open-assignment .left-side-of-header.display-truncate-warning::after {
@@ -380,7 +381,7 @@ main.background-image-exists {
 .assignment.open-assignment, .assignment.assignment-is-closing {
     padding-bottom: unset;
 }
-.assignment:not(.open-assignment) .title {
+.assignment .title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -415,7 +416,7 @@ main.background-image-exists {
 }
 .arrow-container {
     margin-left: var(--arrow-margin-left);
-    margin-right: 11px;
+    margin-right: 10px;
     overflow: visible;
     fill: currentColor;
 }
@@ -431,16 +432,17 @@ main.background-image-exists {
 /* selects the element right before right-side-of-header
 do this because midde-of-header is hidden in the delete assignments view */
 .assignment-header > :nth-last-child(2) {
-    margin-right: 35px;
+    --assignment-header-text-right-margin: 25px;
+    margin-right: var(--assignment-header-text-right-margin);
 }
 .align-to-status-message-container {
-    margin-left: 5px;
+    margin-left: 6px;
 }
 .tags {
     position: absolute;
     z-index: 1;
     white-space: nowrap;
-    font-size: 0.75em;
+    font-size: 13.6px;
     --tags-left--margin-bottom: 7px;
     --tags-bottom--margin-bottom: 3px;
     --tags-right--margin-right: 2px;
@@ -466,10 +468,6 @@ do this because midde-of-header is hidden in the delete assignments view */
     bottom: var(--tags-bottom--margin-bottom);
 }
 
-
-.assignment.tags-left .tag-add-box {
-    left: 23px;
-}
 .tag-wrapper {
     position: relative;
     display: inline-flex;
@@ -498,9 +496,9 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .tag-delete {
     position: absolute;
-    width: 9px;
-    height: 9px;
-    right: 3px;
+    width: 10.5px;
+    height: 10.5px;
+    right: 4px;
     border-radius: 50%;
     background-color: var(--color);
     cursor: pointer;
@@ -528,8 +526,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     vertical-align: top;
     display: inline-block;
     top: 0;
-    width: 16.8px;
-    height: 16.8px;
+    width: 19.7px;
+    height: 19.7px;
     border-radius: 10px;
     --background-color: hsl(0, 0%, 91%);
     background-color: var(--background-color);
@@ -566,42 +564,53 @@ do this because midde-of-header is hidden in the delete assignments view */
     transition: margin-right calc(0.15s * var(--animation-speed)) ease-in-out;
 }
 .tag-wrapper:hover .tag-name, .tag-wrapper.keep-delete-open .tag-name {
-    margin-right: 11px;
+    margin-right: 15px;
 }
 .tag-wrapper:hover .tag-delete, .tag-wrapper.keep-delete-open .tag-delete {
     opacity: 1;
     transform: scale(1.2);
 }
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
-    width: 68px;
+    width: 78px;
 }
 .tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
 }
 .tag-add-box {
     white-space: normal;
-    width: 155px;
+    width: 159px;
     --box-shadow-color: hsla(0, 0%, 67%, 0.65);
+    --box-shadow-color2: black;
     --input-background-color: hsl(0, 0%, 86%);
     --background-color: var(--body-background);
 
     box-shadow: 0 2px 5px 1px var(--box-shadow-color) !important;
     background: var(--background-color) !important;
     transform-origin: top;
-    transform: translateX(-50%) translateX(6px) scale(0.85) translateY(-5px) !important;
-    transition: transform calc(0.15s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
+    transform: translateX(-50%) translate(8px, -5px) scale(0.85) !important;
+    /* let's use 0.14 instead of 0.15 because 0.15 can overflow offscreen and cause the 
+    x scrollbar to show up */
+    transition: transform calc(0.14s * var(--animation-speed)) cubic-bezier(0.31, 1.15, 0.5, 1.2),
                 opacity calc(0.1s * var(--animation-speed)) ease-out;
+}
+/* mobile view also effects the left */
+.tags.tags-left .tag-add-box {
+    --move-left: 58px;
+    left: var(--move-left);
 }
 .tag-add-box::after {
     border-color: transparent transparent var(--input-background-color) transparent !important;
     pointer-events: none;
+    margin-right: var(--move-left);
     bottom: calc(100% - 1px) !important; /* -1 because 100% sometimes doesnt align properly */
+    filter: drop-shadow(0 0 1px var(--box-shadow-color2));
+    z-index: -1;
 }
 .assignment.open-tag-add-box {
     z-index: 1001;
 }
 .assignment.open-tag-add-box .tag-add-box {
-    transform: translateX(-50%) translateX(6px) !important;
+    transform: translateX(-50%) translateX(8px) !important;
     opacity: 1;
     height: unset;
     overflow: visible;
@@ -705,7 +714,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     word-break: break-word;
 }
 .tag-add-checkbox {
-    -webkit-appearance: revert;
+    appearance: revert;
 }
 .tag-add-transition-disabler {
     transition: none !important;
@@ -716,14 +725,14 @@ do this because midde-of-header is hidden in the delete assignments view */
     right: 0;
     left: 0;
     margin: auto;
-    height: 6px;
+    height: 7px;
     width: 1px;
     position: absolute;
 }
 .tag-add > .icon-slash {
     right: unset;
-    left: 7.75px;
-    height: 10px;
+    left: 9.25px;
+    height: 12px;
     background-color: var(--color);
 }
 .x-first-slash {
@@ -753,8 +762,10 @@ do this because midde-of-header is hidden in the delete assignments view */
     /* negate the variable pixel value */
     margin-top: calc(-1 * var(--vertical-assignment-padding));
     margin-bottom: calc(-1 * var(--vertical-assignment-padding));
-    margin-right: -4px;
-    padding: 0 7px;
+    margin-left: 1px;
+    margin-right: -3px;
+    --horizontal-header-button-padding: 8px;
+    padding: 0 var(--horizontal-header-button-padding);
     cursor: pointer;
     background-color: var(--background-color);
     transition: background-color 0.25s ease-out;
@@ -762,6 +773,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 .assignment-header-button:focus, .assignment-header-button:hover {
     outline: 0;
     --background-color: rgb(173, 216, 230);
+    z-index: 1;
 }
 .assignment-header-button:active svg {
     transform: scale(0.95);
@@ -808,6 +820,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     gap: 4px;
 }
 .today-display-in-text hr {
+    border-width: 1.5px;
     display: inline-block;
     flex-grow: 1;
 }
@@ -826,7 +839,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 .hover-point-label {
     position: absolute;
     padding: 4px 7px;
-    font-size: 13px;
+    font-size: 15px;
     box-shadow: 0 1px 3px 1px hsla(0, 0%, 0%, 0.3);
     background-color: var(--primary);
     border-radius: 3px;
@@ -834,15 +847,12 @@ do this because midde-of-header is hidden in the delete assignments view */
     pointer-events: none; /* hovering this label doesn't allow clicking the graph */
     --translatex: 10px;
     /* Don't make transform origin left or right or else the transitions between left and right get messed up */
-    transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%);
+    transform: translate(calc(1px * var(--x, 0)), calc(1px * var(--y, 0))) translate(var(--translatex), -50%);
     transition: transform calc(0.1s * clamp(0, var(--animation-speed) * 999, 1)) linear;
 }
 .hover-point-label.hide-label {
-    transform: translate(calc(1px * var(--x)), calc(1px * var(--y))) translate(var(--translatex), -50%) 
+    transform: translate(calc(1px * var(--x, 0)), calc(1px * var(--y, 0))) translate(var(--translatex), -50%) 
             scale(0.002); /* for some really odd reason scale(0) break the transition on safari and on mobile */
-}
-.hover-point-label.initial-position {
-    transform: scale(0.002);
 }
 .hover-point-label.move-left {
     --translatex: calc(-100% - 10px);
@@ -914,11 +924,12 @@ do this because midde-of-header is hidden in the delete assignments view */
     display: flex;
     visibility: hidden;
     justify-content: center;
+    white-space: nowrap;
     flex-wrap: wrap;
     margin-right: 45px;
     margin-left: 45px;
     gap: 7px;
-    --font-size: 14px;
+    --font-size: 15px;
     font-size: var(--font-size);
     line-height: calc(3 * var(--font-size));
 }
@@ -927,6 +938,9 @@ main:not(.background-image-exists) #extra-navs {
 }
 main.finished-header-transition #extra-navs {
     visibility: initial;
+}
+#extra-navs span {
+    white-space: nowrap;
 }
 #extra-navs span a {
     color: var(--color);
@@ -950,11 +964,20 @@ main.finished-header-transition #extra-navs {
     border-color: var(--color);
 }
 
-.grey-highlight:not(.assignment-container),
-.grey-highlight.assignment-container::after,
-.grey-highlight.assignment-container::before {
-    --filter-drop-shadow-color: hsl(0, 0%, 73%);
+#assignments-container.thin-text-shadow-width {
     --filter-drop-shadow-width: 0.5px;
+}
+#assignments-container.normal-text-shadow-width {
+    --filter-drop-shadow-width: 1px;
+}
+#assignments-container.thick-text-shadow-width {
+    --filter-drop-shadow-width: 1.5px;
+}
+
+#assignments-container:not(.none-text-shadow-width) .grey-highlight:not(.assignment-container),
+#assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::after,
+#assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::before {
+    --filter-drop-shadow-color: hsl(0, 0%, 73%);
     filter: drop-shadow(0 var(--filter-drop-shadow-width) 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(0 calc(-1 * var(--filter-drop-shadow-width)) 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(var(--filter-drop-shadow-width) 0 0 var(--filter-drop-shadow-color, transparent))
@@ -963,6 +986,9 @@ main.finished-header-transition #extra-navs {
 
 
 /* Mobile view */
+.show-on-mobile {
+    display: none;
+}
 @media screen and (max-width: 850px) {
     .assignment {
         --box-shadow: 0 0 12px -8px black;
@@ -978,14 +1004,28 @@ main.finished-header-transition #extra-navs {
     .shortcut-line-left, .shortcut-line-right {
         --negative-horizontal-margin: -9px;
     }
-    .shortcut-text {
-        font-size: 15px;
+    .assignment-header > :nth-last-child(2) {
+        --assignment-header-text-right-margin: 10px;
+    }
+    .assignment-header-button {
+        margin-left: 0px;
+        margin-right: -4px;
+    }
+    .status-image {
+        position: absolute;
+        visibility: hidden;
+    }
+    .align-to-status-message-container {
+        margin-left: -3px;
     }
     .hide-on-mobile {
         display: none;
     }
-    .left-side-of-header .title .title-link-anchor {
+    .show-on-mobile {
         display: initial;
+    }
+    .tags.tags-left .tag-add-box {
+        left: 58px;
     }
     main {
         box-shadow: none;

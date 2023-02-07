@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{% static 'navbar/css/settings.css' %}">
     {% if settings_model.appearance == "automatic" %}
         <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
-    {% elif settings_model.appearance == "dark" or settings_model.appearance == "fancy dark" %}
+    {% elif settings_model.appearance == "dark" or settings_model.appearance == "lesser dark" %}
         <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
     {% endif %}
 {% endblock %}
@@ -29,7 +29,7 @@
     {% comment %} Injects libraries for the color picker {% endcomment %}
     {{ form.media }}
     <div id="settings-scroller">
-    <form method="POST" autocomplete="off" enctype="multipart/form-data">
+    <form method="POST" autocomplete="off" enctype="multipart/form-data" id="settings-form">
         {% csrf_token %}
         {% if request.user.email == EXAMPLE_ACCOUNT_EMAIL %}
             Note: changes to the settings in the example account are not saved.
@@ -39,7 +39,7 @@
             <span class="error-note">{{ error|escape }}</span>
         {% endfor %}
         {% for field in form.visible_fields %}
-            {% if field.name == "enable_gc_integration" or field.name == "immediately_delete_completely_finished_assignments" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "enable_tutorial" %}
+            {% if field.name == "enable_gc_integration" or field.name == "gc_assignments_always_midnight" or field.name == "immediately_delete_completely_finished_assignments" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "enable_tutorial" %}
                 {% if field.name != "enable_gc_integration" %}
                     </div>
                 {% endif %}
@@ -47,6 +47,8 @@
                     <span class="field-group-label">
                         {% if field.name == "enable_gc_integration" %}
                             Integrations
+                        {% elif field.name == "gc_assignments_always_midnight" %}
+                            Integration Configurations
                         {% elif field.name == "immediately_delete_completely_finished_assignments" %}
                             Assignment Deletion
                         {% elif field.name == "def_min_work_time" %}
@@ -83,24 +85,25 @@
                             {% endfor %}
                             {{ field }}
                             {% if field.widget_type == "checkbox" %}
-                                <label {% if field.name == "view_deleted_assignments" %}class="single-action-label"{% endif %} tabindex="0" for={{ field.auto_id }}>
+                                <label {% if field.name == "view_deleted_assignments" %}class="single-action-label immediate-action"{% endif %} tabindex="0" for={{ field.auto_id }}>
                                     {% if field.name == "view_deleted_assignments" %}
                                         View
                                     {% else %}
-                                        <span class="toggle-text">
-                                            {% if field.name == "enable_gc_integration" %}
+                                        {% if field.name == "enable_gc_integration" or field.name == "calendar_integration" or field.name == "notifications_integration" or field.name == "canvas_integration" %}
+                                            <span class="toggle-text">
                                                 Disable
-                                            {% else %}
-                                                Off
-                                            {% endif %}
-                                        </span>
-                                        <span class="toggle-text">
-                                            {% if field.name == "enable_gc_integration" %}
+                                            </span>
+                                            <span class="toggle-text">
                                                 Enable
-                                            {% else %}
+                                            </span>
+                                        {% else %}
+                                            <span class="toggle-text">
+                                                Off
+                                            </span>
+                                            <span class="toggle-text">
                                                 On
-                                            {% endif %}
-                                        </span>
+                                            </span>
+                                        {% endif %}
                                     {% endif %}
                                 </label>
                             {% endif %}
@@ -115,7 +118,11 @@
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
-        <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
+        <div id="button-container">
+            {% comment %} order needs to be switched so the mobile view stacks save on top of reset {% endcomment %}
+            <input type="submit" value="Save" id="submit-settings-button" class="generic-button">
+            <input type="button" value="Reset" id="reset-settings-button" class="generic-button">
+        </div>
     </form>
     </div>
 {% endblock %}

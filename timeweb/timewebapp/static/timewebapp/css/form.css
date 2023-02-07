@@ -7,6 +7,9 @@
     --error-note-color: hsl(353deg, 77%, 50%);
     --field-widget-background-color: hsl(0, 0%, 97%);
 }
+#form-wrapper form, #break-days-wrapper {
+    --field-wrapper-border: 1px solid var(--color);
+}
 /* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
 #form-wrapper .field-wrapper > textarea:focus {
@@ -47,13 +50,16 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     content: "(Enter today if you don't remember)";
 }
 #form-wrapper {
-    width: min(100vw, 490px);
+    --raw-form-width: min(calc(100vw - 55px), 490px);
+    width: var(--raw-form-width);
     box-sizing: border-box;
     background: var(--primary);
     box-shadow: 0 0 100px -23px black;
     margin: 5px auto 35px;
     border-radius: 15px;
-    padding: 5px 15px 25px;
+    --horizontal-form-margin: 15px;
+    padding: 5px var(--horizontal-form-margin) 25px;
+    --form-width: calc(var(--raw-form-width) - var(--horizontal-form-margin) * 2);
     position: relative;
     letter-spacing: 0.5px;
 }
@@ -123,32 +129,32 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     box-sizing: border-box;
 }
 #form-wrapper #selected-form-tab-styling {
-    border-top: 1px solid var(--color);
-    border-left: 1px solid var(--color);
-    border-right: 1px solid var(--color);
+    border-top: var(--field-wrapper-border);
+    border-left: var(--field-wrapper-border);
+    border-right: var(--field-wrapper-border);
     width: calc(50% - var(--horizontal-field-group-tab-padding));
     margin: 0 -1px;
     border-top-right-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
 }
 #form-wrapper .selected-form-tab-styling-line {
-    border-bottom: 1px solid var(--color);
+    border-bottom: var(--field-wrapper-border);
     align-self: flex-end;
     width: calc(50% + 1px);
 }
 #form-wrapper #first-tab-line {
     border-bottom-right-radius: var(--border-radius);
-    border-right: 1px solid var(--color);
+    border-right: var(--field-wrapper-border);
 }
 #form-wrapper #second-tab-line {
     border-bottom-left-radius: var(--border-radius);
-    border-left: 1px solid var(--color);
+    border-left: var(--field-wrapper-border);
 }
 #field-group-picker-styling * {
     transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
-    transform: translateX(-207px);
+    transform: translateX(calc(var(--form-width) / 100 * -45));
 }
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group {
     margin-left: calc(-100% - var(--field-group-gap));
@@ -159,7 +165,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #fields-wrapper #second-field-group .instant-margin-transition,
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group .instant-margin-transition {
-    margin-bottom: -100% !important;
+    margin-bottom: -9999px !important;
 }
 #form-wrapper .notransition {
     transition: none;
@@ -172,7 +178,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    --vertical-field-padding: 13px;
+    --vertical-field-padding: 15px;
     padding-top: var(--vertical-field-padding);
     padding-bottom: var(--vertical-field-padding);
 }
@@ -239,20 +245,51 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper #fields-wrapper {
     --magic-wand-width: 34px;
 }
+#form-wrapper #id_name {
+    padding-right: 26px;
+}
 #form-wrapper #id_x, #form-wrapper #id_y {
     padding-left: var(--magic-wand-width);
 }
 #form-wrapper .field-wrapper.has-widget > input {
-    width: initial;
     flex-grow: 1;
-    border-top-right-radius: unset;
-    border-bottom-right-radius: unset;
+}
+#form-wrapper .field-wrapper.has-widget:not(.disabled-field.disable-widget-along-with-field) > input {
+    width: initial;
+    border-top-right-radius: initial;
+    border-bottom-right-radius: initial;
+}
+#form-wrapper .field-wrapper.has-widget.disabled-field:not(.disable-widget-along-with-field) > input:first-of-type {
+    border-right: none;
+}
+#form-wrapper .field-wrapper.has-widget.disabled-field:not(.disable-widget-along-with-field) > label:last-of-type {
+    border-left: var(--field-wrapper-border);
 }
 #form-wrapper .field-widget-checkbox:not(#id_soft) {
     position: absolute;
-    left: -100vw;
+    /* don't use left: -100vw; because it breaks on smaller vws */
+    left: -9999px;
 }
-#form-wrapper .field-widget {
+#form-wrapper input:not(.field-widget-checkbox),
+#form-wrapper textarea {
+    padding: var(--vertical-form-padding) var(--horizontal-form-padding);
+    width: 100%;
+    /* Style meant to be overwritten */
+    border: none;
+}
+#form-wrapper .field-wrapper > input,
+#form-wrapper .field-wrapper > .field-widget,
+#form-wrapper .field-wrapper > textarea,
+#break-days-wrapper {
+    margin-top: 2px;
+    border: var(--field-wrapper-border);
+    box-sizing: border-box; 
+    border-radius: 3px;
+    height: var(--field-height);
+    --background-color: white;
+    background-color: var(--background-color);
+}
+#form-wrapper .field-wrapper > .field-widget {
     cursor: pointer;
     position: relative;
     display: flex;
@@ -264,10 +301,10 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
             user-select: none;
     padding-right: 6px;
     padding-left: 6px;
-    border-left: none !important;
-    border-top-left-radius: unset !important;
-    border-bottom-left-radius: unset !important;
-    --background-color: var(--field-widget-background-color) !important;
+    border-left: none;
+    border-top-left-radius: unset;
+    border-bottom-left-radius: unset;
+    --background-color: var(--field-widget-background-color);
 }
 #form-wrapper .field-widget-checkbox:not(:checked) ~ .field-widget::after {
     content: "Minutes";
@@ -293,6 +330,9 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     /* for invalid fields */
     box-shadow: none;
 }
+#form-wrapper .field-wrapper.disabled-field.disable-widget-along-with-field .field-widget {
+    display: none;
+}
 #form-wrapper .field-wrapper > input {
     transition: 0.25s ease-out;
     transition-property: opacity, background-color;
@@ -311,27 +351,8 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     We can't set the z-index to -1 for .hide-field or else the opacity transition breaks */
     z-index: 1;
 }
-#form-wrapper input:not(.field-widget-checkbox),
-#form-wrapper textarea {
-    padding: var(--vertical-form-padding) var(--horizontal-form-padding);
-    width: 100%;
-    /* Style meant to be overwritten */
-    border: none;
-}
-#form-wrapper .field-wrapper > input,
-#form-wrapper .field-wrapper > .field-widget,
-#form-wrapper .field-wrapper > textarea,
-#break-days-wrapper {
-    margin-top: 2px;
-    border: 1px solid var(--color);
-    box-sizing: border-box; 
-    border-radius: 3px;
-    height: var(--field-height);
-    --background-color: white;
-    background-color: var(--background-color);
-}
 #form-wrapper .info-button::after {
-    transform: scale(2);
+    transform: scale(3);
 }
 #form-wrapper #submit-assignment-button {
     align-self: center;

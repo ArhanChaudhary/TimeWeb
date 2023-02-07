@@ -22,12 +22,13 @@ import os
 admin_url = os.environ.get("ADMINURL", "admin/")
 urlpatterns = [
     path(admin_url, admin.site.urls),
+    path('accounts/', include('timewebauth.urls')),
     path('accounts/', include('allauth.urls')),
+    path('contact/', include('navbar.contact_form_urls')),
     path('contact/', include('contact_form.urls')),
     path('', include('home_page.urls')),
     path('', include('timewebapp.urls')),
     path('api/', include('api.urls')),
-    path('accounts/', include('timewebauth.urls')),
     path('', include('navbar.urls')),
     path('', include('misc.urls')),
     path('', include('pwa.urls')),

@@ -2,8 +2,8 @@
 {% load account %}
 {% user_display user as user_display %}
 
-{% comment %} current_site.name for site name {% endcomment %}
 {% block content %}
-    Please confirm that your e-mail address was used to register a user account:
-    <a class="submit-button" href="{{ activate_url }}">Confirm E-mail Address</a>
+<p>Please verify and associate your e-mail address with your TimeWeb account:</p>
+
+<a class="submit-button" href="{{ activate_url }}">Verify E-mail Address</a>
 {% endblock %}

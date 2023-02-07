@@ -31,7 +31,7 @@ the span groups the major and minor categories together for user_guide.js
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-form">What is the assignment form?</summary>
         <br>
-        <img src={% static 'navbar/images/assignment_form.webp' %}>
+        <img src={% static 'navbar/images/assignment_form.webp' %} alt="Assignment form image">
         <p>The assignment form is used to either create a new assignment, which can be done by clicking the "New Assignment" button at the left of the header, or edit an already existing assignment, which can be done by clicking its edit button.</p>
         <p>The assignment form has 12 inputs in total. 6 of these inputs are required for a complete assignment, and 6 of these inputs are optional.</p>
     </details>
@@ -119,7 +119,7 @@ the span groups the major and minor categories together for user_guide.js
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
         <br>
-        <img id="assignment-graph-image">
+        <img id="assignment-graph-image" alt="Assignment graph image">
         <p>After creating an assignment, click it to open its graph. The graph provides a visualization of your assignment's entire work schedule. </p>
         <p>Its x-axis represents days, while its y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.</p>
         <p>As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.</p>
@@ -191,7 +191,7 @@ the span groups the major and minor categories together for user_guide.js
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
         <br>
-        <img src="{% static 'navbar/images/assignment_header.webp' %}">
+        <img src="{% static 'navbar/images/assignment_header.webp' %}" alt="Assignment header image">
         <p>The assignment header contains a brief summary of the assignment and its work for today.</p>
         <p>Above the assignment's name is its priority percentage relative to the other assignments. Below the assignment's name is the days left until it is due. Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".</p>
         <p>At the center of an assignment is its header message, which reflects the current status of the assignment. For example, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.</p>
@@ -215,7 +215,7 @@ the span groups the major and minor categories together for user_guide.js
             <br>
             To demonstrate, let's go through the methodology of ordering every assignment in an example. Each assignment in the image is manually labeled with a number:
         </p>
-        <img src="{% static 'navbar/images/advanced_priority_example.webp' %}">
+        <img src="{% static 'navbar/images/advanced_priority_example.webp' %}" alt="Advanced priority example image">
         <p>At a first glance, it may seem like the assignments are randomly prioritized. However, this is not the case: the assignments are actually optimally ordered.</p>
         <br>
         <p>Assignment #1 has the "Important" tag, so it is placed as the first assignment.</p>
@@ -230,7 +230,7 @@ the span groups the major and minor categories together for user_guide.js
     <details open>
         <summary class="minor-category" id="hide-assignment">Hide assignment</summary>
         <br>
-        <img src="{% static 'navbar/images/hide_assignment.webp' %}">
+        <img src="{% static 'navbar/images/hide_assignment.webp' %}" alt="Hide assignment image">
         <p>This button ignores the assignment's work from the total estimated completion time and removes the assignment's priority. The assignment also becomes translucent as a visual indicator of this action. However, the assignment's position will remain unchanged. The assignment is automatically un-hidden the day after.</p>
         <p>Use this if you want to temporarily ignore an assignment's work from the total estimated completion time, to see how the estimated completion time or other assignments' priorities will change.</p>
         <p>You can also use this when you're not sure whether or not you'll complete an assignment's work for any day. Enter 0 units done instead when you are sure you won't complete any of the assignment's work.</p>
@@ -245,13 +245,13 @@ the span groups the major and minor categories together for user_guide.js
     <div class="major-category">Google Classroom integration</div>
     <details open>
         <summary class="minor-category" id="what-is-the-google-classroom-integration">What is the Google Classroom integration?</summary>
-        <p>The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authentication, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not affect Google Classroom assignments in any way.</p>
+        <p>The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authorization, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not affect Google Classroom assignments in any way.</p>
     </details>
     <details open>
         <summary class="minor-category" id="enabling-the-google-classroom-integration">Enabling the Google Classroom integration</summary>
         <br>
-        <img src="{% static 'navbar/images/google_classroom_integration.webp' %}">
-        <p>To enable the Google Classroom integration, click the Google Classroom icon at the bottom right of the main page. This will bring up Google's authentication service. You MUST agree to both of the requested permissions for this to properly enable.</p>
+        <img src="{% static 'navbar/images/google_classroom_integration.webp' %}" alt="Google Classroom integration image">
+        <p>To enable the Google Classroom integration, click the Google Classroom icon at the bottom right of the main page. This will bring up Google's authorization service. You MUST agree to both of the requested permissions for this to properly enable.</p>
         <span class="label-question" id="why-do-we-ask-for-pemission-to-view-your-grades-on-google-classroom">
             <span class="label-title">Why do we ask for permission to view your grades on Google Classroom?</span>
             According to the <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html">Google Classroom integration documentation</a> there isn't a permission for just viewing your course work, so we're forced to ask to view your grades, too.
@@ -276,10 +276,9 @@ the span groups the major and minor categories together for user_guide.js
     </details>
 </span>
 <details open>
-    <summary class="major-category create-dropdown" id="keybinds">Keybinds</summary>
+    <summary class="major-category">Keybinds</summary>
     <br>
-    <br>
-    <p>
+    <p id="keybinds">
         <button class="generic-button">Enter/return</button> : Submit any textbox or click any button
     </p>
     <p>

@@ -1,5 +1,13 @@
 {
+  "scripts": {
+    "build": "npx webpack && postcss ./timeweb/**/*.css --base timeweb --dir timeweb"
+  },
   "dependencies": {
-    "workbox-build": "^6.4.2"
+    "webpack-cli": "^4.10.0"
+  },
+  "devDependencies": {
+    "cssnano": "^5.1.13",
+    "postcss": "^8.4.17",
+    "postcss-cli": "^10.0.0"
   }
 }

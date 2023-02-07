@@ -15,11 +15,23 @@
             {% endif %}
         >
             /* 
-            NOTE:
-            !important is NEEDED for overriding gmail styling
+            Gmail specific stylings
             */
+
+            /* !important is NEEDED for overriding gmail styling */
             .submit-button {
                 color: white !important;
+                /* so i don't need to put <br> after every .submit-button */
+                display: inline-block !important;
+                margin-top: 0.5em !important;
+                margin-bottom: 1em;
+            }
+            /* fonts */
+            #content-wrapper {
+                /* Cannot import fonts on mobile */
+                font-family: 'Roboto', Arial;
+                /* Hard to see on mobile */
+                font-size: 14px;
             }
 
 
@@ -65,8 +77,7 @@
     </head>
     <body>
         <div id="content-wrapper">
-            Hello {{ user_display }},
-            <br>
+            <p>Hello{% if user_display %} {% endif %}{{ user_display }},</p>
             <br>
             {% block content %}{% endblock %}
             <p>
@@ -74,7 +85,7 @@
                 <br>
                 {{ current_site.domain }}
             </p>
-            <img src="{% static 'timewebapp/images/timeweb.webp' %}">
+            <img alt src="{% static 'timewebapp/images/timeweb.webp' %}">
         </div>
     </body>
 </html>    

@@ -42,6 +42,7 @@ select {
 }
 #form-wrapper .field-widget:hover {
     --field-widget-background-color: hsl(0, 0%, 24%);
+    color: white;
 }
 .generic-button:hover, .generic-button:focus, ::file-selector-button:hover {
     --bg-c: calc(var(--primary-c) + 12);
@@ -52,9 +53,19 @@ select {
 .assignment-header-button:focus, .assignment-header-button:hover {
     --background-color: rgb(86, 116, 129);
 }
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .left-side-of-header,
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .left-side-of-header a {
+    transition: none;
+}
+.left-side-of-header.fancy-coloring, .left-side-of-header.fancy-coloring a {
+    --color: var(--priority-color);
+    color: var(--color) !important;
+    transition: color calc(var(--priority-color-transition-speed) * var(--animation-speed));
+}
 .tag-add-box {
     --background-color: hsl(0, 0%, 15%);
     --box-shadow-color: hsla(0, 0%, 32%, 0.65);
+    --box-shadow-color2: white;
     --input-background-color: hsl(0, 0%, 11%);
 }
 .tag-add-button {
@@ -90,7 +101,6 @@ select {
     --background-color: black;
 }
 .grey-highlight, .grey-highlight::before, .grey-highlight::after {
-    --filter-drop-shadow-width: 0.75px;
     --filter-drop-shadow-color: black !important;
 }
 #form-wrapper #cancel-button {
@@ -135,27 +145,37 @@ main:not(.background-image-exists) #extra-navs {
 .daterangepicker th.available:hover {
     background-color: hsl(0, 0%, 30%);
 }
-.daterangepicker select {
-    --border-color: var(--color) !important;
-}
-
 .jconfirm.jconfirm-light .jconfirm-box {
     box-shadow: none !important;
     border: 1px solid hsl(0, 0%, 48%);
 }
 
 /* settings */
-.field-group, #break-days-wrapper {
+#settings-form .field-group,
+#settings-form #break-days-wrapper {
     --background-color: var(--primary);
     --box-shadow: initial;
 }
-.field-group-label {
+#settings-form  .field-group-label {
     --lightness: 50%;
 }
-[type="checkbox"] ~ label:not(.break-days-label) {
+#settings-form [type="checkbox"] ~ label:not(.break-days-label),
+#settings-form #submit-settings-button {
     --checkbox-widget-primary-color-lightness: 40%;
+}
+
+#settings-form [type="checkbox"] ~ label:not(.break-days-label) .toggle-text {
+    transition: color 0.2s ease-in-out;
+}
+#settings-form [type="checkbox"]:checked ~ label:not(.break-days-label) .toggle-text:nth-child(2),
+#settings-form [type="checkbox"]:not(:checked) ~ label:not(.break-days-label) .toggle-text:first-child,
+#settings-form select,
+#settings-form ::file-selector-button {
     color: white;
 }
-[type="checkbox"] ~ label:not(.break-days-label):hover:active {
+#settings-form #reset-settings-button {
+    color: var(--color);
+}
+#settings-form [type="checkbox"] ~ label:not(.break-days-label):hover:active {
     --box-shadow: initial;
 }

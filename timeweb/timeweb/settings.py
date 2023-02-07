@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from pathlib import Path
 import os
+import json
+from pathlib import Path
+from google.oauth2 import service_account
 
 # SECURITY WARNING: don't run with debug turned on in production!
 try:
@@ -64,7 +66,12 @@ else:
 CSRF_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
 SESSION_COOKIE_SECURE = not (DEBUG or FIX_DEBUG_LOCALLY)
 
-SECURE_SSL_REDIRECT = not (DEBUG or FIX_DEBUG_LOCALLY)
+CSRF_TRUSTED_ORIGINS = ['https://timeweb.io']
+
+# railway (timeweb's hosting provider) misbehaves with this setting enabled
+# For future reference, please check out this https://discord.com/channels/713503345364697088/1039676438338605127/1039676438338605127
+# (in the Railway discord server)
+# SECURE_SSL_REDIRECT = not (DEBUG or FIX_DEBUG_LOCALLY)
 SECURE_HSTS_SECONDS = 63072000 # 2 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
@@ -112,14 +119,16 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'api.middleware.CatchRequestDataTooBig',
 
+    'common.middleware.LogoutExampleAccount',
     'common.middleware.DefineIsExampleAccount',
+    'common.middleware.DefineUTCOffset',
     'common.middleware.CommonRatelimit',
-    # don't add APIValidationMiddleware; these are only specific to their corresponding app view functions
+    'api.middleware.APIValidationMiddleware',
     # CatchRequestDataTooBig must be a global middleware so it can be ordered before PopulatePost
 
     # Even though cloudflare has an html minfier, let's instead use our own so the debug and non debug versions' html stays consistent
     # It's also more efficient than cf's html minifier
-    "django_minify_html.middleware.MinifyHtmlMiddleware",
+    "common.middleware.MinifyHTMLMiddleware",
 ]
 if DEBUG:
     INSTALLED_APPS.append('livereload')
@@ -210,7 +219,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = "America/Los_Angeles"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -240,43 +249,32 @@ else:
     GS_MEDIA_BUCKET_NAME = 'twmedia'
 
     GS_PROJECT_ID = 'timeweb-308201'
-    from google.oauth2 import service_account
-    GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        BASE_DIR / "sa_private_key.json"
-    )
-# Django Logging config
-ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'WARNING'
-DJANGO_LOG_LEVEL = 'INFO' if DEBUG else 'WARNING'
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': ROOT_LOG_LEVEL,
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': DJANGO_LOG_LEVEL,
-        }
-    },
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d}>> {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{asctime} <<{levelname}>> {message}',
-            'style': '{',
-        },
-    },
-}
+    if key := os.environ.get("SA_PRIVATE_KEY"):
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_info(
+            json.loads(key)
+        )
+    # Note: this message is still valid even in DEBUG
+    # if someone else were to run this in DEBUG, the other
+    # if statement would change their staticfiles storage to
+    # local. This line is reached in prod, so if it can't find
+    # credentials, it will not work.
+    else:
+        print("GS_CREDENTIALS not found; background images will not work")
+# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
+GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
+GC_CREDENTIALS_JSON = os.environ.get("GC_API_CREDENTIALS")
+if GC_CREDENTIALS_JSON is None:
+    print("GC_API_CREDENTIALS is not set; Google Classroom API will not work")
+else:
+    GC_CREDENTIALS_JSON = json.loads(GC_CREDENTIALS_JSON)
+
+if DEBUG or FIX_DEBUG_LOCALLY:
+    GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback/"
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+else:
+    GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback/"
+# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -290,6 +288,10 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
+            # if needed
+            # 'prompt': 'consent',
+            # might be needed?
+            # 'inlcude_granted_scopes': 'true',
         }
     }
 }
@@ -299,6 +301,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = False # Always prompt for username
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_REQUIRED = True
@@ -329,57 +332,46 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-DEFAULT_FROM_EMAIL = 'TimeWeb E-mail Service <arhanc.cs@gmail.com>'
-EMAIL_HOST_USER = 'arhanc.cs@gmail.com'
-MANAGERS = [('Arhan', 'arhan.ch@gmail.com')]
+DEFAULT_FROM_EMAIL = 'TimeWeb E-mail Service <timewebapp@gmail.com>'
+EMAIL_HOST_USER = 'timewebapp@gmail.com'
+MANAGERS = [('Arhan', 'arhan.ch@gmail.com'), ('TimeWeb', 'timewebapp@gmail.com')]
 EMAIL_HOST_PASSWORD = os.environ.get('GMAILPASSWORD', None)
-
-EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
 
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
 
-
-
-# App constants
-from json import load as json_load
-from common.views import logger
-
-# https://stackoverflow.com/questions/48242761/how-do-i-use-oauth2-and-refresh-tokens-with-the-google-api
-GC_SCOPES = ['https://www.googleapis.com/auth/classroom.student-submissions.me.readonly', 'https://www.googleapis.com/auth/classroom.courses.readonly']
-GC_CREDENTIALS_PATH = BASE_DIR / "gc_api_credentials.json"
-if DEBUG or FIX_DEBUG_LOCALLY:
-    GC_REDIRECT_URI = "http://localhost:8000/api/gc-auth-callback"
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-else:
-    GC_REDIRECT_URI = "https://timeweb.io/api/gc-auth-callback"
-# https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
-
-MAX_NUMBER_OF_TAGS = 5
-DELETED_ASSIGNMENTS_PER_PAGE = 70
-EXAMPLE_ASSIGNMENT = {
-    "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
-    "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
-    "unit": "Page",
-    "y": "400.00",
-    "blue_line_start": 0,
-    "skew_ratio": "1.0000000000",
-    "time_per_unit": "3.00",
-    "funct_round": "1.00",
-    "min_work_time": "60.00",
-    "break_days": [],
-    "dynamic_start": 0,
-    "description": "Example assignment description"
-}
+EXAMPLE_ACCOUNT_EMAIL = 'timeweb@example.com'
 EDITING_EXAMPLE_ACCOUNT = False
 
-def GET_CLIENT_IP(group, request):
-    if 'HTTP_CF_CONNECTING_IP' in request.META:
-        return request.META['HTTP_CF_CONNECTING_IP']
-    logger.warning(f"request for {request} has no CF_CONNECTING_IP, ratelimiting is defaulting to REMOTE_ADDR: {request.META['REMOTE_ADDR']}")
-    return request.META['REMOTE_ADDR']
-DEFAULT_GLOBAL_RATELIMIT = '5/s'
-
-# Changelog
-with open("changelogs.json", "r") as f:
-    CHANGELOGS = json_load(f)
+# Django Logging config
+ROOT_LOG_LEVEL = 'DEBUG' if DEBUG else 'INFO'
+DJANGO_LOG_LEVEL = 'INFO'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': ROOT_LOG_LEVEL,
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': DJANGO_LOG_LEVEL,
+        }
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d}>> {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{asctime} <<{levelname}>> {message}',
+            'style': '{',
+        },
+    },
+}

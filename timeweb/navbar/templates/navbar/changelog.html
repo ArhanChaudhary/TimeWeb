@@ -11,8 +11,18 @@
     {% autoescape off %}
         {% for changelog in changelogs %}
             <span>
-                <div class="major-category" id="{{ changelog.version|get_version_id }}">{{ changelog.version }}</div>
-                {{ changelog.updates }}
+                <div class="major-category dont-create-dropdown">{{ changelog.version }} ({{ changelog.date }})</div>
+                {% comment %} put id on ul so it can be hreffed there (id on stick element cannot be hreffed upwards) {% endcomment %}
+                <ul id="{{ changelog.version }}">
+                {% for update in changelog.updates %}
+                    <li>{{ update }}</li>
+                {% endfor %}
+                <ul>
+                {% for bugfix in changelog.bugfixes %}
+                    <li>{{ bugfix }}</li>
+                {% endfor %}
+                </ul>
+                </ul>
             </span>
         {% endfor %}
     {% endautoescape %}
