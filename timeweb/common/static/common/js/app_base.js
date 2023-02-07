@@ -204,14 +204,17 @@ GCIntegrationError: function(jqXHR) {
             var reauthorization_url = jqXHR.responseText;
             $.alert({
                 title: "Invalid credentials.",
-                content: "Your Google Classroom integration credentials are invalid. Please authenticate again or disable the integration.",
+                content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
                 buttons: {
+                    ok: {
+
+                    },
                     "disable integration": {
                         action: function() {
                             ajaxUtils.changeSetting({setting: "oauth_token", value: false});
                         }
                     },
-                    "authenticate again": {
+                    reauthenticate: {
                         action: function() {
                             reloadWhenAppropriate({href: reauthorization_url});
                         }
