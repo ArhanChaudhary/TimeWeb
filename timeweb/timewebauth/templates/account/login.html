@@ -15,7 +15,7 @@
 {% block content %}
 {% get_providers as socialaccount_providers %}
 
-{% include "socialaccount/snippets/provider_list.html" with process="login" %}
+{% include "socialaccount/snippets/provider_list.html" with process="login" label="log in" %}
 <hr>
 <span class="hr-interrupt">or</span>
 <form class="login" method="POST" action="{% url 'account_login' %}">
