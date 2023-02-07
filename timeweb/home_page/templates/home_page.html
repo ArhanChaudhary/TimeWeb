@@ -17,14 +17,13 @@
             <span class="left-section-side">
                 <header>
                     <img id="logo-icon" src="{% static 'misc/icons/icon_512x512.webp' %}" draggable="false"/>
-                    {% comment %} <a href="{% url 'account_signup' %}">Sign up</a> {% endcomment %}
+                    <a href="{% url 'account_signup' %}">Sign up</a>
                     <a href="{% url 'account_login' %}">Log in</a>
                     <a href="{% url 'example' %}">Example Account</a>
                 </header>
                 <img src="{% static 'timewebapp/images/timeweb.webp' %}" draggable="false"/>
                 <br>
                 The new way to<br> manage your time
-                <a class="signup-button" href="{% url 'account_signup' %}">Sign up</a>
                 {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
             </span>
             <span class="right-section-side">
@@ -63,7 +62,7 @@
             {% include "favicon_animated.svg" %}
             <span class="right-section-side">
                 No ads. No paywalls. Just you and your assignments — uninterrupted
-                <a class="signup-button" href="{% url 'account_signup' %}">Sign up</a>
+                <a id="bottom-signup-button" href="{% url 'account_signup' %}">Sign up</a>
             </span>
         </span>
     </div>

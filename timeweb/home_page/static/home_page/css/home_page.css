@@ -175,27 +175,17 @@ main {
 .section-block#fifth .section-max-width-wrapper {
     max-width: 775px;
 }
-.signup-button {
+.section-block#fifth #bottom-signup-button {
+    color: hsl(183deg 92% 41%);
     text-decoration: none;
+    background-color: white;
+    width: 500px;
+    height: 80px;
     margin: 30px auto 0;
+    border-radius: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.section-block#fifth .signup-button {
-    width: 500px;
-    height: 80px;
-    background-color: white;
-    border-radius: 40px;
-    color: hsl(183deg 92% 41%);
-}
-.section-block#first .signup-button {
-    font-size: 30px;
-    width: 400px;
-    height: 65px;
-    border-radius: 33px;
-    background-color: hsl(183deg 92% 41%);
-    color: white;
 }
 #favicon-animated {
     position: absolute;
