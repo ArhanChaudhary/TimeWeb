@@ -31,7 +31,8 @@ def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 
 def utc_to_local(request, utctime):
-    offset = request.user.settingsmodel.timezone or request.utc_offset
+    offset = str(request.user.settingsmodel.timezone) or request.utc_offset
+    breakpoint()
     assert offset, "User must have a timezone or utc_offset"
     return utctime.astimezone(timezone.zoneinfo.ZoneInfo(offset))
 
