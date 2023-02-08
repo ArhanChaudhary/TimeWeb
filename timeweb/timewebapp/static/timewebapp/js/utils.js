@@ -220,11 +220,11 @@ setClickHandlers: {
         $("#hide-button").click(function() {
             if ($(this).text() === "Hide") {
                 $(this).text("Show");
-                $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").addClass("hide-info");
+                $("#estimated-total-time, #estimated-completion-time, #important-total-time").addClass("hide-info");
                 localStorage.setItem("hide-button", true);
             } else {
                 $(this).text("Hide");
-                $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").removeClass("hide-info");
+                $("#estimated-total-time, #estimated-completion-time, #important-total-time").removeClass("hide-info");
                 localStorage.removeItem("hide-button");
             }
         });

@@ -24,7 +24,8 @@ class Priority {
         that.due_date_incremented_notices = [];
         that.priority_data_list = [];
         that.total_completion_time = 0;
-        that.today_and_tomorrow_total_completion_time = 0;
+        that.today_total_completion_time = 0;
+        that.tomorrow_total_completion_time = 0;
     }
     
     percentageToColor(priority_percentage) {
@@ -460,17 +461,15 @@ class Priority {
                     // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
                     // when it in fact displays no useful information
                     if (due_date_minus_today_floor === 0) {
-                        // hurry the F*CK up >:(
-                        that.display_due_today_completion_time = true;
+                        that.today_total_completion_time += Math.ceil(todo * sa.sa.time_per_unit);
                         status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
                     } else if (due_date_minus_today_floor === 1) {
-                        that.display_due_tomorrow_completion_time = true;
+                        that.tomorrow_total_completion_time += Math.ceil(todo * sa.sa.time_per_unit);
                         if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
                         else
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                     }
-                    that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
             }
 
@@ -869,23 +868,23 @@ class Priority {
     updateInfoHeader() {
         const that = this;
         if (!that.total_completion_time) {
-            $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").removeClass("hide-info");
-            $("#estimated-completion-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
+            $("#estimated-total-time, #estimated-completion-time, #important-total-time").removeClass("hide-info");
+            $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").hide();
             $("#estimated-total-time").text(dat.length ? 'You have finished everything for today' : 'You don\'t have any assignments');
         } else {
-            $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").addClass("hide-info");
-            $("#estimated-completion-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
+            $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #important-total-time").addClass("hide-info");
+            $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").show();
             $("#estimated-total-time").text(` ${utils.formatting.formatMinutes(that.total_completion_time)}`).attr("data-minutes", that.total_completion_time);
 
-            let relative_today_and_tomorrow_date;
-            if (that.display_due_today_completion_time && that.display_due_tomorrow_completion_time) {
-                relative_today_and_tomorrow_date = "Today and Tomorrow";
-            } else if (that.display_due_today_completion_time) {
-                relative_today_and_tomorrow_date = "Today";
+            if (that.today_total_completion_time) {
+                var relative_important_total_time_date = "Today";
+                var important_total_minutes = that.today_total_completion_time;
             } else {
-                relative_today_and_tomorrow_date = "Tomorrow";
+                var relative_important_total_time_date = "Tomorrow";
+                var important_total_minutes = that.tomorrow_total_completion_time;
             }
-            $("#tomorrow-time").text(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
+            let important_total_time = utils.formatting.formatMinutes(important_total_minutes);
+            $("#important-total-time").text(` (${important_total_time} due ${relative_important_total_time_date})`);
         }
         if (!that.params.first_sort)
             $("#currently-has-changed-notice").remove();
