@@ -677,13 +677,16 @@ def gc_auth_callback(request):
             authorization_response = "https://" + authorization_response[7:]
     # turn those parameters into a token
     try:
-        flow.fetch_token(authorization_response=authorization_response)
+        authorized_flow_info = flow.fetch_token(authorization_response=authorization_response)
     except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError):
         # InvalidGrantError for bad requests
-        # AccessDeniedError If the user reloads (dont remember how but it has happened) or clicks cancel
+        # AccessDeniedError If the user enables no scopes or clicks cancel
         # MissingCodeError if the user manually gets this route and forgets "code" in the url
         # note that code is the only required url parameter
         # ConnectionError if the wifi randomly dies (could happen when offline)
+        return callback_failed()
+    if authorized_flow_info['scope'] != settings.GC_SCOPES:
+        # If the user didn't enable both scopes
         return callback_failed()
     try:
         credentials = flow.credentials
@@ -691,47 +694,14 @@ def gc_auth_callback(request):
         # ValueError at /api/gc-auth-callback
         # There is no access token for this session, did you call fetch_token?
         return callback_failed()
-
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
-    # Ensure the user enabled both scopes
-    # let's avoid a batch request because
-    # 1) it takes like 1 second longer without
-    # 2) less verbose exception handling
-    # 3) i am lazy
-
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
         courses = service.courses().list(courseStates=["ACTIVE"]).execute()
-    except (OAuth2Error, TimeoutError):
+    except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
-    # Let's use type instead of isinstance because I want an exact exception class match
-    if courses and 0:
-        # NOTE: on second thought, we don't actually want to do this because it may take long if the course has a lot of
-        # coursework
-        # Keep this here in case for future reference
-        try:
-            service.courses().courseWork().list(courseId=courses[0]['id'], orderBy="dueDate desc", pageSize=MAX_DESCENDING_COURSEWORK_PAGE_SIZE).execute()
-        except (HttpError, OAuth2Error, TimeoutError) as e:
-            if not (
-                # condition to ignore HttpError
-                # if you are the owner of a class,
-                # this can throw 403s
-                type(e) is HttpError and e.resp.status == 403
-            ):
-                return callback_failed()
-    else:
-        try:
-            service.courses().courseWork().list(courseId="easter egg", orderBy="dueDate desc", pageSize=MAX_DESCENDING_COURSEWORK_PAGE_SIZE).execute()
-        except (HttpError, OAuth2Error, TimeoutError) as e:
-            if not (
-                # condition to ignore HttpError
-                # I don't have any courseId to test the permission 
-                # with, so I'll just use a dunder string id
-                type(e) is HttpError and e.resp.status == 404
-            ):
-                return callback_failed()
     request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
