@@ -234,7 +234,7 @@ createGCAssignments: function() {
         {type: "POST", url: '/api/update-gc-courses'},
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
-    let ajaxCallback = function(response, textStatus, jqXHR) {
+    let ajaxCallback = function(response, textStatus, jqXHR={} /* in case .success is manually called if ajax is disabled */) {
         // indicates: this ajax didn't create any assignments, go to the next
         // ajax in ajaxs
         if (jqXHR.status === 204) {
