@@ -552,11 +552,13 @@ def create_gc_assignments(request, order=None):
     # Ordering by due date descending puts assignments without due dates at the very bottom, so if we limit the number
     # of assignments its possible for them to get overlooked
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
-    order = {"descending": "desc", "ascending": "asc"}[request.POST.get('order', order)]
-    page_size = {
-        "desc": MAX_DESCENDING_COURSEWORK_PAGE_SIZE,
-        "asc": MAX_ASCENDING_COURSEWORK_PAGE_SIZE,
-    }[order]
+    order = request.POST.get('order', order)
+    if order == "descending":
+        order = "desc"
+        page_size = MAX_DESCENDING_COURSEWORK_PAGE_SIZE
+    elif order == "ascending":
+        order = "asc"
+        page_size = MAX_ASCENDING_COURSEWORK_PAGE_SIZE
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
     for course in request.user.settingsmodel.gc_courses_cache:
@@ -564,7 +566,6 @@ def create_gc_assignments(request, order=None):
         # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
         # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
         batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
-
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
@@ -619,7 +620,8 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
         # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
-        include_granted_scopes='true')
+        include_granted_scopes='true'
+    )
 
     request.session["gc-callback-next-url"] = next_url
     request.session["gc-callback-current-url"] = current_url
@@ -677,7 +679,7 @@ def gc_auth_callback(request):
             authorization_response = "https://" + authorization_response[7:]
     # turn those parameters into a token
     try:
-        authorized_flow_info = flow.fetch_token(authorization_response=authorization_response)
+        authorized_flow_token = flow.fetch_token(authorization_response=authorization_response)
     except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError):
         # InvalidGrantError for bad requests
         # AccessDeniedError If the user enables no scopes or clicks cancel
@@ -685,7 +687,7 @@ def gc_auth_callback(request):
         # note that code is the only required url parameter
         # ConnectionError if the wifi randomly dies (could happen when offline)
         return callback_failed()
-    if authorized_flow_info['scope'] != settings.GC_SCOPES:
+    if authorized_flow_token['scope'] != settings.GC_SCOPES:
         # If the user didn't enable both scopes
         return callback_failed()
     try:
