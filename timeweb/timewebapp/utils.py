@@ -120,23 +120,17 @@ def adjust_blue_line(request, *, old_data, assignment_date, x_num):
         else:
             blue_line_start = old_blue_line_start + utils.days_between_two_dates(old_data.assignment_date, assignment_date)
     if blue_line_start < 0:
-        removed_works_start = -blue_line_start # translates x position 0 so that it can be used to accessing works
         blue_line_start = 0
-    else:
-        removed_works_start = 0
     # TODO: do I need to account for when x_num is None?
     if x_num is None:
         capped_at_x_num = None
-    else:
-        capped_at_x_num = blue_line_start >= x_num
-        if capped_at_x_num:
-            blue_line_start = 0
-    
-    # NOTE: these conditions are derived from the if statement criteria from older commits on how to reach
-    # removed_works_end
+    elif capped_at_x_num := blue_line_start >= x_num:
+        blue_line_start = 0
     if old_data is None or old_data.needs_more_info or capped_at_x_num:
+        removed_works_start = None
         removed_works_end = None
     else:
+        removed_works_start = max(0, blue_line_start - old_blue_line_start)
         removed_works_end = len(old_data.works) - 1
         actual_len_works = removed_works_end + 1 - removed_works_start
         len_works = actual_len_works - 1

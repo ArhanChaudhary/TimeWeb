@@ -472,7 +472,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     new_funct_round = Decimal(30)
                     new_min_work_time = self.sm.min_work_time
 
-                    new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
+                    new_min_work_time_funct_round = ceil(new_min_work_time / new_funct_round) * new_funct_round if new_min_work_time else new_funct_round
                     if new_min_work_time_funct_round <= min_work_time_funct_round:
                         # Now convert to scope of hours
                         new_unit = "Hour"
