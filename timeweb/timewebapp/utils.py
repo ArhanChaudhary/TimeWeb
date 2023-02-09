@@ -1,7 +1,9 @@
-from decimal import Decimal
-import common.utils as utils
-from django.db import transaction
 from django.utils import timezone
+from django.db import transaction
+
+import common.utils as utils
+
+from decimal import Decimal
 
 def calc_mod_days(*, assignment_date, blue_line_start, break_days):
     # Note to future self: I have rigorously tested the inclusion of +1 and it is needed

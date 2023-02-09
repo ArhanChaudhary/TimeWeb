@@ -1,37 +1,29 @@
-# THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-
 # In the future I should probably switch all my view classes to FormView
 
-# Abstractions
 from django.shortcuts import redirect, reverse
-from django.utils.translation import gettext as _
-from django.http import QueryDict
-from django.contrib.auth import logout, login
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
-from common.views import TimewebGenericView
-import datetime
-from math import ceil, floor
-from decimal import Decimal
-
-# App stuff
 from django.conf import settings
-from common.models import User
-from .models import TimewebModel
-from navbar.models import SettingsModel
-from common.views import logger, CHANGELOGS
-
-# Signals
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms.models import model_to_dict
+from django.contrib.auth import logout, login
+from django.http import QueryDict
+from django.utils.decorators import method_decorator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-# Misc
-from django.forms.models import model_to_dict
-import common.utils as utils
-from . import utils as app_utils
-from django.utils.decorators import method_decorator
-from copy import deepcopy
+from django.utils import timezone
+from django.utils.translation import gettext as _
 from ratelimit.decorators import ratelimit
+
+from .models import TimewebModel
+from navbar.models import SettingsModel
+from . import utils as app_utils
+from common.models import User
+from common.views import logger, CHANGELOGS, TimewebGenericView
+import common.utils as utils
+
+import datetime
+from decimal import Decimal
+from math import ceil, floor
+from copy import deepcopy
 
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5

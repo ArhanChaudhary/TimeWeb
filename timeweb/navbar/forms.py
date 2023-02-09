@@ -1,12 +1,14 @@
-from django.contrib import messages
-from contact_form.views import ContactForm as BaseContactForm
-from django.template.loader import render_to_string
-from django.utils.translation import gettext_lazy as _
 from django import forms
-from colorfield.widgets import ColorWidget
-from .models import SettingsModel
+from django.utils.translation import gettext_lazy as _
 from django.forms.widgets import ClearableFileInput
+from django.template.loader import render_to_string
+from django.contrib import messages
 from django.utils.safestring import mark_safe
+
+from colorfield.widgets import ColorWidget
+from contact_form.views import ContactForm as BaseContactForm
+
+from .models import SettingsModel
 
 class CustomImageFieldWidget(ClearableFileInput):
     clear_checkbox_label = _('Clear current image')

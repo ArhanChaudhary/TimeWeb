@@ -32,7 +32,6 @@ from googleapiclient.errors import HttpError
 from requests.exceptions import ConnectionError
 from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
-    OAuth2Error,
     AccessDeniedError,
     InvalidGrantError,
     MissingCodeError

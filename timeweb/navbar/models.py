@@ -1,13 +1,16 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator
-from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
+from django.db import models
 from django.utils import timezone as _timezone
+from django.core.validators import MinValueValidator
+
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
 from timezone_field import TimeZoneField
+
 from timewebapp.models import empty_list, empty_dict, create_image_path, WEEKDAYS
+
+from decimal import Decimal
 
 HORIZONTAL_TAG_POSITIONS = (
     ("Left", "Left"),

@@ -1,9 +1,10 @@
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
-from allauth.exceptions import ImmediateHttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+
 from allauth.account.adapter import get_adapter as get_account_adapter, DefaultAccountAdapter
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.exceptions import ImmediateHttpResponse
 
 message = "socialaccount/messages/cannot_modify_example_account.txt"
 

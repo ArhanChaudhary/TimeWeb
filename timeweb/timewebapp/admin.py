@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import TimewebModel
-from django.contrib.auth.decorators import user_passes_test
-from django.http import Http404
 from django.conf import settings
+from django.http import Http404
+from django.contrib.auth.decorators import user_passes_test
+
+from .models import TimewebModel
 
 # https://stackoverflow.com/questions/6779265/how-can-i-not-use-djangos-admin-login-view
 def staff_or_404(u):

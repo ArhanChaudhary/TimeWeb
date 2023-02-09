@@ -1,31 +1,27 @@
 # In the future I should probably switch all my view classes to FormView
 
-# Abstractions
-from django.forms import ValidationError
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.translation import gettext as _
-from django.urls import reverse_lazy, resolve
-from django.shortcuts import redirect
-from common.views import TimewebGenericView
-
-# App stuff
 from django.conf import settings
-import api.views as api
-import common.utils as utils
-from common.views import CHANGELOGS
-from .forms import SettingsForm
-from .models import SettingsModel
-from contact_form.views import ContactFormView
-
-# Misc
+from django.shortcuts import redirect
+from django.urls import reverse_lazy, resolve
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
+from django.forms.models import model_to_dict
+from django.contrib import messages
+from django.forms import ValidationError
+from django.utils.translation import gettext as _
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
-from django.contrib import messages
-from requests import get as requests_get
-from common.views import logger
-from django.forms.models import model_to_dict
+
+from .forms import SettingsForm
+from .models import SettingsModel
+from common.views import CHANGELOGS, logger, TimewebGenericView
+import common.utils as utils
+
+import api.views as api
+from contact_form.views import ContactFormView
+
 from copy import deepcopy
+from requests import get as requests_get
 
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('loosely_enforce_minimum_work_times', )
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('id', 'immediately_delete_completely_finished_assignments', 'def_min_work_time',

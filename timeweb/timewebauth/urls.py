@@ -1,8 +1,9 @@
 from django.views.defaults import page_not_found
 from django.urls import path, re_path
 from django.conf import settings
-from . import views
+
 from allauth.account.views import LogoutView
+from . import views
 
 urlpatterns = [
     # Redirect to login instead of password/reset/key/done/ after a successful password reset

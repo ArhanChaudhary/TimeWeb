@@ -1,7 +1,8 @@
 from django.urls import path, re_path
-from django.http import HttpResponse
-from . import views
 from django.views.generic import RedirectView
+from django.http import HttpResponse
+
+from . import views
 import common.utils as utils
 
 app_static = utils.app_static_factory(__package__)

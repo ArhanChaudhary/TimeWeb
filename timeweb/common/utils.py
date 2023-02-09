@@ -1,12 +1,15 @@
-import re
-from django.utils import timezone
-from django.shortcuts import redirect
-from ratelimit.exceptions import Ratelimited
-from django.http import HttpResponseForbidden, HttpResponse
 from django.conf import settings
+from django.shortcuts import redirect
 from django.contrib.sites.models import Site
-from common.views import logger
+from django.http import HttpResponseForbidden, HttpResponse
 from django.db.utils import OperationalError
+from django.utils import timezone
+
+from common.views import logger
+
+from ratelimit.exceptions import Ratelimited
+
+import re
 
 def get_client_ip(group, request):
     if 'HTTP_CF_CONNECTING_IP' in request.META:
