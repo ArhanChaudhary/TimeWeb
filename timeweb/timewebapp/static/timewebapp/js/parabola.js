@@ -615,8 +615,10 @@ Assignment.prototype.autotuneSkewRatio = function(wls/* = { parabola, autotune_f
     the blue line and the due date
 
     forming a linear gradient that successfully mitigates this issue
+
+    note that we need to clamp this due to due times
     */
-    let autotune_factor = wls.len_works_without_break_days / wls.x1_from_blue_line_start;
+    let autotune_factor = mathUtils.clamp(0, wls.len_works_without_break_days / wls.x1_from_blue_line_start, 1);
     if (Number.isNaN(wls.parabola)) {
         // A parabola cannot be defined by two or less points; instead connect a line
         var autotuned_skew_ratio = 1;
