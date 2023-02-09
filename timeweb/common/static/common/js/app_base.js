@@ -257,7 +257,7 @@ createGCAssignments: function() {
             sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
             reloadWhenAppropriate();
         } else if (jqXHR.status === 200) {
-
+            sessionStorage.removeItem("ajaxs");
         }
     }
     ajaxCallback(undefined, undefined, {status: 204});
