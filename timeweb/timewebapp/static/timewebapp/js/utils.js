@@ -1203,7 +1203,10 @@ window.dat = JSON.parse(document.getElementById("assignment-models").textContent
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
-        // TODO: don't use epoch shifting
+        // NOTE: compare all dates in the front end in the user's time zone
+        // the Date object is always in the user's time zone, making it
+        // far easier to do it this way
+        // assignment_date and x are in utc, so we need to convert them
         // Reference: https://stackoverflow.com/questions/15141762/how-to-initialize-a-javascript-date-to-a-particular-time-zone
         sa.assignment_date = new Date(sa.assignment_date
             .getUTCFullYear(), sa.assignment_date
