@@ -691,7 +691,7 @@ class VisualAssignment extends Assignment {
                 displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
                 str_day = displayed_day.toLocaleDateString([], this.date_string_options);
             }
-            const distance_today_from_displayed_day = today_minus_assignment_date - this.sa.blue_line_start - len_works;
+            const distance_today_from_displayed_day = Math.floor((displayed_day - date_now) / (1000 * 60 * 60 * 24));
             switch (distance_today_from_displayed_day) {
                 case -1:
                     str_day += ' (Tomorrow)';
