@@ -235,6 +235,8 @@ createGCAssignments: function() {
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
     let ajaxCallback = function(response, textStatus, jqXHR) {
+        // indicates: this ajax didn't create any assignments, go to the next
+        // ajax in ajaxs
         if (jqXHR.status === 204) {
             // If the last ajaxs ajax reloads, ajaxs in sessionStorage will be []
             // .shift on an empty array returns undefined, which is truthy
@@ -253,9 +255,17 @@ createGCAssignments: function() {
                 error: ajaxUtils.GCIntegrationError,
                 success: ajaxCallback,
             });
+        // indicates: this ajax means google classroom assignments were
+        // created
         } else if (jqXHR.status === 205) {
             sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
             reloadWhenAppropriate();
+        // indicates: this ajax means we have to terminate everything and
+        // restart the later queue from the beginning
+
+        // raised if:
+        // concurrent requests are made
+        // update-gc-courses doesn't add any new courses (saves last ajax)
         } else if (jqXHR.status === 200) {
             sessionStorage.removeItem("ajaxs");
         }
