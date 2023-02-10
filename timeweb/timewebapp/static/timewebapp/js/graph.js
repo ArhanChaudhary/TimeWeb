@@ -711,7 +711,7 @@ class VisualAssignment extends Assignment {
 
             if (displayed_day.valueOf() !== date_now.valueOf()) {
                 center(str_day + ":", 1);
-                center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, this, false), 2);
+                center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(this, todo, last_work_input), 2);
             }
         }
         screen.scale(1 / this.scale, 1 / this.scale);
