@@ -226,8 +226,7 @@ class Priority {
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
                 sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true } });
             }
-                
-            let display_format_minutes = false;
+
             let delete_starred_assignment_after_sorting = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
@@ -450,7 +449,6 @@ class Priority {
                     status_value = Priority.FINISHED_FOR_TODAY;
                 } else {
                     status_value = Priority.UNFINISHED_FOR_TODAY;
-                    display_format_minutes = true;
                     status_image = 'unfinished';
                     //hard
                     dom_status_image.attr({
@@ -459,20 +457,20 @@ class Priority {
                     }).css({marginLeft: -1, marginRight: -1});
                     status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, false);
                     that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
-                }
-                const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                if ([0, 1].includes(due_date_minus_today_floor) && status_value === Priority.UNFINISHED_FOR_TODAY) {
-                    // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
-                    // when it in fact displays no useful information
-                    if (due_date_minus_today_floor === 0) {
-                        that.today_total_completion_time += Math.ceil(todo * sa.sa.time_per_unit);
-                        status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
-                    } else if (due_date_minus_today_floor === 1) {
-                        that.tomorrow_total_completion_time += Math.ceil(todo * sa.sa.time_per_unit);
-                        if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
-                        else
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                    const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                    if ([0, 1].includes(due_date_minus_today_floor)) {
+                        // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
+                        // when it in fact displays no useful information
+                        if (due_date_minus_today_floor === 0) {
+                            that.today_total_completion_time += Math.ceil(todo * sa.sa.time_per_unit);
+                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
+                        } else if (due_date_minus_today_floor === 1) {
+                            that.tomorrow_total_completion_time += Math.ceil(todo * sa.sa.time_per_unit);
+                            if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
+                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
+                            else
+                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                        }
                     }
                 }
             }
@@ -594,9 +592,18 @@ class Priority {
 
             // !! is needed because toggleClass only works with booleans
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            dom_completion_time.text(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '')
-                // If the status message is "finish this assignment", display the completion time on mobile
-                .toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
+            if ([
+                Priority.UNFINISHED_FOR_TODAY,
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
+            ].includes(status_value)) {
+                dom_completion_time.text(utils.formatting.formatMinutes(todo * sa.sa.time_per_unit));
+            } else {
+                dom_completion_time.text("");
+            }
+            // If the status message is "finish this assignment", display the completion time on mobile
+            dom_completion_time.toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
         });
         if (!starred_assignment_ids_to_delete_after_sorting.size) return;
 
