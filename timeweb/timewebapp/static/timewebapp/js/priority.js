@@ -164,8 +164,18 @@ class Priority {
     static generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input, reference_relative_date=false) {
         if (todo + last_work_input === sa.sa.y) {
             return "Finish this assignment" + (reference_relative_date ? " today" : "");
+        } else if (sa.unit_is_of_time) {
+            let todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+            let unit_str;
+            if (Crud.shouldConvertToHours(todo_minutes)) {
+                todo_minutes = Crud.minutesToHours(todo_minutes);
+                unit_str = pluralize("hour", todo_minutes);
+            } else {
+                unit_str = pluralize("minute", todo_minutes);
+            }
+            return `Complete ${mathUtils.precisionRound(todo_minutes, 10)} ${unit_str} of work`;
         } else {
-            return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
+            return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit, todo).toLowerCase()}`;
         }
     }
     // create a sorting function that compares numbers on the number line for less than [0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5]
