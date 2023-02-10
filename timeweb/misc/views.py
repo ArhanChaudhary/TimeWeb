@@ -16,3 +16,6 @@ class ChungusView(TimewebGenericView):
 
 class ShantanuView(TimewebGenericView):
     template_name = "misc/shantanu.html"
+
+class BrianView(TimewebGenericView):
+    template_name = "misc/brain.html"
