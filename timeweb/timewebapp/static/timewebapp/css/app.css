@@ -326,7 +326,7 @@ main.background-image-exists {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: max(105px, calc(35px + 12vw));
+    --left-side-of-header-width: max(110px, calc(40px + 12vw));
 }
 .description {
     position: relative;
