@@ -90,12 +90,14 @@ class Priority {
         const that = this;
         let str_daysleft;
         let long_str_daysleft;
+        let mobile_str_daysleft;
         let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
         if (today_minus_assignment_date < 0) {
             if (today_minus_assignment_date === -1) {
                 str_daysleft = 'Assigned Tomorrow';
             } else if (today_minus_assignment_date > -7) {
                 str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString([], {weekday: 'long'})}`;
+                mobile_str_daysleft = `Assigned ${sa.sa.assignment_date.toLocaleDateString([], {weekday: 'long'})}`;
             } else {
                 str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
             }
@@ -155,7 +157,9 @@ class Priority {
             str_daysleft = "";
             long_str_daysleft = "";
         }
-        return {str_daysleft, long_str_daysleft};
+        if (!mobile_str_daysleft)
+            mobile_str_daysleft = str_daysleft;
+        return {str_daysleft, long_str_daysleft, mobile_str_daysleft};
     }
     static generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, reference_relative_date) {
         if (todo + last_work_input === sa.sa.y) {
@@ -492,9 +496,10 @@ class Priority {
                 that.due_date_incremented_notices.push(sa.sa);
             }
 
-            let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(sa, complete_date_now);
+            let {str_daysleft, long_str_daysleft, mobile_str_daysleft} = Priority.generateDaysleftMessages(sa, complete_date_now);
             dom_title.attr("data-daysleft", str_daysleft);
             dom_title.attr("data-long-daysleft", long_str_daysleft);
+            dom_title.attr("data-mobile-daysleft", mobile_str_daysleft);
             
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");

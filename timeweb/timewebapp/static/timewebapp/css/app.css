@@ -1011,6 +1011,9 @@ main.finished-header-transition #extra-navs {
         margin-left: 0px;
         margin-right: -4px;
     }
+    .title[data-daysleft]::after {
+        content: attr(data-mobile-daysleft) !important;
+    }
     .status-image {
         position: absolute;
         visibility: hidden;
