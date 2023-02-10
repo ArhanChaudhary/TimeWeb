@@ -498,13 +498,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # # y doesn't change
                     # # min_work_time changes,
                     # # Undo the 1 / self.sm.time_per_unit, true original min work time in minutes
-                    # self.sm.min_work_time = self.sm.min_work_time * self.sm.time_per_unit
+                    # self.sm.min_work_time = self.sm.min_work_time * self.sm.time_per_unit # (change this to be safe conversion)
                     # # Redo that but with new_time_per_unit, new min work time in terms of time_per_unit
                     # self.sm.min_work_time = self.sm.min_work_time / new_time_per_unit
                     # # works doesn't change
                     # new_funct_round = app_utils.minutes_to_hours(new_funct_round)
 
-                    # current_min_work_time_funct_round_minutes = min_work_time_funct_round * self.sm.time_per_unit
+                    # current_min_work_time_funct_round_minutes = min_work_time_funct_round * self.sm.time_per_unit # (change this to be safe conversion)
                     # new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
                     # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
                     

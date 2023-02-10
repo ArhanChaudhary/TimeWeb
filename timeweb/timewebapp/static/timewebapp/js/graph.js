@@ -1208,7 +1208,7 @@ class VisualAssignment extends Assignment {
             let diff;
             let today_index;
             let last_work_index;
-            let total = this.sa.works[0];;
+            let total = this.sa.works[0];
             let end_of_works = false;
 
             // assignment date
@@ -1252,8 +1252,9 @@ class VisualAssignment extends Assignment {
 
                 total += diff;
                 let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>total)`;
-                if (diff * this.sa.time_per_unit !== 0 && unit_singular.toLowerCase() !== "hour" && (unit_singular.toLowerCase() !== "minute" || diff * this.sa.time_per_unit >= 60))
-                    formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
+                let diff_minutes = Crud.safeConversion(diff, this.sa.time_per_unit);
+                if (diff_minutes !== 0 && unit_singular.toLowerCase() !== "hour" && (unit_singular.toLowerCase() !== "minute" || diff_minutes >= 60))
+                    formatted_date += ` (${utils.formatting.formatMinutes(diff_minutes)})`;
                 if (today_minus_assignment_date == i)
                     today_index = formatted_dates.length;
                 if (add_last_work_input && i === len_works + this.sa.blue_line_start - 1)
