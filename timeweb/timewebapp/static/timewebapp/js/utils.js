@@ -200,16 +200,22 @@ setClickHandlers: {
         $(".tick-button").parent().click(function() {
             const $this = $(this);
             const dom_assignment = $this.parents(".assignment");
+            const sa = new VisualAssignment(dom_assignment);
+            sa.setParabolaValues();
 
             // .sort is already called in the controls' click handlers
             if (!dom_assignment.hasClass("has-been-clicked")) {
-                new VisualAssignment(dom_assignment).initUI();
+                sa.initUI();
             }
 
             if (!dom_assignment.hasClass("open-assignment")) {
                 dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement();
             }
-            dom_assignment.find(".work-input-textbox").val("fin");
+            let len_works = sa.sa.works.length - 1;
+            let last_work_input = sa.sa.works[len_works];
+            let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
+            todo = Math.max(0, todo);
+            dom_assignment.find(".work-input-textbox").val(todo);
             dom_assignment.find(".submit-work-button").click();
         });
     },
