@@ -640,18 +640,18 @@ addTagHandlers: function() {
 },
 setKeybinds: function() {
 $(document).keydown(function(e) {
+e.key = e.key.toLowerCase();
 if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["Backspace", "s", "f", "n"].includes(e.key)
-    || e.originalEvent.repeat && ["Backspace", "s", "f", "0"].includes(e.key)) return;
+    || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e.key)
+    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e.key)) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;
 switch (e.key) {
     case "n":
     case "e":
     case "d":
-    case "D":
     case "r":
-    case "Backspace":
+    case "backspace":
     case "s":
     case "f":
     case "0":
@@ -671,9 +671,8 @@ switch (e.key) {
                 break;
             case "e":
             case "d":
-            case "D":
             case "r":
-            case "Backspace":
+            case "backspace":
             case "s":
             case "f":
             case "0":
@@ -697,10 +696,7 @@ switch (e.key) {
                             // Fix typing on the assignment form itself
                             e.preventDefault();
                             break;
-                        case "d":
-                            assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "D": {
+                        case "d": {
                             const click_delete_button = $.Event("click");
                             click_delete_button.shiftKey = e.shiftKey;
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
@@ -719,13 +715,13 @@ switch (e.key) {
                             dom_assignment.find(".work-input-textbox").val("0");
                             dom_assignment.find(".submit-work-button").click();
                             break;
-                        case "Backspace":
+                        case "backspace":
                         case "s":
-                            // I would animate the arrow for Backspace too but 
+                            // I would animate the arrow for backspace too but 
                             // that only works when an assignment is open
                             if (dom_assignment.hasClass("open-assignment")) {
                             switch (e.key) {
-                                case "Backspace":
+                                case "backspace":
                                     var graph_button = assignment_container.find(".delete-work-input-button");
                                     break;
                                 case "s":
@@ -746,12 +742,12 @@ switch (e.key) {
                 }
         }
         break;
-    case "Escape":
+    case "escape":
         // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
         new Crud().hideForm();
         break;
-    case "ArrowDown":
-    case "ArrowUp":
+    case "arrowdown":
+    case "arrowup":
         if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
         const open_assignmens_on_screen = $(".open-assignment").filter(function() {
             return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
