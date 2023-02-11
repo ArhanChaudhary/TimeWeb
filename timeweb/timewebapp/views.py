@@ -456,7 +456,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
                 # if min work time is for example 1 hour and work_day_count is 7 days, the user would ideally want to see
                 # unit as "hour" and y as 7 hours instead of "minute" and 420 minutes
-                if self.sm.unit == "Minute" and app_utils.should_convert_to_hours(self.sm.y):
+                if self.sm.unit.lower() in ('minute', 'minutes') and app_utils.should_convert_to_hours(self.sm.y):
                     # so far all in the scope of minutes to define new_min_work_time_funct_round
                     new_unit = "Minute"
                     new_y = self.sm.y
