@@ -989,7 +989,7 @@ main.finished-header-transition #extra-navs {
 .show-on-mobile {
     display: none;
 }
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 750px) {
     .assignment {
         --box-shadow: 0 0 12px -8px black;
     }
