@@ -50,6 +50,15 @@ $(function() {
                 break;
         }
     });
+    $(document).on('input', 'input[step]', function() {
+        var input = $(this);
+        let step = input.attr('step');
+        var newVal = input.val();
+        if (newVal.includes(".") && newVal.split(".")[1].length > step.split(".")[1].length) {
+            // remove extra decimals
+            input.val(newVal.substring(0, newVal.indexOf(".") + step.split(".")[1].length + 1));
+        }
+    });
     $("input").on("show.daterangepicker", function(e, picker) {
         function dothething(_timeselects) {
             _timeselects.on("change", function() {
