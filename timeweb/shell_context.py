@@ -14,3 +14,4 @@ from django.contrib.auth import get_user_model
 u = get_user_model()
 t = TimewebModel
 s = SettingsModel
+from django.conf import settings
