@@ -698,7 +698,23 @@ class Priority {
             // when sorting alphabetically you are not sorting by priority
             // so if stuff is due tomorrow or today i guess its fine
             case "Tag Name A-Z":
-                // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
+                // a.first_real_tag === undefined: Treat undefined as "a"
+
+                // "r" > "a" => true
+                // "r" > undefined => false (the below makes this true)
+
+                // "a" < "r" => true
+                // undefined < "r" => false (the below makes this true)
+
+                // b.first_real_tag !== undefined: If both are undefined, skip this check
+                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return 1;
+                if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return -1;
+                break;
+            // We do not need to worry about different status groups here
+            // when sorting alphabetically you are not sorting by priority
+            // so if stuff is due tomorrow or today i guess its fine
+            case "Tag Name Z-A":
+                // b.first_real_tag === undefined: Treat undefined as "z"
 
                 // "r" < "z" => true
                 // "r" < undefined => false (the below makes this true)
@@ -707,16 +723,8 @@ class Priority {
                 // undefined > "r" => false (the below makes this true)
                 
                 // a.first_real_tag !== undefined: If both are undefined, skip this check
-                if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return -1;
-                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return 1;
-                break;
-            // We do not need to worry about different status groups here
-            // when sorting alphabetically you are not sorting by priority
-            // so if stuff is due tomorrow or today i guess its fine
-            case "Tag Name Z-A":
-                // same logic as above, but reversed
-                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 break;
         }
         
