@@ -1323,6 +1323,7 @@ class VisualAssignment extends Assignment {
         // BEGIN Work input textbox
         {
         let enter_fired = false;
+        this.dom_assignment.find(".work-input-textbox-wrapper").toggleClass("show-input-widget", this.unit_is_of_time);
         const work_input_elements = work_input_textbox.add(this.dom_assignment.find(".work-input-unit-of-time-widget"));
         work_input_textbox.attr("data-placeholder", work_input_textbox.attr("placeholder"));
         work_input_elements.on("keydown", e => {
@@ -1330,7 +1331,7 @@ class VisualAssignment extends Assignment {
                 enter_fired = true;
                 submit_work_button.click();
             }
-        }).on("blur", function(e) {
+        }).on("blur", e => {
             // If you enter a number and press enter and the assignments sort, focus is removed from work_input_textbox and the keyup returns early
             // because e.target is now instead body
             // This can cause enter_fired to remain true and using enter to not work
@@ -1338,11 +1339,11 @@ class VisualAssignment extends Assignment {
             // This ensures that enter_fired is appropriately changed if the assignments re sort
             enter_fired = false;
 
-            if (e.target !== e.relatedTarget && $(e.relatedTarget).is(work_input_elements) && $(e.target).is(work_input_elements)) return; 
+            if (!this.unit_is_of_time || e.target !== e.relatedTarget && $(e.relatedTarget).is(work_input_elements) && $(e.target).is(work_input_elements)) return; 
             work_input_textbox.attr("placeholder", work_input_textbox.attr("data-placeholder"));
             // dont remove data-placeholder or it breaks
-        }).on("focus", function(e) {
-            if (e.target !== e.relatedTarget && $(e.relatedTarget).is(work_input_elements) && $(e.target).is(work_input_elements)) return; 
+        }).on("focus", e => {
+            if (!this.unit_is_of_time || e.target !== e.relatedTarget && $(e.relatedTarget).is(work_input_elements) && $(e.target).is(work_input_elements)) return; 
             work_input_textbox.removeAttr("placeholder");
         });
         // an alert can sometimes cause the enter to be fired on another element, instead listen to the event's propagation to the root
@@ -1428,12 +1429,14 @@ class VisualAssignment extends Assignment {
             }
             // Clear once textbox if the input is valid
             work_input_textbox.val("");
-            const unit_singular = pluralize(this.sa.unit.toLowerCase(), 1);
-            const work_input_textbox_label_is_checked = this.dom_assignment.find(".work-input-unit-of-time-checkbox").is(":checked");
-            if (unit_singular === "hour" && !work_input_textbox_label_is_checked) {
-                input_done = Crud.minutesToHours(input_done);
-            } else if (unit_singular === "minute" && work_input_textbox_label_is_checked) {
-                input_done = Crud.hoursToMinutes(input_done);
+            if (this.unit_is_of_time) {
+                const unit_singular = pluralize(this.sa.unit.toLowerCase(), 1);
+                const work_input_textbox_label_is_checked = this.dom_assignment.find(".work-input-unit-of-time-checkbox").is(":checked");
+                if (unit_singular === "hour" && !work_input_textbox_label_is_checked) {
+                    input_done = Crud.minutesToHours(input_done);
+                } else if (unit_singular === "minute" && work_input_textbox_label_is_checked) {
+                    input_done = Crud.hoursToMinutes(input_done);
+                }
             }
 
             // Cap at y and 0

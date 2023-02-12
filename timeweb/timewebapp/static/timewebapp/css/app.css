@@ -932,7 +932,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     visibility: hidden;
 }
 .work-input-unit-of-time-widget {
-    display: inline-block;
+    display: none;
     position: absolute;
     visibility: hidden;
     opacity: 0;
@@ -946,6 +946,9 @@ do this because midde-of-header is hidden in the delete assignments view */
     transition: 0.3s ease-in-out;
     transition-property: margin-left, opacity, visibility;
 }
+.work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-widget {
+    display: inline-block;
+}
 .work-input-unit-of-time-widget:focus {
     outline: 0;
 }
@@ -955,7 +958,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 .work-input-unit-of-time-checkbox:checked ~ .work-input-unit-of-time-widget::after {
     content: "Hours";
 }
-.work-input-textbox-wrapper:focus-within .work-input-textbox {
+.work-input-textbox-wrapper.show-input-widget:focus-within .work-input-textbox {
     border-top-right-radius: initial;
     border-bottom-right-radius: initial;
     padding-right: 5px;
@@ -1071,7 +1074,7 @@ main.finished-header-transition #extra-navs {
     .align-to-status-message-container {
         margin-left: -3px;
     }
-    .work-input-textbox-wrapper:focus-within .work-input-textbox {
+    .work-input-textbox-wrapper.show-input-widget:focus-within .work-input-textbox {
         border-radius: 20px;
         padding-right: calc(var(--widget-padding) + 10px);
         width: calc(var(--width) - var(--widget-padding));
@@ -1091,11 +1094,12 @@ main.finished-header-transition #extra-navs {
     .work-input-textbox {
         z-index: initial;
         transition: none;
+        --widget-padding: 0px;
     }
-    .work-input-unit-of-time-checkbox:checked ~ .work-input-textbox {
+    .work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-checkbox:checked ~ .work-input-textbox {
         --widget-padding: 51px;
     }
-    .work-input-unit-of-time-checkbox:not(:checked) ~ .work-input-textbox {
+    .work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-checkbox:not(:checked) ~ .work-input-textbox {
         --widget-padding: 67px;
     }
     .hide-on-mobile {
