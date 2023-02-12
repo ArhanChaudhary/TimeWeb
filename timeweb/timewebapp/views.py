@@ -59,7 +59,7 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'close_graph_after_work_input', 'show_priority', 'highest_priority_color', 'lowest_priority_color',
     'assignment_sorting', 'default_dropdown_tags', 'display_working_days_left',
     'horizontal_tag_position', 'vertical_tag_position', 'animation_speed',  'enable_tutorial',
-    'sorting_animation_threshold', 'timezone', 'seen_latest_changelog', 
+    'sorting_animation_threshold', 'seen_latest_changelog', 
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
@@ -163,7 +163,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['settings_model'] = request.user.settingsmodel
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
         self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
-        self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
         if not request.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]
