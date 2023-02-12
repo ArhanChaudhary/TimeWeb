@@ -238,7 +238,7 @@ setClickHandlers: {
             $("#hide-button").click();
         }
 
-        $("#go-to-next-day").click(function() {
+        $("#go-to-next-day").click(function(e) {
             function changeDay() {
                 utils.in_simulation = true;
                 ajaxUtils.disable_ajax = true;
@@ -252,7 +252,7 @@ setClickHandlers: {
                 new Priority().sort();
             }
 
-            if (utils.in_simulation) {
+            if (utils.in_simulation || e.shiftKey) {
                 changeDay();
                 return;
             }
