@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.contrib.sitemaps.views import sitemap
+
 from .sitemap import AppSitemap
 
 import os

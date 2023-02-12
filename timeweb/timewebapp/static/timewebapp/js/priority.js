@@ -24,7 +24,8 @@ class Priority {
         that.due_date_incremented_notices = [];
         that.priority_data_list = [];
         that.total_completion_time = 0;
-        that.today_and_tomorrow_total_completion_time = 0;
+        that.today_total_completion_time = 0;
+        that.tomorrow_total_completion_time = 0;
     }
     
     percentageToColor(priority_percentage) {
@@ -89,12 +90,14 @@ class Priority {
         const that = this;
         let str_daysleft;
         let long_str_daysleft;
+        let mobile_str_daysleft;
         let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
         if (today_minus_assignment_date < 0) {
             if (today_minus_assignment_date === -1) {
                 str_daysleft = 'Assigned Tomorrow';
             } else if (today_minus_assignment_date > -7) {
                 str_daysleft = `Assigned on ${sa.sa.assignment_date.toLocaleDateString([], {weekday: 'long'})}`;
+                mobile_str_daysleft = `Assigned ${sa.sa.assignment_date.toLocaleDateString([], {weekday: 'long'})}`;
             } else {
                 str_daysleft = `Assigned in ${-today_minus_assignment_date}d`;
             }
@@ -154,13 +157,25 @@ class Priority {
             str_daysleft = "";
             long_str_daysleft = "";
         }
-        return {str_daysleft, long_str_daysleft};
+        if (!mobile_str_daysleft)
+            mobile_str_daysleft = str_daysleft;
+        return {str_daysleft, long_str_daysleft, mobile_str_daysleft};
     }
-    static generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, reference_relative_date) {
+    static generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input, reference_relative_date=false) {
         if (todo + last_work_input === sa.sa.y) {
             return "Finish this assignment" + (reference_relative_date ? " today" : "");
+        } else if (sa.unit_is_of_time) {
+            let todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+            let unit_str;
+            if (Crud.shouldConvertToHours(todo_minutes)) {
+                todo_minutes = Crud.minutesToHours(todo_minutes);
+                unit_str = pluralize("hour", todo_minutes);
+            } else {
+                unit_str = pluralize("minute", todo_minutes);
+            }
+            return `Complete ${mathUtils.precisionRound(todo_minutes, 10)} ${unit_str} of work`;
         } else {
-            return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit,todo).toLowerCase()} ${sa.unit_is_of_time ? "of work " : ""}`;
+            return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit, todo).toLowerCase()}`;
         }
     }
     // create a sorting function that compares numbers on the number line for less than [0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5]
@@ -221,8 +236,7 @@ class Priority {
                 // setParabolaValues needs to be above for it doesn't run in this function with fixed mode
                 sa.refreshDynamicMode({ shouldAutotuneParams: { skip_break_days_check: true } });
             }
-                
-            let display_format_minutes = false;
+
             let delete_starred_assignment_after_sorting = false;
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
@@ -385,6 +399,12 @@ class Priority {
                      * 10 7 > 11
                      * We can deduce the following logic to properly set x:
                      */
+                    // If the user edits their due date before their last work input and there is a work input on x,
+                    // don't increment the due date over here
+
+                    // This is for the sake of being consistent; due time only changes 
+                    // Plus it would be extremely jarring to the user to have an alert immediately after creating an 
+                    // assignment and seeing a due date different from what they entered
                     const increment_due_date_condition = sa.sa.soft && today_minus_assignment_date >= sa.sa.x;
                     if (increment_due_date_condition) {
                         sa.sa.x = today_minus_assignment_date;
@@ -445,32 +465,31 @@ class Priority {
                     status_value = Priority.FINISHED_FOR_TODAY;
                 } else {
                     status_value = Priority.UNFINISHED_FOR_TODAY;
-                    display_format_minutes = true;
                     status_image = 'unfinished';
                     //hard
                     dom_status_image.attr({
                         width: 15,
                         height: 15,
                     }).css({marginLeft: -1, marginRight: -1});
-                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, sa, false);
-                    that.total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
-                }
-                const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                if ([0, 1].includes(due_date_minus_today_floor) && status_value === Priority.UNFINISHED_FOR_TODAY) {
-                    // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
-                    // when it in fact displays no useful information
-                    if (due_date_minus_today_floor === 0) {
-                        // hurry the F*CK up >:(
-                        that.display_due_today_completion_time = true;
-                        status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
-                    } else if (due_date_minus_today_floor === 1) {
-                        that.display_due_tomorrow_completion_time = true;
-                        if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59)
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
-                        else
-                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
+                    var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                    that.total_completion_time += todo_minutes;
+                    const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                    if ([0, 1].includes(due_date_minus_today_floor)) {
+                        // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
+                        // when it in fact displays no useful information
+                        if (due_date_minus_today_floor === 0) {
+                            that.today_total_completion_time += todo_minutes;
+                            status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
+                        } else if (due_date_minus_today_floor === 1) {
+                            that.tomorrow_total_completion_time += todo_minutes;
+                            if (sa.sa.due_time && sa.sa.due_time.hour === 23 && sa.sa.due_time.minute === 59) {
+                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW;
+                            } else {
+                                status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
+                            }
+                        }
                     }
-                    that.today_and_tomorrow_total_completion_time += Math.ceil(todo*sa.sa.time_per_unit);
                 }
             }
 
@@ -493,9 +512,10 @@ class Priority {
                 that.due_date_incremented_notices.push(sa.sa);
             }
 
-            let {str_daysleft, long_str_daysleft} = Priority.generateDaysleftMessages(sa, complete_date_now);
+            let {str_daysleft, long_str_daysleft, mobile_str_daysleft} = Priority.generateDaysleftMessages(sa, complete_date_now);
             dom_title.attr("data-daysleft", str_daysleft);
             dom_title.attr("data-long-daysleft", long_str_daysleft);
+            dom_title.attr("data-mobile-daysleft", mobile_str_daysleft);
             
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");
@@ -590,9 +610,18 @@ class Priority {
 
             // !! is needed because toggleClass only works with booleans
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            dom_completion_time.text(display_format_minutes ? utils.formatting.formatMinutes(todo * sa.sa.time_per_unit) : '')
-                // If the status message is "finish this assignment", display the completion time on mobile
-                .toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
+            if ([
+                Priority.UNFINISHED_FOR_TODAY,
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW
+            ].includes(status_value)) {
+                dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
+            } else {
+                dom_completion_time.text("");
+            }
+            // If the status message is "finish this assignment", display the completion time on mobile
+            dom_completion_time.toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
         });
         if (!starred_assignment_ids_to_delete_after_sorting.size) return;
 
@@ -675,7 +704,23 @@ class Priority {
             // when sorting alphabetically you are not sorting by priority
             // so if stuff is due tomorrow or today i guess its fine
             case "Tag Name A-Z":
-                // b.first_real_tag === undefined: Treat undefined as the highst index lexicographic string
+                // a.first_real_tag === undefined: Treat undefined as "a"
+
+                // "r" > "a" => true
+                // "r" > undefined => false (the below makes this true)
+
+                // "a" < "r" => true
+                // undefined < "r" => false (the below makes this true)
+
+                // b.first_real_tag !== undefined: If both are undefined, skip this check
+                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return 1;
+                if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return -1;
+                break;
+            // We do not need to worry about different status groups here
+            // when sorting alphabetically you are not sorting by priority
+            // so if stuff is due tomorrow or today i guess its fine
+            case "Tag Name Z-A":
+                // b.first_real_tag === undefined: Treat undefined as "z"
 
                 // "r" < "z" => true
                 // "r" < undefined => false (the below makes this true)
@@ -684,16 +729,8 @@ class Priority {
                 // undefined > "r" => false (the below makes this true)
                 
                 // a.first_real_tag !== undefined: If both are undefined, skip this check
-                if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
-                if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
-                break;
-            // We do not need to worry about different status groups here
-            // when sorting alphabetically you are not sorting by priority
-            // so if stuff is due tomorrow or today i guess its fine
-            case "Tag Name Z-A":
-                // same logic as above, but reversed
-                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 break;
         }
         
@@ -869,23 +906,23 @@ class Priority {
     updateInfoHeader() {
         const that = this;
         if (!that.total_completion_time) {
-            $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").removeClass("hide-info");
-            $("#estimated-completion-time, #tomorrow-time, #hide-button, #estimated-total-time-label").hide();
+            $("#estimated-total-time, #estimated-completion-time, #important-total-time").removeClass("hide-info");
+            $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").hide();
             $("#estimated-total-time").text(dat.length ? 'You have finished everything for today' : 'You don\'t have any assignments');
         } else {
-            $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").addClass("hide-info");
-            $("#estimated-completion-time, #tomorrow-time, #hide-button, #estimated-total-time-label").show();
+            $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #important-total-time").addClass("hide-info");
+            $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").show();
             $("#estimated-total-time").text(` ${utils.formatting.formatMinutes(that.total_completion_time)}`).attr("data-minutes", that.total_completion_time);
 
-            let relative_today_and_tomorrow_date;
-            if (that.display_due_today_completion_time && that.display_due_tomorrow_completion_time) {
-                relative_today_and_tomorrow_date = "Today and Tomorrow";
-            } else if (that.display_due_today_completion_time) {
-                relative_today_and_tomorrow_date = "Today";
+            if (that.today_total_completion_time) {
+                var relative_important_total_time_date = "Today";
+                var important_total_minutes = that.today_total_completion_time;
             } else {
-                relative_today_and_tomorrow_date = "Tomorrow";
+                var relative_important_total_time_date = "Tomorrow";
+                var important_total_minutes = that.tomorrow_total_completion_time;
             }
-            $("#tomorrow-time").text(` (${utils.formatting.formatMinutes(that.today_and_tomorrow_total_completion_time)} due ${relative_today_and_tomorrow_date})`);
+            let important_total_time = utils.formatting.formatMinutes(important_total_minutes);
+            $("#important-total-time").text(` (${important_total_time} due ${relative_important_total_time_date})`);
         }
         if (!that.params.first_sort)
             $("#currently-has-changed-notice").remove();

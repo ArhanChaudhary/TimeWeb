@@ -133,7 +133,7 @@ getReversibilityStatus: function() {
 },
 ui: {
 tickClock: function() {
-    const now = utils.getRawDateNow();
+    const now = utils.getRawDateNow({ dont_stem_off_date_now: true });
     if (utils.ui.tickClock.oldNow === undefined) {
         utils.ui.tickClock.oldNow = now;
     }
@@ -200,16 +200,22 @@ setClickHandlers: {
         $(".tick-button").parent().click(function() {
             const $this = $(this);
             const dom_assignment = $this.parents(".assignment");
+            const sa = new VisualAssignment(dom_assignment);
+            sa.setParabolaValues();
 
             // .sort is already called in the controls' click handlers
             if (!dom_assignment.hasClass("has-been-clicked")) {
-                new VisualAssignment(dom_assignment).initUI();
+                sa.initUI();
             }
 
             if (!dom_assignment.hasClass("open-assignment")) {
                 dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement();
             }
-            dom_assignment.find(".work-input-textbox").val("fin");
+            let len_works = sa.sa.works.length - 1;
+            let last_work_input = sa.sa.works[len_works];
+            let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
+            todo = Math.max(0, todo);
+            dom_assignment.find(".work-input-textbox").val(todo);
             dom_assignment.find(".submit-work-button").click();
         });
     },
@@ -220,11 +226,11 @@ setClickHandlers: {
         $("#hide-button").click(function() {
             if ($(this).text() === "Hide") {
                 $(this).text("Show");
-                $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").addClass("hide-info");
+                $("#estimated-total-time, #estimated-completion-time, #important-total-time").addClass("hide-info");
                 localStorage.setItem("hide-button", true);
             } else {
                 $(this).text("Hide");
-                $("#estimated-total-time, #estimated-completion-time, #tomorrow-time").removeClass("hide-info");
+                $("#estimated-total-time, #estimated-completion-time, #important-total-time").removeClass("hide-info");
                 localStorage.removeItem("hide-button");
             }
         });
@@ -232,7 +238,7 @@ setClickHandlers: {
             $("#hide-button").click();
         }
 
-        $("#go-to-next-day").click(function() {
+        $("#go-to-next-day").click(function(e) {
             function changeDay() {
                 utils.in_simulation = true;
                 ajaxUtils.disable_ajax = true;
@@ -246,11 +252,11 @@ setClickHandlers: {
                 new Priority().sort();
             }
 
-            if (utils.in_simulation) {
+            if (utils.in_simulation || e.shiftKey) {
                 changeDay();
                 return;
             }
-            $.confirm({
+            $.alert({
                 title: `Are you sure you want to simulate all of your work for tomorrow?`,
                 content: `NONE of the changes you make in the simulation are saved, and your assignments can be restored by refreshing this page.`,
                 buttons: {
@@ -640,18 +646,19 @@ addTagHandlers: function() {
 },
 setKeybinds: function() {
 $(document).keydown(function(e) {
+// it's important to not modify e.key because then the event object itself will be modified
+const e_key = e.key.toLowerCase();
 if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["Backspace", "s", "f", "n"].includes(e.key)
-    || e.originalEvent.repeat && ["Backspace", "s", "f", "0"].includes(e.key)) return;
+    || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
+    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;
-switch (e.key) {
+switch (e_key) {
     case "n":
     case "e":
     case "d":
-    case "D":
     case "r":
-    case "Backspace":
+    case "backspace":
     case "s":
     case "f":
     case "0":
@@ -659,7 +666,7 @@ switch (e.key) {
     case "c":
     case "t":
         if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
-        switch (e.key) {
+        switch (e_key) {
             case "n":
                 if (form_is_showing) return;
                 $("#image-new-container").click();
@@ -671,9 +678,8 @@ switch (e.key) {
                 break;
             case "e":
             case "d":
-            case "D":
             case "r":
-            case "Backspace":
+            case "backspace":
             case "s":
             case "f":
             case "0":
@@ -686,7 +692,7 @@ switch (e.key) {
                     if (!dom_assignment.hasClass("has-been-clicked")) {
                         new VisualAssignment(dom_assignment).initUI();
                     }
-                    switch (e.key) {
+                    switch (e_key) {
                         case "o":
                         case "c":
                             dom_assignment.click();
@@ -697,10 +703,7 @@ switch (e.key) {
                             // Fix typing on the assignment form itself
                             e.preventDefault();
                             break;
-                        case "d":
-                            assignment_container.find(".delete-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "D": {
+                        case "d": {
                             const click_delete_button = $.Event("click");
                             click_delete_button.shiftKey = e.shiftKey;
                             assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
@@ -719,13 +722,13 @@ switch (e.key) {
                             dom_assignment.find(".work-input-textbox").val("0");
                             dom_assignment.find(".submit-work-button").click();
                             break;
-                        case "Backspace":
+                        case "backspace":
                         case "s":
-                            // I would animate the arrow for Backspace too but 
+                            // I would animate the arrow for backspace too but 
                             // that only works when an assignment is open
                             if (dom_assignment.hasClass("open-assignment")) {
-                            switch (e.key) {
-                                case "Backspace":
+                            switch (e_key) {
+                                case "backspace":
                                     var graph_button = assignment_container.find(".delete-work-input-button");
                                     break;
                                 case "s":
@@ -746,12 +749,12 @@ switch (e.key) {
                 }
         }
         break;
-    case "Escape":
+    case "escape":
         // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
         new Crud().hideForm();
         break;
-    case "ArrowDown":
-    case "ArrowUp":
+    case "arrowdown":
+    case "arrowup":
         if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
         const open_assignmens_on_screen = $(".open-assignment").filter(function() {
             return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
@@ -768,7 +771,7 @@ switch (e.key) {
     }
     });
     $(".tag-add-input").keydown(function(e) {
-        if (e.key === "Enter") {
+        if (e_key === "Enter") {
             utils.ui.close_on_success = true;
             $(this).parents(".tags").find(".tag-add-button").click();
         }
@@ -1112,9 +1115,7 @@ loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
     return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
 },
 getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
-    let raw_date_now = new Date();
-    if (SETTINGS.timezone) 
-        raw_date_now = new Date(raw_date_now.toLocaleString([], {timeZone: SETTINGS.timezone}));
+    const raw_date_now = new Date();
     if (!params.dont_stem_off_date_now) {
         let complete_date_now = new Date(date_now.valueOf());
         if (utils.in_simulation) {
@@ -1203,7 +1204,10 @@ window.dat = JSON.parse(document.getElementById("assignment-models").textContent
 for (let sa of dat) {
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
-        // TODO: don't use epoch shifting
+        // NOTE: compare all dates in the front end in the user's time zone
+        // the Date object is always in the user's time zone, making it
+        // far easier to do it this way
+        // assignment_date and x are in utc, so we need to convert them
         // Reference: https://stackoverflow.com/questions/15141762/how-to-initialize-a-javascript-date-to-a-particular-time-zone
         sa.assignment_date = new Date(sa.assignment_date
             .getUTCFullYear(), sa.assignment_date

@@ -32,7 +32,6 @@ from googleapiclient.errors import HttpError
 from requests.exceptions import ConnectionError
 from httplib2.error import ServerNotFoundError
 from oauthlib.oauth2.rfc6749.errors import (
-    OAuth2Error,
     AccessDeniedError,
     InvalidGrantError,
     MissingCodeError
@@ -552,11 +551,13 @@ def create_gc_assignments(request, order=None):
     # Ordering by due date descending puts assignments without due dates at the very bottom, so if we limit the number
     # of assignments its possible for them to get overlooked
     # So, we are forced to make a second request this time in ascending order to add assignments without due dates
-    order = {"descending": "desc", "ascending": "asc"}[request.POST.get('order', order)]
-    page_size = {
-        "desc": MAX_DESCENDING_COURSEWORK_PAGE_SIZE,
-        "asc": MAX_ASCENDING_COURSEWORK_PAGE_SIZE,
-    }[order]
+    order = request.POST.get('order', order)
+    if order == "descending":
+        order = "desc"
+        page_size = MAX_DESCENDING_COURSEWORK_PAGE_SIZE
+    elif order == "ascending":
+        order = "asc"
+        page_size = MAX_ASCENDING_COURSEWORK_PAGE_SIZE
     coursework_lazy = service.courses().courseWork()
     batch = service.new_batch_http_request(callback=add_gc_assignments_from_response)
     for course in request.user.settingsmodel.gc_courses_cache:
@@ -564,7 +565,6 @@ def create_gc_assignments(request, order=None):
         # from https://developers.google.com/classroom/reference/rest/v1/courses.courseWork/list#description
         # "Course students may only view PUBLISHED course work. Course teachers and domain administrators may view all course work."
         batch.add(coursework_lazy.list(courseId=course["id"], orderBy=f"dueDate {order}", pageSize=page_size))
-
     concurrent_request_key = f"gc_api_request_thread_{request.user.id}"
     thread_timestamp = datetime.datetime.now().timestamp()
     cache.set(concurrent_request_key, thread_timestamp, 2 * 60)
@@ -619,7 +619,8 @@ def generate_gc_authorization_url(request, *, next_url, current_url):
         # re-prompting the user for permission. Recommended for web server apps.
         access_type='offline',
         # Enable incremental authorization. Recommended as a best practice.
-        include_granted_scopes='true')
+        include_granted_scopes='true'
+    )
 
     request.session["gc-callback-next-url"] = next_url
     request.session["gc-callback-current-url"] = current_url
@@ -677,13 +678,19 @@ def gc_auth_callback(request):
             authorization_response = "https://" + authorization_response[7:]
     # turn those parameters into a token
     try:
-        flow.fetch_token(authorization_response=authorization_response)
+        authorized_flow_token = flow.fetch_token(authorization_response=authorization_response)
     except (InvalidGrantError, AccessDeniedError, MissingCodeError, ConnectionError):
         # InvalidGrantError for bad requests
-        # AccessDeniedError If the user reloads (dont remember how but it has happened) or clicks cancel
+        # AccessDeniedError If the user enables no scopes or clicks cancel
         # MissingCodeError if the user manually gets this route and forgets "code" in the url
         # note that code is the only required url parameter
         # ConnectionError if the wifi randomly dies (could happen when offline)
+        return callback_failed()
+    # the scope order MAY change
+    # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+    # Though this hasn't happened, let's be safe and ignore the order in this comparison
+    if set(authorized_flow_token['scope']) != set(settings.GC_SCOPES):
+        # If the user didn't enable both scopes
         return callback_failed()
     try:
         credentials = flow.credentials
@@ -691,47 +698,14 @@ def gc_auth_callback(request):
         # ValueError at /api/gc-auth-callback
         # There is no access token for this session, did you call fetch_token?
         return callback_failed()
-
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
-    # Ensure the user enabled both scopes
-    # let's avoid a batch request because
-    # 1) it takes like 1 second longer without
-    # 2) less verbose exception handling
-    # 3) i am lazy
-
     # I don't need to worry about RefreshErrors here because if permissions are revoked just before this code is ran, the api still successfully executes depsite that
     # I don't need to worry about Ratelimit errors either because such a situation would be very rare
     try:
         courses = service.courses().list(courseStates=["ACTIVE"]).execute()
-    except (OAuth2Error, TimeoutError):
+    except TimeoutError:
         return callback_failed()
     courses = courses.get('courses', [])
-    # Let's use type instead of isinstance because I want an exact exception class match
-    if courses and 0:
-        # NOTE: on second thought, we don't actually want to do this because it may take long if the course has a lot of
-        # coursework
-        # Keep this here in case for future reference
-        try:
-            service.courses().courseWork().list(courseId=courses[0]['id'], orderBy="dueDate desc", pageSize=MAX_DESCENDING_COURSEWORK_PAGE_SIZE).execute()
-        except (HttpError, OAuth2Error, TimeoutError) as e:
-            if not (
-                # condition to ignore HttpError
-                # if you are the owner of a class,
-                # this can throw 403s
-                type(e) is HttpError and e.resp.status == 403
-            ):
-                return callback_failed()
-    else:
-        try:
-            service.courses().courseWork().list(courseId="easter egg", orderBy="dueDate desc", pageSize=MAX_DESCENDING_COURSEWORK_PAGE_SIZE).execute()
-        except (HttpError, OAuth2Error, TimeoutError) as e:
-            if not (
-                # condition to ignore HttpError
-                # I don't have any courseId to test the permission 
-                # with, so I'll just use a dunder string id
-                type(e) is HttpError and e.resp.status == 404
-            ):
-                return callback_failed()
     request.user.settingsmodel.gc_courses_cache = simplify_courses(courses)
     # Use .update() (dict method) instead of = so the refresh token isnt overwritten
     request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))

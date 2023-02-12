@@ -1,28 +1,27 @@
 # In the future I should probably switch all my view classes to FormView 
 
-# Abstractions
-from common.views import TimewebGenericView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import ValidationError
 from django.http import HttpResponseNotAllowed
-from django.urls import reverse_lazy
+from django.contrib import messages
+
 from allauth.account.adapter import get_adapter as get_account_adapter
 from allauth.account.views import PasswordResetFromKeyView
+from allauth.socialaccount import app_settings
+from allauth.socialaccount.providers.base.mixins import OAuthLoginMixin
+
 from allauth.socialaccount.views import ConnectionsView as SocialaccountConnectionsView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.views import OAuth2LoginView, OAuth2View
-from allauth.socialaccount.providers.base.mixins import OAuthLoginMixin
+from common.views import TimewebGenericView
 
-# App stuff
-from django.conf import settings
 from .forms import UsernameResetForm
-from allauth.socialaccount import app_settings
 
-# Misc
 from common.views import logger
-from django.contrib import messages
 
 class UsernameResetView(LoginRequiredMixin, TimewebGenericView):
     template_name = "account/username_reset.html"

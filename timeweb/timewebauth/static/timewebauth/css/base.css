@@ -204,7 +204,7 @@ main {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-a {
+a:not(.dummyforspecifity) {
     color: rgb(50, 87, 255);
 }
 .add-input-margin {

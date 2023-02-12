@@ -20,7 +20,7 @@
                     <div>
                         <label for="id_account_{{ base_account.id }}">
                             <input id="id_account_{{ base_account.id }}" type="radio" name="account" value="{{ base_account.id }}"/>
-                            <span class="socialaccount_provider {{ base_account.provider }} {{ account.get_brand.id }}">{{ base_account.extra_data.email }}</span>
+                            <span class="{{ base_account.provider }} {{ account.get_brand.id }}">{{ base_account.extra_data.email }}</span>
                         </label>
                     </div>
                 {% endwith %}
@@ -38,7 +38,7 @@
         <form method="POST" action="{% provider_login_url provider.id process="connect" scope=scope auth_params=auth_params %}">
             {% csrf_token %}
             <button class="submit-button" type="submit" no-top-margin>
-                <span title="{{provider.name}}" class="socialaccount_provider"{% comment %} {{provider.id}}"  {% endcomment %}
+                <span title="{{provider.name}}" {% comment %} class="{{provider.id}}" {% endcomment %}
                     href="">Connect a new {{provider.name}} account</span>
             </button>
         </form>

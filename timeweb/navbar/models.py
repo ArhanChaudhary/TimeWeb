@@ -1,13 +1,15 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator
-from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone as _timezone
+from django.db import models
+from django.utils import timezone
+from django.core.validators import MinValueValidator
+
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
-from timezone_field import TimeZoneField
+
 from timewebapp.models import empty_list, empty_dict, create_image_path, WEEKDAYS
+
+from decimal import Decimal
 
 HORIZONTAL_TAG_POSITIONS = (
     ("Left", "Left"),
@@ -185,10 +187,6 @@ class SettingsModel(models.Model):
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
         verbose_name=_('Sorting Animation Threshold'),
     )
-    timezone = TimeZoneField(
-        null=True,
-        blank=True,
-    )
 
     # Hidden
     # Custom field validation in views: hardcoded enable or disable in change_setting
@@ -233,7 +231,7 @@ class SettingsModel(models.Model):
     device_uuid_api_timestamp = models.DateTimeField(
         null=True,
         blank=True,
-        default=_timezone.now,
+        default=timezone.now,
     )
     def __str__(self):
         return self.user.username

@@ -691,7 +691,7 @@ class VisualAssignment extends Assignment {
                 displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
                 str_day = displayed_day.toLocaleDateString([], this.date_string_options);
             }
-            const distance_today_from_displayed_day = today_minus_assignment_date - this.sa.blue_line_start - len_works;
+            const distance_today_from_displayed_day = Math.floor((displayed_day - date_now) / (1000 * 60 * 60 * 24));
             switch (distance_today_from_displayed_day) {
                 case -1:
                     str_day += ' (Tomorrow)';
@@ -711,7 +711,7 @@ class VisualAssignment extends Assignment {
 
             if (displayed_day.valueOf() !== date_now.valueOf()) {
                 center(str_day + ":", 1);
-                center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(todo, last_work_input, this, false), 2);
+                center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(this, todo, last_work_input), 2);
             }
         }
         screen.scale(1 / this.scale, 1 / this.scale);
@@ -1208,7 +1208,7 @@ class VisualAssignment extends Assignment {
             let diff;
             let today_index;
             let last_work_index;
-            let total = this.sa.works[0];;
+            let total = this.sa.works[0];
             let end_of_works = false;
 
             // assignment date
@@ -1252,8 +1252,9 @@ class VisualAssignment extends Assignment {
 
                 total += diff;
                 let formatted_date = `<td>${formatted_date_i}</td> <td>&nbsp;${diff}</td> <td>${diff === 1 ? unit_singular : unit_plural}</td> <td>(${total}</td> <td>total)`;
-                if (diff * this.sa.time_per_unit !== 0 && unit_singular.toLowerCase() !== "hour" && (unit_singular.toLowerCase() !== "minute" || diff * this.sa.time_per_unit >= 60))
-                    formatted_date += ` (${utils.formatting.formatMinutes(diff * this.sa.time_per_unit)})`;
+                let diff_minutes = Crud.safeConversion(diff, this.sa.time_per_unit);
+                if (diff_minutes !== 0 && unit_singular.toLowerCase() !== "hour" && (unit_singular.toLowerCase() !== "minute" || diff_minutes >= 60))
+                    formatted_date += ` (${utils.formatting.formatMinutes(diff_minutes)})`;
                 if (today_minus_assignment_date == i)
                     today_index = formatted_dates.length;
                 if (add_last_work_input && i === len_works + this.sa.blue_line_start - 1)
@@ -1322,18 +1323,28 @@ class VisualAssignment extends Assignment {
         // BEGIN Work input textbox
         {
         let enter_fired = false;
-        work_input_textbox.keydown(e => {
+        this.dom_assignment.find(".work-input-textbox-wrapper").toggleClass("show-input-widget", this.unit_is_of_time);
+        const work_input_elements = work_input_textbox.add(this.dom_assignment.find(".work-input-unit-of-time-widget"));
+        work_input_textbox.attr("data-placeholder", work_input_textbox.attr("placeholder"));
+        work_input_elements.on("keydown", e => {
             if (e.key === "Enter" && !enter_fired) {
                 enter_fired = true;
                 submit_work_button.click();
             }
-        // If you enter a number and press enter and the assignments sort, focus is removed from work_input_textbox and the keyup returns early
-        // because e.target is now instead body
-        // This can cause enter_fired to remain true and using enter to not work
-
-        // THis ensures that enter_fired is appropriately changed if the assignments re sort
-        }).on("blur", function() {
+        }).on("blur", e => {
+            // If you enter a number and press enter and the assignments sort, focus is removed from work_input_textbox and the keyup returns early
+            // because e.target is now instead body
+            // This can cause enter_fired to remain true and using enter to not work
+    
+            // This ensures that enter_fired is appropriately changed if the assignments re sort
             enter_fired = false;
+
+            if (!this.unit_is_of_time || e.target !== e.relatedTarget && $(e.relatedTarget).is(work_input_elements) && $(e.target).is(work_input_elements)) return; 
+            work_input_textbox.attr("placeholder", work_input_textbox.attr("data-placeholder"));
+            // dont remove data-placeholder or it breaks
+        }).on("focus", e => {
+            if (!this.unit_is_of_time || e.target !== e.relatedTarget && $(e.relatedTarget).is(work_input_elements) && $(e.target).is(work_input_elements)) return; 
+            work_input_textbox.removeAttr("placeholder");
         });
         // an alert can sometimes cause the enter to be fired on another element, instead listen to the event's propagation to the root
         $(document).keyup(e => {
@@ -1418,7 +1429,16 @@ class VisualAssignment extends Assignment {
             }
             // Clear once textbox if the input is valid
             work_input_textbox.val("");
-            input_done = Math.floor(input_done * 100) / 100;
+            if (this.unit_is_of_time) {
+                const unit_singular = pluralize(this.sa.unit.toLowerCase(), 1);
+                const work_input_textbox_label_is_checked = this.dom_assignment.find(".work-input-unit-of-time-checkbox").is(":checked");
+                if (unit_singular === "hour" && !work_input_textbox_label_is_checked) {
+                    input_done = Crud.minutesToHours(input_done);
+                } else if (unit_singular === "minute" && work_input_textbox_label_is_checked) {
+                    input_done = Crud.hoursToMinutes(input_done);
+                }
+            }
+
             // Cap at y and 0
             if (input_done + last_work_input > this.sa.y) {
                 input_done = this.sa.y - last_work_input;
@@ -1426,11 +1446,6 @@ class VisualAssignment extends Assignment {
                 input_done = -last_work_input;
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
-            if (Math.abs(Math.round(last_work_input) - last_work_input) <= 1 / 100) {
-                // Snap last_work_input to whole numbers (if unit is hour and last work input is 4.66666 but only 4.66 is displayed and you
-                // enter 0.34, last_work_input will be 5.0066 making the conversion back to minutes 300.4 instead of just 300)
-                last_work_input = Math.round(last_work_input);
-            }
 
             if (use_in_progress) {
                 if (this.sa.works[len_works] === last_work_input) return; // Pointless input (input_done === 0)
@@ -1661,6 +1676,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         dom_assignment.addClass("assignment-is-closing").removeClass("open-assignment").css("overflow", "hidden");
+        assignment_footer.find(".graph-footer [tabindex]").each(function() {
+            $(this).attr("data-tabindex", $(this).attr("tabindex"));
+        });
         assignment_footer.find(".graph-footer *").attr("tabindex", -1);
         assignment_footer.animate({
             marginBottom: -assignment_footer.height(),
@@ -1668,6 +1686,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "").removeClass("assignment-is-closing");
             assignment_footer.find(".graph-footer *").removeAttr("tabindex");
+            assignment_footer.find(".graph-footer [data-tabindex]").each(function() {
+                $(this).attr("tabindex", $(this).attr("data-tabindex"));
+            });
             assignment_footer.css({
                 display: "",
                 marginBottom: "",

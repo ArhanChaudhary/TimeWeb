@@ -2,12 +2,15 @@ from django.conf import settings
 from django.urls import resolve
 from django.http import QueryDict
 from django.contrib.auth import logout
+
 from ratelimit.exceptions import Ratelimited
 from ratelimit.decorators import ratelimit
 from ratelimit.core import is_ratelimited
-from . import utils
-from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
+
 from timewebapp.urls import KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS
+from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
+
+from . import utils
 
 DEFAULT_GLOBAL_RATELIMIT = "5/s"
 class LogoutExampleAccount:

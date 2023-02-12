@@ -111,9 +111,6 @@ main ul {
     padding-top: 4px;
     padding-bottom: 4px;
 }
-a:visited {
-    color: blue;
-}
 #table-of-contents-container a {
     color: black;
     -webkit-text-decoration-color: hsla(0, 0%, 0%, 0.3);

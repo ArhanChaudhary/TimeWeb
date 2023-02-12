@@ -18,7 +18,6 @@ document.addEventListener("DOMContentLoaded", function() {
             $major_category_href_element.css("scroll-margin-top", href_scroll_margin);
             $("#table-of-contents-container #category-table-of-contents").after(minor_category_li);
         } else {
-            debugger;
             if (!minor_categories.length)
                 minor_categories = minor_categories.add($major_category);
             major_category_li.find("span").text($major_category.text());

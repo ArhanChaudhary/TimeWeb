@@ -326,7 +326,7 @@ main.background-image-exists {
     position: relative;
     --description-opacity: 0.65;
     --description-font-size: 0.7em;
-    --left-side-of-header-width: max(105px, calc(35px + 12vw));
+    --left-side-of-header-width: max(110px, calc(40px + 12vw));
 }
 .description {
     position: relative;
@@ -870,7 +870,9 @@ do this because midde-of-header is hidden in the delete assignments view */
 .graph-footer {
     position: relative;
 }
-.graph-footer * {
+.graph-footer > :not(.work-input-textbox-wrapper),
+.work-input-textbox,
+.work-input-unit-of-time-widget {
     font-size: 15px;
     border-radius: 20px;
     border: none;
@@ -881,10 +883,11 @@ do this because midde-of-header is hidden in the delete assignments view */
     color: var(--color);
     z-index: 1;
 }
-.graph-footer :focus {
+.graph-footer > :focus,
+.work-input-textbox:focus {
     outline: 0;
     border-color: var(--input-focus-color);
-    background: inherit;
+    background-color: var(--primary);
     box-shadow: inset 0 0 0 3px var(--input-focus-color);
 }
 /* 1st column */
@@ -893,9 +896,9 @@ do this because midde-of-header is hidden in the delete assignments view */
     left: 0;
 }
 /* 2nd column */
-.work-input-textbox, .skew-ratio-button {
+.work-input-textbox-wrapper, .skew-ratio-button {
     position: relative;
-    z-index: unset;
+    z-index: initial;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -905,7 +908,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     right: 0;
 }
 /* 1st row */
-.delete-work-input-button, .work-input-textbox, .submit-work-button {
+.delete-work-input-button, .work-input-textbox-wrapper, .submit-work-button {
     margin-top: 12px;
 }
 /* 2nd row */
@@ -914,7 +917,57 @@ do this because midde-of-header is hidden in the delete assignments view */
     margin-bottom: var(--assignment-margin-bottom);
 }
 .work-input-textbox {
-    width: 123px;
+    --width: 123px;
+    width: var(--width);
+    position: relative;
+    transition-property: border-radius, padding-right, margin-left;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
+}
+.work-input-textbox-wrapper {
+    display: inline-block;
+}
+.work-input-unit-of-time-checkbox {
+    position: absolute;
+    visibility: hidden;
+}
+.work-input-unit-of-time-widget {
+    display: none;
+    position: absolute;
+    visibility: hidden;
+    opacity: 0;
+    z-index: initial;
+    cursor: pointer;
+    margin-left: -50px;
+    user-select: none;
+    padding: 5px 10px 5px 5px;
+    border-radius: 0px 20px 20px 0px;
+    --background-color: hsl(0, 0%, 80%);
+    transition: 0.3s ease-in-out;
+    transition-property: margin-left, opacity, visibility;
+}
+.work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-widget {
+    display: inline-block;
+}
+.work-input-unit-of-time-widget:focus {
+    outline: 0;
+}
+.work-input-unit-of-time-checkbox:not(:checked) ~ .work-input-unit-of-time-widget::after {
+    content: "Minutes";
+}
+.work-input-unit-of-time-checkbox:checked ~ .work-input-unit-of-time-widget::after {
+    content: "Hours";
+}
+.work-input-textbox-wrapper.show-input-widget:focus-within .work-input-textbox {
+    border-top-right-radius: initial;
+    border-bottom-right-radius: initial;
+    padding-right: 5px;
+    margin-left: -63px;
+}
+.work-input-textbox-wrapper:focus-within .work-input-unit-of-time-widget {
+    visibility: visible;
+    opacity: 1;
+    margin-left: 0px;
 }
 #extra-navs {
     position: absolute;
@@ -989,7 +1042,7 @@ main.finished-header-transition #extra-navs {
 .show-on-mobile {
     display: none;
 }
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 750px) {
     .assignment {
         --box-shadow: 0 0 12px -8px black;
     }
@@ -1011,12 +1064,43 @@ main.finished-header-transition #extra-navs {
         margin-left: 0px;
         margin-right: -4px;
     }
+    .title[data-daysleft]::after {
+        content: attr(data-mobile-daysleft) !important;
+    }
     .status-image {
         position: absolute;
         visibility: hidden;
     }
     .align-to-status-message-container {
         margin-left: -3px;
+    }
+    .work-input-textbox-wrapper.show-input-widget:focus-within .work-input-textbox {
+        border-radius: 20px;
+        padding-right: calc(var(--widget-padding) + 10px);
+        width: calc(var(--width) - var(--widget-padding));
+        margin-left: initial;
+    }
+    .work-input-textbox-wrapper:focus-within .work-input-unit-of-time-widget {
+        transform: initial;
+        transition-property: transform;
+    }
+    .work-input-unit-of-time-widget {
+        right: 0;
+        transition: 0.1s ease-out;
+        transition-property: transform, opacity, visibility;
+        transform: scaleX(0.9);
+        transform-origin: right;
+    }
+    .work-input-textbox {
+        z-index: initial;
+        transition: none;
+        --widget-padding: 0px;
+    }
+    .work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-checkbox:checked ~ .work-input-textbox {
+        --widget-padding: 51px;
+    }
+    .work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-checkbox:not(:checked) ~ .work-input-textbox {
+        --widget-padding: 67px;
     }
     .hide-on-mobile {
         display: none;

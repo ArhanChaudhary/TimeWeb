@@ -1,5 +1,5 @@
 from django.contrib import admin
-from timewebauth.models import TimewebUser
 from django.contrib.auth.admin import UserAdmin
+from common.models import User
 
-admin.site.register(TimewebUser, UserAdmin)
+admin.site.register(User, UserAdmin)

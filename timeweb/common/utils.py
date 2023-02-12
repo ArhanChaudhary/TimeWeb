@@ -1,12 +1,15 @@
-import re
-from django.utils import timezone
-from django.shortcuts import redirect
-from ratelimit.exceptions import Ratelimited
-from django.http import HttpResponseForbidden, HttpResponse
 from django.conf import settings
+from django.shortcuts import redirect
 from django.contrib.sites.models import Site
-from common.views import logger
+from django.http import HttpResponseForbidden, HttpResponse
 from django.db.utils import OperationalError
+from django.utils import timezone
+
+from common.views import logger
+
+from ratelimit.exceptions import Ratelimited
+
+import re
 
 def get_client_ip(group, request):
     if 'HTTP_CF_CONNECTING_IP' in request.META:
@@ -31,9 +34,8 @@ def days_between_two_dates(day1, day2):
     return (day1 - day2).days + ((day1 - day2).seconds >= (60*60*24) / 2)
 
 def utc_to_local(request, utctime):
-    offset = request.user.settingsmodel.timezone or request.utc_offset
-    assert offset, "User must have a timezone or utc_offset"
-    return utctime.astimezone(timezone.zoneinfo.ZoneInfo(offset))
+    assert request.utc_offset, "request must have a utc_offset"
+    return utctime.astimezone(timezone.zoneinfo.ZoneInfo(request.utc_offset))
 
 def app_static_factory(app_name):
     def app_static(url_path):

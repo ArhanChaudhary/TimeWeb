@@ -1,5 +1,11 @@
-from allauth.socialaccount.forms import SignupForm as SocialaccountSignupForm, DisconnectForm as SocialaccountDisconnectForm
+from django.conf import settings
+from django import forms
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
+
 from allauth.account import app_settings
+from allauth.account.adapter import get_adapter
+from allauth.account.utils import filter_users_by_email
 from allauth.account.forms import (
     LoginForm,
     SignupForm,
@@ -9,14 +15,13 @@ from allauth.account.forms import (
     ResetPasswordKeyForm,
     PasswordVerificationMixin,
 )
+from allauth.socialaccount.forms import (
+    SignupForm as SocialaccountSignupForm,
+    DisconnectForm as SocialaccountDisconnectForm
+)
+
 from allauth.account.models import EmailAddress
-from allauth.account.adapter import get_adapter
-from allauth.account.utils import filter_users_by_email
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django import forms
 from common.models import User
-from django.contrib import messages
 
 class LabeledLoginForm(LoginForm):
     error_messages = {

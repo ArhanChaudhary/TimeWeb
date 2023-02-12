@@ -427,26 +427,6 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     background-color: #2980b9;
     box-shadow: 0 0 0 1px #2980b9;
 }
-.jconfirm a {
-    color: rgb(0, 0, 238);
-}
-.jconfirm a:visited {
-    color: rgb(85, 26, 139);
-}
-@media (prefers-color-scheme: dark) {
-    .jconfirm a {
-        color: rgb(158, 158, 255);
-    }
-    .jconfirm a:visited {
-        color: rgb(208, 173, 240);
-    }
-}
-body.dark .jconfirm a {
-    color: rgb(158, 158, 255);
-}
-body.dark .jconfirm a:visited {
-    color: rgb(208, 173, 240);
-}
 @media screen and (max-width: 700px) {
     .jconfirm .jconfirm-box {
         /* First 30 for the padding due to a lack of border-box, second 30 for the right and left margin */

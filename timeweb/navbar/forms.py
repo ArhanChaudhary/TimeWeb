@@ -1,12 +1,14 @@
-from django.contrib import messages
-from contact_form.views import ContactForm as BaseContactForm
-from django.template.loader import render_to_string
-from django.utils.translation import gettext_lazy as _
 from django import forms
-from colorfield.widgets import ColorWidget
-from .models import SettingsModel
+from django.utils.translation import gettext_lazy as _
 from django.forms.widgets import ClearableFileInput
+from django.template.loader import render_to_string
+from django.contrib import messages
 from django.utils.safestring import mark_safe
+
+from colorfield.widgets import ColorWidget
+from contact_form.views import ContactForm as BaseContactForm
+
+from .models import SettingsModel
 
 class CustomImageFieldWidget(ClearableFileInput):
     clear_checkbox_label = _('Clear current image')
@@ -99,7 +101,6 @@ class SettingsForm(forms.ModelForm):
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
             "appearance": "Lesser dark mode doesn't color your assignment titles.",
             "animation_speed": "Controls the speed of most animations.",
-            "timezone": "Backend calculations use your browser's timezone. Choose your timezone here if you wish to change it.",
             "sorting_animation_threshold": "Only do the assignment sorting animation when there are this many assignments or less. Due to performance lag as the number of assignments increase, enter a higher number if your device is high-end and a lower number if your device is low-end.",
             "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished by your work inputs. Ignores assignments that are marked as completely finished from their due dates passing. Deleted assignments can be recovered and restored from the deleted assignments view.",
             "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",

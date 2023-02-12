@@ -1,37 +1,29 @@
-# THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
-
 # In the future I should probably switch all my view classes to FormView
 
-# Abstractions
 from django.shortcuts import redirect, reverse
-from django.utils.translation import gettext as _
-from django.http import QueryDict
-from django.contrib.auth import logout, login
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
-from common.views import TimewebGenericView
-import datetime
-from math import ceil, floor
-from decimal import Decimal
-
-# App stuff
 from django.conf import settings
-from common.models import User
-from .models import TimewebModel
-from navbar.models import SettingsModel
-from common.views import logger, CHANGELOGS
-
-# Signals
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms.models import model_to_dict
+from django.contrib.auth import logout, login
+from django.http import QueryDict
+from django.utils.decorators import method_decorator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-# Misc
-from django.forms.models import model_to_dict
-import common.utils as utils
-from . import utils as app_utils
-from django.utils.decorators import method_decorator
-from copy import deepcopy
+from django.utils import timezone
+from django.utils.translation import gettext as _
 from ratelimit.decorators import ratelimit
+
+from .models import TimewebModel
+from navbar.models import SettingsModel
+from . import utils as app_utils
+from common.models import User
+from common.views import logger, CHANGELOGS, TimewebGenericView
+import common.utils as utils
+
+import datetime
+from decimal import Decimal
+from math import ceil, floor
+from copy import deepcopy
 
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
@@ -67,7 +59,7 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'close_graph_after_work_input', 'show_priority', 'highest_priority_color', 'lowest_priority_color',
     'assignment_sorting', 'default_dropdown_tags', 'display_working_days_left',
     'horizontal_tag_position', 'vertical_tag_position', 'animation_speed',  'enable_tutorial',
-    'sorting_animation_threshold', 'timezone', 'seen_latest_changelog', 
+    'sorting_animation_threshold', 'seen_latest_changelog', 
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
@@ -171,7 +163,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['settings_model'] = request.user.settingsmodel
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
         self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
-        self.context['settings_model_as_json']['timezone'] = str(self.context['settings_model_as_json']['timezone'] or '') # timezone isnt json serializable
 
         if not request.user.settingsmodel.seen_latest_changelog:
             self.context['latest_changelog'] = CHANGELOGS[0]
@@ -464,7 +455,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
                 # if min work time is for example 1 hour and work_day_count is 7 days, the user would ideally want to see
                 # unit as "hour" and y as 7 hours instead of "minute" and 420 minutes
-                if self.sm.unit == "Minute" and app_utils.should_convert_to_hours(self.sm.y):
+                if self.sm.unit.lower() in ('minute', 'minutes') and app_utils.should_convert_to_hours(self.sm.y):
                     # so far all in the scope of minutes to define new_min_work_time_funct_round
                     new_unit = "Minute"
                     new_y = self.sm.y
@@ -472,7 +463,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     new_funct_round = Decimal(30)
                     new_min_work_time = self.sm.min_work_time
 
-                    new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
+                    new_min_work_time_funct_round = ceil(new_min_work_time / new_funct_round) * new_funct_round if new_min_work_time else new_funct_round
                     if new_min_work_time_funct_round <= min_work_time_funct_round:
                         # Now convert to scope of hours
                         new_unit = "Hour"
@@ -506,13 +497,13 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                     # # y doesn't change
                     # # min_work_time changes,
                     # # Undo the 1 / self.sm.time_per_unit, true original min work time in minutes
-                    # self.sm.min_work_time = self.sm.min_work_time * self.sm.time_per_unit
+                    # self.sm.min_work_time = self.sm.min_work_time * self.sm.time_per_unit # (change this to be safe conversion)
                     # # Redo that but with new_time_per_unit, new min work time in terms of time_per_unit
                     # self.sm.min_work_time = self.sm.min_work_time / new_time_per_unit
                     # # works doesn't change
                     # new_funct_round = app_utils.minutes_to_hours(new_funct_round)
 
-                    # current_min_work_time_funct_round_minutes = min_work_time_funct_round * self.sm.time_per_unit
+                    # current_min_work_time_funct_round_minutes = min_work_time_funct_round * self.sm.time_per_unit # (change this to be safe conversion)
                     # new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
                     # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
                     

@@ -50,6 +50,15 @@ $(function() {
                 break;
         }
     });
+    $(document).on('input', 'input[step]', function() {
+        var input = $(this);
+        let step = input.attr('step');
+        var newVal = input.val();
+        if (newVal.includes(".") && newVal.split(".")[1].length > step.split(".")[1].length) {
+            // remove extra decimals
+            input.val(newVal.substring(0, newVal.indexOf(".") + step.split(".")[1].length + 1));
+        }
+    });
     $("input").on("show.daterangepicker", function(e, picker) {
         function dothething(_timeselects) {
             _timeselects.on("change", function() {
@@ -234,7 +243,9 @@ createGCAssignments: function() {
         {type: "POST", url: '/api/update-gc-courses'},
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
-    let ajaxCallback = function(response, textStatus, jqXHR) {
+    let ajaxCallback = function(response, textStatus, jqXHR={} /* in case .success is manually called if ajax is disabled */) {
+        // indicates: this ajax didn't create any assignments, go to the next
+        // ajax in ajaxs
         if (jqXHR.status === 204) {
             // If the last ajaxs ajax reloads, ajaxs in sessionStorage will be []
             // .shift on an empty array returns undefined, which is truthy
@@ -253,11 +264,19 @@ createGCAssignments: function() {
                 error: ajaxUtils.GCIntegrationError,
                 success: ajaxCallback,
             });
+        // indicates: this ajax means google classroom assignments were
+        // created
         } else if (jqXHR.status === 205) {
             sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
             reloadWhenAppropriate();
-        } else if (jqXHR.status === 200) {
+        // indicates: this ajax means we have to terminate everything and
+        // restart the later queue from the beginning
 
+        // raised if:
+        // concurrent requests are made
+        // update-gc-courses doesn't add any new courses (saves last ajax)
+        } else if (jqXHR.status === 200) {
+            sessionStorage.removeItem("ajaxs");
         }
     }
     ajaxCallback(undefined, undefined, {status: 204});
