@@ -1443,11 +1443,6 @@ class VisualAssignment extends Assignment {
                 input_done = -last_work_input;
             }
             last_work_input = mathUtils.precisionRound(last_work_input + input_done, 10);
-            if (Math.abs(Math.round(last_work_input) - last_work_input) <= 1 / 100) {
-                // Snap last_work_input to whole numbers (if unit is hour and last work input is 4.66666 but only 4.66 is displayed and you
-                // enter 0.34, last_work_input will be 5.0066 making the conversion back to minutes 300.4 instead of just 300)
-                last_work_input = Math.round(last_work_input);
-            }
 
             if (use_in_progress) {
                 if (this.sa.works[len_works] === last_work_input) return; // Pointless input (input_done === 0)
