@@ -1669,6 +1669,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     if (dom_assignment.hasClass("open-assignment")) {
         // Animate the graph's margin bottom to close the assignment and make the graph's overflow hidden
         dom_assignment.addClass("assignment-is-closing").removeClass("open-assignment").css("overflow", "hidden");
+        assignment_footer.find(".graph-footer [tabindex]").each(function() {
+            $(this).attr("data-tabindex", $(this).attr("tabindex"));
+        });
         assignment_footer.find(".graph-footer *").attr("tabindex", -1);
         assignment_footer.animate({
             marginBottom: -assignment_footer.height(),
@@ -1676,6 +1679,9 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
             // Hide graph when transition ends
             dom_assignment.css("overflow", "").removeClass("assignment-is-closing");
             assignment_footer.find(".graph-footer *").removeAttr("tabindex");
+            assignment_footer.find(".graph-footer [data-tabindex]").each(function() {
+                $(this).attr("tabindex", $(this).attr("data-tabindex"));
+            });
             assignment_footer.css({
                 display: "",
                 marginBottom: "",
