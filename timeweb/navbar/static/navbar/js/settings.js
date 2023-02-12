@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#id_def_skew_ratio").val(mathUtils.precisionRound($("#id_def_skew_ratio").val()-1, 10)).prop("required", false);
     $("#id_def_min_work_time").val(+$("#id_def_min_work_time").val()||'');
     $("#reset-settings-button").click(function() {
-        $.confirm({
+        $.alert({
             title: "Are you sure you want to reset your settings?",
             content: 'If you accidentally reset your settings, refresh the page to restore them.',
             buttons: {

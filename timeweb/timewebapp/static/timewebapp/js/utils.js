@@ -256,7 +256,7 @@ setClickHandlers: {
                 changeDay();
                 return;
             }
-            $.confirm({
+            $.alert({
                 title: `Are you sure you want to simulate all of your work for tomorrow?`,
                 content: `NONE of the changes you make in the simulation are saved, and your assignments can be restored by refreshing this page.`,
                 buttons: {
