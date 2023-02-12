@@ -686,7 +686,10 @@ def gc_auth_callback(request):
         # note that code is the only required url parameter
         # ConnectionError if the wifi randomly dies (could happen when offline)
         return callback_failed()
-    if authorized_flow_token['scope'] != settings.GC_SCOPES:
+    # the scope order MAY change
+    # https://stackoverflow.com/questions/53176162/google-oauth-scope-changed-during-authentication-but-scope-is-same
+    # Though this hasn't happened, let's be safe and ignore the order in this comparison
+    if set(authorized_flow_token['scope']) != set(settings.GC_SCOPES):
         # If the user didn't enable both scopes
         return callback_failed()
     try:
