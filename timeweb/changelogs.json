@@ -1,5 +1,48 @@
 [
   {
+    "date": "2/12/2023",
+    "version": "v1.9.0-beta",
+    "updates": [
+      "Reworked the assignment priority and sorting algorithm",
+      "Increased spacing and font sizes for better mobile support",
+      "Improved dark mode",
+      "Improved performance",
+      "Tripled load speed for the page and the Google Classroom API",
+      "Implemented more assignment sorting options",
+      "Improved the assignment graph axis labeling algorithm",
+      "Reordered assignment form fields more logically intuitive",
+      "Reworked the assignment form prediction algorithms",
+      "Reworked the dynamic mode curvature auto-tuning algorithm",
+      "Prevented using outdated assignments across multiple devices",
+      "Implemented shift click keybind to skip confirmation dialogs",
+      "Implemented Minute/Hour widgets for time inputs",
+      "Formally support different timezones",
+      "Simplified and shortened Google Classroom assignment tag names",
+      "Reworded and styled email templates",
+      "Implemented \"Display Number of Working Days Left\" setting",
+      "Implemented \"Background Image Text Shadow Width\" setting",
+      "Implemented \"Google Classroom 11:59 PM Due Time Fix\" setting",
+      "Removed \"Timezone\" setting",
+      "Minor bug fixes"
+    ],
+    "bugfixes": [
+      "Fixed inaccurate total estimated completion times",
+      "Fixed inaccurate work schedules for assignments with break days",
+      "Fixed NaN curvature values after submitting work inputs",
+      "Fixed lower priority assignments ordering higher than higher priority assignments",
+      "Fixed displaying inaccurate number of remaining days left",
+      "Fixed \"Important\" tagged assignments not being included in assignment line wrappers",
+      "Fixed starred assignments unexpectedly auto-deleting",
+      "Fixed simulating next day unexpectedly marking some assignments as completely finished",
+      "Fixed assignments unexpectedly immediately deleting after creation",
+      "Fixed duplicating already-added Google Classroom assignments",
+      "Fixed adding overdue Google Classroom assignments",
+      "Fixed work days not repopulating input on invalid form",
+      "Fixed conversion incomapabilities when switching from minutes to hours and hours to minutes",
+      "Fixed keybinds not working with caps lock on"
+    ]
+  },
+  {
     "date": "8/10/2022",
     "version": "v1.8.1-beta",
     "updates": [
