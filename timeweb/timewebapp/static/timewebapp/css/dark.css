@@ -109,8 +109,12 @@ select {
 .fixed-graph {
     filter: invert(1) hue-rotate(180deg);
 }
-.graph-footer > * {
+.graph-footer > :not(.work-input-textbox-wrapper),
+.graph-footer .work-input-textbox {
     --background-color: hsl(0, 0%, 27%);
+}
+.work-input-unit-of-time-widget {
+    --background-color: hsl(0, 0%, 37%);
 }
 .graph-container > table {
     --background-color: hsl(0, 0%, 12%);

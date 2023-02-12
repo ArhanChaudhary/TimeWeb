@@ -274,7 +274,11 @@
                 <div class="graph-footer">
                   {% if not view_deleted_assignments_in_app_view %}
                     <button class="delete-work-input-button">Delete Work Input</button>
-                    <input class="work-input-textbox" placeholder="Enter Units Done" type="number" step="0.01"/>
+                    <div class="work-input-textbox-wrapper">
+                      <input id="work-input-label-{{ assignment.id }}" type="checkbox" class="work-input-unit-of-time-checkbox">
+                      <input class="work-input-textbox" placeholder="Enter Units Done" type="number" step="0.01"/>
+                      <label for="work-input-label-{{ assignment.id }}" class="work-input-unit-of-time-widget" tabindex="-1"></label>
+                    </div>
                     <button class="submit-work-button">Submit Work Input</button>
                     <br>
                     <button class="fixed-mode-button" data-fixed-mode-label="Fixed Mode" data-dynamic-mode-label="Dynamic Mode"></button>
