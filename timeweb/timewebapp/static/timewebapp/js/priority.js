@@ -399,6 +399,12 @@ class Priority {
                      * 10 7 > 11
                      * We can deduce the following logic to properly set x:
                      */
+                    // If the user edits their due date before their last work input and there is a work input on x,
+                    // don't increment the due date over here
+
+                    // This is for the sake of being consistent; due time only changes 
+                    // Plus it would be extremely jarring to the user to have an alert immediately after creating an 
+                    // assignment and seeing a due date different from what they entered
                     const increment_due_date_condition = sa.sa.soft && today_minus_assignment_date >= sa.sa.x;
                     if (increment_due_date_condition) {
                         sa.sa.x = today_minus_assignment_date;
