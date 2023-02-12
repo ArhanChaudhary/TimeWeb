@@ -707,8 +707,8 @@ class Priority {
                 // undefined > "r" => false (the below makes this true)
                 
                 // a.first_real_tag !== undefined: If both are undefined, skip this check
-                if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
-                if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
+                if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return -1;
+                if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return 1;
                 break;
             // We do not need to worry about different status groups here
             // when sorting alphabetically you are not sorting by priority
