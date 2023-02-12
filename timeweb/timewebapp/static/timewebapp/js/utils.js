@@ -646,13 +646,14 @@ addTagHandlers: function() {
 },
 setKeybinds: function() {
 $(document).keydown(function(e) {
-e.key = e.key.toLowerCase();
+// it's important to not modify e.key because then the event object itself will be modified
+const e_key = e.key.toLowerCase();
 if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e.key)
-    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e.key)) return;
+    || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
+    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;
-switch (e.key) {
+switch (e_key) {
     case "n":
     case "e":
     case "d":
@@ -665,7 +666,7 @@ switch (e.key) {
     case "c":
     case "t":
         if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
-        switch (e.key) {
+        switch (e_key) {
             case "n":
                 if (form_is_showing) return;
                 $("#image-new-container").click();
@@ -691,7 +692,7 @@ switch (e.key) {
                     if (!dom_assignment.hasClass("has-been-clicked")) {
                         new VisualAssignment(dom_assignment).initUI();
                     }
-                    switch (e.key) {
+                    switch (e_key) {
                         case "o":
                         case "c":
                             dom_assignment.click();
@@ -726,7 +727,7 @@ switch (e.key) {
                             // I would animate the arrow for backspace too but 
                             // that only works when an assignment is open
                             if (dom_assignment.hasClass("open-assignment")) {
-                            switch (e.key) {
+                            switch (e_key) {
                                 case "backspace":
                                     var graph_button = assignment_container.find(".delete-work-input-button");
                                     break;
@@ -770,7 +771,7 @@ switch (e.key) {
     }
     });
     $(".tag-add-input").keydown(function(e) {
-        if (e.key === "Enter") {
+        if (e_key === "Enter") {
             utils.ui.close_on_success = true;
             $(this).parents(".tags").find(".tag-add-button").click();
         }
