@@ -4,7 +4,8 @@ class Crud {
     static hoursToMinutes = hours => Crud.safeConversion(hours, 60);
     static minutesToHours = minutes => Crud.safeConversion(minutes, 1/60);
     static safeConversion = (value, factor) => {
-        if (!Number.isFinite(value)) return value;
+        assert(Number.isFinite(factor));
+        assert(Number.isFinite(value));
         if (factor < 1 || factor === 1) {
             return Math.round(value * factor * 100) / 100;
         } else if (factor > 1) {
@@ -97,6 +98,7 @@ class Crud {
                 case "funct_round":
                     switch (normalized_unit) {
                         case "minute":
+                            // value is undefined?
                             if (Crud.shouldConvertToHours(value)) {
                                 $(`#${field}-widget-checkbox`).prop("checked", true);
                                 $field.val(Crud.minutesToHours(value));
@@ -121,7 +123,8 @@ class Crud {
                     }
                     continue;
                 case "min_work_time":
-                    value = Crud.safeConversion(value, formDict.time_per_unit);
+                    if (Number.isFinite(formDict.time_per_unit) && Number.isFinite(value))
+                        value = Crud.safeConversion(value, formDict.time_per_unit);
                 case "min_work_time":
                 // it's fine if time_per_unit widget checkbox is set even when hidden
                 // this is because the unit for this field is always "minute" or "hour"
@@ -129,7 +132,7 @@ class Crud {
                 // works, however, can refer to units other than "minute" or "hour", so this does
                 // not apply to that
                 case "time_per_unit":
-                    if (Crud.shouldConvertToHours(value)) {
+                    if (Number.isFinite(value) && Crud.shouldConvertToHours(value)) {
                         $(`#${field}-widget-checkbox`).prop("checked", true);
                         $field.val(Crud.minutesToHours(value));
                     } else {
