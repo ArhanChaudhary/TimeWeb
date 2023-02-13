@@ -34,3 +34,9 @@ function setVh() {
 }
 setVh();
 window.addEventListener('resize', () => requestAnimationFrame(setVh));
+if (ACCOUNT_EMAIL === '') {
+    // Reset storages from saveAndLoadStates from utils.js
+    sessionStorage.removeItem("open_assignments");
+    sessionStorage.removeItem("scroll");
+    localStorage.removeItem("last_visit");
+}
