@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator
 
 from colorfield.fields import ColorField
 from multiselectfield import MultiSelectField
+from multiselectfield.utils import get_max_length
 
 from timewebapp.models import empty_list, empty_dict, create_image_path, WEEKDAYS
 
@@ -85,6 +86,7 @@ class SettingsModel(models.Model):
         choices=WEEKDAYS,
         blank=True,
         null=True,
+        max_length=get_max_length(WEEKDAYS, None),
         verbose_name=_('Default Work Days'),
     )
 
