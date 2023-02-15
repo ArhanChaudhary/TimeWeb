@@ -17,7 +17,7 @@ function setMoveLefts() {
         if (!in_view) return;
 
         let mid = this_top + $(this).height() / 2;
-        let linear_factor = 1 - Math.abs(section_mid - mid) / (section_mid);
+        let linear_factor = 1 - Math.abs(section_mid - mid) / (section_mid - 20);
         if (linear_factor < 0) {
             var opacity = linear_factor * 3 + 0.3;
         } else if (linear_factor < 0.5) {
