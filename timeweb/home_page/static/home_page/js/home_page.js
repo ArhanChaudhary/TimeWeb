@@ -52,10 +52,16 @@ $(window).one("load", function() {
         now -= diff;
         if (velocity_scroll_amount < 0) {
             now += velocity_scroll_amount;
-            if (velocity_scroll_amount > -10)
+            if (velocity_scroll_amount > -2)
+                velocity_scroll_amount += 0.05;
+            else if (velocity_scroll_amount > -5)
+                velocity_scroll_amount += 0.1;
+            else if (velocity_scroll_amount > -10)
                 velocity_scroll_amount += 0.15;
-            else
+            else if (velocity_scroll_amount > -50)
                 velocity_scroll_amount += 0.25;
+            else
+                velocity_scroll_amount += 0.25 * velocity_scroll_amount / -50;
         }
         if (diff < 1.5) {
             diff += diff_diff;
