@@ -44,6 +44,14 @@ main {
 .section-block#first .left-section-side {
     margin-right: var(--left-section-margin);
     flex-shrink: 0;
+    width: 600px;
+    font-size: 33px;
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+}
+.section-block#first .left-section-side #main-logo {
+    width: 100%;
 }
 .section-block#first header {
     height: 65px;
@@ -59,7 +67,6 @@ main {
     color: black;
     text-decoration: none;
     font-weight: 700;
-    font-family: "Open Sans";
 }
 .section-block#first header a:hover {
     text-decoration: underline 2px;
@@ -135,8 +142,7 @@ main {
     transform: scaleY(1.1);
 }
 .section-max-width-wrapper {
-    margin: 0 var(--site-horizontal-padding);
-    max-width: 1100px;
+    max-width: 1600px;
     width: calc(100% - var(--site-horizontal-padding) * 2);
 }
 #graph-image {
