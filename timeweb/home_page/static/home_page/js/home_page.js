@@ -10,12 +10,14 @@ scaled_horizontal_factor = 0;
 now = 0;
 function setMoveLefts() {
     const section_mid = $(".section-block#first").height() / 2;
+    const second_top = $("#second").offset().top;
     $(".assignment-scroller-image").each(function() {
-        let in_view = $(this).offset().top + $(this).height() > 0 && $(this).offset().top < $("#second").offset().top;
+        const this_top = $(this).offset().top;
+        let in_view = this_top + $(this).height() > 0 && this_top < second_top;
         if (!in_view) return;
 
-        let mid = $(this).offset().top + $(this).height() / 2;
-        let linear_factor = 1 - Math.abs(section_mid - mid) / ($(".section-block#first").height() / 2);
+        let mid = this_top + $(this).height() / 2;
+        let linear_factor = 1 - Math.abs(section_mid - mid) / (section_mid);
         if (linear_factor < 0) {
             var opacity = linear_factor * 3 + 0.3;
         } else if (linear_factor < 0.5) {
