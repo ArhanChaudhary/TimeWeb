@@ -1,5 +1,5 @@
 * {
-    font-family: futura, sans-serif;
+    font-family: montserrat, sans-serif;
 }
 #site {
     overflow: hidden;
@@ -152,7 +152,6 @@ main {
 }
 .header-description {
     font-size: 23px;
-    font-family: "Open Sans";
 }
 .section-block#second .right-section-side {
     width: min(calc(50vw - 120px), 545px);
@@ -227,6 +226,6 @@ main {
     } */
 }
 @font-face {
-    font-family: futura-pt;
-    src: url(".fonts/Futura PT Heavy.ttf");
+    font-family: montserrat;
+    src: url("../fonts/Montserrat.ttf");
 }
