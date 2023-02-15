@@ -29,7 +29,7 @@ main {
 .section-block {
     justify-content: center;
     /* needs to be at .section-block so --preferred-sction-height can be overwritten */
-    --section-height: max(575px, var(--preferred-section-height));
+    --section-height: clamp(575px, var(--preferred-section-height), 1000px);
 }
 .section-max-width-wrapper {
     justify-content: space-between;
