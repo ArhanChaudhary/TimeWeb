@@ -46,7 +46,7 @@ main {
 .section-block#first .left-section-side {
     margin-right: var(--left-section-margin);
     flex-shrink: 0;
-    width: 600px;
+    width: 590px;
     font-size: 33px;
     display: flex;
     justify-content: center;
@@ -54,6 +54,7 @@ main {
 }
 .section-block#first .left-section-side #main-logo {
     width: 100%;
+    margin-bottom: 5px;
 }
 .section-block#first header {
     height: 65px;
