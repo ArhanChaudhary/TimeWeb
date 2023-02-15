@@ -9,13 +9,13 @@ function clamp(low, value, high) {
 scaled_horizontal_factor = 0;
 now = 0;
 function setMoveLefts() {
-    const section_mid = $(".section-block#first").height() / 2 + 85 * isMobile;
+    const section_mid = $(".section-block#first").height() / 2;
     $(".assignment-scroller-image").each(function() {
         let in_view = $(this).offset().top + $(this).height() > 0 && $(this).offset().top < $("#second").offset().top;
         if (!in_view) return;
 
         let mid = $(this).offset().top + $(this).height() / 2;
-        let linear_factor = 1 - Math.abs(section_mid - mid) / ($(".section-block#first").height() / 2 - 175 * isMobile);
+        let linear_factor = 1 - Math.abs(section_mid - mid) / ($(".section-block#first").height() / 2);
         if (linear_factor < 0) {
             var opacity = linear_factor * 3 + 0.3;
         } else if (linear_factor < 0.5) {
