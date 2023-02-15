@@ -2,7 +2,7 @@ from PIL import Image
 from pathlib import Path
 
 app_dir = Path(__file__).resolve().parent
-light = True
+light = False
 
 if light:
     img = Image.open(app_dir / "light_scroller.png")
