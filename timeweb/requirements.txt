@@ -1,4 +1,4 @@
-asgiref==3.4.1
+asgiref==3.5.2
 beautifulsoup4==4.11.1
 cachetools==4.2.2
 certifi==2022.12.7
