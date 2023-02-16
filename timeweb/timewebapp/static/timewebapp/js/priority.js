@@ -1086,8 +1086,7 @@ class Priority {
 
         // wrappers that wrap only around one assignment
         $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
-            // Don't apply this removal to .autofill-work-done
-            if ($(this).find(".autofill-work-done").length) return;
+            if ($(this).find(".allow-singular-wrapper").length) return;
 
             // Remove .delete-starred-assignments and every other shortcut
             $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
