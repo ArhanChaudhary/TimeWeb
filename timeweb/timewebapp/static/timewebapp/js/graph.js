@@ -347,6 +347,8 @@ class VisualAssignment extends Assignment {
             if (!e.isTrigger) {
                 const hover_point_label = this.dom_assignment.find(".hover-point-label");
                 hover_point_label.removeClass("move-left").addClass("hide-label");
+                hover_point_label.css("--x", 0);
+                hover_point_label.css("--y", 0);
             }
         }
     }
