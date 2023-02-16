@@ -105,7 +105,7 @@ $(window).scroll(function(e) {
     // store the past velocity to fix this
     const min_velocity = Math.min(old_velocity, new_velocity);
     if (new_position === 0 && min_velocity < 0) {
-        velocity_scroll_amount += Math.max(-20, min_velocity * 2);
+        velocity_scroll_amount += Math.max(-12, min_velocity * 2);
     }
 
     let first_section_height = $(".section-block#first").height();
