@@ -205,6 +205,8 @@ main.background-image-exists {
 }
 #tutorial-click-assignment-to-open {
     font-size: 18px;
+    margin-top: 3px;
+    display: inline-block;
     scroll-margin: 30px;
 }
 .shortcut {
