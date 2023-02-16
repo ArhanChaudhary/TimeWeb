@@ -30,7 +30,7 @@ function setMoveLefts() {
             var opacity = 1;
         }
         $(this.parentElement).css(opacity < 0 ? {
-            opacity: 0,
+            opacity: "",
         } : {
             opacity: opacity,
             "--move-left": `${-scalingFunction(linear_factor) * scaled_horizontal_factor}px`,
@@ -84,6 +84,7 @@ $(window).one("load", function() {
             container.prop("style").setProperty("--move-up", now + "px");
             container[0].offsetHeight;
             container.css("transition", "");
+            $(".assignment-scroller-image-extender").css("opacity", "");
         }
         requestAnimationFrame(step);
     }

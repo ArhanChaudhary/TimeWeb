@@ -126,6 +126,7 @@ main {
     display: block;
     position: relative;
     transform: translateX(var(--move-left));
+    opacity: 0;
     /* right: -180px; */
 }
 .assignment-scroller-image-extender:hover {
