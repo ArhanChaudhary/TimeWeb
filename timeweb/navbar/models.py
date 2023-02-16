@@ -157,7 +157,7 @@ class SettingsModel(models.Model):
     appearance = models.CharField(
         max_length=MAX_APPEARANCES_LENGTH,
         choices=APPEARANCES,
-        default=_("automatic"),
+        default=_("dark"),
         verbose_name=_('Appearance'),
     )
     background_image = models.ImageField(

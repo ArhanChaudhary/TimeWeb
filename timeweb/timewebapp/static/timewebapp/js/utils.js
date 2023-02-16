@@ -124,7 +124,7 @@ arrayToEnglish: function(array) {
 },
 getReversibilityStatus: function() {
     if (utils.in_simulation)
-        return "Remember that you can restore this assignment by refreshing this page.";
+        return "You can restore your assignments in the simulation by refreshing.";
     else if (VIEWING_DELETED_ASSIGNMENTS)
         return "This action is irreversible.";  
     else
@@ -310,7 +310,7 @@ setClickHandlers: {
     },
     generateJConfirmParams: function(params) {
         return {
-            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} starred ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} completely finished ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
             content: utils.formatting.getReversibilityStatus(),
             buttons: {
                 confirm: {
@@ -323,6 +323,15 @@ setClickHandlers: {
             },
         }
     },
+},
+{
+    selector: ".delete-due-date-passed-assignments .generic-button",
+    // the value of this doesn't matter
+    confirmAction: params => shortcuts.find(s => s.selector === ".delete-starred-assignments .generic-button").confirmAction(params),
+    generateJConfirmParams: params => ({
+        ...shortcuts.find(s => s.selector === ".delete-starred-assignments .generic-button").generateJConfirmParams(params),
+        title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} past due ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+    }),
 },
 {
     selector: ".autofill-work-done .generic-button:not(select)",
@@ -771,7 +780,7 @@ switch (e_key) {
     }
     });
     $(".tag-add-input").keydown(function(e) {
-        if (e_key === "Enter") {
+        if (e.key === "Enter") {
             utils.ui.close_on_success = true;
             $(this).parents(".tags").find(".tag-add-button").click();
         }

@@ -346,7 +346,11 @@ class VisualAssignment extends Assignment {
             // Don't hide graph hover point label on set skew ratio end if enabled
             if (!e.isTrigger) {
                 const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.removeClass("move-left").addClass("hide-label");
+                hover_point_label.addClass("disable-hover-point-label-transition hide-label").removeClass("move-left");
+                hover_point_label.css("--x", 0);
+                hover_point_label.css("--y", 0);
+                hover_point_label[0].offsetHeight;
+                hover_point_label.removeClass("disable-hover-point-label-transition");
             }
         }
     }
@@ -691,7 +695,7 @@ class VisualAssignment extends Assignment {
                 displayed_day.setDate(displayed_day.getDate() + this.sa.blue_line_start + len_works);
                 str_day = displayed_day.toLocaleDateString([], this.date_string_options);
             }
-            const distance_today_from_displayed_day = Math.floor((displayed_day - date_now) / (1000 * 60 * 60 * 24));
+            const distance_today_from_displayed_day = Math.floor((date_now - displayed_day) / (1000 * 60 * 60 * 24));
             switch (distance_today_from_displayed_day) {
                 case -1:
                     str_day += ' (Tomorrow)';

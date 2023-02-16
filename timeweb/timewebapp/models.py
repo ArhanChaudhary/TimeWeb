@@ -146,9 +146,6 @@ class TimewebModel(models.Model):
         null=True,
         blank=True,
     )
-    has_alerted_due_date_passed_notice = models.BooleanField(
-        default=False,
-    )
     alert_due_date_incremented = models.BooleanField(
         default=False,
     )
