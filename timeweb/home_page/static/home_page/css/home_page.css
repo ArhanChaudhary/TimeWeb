@@ -39,6 +39,8 @@ main {
 .section-max-width-wrapper {
     display: flex;
     align-items: center;
+    max-width: 1600px;
+    width: calc(100% - var(--site-horizontal-padding) * 2);
     justify-content: space-between;
 }
 .section-block#first {
@@ -139,10 +141,6 @@ main {
 .assignment-scroller-image-extender:hover::before {
     transform: scaleY(1.1);
 }
-.section-max-width-wrapper {
-    max-width: 1600px;
-    width: calc(100% - var(--site-horizontal-padding) * 2);
-}
 #graph-image {
     display: block;
     position: relative;
@@ -173,16 +171,21 @@ main {
 
 .section-block#fifth {
     color: white;
+    font-weight: 800;
     background-color: hsl(183deg 92% 41%);
+}
+.section-block#fifth * {
+    font-weight: 700;
 }
 .section-block#fifth .section-max-width-wrapper {
     max-width: 775px;
 }
 .section-block#fifth #bottom-signup-button {
+    font-weight: 800;
     color: hsl(183deg 92% 41%);
     text-decoration: none;
     background-color: white;
-    width: 500px;
+    width: 600px;
     height: 80px;
     margin: 30px auto 0;
     border-radius: 40px;
