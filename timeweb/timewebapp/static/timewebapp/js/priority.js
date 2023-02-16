@@ -21,7 +21,6 @@ class Priority {
 
     constructor() {
         const that = this;
-        that.due_date_passed_notices = [];
         that.due_date_incremented_notices = [];
         that.priority_data_list = [];
         that.total_completion_time = 0;
@@ -309,8 +308,6 @@ class Priority {
             // Check if sa.sa.y is a number, and do the same for last_work_input for extra precaution
             const finished_work_inputs = last_work_input >= sa.sa.y && Number.isFinite(sa.sa.y) && Number.isFinite(last_work_input);
             const not_yet_assigned = today_minus_assignment_date < 0;
-
-            let alert_due_date_passed_cond = false;
             let status_value, status_message, status_image, due_date_minus_today;
 
             // hard_due_date_passed
@@ -484,11 +481,6 @@ class Priority {
                             status_message = "This assignment needs more info but passed its due date";
                         else
                             status_message = 'This assignment\'s due date has passed';
-                        alert_due_date_passed_cond = true;
-                        if (assignment_container.is("#animate-in, #animate-color")) {
-                            sa.sa.has_alerted_due_date_passed_notice = true;
-                            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {has_alerted_due_date_passed_notice: sa.sa.has_alerted_due_date_passed_notice, id: sa.sa.id});
-                        }
                     } else {
                         status_value = Priority.UNFINISHED_FOR_TODAY;
                         status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
@@ -499,16 +491,6 @@ class Priority {
             if (status_value !== Priority.COMPLETELY_FINISHED && sa.sa.dont_hide_again) {
                 sa.sa.dont_hide_again = false;
                 ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {dont_hide_again: sa.sa.dont_hide_again, id: sa.sa.id});
-            }
-
-			if (alert_due_date_passed_cond && !sa.sa.has_alerted_due_date_passed_notice) {
-				// sa.sa.has_alerted_due_date_passed_notice will only be set to true after the user closes the alert modal
-				that.due_date_passed_notices.push(sa.sa);
-			// If the condition to alert the due date has passed is false, set sa.sa.has_alerted_due_date_passed_notice to true
-            // This is done so that it doesn't remain as true and fail to alert the user again
-			} else if (!alert_due_date_passed_cond && sa.sa.has_alerted_due_date_passed_notice) {
-                sa.sa.has_alerted_due_date_passed_notice = false;
-                ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {has_alerted_due_date_passed_notice: sa.sa.has_alerted_due_date_passed_notice, id: sa.sa.id});
             }
 
             if (sa.sa.alert_due_date_incremented) {
@@ -647,32 +629,6 @@ class Priority {
     }
     alertDueDates() {
         const that = this;
-        let due_date_passed_notice_title;
-        if (that.due_date_passed_notices.length === 1) {
-            due_date_passed_notice_title = `Notice: "${that.due_date_passed_notices[0].name}" has been marked as completely finished because its due date has passed.`;
-        } else if (that.due_date_passed_notices.length > 1) {
-            due_date_passed_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_passed_notices.map(i => i.name))} have been marked as completely finished because their due dates have passed.`;
-        }
-        if (due_date_passed_notice_title && !Priority.due_date_passed_notice_on_screen) {
-            Priority.due_date_passed_notice_on_screen = true;
-            $.alert({
-                title: due_date_passed_notice_title,
-                content: "You can enable soft due dates in the assignment form if you want your assignments' due dates to automatically increment if you haven't finished them by then.",
-                backgroundDismiss: false,
-                buttons: {
-                    ok: {
-                        action: function() {
-                            Priority.due_date_passed_notice_on_screen = false;
-                            for (let sa of that.due_date_passed_notices) {
-                                sa.has_alerted_due_date_passed_notice = true;
-                                ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {has_alerted_due_date_passed_notice: sa.has_alerted_due_date_passed_notice, id: sa.id});
-                            }
-                        }
-                    }
-                },
-            });
-        }
-
         let due_date_incremented_notice_title;
         let due_date_incremented_notice_content;
         if (that.due_date_incremented_notices.length === 1) {
@@ -855,7 +811,6 @@ class Priority {
     }
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
-
         if ([
             Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
             Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,

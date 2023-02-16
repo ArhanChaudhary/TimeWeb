@@ -42,7 +42,6 @@ class TimewebForm(forms.ModelForm):
             'description': forms.Textarea(attrs={"rows": "1", "class": "dont-mark-invalid-if-empty"}),
             'funct_round': forms.NumberInput(attrs={"min":"0"}),
             'min_work_time': forms.NumberInput(attrs={"min":"0"}),
-            'has_alerted_due_date_passed_notice': forms.HiddenInput(),
             'alert_due_date_incremented': forms.HiddenInput(),
             'dont_hide_again': forms.HiddenInput(),
         }

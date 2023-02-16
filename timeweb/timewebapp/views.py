@@ -49,8 +49,8 @@ DELETED_ASSIGNMENTS_PER_PAGE = 70
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
-                                        "google_classroom_assignment_link", "has_alerted_due_date_passed_notice",
-                                        "alert_due_date_incremented", "dont_hide_again", "deletion_time", "user", "needs_more_info")
+                                        "google_classroom_assignment_link", "alert_due_date_incremented", "dont_hide_again",
+                                        "deletion_time", "user", "needs_more_info")
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
 INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
@@ -77,8 +77,7 @@ INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
     "assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
     "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "id", "name",
     "soft", "unit", "description", "tags", "is_google_classroom_assignment",
-    "has_alerted_due_date_passed_notice", "alert_due_date_incremented", "dont_hide_again",
-    "deletion_time", "needs_more_info",
+    "alert_due_date_incremented", "dont_hide_again", "deletion_time", "needs_more_info",
 )
 
 assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"
@@ -246,7 +245,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             old_data = deepcopy(self.sm)
 
             # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
-            # Excluded: id, blue_line_start, skew_ratio, works, fixed_mode, dynamic_start, tags, has_alerted_due_date_passed_notice, alert_due_date_incremented, dont_hide_again
+            # Excluded: id, blue_line_start, skew_ratio, works, fixed_mode, dynamic_start, tags, alert_due_date_incremented, dont_hide_again
 
             self.sm.name = self.form.cleaned_data.get("name")
             self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
