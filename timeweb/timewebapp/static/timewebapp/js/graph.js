@@ -346,9 +346,11 @@ class VisualAssignment extends Assignment {
             // Don't hide graph hover point label on set skew ratio end if enabled
             if (!e.isTrigger) {
                 const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.removeClass("move-left").addClass("hide-label");
+                hover_point_label.addClass("disable-hover-point-label-transition hide-label").removeClass("move-left");
                 hover_point_label.css("--x", 0);
                 hover_point_label.css("--y", 0);
+                hover_point_label[0].offsetHeight;
+                hover_point_label.removeClass("disable-hover-point-label-transition");
             }
         }
     }
