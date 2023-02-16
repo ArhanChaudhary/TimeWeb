@@ -101,9 +101,13 @@ main {
 .assignment-scroller-image {
     transition: var(--scale-transition);
     display: block;
+    border-radius: 5px;
     margin-bottom: 20px;
     transform-origin: right;
     width: calc(525px + var(--site-horizontal-padding));
+    box-shadow: 0 0 65px 0 hsl(195deg 43% 39%),
+                /* fake the effect of drop-shadow by plugging in the image corner holes */
+                inset 0 0 0px 2px hsl(195deg 43% 17%);
 }
 .assignment-scroller-image-extender:hover .assignment-scroller-image {
     transform: scale(1.1);
@@ -128,8 +132,16 @@ main {
     height: 100%;
     transition: var(--scale-transition);
 }
+.assignment-scroller-image-extender::before {
+    width: 71px;
+    z-index: 1;
+    left: calc(100% - 70px);
+    background-color: white;
+    box-shadow: none;
+}
 .assignment-scroller-image-extender::after {
-    background-color: rgb(48, 48, 48);
+    background-color: white;
+    box-shadow: 0 0 60px 0 hsl(195deg 43% 39%);
     left: 100%;
     width: 100vw;
 }
