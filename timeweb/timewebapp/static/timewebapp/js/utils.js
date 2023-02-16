@@ -310,7 +310,7 @@ setClickHandlers: {
     },
     generateJConfirmParams: function(params) {
         return {
-            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} starred ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} completely finished ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
             content: utils.formatting.getReversibilityStatus(),
             buttons: {
                 confirm: {
