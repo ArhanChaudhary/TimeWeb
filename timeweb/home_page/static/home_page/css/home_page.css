@@ -9,8 +9,8 @@ main {
     --color: hsl(0, 0%, 87%);
     --preferred-section-height: 85vh;
     --left-section-margin: 70px;
-    --odd-section-color: hsl(0, 0%, 10%);
-    --even-section-color: hsl(0, 0%, 7%);
+    --odd-section-color: hsl(0, 0%, 7%);
+    --even-section-color: hsl(0, 0%, 10%);
     --site-horizontal-padding: 30px;
 }
 .section-block:nth-child(odd) {
