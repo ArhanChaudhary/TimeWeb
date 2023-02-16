@@ -325,6 +325,15 @@ setClickHandlers: {
     },
 },
 {
+    selector: ".delete-due-date-passed-assignments .generic-button",
+    // the value of this doesn't matter
+    confirmAction: params => shortcuts.find(s => s.selector === ".delete-starred-assignments .generic-button").confirmAction(params),
+    generateJConfirmParams: params => ({
+        ...shortcuts.find(s => s.selector === ".delete-starred-assignments .generic-button").generateJConfirmParams(params),
+        title: `Are you sure you want to delete ${params.assignments_in_wrapper.length} past due ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+    }),
+},
+{
     selector: ".autofill-work-done .generic-button:not(select)",
     confirmAction: function(params) {
         const params2 = {};
