@@ -1,6 +1,12 @@
 * {
     font-family: montserrat, sans-serif;
 }
+body {
+    /* --odd-section-color: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(14,40,48,1) 100%); */
+    --odd-section-color: hsl(0, 0%, 7%);
+    /* this is the color you see when trying to scroll up and seeing extra space at the top of the screen */
+    background-color: var(--odd-section-color);
+}
 #site {
     overflow: hidden;
 }
@@ -20,13 +26,10 @@ main {
     background-color: var(--even-section-color);
 }
 .section-block {
-    height: var(--section-height);
-    font-size: 40px;
-}
-.section-block,
-.section-max-width-wrapper {
     display: flex;
     align-items: center;
+    height: var(--section-height);
+    font-size: 40px;
 }
 .section-block {
     justify-content: center;
@@ -34,6 +37,8 @@ main {
     --section-height: clamp(500px, var(--preferred-section-height), 1000px);
 }
 .section-max-width-wrapper {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
 }
 .section-block#first {
