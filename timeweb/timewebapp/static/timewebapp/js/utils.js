@@ -124,7 +124,7 @@ arrayToEnglish: function(array) {
 },
 getReversibilityStatus: function() {
     if (utils.in_simulation)
-        return "Remember that you can restore this assignment by refreshing this page.";
+        return "You can restore your assignments in the simulation by refreshing.";
     else if (VIEWING_DELETED_ASSIGNMENTS)
         return "This action is irreversible.";  
     else
