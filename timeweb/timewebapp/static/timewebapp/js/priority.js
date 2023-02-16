@@ -57,7 +57,7 @@ class Priority {
             if (params.first_sort) {
                 params.dom_assignment.addClass("transition-instantly");
             }
-            if (isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
+            if (Number.isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
                 params.dom_assignment.css("--priority-color", "var(--color)");
             } else {
                 const priority_color = that.percentageToColor(params.priority_percentage);
