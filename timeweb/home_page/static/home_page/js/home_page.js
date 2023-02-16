@@ -37,6 +37,7 @@ function setMoveLefts() {
         });
     });
 }
+disable_scroll = false;
 position_stop = false;
 needs_restarting = false;
 velocity_scroll_amount = 0;
@@ -48,14 +49,22 @@ $(window).one("load", function() {
     let diff = 0;
     let diff_diff = 0.07;
     let scaled_horizontal_factor_diff = 4.6;
+    let old_diff;
+    let old_scaled_horizontal_factor_diff;
     step = () => {
+        if (disable_scroll && diff === old_diff && scaled_horizontal_factor_diff === old_scaled_horizontal_factor_diff) {
+            return;
+        }
+        old_diff = diff;
+        old_scaled_horizontal_factor_diff = scaled_horizontal_factor_diff;
         if (position_stop) {
             needs_restarting = true;
             return;
         }
         container.prop("style").setProperty("--move-up", now + "px");
         setMoveLefts();
-        now -= diff;
+        if (!disable_scroll)
+            now -= diff;
         if (velocity_scroll_amount < 0) {
             now += velocity_scroll_amount;
             if (velocity_scroll_amount > -2)
