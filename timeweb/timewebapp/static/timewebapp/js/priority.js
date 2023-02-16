@@ -1072,7 +1072,8 @@ class Priority {
                     Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
                     Priority.NO_WORKING_DAYS,
                     Priority.INCOMPLETE_WORKS,
-                    Priority.COMPLETELY_FINISHED
+                    Priority.COMPLETELY_FINISHED,
+                    Priority.DUE_DATE_PASSED,
                 ].includes(priority_data.status_value) && !dom_assignment.hasClass("assignment-is-deleting")
             ) {
                 first_available_tutorial_assignment = dom_assignment;
