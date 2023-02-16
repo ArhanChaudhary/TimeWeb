@@ -9,15 +9,19 @@ function clamp(low, value, high) {
 scaled_horizontal_factor = 0;
 now = 0;
 function setMoveLefts() {
-    const section_mid = $(".section-block#first").height() / 2;
+    const first_top = $(".section-block#first").offset().top;
+    const first_mid = first_top + $(".section-block#first").height() / 2;
     const second_top = $("#second").offset().top;
     $(".assignment-scroller-image").each(function() {
         const this_top = $(this).offset().top;
-        let in_view = this_top + $(this).height() > 0 && this_top < second_top;
+        const this_height = $(this).height();
+        let in_view = this_top + this_height > 0 && this_top < second_top;
         if (!in_view) return;
 
-        let mid = this_top + $(this).height() / 2;
-        let linear_factor = 1 - Math.abs(section_mid - mid) / (section_mid - 20);
+        let mid = this_top + this_height / 2;
+        // -20 in the numerator translates the midpoint slightly upwards
+        // the +20 in the denominator increases the width of the linear region
+        let linear_factor = 1 - Math.abs(first_mid - mid - 20) / (first_mid - first_top + 20);
         if (linear_factor < 0) {
             var opacity = linear_factor * 3 + 0.3;
         } else if (linear_factor < 0.5) {
@@ -108,9 +112,9 @@ $(window).scroll(function(e) {
         velocity_scroll_amount += Math.max(-12, min_velocity * 2);
     }
 
-    let first_section_height = $(".section-block#first").height();
-    position_stop = new_position >= first_section_height;
-    if (new_position < first_section_height && old_position >= first_section_height) {
+    let first_section_bottom = $(".section-block#first").height() + $(".section-block#first").offset().top;
+    position_stop = new_position >= first_section_bottom;
+    if (new_position < first_section_bottom && old_position >= first_section_bottom) {
         position_stop = false;
     }
 

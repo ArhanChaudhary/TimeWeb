@@ -12,16 +12,45 @@ body {
 }
 main {
     color: var(--color);
+    --preferred-section-height: calc(100vh - 40px);
+    --header-height: 85px;
+    --header-vertical-padding: 10px;
+
     --color: hsl(0, 0%, 87%);
     --preferred-section-height: 85vh;
-    --left-section-margin: 70px;
     --even-section-color: hsl(0, 0%, 10%);
     --site-horizontal-padding: 30px;
 }
-.section-block:nth-child(odd) {
+#header {
+    position: relative;
+    height: var(--header-height);
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 35px;
+    white-space: nowrap;
+    font-size: 20px;
+    background-color: hsl(195deg 60% 12%);
+    padding: var(--header-vertical-padding) var(--site-horizontal-padding);
+    z-index: 1;
+}
+#header a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 700;
+}
+#header a:hover {
+    text-decoration: underline 2px;
+}
+#header #logo-icon {
+    height: 100%;
+}
+/* we need to switch even and odd because of <header> */
+.section-block:nth-child(2n) {
     background-color: var(--odd-section-color);
 }
-.section-block:nth-child(even) {
+.section-block:nth-child(2n+1) {
     background-color: var(--even-section-color);
 }
 .section-block {
@@ -39,17 +68,19 @@ main {
     display: flex;
     align-items: center;
     max-width: 1600px;
+    height: 100%;
     width: calc(100% - var(--site-horizontal-padding) * 2);
-    justify-content: space-between;
 }
 .section-block:not(#first) {
     position: relative;
     z-index: 1;
 }
+.section-block#first {
+    align-items: flex-start;
+}
 .section-block#first .left-section-side {
-    margin-right: var(--left-section-margin);
-    flex-shrink: 0;
     width: 590px;
+    margin: 25px auto 0px;
     font-size: 33px;
     display: flex;
     justify-content: center;
@@ -59,31 +90,10 @@ main {
     width: 100%;
     margin-bottom: 5px;
 }
-.section-block#first header {
-    height: 65px;
-    display: flex;
-    align-items: center;
-    position: absolute;
-    top: 10px;
-    gap: 35px;
-    white-space: nowrap;
-    font-size: 20px;
-}
-.section-block#first header a {
-    color: inherit;
-    text-decoration: none;
-    font-weight: 700;
-}
-.section-block#first header a:hover {
-    text-decoration: underline 2px;
-}
-.section-block#first #logo-icon {
-    height: 100%;
-}
 .section-block#first .right-section-side {
     --move-up: 0px;
     transform: translateY(var(--move-up));
-    max-height: var(--section-height);
+    align-self: flex-start;
     position: relative;
 }
 .section-block#first .right-section-side #first-section-initial-scroller-transition {

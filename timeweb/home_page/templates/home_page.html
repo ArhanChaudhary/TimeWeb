@@ -12,15 +12,15 @@
 
 {% block base_head_body %}
 <main>
+    <header id="header">
+        <img id="logo-icon" src="{% static 'misc/icons/icon_512x512.webp' %}" draggable="false"/>
+        <a href="{% url 'account_signup' %}">Sign up</a>
+        <a href="{% url 'account_login' %}">Log in</a>
+        <a href="{% url 'example' %}">Example Account</a>
+    </header>
     <div class="section-block" id="first">
         <span class="section-max-width-wrapper">
             <span class="left-section-side">
-                <header>
-                    <img id="logo-icon" src="{% static 'misc/icons/icon_512x512.webp' %}" draggable="false"/>
-                    <a href="{% url 'account_signup' %}">Sign up</a>
-                    <a href="{% url 'account_login' %}">Log in</a>
-                    <a href="{% url 'example' %}">Example Account</a>
-                </header>
                 <img src="{% static 'home_page/images/timeweb_scaled.webp' %}" draggable="false" id="main-logo"/>
                 The new way to manage your time
                 {% comment %} <a href="{% url 'account_login' %}">Login</a> {% endcomment %}
