@@ -392,8 +392,8 @@ main.background-image-exists {
 .title {
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
-    --smush-daysleft: 2px;
-    --smush-priority: 3px;
+    --smush-daysleft: -1px;
+    --smush-priority: -1px;
     overflow-wrap: break-word;
 }
 .title::after, .title::before {
