@@ -52,7 +52,7 @@ def fill_transparent(img, x, y):
 top = None
 bottom = None
 left = 0
-right = img.width - 550
+right = 1116
 
 count = 0
 old_color = wanted_column_colors[1]
