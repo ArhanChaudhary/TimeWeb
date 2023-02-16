@@ -771,7 +771,7 @@ switch (e_key) {
     }
     });
     $(".tag-add-input").keydown(function(e) {
-        if (e_key === "Enter") {
+        if (e.key === "Enter") {
             utils.ui.close_on_success = true;
             $(this).parents(".tags").find(".tag-add-button").click();
         }
