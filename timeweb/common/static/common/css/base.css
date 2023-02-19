@@ -66,25 +66,19 @@ textarea
     -webkit-appearance: button;
     border-color: black;
 }
-a {
+a, :visited {
     color: rgb(0, 0, 238);
 }
-a:visited {
-    color: rgb(85, 26, 139);
-}
 @media (prefers-color-scheme: dark) {
-    a {
+    a, :visited {
         color: rgb(158, 158, 255);
     }
-    a:visited {
-        color: rgb(208, 173, 240);
-    }
 }
-body.dark a {
+.dark a, .dark :visited {
     color: rgb(158, 158, 255);
 }
-body.dark a:visited {
-    color: rgb(208, 173, 240);
+.light a, .light :visited {
+    color: rgb(0, 0, 238);
 }
 
 .oudated-serviceworker-registration-bugfix {
