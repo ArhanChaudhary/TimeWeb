@@ -193,11 +193,6 @@ details > .img-ignore-padding-container img {
 #assignment-graph-image {
     content: url("../images/wide_assignment_graph.webp");
 }
-@media screen and (max-width: 790px) {
-    #assignment-graph-image {
-        content: url("../images/narrow_assignment_graph.webp");
-    }
-}
 .minor-category {
     margin-top: 2rem;
     margin-left: -30px;
@@ -254,4 +249,9 @@ details > .img-ignore-padding-container img {
 }
 .label-icon {
     position: absolute;
+}
+@media screen and (max-width: 790px) {
+    #assignment-graph-image {
+        content: url("../images/narrow_assignment_graph.webp");
+    }
 }
