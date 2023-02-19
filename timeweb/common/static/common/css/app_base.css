@@ -220,7 +220,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
 #account-dropdown {
     display: none;
     right: 50%;
-    width: 100px;
+    width: 125px;
     cursor: initial;
     position: absolute;
     background: rgb(43, 56, 68);
@@ -257,12 +257,12 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     height: 1px;
     background: hsl(0, 0%, 40%);
 }
-#account-dropdown a {
+#account-dropdown a, #account-dropdown button {
     display: block;
     color: white;
     text-decoration: none;
-    font-size: 14px;
-    padding: 6px;
+    font-size: 16px;
+    padding: 7px;
     text-align: center;
 }
 #account-dropdown .one-line {
@@ -270,14 +270,10 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     padding-bottom: 10px;
 }
 #account-dropdown button {
-    display: block;
-    text-align: center;
-    padding: 6px;
-    font-size: 15px;
     width: 100%;
-    background: none;
+    background: inherit;
 	color: inherit;
-	border: none;
+	border: inherit;
 	cursor: pointer;
 	outline: inherit;
 }
