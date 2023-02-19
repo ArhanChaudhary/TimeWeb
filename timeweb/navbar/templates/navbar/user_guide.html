@@ -207,30 +207,6 @@ the span groups the major and minor categories together for user_guide.js
         <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
         <p>After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.</p>
         <p>Their priority is also a factor in determining their assignment list positions, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.</p>
-        <span class="label-question" id="why-do-some-assignments-with-low-priority-have-a-higher-list-position">
-            <span class="label-title">Why do some assignments with low priority have a higher list position?</span>
-            You may notice that an assignment with a low priority is sometimes placed above an assignment with a high priority. As mentioned right above, the order in which you should complete your assignments isn't determined by their priority, but rather their position in the assignment list. Although it may seem so at first, this isn't a bug or a glitch.<br>
-            <br>
-            If you look carefully, there will always be a reason why this is the case; other external factors may make an assignment more urgent than others. For instance, the assignment could be due tomorrow.<br>
-            <br>
-            Check out the below advanced example for a better understanding of this functionality.
-        </span>
-        <p>
-            <span class="minor-minor-category" id="advanced-example">An advanced example</span>
-            <br>
-            To demonstrate, let's go through the methodology of ordering every assignment in an example. Each assignment in the image is manually labeled with a number:
-        </p>
-        <img src="{% static 'navbar/images/advanced_priority_example.webp' %}" alt="Advanced priority example image">
-        <p>At a first glance, it may seem like the assignments are randomly prioritized. However, this is not the case: the assignments are actually optimally ordered.</p>
-        <br>
-        <p>Assignment #1 has the "Important" tag, so it is placed as the first assignment.</p>
-        <p>Assignment #2 also has the "Important" tag, but it has a lower priority than #1, so it is placed as the second assignment.</p>
-        <p>Assignment #3 does not have the "Important" tag, so it is placed as the third assignment.</p>
-        <p>Assignment #4 also does not have the "Important" tag, but it has a lower priority than #3, so it is placed as the fourth assignment.</p>
-        <p>Assignment #5 has the "Not Important" tag, so it is placed as the fifth assignment.</p>
-        <p>Assignment #6 also has the "Not Important" tag, but it has a lower priority than #5, so it is placed as the sixth assignment.</p>
-        <br>
-        <p>At this point, you may be wondering why assignment #7 and assignment #8 are placed at the bottom. This is because assignments #1 through #6 are all due tomorrow, as indicated below their name. They are placed at the very top of the assignment list, as, logically, assignments due tomorrow are more urgent than assignments due later.</p>
     </details>
     <details open>
         <summary class="minor-category" id="hide-assignment">Hide assignment</summary>
