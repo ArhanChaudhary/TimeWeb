@@ -58,7 +58,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     margin: 5px auto 35px;
     border-radius: 15px;
     --horizontal-form-margin: 15px;
-    padding: 5px var(--horizontal-form-margin) 25px;
+    padding: 7px var(--horizontal-form-margin) 25px;
     --form-width: calc(var(--raw-form-width) - var(--horizontal-form-margin) * 2);
     position: relative;
     letter-spacing: 0.5px;
@@ -92,7 +92,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     --horizontal-field-group-tab-padding: 5%;
     padding: 0 var(--horizontal-field-group-tab-padding);
     height: 30px;
-    margin-top: 10px;
+    margin-top: 25px;
     --border-radius: 5px;
 }
 #form-wrapper #fields-wrapper {
