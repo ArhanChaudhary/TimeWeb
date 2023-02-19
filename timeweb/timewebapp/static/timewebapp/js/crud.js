@@ -243,6 +243,7 @@ class Crud {
                 locale: {
                     format: 'MM/DD/YYYY'
                 },
+                parentEl: "#form-wrapper",
             }).on('input', function() {
                 last_assignment_date_input_val = $(this).val();
             }).on('hide.daterangepicker', function(e, picker) {
@@ -260,6 +261,7 @@ class Crud {
                     format: 'MM/DD/YYYY h:mm A'
                 },
                 timePicker: true,
+                parentEl: "#form-wrapper",
             }).on('show.daterangepicker', function(e, picker) {
                 old_due_date_val = $(this).val();
                 picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
