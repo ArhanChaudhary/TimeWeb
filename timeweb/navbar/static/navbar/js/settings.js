@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // d256f25 should have fixed this but it's stupidly inconsistent
     $("option:not([value])").attr("value", "");
 
-    let hasSubmitted = false;
+    let alreadySubmitted = false;
     if (GC_API_INIT_FAILED) {
         $.alert({
             title: "Could not enable the Google Classroom integration.",
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 "try again": {
                     action: () => {
-                        hasSubmitted = true;
+                        alreadySubmitted = true;
                         ajaxUtils.changeSetting({setting: "oauth_token", value: true});
                     },
                 },
@@ -84,18 +84,18 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#submit-settings-button").click();
     });
     $("#submit-settings-button").click(function() {
-		if (hasSubmitted) return false;
+		if (alreadySubmitted) return false;
         $("#id_def_skew_ratio").val(mathUtils.precisionRound(+$("#id_def_skew_ratio").val()+1, 10));
         textareaToJSON($("#id_default_dropdown_tags"));
-        hasSubmitted = true;
+        alreadySubmitted = true;
     });
     // or else logging out will display the "you form changes my not been saved" alert
     $("form:not(#settings-form)").submit(function() {
-        hasSubmitted = true;
+        alreadySubmitted = true;
     });
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
     window.addEventListener("beforeunload", function(e) {
-        if (hasSubmitted || window.ignore_reload_alert) return;
+        if (alreadySubmitted || window.ignore_reload_alert) return;
 
         e.preventDefault();
         $("#logo-container").removeAttr("tabindex").focus();
