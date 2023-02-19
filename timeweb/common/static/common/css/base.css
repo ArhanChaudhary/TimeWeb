@@ -74,7 +74,7 @@ a, :visited {
         color: rgb(158, 158, 255);
     }
 }
-body.dark a, body.dark a:visited {
+.dark a, .dark :visited {
     color: rgb(158, 158, 255);
 }
 
