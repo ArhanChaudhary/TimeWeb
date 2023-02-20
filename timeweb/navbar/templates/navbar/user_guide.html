@@ -115,6 +115,29 @@ the span groups the major and minor categories together for user_guide.js
     </details>
 </span>
 <span>
+    <div class="major-category">Assignment header</div>
+    <details open>
+        <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
+        <br>
+        <img src="{% static 'navbar/images/assignment_header.webp' %}" alt="Assignment header image">
+        <p>The assignment header contains a brief summary of the assignment and its work for today.</p>
+        <p>Above the assignment's name is its priority percentage relative to the other assignments. Below the assignment's name is the days left until it is due. Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".</p>
+        <p>At the center of an assignment is its header message, which reflects the current status of the assignment. For example, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.</p>
+        <p>At the center of the assignment header is the assignment's tags. Tags allow you to label an assignment by a broader category, for example a school class period. You can also sort tags in the order you like by dragging them around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around.</p>
+        <p>At the right of the assignment header is the assignment's estimated completion time along with its finish, hide, edit, and delete buttons.</p>
+    </details>
+    <details open>
+        <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
+        <p>After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.</p>
+        <p>Their priority is also a factor in determining their assignment list positions, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.</p>
+    </details>
+    <details open>
+        <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" assignment tags</summary>
+        <p>Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions. Adding the "Important" tag moves the assignment to the highest appropriate list position while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom, as more urgent assignments may come first or less urgent assignments may come last.</p>
+        <p>Refer to the <a href="#advanced-example">advanced example</a> for a more in depth explanation.</p>
+    </details>
+</span>
+<span>
     <div class="major-category">Assignment graph</div>
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
@@ -184,29 +207,6 @@ the span groups the major and minor categories together for user_guide.js
             <span class="label-title">Why do similar curvature values result in different work distributions in dynamic mode?</span>
             Unfortunately, this is a side effect of dynamic mode's implementation, occasionally occurring after submitting and deleting work inputs. Try to re-adjust the curvature to its original state if this happens.
         </span>
-    </details>
-</span>
-<span>
-    <div class="major-category">Assignment header</div>
-    <details open>
-        <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
-        <br>
-        <img src="{% static 'navbar/images/assignment_header.webp' %}" alt="Assignment header image">
-        <p>The assignment header contains a brief summary of the assignment and its work for today.</p>
-        <p>Above the assignment's name is its priority percentage relative to the other assignments. Below the assignment's name is the days left until it is due. Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".</p>
-        <p>At the center of an assignment is its header message, which reflects the current status of the assignment. For example, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.</p>
-        <p>At the center of the assignment header is the assignment's tags. Tags allow you to label an assignment by a broader category, for example a school class period. You can also sort tags in the order you like by dragging them around horizontally. Note that it may be easier to pinch and zoom on mobile before dragging the tags around.</p>
-        <p>At the right of the assignment header is the assignment's estimated completion time along with its finish, hide, edit, and delete buttons.</p>
-    </details>
-    <details open>
-        <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
-        <p>After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.</p>
-        <p>Their priority is also a factor in determining their assignment list positions, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.</p>
-    </details>
-    <details open>
-        <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" assignment tags</summary>
-        <p>Although assignment tags are only for you to see visually, the "Important" and "Not Important" tags are two exceptions. Adding the "Important" tag moves the assignment to the highest appropriate list position while adding the "Not Important" tag moves the assignment to the lowest appropriate list position. Note that adding these won't necessarily always put them at the very top or the very bottom, as more urgent assignments may come first or less urgent assignments may come last.</p>
-        <p>Refer to the <a href="#advanced-example">advanced example</a> for a more in depth explanation.</p>
     </details>
 </span>
 <span>
