@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-doc-labels").append(minor_category_li);
     });
 
-    $("details > img").each(function() {
+    $(".major-category ~ details > img, .major-category ~ img").each(function() {
         if (!$(this).parents(".label-icon-container").length)
         $(this).wrap("<div class=\"img-ignore-padding-container\">");
     });
