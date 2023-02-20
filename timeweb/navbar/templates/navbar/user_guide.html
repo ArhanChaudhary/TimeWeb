@@ -37,38 +37,32 @@ the span groups the major and minor categories together for user_guide.js
     <img src={% static 'navbar/images/assignment_form.webp' %} alt="Assignment form image">
     <details open>
         <summary class="minor-category" id="standard-assignment-form-inputs">Standard inputs</summary>
-        <p>These inputs in the assignment form are mandatory for every assignment. There are 6 standard inputs:</p>
+        <p>The assignment form allows you to create and modify assignments. You must enter five standard inputs for every complete assignment:</p>
         <p>
             <span class="minor-minor-category">Name of this Assignment</span>
             <br>
-            Simply the name of the assignment. is displayed at the left of the assignment header.
+            The displayed name of the assignment.
         </p>
         <p>
             <span class="minor-minor-category">Date Assigned</span>
             <br>
-            This input is the date the assignment was assigned or the date you'll start working on the assignment. Dates from the future are also perfectly valid. If you don't remember, enter today's date instead.
+            The date the assignment was assigned or the date you'll start working on the assignment. If you don't remember, enter today's date instead. Dates from the future are also perfectly valid. 
         </p>
         <p>
             <span class="minor-minor-category">Due Date</span>
             <br>
-            This input is the date the assignment is due. This can't be on or before the "Date Assigned" field. If your assignment doesn't have a due date, leave this input empty, and a rough due date will be calculated based on your other inputs. This should be a last resort, as the predicted due date may not always be suitable.
+            The date the assignment is due. If your assignment doesn't have a due date, click the magic wand icon to let TimeWeb predict a due date for you. Upon submission, this due date will be calculated and estimated based on your other inputs.
+        </p>
+        <p>You can also enable soft due dates. Soft due dates are automatically incremented if you haven't finished the assignment by then.</p>
+        <p>
+            <span class="minor-minor-category">How long will this assignment take to complete</span>
+            <br>
+            An estimation of how long you think the assignment will take to complete. You can switch from entering this input in minutes to hours if the assignment will take a longer time to complete. It's ok if you are unsure about your estimate. However, if you cannot decide, you can click the magic wand icon to let TimeWeb predict a length of time for you. Upon submission, this length of time will be calculated and estimated based on your other inputs.
         </p>
         <p>
-            <span class="minor-minor-category">Name of each Unit of Work</span>
+            <span class="minor-minor-category">Minimum Daily Work Time</span>
             <br>
-            This input is how the assignment is split and divided up. As an analogy, if the assignment is reading a book, then this input would be "Page". In simpler terms, the assignment's header message will say "Complete [some number] amount of [this input] today".
-        </p>
-        <p>Try not to choose large divisions of work for this input. Pretend you're assigned an assignment with three worksheets, each containing thirty pages of work. Rather than entering "Worksheet" for this input, it's usually more ideal to enter "Page" instead. This way, if you complete let's say fifteen pages, you can input you completed 15 pages, which is nice and clean, instead of 0.5 worksheets, which is an ugly decimal. However, the latter is still completely valid if you prefer to input that.</p>
-        <p>If you don't know how to split and divide up the assignment, enter the special keywords "Minute" or "Hour" for this input. By doing this, you effectively divide the assignment up into units of time, which is usually easier to estimate. Typically, you'll want to use "Minute" for working in short, precise intervals of a singular minute, and you'll want to use "Hour" for working in longer, less precise intervals of 60 minutes.</p>
-        <p>
-            <span class="minor-minor-category">Total number of Units in this Assignment</span>
-            <br>
-            This input is the number of units of work in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. This number will be split up over the days the assignment is due.
-        </p>
-        <p>
-            <span class="minor-minor-category">Estimated number of Minutes to complete each Unit</span>
-            <br>
-            This input is the estimated number of minutes to complete each unit in the assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Note that this value is logically locked to 1 when the name of each unit of work is "Minute" and 60 when the name of each unit of work is "Hour".
+            An optional minimum amount of time you will work on an assignment for every working day. This input's default of 15 minutes can be changed in the settings.
         </p>
     </details>
     <details open>
