@@ -82,17 +82,19 @@ $(function() {
         if (!$(":hover").filter(".daterangepicker").length)
             $(this).data("daterangepicker")?.hide();
     });
-    // close dropdown if clicked while open
-    let wasOpen = false;
-    $("#username").mousedown(function(e) {
-        wasOpen = $(this).is(document.activeElement) || $(document.activeElement).parents("#username").length;
-    }).click(function(e) {
-        if (wasOpen)
-            $("#username").blur();
-    });
-    $("#account-dropdown").css("display", "block");
-    $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
-    $("#account-dropdown").css("display", "");
+    if ($("#username").length) {
+        // close dropdown if clicked while open
+        let wasOpen = false;
+        $("#username").mousedown(function(e) {
+            wasOpen = $(this).is(document.activeElement) || $(document.activeElement).parents("#username").length;
+        }).click(function(e) {
+            if (wasOpen)
+                $("#username").blur();
+        });
+        $("#account-dropdown").css("display", "block");
+        $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
+        $("#account-dropdown").css("display", "");
+    }
 
     function resetHeaderLayout() {
         const username = $("#user-greeting #username");
