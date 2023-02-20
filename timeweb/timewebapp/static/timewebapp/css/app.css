@@ -1007,16 +1007,51 @@ main.finished-header-transition #extra-navs {
     text-decoration: underline;
 }
 
+.daterangepicker {
+    width: initial !important;
+}
 .daterangepicker,
 .daterangepicker .calendar-table {
-    background-color: var(--primary);
-    transform: translateX(-5px);
+    background-color: var(--primary) !important;
 }
-.daterangepicker td:not(.active, :hover) {
-    background-color: unset !important;
+.daterangepicker .calendar-table td:not(.active, :hover) {
+    background-color: inherit !important;
 }
 .daterangepicker .calendar-table .available span {
-    border-color: var(--color);
+    border-color: var(--color) !important;
+}
+.daterangepicker .calendar-table th, .daterangepicker .calendar-table td {
+    width: 43px !important;
+    height: 29px !important;
+    font-size: 16px !important;
+}
+.daterangepicker.show-calendar .ranges {
+    float: left !important;
+}
+.daterangepicker .drp-calendar {
+    max-width: initial !important;
+}
+.daterangepicker select.hourselect,
+.daterangepicker select.minuteselect,
+.daterangepicker select.secondselect,
+.daterangepicker select.ampmselect {
+    width: 60px !important;
+}
+.daterangepicker,
+.daterangepicker select.monthselect,
+.daterangepicker select.yearselect,
+.daterangepicker select.hourselect,
+.daterangepicker select.minuteselect,
+.daterangepicker select.secondselect,
+.daterangepicker select.ampmselect {
+    font-size: 16px !important;
+}
+.daterangepicker .calendar-time {
+    margin-top: 8px !important;
+}
+.daterangepicker .calendar-table tr:first-of-type > th {
+    vertical-align: middle !important;
+    line-height: 0px !important;
 }
 
 #assignments-container.thin-text-shadow-width {
