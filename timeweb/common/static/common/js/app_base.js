@@ -59,25 +59,17 @@ $(function() {
             input.val(newVal.substring(0, newVal.indexOf(".") + step.split(".")[1].length + 1));
         }
     });
-    $("input").on("show.daterangepicker", function(e, picker) {
-        function dothething(_timeselects) {
-            _timeselects.on("change", function() {
-                setTimeout(function() {
-                    // idk why but theres always a new minuteselect element when its changed
-                    const minuteselect = picker.container.find(".minuteselect:visible");
-                    minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-                    const timeselects = picker.container.find(".calendar-time > select:visible");
-                    dothething(timeselects);
-                }, 0);
-            });
-        }
-        // There's a random invisible datepicker, so only query the one that's visible
-        const minuteselect = picker.container.find(".minuteselect:visible");
+    const org = daterangepicker.prototype.renderTimePicker;
+    daterangepicker.prototype.renderTimePicker = function() {
+        // daterangepicker rerenders itself every change
+        const ret = org.apply(this, arguments);
+        if (arguments[0] === "left") return ret;
+        const minuteselect = this.container.find(".minuteselect").eq(0);
         minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-        const timeselects = picker.container.find(".calendar-time > select:visible");
-        dothething(timeselects);
+        return ret;
+    }
     // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
-    }).on('blur', function(e) {
+    $("input").on('blur', function(e) {
         // Can't use relatedTarget because it needs to be on an element with a tabindex, which the daterangepicker doesn't have
         if (!$(":hover").filter(".daterangepicker").length)
             $(this).data("daterangepicker")?.hide();
