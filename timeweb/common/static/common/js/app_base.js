@@ -64,8 +64,13 @@ $(function() {
         // daterangepicker rerenders itself every change
         const ret = org.apply(this, arguments);
         if (arguments[0] === "left") return ret;
-        const minuteselect = this.container.find(".minuteselect").eq(0);
-        minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
+        $('<a id="daterangepicker-midnight" href="#">midnight</a>').appendTo(this.container.find(".calendar-time")).click(e => {
+            const [hourselect, minuteselect, ampmselect] = this.container.find(".calendar-time > select:visible").toArray();
+            $(hourselect).val(11);
+            $(minuteselect).val(59);
+            $(ampmselect).val("PM");
+            $("select.hourselect").trigger("change.daterangepicker");
+        });
         return ret;
     }
     // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker

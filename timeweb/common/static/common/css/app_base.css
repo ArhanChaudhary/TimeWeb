@@ -206,6 +206,9 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     vertical-align: middle !important;
     line-height: 0px !important;
 }
+.daterangepicker #daterangepicker-midnight {
+    margin-left: 6px;
+}
 #logo-container {
     display: inline-block;
     position: relative;
