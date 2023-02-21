@@ -95,11 +95,11 @@ $(function() {
     $("#account-dropdown").css("display", "");
 
     function resetHeaderLayout() {
-        const username = $("#user-greeting #username"),
-            logo = $("#logo-container"),
-            welcome = $("#welcome"),
-            plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
-            newassignmenttext = $("#new-assignment-text");
+        const username = $("#user-greeting #username");
+        const logo = $("#logo-container");
+        const welcome = $("#welcome");
+        const left_icon_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0;
+        const left_icon_text = $("#new-assignment-text");
     
         logo.css({
             left: '',
@@ -107,18 +107,19 @@ $(function() {
         });
         logo.find("img").css("width", "");
         welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-        newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+        if (left_icon_text.length)
+            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 30 }));
     
         if (!collision(username, logo, { margin: 30 })) return;
         logo.css({
-            left: 5 + plus_button_width,
+            left: 5 + left_icon_width,
             transform: "none",
         });
         welcome.toggle(!collision(welcome, logo, { margin: 30 }));
     
         if (!collision(username, logo, { margin: 10 })) return;
         // compress the logo
-        logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+        logo.find("img").css("width", Math.max(0, username.offset().left-left_icon_width-20-5));
     }
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);
