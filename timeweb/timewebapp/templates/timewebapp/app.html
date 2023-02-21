@@ -34,6 +34,15 @@
   {% endif %}
 {% endblock %}
 
+{% block extra_header_elements %}
+  {% if not view_deleted_assignments_in_app_view %}
+    <div id="image-new-container" tabindex="0">
+      <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt draggable="false"/>
+      <span id="new-assignment-text">New Assignment</span>
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
   {% if settings_model.background_image %}
     <img alt id="background-image" src="{{ settings_model.background_image.url }}" width="{{settings_model.background_image.width}}" height="{{settings_model.background_image.height}}" draggable="false">
