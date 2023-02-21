@@ -39,9 +39,9 @@ $(window).one("load", function() {
     };
     // let back_color = {r: 49, g: 75, b: 110}; (actual bottom color of the logo)
     let back_color = {
-        r: 71,
-        g: 137,
-        b: 156
+        r: 41,
+        g: 81,
+        b: 97,
     };
 
     $("#circles-background .bubble-up").each(function(i) {
