@@ -216,9 +216,8 @@ summary {
     left: -60px;
     width: 40px;
     height: 40px;
-    background-color: var(--label-color);
+    background-color: hsl(196deg, 76%, 66%);
     border-radius: 50%;
-    filter: brightness(0.85);
 }
 .label-icon {
     position: absolute;
