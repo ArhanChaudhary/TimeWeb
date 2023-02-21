@@ -18,13 +18,13 @@
     #table-of-contents-container {
         position: absolute;
         z-index: 2;
-        transform: translateX(-100%);
+        transform: translateX(-100%) translateX(-5px);
         transition: transform 0.2s ease-out;
     }
     #table-of-contents-container-label {
         display: block;
         position: absolute;
-        transform: translateX(-100%);
+        transform: translateX(-100%) translateX(-5px);
         -webkit-animation: slideLabelIn 0.35s ease-out 0.2s 1 forwards;
                 animation: slideLabelIn 0.35s ease-out 0.2s 1 forwards;
     }
