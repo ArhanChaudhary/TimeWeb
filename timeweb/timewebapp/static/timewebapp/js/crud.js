@@ -518,7 +518,8 @@ class Crud {
             // Set button pk so it gets sent on post
             $("#submit-assignment-button").val(sa.id);
             that.showForm();
-            Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
+            if (!(sa.is_google_classroom_assignment && sa.needs_more_info))
+                Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
         });
         $('.delete-button, .restore-button').parent().click(function(e) {
             const $this = $(this);
