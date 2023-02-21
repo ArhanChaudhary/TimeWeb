@@ -1,5 +1,5 @@
 /* Make sure to change changelog.css and others if this media query is modified */
-@media screen and (max-width: 1170px) {
+@media screen and (max-width: 1250px) {
     #table-of-contents-container {
         position: absolute;
         z-index: 2;
