@@ -100,7 +100,7 @@ $(function() {
         const username = $("#user-greeting #username");
         const logo = $("#logo-container");
         const welcome = $("#welcome");
-        const left_icon_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0;
+        const left_icon_width = $("#image-new-container img, #hamborger-menu").length ? $("#image-new-container img, #hamborger-menu").outerWidth(true) : 0;
         const left_icon_text = $("#new-assignment-text");
     
         logo.css({
@@ -128,6 +128,9 @@ $(function() {
         resetHeaderLayout();
     }
     $("header > *").css("visibility", "visible");
+    $("#hamborger-menu").click(function() {
+        $("#table-of-contents-container").toggleClass("active");
+    });
 });
 // It's important to remember to NOT use .done() or any other callback method on a jquery ajax
 // This is to allow ajaxUtils.error to redo the ajax with the appropriate callbacks

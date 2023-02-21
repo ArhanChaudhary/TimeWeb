@@ -13,26 +13,7 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
 }
-#table-of-contents-container-label::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-
-    top: 0;
-    bottom: 0;
-    margin-top: auto;
-    margin-bottom: auto;
-    right: 15px; 
-
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-right: 10px solid black;
-}
-#table-of-contents-container-label:focus ~ #table-of-contents-container,
-#table-of-contents-container:focus,
-/* Can't click the links without the below style because the label gets unfocused and it starts transforming */
-#table-of-contents-container:focus-within {
+#table-of-contents-container.active {
     transform: none;
 }
 #table-of-contents-container {
@@ -40,14 +21,6 @@ body {
     box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
     overflow-y: auto;
-}
-#table-of-contents-container-label {
-    display: none;
-    bottom: 5px;
-    cursor: pointer;
-    box-shadow: 6px 2px 6px -4px hsl(0, 0%, 50%);
-}
-#table-of-contents-container, #table-of-contents-container-label {
     width: 300px;
     position: relative;
     z-index: 2;
@@ -249,6 +222,13 @@ summary {
 }
 .label-icon {
     position: absolute;
+}
+#hamborger-menu {
+    top: 0;
+    left: 0;
+    position: absolute;
+    cursor: pointer;
+    display: none;
 }
 @media screen and (max-width: 790px) {
     #assignment-graph-image {

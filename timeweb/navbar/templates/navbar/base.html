@@ -12,11 +12,16 @@
     {% block _js %}{% endblock %}
 {% endblock js %}
 
+{% block extra_header_elements %}
+    <svg width="89px" height="100%" id="hamborger-menu">
+        <rect y="24.75" x="32" width="25" height="4.25" fill="white"></rect>
+        <rect y="33" x="32" width="25" height="4.25" fill="white"></rect>
+        <rect y="41.25" x="32" width="25" height="4.25" fill="white"></rect>
+    </svg>
+{% endblock %}
+
 {% block content %}
     <div id="flex-container">
-        <div id="table-of-contents-container-label" tabindex="-1">
-            <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
-        </div>
         <div id="table-of-contents-container" tabindex="-1">
             <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
             {% if add_faq %}<span class="table-of-contents-header" id="category-important-labels">FAQs</span>{% endif %}
