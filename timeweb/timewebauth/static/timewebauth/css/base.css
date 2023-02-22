@@ -1,3 +1,8 @@
+body {
+    /* do not move background-image to #circles-background to prevent the white background rebound because that messes up the goo */
+    background-image: linear-gradient(150deg, hsl(197deg 41% 15%) 0%, hsl(225, 10%, 10%) 100%);
+    background-attachment: fixed;
+}
 #accounts-container {
     border-radius: 10px;
     position: relative;
@@ -89,8 +94,6 @@
 }
 #circles-background {
     filter: url("#goo");
-    /* so when you scroll up the rebound scroll down isn't olored white */
-    background-image: linear-gradient(150deg, hsl(197deg 41% 15%) 0%, hsl(225, 10%, 10%) 100%);
     overflow: hidden;
     position: fixed;
     top: 0;
