@@ -1,7 +1,3 @@
-body {
-    background-image: linear-gradient(130deg, hsl(197deg 41% 15%) 0%, hsl(225, 10%, 10%) 100%);
-    background-attachment: fixed;
-}
 #accounts-container {
     border-radius: 10px;
     position: relative;
@@ -93,6 +89,8 @@ body {
 }
 #circles-background {
     filter: url("#goo");
+    /* so when you scroll up the rebound scroll down isn't olored white */
+    background-image: linear-gradient(130deg, hsl(197deg 41% 15%) 0%, hsl(225, 10%, 10%) 100%);
     overflow: hidden;
     position: fixed;
     top: 0;
