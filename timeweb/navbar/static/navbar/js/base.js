@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
             $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
         }
     });
+    $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
     $("#table-of-contents-container").click(function(e) {
         if ($(e.target).is("a"))
             $("#table-of-contents-container").removeClass("active");
