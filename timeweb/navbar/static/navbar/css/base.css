@@ -117,8 +117,14 @@ code {
     font-weight: 400;
 }
 .major-category {
+    box-sizing: border-box;
+    width: calc(100% + 2 * var(--container-padding-left));
+    margin-left: calc(-1 * var(--container-padding-left));
+    padding-left: var(--container-padding-left);
+    padding-right: 35px;
     margin-top: 2em;
-    margin-left: -15px;
+    background-color: white;
+    box-shadow: 0 0 9px -7px hsl(0, 0%, 52%);
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 40px;
@@ -127,18 +133,8 @@ code {
     top: 0;
 
     white-space: nowrap;
-}
-.major-category::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    transform: scaleX(2);
-    box-shadow: 0 0 9px -7px hsl(0, 0%, 52%);
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 .major-category.isSticky::before {
     box-shadow: none;
