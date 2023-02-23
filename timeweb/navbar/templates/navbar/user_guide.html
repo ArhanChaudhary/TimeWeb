@@ -219,12 +219,8 @@ the span groups the major and minor categories together for user_guide.js
 <span>
     <div class="major-category">Google Classroom integration</div>
     <details open>
-        <summary class="minor-category" id="what-is-the-google-classroom-integration">What is the Google Classroom integration?</summary>
-        <p>The Google Classroom integration provides an easy way to link Google Classroom assignments with TimeWeb assignments. After authorization, Google Classroom assignments are automatically added to TimeWeb. Note that modifying TimeWeb assignments will not affect Google Classroom assignments in any way.</p>
-    </details>
-    <details open>
         <summary class="minor-category" id="enabling-the-google-classroom-integration">Enabling the Google Classroom integration</summary>
-        <p>To enable the Google Classroom integration, click the Google Classroom icon at the bottom right of the main page. This will bring up Google's authorization service. You MUST agree to both of the requested permissions for this to properly enable.</p>
+        <p>To enable the Google Classroom integration, click the Google Classroom icon at the bottom right of the main page. This will bring up Google's authorization service. You MUST agree to both of the requested permissions for this to properly enable. Note that modifying TimeWeb assignments does not affect Google Classroom assignments and vice versa.</p>
         <span class="label-question" id="why-do-we-ask-for-permission-to-view-your-grades-on-google-classroom">
             <span class="label-title">Why do we ask for permission to view your grades on Google Classroom?</span>
             <p>TimeWeb must adhere to Google Classroom's policies regarding third-party account access: we are only allowed to request user data from a predefined set of permissions. According to <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html#ae389e7c46bab2c4c67f3e05c12db4e2a">Google's API reference</a>, the scopes (permissions) for viewing course work is forcibly included with also viewing grades. Therefore, we must ask for permission to view grades, too, in order for TimeWeb to create assignments from your course work.</p>
