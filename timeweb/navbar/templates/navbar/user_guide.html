@@ -120,7 +120,10 @@ the span groups the major and minor categories together for user_guide.js
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-header">What is displayed on the assignment header?</summary>
         <br>
-        <img src="{% static 'navbar/images/assignment_header.webp' %}" alt="Assignment header image">
+        <picture>
+            <source media="(max-width: 790px)" srcset="{% static 'navbar/images/narrow_assignment_header.webp' %}">
+            <img src="{% static 'navbar/images/assignment_header.webp' %}" alt="Assignment header image">
+        </picture>
         <p>The assignment header contains a brief summary of the assignment and its work for today.</p>
         <p>Above the assignment's name is its priority percentage relative to the other assignments. Below the assignment's name is the days left until it is due. Underneath both of these is the assignment's description, which only appears when the graph is open or when the assignment is marked as "needs more info".</p>
         <p>At the center of an assignment is its header message, which reflects the current status of the assignment. For example, if you need to work on an assignment for today, the header message will display how much you need to work for today according to the assignment graph.</p>
@@ -143,7 +146,10 @@ the span groups the major and minor categories together for user_guide.js
     <details open>
         <summary class="minor-category" id="what-is-the-assignment-graph">What is the assignment graph?</summary>
         <br>
-        <img id="assignment-graph-image" alt="Assignment graph image">
+        <picture>
+            <source media="(max-width: 790px)" srcset="{% static 'navbar/images/narrow_assignment_graph.webp' %}">
+            <img id="assignment-graph-image" src="{% static 'navbar/images/wide_assignment_graph.webp' %}" alt="Assignment graph image">
+        </picture>
         <p>After creating an assignment, click it to open its graph. The graph provides a visualization of your assignment's entire work schedule. </p>
         <p>Its x-axis represents days, while its y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.</p>
         <p>As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.</p>

@@ -145,12 +145,12 @@ code {
 summary {
     cursor: pointer;
 }
-.img-ignore-padding-container {
+.img-positioner {
     display: flex;
     justify-content: center;
     margin-bottom: 2em;
 }
-.img-ignore-padding-container img {
+.img-positioner img {
     filter: drop-shadow(0 9px 10px hsl(0, 0%, 50%));
     --image-margin: 20px;
     max-height: 600px;
@@ -159,9 +159,6 @@ summary {
     margin-left: calc(-1 * var(--container-padding-left) + var(--image-margin));
 }
 
-#assignment-graph-image {
-    content: url("../images/wide_assignment_graph.webp");
-}
 .minor-category {
     margin-top: 2rem;
     margin-left: -30px;
@@ -224,9 +221,4 @@ summary {
     position: absolute;
     cursor: pointer;
     display: none;
-}
-@media screen and (max-width: 790px) {
-    #assignment-graph-image {
-        content: url("../images/narrow_assignment_graph.webp");
-    }
 }

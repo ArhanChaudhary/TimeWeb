@@ -70,8 +70,11 @@ document.addEventListener("DOMContentLoaded", function() {
         $("#table-of-contents-container #category-doc-labels").append(minor_category_li);
     });
 
-    $(".major-category ~ details > img, .major-category ~ img").each(function() {
-        if (!$(this).parents(".label-icon-container").length)
-        $(this).wrap("<div class=\"img-ignore-padding-container\">");
+    $(".major-category ~ * img, .major-category ~ img").each(function() {
+        if ($(this).parents(".label-icon-container").length) return;
+        if ($(this).parent().is("picture"))
+            $(this).parent().wrap("<div class=\"img-positioner\">");
+        else
+            $(this).wrap("<div class=\"img-positioner\">");
     });
 });
