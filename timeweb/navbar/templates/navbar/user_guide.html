@@ -36,7 +36,7 @@ the span groups the major and minor categories together for user_guide.js
 <span>
     <div class="major-category">Assignment form</div>
     <br>
-    <img src={% static 'navbar/images/assignment_form.webp' %} alt="Assignment form image">
+    <img src="{% static 'navbar/images/assignment_form.webp' %}" alt="Assignment form image">
     <details open>
         <summary class="minor-category" id="standard-assignment-form-inputs">Standard inputs</summary>
         <p>To create a complete TimeWeb assignment, you must enter these five standard inputs into the assignment form:</p>
@@ -85,7 +85,7 @@ the span groups the major and minor categories together for user_guide.js
             <p>While this decision is mainly up to your own discretion, there are two general guidelines you should follow for entering this field:</p>
             <p><b>1) Strike a balance between being too small and too large in size.</b></p>
             <p>If a unit of work is too small, it can become difficult to track your progress and estimate how long the entire task will take. For example, if this assignment is reading a book and it is split up into sentences, it will be difficult to estimate how many sentences are in the book, how long it will take to read the entire book, and how many you've read after reading.</p>
-            <p>If a unit of work is too large, it can also become difficult to track your progress and estimate how long the entire task will take. For example, if the unit of work is "the entire assignment", it will be difficult to know where to start and enter your progress.</p>
+            <p>If a unit of work is too large, it can also become difficult to track your progress and estimate how long the entire task will take. For example, if the unit of work is "the entire assignment", it will be difficult to know where to start and how to enter your progress.</p>
             <p>A good unit of work should be something that can be completed in a reasonable amount of time. In the example of reading a book, a better unit of work could be splitting it up into chapters. This is large enough to make progress, but small enough to track it effectively.</p>
             <p><b>2) If you are still unsure, don't enter your own unit of work.</b></p>
             <p>Leave this input blank and instead estimate how long this assignment will take to complete in the Standard inputs</p>
@@ -141,7 +141,7 @@ the span groups the major and minor categories together for user_guide.js
         <p>At the right of the assignment header is the assignment's estimated completion time along with its finish, hide, edit, and delete buttons.</p>
         <span class="label-question" id="why-doesn't-my-assignment's-work-for-today-respect-the-step-size?">
             <span class="label-title">Why doesn't my assignment's work for today respect its step size?</span>
-            <p>The assignment form's <a href="#assignment-form-step-size">step size</a> defines how many units of work you will complete at a time, meaning you will always work in multiples of this number. If the total number of units of work in the assignment is not a multiple of the step size, there will be a remainder of work you will need to complete that isn't a multiple of the step size. By design, this remainder of work is completed on the first working day of the assignment.</p>
+            <p>The assignment form's <a href="#assignment-form-step-size">step size</a> defines how many units of work you will complete at a time, meaning you will always work in multiples of this number. If the total number of units of work in the assignment isn't a multiple of the step size, there will be a remainder of work you will need to complete that isn't a multiple of the step size. By design, this remainder of work is completed on the first working day of the assignment.</p>
             <p>For example, if an assignment is a book that has thirty-nine chapters and is read five chapters at a time, the remainder of four chapters is completed on the book's first working day.</p>
         </span>
     </details>
@@ -239,7 +239,7 @@ the span groups the major and minor categories together for user_guide.js
         <span class="label-question" id="why-do-we-ask-for-permission-to-view-your-grades-on-google-classroom">
             <span class="label-title">Why do we ask for permission to view your grades on Google Classroom?</span>
             <p>TimeWeb must adhere to Google Classroom's policies regarding third-party account access: we are only allowed to request user data from a predefined set of permissions. According to <a href="https://developers.google.com/resources/api-libraries/documentation/classroom/v1/cpp/latest/classgoogle__classroom__api_1_1ClassroomService_1_1SCOPES.html#ae389e7c46bab2c4c67f3e05c12db4e2a">Google's API reference</a>, the scopes (permissions) for viewing course work are forcibly included with also viewing grades. Therefore, we must ask for permission to view grades, too, in order for TimeWeb to create assignments from your course work.</p>
-            <p>As emphasized in TimeWeb's <a href={% url 'privacy' %}>privacy policy</a>, we do not share any of your information with third parties. Nevertheless, you can always revoke TimeWeb's access by going to <a href="https://myaccount.google.com/permissions">Google's permissions page</a>.</p>
+            <p>As emphasized in TimeWeb's <a href="{% url 'privacy' %}">privacy policy</a>, we do not share any of your information with third parties. Nevertheless, you can always revoke TimeWeb's access by going to <a href="https://myaccount.google.com/permissions">Google's permissions page</a>.</p>
             <p>If you still want to use the Google Classroom integration without granting TimeWeb access to your grades, you will have to host your database and create your own Google Classroom API client. Please <a href="{% url 'contact_form' %}">contact us</a> for personal assistance through this process.</p>
         </span>
     </details>
