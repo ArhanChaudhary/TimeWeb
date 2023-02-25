@@ -215,6 +215,7 @@ def simplify_course_name(tag_name):
             (r"\(\)", ""),
             # if the string is instead something like "a--" or "a -" or "--a" or "- a" then remove it
             (r"^-+ ?| ?-+$", ""),
+            (r"^,|,$", ""),
         )
         for regex in regexes:
             pre_tag_name = re.sub(regex, "", tag_name, flags=re.IGNORECASE)
