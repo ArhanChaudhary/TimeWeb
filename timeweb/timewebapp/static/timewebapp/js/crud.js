@@ -274,7 +274,12 @@ class Crud {
                 } else {
                    var event = "focusout";
                 }
-                $(this).on(event, Crud.alertEarlyDueDate);
+                $(this).on(event, function() {
+                    // prevent hideform from doing this alert
+                    const form_is_showing = $("#overlay").is(":visible");
+                    if (form_is_showing)
+                        Crud.alertEarlyDueDate();
+                });
             })
             that.setCrudHandlers();
         }, 0);
