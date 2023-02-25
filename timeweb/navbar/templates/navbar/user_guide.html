@@ -74,48 +74,72 @@ the span groups the major and minor categories together for user_guide.js
     </details>
     <details open>
         <summary class="minor-category" id="advanced-assignment-form-inputs">Advanced inputs</summary>
-        <p>These inputs in the assignment form are optional for every assignment, but they further enhance your assignments' work schedules. There are 6 advanced inputs:</p>
+        <p>Along with the assignment form's standard inputs, you can also enter enter optional advanced inputs to further customize your TimeWeb assignments:</p>
         <p>
-            <span class="minor-minor-category">Soft</span>
+            <span class="minor-minor-category">Name of each Unit of Work</span>
             <br>
-            This option enables soft due dates. Soft due dates are automatically incremented if you haven't finished this assignment by then.
+            If you don't want to estimate how long this assignment will take to complete, you can split this assignment up into your own units of work instead. For example, if this assignment is reading a book, you can split up the book into chapters.
         </p>
         <span class="label-question" id="how-should-i-choose-my-own-unit-of-work?">
             <span class="label-title">How should I choose my own unit of work?</span>
             <p>While this decision is mainly up to your own discretion, there are two general guidelines you should follow for entering this field:</p>
-            <p><b>1) Strike a balance between being too small and too large in size.</b></p>
+            <p>
+                <b>1) Strike a balance between being too small and too large in size.</b>
+            </p>
             <p>If a unit of work is too small, it can become difficult to track your progress and estimate how long the entire task will take. For example, if this assignment is reading a book and it is split up into sentences, it will be difficult to estimate how many sentences are in the book, how long it will take to read the entire book, and how many you've read after reading.</p>
             <p>If a unit of work is too large, it can also become difficult to track your progress and estimate how long the entire task will take. For example, if the unit of work is "the entire assignment", it will be difficult to know where to start and how to enter your progress.</p>
             <p>A good unit of work should be something that can be completed in a reasonable amount of time. In the example of reading a book, a better unit of work could be splitting it up into chapters. This is large enough to make progress, but small enough to track it effectively.</p>
-            <p><b>2) If you are still unsure, don't enter your own unit of work.</b></p>
+            <p>
+                <b>2) If you are still unsure, don't enter your own unit of work.</b>
+            </p>
             <p>Leave this input blank and instead estimate how long this assignment will take to complete in the Standard inputs</p>
         </span>
         <p>
+            <span class="minor-minor-category">Total number of [units] in this assignment</span>
+            <br>
+            The number of units of work in this assignment. If you have to estimate this number, it's ok if you are unsure. However, if you cannot decide, you can click the magic wand icon to let TimeWeb predict a number for you. Upon submission, this number will be calculated and estimated based on your other inputs.
+        </p>
+        <p>Only visible when you enter a name for each unit of work.</p>
+        <p>
+            <span class="minor-minor-category">How long does it take to complete each [unit]</span>
+            <br>
+            An estimation of how long you think each unit of work in this assignment will take to complete. It's ok if you are unsure about your estimate.
+        </p>
+        <p>Only visible when you enter a name for each unit of work.</p>
+        <p>
+            <span class="minor-minor-category">Total number of [units] already completed</span>
+            <br>
+            The number of units of work you've already completed in this assignment. This represents your initial work input and the first point on the blue line, so changing this number will vertically translate all of your other work inputs accordingly. If you have to estimate this number, it's ok if you are unsure.
+        </p>
+        <p>Only visible when you enter a name for each unit of work.</p>
+        <p>
+            <span class="minor-minor-category">How long have you already worked</span>
+            <br>
+            How long you've already worked on this assignment. This represents your initial work input and the first point on the blue line, so changing this number will vertically translate all of your other work inputs accordingly. If you have to estimate this length of time, it's ok if you are unsure.
+        </p>
+        <p>Not visible when you enter a name for each unit of work.</p>
+        <p>
+            <span class="minor-minor-category" id="assignment-form-step-size">Step Size</span>
+            <br>
+            If you have entered a name for each unit of work:
+            <br>
+            This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number.
+        </p>
+        <p>
+            If you have not entered a name for each unit of work:
+            <br>
+            This input is the length of time that you will work in increments of, meaning you will always work in multiples of this number.
+        </p>
+        <p>For example, if the step size is 5 minutes, you will only work in multiples of 5 minutes (10m, 25m, 1h, etc).</p>
+        <p>
             <span class="minor-minor-category">Assignment Description</span>
             <br>
-            This input is the description of this assignment, shown below the assignment name when this assignment is open or when this assignment needs more info.
+            The description of this assignment. Displayed when this assignment is open or marked as "needs more info".
         </p>
-        <p>
-            <span class="minor-minor-category">Total number of Units already Completed</span>
-            <br>
-            This input is the number of units of work you've already completed in this assignment. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. Since this represents the first point on the blue line and the initial work input, if you edit this value, all of your other work inputs are vertically translated accordingly.
-        </p>
-        <p>
-            <span class="minor-minor-category">Step Size</span>
-            <br>
-            This input is the number of units of work you will complete at a time, meaning you will always work in multiples of this number. The "Unit" part of this input is replaced in the assignment form with the name of each unit of work. For example, if this assignment is reading a book, the name of each unit of work is "Page", and this input is 5, you will always work in multiples of 5 pages throughout the entire assignment.
-        </p> 
-        <p>You can leave this input empty to disable it.</p>
-        <p>
-            <span class="minor-minor-category">Minimum Daily Work Time</span>
-            <br>
-            This input is the minimum amount of time you will work on an assignment every day. This only applies to days when you DO work on this assignment and doesn't apply to days when you don't work.
-        </p> 
-        <p>You can leave this input empty to disable it.</p>
         <p>
             <span class="minor-minor-category">Work Days</span>
             <br>
-            These inputs are the days of the week you will work on this assignment. Green days represent the days you will work, while red days represent the days you won't work.
+            The days of the week you will work on this assignment. You won't be assigned any work on non-working days.
         </p>
     </details>
     <details open>
