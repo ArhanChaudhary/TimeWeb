@@ -956,7 +956,7 @@ saveAndLoadStates: function() {
     // Use beforeunload instead of unload or else the loading screen triggers and $("#assignments-container").scrollTop() becomes 0
     $(window).on('beforeunload', function() {
         sessionStorage.setItem("login_email", ACCOUNT_EMAIL);
-        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) {
+        if (!(SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS)) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
                 $(".assignment.open-assignment").map(function() {
@@ -988,32 +988,32 @@ saveAndLoadStates: function() {
 
     // Ensure fonts load for the graph
     document.fonts.ready.then(function() {
-        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS)
-            // setTimeout so the assignments are clicked after the click handlers are set
-            setTimeout(function() {
-                // Reopen closed assignments
-                if ("open_assignments" in sessionStorage) {
-                    const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".assignment").each(function() {
-                        const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
-                        if (!was_open) return;
+        if (SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
+        // setTimeout so the assignments are clicked after the click handlers are set
+        setTimeout(function() {
+            // Reopen closed assignments
+            if ("open_assignments" in sessionStorage) {
+                const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+                $(".assignment").each(function() {
+                    const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
+                    if (!was_open) return;
 
-                        // if you edit an open assignment and make it needs more info
-                        // ensure it isn't clicked
-                        const dom_assignment = $(this);
-                        const sa = new VisualAssignment(dom_assignment);
-                        if (sa.canOpenAssignment()) {
-                            dom_assignment.click();
-                        }
-                    });
-                }
+                    // if you edit an open assignment and make it needs more info
+                    // ensure it isn't clicked
+                    const dom_assignment = $(this);
+                    const sa = new VisualAssignment(dom_assignment);
+                    if (sa.canOpenAssignment()) {
+                        dom_assignment.click();
+                    }
+                });
+            }
 
-                // Scroll to original position
-                // Needs to scroll after assignments are opened
-                if ("scroll" in sessionStorage) {
-                    $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
-                }
-            }, 0);
+            // Scroll to original position
+            // Needs to scroll after assignments are opened
+            if ("scroll" in sessionStorage) {
+                $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
+            }
+        }, 0);
     });
 },
 navClickHandlers: function() {

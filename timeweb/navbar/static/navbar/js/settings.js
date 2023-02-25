@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event#examples
     const previous_state = $('form').serialize();
-    window.addEventListener("beforeunload", function(e) {
+    $(window).on("beforeunload", function(e) {
         if (alreadySubmitted || window.ignore_reload_alert || previous_state === $('form').serialize()) return;
 
         e.preventDefault();
