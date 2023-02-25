@@ -459,6 +459,8 @@ class Priority {
                     }).css({marginLeft: -1, marginRight: -1});
                     var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
                     that.total_completion_time += todo_minutes;
+                    status_value = Priority.UNFINISHED_FOR_TODAY;
+                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
                     const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
                     if ([0, 1].includes(due_date_minus_today_floor)) {
                         // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
@@ -481,9 +483,6 @@ class Priority {
                             status_message = "This assignment needs more info but passed its due date";
                         else
                             status_message = 'This assignment\'s due date has passed';
-                    } else {
-                        status_value = Priority.UNFINISHED_FOR_TODAY;
-                        status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
                     }
                 }
             }
