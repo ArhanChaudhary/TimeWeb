@@ -362,7 +362,7 @@ main.background-image-exists {
     transition-property: border-bottom-color;
 }
 /* Add to truncate warning if the below style is changed */
-.assignment.open-assignment .description {
+.assignment.open-assignment .description, .assignment.needs-more-info .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
