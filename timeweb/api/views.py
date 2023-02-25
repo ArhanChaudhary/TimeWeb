@@ -260,7 +260,7 @@ def simplify_course_name(tag_name):
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|([4-9]|1[0-2]|four|fif|six|seven|eigh|nin|ten|eleven|twelve)th) grade",
         # second period
         # do this above grade-5 or else 5th Period 6th Grade Math => 5th th Grade Math
-        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) per",
+        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) per|(1st|2nd|3rd|((0|[4-7])th)|[0-7])(º|°)",
         # 3rd quarter
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|(4|four)th) quarter",
         # 1st sem
