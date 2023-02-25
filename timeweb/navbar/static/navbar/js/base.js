@@ -79,3 +79,12 @@ document.addEventListener("DOMContentLoaded", function() {
             $(this).wrap("<div class=\"img-positioner\">");
     });
 });
+$(window).one("load", function() {
+    const scroll_position = sessionStorage.getItem("navbar_scroll");
+    if (!scroll_position) return;
+    $("#doc-container").scrollTop(scroll_position);
+    sessionStorage.removeItem("navbar_scroll");
+});
+window.addEventListener("beforeunload", function() {
+    sessionStorage.setItem("navbar_scroll", $("#doc-container").scrollTop());
+});
