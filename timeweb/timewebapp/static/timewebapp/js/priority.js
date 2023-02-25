@@ -457,15 +457,23 @@ class Priority {
                         width: 15,
                         height: 15,
                     }).css({marginLeft: -1, marginRight: -1});
-                    var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
-                    that.total_completion_time += todo_minutes;
-                    status_value = Priority.UNFINISHED_FOR_TODAY;
-                    status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
-                    const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                    if ([0, 1].includes(due_date_minus_today_floor)) {
-                        // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
-                        // when it in fact displays no useful information
-                        if (due_date_minus_today_floor === 0) {
+                    if (hard_due_date_passed) {
+                        todo = sa.sa.y - last_work_input;
+                        var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        status_value = Priority.DUE_DATE_PASSED;
+                        if (sa.sa.needs_more_info)
+                            status_message = "This assignment needs more info but passed its due date";
+                        else
+                            status_message = 'This assignment\'s due date has passed';
+                    } else {
+                        var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        that.total_completion_time += todo_minutes;
+                        const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                        if (![0, 1].includes(due_date_minus_today_floor)) {
+                            status_value = Priority.UNFINISHED_FOR_TODAY;
+                        } else if (due_date_minus_today_floor === 0) {
+                            // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
+                            // when it in fact displays no useful information
                             that.today_total_completion_time += todo_minutes;
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
                         } else if (due_date_minus_today_floor === 1) {
@@ -476,13 +484,7 @@ class Priority {
                                 status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                             }
                         }
-                    }
-                    if (hard_due_date_passed) {
-                        status_value = Priority.DUE_DATE_PASSED;
-                        if (sa.sa.needs_more_info)
-                            status_message = "This assignment needs more info but passed its due date";
-                        else
-                            status_message = 'This assignment\'s due date has passed';
+                        status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
                     }
                 }
             }
@@ -599,16 +601,20 @@ class Priority {
 
             // !! is needed because toggleClass only works with booleans
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            if ([
-                Priority.UNFINISHED_FOR_TODAY,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
-                Priority.DUE_DATE_PASSED
-            ].includes(status_value)) {
-                dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
-            } else {
-                dom_completion_time.text("");
+            switch (status_value) {
+                case Priority.DUE_DATE_PASSED:
+                    if (!Number.isFinite(sa.sa.y) || !Number.isFinite(last_work_input)) {
+                        dom_completion_time.text("");
+                        break;
+                    }
+                case Priority.UNFINISHED_FOR_TODAY:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
+                    dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
+                    break;
+                default:
+                    dom_completion_time.text("");
             }
             // If the status message is "finish this assignment", display the completion time on mobile
             dom_completion_time.toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
@@ -731,7 +737,6 @@ class Priority {
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
-            case Priority.DUE_DATE_PASSED:
             case Priority.INCOMPLETE_WORKS:
             case Priority.NO_WORKING_DAYS:
             case Priority.FINISHED_FOR_TODAY:
@@ -778,6 +783,10 @@ class Priority {
                         if (a.status_priority < b.status_priority) return 1;
                 }
                 break;
+            case Priority.DUE_DATE_PASSED:
+                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
+                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
+                break;
             case Priority.NOT_YET_ASSIGNED:
                 if (a.today_minus_assignment_date > b.today_minus_assignment_date) return -1;
                 if (a.today_minus_assignment_date < b.today_minus_assignment_date) return 1;
@@ -810,26 +819,28 @@ class Priority {
     }
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
-        if ([
-            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
-            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
-            Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
-            Priority.NO_WORKING_DAYS,
-            Priority.INCOMPLETE_WORKS
-        ].includes(priority_data.status_value)) {
-            var priority_percentage = NaN;
-        } else if ([
-            Priority.FINISHED_FOR_TODAY,
-            // needed for "This assignment has not yet been assigned" being set to color values greater than 1
-            Priority.NOT_YET_ASSIGNED,
-            Priority.COMPLETELY_FINISHED
-        ].includes(priority_data.status_value)) {
-            var priority_percentage = 0;
-        } else {
-            var priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
-            if (!Number.isFinite(priority_percentage)) {
+        let priority_percentage;
+        switch (priority_data.status_value) {
+            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
+            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
+            case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
+            case Priority.NO_WORKING_DAYS:
+            case Priority.INCOMPLETE_WORKS:
+                priority_percentage = NaN;
+                break;
+            case Priority.DUE_DATE_PASSED:
                 priority_percentage = 100;
-            }
+                break;
+            case Priority.FINISHED_FOR_TODAY:
+            case Priority.NOT_YET_ASSIGNED: // needed for "This assignment has not yet been assigned" being set to color values greater than 1
+            case Priority.COMPLETELY_FINISHED:
+                priority_percentage = 0;
+                break;
+            default:
+                priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
+                if (!Number.isFinite(priority_percentage)) {
+                    priority_percentage = 100;
+                }
         }
         return priority_percentage;
     }
@@ -949,7 +960,6 @@ class Priority {
             Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
             Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
             Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-            Priority.DUE_DATE_PASSED
         ].includes(priority_data.status_value));
         if (that.highest_priority) {
             that.highest_priority = that.highest_priority.status_priority;
@@ -1009,8 +1019,7 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY,
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-                Priority.DUE_DATE_PASSED
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
             const dom_title = $(".title").eq(priority_data.index);
 
