@@ -1433,9 +1433,10 @@ class VisualAssignment extends Assignment {
             }
             // Clear once textbox if the input is valid
             work_input_textbox.val("");
-            if (this.unit_is_of_time) {
+            const work_input_textbox_label = this.dom_assignment.find(".work-input-unit-of-time-checkbox")
+            if (this.unit_is_of_time && !work_input_textbox_label.hasClass("disable-conversion")) {
                 const unit_singular = pluralize(this.sa.unit.toLowerCase(), 1);
-                const work_input_textbox_label_is_checked = this.dom_assignment.find(".work-input-unit-of-time-checkbox").is(":checked");
+                const work_input_textbox_label_is_checked = work_input_textbox_label.is(":checked");
                 if (unit_singular === "hour" && !work_input_textbox_label_is_checked) {
                     input_done = Crud.minutesToHours(input_done);
                 } else if (unit_singular === "minute" && work_input_textbox_label_is_checked) {

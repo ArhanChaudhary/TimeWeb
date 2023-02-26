@@ -214,9 +214,12 @@ setClickHandlers: {
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
             let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
+            const work_input_textbox_label = dom_assignment.find(".work-input-unit-of-time-checkbox");
+            work_input_textbox_label.addClass("disable-conversion");
             todo = Math.max(0, todo);
             dom_assignment.find(".work-input-textbox").val(todo);
             dom_assignment.find(".submit-work-button").click();
+            work_input_textbox_label.removeClass("disable-conversion");
         });
     },
     assignmentsHeaderUI: function() {
