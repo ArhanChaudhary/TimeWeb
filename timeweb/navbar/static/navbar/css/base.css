@@ -158,6 +158,9 @@ summary {
     margin-right: calc(-1 * var(--container-padding-right) + var(--image-margin));
     margin-left: calc(-1 * var(--container-padding-left) + var(--image-margin));
 }
+.img-positioner img.tall-image {
+    max-height: 800px;
+}
 
 .minor-category {
     margin-top: 2rem;
