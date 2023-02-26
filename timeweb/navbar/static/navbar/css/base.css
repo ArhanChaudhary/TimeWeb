@@ -73,11 +73,9 @@ main ul {
     font-weight: var(--roboto-font-weight);
     font-size: 20px;
 }
-#category-table-of-contents {
-    top: 0;
-}
+#category-table-of-contents,
 #category-important-labels {
-    top: 40px;
+    top: 0;
 }
 #table-of-contents-container li {
     padding-right: 15px;
