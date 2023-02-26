@@ -5,6 +5,7 @@ from django.http import HttpResponseForbidden, HttpResponse
 from django.db.utils import OperationalError
 from django.utils import timezone
 
+import unicodedata
 from common.views import logger
 
 from ratelimit.exceptions import Ratelimited
@@ -41,6 +42,13 @@ def app_static_factory(app_name):
     def app_static(url_path):
         return f"/static/{app_name}/{url_path}" if settings.DEBUG else f'https://storage.googleapis.com/twstatic/{app_name}/{url_path}'
     return app_static
+
+def simplify_whitespace(s):
+    s = unicodedata.normalize('NFKD', s)
+    s = re.sub(r'[\t ]+', ' ', s)
+    s = re.sub(r'^\s+|\s+$', '', s)
+    s = re.sub(r'\n{3,}', '\n\n', s)
+    return s
 
 try:
     current_site = Site.objects.get(domain="localhost" if (settings.DEBUG or settings.FIX_DEBUG_LOCALLY) else "timeweb.io")

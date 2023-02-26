@@ -502,14 +502,17 @@ def create_gc_assignments(request, order=None):
                 due_time = None
                 x = None
                 x_num = None
-            name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
+            name = assignment['title']
+            name = utils.simplify_whitespace(name)
+            name = Truncator(name).chars(TimewebModel.name.field.max_length)
             # We don't need to worry if there if this raises a not found error because the courses we
             # request assignments from are the ones in request.user.settingsmodel.gc_courses_cache itself
             tags.insert(0, next(
                 i['name'] for i in request.user.settingsmodel.gc_courses_cache
                 if assignment['courseId'] == i['id']
             ))
-            description = assignment.get('description')
+            if description := assignment.get('description'):
+                description = utils.simplify_whitespace(description)
             google_classroom_assignment_link = assignment.get("alternateLink")
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=None,
