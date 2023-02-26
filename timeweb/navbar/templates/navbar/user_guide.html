@@ -190,6 +190,10 @@ the span groups the major and minor categories together for user_guide.js
         </picture>
         <p>After creating an assignment, click it to open its graph. The graph provides a visualization of your assignment's entire work schedule. </p>
         <p>Its x-axis represents days, while its y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.</p>
+        <span class="label-question" id="why-isn't-the-assignment-graph's-today-line-always-accurate?">
+            <span class="label-title">Why isn't the assignment graph's today line always accurate?</span>
+            <p></p>
+        </span>
         <p>As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.</p>
         <p>The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure the assignment graph is tuned for you and your work style.</p>
     </details>
@@ -250,6 +254,8 @@ the span groups the major and minor categories together for user_guide.js
         <p>In dynamic mode, the work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden. Note that dynamic mode discourages extremely low or high curvatures, as it tends to make your work schedule more linear as you enter more work inputs.</p>
         <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
             <span class="label-title">Why do similar curvature values result in different work distributions in dynamic mode?</span>
+            The assignment graph's <a href="#advanced-assignment-graph-controls">curvature</a> is ... etc
+
             Unfortunately, this is a side effect of dynamic mode's implementation, occasionally occurring after submitting and deleting work inputs. Try to re-adjust the curvature to its original state if this happens.
         </span>
     </details>
@@ -277,6 +283,11 @@ the span groups the major and minor categories together for user_guide.js
             <li>You must be a student of the assignment's class</li>
             <li>The assignment's class can't be archived</li>
         </ul>
+        <br>
+        <span class="label-question" id="why-are-some-google-classroom-assignments-incorrectly-due-at-11:59-pm?">
+            <span class="label-title">Why are some Google Classroom assignments incorrectly due at 11:59 PM?</span>
+            <p>Google Classroom defaults assignments without a due time to 11:59 PM. This, however, isn't distinguishable from assignments with a manually assigned due time of 11:59 PM. </p>
+        </span>
     </details>
 </span>
 <details open>
@@ -301,9 +312,7 @@ the span groups the major and minor categories together for user_guide.js
         <button class="generic-button">Shift + Click delete assignment</button> : Delete assignment without confirmation prompt
     </p>
     <br>
-    <p>
-        Hover over or focus on any element in an assignment to select it as the target of the below keybinds:
-    </p>
+    <p>Hover over or focus on any element in an assignment to select it as the target of the below keybinds:</p>
     <p>
         <button class="generic-button">e</button> : Open the edit assignment form
     </p>
