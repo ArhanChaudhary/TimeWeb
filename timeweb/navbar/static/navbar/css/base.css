@@ -138,7 +138,10 @@ code {
     box-shadow: none;
 }
 .written-on {
-    transform: translateX(-45px);
+    transform: translateX(-10px);
+}
+.written-on::before {
+    content: "Last updated: ";
 }
 summary {
     cursor: pointer;
