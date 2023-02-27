@@ -70,12 +70,12 @@ class Priority {
             }
         }, 0);
     }
-    // https://www.desmos.com/calculator/lv6pgvsa0c
+    // https://www.desmos.com/calculator/nhivlbqdzf
     // I will not be explaining anything nor answering any questions
     // goodbye
-    static dayZeroScaleOutput = 5;
+    static dayZeroScaleOutput = 4.2;
     static dueDateTransitionValue = 1.8;
-    static piecewiseCutoff = 2.85;
+    static piecewiseCutoff = 3.9;
     static dueDateScalingFunction(days_until_due) {
         const x = days_until_due;
         const a = Priority.dayZeroScaleOutput;
