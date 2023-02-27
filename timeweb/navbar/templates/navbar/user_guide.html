@@ -182,6 +182,14 @@ the span groups the major and minor categories together for user_guide.js
         <summary class="minor-category" id="assignment-priority">Assignment priority</summary>
         <p>After you add multiple assignments, every assignment you're supposed to work on will automatically receive a priority percentage and a color. They both represent how urgent an assignment's work is for any given day compared to every other assignment.</p>
         <p>Their priority is also a factor in determining their assignment list positions, which represents the order you should complete every assignment's work, though you are still free to complete them in a different order. Assignments with low priorities will be positioned near the bottom of the assignment list, while assignments with high priorities will be positioned near the top of the assignment list, with the most important assignment always having 100% priority.</p>
+        <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
+            <span class="label-title">How is the assignment priority percentage calculated?</span>
+            <p>In short, the more work for the assignment today and the closer its due date is to today, the higher the priority percentage. These are the only two factors that determine assignment priority percentage. The only exceptions are for assignments due later today or tomorrow which are manually given a priority percentage higher than every other assignment.</p>
+            <p>However, in case you want further elaboration, every assignment is first given a priority as a number instead of a percentage. If <code>x</code> represents the assignment's daily work for today in minutes and <code>y</code> represents the number of days between the due date and today, this number is calculated according to the expression:</p>
+            <img class="small-image" src="{% static 'navbar/images/priority_algorithm.webp' %}" alt="sqrt(x)/(y - 1.8)">
+            <p>Then, this number is converted to a percentage by dividing it by the highest priority number of all assignments.</p>
+            <p><code>sqrt(x)</code> implies that assignments become more important at a lesser rate as its work for today increases. <code>y - 1.8</code> implies that assignments due sooner are skewed towards a slightly higher priority number.</p>
+        </span>
     </details>
     <details open>
         <summary class="minor-category" id="important-and-not-important-assignment-tags">"Important" and "Not Important" assignment tags</summary>

@@ -149,7 +149,6 @@ summary {
 .img-positioner {
     display: flex;
     justify-content: center;
-    margin-bottom: 2em;
 }
 .img-positioner img {
     filter: drop-shadow(0 9px 10px hsl(0, 0%, 50%));
@@ -158,9 +157,15 @@ summary {
     max-width: calc(100% + var(--container-padding-left) + var(--container-padding-right) - 2 * var(--image-margin));
     margin-right: calc(-1 * var(--container-padding-right) + var(--image-margin));
     margin-left: calc(-1 * var(--container-padding-left) + var(--image-margin));
+    margin-bottom: 2em;
 }
 .img-positioner img.tall-image {
     max-height: 800px;
+}
+.img-positioner img.small-image {
+    max-height: 80px;
+    margin-bottom: initial;
+    filter: initial;
 }
 
 .minor-category {
