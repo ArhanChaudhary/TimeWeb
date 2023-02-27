@@ -70,17 +70,21 @@ class Priority {
             }
         }, 0);
     }
-    // https://www.desmos.com/calculator/zlzx0bqhur
+    // https://www.desmos.com/calculator/lv6pgvsa0c
     // I will not be explaining anything nor answering any questions
     // goodbye
     static dayZeroScaleOutput = 5;
     static dueDateTransitionValue = 1.8;
     static piecewiseCutoff = 2.85;
     static dueDateScalingFunction(days_until_due) {
-        if (days_until_due > Priority.piecewiseCutoff)
-            return days_until_due - Priority.dueDateTransitionValue;
-        else
-            return days_until_due / (Priority.dayZeroScaleOutput - Priority.dayZeroScaleOutput * Math.pow(days_until_due, 2) / Math.pow(Priority.piecewiseCutoff, 2) + Math.pow(days_until_due, 2) / (Math.pow(Priority.piecewiseCutoff, 2) - Priority.dueDateTransitionValue * Priority.piecewiseCutoff));
+        const x = days_until_due;
+        const a = Priority.dayZeroScaleOutput;
+        const b = Priority.dueDateTransitionValue;
+        const c = Priority.piecewiseCutoff;
+        assert(x > 0);
+        if (x <= c)
+            return x / (a - a * x * x / (c * c) + x * x / (c * c - b * c));
+        return x - b;
     }
     static todoScalingFunction(minutes) {
         return Math.sqrt(minutes);
