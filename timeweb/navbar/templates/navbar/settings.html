@@ -39,7 +39,7 @@
             <span class="error-note">{{ error|escape }}</span>
         {% endfor %}
         {% for field in form.visible_fields %}
-            {% if field.name == "enable_gc_integration" or field.name == "immediately_delete_completely_finished_assignments" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "default_dropdown_tags" or field.name == "appearance" or field.name == "enable_tutorial" %}
+            {% if field.name == "enable_gc_integration" or field.name == "immediately_delete_completely_finished_assignments" or field.name == "def_min_work_time" or field.name == "def_skew_ratio" or field.name == "show_priority" or field.name == "display_working_days_left" or field.name == "appearance" or field.name == "enable_tutorial" %}
                 {% if field.name != "enable_gc_integration" %}
                     </div>
                 {% endif %}
@@ -55,7 +55,7 @@
                             Assignment Graph
                         {% elif field.name == "show_priority" %}
                             Assignment Priority
-                        {% elif field.name == "default_dropdown_tags" %}
+                        {% elif field.name == "display_working_days_left" %}
                             Assignment Header
                         {% elif field.name == "appearance" %}
                             Personalize

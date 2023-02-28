@@ -125,14 +125,14 @@ class SettingsModel(models.Model):
     )
     
     # Group "Assignment Header"
+    display_working_days_left = models.BooleanField(
+        default=False,
+        verbose_name=('Display Number of Working Days Left'),
+    )
     default_dropdown_tags = models.JSONField(
         default=empty_list,
         blank=True,
         verbose_name=_('Default Dropdown Tags'),
-    )
-    display_working_days_left = models.BooleanField(
-        default=False,
-        verbose_name=('Display Number of Working Days Left'),
     )
     horizontal_tag_position = models.CharField(
         max_length=MAX_HORIZONTAL_TAG_POSITIONS_LENGTH,
