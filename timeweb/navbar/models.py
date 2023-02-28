@@ -107,7 +107,7 @@ class SettingsModel(models.Model):
     # Group "Assignment Priority"
     show_priority = models.BooleanField(
         default=True,
-        verbose_name=_('Show Priority'),
+        verbose_name=_('Display Priority'),
     )
     highest_priority_color = ColorField(
         default="#e8564a",
