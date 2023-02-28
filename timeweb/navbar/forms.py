@@ -26,7 +26,7 @@ class SettingsForm(forms.ModelForm):
                     help_text=mark_safe('Imports assignments from Google Classroom to TimeWeb. Some assignments are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.'),
                     required=False,
                 ),
-                "order": "before gc_assignments_always_midnight",
+                "order": "before immediately_delete_completely_finished_assignments",
             },
             "calendar_integration": {
                 "field": forms.BooleanField(
