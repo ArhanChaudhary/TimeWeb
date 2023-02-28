@@ -204,7 +204,6 @@ def simplify_course_name(tag_name):
         tag_name = re.sub(abbreviation[0], abbreviation[1], tag_name, flags=re.IGNORECASE)
 
     def tag_name_re_subs(regexes, tag_name):
-        tag_name = " ".join(tag_name.split())
         tag_name_post_re_subs = (
             # if there is something like "a--b" or "a -b" then replace it when "a b"
             # a dash is not usually treated as a space, such as when it's used
@@ -217,12 +216,13 @@ def simplify_course_name(tag_name):
             (r"^-+ ?| ?-+$", ""),
             (r"^,|,$", ""),
         )
+        tag_name = utils.simplify_whitespace(tag_name)
         for regex in regexes:
             pre_tag_name = re.sub(regex, "", tag_name, flags=re.IGNORECASE)
-            pre_tag_name = " ".join(pre_tag_name.split())
+            pre_tag_name = utils.simplify_whitespace(tag_name)
             for post_re_sub in tag_name_post_re_subs:
                 pre_tag_name = re.sub(*post_re_sub, pre_tag_name, flags=re.IGNORECASE)
-                pre_tag_name = " ".join(pre_tag_name.split())
+                pre_tag_name = utils.simplify_whitespace(tag_name)
             if not pre_tag_name or len(tag_name) < 10:
                 return tag_name
             tag_name = pre_tag_name
