@@ -152,7 +152,7 @@ class SettingsModel(models.Model):
         max_length=MAX_APPEARANCES_LENGTH,
         choices=APPEARANCES,
         default=_("dark"),
-        verbose_name=_('Appearance'),
+        verbose_name=_('Color Scheme'),
     )
     background_image = models.ImageField(
         upload_to=create_image_path,
