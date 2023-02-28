@@ -104,27 +104,11 @@ class SettingsModel(models.Model):
         verbose_name=_('Close Graph After Submitting Work Input'),
     )
 
-    # Group "Assignment Priority"
+    # Group "Assignment Header"
     show_priority = models.BooleanField(
         default=True,
         verbose_name=_('Display Priority'),
     )
-    highest_priority_color = ColorField(
-        default="#e8564a",
-        verbose_name=_('Highest Priority Color'),
-    )
-    lowest_priority_color = ColorField(
-        default="#84d336",
-        verbose_name=_('Lowest Priority Color'),
-    )
-    assignment_sorting = models.CharField(
-        max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
-        choices=ASSIGNMENT_SORTINGS,
-        default=_("Most Priority First"),
-        verbose_name=_('Assignment Sorting: '),
-    )
-    
-    # Group "Assignment Header"
     display_working_days_left = models.BooleanField(
         default=False,
         verbose_name=('Display Number of Working Days Left'),
@@ -153,6 +137,14 @@ class SettingsModel(models.Model):
         choices=APPEARANCES,
         default=_("dark"),
         verbose_name=_('Color Scheme'),
+    )
+    highest_priority_color = ColorField(
+        default="#e8564a",
+        verbose_name=_('Highest Priority Color'),
+    )
+    lowest_priority_color = ColorField(
+        default="#84d336",
+        verbose_name=_('Lowest Priority Color'),
     )
     background_image = models.ImageField(
         upload_to=create_image_path,
@@ -189,6 +181,12 @@ class SettingsModel(models.Model):
     )
 
     # Hidden
+    assignment_sorting = models.CharField(
+        max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
+        choices=ASSIGNMENT_SORTINGS,
+        default=_("Most Priority First"),
+        verbose_name=_('Assignment Sorting: '),
+    )
     # Custom field validation in views: hardcoded enable or disable in change_setting
     oauth_token = models.JSONField(
         default=empty_dict,
