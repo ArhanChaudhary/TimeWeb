@@ -464,6 +464,10 @@ class Priority {
                     if (hard_due_date_passed) {
                         todo = sa.sa.y - last_work_input;
                         var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        // NOTE: in case I add other status groups, it's important that I don't forget to manually add
+                        // conditions to replicate as if the assignment has other status groups. This is because the
+                        // condition !hard_due_date_passed manually skips over status groups that are used for checking
+                        // in later behavior
                         status_value = Priority.DUE_DATE_PASSED;
                         if (sa.sa.needs_more_info)
                             status_message = "This assignment needs more info but passed its due date";
@@ -510,15 +514,17 @@ class Priority {
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
-            assignment_header_tick_svg.parents(".assignment-header-button").toggle(
-                ![
+            assignment_header_tick_svg.parents(".assignment-header-button").toggle(!(
+                [
                     Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED,
                     Priority.FINISHED_FOR_TODAY,
-                    Priority.COMPLETELY_FINISHED
-                ].includes(status_value) && !already_entered_work_input_for_today
-            );
+                    Priority.COMPLETELY_FINISHED,
+                ].includes(status_value)
+                || already_entered_work_input_for_today
+                || sa.sa.needs_more_info
+            ));
             let href = `#tick-svg`;
             assignment_header_tick_svg.find("use").attr("href", href);
             assignment_header_tick_svg.attr("viewBox", (function() {
@@ -799,18 +805,18 @@ class Priority {
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
 
-        switch (status_value) {
-            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
-            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
-            case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
-            case Priority.COMPLETELY_FINISHED:
-                // exact same logic as above
-                // as a note, this will never deal with negative numbers, as a negative
-                // due date means the assignment was already due. so, the status value
-                // will be completely_finished and this if statement won't run
-                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
-                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
-                break;
+        if ([
+            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
+            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
+            Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
+            Priority.COMPLETELY_FINISHED,
+        ].includes(status_value)) {
+            // exact same logic as above
+            // as a note, this will never deal with negative numbers, as a negative
+            // due date means the assignment was already due. so, the status value
+            // will be completely_finished and this if statement won't run
+            if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+            if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
         }
 
         if (a.name < b.name) return -1;
