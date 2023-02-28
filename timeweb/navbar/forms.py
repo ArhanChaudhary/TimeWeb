@@ -105,6 +105,7 @@ class SettingsForm(forms.ModelForm):
             "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished by your work inputs. Ignores assignments that are marked as completely finished from their due dates passing. Deleted assignments can be recovered and restored from the deleted assignments view.",
             "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",
             "gc_assignments_always_midnight": mark_safe("Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM.<br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to 12:00 AM.<br><br>Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created."),
+            "priority_color_borders": "Adds a priority colored border around every assignment.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):

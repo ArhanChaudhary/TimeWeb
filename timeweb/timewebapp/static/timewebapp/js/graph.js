@@ -1628,7 +1628,8 @@ class VisualAssignment extends Assignment {
 
                 // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
                 const padding_to_add = title_top + title_height - tag_top + parseFloat(dom_tags.css("--tags-left--margin-bottom"));
-                let original_padding = parseFloat($("#assignments-container").css("--vertical-assignment-padding"));
+                let original_padding = parseFloat($("#assignments-container").css("--original-vertical-assignment-padding"));
+                original_padding += parseFloat($("#assignments-container").css("--first-extra-vertical-assignment-padding") || 0);
                 this.dom_assignment.css("--vertical-assignment-padding", `${Math.max(0, padding_to_add) + original_padding}px`);
 
                 if (SETTINGS.vertical_tag_position === "Top") {

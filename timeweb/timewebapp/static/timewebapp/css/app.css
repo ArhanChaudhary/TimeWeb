@@ -9,7 +9,8 @@ html {
     margin-top: -10px;
     padding-top: 10px;
     --scale-percent-y: 1.05;
-    --vertical-assignment-padding: 33px;
+    --original-vertical-assignment-padding: 33px;
+    --vertical-assignment-padding: calc(var(--original-vertical-assignment-padding) + var(--first-extra-vertical-assignment-padding, 0px));
     --horizontal-assignment-padding: 15px;
     --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
@@ -182,7 +183,8 @@ main.background-image-exists {
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring a {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring a,
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .assignment-header {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
@@ -446,9 +448,9 @@ do this because midde-of-header is hidden in the delete assignments view */
     white-space: nowrap;
     font-size: 13.6px;
     --tags-left--margin-bottom: 7px;
-    --tags-bottom--margin-bottom: 3px;
+    --tags-bottom--margin-bottom: calc(3px + var(--first-extra-vertical-assignment-padding, 0px));
     --tags-right--margin-right: 2px;
-    --tags-top--margin-top: 3px;
+    --tags-top--margin-top: calc(3px + var(--first-extra-vertical-assignment-padding, 0px));
 }
 .tags [tabindex]:focus, .tags input:focus {
     outline: 0;
@@ -762,8 +764,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     align-items: center;
     justify-content: center;
     /* negate the variable pixel value */
-    margin-top: calc(-1 * var(--vertical-assignment-padding));
-    margin-bottom: calc(-1 * var(--vertical-assignment-padding));
+    margin-top: calc(var(--priority-color-border-width, 0px) - var(--vertical-assignment-padding));
+    margin-bottom: calc(var(--priority-color-border-width, 0px) - var(--vertical-assignment-padding));
     margin-left: 1px;
     margin-right: -3px;
     --horizontal-header-button-padding: 8px;
@@ -1015,7 +1017,6 @@ main.finished-header-transition #extra-navs {
 #assignments-container.thick-text-shadow-width {
     --filter-drop-shadow-width: 1.5px;
 }
-
 #assignments-container:not(.none-text-shadow-width) .grey-highlight:not(.assignment-container),
 #assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::after,
 #assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::before {
@@ -1024,6 +1025,17 @@ main.finished-header-transition #extra-navs {
             drop-shadow(0 calc(-1 * var(--filter-drop-shadow-width)) 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(var(--filter-drop-shadow-width) 0 0 var(--filter-drop-shadow-color, transparent))
             drop-shadow(calc(-1 * var(--filter-drop-shadow-width)) 0 0 var(--filter-drop-shadow-color, transparent));
+}
+
+
+#assignments-container.priority-color-borders .assignment-header {
+    border-radius: inherit;
+    --priority-color-border-width: 1px;
+    box-shadow: inset 0 0 0 var(--priority-color-border-width) var(--priority-color);
+    transition: box-shadow calc(var(--priority-color-transition-speed) * var(--animation-speed));
+}
+#assignments-container.priority-color-borders {
+    --first-extra-vertical-assignment-padding: 3px;
 }
 
 

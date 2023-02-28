@@ -146,6 +146,10 @@ class SettingsModel(models.Model):
         default="#84d336",
         verbose_name=_('Lowest Priority Color'),
     )
+    priority_color_borders = models.BooleanField(
+        default=False,
+        verbose_name=_('Priority Color Borders'),
+    )
     background_image = models.ImageField(
         upload_to=create_image_path,
         null=True,
