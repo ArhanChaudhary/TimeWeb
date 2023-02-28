@@ -28,6 +28,15 @@ class SettingsForm(forms.ModelForm):
                 ),
                 "order": "before immediately_delete_completely_finished_assignments",
             },
+            "canvas_integration": {
+                "field": forms.BooleanField(
+                    label="Canvas Integration",
+                    help_text="Not yet implemented.",
+                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    required=False,
+                ),
+                "order": "after enable_gc_integration",
+            },
             "calendar_integration": {
                 "field": forms.BooleanField(
                     label="Google Calendar Integration",
@@ -35,7 +44,7 @@ class SettingsForm(forms.ModelForm):
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
                     help_text="Not yet implemented.",
                 ),
-                "order": "after enable_gc_integration",
+                "order": "after canvas_integration",
             },
             "notifications_integration": {
                 "field": forms.BooleanField(
@@ -45,15 +54,6 @@ class SettingsForm(forms.ModelForm):
                     required=False,
                 ),
                 "order": "after calendar_integration",
-            },
-            "canvas_integration": {
-                "field": forms.BooleanField(
-                    label="Canvas Integration",
-                    help_text="Not yet implemented.",
-                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
-                    required=False,
-                ),
-                "order": "after notifications_integration",
             },
             "view_deleted_assignments": {
                 "field": forms.BooleanField(
