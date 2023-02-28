@@ -58,7 +58,7 @@ class SettingsForm(forms.ModelForm):
             "view_deleted_assignments": {
                 "field": forms.BooleanField(
                     label="View Deleted Assignments",
-                    help_text="Refresh after viewing to go back to your unhidden assignments.",
+                    help_text="Refresh after viewing to go back to your current assignments.",
                     required=False,
                 ),
                 "order": "after immediately_delete_completely_finished_assignments"
