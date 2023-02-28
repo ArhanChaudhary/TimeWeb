@@ -980,8 +980,7 @@ class Priority {
                     Priority.UNFINISHED_FOR_TODAY,
                     Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
                     Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
-                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-                    Priority.DUE_DATE_PASSED
+                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
                 ].includes(priority_data.status_value))
                     continue;
 
