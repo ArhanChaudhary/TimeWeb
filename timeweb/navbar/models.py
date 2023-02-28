@@ -166,17 +166,17 @@ class SettingsModel(models.Model):
         default=_("normal"),
         verbose_name=_('Background Image Text Shadow Width'),
     )
-    animation_speed = models.CharField(
-        max_length=MAX_ANIMATION_SPEED_LENGTH,
-        choices=ANIMATION_SPEED,
-        default=_("1"),
-        verbose_name=_('Animation Speed'),
-    )
 
     # Group "Miscellaneous"
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Tutorial'),
+    )
+    animation_speed = models.CharField(
+        max_length=MAX_ANIMATION_SPEED_LENGTH,
+        choices=ANIMATION_SPEED,
+        default=_("1"),
+        verbose_name=_('Animation Speed'),
     )
     sorting_animation_threshold = models.IntegerField(
         default=50,
