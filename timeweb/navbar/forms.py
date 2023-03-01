@@ -108,11 +108,11 @@ class SettingsForm(forms.ModelForm):
             "priority_color_borders": "Adds a priority colored border around every assignment.",
             "font": mark_safe('''
                 <table class="description-table">
-                    <tr class="opensans">
+                    <tr class="font-opensans">
                         <td>Open Sans:</td>
                         <td>The quick brown fox jumps over the lazy dog</td>
                     </tr>
-                    <tr class="montserrat">
+                    <tr class="font-montserrat">
                         <td>Montserrat:</td>
                         <td>The quick brown fox jumps over the lazy dog</td>
                     </tr>
