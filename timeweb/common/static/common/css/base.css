@@ -47,7 +47,7 @@ hr {
 }
 /* Override normalize.css */
 html {
-    line-height: unset !important;
+    line-height: 1.36;
 }
 button,
 input,
