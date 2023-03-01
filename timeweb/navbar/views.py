@@ -66,7 +66,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
-        self.context['settings_model'] = request.user.settingsmodel
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
                             exclude=[*SettingsForm.Meta.exclude, # SettingsForm already excludes these fields but saving the field to a model adds them back
                             *EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS])

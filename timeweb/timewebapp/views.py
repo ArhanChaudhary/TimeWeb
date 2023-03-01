@@ -159,7 +159,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
-        self.context['settings_model'] = request.user.settingsmodel
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
         self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
 
