@@ -67,7 +67,7 @@
         {% block base_head_js %}{% endblock %}
         <noscript>Your browser does not support or has disabled javascript, which is required for this website</noscript>
     </head>
-    <body tabindex="-1" class="{% if settings_model.appearance == "dark" %}dark{% elif settings_model.appearance == "light" %}light{% endif %} {% block body_classes %}{% endblock %}">
+    <body tabindex="-1" class="{% if user.settingsmodel.appearance == "dark" %}dark{% elif user.settingsmodel.appearance == "light" %}light{% endif %} {% block body_classes %}{% endblock %}">
         <div id="site">
             {% comment %} 
             remember to have a <main> on these blocks, many stylesheets and scripts rely on that being present 

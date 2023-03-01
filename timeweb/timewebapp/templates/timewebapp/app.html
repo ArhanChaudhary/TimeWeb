@@ -5,9 +5,9 @@
   <link rel="stylesheet" href="https://unpkg.com/daterangepicker@3.1.0/daterangepicker.css" crossorigin="anonymous"/>
   <link rel="stylesheet" href="{% static 'timewebapp/css/app.css' %}">
   <link rel="stylesheet" href="{% static 'timewebapp/css/form.css' %}">
-  {% if settings_model.appearance == "automatic" %}
+  {% if user.settingsmodel.appearance == "automatic" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}" media="(prefers-color-scheme: dark)">
-  {% elif settings_model.appearance == "dark" or settings_model.appearance == "lesser dark" %}
+  {% elif user.settingsmodel.appearance == "dark" or user.settingsmodel.appearance == "lesser dark" %}
     <link rel="stylesheet" href="{% static 'timewebapp/css/dark.css' %}">
   {% endif %}
 {% endblock %}
@@ -35,8 +35,8 @@
 {% endblock %}
 
 {% block content %}
-  {% if settings_model.background_image %}
-    <img alt id="background-image" src="{{ settings_model.background_image.url }}" width="{{settings_model.background_image.width}}" height="{{settings_model.background_image.height}}" draggable="false">
+  {% if user.settingsmodel.background_image %}
+    <img alt id="background-image" src="{{ user.settingsmodel.background_image.url }}" width="{{ user.settingsmodel.background_image.width }}" height="{{ user.settingsmodel.background_image.height }}" draggable="false">
   {% endif %}
   <div id="overlay">
     <div id="form-wrapper">
@@ -114,8 +114,8 @@
   </div>
   {% comment %} add tabindex because some js makes main focusable {% endcomment %}
   <div id="assignments-container" class="{% if view_deleted_assignments_in_app_view %}viewing-deleted-assignments{% endif %}
-  {% if settings_model.background_image %}{{ settings_model.background_image_text_shadow_width }}-text-shadow-width{% endif %}
-  {% if settings_model.priority_color_borders %}priority-color-borders{% endif %}" tabindex="-1">
+  {% if user.settingsmodel.background_image %}{{ user.settingsmodel.background_image_text_shadow_width }}-text-shadow-width{% endif %}
+  {% if user.settingsmodel.priority_color_borders %}priority-color-borders{% endif %}" tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
       (function() {
         if ($("main").hasClass("finished-header-transition")) return
@@ -140,7 +140,7 @@
       {% comment %} <span> so :last-child is forwards-compatible {% endcomment %}
       <span>
         {% if not view_deleted_assignments_in_app_view %}
-          <div id="assignments-header" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
+          <div id="assignments-header" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>
             <span id="todo-wrapper">
               <span id="estimated-total-time-label">Todo:</span>
               <span id="estimated-total-time"></span>
@@ -164,12 +164,12 @@
         {% endif %}
         {% for assignment in assignment_models %}
           {% comment %} Grey highlight for the ::after and ::before elements {% endcomment %}
-          <div class="assignment-container{% if settings_model.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
+          <div class="assignment-container{% if user.settingsmodel.background_image %} grey-highlight{% endif %}"{% if assignment.pk == just_created_assignment_id %} id="animate-in"{% elif assignment.pk == just_updated_assignment_id %} id="animate-color"{% endif %}>
             <div class="assignment {% if assignment.needs_more_info %}needs-more-info{% endif %} {% if refresh_dynamic_mode_all or refresh_dynamic_mode == assignment.pk %}refresh-dynamic-mode{% endif %}" data-assignment-id="{{ assignment.pk }}" tabindex="0">
               {% comment %} priority-color-strip must be a first child of .assignment so it expands its entire height when opened {% endcomment %}
               <div class="priority-color-strip"></div>
               <div class="assignment-header">
-                <div class="tags tags-{{ settings_model.horizontal_tag_position|lower }} tags-{{ settings_model.vertical_tag_position|lower }}">
+                <div class="tags tags-{{ user.settingsmodel.horizontal_tag_position|lower }} tags-{{ user.settingsmodel.vertical_tag_position|lower }}">
                   <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
                     {% comment %} Remove whitespace to remove inline-black gap (minify-html does not fix this) {% endcomment %}
                     {% for tag in assignment.tags %}<div class="tag-wrapper">
@@ -198,7 +198,7 @@
                 note: confirm with the .assignment-header > :nth-last-child(2) selector before changing
                 any .assignment-header first child element tags
                 {% endcomment %}
-                <div class="left-side-of-header {% if settings_model.appearance == "dark" or settings_model.appearance == "automatic" %}fancy-coloring{% endif %}">
+                <div class="left-side-of-header {% if user.settingsmodel.appearance == "dark" or user.settingsmodel.appearance == "automatic" %}fancy-coloring{% endif %}">
                   <span class="title">
                     {% if assignment.google_classroom_assignment_link %}
                       {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
@@ -293,12 +293,12 @@
           </div>
         {% endfor %}
         {% if view_deleted_assignments_in_app_view %}
-          <div id="no-assignments-message" {% if settings_model.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...</div>
+          <div id="no-assignments-message" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...</div>
         {% endif %}
       </span>
       <div id="extra-navs">
         {% comment %} extra-navs already has a filter style {% endcomment %}
-        <span {% if settings_model.background_image %}class="grey-highlight"{% endif %}>
+        <span {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>
           {% if view_deleted_assignments_in_app_view %}
             {% if show_previous_page %}
               <span id="previous-page">Previous Page</span>
@@ -327,7 +327,7 @@
     </div>
   </div>
   <template id="delete-gc-assignments-from-class-template">
-    <div class="delete-gc-assignments-from-class shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+    <div class="delete-gc-assignments-from-class shortcut {% if user.settingsmodel.background_image %}grey-highlight{% endif %}">
       <div class="shortcut-line-left"></div>
       <span class="shortcut-text">
         Delete Assignments from this Class
@@ -337,7 +337,7 @@
     </div>
   </template>
   <template id="autofill-work-done-template">
-    <div class="autofill-work-done allow-singular-wrapper shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+    <div class="autofill-work-done allow-singular-wrapper shortcut {% if user.settingsmodel.background_image %}grey-highlight{% endif %}">
       <div class="shortcut-line-left"></div>
       <span class="shortcut-text">
         Autofill
@@ -352,7 +352,7 @@
     </div>
   </template>
   <template id="delete-starred-assignments-template">
-    <div class="delete-starred-assignments shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+    <div class="delete-starred-assignments shortcut {% if user.settingsmodel.background_image %}grey-highlight{% endif %}">
       <div class="shortcut-line-left"></div>
       <span class="shortcut-text">
         Delete Completely Finished Assignments
@@ -362,7 +362,7 @@
     </div>
   </template>
   <template id="delete-due-date-passed-assignments-template">
-    <div class="delete-due-date-passed-assignments allow-singular-wrapper shortcut {% if settings_model.background_image %}grey-highlight{% endif %}">
+    <div class="delete-due-date-passed-assignments allow-singular-wrapper shortcut {% if user.settingsmodel.background_image %}grey-highlight{% endif %}">
       <div class="shortcut-line-left"></div>
       <span class="shortcut-text">
         Delete Past Due Assignments
@@ -395,7 +395,7 @@
     </div>
   </template>
   <template id="tutorial-click-assignment-to-open-template">
-    <span id="tutorial-click-assignment-to-open"{% if settings_model.background_image %} class="grey-highlight"{% endif %}>
+    <span id="tutorial-click-assignment-to-open"{% if user.settingsmodel.background_image %} class="grey-highlight"{% endif %}>
       Click your assignment to open it
       <br>
     </span>
