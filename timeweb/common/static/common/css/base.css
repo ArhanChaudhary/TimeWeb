@@ -9,8 +9,12 @@ html {
     scroll-behavior: smooth;
     --100vh: calc(var(--vh, 1vh) * 100);
 }
-html,
-.info-button-text {
+.montserrat,
+.montserrat .info-button-text {
+    font-family: "Montserrat", sans-serif;
+}
+.opensans,
+.opensans .info-button-text {
     font-family: "Open Sans", sans-serif;
 }
 input, textarea {

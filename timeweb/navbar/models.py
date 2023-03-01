@@ -59,6 +59,13 @@ APPEARANCES = (
 )
 MAX_APPEARANCES_LENGTH = len(max([i[0] for i in APPEARANCES], key=len))
 
+FONTS = (
+    ("opensans", "Open Sans"),
+    ("montserrat", "Montserrat"),
+)
+
+MAX_FONTS_LENGTH = len(max([i[0] for i in FONTS], key=len))
+
 class SettingsModel(models.Model):
     # Group "Assignment Deletion"
     immediately_delete_completely_finished_assignments = models.BooleanField(
@@ -131,12 +138,18 @@ class SettingsModel(models.Model):
         verbose_name=_('Vertical Assignment Tag Position'),
     )
 
-    # Group "Personalize"
+    # Group "Appearance"
     appearance = models.CharField(
         max_length=MAX_APPEARANCES_LENGTH,
         choices=APPEARANCES,
         default=_("dark"),
         verbose_name=_('Color Scheme'),
+    )
+    font = models.CharField(
+        max_length=MAX_FONTS_LENGTH,
+        choices=FONTS,
+        default=_("opensans"),
+        verbose_name=_('Font'),
     )
     highest_priority_color = ColorField(
         default="#e8564a",

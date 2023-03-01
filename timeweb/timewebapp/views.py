@@ -65,7 +65,7 @@ EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
     "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
     "gc_courses_cache", "gc_assignments_always_midnight", "background_image_text_shadow_width",
-    "appearance", "priority_color_borders", 
+    "appearance", "priority_color_borders", "font"
 )
 
 assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
