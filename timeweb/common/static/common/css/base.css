@@ -1,7 +1,6 @@
 * {
     font-weight: 600;
     /* keep this as selector as * so fonts arent inherited (for example .info-button) */
-    font-family: "Open Sans", sans-serif;
     touch-action: manipulation;
     text-decoration-thickness: 1.5px;
 }
@@ -9,6 +8,10 @@ html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
     --100vh: calc(var(--vh, 1vh) * 100);
+}
+html,
+.info-button-text {
+    font-family: "Open Sans", sans-serif;
 }
 input, textarea {
     -webkit-user-select: text;

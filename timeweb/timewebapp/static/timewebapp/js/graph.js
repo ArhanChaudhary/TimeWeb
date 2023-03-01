@@ -514,7 +514,7 @@ class VisualAssignment extends Assignment {
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
         new Priority().sort();
     }
-    static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
+    static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px ${$("body").css("font-family").split(",")[0]}`;
     static getTextHeight = screen => screen.measureText("0").width * 2;
     static setCanvasFont(screen, font_size) {
         screen.font = VisualAssignment.generateCanvasFont(font_size);
