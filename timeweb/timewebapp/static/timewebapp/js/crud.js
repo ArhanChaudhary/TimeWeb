@@ -827,7 +827,7 @@ class Crud {
         $("#id_name").info('left',
             `Only enter an assignment's name to mark it as "needs more info"
             
-            Useful as a reminder system for assignments you don't want to fully submit to the assignment form`, 
+            Disables functionality but useful as a reminder for short assignments`, 
         "after").css({
             marginTop: -23,
             marginLeft: "auto",
