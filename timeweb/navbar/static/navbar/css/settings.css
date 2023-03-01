@@ -43,6 +43,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 100px;
 }
 .field-group > .field-container ~ .field-container {
     margin-top: 15px;
@@ -171,9 +172,6 @@ body {
 .field-description {
     font-size: 0.8em;
     opacity: 0.7;
-}
-.description-table {
-    border-collapse: collapse;
 }
 #button-container {
     display: flex;
