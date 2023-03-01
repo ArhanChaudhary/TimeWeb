@@ -9,9 +9,12 @@ body {
     display: flex;
     position: relative;
 }
-#table-of-contents-container > ul, #category-doc-labels > li {
-    margin-top: 10px;
-    margin-bottom: 10px;
+#table-of-contents-container > ul, #category-important-labels ~ ul > li {
+    margin-top: 13px;
+    margin-bottom: 13px;
+}
+#category-important-labels ~ ul {
+    padding-inline-start: 32px;
 }
 #table-of-contents-container.active {
     transform: none;
@@ -57,10 +60,9 @@ main ul {
     font-size: 14px;
 }
 #table-of-contents-container > .table-of-contents-item {
-    margin-top: 15px;
+    margin-top: 11px;
     margin-bottom: 15px;
-    -webkit-padding-start: 28px;
-            padding-inline-start: 28px;
+    padding-inline-start: 18px;
 }
 .table-of-contents-header {
     display: block;

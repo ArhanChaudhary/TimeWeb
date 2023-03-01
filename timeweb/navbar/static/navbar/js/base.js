@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .text($label_question.find(".label-title").text());
         $label_question.css("scroll-margin-top", href_scroll_margin);
 
-        $("#table-of-contents-container #category-doc-labels").append(minor_category_li);
+        $("#table-of-contents-container #category-important-labels ~ ul").append(minor_category_li);
     });
 
     $(".major-category ~ * img, .major-category ~ img").each(function() {
