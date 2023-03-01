@@ -251,6 +251,9 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper #id_x, #form-wrapper #id_y {
     padding-left: var(--magic-wand-width);
 }
+#form-wrapper #id_description {
+    --nothing-height: var(--field-height);
+}
 #form-wrapper .field-wrapper.has-widget > input {
     flex-grow: 1;
 }

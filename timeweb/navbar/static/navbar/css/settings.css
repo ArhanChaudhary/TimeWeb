@@ -133,6 +133,9 @@ body {
     z-index: 1;
     transition: all 0.1s ease-in-out;
 }
+#id_default_dropdown_tags {
+    --nothing-height: auto;
+}
 [type="checkbox"] ~ label:not(.break-days-label):hover:active {
     --box-shadow: 0 0 11px -1px hsl(0, 0%, 73%);
     box-shadow: var(--box-shadow);
