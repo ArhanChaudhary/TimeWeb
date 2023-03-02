@@ -1,5 +1,9 @@
 body {
+    font-size: 17px;
     --roboto-font-weight: 700;
+}
+.generic-button {
+    font-size: inherit;
 }
 #flex-container {
     height: calc(var(--100vh) - 70px);
@@ -10,8 +14,8 @@ body {
     position: relative;
 }
 #table-of-contents-container > ul, #category-important-labels ~ ul > li {
-    margin-top: 13px;
-    margin-bottom: 13px;
+    margin-top: 16px;
+    margin-bottom: 16px;
 }
 #category-important-labels ~ ul {
     padding-inline-start: 32px;
@@ -24,7 +28,7 @@ body {
     box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
     overflow-y: auto;
-    width: 300px;
+    width: 295px;
     position: relative;
     z-index: 2;
     background-color: hsl(0, 0%, 93%);
@@ -56,12 +60,9 @@ main ul {
     -webkit-margin-after: 0;
             margin-block-end: 0;
 }
-#table-of-contents-container:not(.table-of-contents-header) {
-    font-size: 14px;
-}
 #table-of-contents-container > .table-of-contents-item {
-    margin-top: 11px;
-    margin-bottom: 15px;
+    margin-top: 21px;
+    margin-bottom: 21px;
     padding-inline-start: 18px;
 }
 .table-of-contents-header {
@@ -69,20 +70,21 @@ main ul {
     position: sticky;
     background-color: inherit;
     filter: brightness(0.95);
-    line-height: 40px;
+    line-height: 50px;
     text-align: center;
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
-    font-size: 20px;
+    font-size: 26px;
 }
 #category-table-of-contents,
 #category-important-labels {
     top: 0;
 }
 #table-of-contents-container li {
+    font-size: 16px;
     padding-right: 15px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 #table-of-contents-container a {
     color: black;
@@ -92,6 +94,7 @@ main ul {
 #doc-container {
     --container-padding-right: 50px;
     --container-padding-left: 70px;
+    --move-minor-category-left: -15px;
     padding-left: var(--container-padding-left);
     padding-right: var(--container-padding-right);
     padding-bottom: 150px;
@@ -172,7 +175,7 @@ summary {
 
 .minor-category {
     margin-top: 2rem;
-    margin-left: -15px;
+    margin-left: var(--move-minor-category-left);
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 30px;
@@ -180,7 +183,7 @@ summary {
 .minor-minor-category {
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
-    font-size: 21px;
+    font-size: 22px;
 }
 .label-question {
     --label-color: rgb(150, 232, 253);
@@ -190,7 +193,9 @@ summary {
     position: relative;
     white-space: normal;
     padding-bottom: 12px;
-    width: 100%;
+    margin-left: auto;
+    --move-question-right: 0px;
+    width: calc(100% - var(--move-question-right));
 }
 .label-question::before {
     content: '';
@@ -217,7 +222,8 @@ summary {
     justify-content: center;
     position: absolute;
     top: 5px;
-    left: -60px;
+    --label-icon-left: -60px;
+    left: var(--label-icon-left);
     width: 40px;
     height: 40px;
     background-color: hsl(196deg, 76%, 66%);
