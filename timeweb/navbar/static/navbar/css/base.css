@@ -239,3 +239,18 @@ summary {
     cursor: pointer;
     display: none;
 }
+@media screen and (max-width: 750px) {
+    #doc-container {
+        --container-padding-right: 20px;
+        --container-padding-left: 35px;
+    }
+    .minor-category {
+        --move-minor-category-left: -10px;
+    }
+    .label-question {
+        --move-question-right: 25px;
+    }
+    .label-icon-container {
+        --label-icon-left: -50px;
+    }
+}
