@@ -235,9 +235,17 @@ summary {
 #hamborger-menu {
     top: 0;
     left: 0;
+    width: 89px;
+    height: 100%;
     position: absolute;
     cursor: pointer;
     display: none;
+    --display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#hamborger-menu > * {
+    display: block;
 }
 @media screen and (max-width: 750px) {
     #doc-container {

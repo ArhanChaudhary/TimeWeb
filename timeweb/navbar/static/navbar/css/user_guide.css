@@ -13,6 +13,6 @@
         transition: transform 0.2s ease-out;
     }
     #hamborger-menu {
-        display: initial;
+        display: var(--display);
     }
 }
