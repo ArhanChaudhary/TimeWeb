@@ -23,7 +23,11 @@ class SettingsForm(forms.ModelForm):
             "enable_gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
-                    help_text=mark_safe('Imports assignments from Google Classroom to TimeWeb. Some assignments are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.'),
+                    help_text=mark_safe('''
+                        Imports assignments from Google Classroom. Some are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.<br>
+                        <br>
+                        Note that you can use a different Google account for the Google Classroom integration than the one you use to sign in to TimeWeb.
+                    '''),
                     required=False,
                 ),
                 "order": "before immediately_delete_completely_finished_assignments",
