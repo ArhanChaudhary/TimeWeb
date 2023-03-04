@@ -1155,7 +1155,7 @@ class VisualAssignment extends Assignment {
 
         // looking back i probably could have used e.originalEvent.repeat but uhhh it works ig
         $(document).keydown(e => {
-            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.assignmentGraphIsOnScreen() && !arrow_key_fired) {
+            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && this.assignmentGraphIsOnScreen() && !arrow_key_fired) {
                 // "arrow_key_fired" makes .keydown fire only when a key is pressed, not repeatedly
                 arrow_key_fired = true;
                 this.pressed_arrow_key = e.key;
