@@ -26,7 +26,7 @@ class SettingsForm(forms.ModelForm):
                     help_text=mark_safe('''
                         Imports assignments from Google Classroom. Some are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.<br>
                         <br>
-                        Note that you can use a different Google account for the Google Classroom integration than the one you use to sign in to TimeWeb.
+                        Note that you can use a different Google account for the Google Classroom integration than the one used to log in to TimeWeb.
                     '''),
                     required=False,
                 ),
