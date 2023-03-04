@@ -61,6 +61,12 @@ $(function() {
             input.val(newVal.substring(0, newVal.indexOf(".") + step.split(".")[1].length + 1));
         }
     });
+    // prevent shift keybinds from selecting text too
+    // is not an issue with mobile because shiftKey doesn't exist
+    $(document).on("mousedown", function(e) {
+        if (e.shiftKey && $(e.target).hasClass("block-selection") || $(e.target).parents(".block-selection").length)
+            document.getSelection().removeAllRanges();
+    })
     if (window.daterangepicker) {
         const org = daterangepicker.prototype.renderTimePicker;
         daterangepicker.prototype.renderTimePicker = function() {
