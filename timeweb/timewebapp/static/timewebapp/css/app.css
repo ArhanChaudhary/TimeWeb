@@ -881,6 +881,9 @@ do this because midde-of-header is hidden in the delete assignments view */
 .graph-footer > :not(.work-input-textbox-wrapper),
 .work-input-textbox,
 .work-input-unit-of-time-widget {
+    --control-height: 21px;
+    box-sizing: content-box;
+    height: var(--control-height);
     font-size: 15px;
     border-radius: 20px;
     border: none;
@@ -924,8 +927,13 @@ do this because midde-of-header is hidden in the delete assignments view */
     margin-top: 13px;
     margin-bottom: var(--assignment-margin-bottom);
 }
-.work-input-textbox {
+.font-opensans .work-input-textbox-wrapper {
     --width: 123px;
+}
+.font-montserrat .work-input-textbox-wrapper {
+    --width: 132px;
+}
+.work-input-textbox {
     width: var(--width);
     position: relative;
     transition-property: border-radius, padding-right, margin-left;
@@ -945,6 +953,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     visibility: hidden;
     opacity: 0;
     z-index: initial;
+    height: var(--control-height);
     cursor: pointer;
     margin-left: -50px;
     user-select: none;
