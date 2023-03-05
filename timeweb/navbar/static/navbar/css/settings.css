@@ -71,7 +71,7 @@ body {
 .right-side-of-field > input,
 .right-side-of-field > textarea,
 .right-side-of-field > select {
-    font-size: 14px;
+    font-size: 17px;
     border-width: 1px;
     background-color: var(--primary);
 }
@@ -85,12 +85,11 @@ body {
     height: initial !important;
 }
 .clearable-file-input-text {
-    font-size: 14px;
+    font-size: 17px;
 }
 [type="checkbox"] ~ .single-action-label::before {
     width: 100% !important;
     left: 0 !important;
-    font-size: 14px;
 }
 [type="checkbox"]:not(:checked) ~ .single-action-label::before {
     transform: scaleX(0);
