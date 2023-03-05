@@ -444,7 +444,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     overflow-y: auto !important;
 }
 .jconfirm .jconfirm-content-pane {
-    max-height: 60vh !important;
+    max-height: calc(60 * var(--vh)) !important;
 }
 .jconfirm .jconfirm-box {
     width: min(70vw, 800px) !important;

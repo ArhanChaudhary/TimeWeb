@@ -834,7 +834,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .graph-container {
     border-radius: 12px;
-    height: clamp(200px,65vh,400px);
+    height: clamp(200px, calc(65 * var(--vh)), 400px);
     position: relative;
     border: 2px solid hsla(0, 0%, 42%, 0.75); /* hsl(0, 0%, 70%) */
 }
