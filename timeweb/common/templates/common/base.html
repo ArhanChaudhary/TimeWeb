@@ -2,7 +2,7 @@
 {% load pwa %}
 
 <!DOCTYPE html>
-<html lang="en-US" class="font-{{ user.settingsmodel.font }}">
+<html lang="en-US" class="font-{% if user.settingsmodel.font %}{{ user.settingsmodel.font }}{% else %}opensans{% endif %}">
     <head>
         <meta charset="UTF-8">
         <script nonce="{{request.csp_nonce}}">
