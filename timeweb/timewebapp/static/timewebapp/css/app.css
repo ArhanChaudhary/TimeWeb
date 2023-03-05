@@ -574,15 +574,19 @@ do this because midde-of-header is hidden in the delete assignments view */
     opacity: 1;
     transform: scale(1.2);
 }
+.font-montserrat .tags {
+    --increase-tag-box-width: 7px;
+    --increase-tag-add-width: 6px;
+}
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
-    width: 78px;
+    width: calc(78px + var(--increase-tag-add-width, 0px));
 }
 .tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
 }
 .tag-add-box {
     white-space: normal;
-    width: 159px;
+    width: calc(159px + var(--increase-tag-box-width, 0px));
     --box-shadow-color: hsla(0, 0%, 67%, 0.65);
     --box-shadow-color2: black;
     --input-background-color: hsl(0, 0%, 86%);
