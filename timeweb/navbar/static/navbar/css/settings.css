@@ -4,7 +4,7 @@ main {
 #settings-form {
     padding: 0 1em;
     margin: 0 auto;
-    font-size: 17px;
+    font-size: 19px;
     max-width: 1000px;
 }
 #settings-scroller {
@@ -33,7 +33,7 @@ body {
 }
 .field-group-label {
     font-weight: 700;
-    font-size: 20px;
+    font-size: 22px;
     line-height: 20px;
     --lightness: 37%;
     color: hsl(196, 34%, var(--lightness));
@@ -62,7 +62,7 @@ body {
 }
 .right-side-of-field > * {
     box-sizing: border-box;
-    width: 157px;
+    width: 200px;
     border-color: var(--color);
 }
 .right-side-of-field > :not(.error-note) {
@@ -126,7 +126,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    height: 33px;
+    height: 38px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
@@ -159,7 +159,7 @@ body {
     transform-origin: left;
 }
 [type="checkbox"]:checked ~ label::before {
-    transform: translateX(77px);
+    transform: translateX(99px);
 }
 [type="file"] {
     border: none;
@@ -171,7 +171,7 @@ body {
     text-align: center;
 }
 .field-description {
-    font-size: 0.8em;
+    font-size: 15px;
     opacity: 0.7;
 }
 #button-container {
@@ -196,9 +196,9 @@ body {
     border-top: inherit;
 }
 #break-days-wrapper .break-days-label {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    font-size: 14px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 17px;
     border-top-color: var(--color) !important;
     border-left-color: var(--color) !important;
 }
@@ -226,7 +226,7 @@ body {
     outline: 0;
     box-shadow: 0 0 0 1px hsl(0, 0%, 58%);
 }
-@media screen and (max-width: 750px) {
+@media screen and (max-width: 850px) {
     .field-container {
         align-items: unset;
         flex-flow: column;
