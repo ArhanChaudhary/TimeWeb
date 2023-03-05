@@ -8,7 +8,8 @@
     --field-widget-background-color: hsl(0, 0%, 97%);
 }
 #form-wrapper form, #break-days-wrapper {
-    --field-wrapper-border: 1px solid var(--color);
+    --field-wrapper-border-width: 1px;
+    --field-wrapper-border: var(--field-wrapper-border-width) solid var(--color);
 }
 /* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
@@ -133,7 +134,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     border-left: var(--field-wrapper-border);
     border-right: var(--field-wrapper-border);
     width: calc(50% - var(--horizontal-field-group-tab-padding));
-    margin: 0 -1px;
+    margin: 0 calc(-1 * var(--field-wrapper-border-width));
     border-top-right-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
 }
@@ -152,6 +153,8 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #field-group-picker-styling * {
     transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
+    --field-wrapper-border-width: 2px;
+    --field-wrapper-border: var(--field-wrapper-border-width) solid var(--color);
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
     transform: translateX(calc(var(--form-width) / 100 * -45));
