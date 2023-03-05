@@ -43,7 +43,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 100px;
+    --gap: 100px;
+    gap: var(--gap);
 }
 .field-group > .field-container ~ .field-container {
     margin-top: 15px;
@@ -229,6 +230,7 @@ body {
     .field-container {
         align-items: unset;
         flex-flow: column;
+        --gap: 1px;
     }
     #button-container {
         flex-flow: column;
