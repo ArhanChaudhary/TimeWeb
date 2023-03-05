@@ -173,6 +173,13 @@ body {
     font-size: 15px;
     opacity: 0.7;
 }
+.responsive-description-container {
+    white-space: nowrap
+}
+.responsive-description-container > * > :first-child {
+    width: 95px;
+    display: inline-block;
+}
 #button-container {
     display: flex;
     gap: 10px;
@@ -237,5 +244,8 @@ body {
     .right-side-of-field {
         margin-top: 2px;
         margin-bottom: 18px;
+    }
+    .responsive-description-container > * > :first-child {
+        display: block;
     }
 }

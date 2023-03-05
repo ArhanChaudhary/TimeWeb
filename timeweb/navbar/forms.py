@@ -111,16 +111,16 @@ class SettingsForm(forms.ModelForm):
             "gc_assignments_always_midnight": mark_safe("Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM.<br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to 12:00 AM.<br><br>Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created."),
             "priority_color_borders": "Adds a priority colored border around every assignment.",
             "font": mark_safe('''
-                <table class="description-table">
-                    <tr class="font-opensans">
-                        <td>Open Sans:</td>
-                        <td>The quick brown fox jumps over the lazy dog</td>
-                    </tr>
-                    <tr class="font-montserrat">
-                        <td>Montserrat:</td>
-                        <td>The quick brown fox jumps over the lazy dog</td>
-                    </tr>
-                </table>
+                <div class="responsive-description-container">
+                    <div class="font-opensans">
+                        <span>Open Sans:</span>
+                        <span>The quick brown fox jumps over the lazy dog</span>
+                    </div>
+                    <div class="font-montserrat">
+                        <span>Montserrat:</span>
+                        <span>The quick brown fox jumps over the lazy dog</span>
+                    </div>
+                </div>
             ''')
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
