@@ -28,9 +28,11 @@ window.addEventListener("beforeunload", function() {
         document.querySelector("main").classList.add("loading");
     }, 0);
 });
-function setVh() {
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
+if (!CSS.supports("height", "1dvh")) {
+    function setVh() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    setVh();
+    window.addEventListener('resize', () => requestAnimationFrame(setVh));
 }
-setVh();
-window.addEventListener('resize', () => requestAnimationFrame(setVh));

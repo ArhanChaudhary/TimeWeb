@@ -8,6 +8,8 @@ html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
     --vh: 1vh;
+    --vh: 1dvh;
+    /* if neither are supported, fallback to js base solution in base.js */
     --100vh: calc(var(--vh) * 100);
 }
 .font-montserrat,
