@@ -66,7 +66,7 @@ $(function() {
     $(document).on("mousedown", function(e) {
         if (e.shiftKey && $(e.target).hasClass("block-selection") || $(e.target).parents(".block-selection").length)
             document.getSelection().removeAllRanges();
-    })
+    });
     if (window.daterangepicker) {
         const org = daterangepicker.prototype.renderTimePicker;
         daterangepicker.prototype.renderTimePicker = function() {

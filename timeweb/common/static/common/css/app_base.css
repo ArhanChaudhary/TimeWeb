@@ -331,7 +331,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     width: 17px;
     height: 17px;
     border-radius: 50%;
-    background: rgb(33,163,177) !important;
+    background: hsl(186, 69%, 41%) !important;
     font-size: 16px;
     line-height: 17px;
     font-weight: 400;
@@ -352,11 +352,12 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     top: 0;
     position: absolute;
 }
-.info-button:hover {
-    background: rgb(16,135,148);
+.info-button:focus {
+    background: hsl(186, 80%, 30%) !important;
     outline: 0;
 }
-.info-button:hover .info-button-text {
+.info-button:hover:not(.prevent-hover) .info-button-text,
+.info-button:focus .info-button-text {
     height: unset;
     border: 2px solid var(--color);
     overflow: visible;
@@ -431,10 +432,6 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     right: 50%;
     transform: translateX(50%);
     border-color: transparent transparent var(--color) transparent;
-}
-/* Don't know why this is here but it is here */
-.info-button:hover .info-button-text.info-right {
-    left: calc(100% + 12px);
 }
 
 #changelog-container {
