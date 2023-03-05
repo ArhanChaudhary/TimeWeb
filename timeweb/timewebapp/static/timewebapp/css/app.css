@@ -1122,3 +1122,13 @@ main.finished-header-transition #extra-navs {
         padding-right: 0 !important;
     }
 }
+@media screen and (max-width: 550px) {
+    .font-opensans .hide-on-small-mobile {
+        display: none;
+    }
+}
+@media screen and (max-width: 580px) {
+    .font-montserrat .hide-on-small-mobile {
+        display: none;
+    }
+}

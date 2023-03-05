@@ -1046,7 +1046,7 @@ class VisualAssignment extends Assignment {
         
         switch ($graph_button.prop("tagName").toLowerCase()) {
             case "button":
-                var original_text = $graph_button.text();
+                var original_text = $graph_button.html();
                 $graph_button.text("Not Applicable");
                 break;
             case "input":
@@ -1062,7 +1062,7 @@ class VisualAssignment extends Assignment {
             $graph_button.removeClass("is-flashing");
             switch ($graph_button.prop("tagName").toLowerCase()) {
                 case "button":
-                    $graph_button.text(original_text);
+                    $graph_button.html(original_text);
                     break;
                 case "input":
                     $graph_button.attr("placeholder", original_text);
