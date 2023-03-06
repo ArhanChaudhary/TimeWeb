@@ -250,9 +250,9 @@ def simplify_course_name(tag_name):
         # 2022 - 3
         r"(?<!\d)(20)?\d\d( | - |-|/)(20)?\d?\d(?!\d)",
         # 2022 American Lit
-        r"^20\d\d(?!\d)",
+        r"^2(\d|0\d\d)(?!\d)",
         # American Lit 2022
-        r"(?<!\d)20\d\d$",
+        r"(?<!\d)2(\d|0\d\d)$",
 
         # remove period number
 
@@ -271,16 +271,16 @@ def simplify_course_name(tag_name):
         r"\(((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th)\)",
 
         # Repeat these again
-        r"^20\d\d(?!\d)",
-        r"(?<!\d)20\d\d$",
+        r"^2(\d|0\d\d)(?!\d)",
+        r"(?<!\d)2(\d|0\d\d)$",
 
         # remove teacher title
         r"^m(rs|r|s)\.? [a-z]+(-[a-z]+)?('s)?",
         r"(?<![a-z])m(rs|r|s)\.? [a-z]+(-[a-z]+)?$",
 
         # Repeat this again
-        r"^20\d\d(?!\d)",
-        r"(?<!\d)20\d\d$",
+        r"^2(\d|0\d\d)(?!\d)",
+        r"(?<!\d)2(\d|0\d\d)$",
     ], tag_name)
     return tag_name
 
