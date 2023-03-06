@@ -858,7 +858,7 @@ insertTutorialMessages: function(first_available_assignment) {
                 utils.ui.alreadyScrolled = true;
             }
         } else {
-            $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
+            $("#assignments-header").replaceWith('<div id="tutorial-message" class="grey-highlight"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
             $(".assignment-container, #current-date-container").hide();
         }
     }
