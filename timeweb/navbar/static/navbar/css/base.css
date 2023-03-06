@@ -13,11 +13,11 @@ body {
     display: flex;
     position: relative;
 }
-#table-of-contents-container > ul, #category-important-labels ~ ul > li {
+#table-of-contents-container > ul, #category-important-labels ~ .no-faq-category-container > li {
     margin-top: 16px;
     margin-bottom: 16px;
 }
-#category-important-labels ~ ul {
+#category-important-labels ~ .no-faq-category-container {
     padding-inline-start: 32px;
 }
 #table-of-contents-container.active {
@@ -90,6 +90,9 @@ main ul {
     color: black;
     -webkit-text-decoration-color: hsla(0, 0%, 0%, 0.3);
             text-decoration-color: hsla(0, 0%, 0%, 0.3);
+}
+#category-important-labels ~ .table-of-contents-item > ul {
+    padding-inline-start: 25px;
 }
 #doc-container {
     --container-padding-right: 50px;

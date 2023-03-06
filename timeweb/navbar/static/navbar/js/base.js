@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(".major-category").reverse().each(function() {
         const major_category = $(this);
-        const major_category_dropdown = $($("#table-of-contents-major-category-template").html());
-        let minor_categories = major_category.siblings(".minor-category");
+        let major_category_dropdown = $($("#table-of-contents-major-category-template").html());
+        const minor_categories = major_category.siblings(".minor-category");
 
         if (major_category.hasClass("dont-create-dropdown")) {
             const major_category_href_element = major_category.siblings().filter(function() {
@@ -40,6 +40,33 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         }
+
+        const faq_category_dropdown = $($("#table-of-contents-major-category-template").html());
+        faq_category_dropdown.find("span").text(major_category.text());
+        const faqs = major_category.siblings(".label-question");
+        if (!faqs.length) return;
+
+        faqs.each(function() {
+            const faq = $(this);
+            faq.css("scroll-margin-top", href_scroll_margin);
+
+            const faq_li = $($("#table-of-contents-minor-category-template").html());
+            faq_li.find("a").attr("href", `#${faq.attr("id")}`)
+                .text(faq.find(".label-title").text());
+
+            faq_category_dropdown.find("ul").append(faq_li);
+        });
+        $("#table-of-contents-container #category-important-labels").after(faq_category_dropdown);
+    });
+    $(".label-question").filter(function() {
+        return !$(this).siblings(".major-category").length;
+    }).each(function() {
+        const faq = $(this);
+        const faq_li = $($("#table-of-contents-minor-category-template").html());
+        faq_li.find("a").attr("href", `#${faq.attr("id")}`)
+            .text(faq.find(".label-title").text());
+
+        $("#table-of-contents-container #category-important-labels ~ .no-faq-category-container").append(faq_li);
     });
     $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
     $("#table-of-contents-container").click(function(e) {
@@ -58,17 +85,6 @@ document.addEventListener("DOMContentLoaded", function() {
             $(this).toggleClass("isSticky", $(this).position().top === min);
         });
         $(".major-category.isSticky").last().removeClass("isSticky");
-    });
-
-    $(".label-question").each(function() {
-        const label_question = $(this);
-
-        const minor_category_li = $($("#table-of-contents-minor-category-template").html());
-        minor_category_li.find("a").attr("href", `#${label_question.attr("id")}`)
-            .text(label_question.find(".label-title").text());
-        label_question.css("scroll-margin-top", href_scroll_margin);
-
-        $("#table-of-contents-container #category-important-labels ~ ul").append(minor_category_li);
     });
 
     $(".major-category ~ * img, .major-category ~ img").each(function() {
