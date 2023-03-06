@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(".major-category").reverse().each(function() {
         const $major_category = $(this);
-        const major_category_li = $($("#table-of-contents-major-category-template").html());
+        const major_category_dropdown = $($("#table-of-contents-major-category-template").html());
         let minor_categories = $major_category.siblings(".minor-category");
 
         if ($major_category.hasClass("dont-create-dropdown")) {
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
             $major_category_href_element.css("scroll-margin-top", href_scroll_margin);
             $("#table-of-contents-container #category-table-of-contents").after(minor_category_li);
         } else if (!minor_categories.length) {
-            major_category_li.find("span").text($major_category.text());
+            major_category_dropdown.find("span").text($major_category.text());
             const $minor_category_href_element = $major_category.siblings().filter(function() {
                 return !!$(this).attr("id");
             }).first();
@@ -27,18 +27,18 @@ document.addEventListener("DOMContentLoaded", function() {
             const minor_category_li = $($("#table-of-contents-minor-category-template").html());
             minor_category_li.find("a").attr("href", `#${$minor_category_href_element.attr("id")}`)
                 .text($major_category.text())
-            major_category_li.find("ul").append(minor_category_li);
-            $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
+            major_category_dropdown.find("ul").append(minor_category_li);
+            $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         } else {
-            major_category_li.find("span").text($major_category.text());
+            major_category_dropdown.find("span").text($major_category.text());
             minor_categories.each(function() {
                 $(this).css("scroll-margin-top", href_scroll_margin);
                 const minor_category_li = $($("#table-of-contents-minor-category-template").html());
                 minor_category_li.find("a").attr("href", `#${$(this).attr("id")}`)
                     .text($(this).text())
-                major_category_li.find("ul").append(minor_category_li);
+                major_category_dropdown.find("ul").append(minor_category_li);
             });
-            $("#table-of-contents-container #category-table-of-contents").after(major_category_li);
+            $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         }
     });
     $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
