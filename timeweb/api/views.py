@@ -219,10 +219,10 @@ def simplify_course_name(tag_name):
         tag_name = utils.simplify_whitespace(tag_name)
         for regex in regexes:
             pre_tag_name = re.sub(regex, "", tag_name, flags=re.IGNORECASE)
-            pre_tag_name = utils.simplify_whitespace(tag_name)
+            pre_tag_name = utils.simplify_whitespace(pre_tag_name)
             for post_re_sub in tag_name_post_re_subs:
                 pre_tag_name = re.sub(*post_re_sub, pre_tag_name, flags=re.IGNORECASE)
-                pre_tag_name = utils.simplify_whitespace(tag_name)
+                pre_tag_name = utils.simplify_whitespace(pre_tag_name)
             if not pre_tag_name or len(tag_name) < 10:
                 return tag_name
             tag_name = pre_tag_name
