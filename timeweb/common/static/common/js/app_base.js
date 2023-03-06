@@ -354,7 +354,7 @@ saveAssignment: function(batchRequestData, postError) {
                 case 413: {
                     $.alert({
                         title: "Too much data to save.",
-                        content: `If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.<br><br>
+                        content: `If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autoinputting work done, you will have to manually perform this action for every assignment.<br><br>
                         
                         We understand if this may be frustrating, so feel free to <a href=\"/contact\">contact us</a> for personal assistance.`,
                         backgroundDismiss: false,

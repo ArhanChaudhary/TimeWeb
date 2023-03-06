@@ -345,13 +345,13 @@ setClickHandlers: {
     },
     generateJConfirmParams: function(params) {
         return {
-            title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done for ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            title: `Are you sure you want to autoinput ${$("#autofill-selection").val().toLowerCase()} work done for ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
             content: (function() {
                 switch ($("#autofill-selection").val()) {
                     case "No":
-                        return "Assumes you haven't done anything since your last work input and autofills in no work done until today";
+                        return "Assumes you haven't done anything since your last work input and autoinputs in no work done until today";
                     case "All":
-                        return "Assumes you followed your work schedule since your last work input and autofills in all work done until today";
+                        return "Assumes you followed your work schedule since your last work input and autoinputs in all work done until today";
                 }
             })(),
             buttons: {
