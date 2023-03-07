@@ -46,10 +46,6 @@ $(function() {
                 }
                 break;
             }
-            case "Tab":
-                // Prevent tabbing dispositioning screen from tabbing on nav
-                setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
-                break;
         }
     });
     $(document).on('input', 'input[step]', function() {
