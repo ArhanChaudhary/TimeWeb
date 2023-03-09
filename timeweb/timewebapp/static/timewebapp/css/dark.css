@@ -48,7 +48,7 @@ select {
     --bg-c: calc(var(--primary-c) + 12);
 }
 .assignment {
-    --box-shadow: none !important;
+    --box-shadow-assignment: 0 0 0 0 transparent !important;
 }
 .assignment-header-button:focus, .assignment-header-button:hover {
     --background-color: rgb(86, 116, 129);

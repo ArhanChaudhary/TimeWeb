@@ -15,6 +15,9 @@ html {
     --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
 }
+#assignments-container.priority-color-borders {
+    --first-extra-vertical-assignment-padding: 3px;
+}
 #assignments-container:focus {
     /* Arrow scroll manually focuses */
     outline: none;
@@ -167,7 +170,10 @@ main.background-image-exists {
     padding-bottom: 40px;
 }
 .assignment {
-    --box-shadow: 0 0 12px -9px black;
+    --box-shadow-assignment-spread: -9px;
+    --box-shadow-assignment: 0 0 12px var(--box-shadow-assignment-spread) black;
+    --box-shadow-priority: 0 0 0 0 transparent;
+    --box-shadow: var(--box-shadow-assignment), var(--box-shadow-priority);
     box-shadow: var(--box-shadow);
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
     /* i really could not care less about priority-color being consistent */
@@ -178,13 +184,20 @@ main.background-image-exists {
     /* Ensures this stacks above .assignment-container::after */
     z-index: 1;
     scroll-margin: 20px;
-    transition: all .2s ease-in-out, opacity calc(.375s * var(--animation-speed)) ease-in-out, left 0s, padding 0s;
+    transition: all .2s ease-in-out,
+                opacity calc(.375s * var(--animation-speed)) ease-in-out,
+                box-shadow calc(var(--priority-color-transition-speed) * var(--animation-speed)),
+                left 0s,
+                padding 0s;
+}
+#assignments-container.priority-color-borders .assignment {
+    --priority-color-border-width: 1px;
+    --box-shadow-priority: inset 0 0 0 var(--priority-color-border-width) var(--priority-color);
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring a,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .assignment-header {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
@@ -1039,25 +1052,13 @@ main.finished-header-transition #extra-navs {
             drop-shadow(calc(-1 * var(--filter-drop-shadow-width)) 0 0 var(--filter-drop-shadow-color, transparent));
 }
 
-
-#assignments-container.priority-color-borders .assignment-header {
-    border-radius: inherit;
-    --priority-color-border-width: 1px;
-    box-shadow: inset 0 0 0 var(--priority-color-border-width) var(--priority-color);
-    transition: box-shadow calc(var(--priority-color-transition-speed) * var(--animation-speed));
-}
-#assignments-container.priority-color-borders {
-    --first-extra-vertical-assignment-padding: 3px;
-}
-
-
 /* Mobile view */
 .show-on-mobile {
     display: none;
 }
 @media screen and (max-width: 750px) {
     .assignment {
-        --box-shadow: 0 0 12px -8px black;
+        --box-shadow-assignment-spread: -8px;
     }
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
