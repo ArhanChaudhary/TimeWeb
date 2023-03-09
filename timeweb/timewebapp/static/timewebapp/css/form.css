@@ -141,7 +141,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper .selected-form-tab-styling-line {
     border-bottom: var(--field-wrapper-border);
     align-self: flex-end;
-    width: calc(50% + 1px);
+    width: calc(50% + var(--field-wrapper-border-width));
 }
 #form-wrapper #first-tab-line {
     border-bottom-right-radius: var(--border-radius);
