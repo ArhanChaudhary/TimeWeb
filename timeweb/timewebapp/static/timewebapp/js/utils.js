@@ -528,7 +528,7 @@ addTagHandlers: function() {
         if (dom_assignment.hasClass("open-tag-add-box")) return;
         dom_assignment.addClass("open-tag-add-box");
         $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
-        $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
+        $this.find(".tag-add-input").val("").attr("tabindex", "");
         const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
 
         // This code handles the logic for determining which tags should be added to the tag add dropdown. Let's break this down:
@@ -555,6 +555,10 @@ addTagHandlers: function() {
         final_allTags.push(...unique_allTags.sort());
         // Filter out tags that are already in the assignment
         final_allTags = final_allTags.filter(e => !current_assignment_tags.includes(e));
+        if (!isTouchDevice || !final_allTags.length) {
+            // showing the entire keyboard when you want to add tags can get annoying on mobile
+            $this.find(".tag-add-input").focus();
+        }
 
 
 
