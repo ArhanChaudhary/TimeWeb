@@ -314,7 +314,7 @@ class Crud {
         } else {
             $(".magic-wand-icon").css("margin-bottom", "");
             $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
-            $("form input:visible").first().focus();
+            setTimeout(() => $("form input:visible").first().focus(), 0);
             $(".field-wrapper.disabled-field").each(function() {
                 $(this).find(".magic-wand-icon").click();
             });

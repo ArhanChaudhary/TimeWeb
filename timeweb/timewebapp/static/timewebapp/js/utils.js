@@ -686,8 +686,6 @@ switch (e_key) {
             case "n":
                 if (form_is_showing) return;
                 $("#image-new-container").click();
-                // Fix typing on the assignment form itself
-                e.preventDefault();
                 break;
             case "t":
                 $("#assignments-container").scrollTop(0);
@@ -716,8 +714,6 @@ switch (e_key) {
                         case "e":
                             if (form_is_showing) return;
                             assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                            // Fix typing on the assignment form itself
-                            e.preventDefault();
                             break;
                         case "d": {
                             const click_delete_button = $.Event("click");
