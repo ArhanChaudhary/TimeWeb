@@ -183,8 +183,10 @@ class Assignment {
         due_date.setDate(due_date.getDate() + this.sa.x);
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {x: due_date.getTime()/1000, id: this.sa.id});
 
-        this.sa.alert_due_date_incremented = true;
-        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+        if (SETTINGS.should_alert_due_date_incremented) {
+            this.sa.alert_due_date_incremented = true;
+            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+        }
 
         this.sa.skew_ratio = 1;
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});

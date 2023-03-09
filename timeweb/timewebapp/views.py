@@ -59,7 +59,7 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'close_graph_after_work_input', 'show_priority', 'highest_priority_color', 'lowest_priority_color',
     'assignment_sorting', 'default_dropdown_tags', 'display_working_days_left',
     'horizontal_tag_position', 'vertical_tag_position', 'animation_speed',  'enable_tutorial',
-    'sorting_animation_threshold', 'seen_latest_changelog', 
+    'sorting_animation_threshold', 'seen_latest_changelog', 'should_alert_due_date_incremented',
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",

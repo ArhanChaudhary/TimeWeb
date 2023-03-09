@@ -121,7 +121,8 @@ class SettingsForm(forms.ModelForm):
                         <span>The quick brown fox jumps over the lazy dog</span>
                     </div>
                 </div>
-            ''')
+            '''),
+            "should_alert_due_date_incremented": "Display an alert every time when soft due dates are incremented. Soft due dates increment when an assignment's due date passes but is still unfinished.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):

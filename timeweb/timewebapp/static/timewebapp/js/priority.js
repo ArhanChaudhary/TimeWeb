@@ -644,7 +644,7 @@ class Priority {
     }
     alertDueDates() {
         const that = this;
-        if (that.due_date_incremented_notices.length === 0 || Priority.due_date_incremented_notice_on_screen) return;
+        if (that.due_date_incremented_notices.length === 0 || Priority.due_date_incremented_notice_on_screen || !SETTINGS.should_alert_due_date_incremented) return;
         let due_date_incremented_notice_title;
         let due_date_incremented_notice_content;
         if (that.due_date_incremented_notices.length === 1) {
@@ -659,6 +659,13 @@ class Priority {
             content: due_date_incremented_notice_content,
             backgroundDismiss: false,
             buttons: {
+                "Don't show again": {
+                    action: function() {
+                        SETTINGS.should_alert_due_date_incremented = false;
+                        ajaxUtils.changeSetting({setting: "should_alert_due_date_incremented", value: SETTINGS.should_alert_due_date_incremented});
+                        this.buttons.ok.action();
+                    }
+                },
                 ok: {
                     action: function() {
                         Priority.due_date_incremented_notice_on_screen = false;

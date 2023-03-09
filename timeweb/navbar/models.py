@@ -192,6 +192,10 @@ class SettingsModel(models.Model):
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
         verbose_name=_('Sorting Animation Threshold'),
     )
+    should_alert_due_date_incremented = models.BooleanField(
+        default=True,
+        verbose_name=_('Alert Soft Due Date Incremented'),
+    )
     gc_assignments_always_midnight = models.BooleanField(
         default=False,
         verbose_name=_('Google Classroom 11:59 PM Due Time Fix'),
