@@ -644,33 +644,32 @@ class Priority {
     }
     alertDueDates() {
         const that = this;
+        if (that.due_date_incremented_notices.length === 0 || Priority.due_date_incremented_notice_on_screen) return;
         let due_date_incremented_notice_title;
         let due_date_incremented_notice_content;
         if (that.due_date_incremented_notices.length === 1) {
             due_date_incremented_notice_title = `Notice: "${that.due_date_incremented_notices[0].name}" has had its due date incremented because it has soft due dates enabled.`;
         } else if (that.due_date_incremented_notices.length > 1) {
-            due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they have soft due dates enabled.`;
+            due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they each have soft due dates enabled.`;
         }
-        due_date_incremented_notice_content = "This only occurs when an assignment's due date passes and it is still unfinished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
-        if (due_date_incremented_notice_title && !Priority.due_date_incremented_notice_on_screen) {
-            Priority.due_date_incremented_notice_on_screen = true;
-            $.alert({
-                title: due_date_incremented_notice_title,
-                content: due_date_incremented_notice_content,
-                backgroundDismiss: false,
-                buttons: {
-                    ok: {
-                        action: function() {
-                            Priority.due_date_incremented_notice_on_screen = false;
-                            for (let sa of that.due_date_incremented_notices) {
-                                sa.alert_due_date_incremented = false;
-                                ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: sa.alert_due_date_incremented, id: sa.id});
-                            }
+        due_date_incremented_notice_content = "Soft due dates increment when an assignment's due date passes but is still unfinished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
+        Priority.due_date_incremented_notice_on_screen = true;
+        $.alert({
+            title: due_date_incremented_notice_title,
+            content: due_date_incremented_notice_content,
+            backgroundDismiss: false,
+            buttons: {
+                ok: {
+                    action: function() {
+                        Priority.due_date_incremented_notice_on_screen = false;
+                        for (let sa of that.due_date_incremented_notices) {
+                            sa.alert_due_date_incremented = false;
+                            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: sa.alert_due_date_incremented, id: sa.id});
                         }
                     }
-                },
-            });
-        }
+                }
+            },
+        });
     }
     assignmentSortingComparator(a, b, initial_monotonic_sort) {
         const that = this;
