@@ -354,14 +354,13 @@ main.background-image-exists {
     margin-bottom: 0;
 }
 .left-side-of-header .title .title-link-anchor {
+    display: inline-block;
     color: var(--color);
+    line-height: 0;
 }
 .left-side-of-header .title .title-link-icon {
-    margin-bottom: -2.5px;
-    border-bottom: 1.5px solid var(--color);
-    padding-bottom: 3px;
-    transition: inherit;
-    transition-property: border-bottom-color;
+    margin-bottom: 1px;
+    margin-left: 3px;
 }
 /* Add to truncate warning if the below style is changed */
 .assignment.open-assignment .description, .assignment.needs-more-info .description {
