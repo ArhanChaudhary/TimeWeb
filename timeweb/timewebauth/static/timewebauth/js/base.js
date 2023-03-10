@@ -82,7 +82,7 @@ $(window).one("load", function() {
         });
     }
     const stretch = 5;
-    const bezier_diff = 2;
+    const bezier_diff = 3;
     const fps = 60;
 
     const iter_percent = 1 - Math.exp(-1 / stretch);
