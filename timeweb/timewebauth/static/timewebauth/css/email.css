@@ -13,14 +13,14 @@
 }
 .email-container.primary label {
     position: relative;
-    border: 1px solid rgb(157, 157, 0);
+    border: 1px solid hsl(60deg 40% 47%);
     border-radius: 4px;
     padding: 10px 5px !important;
 }
 .email-container.primary label::before {
     content: "Primary e-mail address";
     position: absolute;
-    background-color: white;
+    background-color: var(--accounts-background);
     top: 0;
     left: 15px;
     transform: translateY(-50%);
