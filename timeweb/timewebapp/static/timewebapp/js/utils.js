@@ -8,12 +8,18 @@ stringifyDate: function(date) {
         ('000' + date.getFullYear()).slice(-4),
     ].join('/');
 },
-formatMinutes: function(total_minutes) {
+formatMinutes: function(total_minutes, verbose=false) {
     const hour = Math.floor(total_minutes / 60),
         minute = Math.ceil(total_minutes % 60);
-    if (!hour) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
-    if (!minute) return hour + "h";
-    return hour + "h " + minute + "m";
+    if (verbose) {
+        if (!hour) return (total_minutes && total_minutes < 1) ? "less than a minute" : minute + " minute" + (minute > 1 ? "s" : "");
+        if (!minute) return hour + " hour" + (hour > 1 ? "s" : "");
+        return hour + " hour" + (hour > 1 ? "s" : "") + " and " + minute + " minute" + (minute > 1 ? "s" : "");
+    } else {
+        if (!hour) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
+        if (!minute) return hour + "h";
+        return hour + "h " + minute + "m";
+    }
 },
 formatSeconds: function(total_seconds) {
     // https://stackoverflow.com/questions/30679279/how-to-convert-seconds-into-year-month-days-hours-minutes-respectively

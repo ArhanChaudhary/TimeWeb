@@ -172,15 +172,8 @@ class Priority {
         if (todo + last_work_input === sa.sa.y) {
             return "Finish this assignment" + (reference_relative_date ? " today" : "");
         } else if (sa.unit_is_of_time) {
-            let todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
-            let unit_str;
-            if (Crud.shouldConvertToHours(todo_minutes)) {
-                todo_minutes = Crud.minutesToHours(todo_minutes);
-                unit_str = pluralize("hour", todo_minutes);
-            } else {
-                unit_str = pluralize("minute", todo_minutes);
-            }
-            return `Complete ${mathUtils.precisionRound(todo_minutes, 10)} ${unit_str} of work`;
+            const todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+            return `Complete ${utils.formatting.formatMinutes(todo_minutes, true)} of work`;
         } else {
             return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit, todo).toLowerCase()}`;
         }
