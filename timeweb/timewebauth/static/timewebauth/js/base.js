@@ -33,9 +33,9 @@ $(window).one("load", function() {
     vws = shuffle(vws);
 
     let front_color = {
-        r: 93,
-        g: 198,
-        b: 201
+        r: 55,
+        g: 161,
+        b: 164
     };
     // let back_color = {r: 49, g: 75, b: 110}; (actual bottom color of the logo)
     let back_color = {
@@ -129,17 +129,6 @@ $(window).one("load", function() {
             }
         });
     });
-
-    // requestAnimationFrame(mousePositionStep);
-    // function mousePositionStep() {
-    //     requestAnimationFrame(mousePositionStep);
-    //     const now = performance.now();
-    //     const elapsed = now - then;
-    //     if (elapsed <= fpsInterval) return;
-    //     then = now - (elapsed % fpsInterval);
-
-        
-    // }
 });
 function diffSmoothingFunction(x) {
     return 1.1 / (1 + 19 * Math.exp(26.4 * (x - 0.2)));
