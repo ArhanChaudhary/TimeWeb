@@ -109,8 +109,7 @@ body {
     position: absolute;
     /* --random-x: 0px !important; */
     --animation-duration: calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay));
-    -webkit-animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
-            animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
+    animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
 }
 #circles-background .bubble-up .bubble-right {
     /* background-image: url("../images/a.jpeg") !important;
@@ -118,8 +117,8 @@ body {
     width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
-    -webkit-animation: bubbleRight var(--animation-duration) cubic-bezier(0.5, 0.0625, 0.5, 0.9375) -5000s infinite normal;
-            animation: bubbleRight var(--animation-duration) cubic-bezier(0.5, 0.0625, 0.5, 0.9375) -5000s infinite normal;
+    --original-animation-timing-function: cubic-bezier(0.5, 0.0625, 0.5, 0.9375);
+    animation: bubbleRight var(--animation-duration) var(--original-animation-timing-function) -5000s infinite normal;
 }
 @-webkit-keyframes bubbleUp {
     from {

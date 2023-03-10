@@ -81,4 +81,72 @@ $(window).one("load", function() {
             }, judgement_time);
         });
     }
+    const stretch = 5;
+    const bezier_diff = 2;
+    const fps = 60;
+
+    const iter_percent = 1 - Math.exp(-1 / stretch);
+    const original_bezier = parseBezier($("#circles-background .bubble-right").css("--original-animation-timing-function").trim());
+    const right_bezier = [...original_bezier];
+    right_bezier[1] -= bezier_diff;
+    right_bezier[3] += bezier_diff;
+    // const left_bezier = [...original_bezier];
+    // left_bezier[1] += bezier_diff;
+    // left_bezier[3] -= bezier_diff;
+    const current_beziers = new Array(number_of_circles).fill(original_bezier);
+
+    let fpsInterval = 1000 / fps;
+    let then = performance.now();
+    $("#circles-background").on("mousemove", function(e) {
+        const now = performance.now();
+        const elapsed = now - then;
+        if (elapsed <= fpsInterval) return;
+        then = now - (elapsed % fpsInterval);
+
+        const mouse_x = e.pageX;
+        const direction = "right";
+        $("#circles-background .bubble-right").each(function(i) {
+            const rect = this.getBoundingClientRect();
+            const circle_width = rect.width;
+            const circle_x = rect.x
+            const circle_avg_x = circle_x + circle_width / 2;
+
+            const current_bezier = current_beziers[i];
+
+            let abs_diff = Math.abs(circle_avg_x - mouse_x);
+            let diff_percent = diffSmoothingFunction(abs_diff / window.innerWidth);
+            
+            let new_bezier;
+            if (direction === "right")
+                new_bezier = right_bezier;
+            else if (direction === "left")
+                new_bezier = left_bezier;
+            new_bezier = new_bezier.map((x, i) => current_bezier[i] + iter_percent * (original_bezier[i] + diff_percent * (x - original_bezier[i]) - current_bezier[i]));
+            // check if new bezier is different from old bezier
+            if (new_bezier.some((x, i) => Math.abs(x - current_bezier[i]) > 0.001)) {
+                current_beziers[i] = new_bezier;
+                $(this).css("animation-timing-function", constructBezier(new_bezier));
+            }
+        });
+    });
+
+    // requestAnimationFrame(mousePositionStep);
+    // function mousePositionStep() {
+    //     requestAnimationFrame(mousePositionStep);
+    //     const now = performance.now();
+    //     const elapsed = now - then;
+    //     if (elapsed <= fpsInterval) return;
+    //     then = now - (elapsed % fpsInterval);
+
+        
+    // }
 });
+function diffSmoothingFunction(x) {
+    return 1.1 / (1 + 19 * Math.exp(26.4 * (x - 0.2)));
+}
+function parseBezier(bezier) {
+    return bezier.slice(13, bezier.length - 1).split(",").map(Number);
+}
+function constructBezier(bezier) {
+    return `cubic-bezier(${bezier[0]}, ${bezier[1]}, ${bezier[2]}, ${bezier[3]})`;
+}
