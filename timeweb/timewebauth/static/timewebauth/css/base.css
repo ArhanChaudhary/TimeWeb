@@ -9,7 +9,8 @@ body {
     --primary-blue: hsl(217deg 72% 58%);
 }
 a, :visited {
-    color: var(--primary-blue);
+    /* override .dark a and other base.css stylings */
+    color: var(--primary-blue) !important;
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
@@ -258,7 +259,7 @@ hr {
     left: 50%;
     padding: 0 5px;
     transform: translate(-50%, -34px);
-    background-color: inherit;
+    background-color: var(--accounts-background);
 }
 
 
@@ -281,6 +282,7 @@ hr {
 }
 .submit-button:focus, .submit-button:hover {
     background: hsl(204deg 58% 40%);
+    color: white;
 }
 .submit-button:focus {
     /* Override #accounts-container :focus */
