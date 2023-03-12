@@ -83,59 +83,43 @@ $(window).one("load", function() {
     }
     const stretch = 5;
     const bezier_diff = 3;
-    const fps = 60;
 
+    const bubble_rights = Array.from(document.querySelectorAll("#circles-background .bubble-right"));
     const iter_percent = 1 - Math.exp(-1 / stretch);
-    const original_bezier = parseBezier($("#circles-background .bubble-right").css("--original-animation-timing-function").trim());
-    const right_bezier = [...original_bezier];
-    right_bezier[1] -= bezier_diff;
-    right_bezier[3] += bezier_diff;
-    // const left_bezier = [...original_bezier];
-    // left_bezier[1] += bezier_diff;
-    // left_bezier[3] -= bezier_diff;
+    const original_bezier = parseBezier($("#circles-background .bubble-right").css("--original-animation-timing-function"));
+    const right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
+    // const left_bezier = [original_bezier[0] + bezier_diff, original_bezier[1] - bezier_diff];
     const current_beziers = new Array(number_of_circles).fill(original_bezier);
 
-    let fpsInterval = 1000 / fps;
-    let then = performance.now();
-    $("#circles-background").on("mousemove", function(e) {
-        const now = performance.now();
-        const elapsed = now - then;
-        if (elapsed <= fpsInterval) return;
-        then = now - (elapsed % fpsInterval);
-
-        const mouse_x = e.pageX;
-        const direction = "right";
-        $("#circles-background .bubble-right").each(function(i) {
-            const rect = this.getBoundingClientRect();
-            const circle_width = rect.width;
-            const circle_x = rect.x
-            const circle_avg_x = circle_x + circle_width / 2;
-
+    const step = function(mouse_x) {
+        const rects = bubble_rights.map(i => i.getBoundingClientRect());
+        for (let i = 0; i < number_of_circles; i++) {
+            const rect = rects[i];
             const current_bezier = current_beziers[i];
 
-            let abs_diff = Math.abs(circle_avg_x - mouse_x);
-            let diff_percent = diffSmoothingFunction(abs_diff / window.innerWidth);
+            const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 5.28));
             
-            let new_bezier;
-            if (direction === "right")
-                new_bezier = right_bezier;
-            else if (direction === "left")
-                new_bezier = left_bezier;
-            new_bezier = new_bezier.map((x, i) => current_bezier[i] + iter_percent * (original_bezier[i] + diff_percent * (x - original_bezier[i]) - current_bezier[i]));
+            const first_diff = iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]);
+            const second_diff = iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1]);
             // check if new bezier is different from old bezier
-            if (new_bezier.some((x, i) => Math.abs(x - current_bezier[i]) > 0.001)) {
-                current_beziers[i] = new_bezier;
-                $(this).css("animation-timing-function", constructBezier(new_bezier));
+            if (Math.abs(first_diff) > 0.001 || Math.abs(second_diff) > 0.001) {
+                current_beziers[i] = [first_diff + current_bezier[0], second_diff + current_bezier[1]];
+                bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + current_bezier[0] + ",0.5," + current_bezier[1] + ")";
             }
-        });
+        }
+    }
+
+    let mouse_x;
+    $("#circles-background").on("mousemove", function(e) {
+        if (mouse_x === undefined)
+            requestAnimationFrame(function() {
+                step(mouse_x);
+                requestAnimationFrame(arguments.callee);
+            });
+        mouse_x = e.pageX;
     });
 });
-function diffSmoothingFunction(x) {
-    return 1.1 / (1 + 19 * Math.exp(26.4 * (x - 0.2)));
-}
 function parseBezier(bezier) {
-    return bezier.slice(13, bezier.length - 1).split(",").map(Number);
-}
-function constructBezier(bezier) {
-    return `cubic-bezier(${bezier[0]}, ${bezier[1]}, ${bezier[2]}, ${bezier[3]})`;
+    const raw = bezier.split("(")[1].split(")")[0].split(", ").map(parseFloat);
+    return [raw[1], raw[3]];
 }
