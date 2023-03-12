@@ -82,7 +82,7 @@ $(window).one("load", function() {
         });
     }
     const stretch = 5;
-    const bezier_diff = 3;
+    const bezier_diff = 4;
 
     const bubble_rights = Array.from(document.querySelectorAll("#circles-background .bubble-right"));
     const iter_percent = 1 - Math.exp(-1 / stretch);
