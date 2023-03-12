@@ -82,12 +82,19 @@ $(window).one("load", function() {
         });
     }
     const stretch = 5;
-    const bezier_diff = 4;
-
+    const min_bezier_diff = 4;
+    const max_bezier_diff = 7;
+    
     const bubble_rights = Array.from(document.querySelectorAll("#circles-background .bubble-right"));
-    const iter_percent = 1 - Math.exp(-1 / stretch);
     const original_bezier = parseBezier($("#circles-background .bubble-right").css("--original-animation-timing-function"));
-    const right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
+    let bezier_diff = min_bezier_diff;
+    let right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
+    $(window).on("resize", function() {
+        const slope = (max_bezier_diff - min_bezier_diff)/(515 - 1440);
+        bezier_diff = slope * window.innerWidth + (min_bezier_diff - slope * 1440);
+        right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
+    });
+    const iter_percent = 1 - Math.exp(-1 / stretch);
     // const left_bezier = [original_bezier[0] + bezier_diff, original_bezier[1] - bezier_diff];
     const current_beziers = new Array(number_of_circles).fill(original_bezier);
 
