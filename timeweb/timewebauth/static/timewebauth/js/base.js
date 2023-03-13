@@ -104,7 +104,7 @@ $(window).one("load", function() {
         for (let i = 0; i < number_of_circles; i++) {
             const rect = rects[i];
             const current_bezier = current_beziers[i];
-
+            // https://www.desmos.com/calculator/y3wmknvtgk
             const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 5.28));
             
             const first_diff = iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]);
