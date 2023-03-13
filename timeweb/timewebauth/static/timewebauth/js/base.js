@@ -81,6 +81,7 @@ $(window).one("load", function() {
             }, judgement_time);
         });
     }
+    if (isTouchDevice) return;
     const stretch = 5;
     const min_bezier_diff = 4;
     const max_bezier_diff = 7;
