@@ -101,11 +101,20 @@ $(window).one("load", function() {
     const current_beziers = new Array(number_of_circles).fill(original_bezier);
 
     const step = function(mouse_x) {
+        // const c1 = window.innerWidth * 0.05 + 40;
+        // const c2 = (window.innerWidth * 0.042 + 25) / number_of_circles;
+        // const centers = bubble_rights.map((bubble_right, i) => {
+        //     const matrix = window.getComputedStyle(bubble_right).transform;
+        //     const translateX = +matrix.slice(19, matrix.length - 4);
+        //     const width = c1 - i * c2;
+        //     return translateX + width / 2;
+        // });
         const rects = bubble_rights.map(i => i.getBoundingClientRect());
         for (let i = 0; i < number_of_circles; i++) {
             const rect = rects[i];
             const current_bezier = current_beziers[i];
             // https://www.desmos.com/calculator/y3wmknvtgk
+            // const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(center - mouse_x) / window.innerWidth - 5.28));
             const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 5.28));
             
             const first_diff = Math.round(iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]) * 100) * 0.01;
