@@ -141,7 +141,7 @@ input:-webkit-autofill:active {
     width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
-    --original-animation-timing-function: cubic-bezier(0.5, 0.0625, 0.5, 0.9375);
+    --original-animation-timing-function: cubic-bezier(0.5, 0.06, 0.5, 0.94);
     animation: bubbleRight var(--animation-duration) var(--original-animation-timing-function) -5000s infinite normal;
 }
 @-webkit-keyframes bubbleUp {

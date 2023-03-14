@@ -93,6 +93,7 @@ $(window).one("load", function() {
     $(window).on("resize", function() {
         const slope = (max_bezier_diff - min_bezier_diff)/(515 - 1440);
         bezier_diff = slope * window.innerWidth + (min_bezier_diff - slope * 1440);
+        bezier_diff = Math.round(bezier_diff * 100) * 0.01;
         right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
     });
     const iter_percent = 1 - Math.exp(-1 / stretch);
@@ -107,10 +108,10 @@ $(window).one("load", function() {
             // https://www.desmos.com/calculator/y3wmknvtgk
             const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 5.28));
             
-            const first_diff = iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]);
-            const second_diff = iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1]);
+            const first_diff = Math.round(iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]) * 100) * 0.01;
+            const second_diff = Math.round(iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1]) * 100) * 0.01;
             // check if new bezier is different from old bezier
-            if (Math.abs(first_diff) > 0.001 || Math.abs(second_diff) > 0.001) {
+            if (first_diff !== 0 || second_diff !== 0) {
                 current_beziers[i] = [first_diff + current_bezier[0], second_diff + current_bezier[1]];
                 bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + current_bezier[0] + ",0.5," + current_bezier[1] + ")";
             }
@@ -128,6 +129,6 @@ $(window).one("load", function() {
     });
 });
 function parseBezier(bezier) {
-    const raw = bezier.split("(")[1].split(")")[0].split(", ").map(parseFloat);
+    const raw = bezier.split("(")[1].split(")")[0].split(", ").map(i => Math.round(parseFloat(i) * 100) * 0.01);
     return [raw[1], raw[3]];
 }
