@@ -33,8 +33,11 @@ input:-webkit-autofill:active {
     padding: 15px 40px 25px;
 }
 #accounts-container :focus {
-    outline: 2px solid hsl(218deg 100% 50%);
+    outline: 2px solid hsl(218deg 70% 50%);
     border-radius: 2px;
+}
+#accounts-container a:focus {
+    outline-color: hsl(218deg 100% 50%);
 }
 #accounts-container > a:first-of-type img {
     display: block;
