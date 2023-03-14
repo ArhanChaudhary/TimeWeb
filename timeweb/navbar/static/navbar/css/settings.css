@@ -232,7 +232,7 @@ body {
     outline: 0;
     box-shadow: 0 0 0 1px hsl(0, 0%, 58%);
 }
-@media screen and (max-width: 850px) {
+@media screen and (max-width: 900px) {
     .field-container {
         align-items: unset;
         flex-flow: column;
