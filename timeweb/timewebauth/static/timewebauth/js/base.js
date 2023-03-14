@@ -101,6 +101,7 @@ $(window).one("load", function() {
     const current_beziers = new Array(number_of_circles).fill(original_bezier);
 
     const step = function(mouse_x) {
+        // Failed optimization attempt #1:
         // const c1 = window.innerWidth * 0.05 + 40;
         // const c2 = (window.innerWidth * 0.042 + 25) / number_of_circles;
         // const centers = bubble_rights.map((bubble_right, i) => {
@@ -109,8 +110,12 @@ $(window).one("load", function() {
         //     const width = c1 - i * c2;
         //     return translateX + width / 2;
         // });
+
+        // Failed optimization attempt #2:
+        // const observer = new IntersectionObserver(entries => {
         const rects = bubble_rights.map(i => i.getBoundingClientRect());
         for (let i = 0; i < number_of_circles; i++) {
+            // const rect = entries[i].boundingClientRect;
             const rect = rects[i];
             const current_bezier = current_beziers[i];
             // https://www.desmos.com/calculator/y3wmknvtgk
@@ -125,6 +130,11 @@ $(window).one("load", function() {
                 bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + current_bezier[0] + ",0.5," + current_bezier[1] + ")";
             }
         }
+        // observer.disconnect();
+        // });
+        // for (const element of bubble_rights) {
+        //     observer.observe(element);
+        // }
     }
 
     let mouse_x;
