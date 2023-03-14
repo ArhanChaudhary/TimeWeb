@@ -949,7 +949,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     width: var(--width);
     position: relative;
     transition-property: border-radius, padding-right, margin-left;
-    transition-duration: 0.3s;
+    transition-duration: calc(.3s * var(--animation-speed));
     transition-timing-function: ease-in-out;
 }
 .work-input-textbox-wrapper {
@@ -972,7 +972,7 @@ do this because midde-of-header is hidden in the delete assignments view */
     padding: 5px 10px 5px 5px;
     border-radius: 0px 20px 20px 0px;
     --background-color: hsl(0, 0%, 80%);
-    transition: 0.3s ease-in-out;
+    transition: calc(.3s * var(--animation-speed)) ease-in-out;
     transition-property: margin-left, opacity, visibility;
 }
 .work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-widget {

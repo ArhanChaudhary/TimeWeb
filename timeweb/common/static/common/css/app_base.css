@@ -362,7 +362,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     border: 2px solid var(--color);
     overflow: visible;
     padding: 5px 5px !important;
-    transition: padding .1s ease-in-out, opacity .15s linear;
+    transition: padding calc(0.1s * var(--animation-speed)) ease-in-out, opacity calc(0.15s * var(--animation-speed)) linear;
     opacity: 1;
 }
 .info-button-text {
