@@ -230,9 +230,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
 #user-greeting #username {
     text-decoration: none;
     display: inline-block;
-    padding: 2px 6px;
-    padding-bottom: 4px;
-    margin-top: 2px;
+    padding: 4px 6px;
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -240,7 +238,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     position: relative;
     cursor: pointer;
 }
-#user-greeting #username::after {
+#user-greeting #username::before {
     content: '';
     position: absolute;
     top: 0;
@@ -252,15 +250,28 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
 }
+#user-greeting #username::after {
+    content: '';
+    display: inline-block;
+    margin-left: 8px;
+    margin-right: -4px;
+    border: 6px solid transparent;
+    border-left-color: rgb(22, 177, 185);
+}
+#user-greeting #username:focus-within::after {
+    border: 6px solid transparent;
+    border-top-color: rgb(22, 177, 185);
+    transform: translate(-3px, 3px);
+}
 #user-greeting #username:focus,
 #user-greeting #username :focus {
     outline: 0;
 }
-#user-greeting #username:focus::after {
+#user-greeting #username:focus::before {
     filter: brightness(1.25);
     transform: scale(1.04);
 }
-#user-greeting #username:hover::after {
+#user-greeting #username:hover::before {
     transform: scale(1.04);
 }
 
