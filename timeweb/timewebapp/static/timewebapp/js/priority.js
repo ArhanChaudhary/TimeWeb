@@ -1225,7 +1225,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
     function positionTags() {
         $(".assignment").each(function() {
-            new VisualAssignment($(this)).positionTags();
+            const sa = new VisualAssignment($(this));
+            sa.positionTags();
+            sa.makeGCAnchorVisible();
         });
         if ("scroll" in sessionStorage) {
             $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));

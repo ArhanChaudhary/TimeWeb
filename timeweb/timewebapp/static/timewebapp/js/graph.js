@@ -1649,6 +1649,18 @@ class VisualAssignment extends Assignment {
             }
         }
     }
+    makeGCAnchorVisible() {
+        if (!this.sa.is_google_classroom_assignment) return;
+        const title = this.dom_assignment.find(".title");
+        const anchor = this.dom_assignment.find(".title-link-anchor");
+        const title_text = this.dom_assignment.find(".title-text");
+        let sliced = this.sa.name;
+        title_text.text(sliced);
+        while (anchor.position().top + anchor.height() > title.height()) {
+            sliced = sliced.slice(0, -1);
+            title_text.text(sliced);
+        }
+    }
     displayTruncateWarning() {
         // remove for now
         return;

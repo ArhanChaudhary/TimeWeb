@@ -814,6 +814,7 @@ setAssignmentScaleUtils: function() {
             const sa = new VisualAssignment($this);
             sa.positionTags();
             sa.displayTruncateWarning();
+            sa.makeGCAnchorVisible();
         });
     });
     // #animate-in is initially display: hidden in priority.js, delay adding the scale
