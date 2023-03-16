@@ -432,7 +432,8 @@ class VisualAssignment extends Assignment {
             this.draw(raw_x, raw_y);
         }
     }
-    arrowSkewRatio() {
+    arrowSkewRatio(pressed_arrow_key) {
+        pressed_arrow_key = pressed_arrow_key.toLowerCase();
         /**
          * Line: y = ax + b
          * y1 = y - this.red_line_start_y
@@ -481,17 +482,17 @@ class VisualAssignment extends Assignment {
         const original_skew_ratio = this.sa.skew_ratio;
         let x_step = x1 / VisualAssignment.TOTAL_ARROW_SKEW_RATIO_STEPS;
         if (intersection_x !== x1 / 2 &&
-            (this.pressed_arrow_key === "ArrowDown" && x1 / 2 - x_step / 2 < intersection_x && intersection_x < x1 / 2 
-            || this.pressed_arrow_key === "ArrowUp" && x1 / 2 < intersection_x && intersection_x < x1 / 2 + x_step / 2)) {
+            (pressed_arrow_key === "arrowdown" && x1 / 2 - x_step / 2 < intersection_x && intersection_x < x1 / 2 
+            || pressed_arrow_key === "arrowup" && x1 / 2 < intersection_x && intersection_x < x1 / 2 + x_step / 2)) {
             // if the curvature is something like 0.001 and the user presses arrow down or
             // the curvature is something like -0.001 and the user presses arrow up
             // go to 0
             this.sa.skew_ratio = 1;
         } else {
             intersection_x = x_step * Math.round(intersection_x / x_step);
-            if (this.pressed_arrow_key === "ArrowUp")
+            if (pressed_arrow_key === "arrowup")
                 var next_intersection_x = intersection_x - x_step;
-            else if (this.pressed_arrow_key === "ArrowDown")
+            else if (pressed_arrow_key === "arrowdown")
                 var next_intersection_x = intersection_x + x_step;
             
             // plug in next_intersection_x as x into y = y1 - x(y1/x1)
@@ -504,9 +505,9 @@ class VisualAssignment extends Assignment {
         const skew_ratio_bound = this.calcSkewRatioBound();
         // use original_skew_ratio to allow one more arrow before bound so the parabols completely flattens
         // add && or else holding down will cause themselves to trigger each other in an infinite loop
-        if ((original_skew_ratio >= skew_ratio_bound || next_intersection_x === 0) && this.pressed_arrow_key === "ArrowUp") {
+        if ((original_skew_ratio >= skew_ratio_bound || next_intersection_x === 0) && pressed_arrow_key === "arrowup") {
             this.sa.skew_ratio = 2 - skew_ratio_bound;
-        } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && this.pressed_arrow_key === "ArrowDown") {
+        } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && pressed_arrow_key === "arrowdown") {
             this.sa.skew_ratio = skew_ratio_bound;
         }
         if (!this.sa.fixed_mode)
@@ -1151,8 +1152,7 @@ class VisualAssignment extends Assignment {
         {
         $(document).keydown(e => {
             if (e.key !== "ArrowUp" && e.key !== "ArrowDown" || !this.assignmentGraphIsOnScreen()) return;
-            this.pressed_arrow_key = e.key;
-            this.arrowSkewRatio();
+            this.arrowSkewRatio(e.key);
         });
         }
         // END Up and down arrow event handler
