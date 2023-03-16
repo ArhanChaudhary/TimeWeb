@@ -277,8 +277,6 @@ class VisualAssignment extends Assignment {
     static MINIMUM_CIRCLE_Y = -1000
     static SKEW_RATIO_ROUND_PRECISION = 3
     static SKEW_RATIO_SNAP_DIFF = 0.05
-    static ARROW_KEYDOWN_THRESHOLD = 500
-    static ARROW_KEYDOWN_INTERVAL = 13
     static BUTTON_ERROR_DISPLAY_TIME = 1000
     static TOTAL_ARROW_SKEW_RATIO_STEPS = 100
 
@@ -1151,30 +1149,10 @@ class VisualAssignment extends Assignment {
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
         // BEGIN Up and down arrow event handler
         {
-        let graphtimeout,
-            arrow_key_fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
-            graphinterval;
-
-        // looking back i probably could have used e.originalEvent.repeat but uhhh it works ig
         $(document).keydown(e => {
-            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && this.assignmentGraphIsOnScreen() && !arrow_key_fired) {
-                // "arrow_key_fired" makes .keydown fire only when a key is pressed, not repeatedly
-                arrow_key_fired = true;
-                this.pressed_arrow_key = e.key;
-                this.arrowSkewRatio();
-                graphtimeout = setTimeout(function() {
-                    clearInterval(graphinterval);
-                    graphinterval = setInterval(this.arrowSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
-                }.bind(this), VisualAssignment.ARROW_KEYDOWN_THRESHOLD);
-            }
-        }).keyup(e => {
-            // Ensures the same key pressed fires the keyup to stop change skew ratio
-            // Without this, you could press another key while the down arrow is being pressed for example and stop graphinterval
-            if (e.key === this.pressed_arrow_key) {
-                arrow_key_fired = false;
-                clearTimeout(graphtimeout);
-                clearInterval(graphinterval);
-            }
+            if (e.key !== "ArrowUp" && e.key !== "ArrowDown" || !this.assignmentGraphIsOnScreen()) return;
+            this.pressed_arrow_key = e.key;
+            this.arrowSkewRatio();
         });
         }
         // END Up and down arrow event handler

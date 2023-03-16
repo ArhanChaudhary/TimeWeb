@@ -774,10 +774,10 @@ switch (e_key) {
     case "arrowdown":
     case "arrowup":
         if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
-        const open_assignmens_on_screen = $(".open-assignment").filter(function() {
+        const open_assignments_on_screen = $(".open-assignment").filter(function() {
             return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
         });
-        if (open_assignmens_on_screen.length !== 0) {
+        if (open_assignments_on_screen.length !== 0) {
             // Prevent arrow scroll
             e.preventDefault();
         } else {
