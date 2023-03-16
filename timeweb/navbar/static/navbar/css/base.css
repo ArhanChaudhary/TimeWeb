@@ -123,7 +123,9 @@ details.table-of-contents-item > ul {
     max-width: 90ch;
     position: relative;
 }
-
+#doc-container * {
+    font-weight: 500;
+}
 #doc-container::-webkit-scrollbar {
     width: 14px;
 }
