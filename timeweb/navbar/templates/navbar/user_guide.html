@@ -539,7 +539,16 @@ the span groups the major and minor categories together for user_guide.js
             Why are some Google Classroom assignments incorrectly due at 11:59 PM?
 		</span>
         <p>
-            Google Classroom defaults assignments without a due time to 11:59 PM. This, however, isn't distinguishable from assignments with a manually assigned due time of 11:59 program.
+            Google Classroom assignments without a due time are not ideally defaulted to 12:00 AM but instead 11:59 PM, which could mislead you into thinking they are due later than they are. These assignments, however, are indistinguishable from those actually due at 11:59 PM, so TimeWeb must choose one of these two cases.
+        </p>
+        <p>
+            By default, TimeWeb keeps the due time at 11:59 PM and assumes the assignment is actually due at 11:59 PM because this case is usually more common. This is why Google Classroom assignments without a due time are also incorrectly kept at 11:59 PM.
+        </p>
+        <p>
+            You can reverse this behavior by toggling on "Google Classroom 11:59 PM Due Time Fix" in the settings. TimeWeb will now assume the latter case and change Google Classroom assignment due times from 11:59 PM to 12:00 AM. Similarly to the first case, this means that Google Classroom assignments that are actually due at 11:59 PM will also have their due times changed to 12:00 AM.
+        </p>
+        <p>
+            Note that this setting's functionality doesn't apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created.
         </p>
     </span>
 </span>
