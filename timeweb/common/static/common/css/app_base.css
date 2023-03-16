@@ -253,15 +253,10 @@ select, .daterangepicker .drp-buttons .cancelBtn {
 #user-greeting #username::after {
     content: '';
     display: inline-block;
-    margin-left: 8px;
-    margin-right: -4px;
-    border: 6px solid transparent;
-    border-left-color: rgb(22, 177, 185);
-}
-#user-greeting #username:focus-within::after {
+    margin-left: 5px;
     border: 6px solid transparent;
     border-top-color: rgb(22, 177, 185);
-    transform: translate(-3px, 3px);
+    transform: translateY(4px);
 }
 #user-greeting #username:focus,
 #user-greeting #username :focus {
