@@ -774,12 +774,17 @@ switch (e_key) {
     case "arrowdown":
     case "arrowup":
         if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
-        const open_assignments_on_screen = $(".open-assignment").filter(function() {
-            return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
-        });
+        const open_assignments_on_screen = $(".open-assignment").map(function() {
+            const sa = new VisualAssignment($(this));
+            return sa.assignmentGraphIsOnScreen() ? sa : null;
+        }).toArray();
         if (open_assignments_on_screen.length !== 0) {
             // Prevent arrow scroll
             e.preventDefault();
+            for (const sa of open_assignments_on_screen) {
+                sa.setParabolaValues();
+                sa.arrowSkewRatio(e.key);
+            }
         } else {
             // Allow arrow scroll
             // Relies on the fact that #assignments-container is the scrolling element

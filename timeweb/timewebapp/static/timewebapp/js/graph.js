@@ -1148,15 +1148,6 @@ class VisualAssignment extends Assignment {
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 display_in_text_button = this.dom_assignment.find(".display-in-text-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
-        // BEGIN Up and down arrow event handler
-        {
-        $(document).keydown(e => {
-            if (e.key !== "ArrowUp" && e.key !== "ArrowDown" || !this.assignmentGraphIsOnScreen()) return;
-            this.arrowSkewRatio(e.key);
-        });
-        }
-        // END Up and down arrow event handler
-
         // BEGIN Display in text button
         this.in_graph_display = true;
         const graph_container = this.dom_assignment.find(".graph-container");
