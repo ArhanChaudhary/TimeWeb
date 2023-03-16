@@ -99,15 +99,15 @@ details.table-of-contents-item > ul {
     padding-top: 6px;
     padding-bottom: 6px;
 }
-#table-of-contents-container li.table-of-contents-item {
+#table-of-contents-container .table-of-contents-item .table-of-contents-item {
     font-size: 16px;
+    font-weight: 500;
 }
 #table-of-contents-container a {
     color: black;
-    -webkit-text-decoration-color: hsla(0, 0%, 0%, 0.3);
-            text-decoration-color: hsla(0, 0%, 0%, 0.3);
+    text-decoration: none;
 }
-#category-important-labels ~ .table-of-contents-item > ul {
+.table-of-contents-item > ul {
     padding-inline-start: 25px;
 }
 #doc-container {
