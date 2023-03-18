@@ -118,9 +118,8 @@ $(window).one("load", function() {
             // const rect = entries[i].boundingClientRect;
             const rect = rects[i];
             const current_bezier = current_beziers[i];
-            // https://www.desmos.com/calculator/y3wmknvtgk
-            // const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(center - mouse_x) / window.innerWidth - 5.28));
-            const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 5.28));
+            // https://www.desmos.com/calculator/bc7khdfh8l
+            const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * (Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 0.2)));
             
             const first_diff = Math.round(iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]) * 100) * 0.01;
             const second_diff = Math.round(iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1]) * 100) * 0.01;
