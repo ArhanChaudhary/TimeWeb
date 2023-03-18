@@ -121,13 +121,14 @@ $(window).one("load", function() {
             // https://www.desmos.com/calculator/bc7khdfh8l
             const diff_percent = 1.1 / (1 + 19 * Math.exp(26.4 * (Math.abs(rect.x + rect.width / 2 - mouse_x) / window.innerWidth - 0.2)));
             
-            const first_diff = Math.round(iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]) * 100) * 0.01;
-            const second_diff = Math.round(iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1]) * 100) * 0.01;
-            // check if new bezier is different from old bezier
-            if (first_diff !== 0 || second_diff !== 0) {
-                current_beziers[i] = [first_diff + current_bezier[0], second_diff + current_bezier[1]];
-                bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + current_bezier[0] + ",0.5," + current_bezier[1] + ")";
+            const next_bezier = [
+                current_bezier[0] + iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]),
+                current_bezier[1] + iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1])
+            ]
+            if (Math.round(next_bezier[0] * 100) !== Math.round(current_bezier[0] * 100) || Math.round(next_bezier[1] * 100) !== Math.round(current_bezier[1] * 100)) {
+                bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + Math.round(next_bezier[0] * 100) * 0.01 + ",0.5," + Math.round(next_bezier[1] * 100) * 0.01 + ")";
             }
+            current_beziers[i] = next_bezier;
         }
         // observer.disconnect();
         // });
