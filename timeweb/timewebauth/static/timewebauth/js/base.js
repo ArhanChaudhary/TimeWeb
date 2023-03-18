@@ -145,6 +145,8 @@ $(window).one("load", function() {
                 requestAnimationFrame(arguments.callee);
             });
         mouse_x = e.pageX;
+    }).on("mouseleave", function() {
+        mouse_x = Infinity;
     });
 });
 function parseBezier(bezier) {
