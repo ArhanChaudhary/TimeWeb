@@ -100,7 +100,7 @@ $(window).one("load", function() {
     // const left_bezier = [original_bezier[0] + bezier_diff, original_bezier[1] - bezier_diff];
     const current_beziers = new Array(number_of_circles).fill(original_bezier);
 
-    const step = function(mouse_x) {
+    const step = function() {
         // Failed optimization attempt #1:
         // const c1 = window.innerWidth * 0.05 + 40;
         // const c2 = (window.innerWidth * 0.042 + 25) / number_of_circles;
@@ -113,6 +113,7 @@ $(window).one("load", function() {
 
         // Failed optimization attempt #2:
         // const observer = new IntersectionObserver(entries => {
+        let changed = false;
         const rects = bubble_rights.map(i => i.getBoundingClientRect());
         for (let i = 0; i < number_of_circles; i++) {
             // const rect = entries[i].boundingClientRect;
@@ -127,6 +128,7 @@ $(window).one("load", function() {
             ]
             if (Math.round(next_bezier[0] * 100) !== Math.round(current_bezier[0] * 100) || Math.round(next_bezier[1] * 100) !== Math.round(current_bezier[1] * 100)) {
                 bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + Math.round(next_bezier[0] * 100) * 0.01 + ",0.5," + Math.round(next_bezier[1] * 100) * 0.01 + ")";
+                changed = true;
             }
             current_beziers[i] = next_bezier;
         }
@@ -135,15 +137,17 @@ $(window).one("load", function() {
         // for (const element of bubble_rights) {
         //     observer.observe(element);
         // }
+        if (changed) {
+            requestAnimationFrame(step);
+        } else {
+            mouse_x = undefined;
+        }
     }
 
     let mouse_x;
     $("#circles-background").on("mousemove", function(e) {
         if (mouse_x === undefined)
-            requestAnimationFrame(function() {
-                step(mouse_x);
-                requestAnimationFrame(arguments.callee);
-            });
+            requestAnimationFrame(step);
         mouse_x = e.pageX;
     }).on("mouseleave", function() {
         mouse_x = Infinity;
