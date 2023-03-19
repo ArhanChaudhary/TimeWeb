@@ -98,7 +98,7 @@ class SettingsForm(forms.ModelForm):
         help_texts = {
             "def_skew_ratio": "Set this value to 0 to make it linear.",
             "def_min_work_time": "Enter this value in minutes. If you typically complete longer periods of work at a time, set this to a high value (such as 60 minutes or 90 minutes).",
-            "loosely_enforce_minimum_work_times": "Ignores every assignments' minimum work time on their first and last working days in exchange for making their work distributions smoother. Recommended to be turned on.",
+            "loosely_enforce_minimum_work_times": "Ignores every assignment's minimum work time on their first and last working days in exchange for making their work distributions smoother. Recommended to be turned on.",
             "show_priority": "Display the priority percentage and color for every assignment.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
