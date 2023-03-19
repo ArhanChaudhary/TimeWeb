@@ -13,12 +13,7 @@ body {
     display: flex;
     position: relative;
 }
-#table-of-contents-container > ul,
-#category-important-labels ~ .no-faq-category-container > .table-of-contents-item {
-    margin-top: 16px;
-    margin-bottom: 16px;
-}
-#category-important-labels ~ .no-faq-category-container {
+#table-of-contents-container .no-faq-category-container {
     padding-inline-start: 32px;
 }
 #table-of-contents-container.active {
@@ -87,9 +82,6 @@ details.table-of-contents-item > ul {
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 26px;
-}
-#category-table-of-contents,
-#category-important-labels {
     top: 0;
     margin-top: -2px;
     margin-bottom: -2px;
