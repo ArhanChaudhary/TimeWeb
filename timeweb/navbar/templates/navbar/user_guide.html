@@ -337,7 +337,7 @@ the span groups the major and minor categories together for user_guide.js
             How is the assignment priority percentage calculated?
 		</span>
         <p>
-            The more work for the assignment today and the closer its due date is to today, the higher the priority percentage. To further elaborate, every assignments' priority is first represented as a number, and then converted to a percentage by dividing it by the highest priority number of all assignments.
+            The more work for the assignment today and the closer its due date is to today, the higher the priority percentage. To further elaborate, every assignment's priority is first represented as a number, and then converted to a percentage by dividing it by the highest priority number of all assignments.
         </p>
         <p>
             If <code>x</code> represents the assignment's daily work for today in minutes and <code>y</code> represents the number of days between the due date and today, the exact calculation for the number is <code>sqrt(x)/(y - 1.8)</code> .
@@ -389,10 +389,20 @@ the span groups the major and minor categories together for user_guide.js
         <img id="assignment-graph-image" src="{% static 'navbar/images/wide_assignment_graph.webp' %}" alt="Assignment graph image">
     </picture>
     <p>
-		After creating an assignment, click it to open its graph. The graph provides a visualization of your assignment's entire work schedule.
+		Click an assignment to open the assignment graph, a visualization of the assignment's entire work schedule.
+    </p>
+        The x-axis of the assignment graph represents days. The starting point at day zero corresponds to the assignment's assignment date, and the ending point corresponds to the assignment's due date.
+        <br>
+        The y-axis of the assignment graph represents units of work, or how the assignment's work is divided and split up.
     </p>
     <p>
-		Its x-axis represents days, while its y-axis represents units of work. Day zero of the graph represents the assignment's assignment date, while the last day of the graph represents the assignment's due date. Every days' work is plotted and connected in red to form your entire work schedule.
+        Every day's work is plotted and connected in red to form the assignment's work schedule.
+    </p>
+    <p>
+		As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.
+    </p>
+    <p>
+		The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure the assignment graph is tuned for you and your work style.
     </p>
     <span class="label-question" id="why-isn't-the-assignment-graph's-today-line-always-accurate">
         <span class="label-title">
@@ -401,12 +411,6 @@ the span groups the major and minor categories together for user_guide.js
         do!
         <p></p>
     </span>
-    <p>
-		As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.
-    </p>
-    <p>
-		The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure the assignment graph is tuned for you and your work style.
-    </p>
     <div class="minor-category" id="standard-assignment-graph-controls">
 		Standard controls
     </div>
