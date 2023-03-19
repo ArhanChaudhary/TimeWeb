@@ -295,13 +295,19 @@ the span groups the major and minor categories together for user_guide.js
 		Assignment status message
     </div>
     <p>
-		The assignment status message reflects the current status of the assignment for today.
+		The assignment status message and icon reflects the current status of the assignment for today. For example:
     </p>
     <p>
-        If you need to work on an assignment for today according to the assignment graph, the assignment status message will display that amount.
+        If you need to work on an assignment for today according to the assignment graph, the status message will display that amount and the status icon will display
+        <svg preserveAspectRatio="none" width="17" height="17" viewBox="0 192 640 640">
+            {% include "unfinished.svg" %}
+        </svg> .
     </p>
     <p>
-        If you're finished with an assignment's work for today, the assignment status message will display that you're finished with the assignment's work for today.
+        If you're finished with an assignment's work for today, the status message will display that you're finished with the assignment's work for today and the status icon will display
+        <svg preserveAspectRatio="none" width="15" height="15" viewBox="1.3571929931640625 -1218.084716796875 1318.642822265625 1214.132080078125">
+            {% include "finished.svg" %}
+        </svg> .
     </p>
     <span class="label-question" id="why-doesn't-my-assignment's-work-for-today-respect-the-step-size">
         <span class="label-title">
@@ -544,7 +550,7 @@ the span groups the major and minor categories together for user_guide.js
         Note that assignments on TimeWeb and Google Classroom are independent of each other. That is, modifications made to assignments on TimeWeb are not reflected on Google Classroom and vice versa.
     </p>
     <p>
-        Google Classroom assignments are not re-added to the assignments page. If you want to recover a deleted Google Classroom assignment, you can restore it in the deleted assignments view in the settings.
+        Google Classroom assignments are not re-added to the assignments page. If you want to recover a deleted Google Classroom assignment, you can restore it from the deleted assignments view in the settings.
     </p>
     <span class="label-question" id="why-are-some-google-classroom-assignments-incorrectly-due-at-11:59-pm">
         <span class="label-title">

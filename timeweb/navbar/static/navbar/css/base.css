@@ -121,6 +121,9 @@ details.table-of-contents-item > ul {
 #doc-container .generic-button {
     margin: 3px 0px;
 }
+#doc-container svg {
+    margin-bottom: -3px;
+}
 #doc-container::-webkit-scrollbar {
     width: 14px;
 }
