@@ -389,7 +389,7 @@ the span groups the major and minor categories together for user_guide.js
         <img id="assignment-graph-image" src="{% static 'navbar/images/wide_assignment_graph.webp' %}" alt="Assignment graph image">
     </picture>
     <p>
-		Click an assignment to open the assignment graph, a visualization of its entire work schedule.
+		Click a complete assignment to open the assignment graph, a visualization of its entire work schedule.
     </p>
         The x-axis of the assignment graph represents days. The starting point at day zero corresponds to the assignment's assignment date, and the ending point corresponds to the assignment's due date.
     </p>
@@ -406,8 +406,9 @@ the span groups the major and minor categories together for user_guide.js
         <span class="label-title">
             Why isn't the assignment graph's today line always accurate?
 		</span>
-        do!
-        <p></p>
+        <p>
+            When close to the end of a day, the today line overlaps with the next day and could incorrectly indicate that the current date is tomorrow. So, the today line is manually moved left in this case to remove the visual overlap and clear up any possible ambiguity.
+        </p>
     </span>
     <div class="minor-category" id="standard-assignment-graph-controls">
 		Standard controls
