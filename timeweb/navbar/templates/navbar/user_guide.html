@@ -85,7 +85,7 @@ the span groups the major and minor categories together for user_guide.js
         The date this assignment is due.
     </p>
     <p>
-        If your assignment doesn't have a due date, click the magic wand icon to let TimeWeb predict a due date for you. Upon submission, this due date will be calculated and estimated based on your other inputs.
+        If this assignment doesn't have a due date, click the magic wand icon to let TimeWeb predict a due date for you. Upon submission, this due date will be calculated and estimated based on your other inputs.
     </p>
     <p>
 		You can also enable soft due dates. Soft due dates are automatically incremented if you haven't finished this assignment by then.
@@ -389,20 +389,18 @@ the span groups the major and minor categories together for user_guide.js
         <img id="assignment-graph-image" src="{% static 'navbar/images/wide_assignment_graph.webp' %}" alt="Assignment graph image">
     </picture>
     <p>
-		Click an assignment to open the assignment graph, a visualization of the assignment's entire work schedule.
+		Click an assignment to open the assignment graph, a visualization of its entire work schedule.
     </p>
         The x-axis of the assignment graph represents days. The starting point at day zero corresponds to the assignment's assignment date, and the ending point corresponds to the assignment's due date.
-        <br>
-        The y-axis of the assignment graph represents units of work, or how the assignment's work is divided and split up.
     </p>
     <p>
-        Every day's work is plotted and connected in red to form the assignment's work schedule.
+        The y-axis of the assignment graph represents units of work, or how the assignment's work is split and divided up. As you progress through the assignment, you will gradually complete more and more units of work until the entire assignment is completely finished.
     </p>
     <p>
-		As you progress through your assignment, there needs to be some way to measure your progress so it can be prioritized accordingly. So, you must input the amount of work you complete every day. This will be plotted and connected in blue to form your assignment's work inputs.
+        The today line is drawn at the current date, indicating how much work you need to complete by tomorrow and how close the assignment is to its due date.
     </p>
     <p>
-		The 6 controls under the graph, 3 standard and 3 advanced, allow you to customize and log your work schedule to ensure the assignment graph is tuned for you and your work style.
+        The assignment's work schedule is formed by connecting the red points on the assignment graph, each of which corresponds to an increasing cumulative amount of work to complete every day until the assignment is due.
     </p>
     <span class="label-question" id="why-isn't-the-assignment-graph's-today-line-always-accurate">
         <span class="label-title">
