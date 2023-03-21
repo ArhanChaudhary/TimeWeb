@@ -410,35 +410,37 @@ the span groups the major and minor categories together for user_guide.js
             When close to the end of a day, the today line overlaps with the next day and could incorrectly indicate that the current date is tomorrow. So, the today line is manually positioned leftwards in this case to remove the visual overlap and clear up any possible ambiguity.
         </p>
     </span>
-    <div class="minor-category" id="standard-assignment-graph-controls">
-		Standard controls
+    <div class="minor-category" id="inputting-work-done">
+		Inputting work done
     </div>
     <p>
-		There are 3 standard controls for the assignment graph:
+		Every day, you must input how much work you actually complete so the assignment can be prioritized accordingly. These will be plotted and connected in blue to form your assignment's work inputs. There are three ways to do this:
     </p>
-    <p>
-        <span class="minor-minor-category">
-            Delete Work Input
-		</span>
+    <ul>
+        <li>
+            If you're finished with the assignment's work for today, click the
+            <svg preserveAspectRatio="none" width="21" viewBox="0 0 768 640">
+                {% include 'tick.svg' %}
+            </svg>
+            button on the assignment header to input all work done for today.
+        </li>
         <br>
-        This button deletes the most recent work input from the graph.
-    </p>
-    <p>
-        <span class="minor-minor-category">
-            Enter Units Done
-		</span>
         <br>
-        This input is the text box used to enter an assignment's daily progress. Enter the number of units of work done on the graph's displayed date and click "Submit Units Done".
-    </p>
-    <p>
-		For any day, if you've completed an assignment's work, enter the keywords "done" or "fin".
-    </p>
-    <p>
-		If you haven't completed any of an assignment's work, enter "0" instead.
-    </p>
-    <p>
-		If you don't remember how much work you did for your previous inputs, enter the keyword "since" followed by how much you've done since your last work input. For example, if you haven't entered any work inputs in a while for an assignment, but you've completed let's say 5 units of work since your last input, enter "since 5".
-    </p>
+        <li>
+            If you're not finished with the assignment's work for today, use the assignment graph's "Enter Units Done" text box to input your own custom amount of work done. For example, if you won't complete any of an assignment's work for today, enter "0".
+            <br>
+            <br>
+            Click "Submit Work Input" to then submit your work input and "Delete Work Input" to delete your most recent work input.
+        </li>
+        <br>
+        <br>
+        <li>
+            If you forget to input your past work inputs for multiple assignments, on the next day, you can autoinput work done since their last work input until today. If you haven't worked on these assignments, autoinput no work done. If you've followed these assignments' work schedules, autoinput all work done.
+            <br>
+            <br>
+            <img src="{% static 'navbar/images/autoinput_work_done.webp' %}" alt="Autoinput work done image">
+        </li>
+    </ul>
     <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
         <span class="label-title">
             Why are assignments marked as finished for today after inputting no work done?
