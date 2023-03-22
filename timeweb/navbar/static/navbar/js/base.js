@@ -67,16 +67,17 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         $("#table-of-contents-container #category-important-labels").after(faq_category_dropdown);
     });
-    $(".label-question").filter(function() {
-        return !$(this).siblings(".major-category").length;
-    }).each(function() {
-        const faq = $(this);
-        const faq_li = $($("#table-of-contents-minor-category-template").html());
-        faq_li.attr("href", `#${faq.attr("id")}`)
-            .children().text(faq.find(".label-title").text());
 
-        $("#table-of-contents-container #category-important-labels ~ .no-faq-category-container").append(faq_li);
-    });
+    {
+        const last_faq = $(".label-question").last().filter(function() {
+            return $(this).hasClass("add-to-end");
+        });
+        const faq_li = $($("#table-of-contents-minor-category-template").html());
+        faq_li.addClass("table-of-contents-header")
+            .attr("href", `#${last_faq.attr("id")}`)
+            .html(last_faq.find(".label-title").text());
+            $("#table-of-contents-container").append(faq_li);
+    }
 
     $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
     $("#table-of-contents-container").click(function(e) {
