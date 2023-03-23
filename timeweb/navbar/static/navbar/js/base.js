@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $(this).append($($("#label-icon-template").html()));
     });
 
+    let add_expand_all = false;
     $(".major-category").reverse().each(function() {
         const major_category = $(this);
         let major_category_dropdown = $($("#table-of-contents-major-category-template").html());
@@ -34,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 .children().text(major_category.text())
             major_category_dropdown.find("ul").append(minor_category_li);
 
+            add_expand_all = true;
             $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         } else {
             major_category_dropdown.find("span").text(major_category.text());
@@ -46,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 major_category_dropdown.find("ul").append(minor_category_li);
             });
 
+            add_expand_all = true;
             $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         }
 
@@ -65,6 +68,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             faq_category_dropdown.find("ul").append(faq_li);
         });
+
+        add_expand_all = true;
         $("#table-of-contents-container #category-important-labels").after(faq_category_dropdown);
     });
 
@@ -77,6 +82,23 @@ document.addEventListener("DOMContentLoaded", function() {
             .attr("href", `#${last_faq.attr("id")}`)
             .html(last_faq.find(".label-title").text());
             $("#table-of-contents-container").append(faq_li);
+    }
+    if (add_expand_all) {
+        const expand_all_button = $("<a>");
+        expand_all_button.attr("href", "#")
+            .addClass("expand-all-button")
+            .html("Expand all");
+        expand_all_button.click(function(e) {
+            e.preventDefault();
+            if (expand_all_button.html() === "Expand all") {
+                $("#table-of-contents-container details.table-of-contents-item").prop("open", true);
+                expand_all_button.html("Collapse all");
+            } else {
+                $("#table-of-contents-container details.table-of-contents-item").prop("open", false);
+                expand_all_button.html("Expand all");
+            }
+        });
+        $("#category-table-of-contents").after(expand_all_button);
     }
 
     $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
