@@ -10,6 +10,7 @@ from ratelimit.core import is_ratelimited
 from timewebapp.urls import KEEP_EXAMPLE_ACCOUNT_LOGGED_IN_VIEWS
 from django_minify_html.middleware import MinifyHtmlMiddleware as _MinifyHtmlMiddleware
 
+import sys
 from . import utils
 
 DEFAULT_GLOBAL_RATELIMIT = "5/s"
@@ -46,16 +47,15 @@ class CommonRatelimit:
         self.get_response = get_response
 
     def __call__(self, request):
+        # https://stackoverflow.com/a/61441816/12230735
         resolved = resolve(request.path)
-        # mostly static urls if the url app name is ""
-        # (do not block things like /favicon.ico)
-        if resolved.app_name != "":
-            if resolved.app_name == "api":
-                group = "api"
-            else:
-                group = resolved._func_path
-            if is_ratelimited(request, group=group, key=utils.get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
-                raise Ratelimited
+        app_name = sys.modules[resolved.func.__module__].__package__
+        if app_name == "api":
+            group = "api"
+        else:
+            group = resolved._func_path
+        if not group.startswith("django") and is_ratelimited(request, group=group, key=utils.get_client_ip, rate=DEFAULT_GLOBAL_RATELIMIT, method=ratelimit.ALL, increment=True):
+            raise Ratelimited
         return self.get_response(request)
 
 class MinifyHTMLMiddleware(_MinifyHtmlMiddleware):
