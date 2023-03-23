@@ -78,6 +78,9 @@ main ul {
     margin-bottom: 10px;
     padding-inline-start: 18px;
 }
+#table-of-contents-container details.table-of-contents-item details.table-of-contents-item:last-of-type {
+    margin-bottom: -6px;
+}
 details.table-of-contents-item > ul {
     margin-top: 5px;
 }
