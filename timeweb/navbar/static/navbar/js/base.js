@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 expand_all_button.html("Expand all");
             }
         });
-        $("#category-table-of-contents").after(expand_all_button);
+        $("#table-of-contents-container").append(expand_all_button);
     }
 
     $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
