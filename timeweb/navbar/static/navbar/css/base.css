@@ -17,7 +17,9 @@ body {
     transform: none;
 }
 #table-of-contents-container {
+    box-sizing: border-box;
     height: 100%;
+    padding-bottom: 20px;
     box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
     overflow-y: auto;

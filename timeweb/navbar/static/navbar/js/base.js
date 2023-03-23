@@ -81,7 +81,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     $(".minor-minor-category[id]").css("scroll-margin-top", href_scroll_margin);
     $("#table-of-contents-container").click(function(e) {
-        if ($(e.target).is("a") || $(e.target).parents("a").length)
+        const a = $(e.target).closest("a").filter(function() {
+            return $(this).attr("href") !== "#";
+        });
+        if (a.length)
             $("#table-of-contents-container").removeClass("active");
     });
 
