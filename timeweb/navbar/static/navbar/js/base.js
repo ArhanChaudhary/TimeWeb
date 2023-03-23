@@ -77,11 +77,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const last_faq = $(".label-question").last().filter(function() {
             return $(this).hasClass("add-to-end");
         });
-        const faq_li = $($("#table-of-contents-minor-category-template").html());
-        faq_li.addClass("table-of-contents-header")
-            .attr("href", `#${last_faq.attr("id")}`)
-            .html(last_faq.find(".label-title").text());
+        if (last_faq.length) {
+            const faq_li = $($("#table-of-contents-minor-category-template").html());
+            faq_li.addClass("table-of-contents-header")
+                .attr("href", `#${last_faq.attr("id")}`)
+                .html(last_faq.find(".label-title").text());
             $("#table-of-contents-container").append(faq_li);
+        }
     }
     if (add_expand_all) {
         const expand_all_button = $("<a>");
