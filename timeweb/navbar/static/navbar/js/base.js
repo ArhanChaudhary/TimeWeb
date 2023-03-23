@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             $("#table-of-contents-container #category-table-of-contents").after(minor_category_li);
         } else if (!minor_categories.length) {
-            major_category_dropdown.find("span").text(major_category.text());
+            major_category_dropdown.find("summary").text(major_category.text());
 
             const minor_category_href_element = major_category.siblings().filter(function() {
                 return !!$(this).attr("id");
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
             add_expand_all = true;
             $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         } else {
-            major_category_dropdown.find("span").text(major_category.text());
+            major_category_dropdown.find("summary").text(major_category.text());
 
             minor_categories.each(function() {
                 $(this).css("scroll-margin-top", href_scroll_margin);
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const faq_category_dropdown = $($("#table-of-contents-major-category-template").html());
-        faq_category_dropdown.find("span").text(major_category.text());
+        faq_category_dropdown.find("summary").text(major_category.text());
 
         const faqs = major_category.siblings(".label-question");
         if (!faqs.length) return;
