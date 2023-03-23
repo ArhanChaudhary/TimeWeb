@@ -635,41 +635,85 @@ class Priority {
             error: ajaxUtils.error,
         });
     }
-    alertDueDates() {
+    doAssignmentAlerts() {
         const that = this;
-        if (that.due_date_incremented_notices.length === 0 || Priority.due_date_incremented_notice_on_screen || !SETTINGS.should_alert_due_date_incremented) return;
-        let due_date_incremented_notice_title;
-        let due_date_incremented_notice_content;
-        if (that.due_date_incremented_notices.length === 1) {
-            due_date_incremented_notice_title = `Notice: "${that.due_date_incremented_notices[0].name}" has had its due date incremented because it has soft due dates enabled.`;
-        } else if (that.due_date_incremented_notices.length > 1) {
-            due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they each have soft due dates enabled.`;
-        }
-        due_date_incremented_notice_content = "Soft due dates increment when an assignment's due date passes but is still unfinished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
-        Priority.due_date_incremented_notice_on_screen = true;
-        $.alert({
-            title: due_date_incremented_notice_title,
-            content: due_date_incremented_notice_content,
-            backgroundDismiss: false,
-            buttons: {
-                "Don't show again": {
-                    action: function() {
-                        SETTINGS.should_alert_due_date_incremented = false;
-                        ajaxUtils.changeSetting({setting: "should_alert_due_date_incremented", value: SETTINGS.should_alert_due_date_incremented});
-                        this.buttons.ok.action();
-                    }
-                },
-                ok: {
-                    action: function() {
-                        Priority.due_date_incremented_notice_on_screen = false;
-                        for (let sa of that.due_date_incremented_notices) {
-                            sa.alert_due_date_incremented = false;
-                            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: sa.alert_due_date_incremented, id: sa.id});
+        if (!(that.due_date_incremented_notices.length === 0 || Priority.due_date_incremented_notice_on_screen || !SETTINGS.should_alert_due_date_incremented)) {
+            let due_date_incremented_notice_title;
+            let due_date_incremented_notice_content;
+            if (that.due_date_incremented_notices.length === 1) {
+                due_date_incremented_notice_title = `Notice: "${that.due_date_incremented_notices[0].name}" has had its due date incremented because it has soft due dates enabled.`;
+            } else if (that.due_date_incremented_notices.length > 1) {
+                due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they each have soft due dates enabled.`;
+            }
+            due_date_incremented_notice_content = "Soft due dates increment when an assignment's due date passes but is still unfinished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
+            Priority.due_date_incremented_notice_on_screen = true;
+            $.alert({
+                title: due_date_incremented_notice_title,
+                content: due_date_incremented_notice_content,
+                backgroundDismiss: false,
+                buttons: {
+                    "Don't show again": {
+                        action: function() {
+                            SETTINGS.should_alert_due_date_incremented = false;
+                            ajaxUtils.changeSetting({setting: "should_alert_due_date_incremented", value: SETTINGS.should_alert_due_date_incremented});
+                            this.buttons.ok.action();
+                        }
+                    },
+                    ok: {
+                        action: function() {
+                            Priority.due_date_incremented_notice_on_screen = false;
+                            for (let sa of that.due_date_incremented_notices) {
+                                sa.alert_due_date_incremented = false;
+                                ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: sa.alert_due_date_incremented, id: sa.id});
+                            }
                         }
                     }
-                }
-            },
-        });
+                },
+            });
+        }
+
+        const completely_finished = that.priority_data_list.filter(priority_data => priority_data.status_value === Priority.COMPLETELY_FINISHED);
+        if (completely_finished.length > 5) {
+            $.alert({
+                title: "You have too many completely finished assignments.",
+                content: "Delete them to improve performance and reduce clutter. Note that you can also view and restore deleted assignments in the settings.",
+                backgroundDismiss: false,
+                buttons: {
+                    "Make this automatic": {
+                        action: function() {
+                            this.buttons["Delete assignments"].action(function() {
+                                // do this after /api/delete-assignment or this may run while the database is locked and crash
+                                SETTINGS.immediately_delete_completely_finished_assignments = true;
+                                ajaxUtils.changeSetting({setting: "immediately_delete_completely_finished_assignments", value: SETTINGS.immediately_delete_completely_finished_assignments});
+                            });
+                        }
+                    },
+                    "Delete assignments": {
+                        action: function(extra_success_function) {
+                            const assignments_to_delete = $(completely_finished.map(priority_data => {
+                                const dom_assignment = $(".assignment").eq(priority_data.index);
+                                return dom_assignment[0];
+                            }));
+                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
+                                const sa = utils.loadAssignmentData($(this));
+                                return sa.id;
+                            }).toArray();
+                            const success = function() {
+                                new Crud().transitionDeleteAssignment(assignments_to_delete);
+                                extra_success_function?.();
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "/api/delete-assignment",
+                                data: {assignments: JSON.stringify(assignment_ids_to_delete)},
+                                success: success,
+                                error: ajaxUtils.error,
+                            });
+                        }
+                    },
+                },
+            });
+        }
     }
     assignmentSortingComparator(a, b, initial_monotonic_sort) {
         const that = this;
@@ -953,7 +997,7 @@ class Priority {
     sortWithoutTimeout() {
         const that = this;
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
-        that.alertDueDates();
+        that.doAssignmentAlerts();
         
         // Updates open graphs' today line and other graph text
         $(window).trigger("redrawGraphs");
