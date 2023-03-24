@@ -465,18 +465,33 @@ the span groups the major and minor categories together for user_guide.js
     <p>
         Click "Set Curvature" and hover over the assignment graph to preview and trace its curvature with your mouse. Click the assignment graph to save, and click "Set Curvature" again to cancel.
     </p>
+    <div class="minor-category" id="dynamic-fixed-mode">
+		Dynamic/Fixed mode
+    </div>
     <p>
         <span class="minor-minor-category">
-            Switch to Fixed/Dynamic mode
+            Dynamic mode
 		</span>
         <br>
-        This button switches the graph to fixed mode or dynamic mode.
+        By default, the assignment graph is set to dynamic mode.
     </p>
     <p>
-		In fixed mode, the work schedule isn't affected by work inputs throughout the entire assignment. If you don't finish a day's work, you'll have to make it up on the next day.
+        In dynamic mode, the work schedule and curvature automatically re-adjust. If you don't finish a day's work, the assignment graph will change to fit your work style and adapt to your past work inputs.
     </p>
     <p>
-		In dynamic mode, the work schedule and curvature automatically re-adjust themselves after every work input to adapt to your work schedule. If you don't finish a day's work, the graph will change to fit your work style. The curvature can still be manually overridden. Note that dynamic mode discourages extremely low or high curvatures, as it tends to make your work schedule more linear as you enter more work inputs.
+        As of v1.9.1, the exact implementation details of dynamic mode are incomplete and will therefore remain undocumented. That being said, dynamic mode discourages extremely low or high curvatures, tending to make the work schedule more linear as it readjusts as you enter more work inputs.
+    </p>
+    <p>
+        If you don't like dynamic mode's new curvature after a work input, you can manually override it with the "Set Curvature" button.
+    </p>
+    <p>
+        <span class="minor-minor-category">
+            Fixed mode
+		</span>
+        <br>
+        You can change from dynamic mode to fixed mode using the "Switch to Fixed Mode" button.
+    <p>
+		In fixed mode, your work inputs don't affect the work schedule. If you don't finish a day's work, you'll have to make it up on the next day. So, use fixed mode if you want the work schedule to remain constant throughout the assignment.
     </p>
     <span class="label-question" id="why-do-similar-skew-ratio-values-result-in-different-work-distributions-in-dynamic-mode">
         <span class="label-title">
