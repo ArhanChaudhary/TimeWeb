@@ -1,4 +1,4 @@
 providers = ['python']
 
 [start]
-cmd = 'ls && python manage.py migrate && gunicorn --max-requests 1000 --workers 5 --threads 2 timeweb.wsgi'
+cmd = 'python manage.py migrate && gunicorn --max-requests 1000 --workers 5 --threads 2 timeweb.wsgi'
