@@ -28,15 +28,15 @@ from copy import deepcopy
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
 EXAMPLE_ASSIGNMENT = {
-    "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
-    "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
-    "unit": "Page",
-    "y": "400.00",
+    "name": "Read a Book (EXAMPLE ASSIGNMENT)",
+    "x": 20, # Not the db value of x, in this case is just the number of days in the assignment
+    "unit": "Chapter",
+    "y": 25,
     "blue_line_start": 0,
-    "skew_ratio": "1.0000000000",
-    "time_per_unit": "3.00",
-    "funct_round": "1.00",
-    "min_work_time": "60.00",
+    "skew_ratio": 1,
+    "time_per_unit": 20,
+    "funct_round": 1,
+    "min_work_time": 2,
     "break_days": [],
     "dynamic_start": 0,
     "description": "Example assignment description"
