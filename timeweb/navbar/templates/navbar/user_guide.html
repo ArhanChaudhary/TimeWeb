@@ -384,8 +384,9 @@ the span groups the major and minor categories together for user_guide.js
     </div>
     <br>
     <picture>
-        <source media="(max-width: 790px)" srcset="{% static 'navbar/images/narrow_assignment_graph.webp' %}">
-        <img id="assignment-graph-image" src="{% static 'navbar/images/wide_assignment_graph.webp' %}" alt="">
+        <source media="(max-width: 580px)" srcset="{% static 'navbar/images/narrow_assignment_graph.webp' %}">
+        <source media="(max-width: 900px)" srcset="{% static 'navbar/images/wide_assignment_graph.webp' %}">
+        <img src="{% static 'navbar/images/wider_assignment_graph.webp' %}" alt="">
     </picture>
     <p>
 		Click a complete assignment to open the assignment graph, a visualization of its entire work schedule.
