@@ -282,12 +282,11 @@ the span groups the major and minor categories together for user_guide.js
     </div>
     <br>
     <picture>
-        <source media="(max-width: 790px)" srcset="{% static 'navbar/images/narrow_assignment_header.webp' %}">
-        <img src="{% static 'navbar/images/assignment_header.webp' %}" alt="Assignment header image">
+        <source media="(max-width: 580px)" srcset="{% static 'navbar/images/narrow_assignment_header.webp' %}">
+        <source media="(max-width: 900px)" srcset="{% static 'navbar/images/wide_assignment_header.webp' %}">
+        <img src="{% static 'navbar/images/wider_assignment_header.webp' %}" alt="">
     </picture>
-    <p>
-		The assignment header summarizes the status of the assignment for today. So, you know exactly what to complete for today to be on track to complete both your short and long term assignments.
-    </p>
+    The assignment header summarizes the status of the assignment for today. So, you know exactly what to complete for today to be on track to complete both your short and long term assignments.
     <p>
         From left to right, the assignment header displays the assignment's priority percentage, name, number of days until due, tags, status message, finish for today button, edit button, and delete button.
     </p>
