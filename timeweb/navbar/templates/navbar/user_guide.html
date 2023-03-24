@@ -433,11 +433,14 @@ the span groups the major and minor categories together for user_guide.js
         <br>
         <li>
             If you forget to input past work done, on the next day, you can autoinput work done until today for every assignment. If you haven't followed your work schedules, autoinput no work done, and if you have, autoinput all work done.
-            <br>
-            <br>
-            <img src="{% static 'navbar/images/autoinput_work_done.webp' %}" alt="">
         </li>
     </ul>
+    <br>
+    <picture>
+        <source media="(max-width: 580px)" srcset="{% static 'navbar/images/narrow_autoinput_work_done.webp' %}" window-width="500">
+        <source media="(max-width: 775px)" srcset="{% static 'navbar/images/wide_autoinput_work_done.webp' %}" window-width="590">
+        <img src="{% static 'navbar/images/wider_autoinput_work_done.webp' %}" alt="" window-width="900">
+    </picture>
     <span class="label-question" id="why-are-assignments-marked-as-finished-for-today-after-inputting-no-work-done">
         <span class="label-title">
             Why are assignments marked as finished for today after inputting no work done?
