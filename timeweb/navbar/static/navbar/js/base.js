@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function() {
         $(".major-category.isSticky").last().removeClass("isSticky");
     });
 
-    $(".major-category ~ * img, .major-category ~ img").each(function() {
+    $(".major-category ~ * img, .major-category ~ img, .major-category ~ * video, .major-category ~ video").each(function() {
         if ($(this).parents(".label-icon-container").length) return;
         if ($(this).parent().is("picture"))
             $(this).parent().wrap("<div class=\"img-positioner\">");
