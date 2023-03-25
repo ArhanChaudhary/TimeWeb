@@ -260,8 +260,9 @@ the span groups the major and minor categories together for user_guide.js
     </div>
     <br>
     <picture>
-        <source media="(max-width: 790px)" srcset="{% static 'navbar/images/narrow_needs_more_info.webp' %}">
-        <img src="{% static 'navbar/images/wide_needs_more_info.webp' %}" alt="">
+        <source media="(max-width: 580px)" srcset="{% static 'navbar/images/narrow_needs_more_info.webp' %}" window-width="519">
+        <source media="(max-width: 900px)" srcset="{% static 'navbar/images/wide_needs_more_info.webp' %}" window-width="650">
+        <img src="{% static 'navbar/images/wider_needs_more_info.webp' %}" alt="" window-width="1100">
     </picture>
     <p>
 		Some of your assignments are small enough that you may not need TimeWeb's entire functionality.
