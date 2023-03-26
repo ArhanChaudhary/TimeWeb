@@ -141,4 +141,24 @@ document.addEventListener("DOMContentLoaded", function() {
         else
             $(this).wrap("<div class=\"img-positioner\">");
     });
+    function responsiveVideoLayout() {
+        // polyfill media queries source elements for video
+        $("video").each(function() {
+            const video = $(this);
+            const sources = video.children("source");
+            sources.each(function() {
+                const source = $(this);
+                const media = source.attr("media");
+                if (!media || window.matchMedia(media).matches) {
+                    const current = video.attr("src");
+                    const next = source.attr("data-src");
+                    if (current !== next)
+                        video.attr("src", source.attr("data-src"));
+                    return false;
+                }
+            });
+        });
+    }
+    $(window).on("resize", responsiveVideoLayout);
+    responsiveVideoLayout();
 });
