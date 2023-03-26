@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
             $("#table-of-contents-container #category-table-of-contents").after(major_category_dropdown);
         } else {
             major_category_dropdown.find("summary").text(major_category.text());
-            major_category_dropdown.attr("data-wrap-around-how-to", major_category.attr("data-wrap-around-how-to"));
+            major_category_dropdown.attr("data-wrap-around-how-to-use", major_category.attr("data-wrap-around-how-to-use"));
 
             minor_categories.each(function() {
                 $(this).css("scroll-margin-top", href_scroll_margin);
@@ -78,8 +78,8 @@ document.addEventListener("DOMContentLoaded", function() {
         major_category_dropdown.addClass("table-of-contents-item");
         major_category_dropdown.attr("id", "how-to-wrapper");
 
-        $("#table-of-contents-container details.table-of-contents-item[data-wrap-around-how-to]").wrapAll(major_category_dropdown);
-        $("<summary>").text("How to").prependTo($("#how-to-wrapper"));
+        $("#table-of-contents-container details.table-of-contents-item[data-wrap-around-how-to-use]").wrapAll(major_category_dropdown);
+        $("<summary>").text("How to use").prependTo($("#how-to-wrapper"));
     }
 
     {
