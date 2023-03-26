@@ -10,6 +10,11 @@
 #table-of-contents-container {
     width: 250px;
 }
+#table-of-contents-container div.table-of-contents-item {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding-left: 40px;
+}
 .table-of-contents-item {
     white-space: nowrap;
 }
