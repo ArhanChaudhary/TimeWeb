@@ -101,6 +101,33 @@ main.background-image-exists {
 #tutorial-message {
     padding: 0 10px;
 }
+#tutorial-overlay {
+    overflow: auto;
+    background-color: hsla(0, 0%, 0%, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    --x: 0px;
+    --y: 0px;
+    --width: 300px;
+    --height: 300px;
+    clip-path: polygon(
+        0% 0%,
+        0% 100%,
+        var(--x) 100%,
+        var(--x) var(--y),
+        calc(var(--x) + var(--width)) var(--y),
+        calc(var(--x) + var(--width)) calc(var(--y) + var(--height)),
+        var(--x) calc(var(--y) + var(--height)),
+        var(--x) 100%,
+        100% 100%,
+        100% 0%
+    );
+    height: 100%;
+    width: 100%;
+    transition: clip-path 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1002;
+}
 #assignments-header {
     position: relative;
     font-size: 18px;
