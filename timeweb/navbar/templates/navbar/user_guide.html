@@ -448,7 +448,9 @@ the span groups the major and minor categories together for user_guide.js
     </div>
     <br>
     <video autoplay loop muted playsinline>
-        <source src="{% static 'navbar/images/wider_curvature.mp4' %}">
+        <source media="(max-width: 580px)" data-src="{% static 'navbar/images/narrow_curvature.mp4' %}" window-width="519">
+        <source media="(max-width: 900px)" data-src="{% static 'navbar/images/wide_curvature.mp4' %}" window-width="650">
+        <source data-src="{% static 'navbar/images/wider_curvature.mp4' %}" window-width="1100">
     </video>
     The assignment graph's curvature is completely optional for you to use, but it gives you control over your work schedule to better suit your work style.
     <p>
