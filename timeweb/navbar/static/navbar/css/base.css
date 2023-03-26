@@ -175,7 +175,7 @@ code {
     box-shadow: none;
 }
 .written-on {
-    transform: translateX(-10px);
+    transform: translateX(var(--move-minor-category-left));
 }
 .written-on::before {
     content: "Last updated: ";
