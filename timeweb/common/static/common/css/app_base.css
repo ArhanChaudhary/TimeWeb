@@ -256,7 +256,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     margin-left: 5px;
     border: 6px solid transparent;
     border-top-color: rgb(22, 177, 185);
-    transform: translateY(4px);
+    transform: translateY(3px);
 }
 #user-greeting #username:focus,
 #user-greeting #username :focus {
