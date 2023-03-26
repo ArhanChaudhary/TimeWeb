@@ -203,6 +203,10 @@ summary {
     margin-bottom: initial;
     filter: initial;
 }
+.img-positioner picture {
+    /* https://stackoverflow.com/a/13961130/12230735 */
+    line-height: 0;
+}
 
 .minor-category {
     margin-top: 2rem;
