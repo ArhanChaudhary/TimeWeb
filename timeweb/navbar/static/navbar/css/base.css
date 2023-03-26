@@ -13,7 +13,8 @@ body {
     display: flex;
     position: relative;
 }
-#table-of-contents-container.active {
+#table-of-contents-container.active,
+#table-of-contents-container:focus-within {
     transform: none;
 }
 #table-of-contents-container {
