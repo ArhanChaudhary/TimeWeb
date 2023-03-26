@@ -25,14 +25,7 @@
     {% url 'contact_form' as contact_form %}
     {% url 'blog' as blog %}
     {% url 'policies' as policies %}
-    {% if user.is_authenticated %}
-        {% if request.path == home or request.path == example %}
-            <div id="image-new-container" tabindex="0">
-                <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt draggable="false"/>
-                <span id="new-assignment-text">New Assignment</span>
-            </div>
-        {% endif %}
-    {% endif %}
+    {% block extra_header_elements %}{% endblock %}
     {% if user.is_authenticated %}
         <div id="user-greeting">
             <span id="welcome">Welcome,&nbsp;</span>

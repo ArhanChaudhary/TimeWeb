@@ -14,7 +14,7 @@ urlpatterns = [
     path('policies/', RedirectView.as_view(url=app_static('policies/policies.html')), name='policies'),
     path('cookies/', RedirectView.as_view(url=app_static('policies/cookies.html'))),
     path('disclaimer/', RedirectView.as_view(url=app_static('policies/disclaimer.html'))),
-    path('privacy/', RedirectView.as_view(url=app_static('policies/privacy.html'))),
+    path('privacy/', RedirectView.as_view(url=app_static('policies/privacy.html')), name='privacy'),
     path('terms/', RedirectView.as_view(url=app_static('policies/terms.html'))),
     path('license/', RedirectView.as_view(url="https://github.com/ArhanChaudhary/TimeWeb/blob/master/LICENSE")),
     

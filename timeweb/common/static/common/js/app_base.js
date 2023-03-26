@@ -37,7 +37,7 @@ $(function() {
                     // Prevent double dipping
                     // I *could* use e.preventDefault instead for forward compatibility, but is risky and prevents some functioanlities
                     // (such as pressing enter to submit a form)
-                    !activeElement.is('button, summary, input[type="file"]')
+                    !activeElement.is('button, summary, input[type="file"], a')
                     // Prevent focused field widgets from toggling on enter form submission
                     && activeElement.attr("tabindex") !== "-1"
                     // keydown fires constantly while enter is being held down, limit it to the first fire
@@ -100,11 +100,11 @@ $(function() {
     }
 
     function resetHeaderLayout() {
-        const username = $("#user-greeting #username"),
-            logo = $("#logo-container"),
-            welcome = $("#welcome"),
-            plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
-            newassignmenttext = $("#new-assignment-text");
+        const username = $("#user-greeting #username");
+        const logo = $("#logo-container");
+        const welcome = $("#welcome");
+        const left_icon_width = $("#image-new-container img, #hamborger-menu").length ? $("#image-new-container img, #hamborger-menu").outerWidth(true) : 0;
+        const left_icon_text = $("#new-assignment-text");
     
         logo.css({
             left: '',
@@ -112,24 +112,28 @@ $(function() {
         });
         logo.find("img").css("width", "");
         welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-        newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+        if (left_icon_text.length)
+            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 30 }));
     
         if (!collision(username, logo, { margin: 30 })) return;
         logo.css({
-            left: 5 + plus_button_width,
+            left: 5 + left_icon_width,
             transform: "none",
         });
         welcome.toggle(!collision(welcome, logo, { margin: 30 }));
     
         if (!collision(username, logo, { margin: 10 })) return;
         // compress the logo
-        logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+        logo.find("img").css("width", Math.max(0, username.offset().left-left_icon_width-20-5));
     }
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);
         resetHeaderLayout();
     }
     $("header > *").css("visibility", "visible");
+    $("#hamborger-menu").click(function() {
+        $("#table-of-contents-container").toggleClass("active");
+    });
 });
 // It's important to remember to NOT use .done() or any other callback method on a jquery ajax
 // This is to allow ajaxUtils.error to redo the ajax with the appropriate callbacks
