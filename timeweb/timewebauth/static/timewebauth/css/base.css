@@ -308,6 +308,6 @@ hr {
     transform-origin: right;
     transform: scale(0.85);
     position: absolute !important;
-    top: 92px;
+    top: 101px;
     right: 40px !important;
 }
