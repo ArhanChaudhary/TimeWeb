@@ -93,7 +93,7 @@ $(window).one("load", function() {
     $(window).on("resize", function() {
         const slope = (max_bezier_diff - min_bezier_diff)/(515 - 1440);
         bezier_diff = slope * window.innerWidth + (min_bezier_diff - slope * 1440);
-        bezier_diff = Math.round(bezier_diff * 100) * 0.01;
+        bezier_diff = Math.round(bezier_diff * 1000) * 0.001;
         right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
     });
     const iter_percent = 1 - Math.exp(-1 / stretch);
@@ -126,8 +126,8 @@ $(window).one("load", function() {
                 current_bezier[0] + iter_percent * (original_bezier[0] + diff_percent * (right_bezier[0] - original_bezier[0]) - current_bezier[0]),
                 current_bezier[1] + iter_percent * (original_bezier[1] + diff_percent * (right_bezier[1] - original_bezier[1]) - current_bezier[1])
             ]
-            if (Math.round(next_bezier[0] * 100) !== Math.round(current_bezier[0] * 100) || Math.round(next_bezier[1] * 100) !== Math.round(current_bezier[1] * 100)) {
-                bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + Math.round(next_bezier[0] * 100) * 0.01 + ",0.5," + Math.round(next_bezier[1] * 100) * 0.01 + ")";
+            if (Math.round(next_bezier[0] * 1000) !== Math.round(current_bezier[0] * 1000) || Math.round(next_bezier[1] * 1000) !== Math.round(current_bezier[1] * 1000)) {
+                bubble_rights[i].style.animationTimingFunction = "cubic-bezier(0.5," + Math.round(next_bezier[0] * 1000) * 0.001 + ",0.5," + Math.round(next_bezier[1] * 1000) * 0.001 + ")";
                 changed = true;
             }
             current_beziers[i] = next_bezier;
@@ -154,6 +154,6 @@ $(window).one("load", function() {
     });
 });
 function parseBezier(bezier) {
-    const raw = bezier.split("(")[1].split(")")[0].split(", ").map(i => Math.round(parseFloat(i) * 100) * 0.01);
+    const raw = bezier.split("(")[1].split(")")[0].split(", ").map(i => Math.round(parseFloat(i) * 1000) * 0.001);
     return [raw[1], raw[3]];
 }
