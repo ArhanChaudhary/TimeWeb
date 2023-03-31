@@ -89,14 +89,16 @@ $(window).one("load", function() {
     
     const bubble_rights = Array.from(document.querySelectorAll("#circles-background .bubble-right"));
     const original_bezier = parseBezier($("#circles-background .bubble-right").css("--original-animation-timing-function"));
-    let bezier_diff = min_bezier_diff;
-    let right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
-    $(window).on("resize", function() {
+    let bezier_diff;
+    let right_bezier;
+    function resetBezierDiff() {
         const slope = (max_bezier_diff - min_bezier_diff)/(515 - 1440);
         bezier_diff = slope * window.innerWidth + (min_bezier_diff - slope * 1440);
         bezier_diff = Math.round(bezier_diff / precision) * precision;
         right_bezier = [original_bezier[0] - bezier_diff, original_bezier[1] + bezier_diff];
-    });
+    }
+    $(window).on("resize", resetBezierDiff);
+    resetBezierDiff();
     const iter_percent = 1 - Math.exp(-1 / stretch);
     // const left_bezier = [original_bezier[0] + bezier_diff, original_bezier[1] - bezier_diff];
     const current_beziers = new Array(number_of_circles).fill(original_bezier);
