@@ -217,33 +217,27 @@ changeSetting: function(kwargs={}) {
 },
 GCIntegrationError: function(jqXHR) {
     sessionStorage.removeItem("ajaxs");
-    switch (jqXHR.status) {
-        case 302:
-            var reauthorization_url = jqXHR.responseText;
-            $.alert({
-                title: "Invalid credentials.",
-                content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
-                buttons: {
-                    ok: {
+    if (jqXHR.status !== 302) return;
+    const reauthorization_url = jqXHR.responseText;
+    $.alert({
+        title: "Invalid credentials.",
+        content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
+        buttons: {
+            ok: {
 
-                    },
-                    "disable integration": {
-                        action: function() {
-                            ajaxUtils.changeSetting({setting: "oauth_token", value: false});
-                        }
-                    },
-                    reauthenticate: {
-                        action: function() {
-                            reloadWhenAppropriate({href: reauthorization_url});
-                        }
-                    },
+            },
+            "disable integration": {
+                action: function() {
+                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
                 }
-            });
-            break;
-
-        default:
-            ajaxUtils.error.bind(this)(...arguments);
-    }
+            },
+            reauthenticate: {
+                action: function() {
+                    reloadWhenAppropriate({href: reauthorization_url});
+                }
+            },
+        }
+    });
 },
 createGCAssignments: function() {
     let ajaxs = JSON.parse(sessionStorage.getItem("ajaxs")) || [
