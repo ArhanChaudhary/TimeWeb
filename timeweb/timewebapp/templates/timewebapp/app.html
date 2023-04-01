@@ -423,4 +423,16 @@
       {% include "restore.svg" %}
     </defs>
   </svg>
+  {% if user.settingsmodel.enable_tutorial %}
+    <template id="tutorial-animation-template">
+      <svg viewBox="0 0 512 512" id="favicon-animated">
+        {% include "favicon_animated.svg" %}
+      </svg>
+      <center>
+        <h1>
+          Welcome to TimeWeb!
+        </h1>
+      </center>
+    </template>
+  {% endif %}
 {% endblock %}
