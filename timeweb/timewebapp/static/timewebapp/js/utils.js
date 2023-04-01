@@ -846,33 +846,33 @@ setAnimationSpeed: function() {
 },
 insertTutorialMessages: function(first_available_assignment) {
     $("#tutorial-click-assignment-to-open").remove();
-    if (SETTINGS.enable_tutorial) {
-        const assignments_excluding_example = $(".assignment").filter(function() {
-            return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
-        });
-        if (assignments_excluding_example.length) {
-            first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
-            if (!utils.ui.alreadyScrolled) {
-                // setTimeout needed because this runs before domSort
-                setTimeout(function() {
-                    $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
-                    new Promise(function(resolve) {
-                        let scrollTimeout = setTimeout(resolve, 200);
-                        $("#assignments-container").scroll(() => {
-                            clearTimeout(scrollTimeout);
-                            scrollTimeout = setTimeout(resolve, 200);
-                        });
-                    }).then(function() {
-                        $("#assignments-container").off('scroll');
-                        first_available_assignment.focus();
+    if (!SETTINGS.enable_tutorial) return;
+
+    const assignments_excluding_example = $(".assignment").filter(function() {
+        return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
+    });
+    if (assignments_excluding_example.length) {
+        first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
+        if (!utils.ui.alreadyScrolled) {
+            // setTimeout needed because this runs before domSort
+            setTimeout(function() {
+                $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                new Promise(function(resolve) {
+                    let scrollTimeout = setTimeout(resolve, 200);
+                    $("#assignments-container").scroll(() => {
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = setTimeout(resolve, 200);
                     });
-                }, 0);
-                utils.ui.alreadyScrolled = true;
-            }
-        } else {
-            $("#assignments-header").replaceWith('<div id="tutorial-message" class="grey-highlight"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
-            $(".assignment-container, #current-date-container").hide();
+                }).then(function() {
+                    $("#assignments-container").off('scroll');
+                    first_available_assignment.focus();
+                });
+            }, 0);
+            utils.ui.alreadyScrolled = true;
         }
+    } else {
+        $("#assignments-header").replaceWith('<div id="tutorial-message" class="grey-highlight"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
+        $(".assignment-container, #current-date-container").hide();
     }
 },
 graphAlertTutorial: function(days_until_due) {
