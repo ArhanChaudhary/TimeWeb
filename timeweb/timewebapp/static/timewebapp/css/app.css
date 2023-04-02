@@ -1090,17 +1090,16 @@ main.finished-header-transition #extra-navs {
     position: relative;
     margin: 20px auto 40px;
     width: 150px;
-    --rotate: 0deg;
     /* animation-delay because jconfirm deletes and re adds the element for some reason */
     animation: jump 4s infinite 0.5s;
     transform-origin: 34px 113px;
 }
 #minute-hand {
     --turns-per-turn: 2;
-    transform: translate(255.81px, 255.967549px) rotate(calc(var(--rotate) * var(--turns-per-turn)));
+    transform: translate(256px, 256px) rotate(calc(var(--rotate, 0deg) * var(--turns-per-turn)));
 }
 #hour-hand {
-    transform: translate(256px, 255.967549px) rotate(calc(227deg + var(--rotate)));
+    transform: translate(256px, 256px) rotate(calc(225deg + var(--rotate, 0deg)));
 }
 @keyframes jump {
     0% {
