@@ -24,6 +24,12 @@ import datetime
 from decimal import Decimal
 from math import ceil, floor
 from copy import deepcopy
+from urlextract import URLExtract
+
+extractor = URLExtract(extract_localhost=False)
+# https://github.com/lipoja/URLExtract/issues/13#issuecomment-467635302
+extractor._stop_chars_left |= {"-", ":", ",", "."}
+extractor._stop_chars_right |= {",", "."}
 
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
@@ -575,6 +581,23 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.assignment_date = self.sm.assignment_date.replace(tzinfo=timezone.utc)
         if self.sm.x:
             self.sm.x = self.sm.x.replace(tzinfo=timezone.utc)
+
+        # ap cs may have .java homework which are counted as links
+        banned_endings = ("java", )
+
+        is_user_assignment = not self.sm.is_google_classroom_assignment
+        description_link = next((
+            url for url in extractor.gen_urls(self.sm.description)
+            if all(not url.endswith("." + ending) for ending in banned_endings)
+        ), None)
+        description_has_link = description_link is not None
+        description_has_changed = request.created_assignment or self.sm.description != old_data.description
+        
+        if is_user_assignment and description_has_link and description_has_changed:
+            self.sm.description = self.sm.description.replace(description_link, '')
+            self.sm.description = self.form.fields['description'].clean(self.sm.description)
+            self.sm.external_link = description_link
+
         self.sm.save()
         if request.created_assignment:
             logger.info(f'User \"{request.user}\" created assignment "{self.sm.name}"')

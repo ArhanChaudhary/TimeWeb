@@ -844,6 +844,13 @@ setAnimationSpeed: function() {
         this.style.setProperty('--scale-percent-y', '1', 'important');
     });
 },
+assignmentLinks: function() {
+    $(".title-link-anchor").each(function() {
+        if (this.href.startsWith(location.origin)) {
+            $(this).attr("href", "//" + this.getAttributeNode("href").value);
+        }
+    });
+},
 insertTutorialMessages: function(first_available_assignment) {
     $("#tutorial-click-assignment-to-open").remove();
     if (!SETTINGS.enable_tutorial) return;
@@ -1363,6 +1370,7 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
+        utils.ui.assignmentLinks();
     }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();
