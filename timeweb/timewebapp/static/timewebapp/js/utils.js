@@ -844,104 +844,75 @@ setAnimationSpeed: function() {
         this.style.setProperty('--scale-percent-y', '1', 'important');
     });
 },
-insertTutorialMessages: function(first_available_assignment) {
+tutorial: function(first_available_assignment) {
     $("#tutorial-click-assignment-to-open").remove();
-    if (!SETTINGS.enable_tutorial) return;
+    if (!SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
 
     first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
-    $.alert({
-        title: $("#tutorial-animation-template").html(),
-        content: "TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Here's a demonstration of how it works.",
-        backgroundDismiss: false,
-        buttons: {
-            "Skip tutorial": {
-                action: function() {
-                    SETTINGS.enable_tutorial = false;
-                    ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+
+    const tutorial_alerts = [
+        {
+            title: $("#tutorial-animation-template").html(),
+            content: "TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Here's a demonstration of how it works.",
+            backgroundDismiss: false,
+            buttons: {
+                "Skip tutorial": {
+                    action: function() {
+                        this.break = true;
+                        SETTINGS.enable_tutorial = false;
+                        // ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+                    }
+                },
+                next: {
+                    action: function() {
+    
+                    }
                 }
             },
-            next: {
-                action: function() {
+        },
+        {
+            title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\" target=\"_blank\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
+            content: "Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.",
+            backgroundDismiss: false,
+            alignTop: true, // alignTop is a custom extension
+            onDestroy: function() {
 
-                }
-            }
+            },
+            transition: function(finished_resolver) {
+                first_available_assignment[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                new Promise(function(resolve) {
+                    let scrollTimeout = setTimeout(resolve, 500);
+                    $("#assignments-container").scroll(() => {
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = setTimeout(resolve, 500);
+                    });
+                }).then(function() {
+                    $("#assignments-container").off('scroll');
+                    first_available_assignment.click();
+                    setTimeout(finished_resolver, 1000);
+                });
+            },
+        },
+    ];
+    function recurseAlert(alertparams) {
+        if (!alertparams.length) return;
+
+        const alertparam = alertparams.shift();
+        alertparam.backgroundDismiss = false;
+        alertparam.onClose = function() {
+            if (this.break) return;
+            recurseAlert(alertparams);
         }
-    });
-},
-graphAlertTutorial: function(days_until_due) {
-    // jconfirm may return the focus to .assignment after the alert
-    // and cause a quick scroll jump, this prevents that from happening
-    $(document.activeElement).blur();
-
-    $.alert({
-        title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\" target=\"_blank\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
-        content: "Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.",
-        backgroundDismiss: false,
-        alignTop: true, // alignTop is a custom extension
-        onDestroy: function() {
-        // Service worker push notifs API hasn't yet been implemented :-(
-        // Code once it is implemented:
-
-        //     $.alert({
-        //         title: "Would you like to allow TimeWeb to send notifications?",
-        //         content: "You will be notified of your total estimated completion time daily. If you accidentally click no, you can come back to this popup by re-enabling the tutorial in the settings.",
-        //         backgroundDismiss: false,
-        //         alignTop: true, // alignTop is a custom extension
-        //         buttons: {
-        //             // https://css-tricks.com/creating-scheduled-push-notifications/
-        //             yes: {
-        //                 action: async function() {
-        //                     const reg = await navigator.serviceWorker.getRegistration();
-        //                     Notification.requestPermission().then(permission => {
-        //                         if (permission === 'granted') {
-        //                             reg.showNotification(
-        //                                 'Demo Push Notification',
-        //                                 {
-        //                                     tag: timestamp, // a unique ID
-        //                                     body: 'Hello World', // content of the push notification
-        //                                     data: {
-        //                                         url: window.location.href, // pass the current url to the notification
-        //                                     },
-        //                                     badge: "images/icon-192x192.png",
-        //                                     icon: "images/icon-192x192.png",
-        //                                     actions: [
-        //                                         {
-        //                                             action: 'open',
-        //                                             title: 'Open app',
-        //                                         },
-        //                                         {
-        //                                             action: 'close',
-        //                                             title: 'Close notification',
-        //                                         }
-        //                                     ]
-        //                                 }
-        //                             );
-        //                         }
-        //                     });
-        //                 }
-        //             },
-        //             no: {
-        //                 action: async function() {
-        //                     const reg = await navigator.serviceWorker.getRegistration();
-        //                     const notifications = await reg.getNotifications({
-        //                         includeTriggered: true
-        //                     });
-        //                     notifications.forEach(notification => notification.close());
-        //                 }
-        //             }
-        //         },
-        //         onClose: function() {
-        //             SETTINGS.enable_tutorial = false;
-        //             ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
-        //         },
-        //     });
-            SETTINGS.enable_tutorial = false;
-            ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
-            $("#username").focus().addClass("highlight-setings-nav").one("click", function() {
-                $(this).removeClass("highlight-setings-nav");
-            });
-        }
-    });
+        new Promise(function(finished_resolver) {
+            if (alertparam.transition)
+                alertparam.transition(finished_resolver);
+            else
+                finished_resolver();
+        }).then(function() {
+            $.alert(alertparam);
+        });
+    }
+    recurseAlert(tutorial_alerts);
 },
 exampleAccountAlertTutorial: function() {
     if (sessionStorage.getItem("already-alerted-example-account")) return;

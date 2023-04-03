@@ -1157,7 +1157,7 @@ class Priority {
         if (!first_available_tutorial_assignment) {
             first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
         }
-        utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
+        utils.ui.tutorial(first_available_tutorial_assignment);
 
         const $assignment_container = $(".assignment-container");
         // We need to do this in a separate loop so single assignment line wrappers are removed appropriately
