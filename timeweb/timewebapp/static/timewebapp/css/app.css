@@ -1195,71 +1195,71 @@ main.finished-header-transition #extra-navs {
         --rotate: 76deg;
     }
     16.5% {
-        transform: rotate(-13deg) translateY(-9.5px) scale(0.965, 1.035);
+        transform: rotate(-13deg) translateY(-9.5px) scale(0.97, 1.035);
         --rotate: 86deg;
     }
     17% {
-        transform: rotate(-14deg) translateY(-10px) scale(0.96, 1.04);
+        transform: rotate(-14deg) translateY(-10px) scale(0.97, 1.04);
         --rotate: 97deg;
     }
     17.5% {
-        transform: rotate(-14.5deg) translateY(-10px) scale(0.96, 1.04);
+        transform: rotate(-14.5deg) translateY(-10px) scale(0.965, 1.045);
         --rotate: 108deg;
     }
     18% {
-        transform: rotate(-15deg) translateY(-10px) scale(0.96, 1.04);
+        transform: rotate(-15deg) translateY(-10px) scale(0.96, 1.05);
         --rotate: 120deg;
     }
     18.5% {
-        transform: rotate(-15deg) translateY(-10.5px) scale(0.96, 1.04);
+        transform: rotate(-15deg) translateY(-10.5px) scale(0.96, 1.05);
         --rotate: 131deg;
     }
     19% {
-        transform: rotate(-15deg) translateY(-11px) scale(0.96, 1.04);
+        transform: rotate(-15deg) translateY(-11px) scale(0.96, 1.05);
         --rotate: 143deg;
     }
     19.5% {
-        transform: rotate(-14.5deg) translateY(-11px) scale(0.955, 1.04);
+        transform: rotate(-14.5deg) translateY(-11px) scale(0.96, 1.05);
         --rotate: 155deg;
     }
     20% {
-        transform: rotate(-14deg) translateY(-11px) scale(0.95, 1.04);
+        transform: rotate(-14deg) translateY(-11px) scale(0.96, 1.05);
         --rotate: 168deg;
     }
     20.5% {
-        transform: rotate(-14deg) translateY(-11px) scale(0.95, 1.04);
+        transform: rotate(-14deg) translateY(-11px) scale(0.96, 1.05);
         --rotate: 180deg;
     }
     21% {
-        transform: rotate(-14deg) translateY(-11px) scale(0.95, 1.04);
+        transform: rotate(-14deg) translateY(-11px) scale(0.96, 1.05);
         --rotate: 192deg;
     }
     21.5% {
-        transform: rotate(-13.5deg) translateY(-10.5px) scale(0.95, 1.04);
+        transform: rotate(-13.5deg) translateY(-10.5px) scale(0.96, 1.05);
         --rotate: 205deg;
     }
     22% {
-        transform: rotate(-13deg) translateY(-10px) scale(0.95, 1.04);
+        transform: rotate(-13deg) translateY(-10px) scale(0.96, 1.05);
         --rotate: 217deg;
     }
     22.5% {
-        transform: rotate(-12.5deg) translateY(-9px) scale(0.95, 1.04);
+        transform: rotate(-12.5deg) translateY(-9px) scale(0.96, 1.045);
         --rotate: 229deg;
     }
     23% {
-        transform: rotate(-12deg) translateY(-8px) scale(0.95, 1.04);
+        transform: rotate(-12deg) translateY(-8px) scale(0.96, 1.04);
         --rotate: 240deg;
     }
     23.5% {
-        transform: rotate(-11.5deg) translateY(-7px) scale(0.955, 1.035);
+        transform: rotate(-11.5deg) translateY(-7px) scale(0.96, 1.04);
         --rotate: 252deg;
     }
     24% {
-        transform: rotate(-11deg) translateY(-6px) scale(0.96, 1.03);
+        transform: rotate(-11deg) translateY(-6px) scale(0.96, 1.04);
         --rotate: 263deg;
     }
     24.5% {
-        transform: rotate(-10deg) translateY(-5.5px) scale(0.96, 1.03);
+        transform: rotate(-10deg) translateY(-5.5px) scale(0.96, 1.035);
         --rotate: 274deg;
     }
     25% {
@@ -1283,31 +1283,31 @@ main.finished-header-transition #extra-navs {
         --rotate: 320deg;
     }
     27.5% {
-        transform: rotate(-4.5deg) translateY(-2px) scale(0.97, 1.025);
+        transform: rotate(-4.5deg) translateY(-2px) scale(0.975, 1.025);
         --rotate: 327deg;
     }
     28% {
-        transform: rotate(-4deg) translateY(-1px) scale(0.97, 1.02);
+        transform: rotate(-4deg) translateY(-1px) scale(0.978, 1.02);
         --rotate: 334deg;
     }
     28.5% {
-        transform: rotate(-3deg) translateY(-1px) scale(0.975, 1.015);
+        transform: rotate(-3deg) translateY(-1px) scale(0.985, 1.015);
         --rotate: 340deg;
     }
     29% {
-        transform: rotate(-2deg) translateY(-1px) scale(0.98, 1.01);
+        transform: rotate(-2deg) translateY(-1px) scale(0.99, 1.01);
         --rotate: 345deg;
     }
     29.5% {
-        transform: rotate(-2deg) translateY(-0.5px) scale(0.985, 1.005);
+        transform: rotate(-2deg) translateY(-0.5px) scale(0.995, 1.005);
         --rotate: 350deg;
     }
     30% {
-        transform: rotate(-2deg) translateY(0px) scale(0.99, 1);
+        transform: rotate(-2deg) translateY(0px) scale(1, 1);
         --rotate: 353deg;
     }
     30.5% {
-        transform: rotate(-1.5deg) translateY(0px) scale(0.995, 1);
+        transform: rotate(-1.5deg) translateY(0px) scale(1, 1);
         --rotate: 356deg;
     }
     31% {
