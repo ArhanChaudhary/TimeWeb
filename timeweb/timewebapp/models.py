@@ -142,7 +142,7 @@ class TimewebModel(models.Model):
     is_google_classroom_assignment = models.BooleanField(
         default=False,
     )
-    google_classroom_assignment_link = models.URLField(
+    assignment_link = models.URLField(
         null=True,
         blank=True,
     )

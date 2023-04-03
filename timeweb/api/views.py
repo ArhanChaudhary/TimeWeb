@@ -513,7 +513,7 @@ def create_gc_assignments(request, order=None):
             ))
             if description := assignment.get('description'):
                 description = utils.simplify_whitespace(description)
-            google_classroom_assignment_link = assignment.get("alternateLink")
+            assignment_link = assignment.get("alternateLink")
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=None,
                 assignment_date=assignment_date,
@@ -538,7 +538,7 @@ def create_gc_assignments(request, order=None):
                 "blue_line_start": blue_line_start,
                 "dynamic_start": dynamic_start,
                 # from api, cannot change
-                "google_classroom_assignment_link": google_classroom_assignment_link,
+                "assignment_link": assignment_link,
                 "tags": tags,
             })
             # we need to save every id we come across for now because pageSize is now limited

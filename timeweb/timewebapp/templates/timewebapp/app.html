@@ -211,7 +211,7 @@
                 <div class="left-side-of-header {% if user.settingsmodel.appearance == "dark" or user.settingsmodel.appearance == "automatic" %}fancy-coloring{% endif %}">
                   <span class="title">
                     {% comment %} Don't make <a> .title so the psuedo elements don't become clickable {% endcomment %}
-                    <span class="title-text">{{ assignment.name }}</span>{% if assignment.google_classroom_assignment_link %}<a class="title-link-anchor" target="_blank" rel="noopener" href="{{ assignment.google_classroom_assignment_link }}" title="Assignment Link" tabindex="-1"
+                    <span class="title-text">{{ assignment.name }}</span>{% if assignment.assignment_link %}<a class="title-link-anchor" target="_blank" rel="noopener" href="{{ assignment.assignment_link }}" title="Assignment Link" tabindex="-1"
                       ><svg class="title-link-icon" width="12" preserveAspectRatio="none" viewBox="0.08 0 383.92 383.51">
                           <use href="#external_link-svg"></use>
                         </svg>

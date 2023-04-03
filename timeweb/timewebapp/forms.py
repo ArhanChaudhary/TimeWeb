@@ -19,7 +19,7 @@ class TimewebForm(forms.ModelForm):
             "needs_more_info",
             "is_google_classroom_assignment",
             "user",
-            "google_classroom_assignment_link",
+            "assignment_link",
             "hidden",
             "deletion_time",
         )

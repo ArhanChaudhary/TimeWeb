@@ -49,7 +49,7 @@ DELETED_ASSIGNMENTS_PER_PAGE = 70
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
-                                        "google_classroom_assignment_link", "alert_due_date_incremented", "dont_hide_again",
+                                        "assignment_link", "alert_due_date_incremented", "dont_hide_again",
                                         "deletion_time", "user", "needs_more_info")
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
@@ -71,7 +71,7 @@ EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
 assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
 
 EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT = (
-    "google_classroom_assignment_link", "user", "hidden"
+    "assignment_link", "user", "hidden"
 )
 INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
     "assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
