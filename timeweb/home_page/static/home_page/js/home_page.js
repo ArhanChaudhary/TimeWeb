@@ -3,9 +3,6 @@ function scalingFunction(x) {
     if (x < 0.02) return x * 5 + 0.1;
     return Math.sqrt(1 - Math.pow((x - 1) / 1, 2));
 }
-function clamp(low, value, high) {
-    return Math.min(Math.max(value, low), high)
-}
 scaled_horizontal_factor = 0;
 now = 0;
 function setMoveLefts() {
@@ -99,11 +96,10 @@ $(window).one("load", function() {
     }
     requestAnimationFrame(step);
     $(window).trigger("resize");
+    turns_per_turn = parseFloat(window.getComputedStyle($("#minute-hand")[0]).getPropertyValue("--turns-per-turn"));
 });
-let turns = 0;
-$(function() {
-    turn_mod = window.getComputedStyle($("#hour-hand")[0]).getPropertyValue("--turns-per-turn");
-});
+let rotate_favicon = 0;
+let turns_per_turn;
 let old_position;
 let old_time;
 let old_velocity;
@@ -138,9 +134,8 @@ $(window).scroll(function(e) {
     old_velocity = new_velocity;
 
     
-    $("#favicon-animated").prop("style").setProperty("--turns", turns);
-    turns += 0.05;
-    turns %= turn_mod;
+    $("#favicon-animated").prop("style").setProperty("--rotate", rotate_favicon + "deg");
+    rotate_favicon = rotate_favicon + 18 / turns_per_turn;
 });
 let old_window_width = window.innerWidth;
 isMobile = false;

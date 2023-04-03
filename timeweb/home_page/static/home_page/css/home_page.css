@@ -221,14 +221,16 @@ main {
     top: 25px;
     filter: drop-shadow(0 0 10px white);
     width: 150px;
-    --turns: 1;
+    --hand-transition: transform 0.1s ease-in;
 }
 #minute-hand {
-    transform: translate(255.81px, 255.967549px) rotate(calc(var(--turns) * 1turn));
+    --turns-per-turn: 5;
+    transform: translate(256px, 256px) rotate(calc(var(--rotate, 0deg) * var(--turns-per-turn)));
+    transition: var(--hand-transition);
 }
 #hour-hand {
-    --turns-per-turn: 5;
-    transform: translate(256px, 255.967549px) rotate(calc(227deg + var(--turns) / var(--turns-per-turn) * 1turn));
+    transform: translate(256px, 256px) rotate(calc(225deg + var(--rotate, 0deg)));
+    transition: var(--hand-transition);
 }
 @media screen and (max-width: 1100px) {
     /* .section-block#first > .section-max-width-wrapper {

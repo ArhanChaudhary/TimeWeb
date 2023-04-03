@@ -1,12 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" id="favicon-animated" viewBox="0 0 512 512">
-    <defs xmlns="http://www.w3.org/2000/svg" id="defs22">
-        <linearGradient id="logo-color-gradient">
-            <stop offset="0" stop-color="#5fc1c4"/>
-            <stop offset="1" stop-color="#345a6f"/>
-        </linearGradient>
-        <linearGradient y2="512.03339" x2="255.99657" y1="0.36104894" x1="255.50133" gradientUnits="userSpaceOnUse" id="logo-gradient" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-color-gradient"/>
-    </defs>
-    <circle r="200" transform="translate(255.81 256.063)" fill="white"/>
+    <linearGradient id="logo-color-gradient">
+        <stop offset="0" stop-color="#5fc1c4"/>
+        <stop offset="1" stop-color="#345a6f"/>
+    </linearGradient>
+    <linearGradient xmlns:xlink="http://www.w3.org/1999/xlink" y2="512" x2="256" y1="0" x1="256" gradientUnits="userSpaceOnUse" id="logo-gradient" xlink:href="#logo-color-gradient"/>
+    <circle r="200" transform="translate(256 256)" fill="white"/>
     <path d="M107.3,1.1C61.5,6.5,22.3,37.9,7.1,81.2c-7,20.1-6.5,7.5-6.8,170.5-.4,160.4-.5,157,5.2,175.3c11.8,37.5,41.9,67.6,79.5,79.4c17.9,5.7,15.2,5.6,171,5.6s153.1.1,171-5.6c37.6-11.8,67.7-41.9,79.5-79.4c5.7-18.3,5.6-14.9,5.2-175.3-.3-136.5-.4-147.7-2.1-154.5C497.9,48.1,463.9,14,415.5,2.7c-8.9-2.1-10.4-2.1-155-2.3-80.3-.1-149.2.2-153.2.7ZM290.5,74.4c72.2,15.3,128.2,70,143.9,140.7c10.1,45.3,3.1,92.3-19.6,132.1-34.4,60.3-98.9,96.2-167.8,93.5-67.3-2.7-127.1-41-157.4-100.7C70,301.2,64.5,260.4,73.1,217.6C87.5,146,147.2,87.6,219.5,74.1c15.7-2.9,15.9-2.9,38.5-2.6c17.4.3,22.3.7,32.5,2.9Z" fill="url(#logo-gradient)"/>
     <path d="M241.7,99.1c-26.9,1.8-53.5,11.2-77.2,27.2-12.3,8.4-32.3,28.5-40.4,40.7-12.1,18.1-19.7,35.9-24.3,56.7-1.9,8.5-2.2,12.8-2.2,32.3s.3,23.8,2.2,32.3c4.6,20.8,12.2,38.6,24.3,56.7c8.1,12.2,28.1,32.3,40.4,40.7c30.6,20.6,64.2,29.7,101.4,27.1c69.4-4.6,126.8-54.6,142.3-123.9c2-9.2,2.3-13,2.3-32.4c0-24.5-1.4-35.9-4.4-35.1-.9.3-5.4,1.3-9.9,2.2l-8.4,1.8.6,3.5c4.4,26.4,3,47-4.9,70.8-6.7,20-17.5,37.4-33,52.8-19.8,19.8-43.2,32.3-71,38.1-12.4,2.5-38.5,2.6-50.5.1-27.9-5.9-51.4-18.3-70.3-37.1-24.3-24-37.5-51.7-40.9-85.8-2.6-26,3.9-55.9,17.2-79.3c13.1-22.7,34.8-43.3,58.3-55.1c8.5-4.3,24.4-9.7,35.7-12.1c12-2.5,38.1-2.4,50.5.1c27.8,5.8,51.2,18.3,71,38.1c9.6,9.5,20.8,24.6,25.1,33.7c1,2.1,2.1,3.8,2.6,3.8c1.8,0,17.8-8,17.8-8.9c0-.6-1.6-3.9-3.5-7.3-30.4-55.3-87.1-86-150.8-81.7Z" fill="#56adb6"/>
     <path d="M249,146v16h7h7v-16-16h-7-7Z" fill="#56adb6"/>
@@ -17,11 +15,11 @@
     <path d="M322.7,321.8l-4.7,4.7l11.8,11.8L341.6,350l4.7-4.8l4.7-4.7-11.8-11.8L327.4,317Z" fill="#56adb6"/>
     <path d="M171,331.5L159.5,343l4.8,4.7l4.7,4.8l11.7-11.7L192.5,329l-4.5-4.5c-2.4-2.5-4.7-4.5-5-4.5s-5.7,5.2-12,11.5Z" fill="#56adb6"/>
     <path d="M249,367v16h7h7v-16-16h-7-7Z" fill="#56adb6"/>
-    <g id="minute-hand" transform="translate(255.81,255.967549)">
-        <rect width="14" height="54.7" rx="0" ry="0" transform="translate(-6.81,-82.967543)" fill="#56adb6"/>
+    <g id="minute-hand">
+        <rect width="14" height="54.7" transform="translate(-7 -82.967543)" fill="#56adb6"/>
     </g>
-    <g id="hour-hand" transform="translate(256,255.967549) rotate(226.939138)">
-        <rect width="12.8613" height="50.3054" rx="0" ry="0" transform="translate(-6.777834,-64.858698)" fill="#56adb6"/>
+    <g id="hour-hand">
+        <rect width="14" height="50.3054" transform="translate(-7 -64.858698)" fill="#56adb6"/>
     </g>
-    <circle r="29.3968" transform="translate(255.81 256.063)" fill="#56adb6"/>
+    <circle r="29.3968" transform="translate(256 256)" fill="#56adb6"/>
 </svg>
