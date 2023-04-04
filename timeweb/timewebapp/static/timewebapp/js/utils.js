@@ -852,9 +852,6 @@ tutorial: function(first_available_assignment) {
 
     const tutorial_alerts = [
         {
-            title: $("#tutorial-animation-template").html(),
-            content: "TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Here's a demonstration of how it works.",
-            backgroundDismiss: false,
             buttons: {
                 "Skip tutorial": {
                     action: function() {
@@ -871,9 +868,6 @@ tutorial: function(first_available_assignment) {
             },
         },
         {
-            title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\" target=\"_blank\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
-            content: "Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.",
-            backgroundDismiss: false,
             alignTop: true, // alignTop is a custom extension
             onDestroy: function() {
 
@@ -894,10 +888,15 @@ tutorial: function(first_available_assignment) {
             },
         },
     ];
+    let alert_number = 0;
     function recurseAlert(alertparams) {
         if (!alertparams.length) return;
 
         const alertparam = alertparams.shift();
+        alert_number++;
+        const alert_template = $($(`#tutorial-${alert_number}-template`).html());
+        alertparam.title = alert_template.filter(".tutorial-title").html();
+        alertparam.content = alert_template.filter(".tutorial-content").html();
         alertparam.backgroundDismiss = false;
         alertparam.onClose = function() {
             if (this.break) return;

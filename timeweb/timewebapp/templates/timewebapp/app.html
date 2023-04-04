@@ -424,15 +424,24 @@
     </defs>
   </svg>
   {% if user.settingsmodel.enable_tutorial %}
-    <template id="tutorial-animation-template">
-      <svg viewBox="0 0 512 512" id="favicon-animated">
-        {% include "favicon_animated.svg" %}
-      </svg>
-      <center>
-        <h1>
-          Welcome to TimeWeb!
-        </h1>
-      </center>
+    <template id="tutorial-1-template">
+      <span class="tutorial-title">
+        <svg viewBox="0 0 512 512" id="favicon-animated">
+          {% include "favicon_animated.svg" %}
+        </svg>
+        <div id="tutorial-welcome">Welcome to TimeWeb!</div>
+      </span>
+      <span class="tutorial-content">
+        TimeWeb is a time management application that visualizes, quantifies, and prioritizes your daily school or work assignments. Here's a demonstration of how it works.
+      </span>
+    </template>
+    <template id="tutorial-2-template">
+      <span class="tutorial-title">
+        Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\" target=\"_blank\">user guide</a> to understand how to use it."
+      </span>
+      <span class="tutorial-content">
+        Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.
+      </span>
     </template>
   {% endif %}
 {% endblock %}

@@ -128,11 +128,10 @@ main.background-image-exists {
     transition: clip-path 0.4s cubic-bezier(0.35, 0.27, 0.16, 1.08);
     z-index: 1002;
 }
-#tutorial-overlay.a {
-    --x: 400px;
-    --y: 200px;
-    --width: 400px;
-    --height: 400px;
+#tutorial-welcome {
+    font-size: 2em;
+    margin-top: 10px;
+    text-align: center;
 }
 #assignments-header {
     position: relative;
@@ -1088,7 +1087,7 @@ main.finished-header-transition #extra-navs {
 #favicon-animated {
     display: block;
     position: relative;
-    margin: 20px auto 40px;
+    margin: 10px auto 30px;
     width: 150px;
     /* animation-delay because jconfirm deletes and re adds the element for some reason */
     animation: jump 4s infinite 0.5s;
