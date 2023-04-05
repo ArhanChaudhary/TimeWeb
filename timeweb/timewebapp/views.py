@@ -82,17 +82,20 @@ INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
 
 assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"
 
-@receiver(post_save, sender=User)
-def create_settings_model_and_example(sender, instance, created, **kwargs):
-    if not created: return
-    # ensure this is UTC for assignment_date and x
-    # The front end adjusts the assignment and due date, so we don't need to worry about this being accurate
+def create_example_assignment(instance):
     date_now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     TimewebModel.objects.create(**EXAMPLE_ASSIGNMENT | {
         "assignment_date": date_now,
         "x": date_now + datetime.timedelta(EXAMPLE_ASSIGNMENT["x"]),
         "user": instance,
     })
+
+@receiver(post_save, sender=User)
+def create_settings_model_and_example(sender, instance, created, **kwargs):
+    if not created: return
+    # ensure this is UTC for assignment_date and x
+    # The front end adjusts the assignment and due date, so we don't need to worry about this being accurate
+    create_example_assignment(instance)
     SettingsModel.objects.create(user=instance)
     logger.info(f'Created settings model for user "{instance.username}"')
 
