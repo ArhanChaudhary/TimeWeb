@@ -9,10 +9,14 @@ html {
     margin-top: -10px;
     padding-top: 10px;
     --scale-percent-y: 1.05;
-    --vertical-assignment-padding: 33px;
+    --original-vertical-assignment-padding: 33px;
+    --vertical-assignment-padding: calc(var(--original-vertical-assignment-padding) + var(--first-extra-vertical-assignment-padding, 0px));
     --horizontal-assignment-padding: 15px;
     --outer-assignment-vertical-padding: 8px;
     --outer-assignment-horizontal-padding: 25px;
+}
+#assignments-container.priority-color-borders {
+    --first-extra-vertical-assignment-padding: 3px;
 }
 #assignments-container:focus {
     /* Arrow scroll manually focuses */
@@ -97,6 +101,39 @@ main.background-image-exists {
 #tutorial-message {
     padding: 0 10px;
 }
+#tutorial-overlay {
+    overflow: auto;
+    background-color: hsla(0, 0%, 0%, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    --x: 0px;
+    --y: 0px;
+    --width: 100%;
+    --height: 100%;
+    clip-path: polygon(
+        0% 0%,
+        0% 100%,
+        var(--x) 100%,
+        var(--x) var(--y),
+        calc(var(--x) + var(--width)) var(--y),
+        calc(var(--x) + var(--width)) calc(var(--y) + var(--height)),
+        var(--x) calc(var(--y) + var(--height)),
+        var(--x) 100%,
+        100% 100%,
+        100% 0%
+    );
+    height: 100%;
+    width: 100%;
+    transition: clip-path 0.4s cubic-bezier(0.35, 0.27, 0.16, 1.08);
+    z-index: 1002;
+}
+#tutorial-overlay.a {
+    --x: 400px;
+    --y: 200px;
+    --width: 400px;
+    --height: 400px;
+}
 #assignments-header {
     position: relative;
     font-size: 18px;
@@ -166,7 +203,10 @@ main.background-image-exists {
     padding-bottom: 40px;
 }
 .assignment {
-    --box-shadow: 0 0 12px -9px black;
+    --box-shadow-assignment-spread: -9px;
+    --box-shadow-assignment: 0 0 12px var(--box-shadow-assignment-spread) black;
+    --box-shadow-priority: 0 0 0 0 transparent;
+    --box-shadow: var(--box-shadow-assignment), var(--box-shadow-priority);
     box-shadow: var(--box-shadow);
     background: var(--primary); /* Set white so it doesnt transition background initially if added by priority.js */
     /* i really could not care less about priority-color being consistent */
@@ -177,12 +217,20 @@ main.background-image-exists {
     /* Ensures this stacks above .assignment-container::after */
     z-index: 1;
     scroll-margin: 20px;
-    transition: all .2s ease-in-out, opacity calc(.375s * var(--animation-speed)) ease-in-out, left 0s, padding 0s;
+    transition: all .2s ease-in-out,
+                opacity calc(.375s * var(--animation-speed)) ease-in-out,
+                box-shadow calc(var(--priority-color-transition-speed) * var(--animation-speed)),
+                left 0s,
+                padding 0s;
+}
+#assignments-container.priority-color-borders .assignment {
+    --priority-color-border-width: 1px;
+    --box-shadow-priority: inset 0 0 0 var(--priority-color-border-width) var(--priority-color);
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
 .assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring a {
+.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {
@@ -205,6 +253,8 @@ main.background-image-exists {
 }
 #tutorial-click-assignment-to-open {
     font-size: 18px;
+    margin-top: 3px;
+    display: inline-block;
     scroll-margin: 30px;
 }
 .shortcut {
@@ -350,17 +400,16 @@ main.background-image-exists {
     margin-bottom: 0;
 }
 .left-side-of-header .title .title-link-anchor {
+    display: inline-block;
     color: var(--color);
+    line-height: 0;
 }
 .left-side-of-header .title .title-link-icon {
-    margin-bottom: -2.5px;
-    border-bottom: 1.5px solid var(--color);
-    padding-bottom: 3px;
-    transition: inherit;
-    transition-property: border-bottom-color;
+    margin-bottom: 1px;
+    margin-left: 3px;
 }
 /* Add to truncate warning if the below style is changed */
-.assignment.open-assignment .description {
+.assignment.open-assignment .description, .assignment.needs-more-info .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -390,8 +439,8 @@ main.background-image-exists {
 .title {
     min-width: var(--left-side-of-header-width);
     max-width: var(--left-side-of-header-width);
-    --smush-daysleft: 2px;
-    --smush-priority: 3px;
+    --smush-daysleft: -1px;
+    --smush-priority: -1px;
     overflow-wrap: break-word;
 }
 .title::after, .title::before {
@@ -444,9 +493,9 @@ do this because midde-of-header is hidden in the delete assignments view */
     white-space: nowrap;
     font-size: 13.6px;
     --tags-left--margin-bottom: 7px;
-    --tags-bottom--margin-bottom: 3px;
+    --tags-bottom--margin-bottom: calc(3px + var(--first-extra-vertical-assignment-padding, 0px));
     --tags-right--margin-right: 2px;
-    --tags-top--margin-top: 3px;
+    --tags-top--margin-top: calc(3px + var(--first-extra-vertical-assignment-padding, 0px));
 }
 .tags [tabindex]:focus, .tags input:focus {
     outline: 0;
@@ -570,15 +619,19 @@ do this because midde-of-header is hidden in the delete assignments view */
     opacity: 1;
     transform: scale(1.2);
 }
+.font-montserrat .tags {
+    --increase-tag-box-width: 7px;
+    --increase-tag-add-width: 6px;
+}
 .tag-add:hover, .assignment.open-tag-add-box .tag-add {
-    width: 78px;
+    width: calc(78px + var(--increase-tag-add-width, 0px));
 }
 .tag-add:hover .tag-add-text, .assignment.open-tag-add-box .tag-add-text {
     opacity: 1;
 }
 .tag-add-box {
     white-space: normal;
-    width: 159px;
+    width: calc(159px + var(--increase-tag-box-width, 0px));
     --box-shadow-color: hsla(0, 0%, 67%, 0.65);
     --box-shadow-color2: black;
     --input-background-color: hsl(0, 0%, 86%);
@@ -760,8 +813,8 @@ do this because midde-of-header is hidden in the delete assignments view */
     align-items: center;
     justify-content: center;
     /* negate the variable pixel value */
-    margin-top: calc(-1 * var(--vertical-assignment-padding));
-    margin-bottom: calc(-1 * var(--vertical-assignment-padding));
+    margin-top: calc(var(--priority-color-border-width, 0px) - var(--vertical-assignment-padding));
+    margin-bottom: calc(var(--priority-color-border-width, 0px) - var(--vertical-assignment-padding));
     margin-left: 1px;
     margin-right: -3px;
     --horizontal-header-button-padding: 8px;
@@ -826,7 +879,7 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .graph-container {
     border-radius: 12px;
-    height: clamp(200px,65vh,400px);
+    height: clamp(200px, calc(65 * var(--vh)), 400px);
     position: relative;
     border: 2px solid hsla(0, 0%, 42%, 0.75); /* hsl(0, 0%, 70%) */
 }
@@ -873,6 +926,9 @@ do this because midde-of-header is hidden in the delete assignments view */
 .graph-footer > :not(.work-input-textbox-wrapper),
 .work-input-textbox,
 .work-input-unit-of-time-widget {
+    --control-height: 21px;
+    box-sizing: content-box;
+    height: var(--control-height);
     font-size: 15px;
     border-radius: 20px;
     border: none;
@@ -916,12 +972,17 @@ do this because midde-of-header is hidden in the delete assignments view */
     margin-top: 13px;
     margin-bottom: var(--assignment-margin-bottom);
 }
-.work-input-textbox {
+.font-opensans .work-input-textbox-wrapper {
     --width: 123px;
+}
+.font-montserrat .work-input-textbox-wrapper {
+    --width: 132px;
+}
+.work-input-textbox {
     width: var(--width);
     position: relative;
     transition-property: border-radius, padding-right, margin-left;
-    transition-duration: 0.3s;
+    transition-duration: calc(.3s * var(--animation-speed));
     transition-timing-function: ease-in-out;
 }
 .work-input-textbox-wrapper {
@@ -937,13 +998,14 @@ do this because midde-of-header is hidden in the delete assignments view */
     visibility: hidden;
     opacity: 0;
     z-index: initial;
+    height: var(--control-height);
     cursor: pointer;
     margin-left: -50px;
     user-select: none;
     padding: 5px 10px 5px 5px;
     border-radius: 0px 20px 20px 0px;
     --background-color: hsl(0, 0%, 80%);
-    transition: 0.3s ease-in-out;
+    transition: calc(.3s * var(--animation-speed)) ease-in-out;
     transition-property: margin-left, opacity, visibility;
 }
 .work-input-textbox-wrapper.show-input-widget .work-input-unit-of-time-widget {
@@ -1004,19 +1066,6 @@ main.finished-header-transition #extra-navs {
     cursor: pointer;
     text-decoration: underline;
 }
-
-.daterangepicker,
-.daterangepicker .calendar-table {
-    background-color: var(--primary);
-    transform: translateX(-5px);
-}
-.daterangepicker td:not(.active, :hover) {
-    background-color: unset !important;
-}
-.daterangepicker .calendar-table .available span {
-    border-color: var(--color);
-}
-
 #assignments-container.thin-text-shadow-width {
     --filter-drop-shadow-width: 0.5px;
 }
@@ -1026,7 +1075,6 @@ main.finished-header-transition #extra-navs {
 #assignments-container.thick-text-shadow-width {
     --filter-drop-shadow-width: 1.5px;
 }
-
 #assignments-container:not(.none-text-shadow-width) .grey-highlight:not(.assignment-container),
 #assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::after,
 #assignments-container:not(.none-text-shadow-width) .grey-highlight.assignment-container::before {
@@ -1037,14 +1085,13 @@ main.finished-header-transition #extra-navs {
             drop-shadow(calc(-1 * var(--filter-drop-shadow-width)) 0 0 var(--filter-drop-shadow-color, transparent));
 }
 
-
 /* Mobile view */
 .show-on-mobile {
     display: none;
 }
 @media screen and (max-width: 750px) {
     .assignment {
-        --box-shadow: 0 0 12px -8px black;
+        --box-shadow-assignment-spread: -8px;
     }
     #assignments-container {
         --outer-assignment-horizontal-padding: 13px;
@@ -1115,5 +1162,15 @@ main.finished-header-transition #extra-navs {
         box-shadow: none;
         padding-left: 0 !important;
         padding-right: 0 !important;
+    }
+}
+@media screen and (max-width: 550px) {
+    .font-opensans .hide-on-small-mobile {
+        display: none;
+    }
+}
+@media screen and (max-width: 580px) {
+    .font-montserrat .hide-on-small-mobile {
+        display: none;
     }
 }

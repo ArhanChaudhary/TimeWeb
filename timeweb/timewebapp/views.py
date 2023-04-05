@@ -24,19 +24,25 @@ import datetime
 from decimal import Decimal
 from math import ceil, floor
 from copy import deepcopy
+from urlextract import URLExtract
+
+extractor = URLExtract(extract_localhost=False)
+# https://github.com/lipoja/URLExtract/issues/13#issuecomment-467635302
+extractor._stop_chars_left |= {"-", ":", ",", "."}
+extractor._stop_chars_right |= {",", "."}
 
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
 EXAMPLE_ASSIGNMENT = {
-    "name": "Reading a Book (EXAMPLE ASSIGNMENT)",
-    "x": 30, # Not the db value of x, in this case is just the number of days in the assignment
-    "unit": "Page",
-    "y": "400.00",
+    "name": "Read a Book (EXAMPLE ASSIGNMENT)",
+    "x": 20, # Not the db value of x, in this case is just the number of days in the assignment
+    "unit": "Chapter",
+    "y": 25,
     "blue_line_start": 0,
-    "skew_ratio": "1.0000000000",
-    "time_per_unit": "3.00",
-    "funct_round": "1.00",
-    "min_work_time": "60.00",
+    "skew_ratio": 1,
+    "time_per_unit": 20,
+    "funct_round": 1,
+    "min_work_time": 2,
     "break_days": [],
     "dynamic_start": 0,
     "description": "Example assignment description"
@@ -49,7 +55,7 @@ DELETED_ASSIGNMENTS_PER_PAGE = 70
 TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
                                         "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "hidden")
 DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "description", "tags", "is_google_classroom_assignment",
-                                        "google_classroom_assignment_link", "alert_due_date_incremented", "dont_hide_again",
+                                        "external_link", "alert_due_date_incremented", "dont_hide_again",
                                         "deletion_time", "user", "needs_more_info")
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
@@ -59,19 +65,19 @@ INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'close_graph_after_work_input', 'show_priority', 'highest_priority_color', 'lowest_priority_color',
     'assignment_sorting', 'default_dropdown_tags', 'display_working_days_left',
     'horizontal_tag_position', 'vertical_tag_position', 'animation_speed',  'enable_tutorial',
-    'sorting_animation_threshold', 'seen_latest_changelog', 
+    'sorting_animation_threshold', 'seen_latest_changelog', 'should_alert_due_date_incremented',
 )
 EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
     "oauth_token", "added_gc_assignment_ids", "user", "background_image", "id", "nudge_calendar",
     "nudge_notifications", "nudge_canvas", "device_uuid", "device_uuid_api_timestamp",
     "gc_courses_cache", "gc_assignments_always_midnight", "background_image_text_shadow_width",
-    "appearance", 
+    "appearance", "priority_color_borders", "font"
 )
 
 assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
 
 EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT = (
-    "google_classroom_assignment_link", "user", "hidden"
+    "external_link", "user", "hidden"
 )
 INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
     "assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
@@ -159,7 +165,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
         self.context['assignment_models'] = timewebmodels
         self.context['assignment_models_as_json'] = [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in timewebmodels]
 
-        self.context['settings_model'] = request.user.settingsmodel
         self.context['settings_model_as_json'] = model_to_dict(request.user.settingsmodel, exclude=EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT)
         self.context['settings_model_as_json']['gc_integration_enabled'] = 'token' in request.user.settingsmodel.oauth_token
 
@@ -576,6 +581,23 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.sm.assignment_date = self.sm.assignment_date.replace(tzinfo=timezone.utc)
         if self.sm.x:
             self.sm.x = self.sm.x.replace(tzinfo=timezone.utc)
+
+        # ap cs may have .java homework which are counted as links
+        banned_endings = ("java", )
+
+        is_user_assignment = not self.sm.is_google_classroom_assignment
+        description_link = next((
+            url for url in extractor.gen_urls(self.sm.description)
+            if all(not url.endswith("." + ending) for ending in banned_endings)
+        ), None)
+        description_has_link = description_link is not None
+        description_has_changed = request.created_assignment or self.sm.description != old_data.description
+        
+        if is_user_assignment and description_has_link and description_has_changed:
+            self.sm.description = self.sm.description.replace(description_link, '')
+            self.sm.description = self.form.fields['description'].clean(self.sm.description)
+            self.sm.external_link = description_link
+
         self.sm.save()
         if request.created_assignment:
             logger.info(f'User \"{request.user}\" created assignment "{self.sm.name}"')

@@ -23,10 +23,23 @@ class SettingsForm(forms.ModelForm):
             "enable_gc_integration": {
                 "field": forms.BooleanField(
                     label="Google Classroom Integration",
-                    help_text=mark_safe('Imports assignments from Google Classroom to TimeWeb. Some assignments are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.'),
+                    help_text=mark_safe('''
+                        Imports assignments from Google Classroom. Some are <a target="_blank" href="/user-guide#adding-google-classroom-assignments">automatically filtered</a>. If nothing happens after authorization, there aren&#x27;t any valid Google Classroom assignments to add.<br>
+                        <br>
+                        Note that you can use a different Google account for the Google Classroom integration than the one used to log in to TimeWeb.
+                    '''),
                     required=False,
                 ),
-                "order": "before gc_assignments_always_midnight",
+                "order": "before immediately_delete_completely_finished_assignments",
+            },
+            "canvas_integration": {
+                "field": forms.BooleanField(
+                    label="Canvas Integration",
+                    help_text="Not yet implemented.",
+                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
+                    required=False,
+                ),
+                "order": "after enable_gc_integration",
             },
             "calendar_integration": {
                 "field": forms.BooleanField(
@@ -35,7 +48,7 @@ class SettingsForm(forms.ModelForm):
                     widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
                     help_text="Not yet implemented.",
                 ),
-                "order": "after enable_gc_integration",
+                "order": "after canvas_integration",
             },
             "notifications_integration": {
                 "field": forms.BooleanField(
@@ -46,19 +59,10 @@ class SettingsForm(forms.ModelForm):
                 ),
                 "order": "after calendar_integration",
             },
-            "canvas_integration": {
-                "field": forms.BooleanField(
-                    label="Canvas Integration",
-                    help_text="Not yet implemented.",
-                    widget=forms.CheckboxInput(attrs={"class": "not-yet-implemented"}),
-                    required=False,
-                ),
-                "order": "after notifications_integration",
-            },
             "view_deleted_assignments": {
                 "field": forms.BooleanField(
                     label="View Deleted Assignments",
-                    help_text="Refresh after viewing to go back to your unhidden assignments.",
+                    help_text="Refresh after viewing to go back to your current assignments.",
                     required=False,
                 ),
                 "order": "after immediately_delete_completely_finished_assignments"
@@ -94,17 +98,31 @@ class SettingsForm(forms.ModelForm):
         help_texts = {
             "def_skew_ratio": "Set this value to 0 to make it linear.",
             "def_min_work_time": "Enter this value in minutes. If you typically complete longer periods of work at a time, set this to a high value (such as 60 minutes or 90 minutes).",
-            "loosely_enforce_minimum_work_times": "Ignores every assignments' minimum work time on their first and last working days in exchange for making their work distributions smoother. Recommended to be turned on.",
-            "show_priority": "Displays the priority percentage and color for every assignment.",
+            "loosely_enforce_minimum_work_times": "Ignores every assignment's minimum work time on their first and last working days in exchange for making their work schedules smoother. Recommended to be turned on.",
+            "show_priority": "Display the priority percentage and color for every assignment.",
             "close_graph_after_work_input": "Automatically closes the assignment graph after submitting today's work input.",
             "one_graph_at_a_time": "Automatically closes other open assignment graphs if you try to open a different one. Useful if many open graphs feel overwhelming.",
             "default_dropdown_tags": "These will show up by default in the tag add dropdown. Separate each default tag with a comma or new line.",
             "appearance": "Lesser dark mode doesn't color your assignment titles.",
             "animation_speed": "Controls the speed of most animations.",
             "sorting_animation_threshold": "Only do the assignment sorting animation when there are this many assignments or less. Due to performance lag as the number of assignments increase, enter a higher number if your device is high-end and a lower number if your device is low-end.",
-            "immediately_delete_completely_finished_assignments": "Immediately delete assignments that are completely finished by your work inputs. Ignores assignments that are marked as completely finished from their due dates passing. Deleted assignments can be recovered and restored from the deleted assignments view.",
+            "immediately_delete_completely_finished_assignments": "Deleted assignments can be viewed and restored in the deleted assignments view.",
             "background_image_text_shadow_width": "Controls the width of the shadow around text for when you have a background image. Make this thicker if the text is hard to read, and thinner if the text is too easy to read.",
-            "gc_assignments_always_midnight": mark_safe("Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM.<br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to 12:00 AM.<br><br>Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created."),
+            "gc_assignments_always_midnight": mark_safe("Automatically changes Google Classroom assignments with a due time of 11:59 PM to 12:00 AM (midnight).<br><br>Google Classroom defaults assignments without a due time to 11:59 PM, so this setting attempts to prevent misleading due times that seem to be later than they actually are. However, <b>enable this setting with caution</b>, as it also incorrectly sets Google Classroom assignments with a manually assigned due time of 11:59 PM to midnight.<br><br>Note: does not apply to Google Classroom assignments that are due later today at 11:59 PM, are due on their assignment day, or have already been created."),
+            "priority_color_borders": "Adds a priority colored border around every assignment.",
+            "font": mark_safe('''
+                <div class="responsive-description-container">
+                    <div class="font-opensans">
+                        <span>Open Sans:</span>
+                        <span>The quick brown fox jumps over the lazy dog</span>
+                    </div>
+                    <div class="font-montserrat">
+                        <span>Montserrat:</span>
+                        <span>The quick brown fox jumps over the lazy dog</span>
+                    </div>
+                </div>
+            '''),
+            "should_alert_due_date_incremented": "Display an alert every time when soft due dates are incremented. Soft due dates increment when an assignment's due date passes but is still unfinished.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
     def __init__(self, *args, **kwargs):

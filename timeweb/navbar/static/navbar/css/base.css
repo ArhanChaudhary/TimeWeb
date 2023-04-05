@@ -1,57 +1,51 @@
 body {
+    font-size: 17px;
     --roboto-font-weight: 700;
 }
+.generic-button {
+    font-size: inherit;
+}
 #flex-container {
-    height: calc(var(--100vh) - 70px);
+    height: calc(var(--100vh) - var(--header-height));
     /* Cancel out paddings */
     margin-top: -10px;
     margin-bottom: -10px;
     display: flex;
     position: relative;
 }
-#table-of-contents-container > ul, #category-doc-labels > li {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-#table-of-contents-container-label::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-
-    top: 0;
-    bottom: 0;
-    margin-top: auto;
-    margin-bottom: auto;
-    right: 15px; 
-
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-right: 10px solid black;
-}
-#table-of-contents-container-label:focus ~ #table-of-contents-container,
-#table-of-contents-container:focus,
-/* Can't click the links without the below style because the label gets unfocused and it starts transforming */
+#table-of-contents-container.active,
 #table-of-contents-container:focus-within {
     transform: none;
 }
 #table-of-contents-container {
+    box-sizing: border-box;
     height: 100%;
+    padding-bottom: 20px;
     box-shadow: 0 0 6px 2px hsl(0, 0%, 50%);
     overflow-x: hidden;
     overflow-y: auto;
-}
-#table-of-contents-container-label {
-    display: none;
-    bottom: 5px;
-    cursor: pointer;
-    box-shadow: 6px 2px 6px -4px hsl(0, 0%, 50%);
-}
-#table-of-contents-container, #table-of-contents-container-label {
-    width: 300px;
+    width: 315px;
     position: relative;
     z-index: 2;
     background-color: hsl(0, 0%, 93%);
+}
+#table-of-contents-container .expand-all-button {
+    display: inline-block;
+    width: 100%;
+    padding: 5px 0;
+    margin-top: 25px;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 16px;
+    font-weight: 500;
+}
+.hover-expander {
+    padding: 0 100px;
+    margin: 0 -100px;
+    display: block;
+}
+.hover-expander:hover {
+    background-color: hsl(0, 0%, 85%);
 }
 @-webkit-keyframes slideLabelIn {
     from {
@@ -80,45 +74,51 @@ main ul {
     -webkit-margin-after: 0;
             margin-block-end: 0;
 }
-#table-of-contents-container:not(.table-of-contents-header) {
-    font-size: 14px;
+#table-of-contents-container details.table-of-contents-item {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-inline-start: 18px;
 }
-#table-of-contents-container > .table-of-contents-item {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    -webkit-padding-start: 28px;
-            padding-inline-start: 28px;
+#table-of-contents-container details.table-of-contents-item details.table-of-contents-item:last-of-type {
+    margin-bottom: -6px;
+}
+details.table-of-contents-item > ul {
+    margin-top: 5px;
 }
 .table-of-contents-header {
     display: block;
     position: sticky;
     background-color: inherit;
     filter: brightness(0.95);
-    line-height: 40px;
+    line-height: 50px;
     text-align: center;
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
-    font-size: 20px;
-}
-#category-table-of-contents {
+    font-size: 26px;
     top: 0;
+    margin-top: -2px;
+    margin-bottom: -2px;
 }
-#category-important-labels {
-    top: 40px;
-}
-#table-of-contents-container li {
+#table-of-contents-container .table-of-contents-item {
     padding-right: 15px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+#table-of-contents-container div.table-of-contents-item {
+    font-size: 16px;
+    font-weight: 500;
 }
 #table-of-contents-container a {
     color: black;
-    -webkit-text-decoration-color: hsla(0, 0%, 0%, 0.3);
-            text-decoration-color: hsla(0, 0%, 0%, 0.3);
+    text-decoration: none;
+}
+details.table-of-contents-item > ul {
+    padding-inline-start: 25px;
 }
 #doc-container {
     --container-padding-right: 50px;
     --container-padding-left: 70px;
+    --move-minor-category-left: -15px;
     padding-left: var(--container-padding-left);
     padding-right: var(--container-padding-right);
     padding-bottom: 150px;
@@ -128,7 +128,15 @@ main ul {
     max-width: 90ch;
     position: relative;
 }
-
+#doc-container :not(b) {
+    font-weight: 500;
+}
+#doc-container .generic-button {
+    margin: 3px 0px;
+}
+#doc-container svg {
+    margin-bottom: -3px;
+}
 #doc-container::-webkit-scrollbar {
     width: 14px;
 }
@@ -144,8 +152,14 @@ code {
     font-weight: 400;
 }
 .major-category {
+    box-sizing: border-box;
+    width: calc(100% + 2 * var(--container-padding-left));
+    margin-left: calc(-1 * var(--container-padding-left));
+    padding-left: var(--container-padding-left);
+    padding-right: 35px;
     margin-top: 2em;
-    margin-left: -15px;
+    background-color: white;
+    box-shadow: 0 0 9px -7px hsl(0, 0%, 52%);
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 40px;
@@ -154,53 +168,50 @@ code {
     top: 0;
 
     white-space: nowrap;
-}
-.major-category::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    transform: scaleX(2);
-    box-shadow: 0 0 9px -7px hsl(0, 0%, 52%);
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 .major-category.isSticky::before {
     box-shadow: none;
 }
-.written-on {
-    transform: translateX(-45px);
+#written-on {
+    transform: translateX(var(--move-minor-category-left));
+}
+#written-on::before {
+    content: "Last updated: ";
 }
 summary {
     cursor: pointer;
 }
-details > .img-ignore-padding-container {
+.img-positioner {
     display: flex;
     justify-content: center;
-    margin-bottom: 2em;
 }
-details > .img-ignore-padding-container img {
+.img-positioner img, .img-positioner video {
     filter: drop-shadow(0 9px 10px hsl(0, 0%, 50%));
     --image-margin: 20px;
     max-height: 600px;
     max-width: calc(100% + var(--container-padding-left) + var(--container-padding-right) - 2 * var(--image-margin));
     margin-right: calc(-1 * var(--container-padding-right) + var(--image-margin));
     margin-left: calc(-1 * var(--container-padding-left) + var(--image-margin));
+    margin-bottom: 2em;
+}
+.img-positioner img.tall-image {
+    max-height: 800px;
+}
+.img-positioner img.small-image {
+    max-height: 80px;
+    margin-bottom: initial;
+    filter: initial;
+}
+.img-positioner picture {
+    /* https://stackoverflow.com/a/13961130/12230735 */
+    line-height: 0;
 }
 
-#assignment-graph-image {
-    content: url("../images/wide_assignment_graph.webp");
-}
-@media screen and (max-width: 790px) {
-    #assignment-graph-image {
-        content: url("../images/narrow_assignment_graph.webp");
-    }
-}
 .minor-category {
     margin-top: 2rem;
-    margin-left: -30px;
+    margin-left: var(--move-minor-category-left);
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
     font-size: 30px;
@@ -208,7 +219,7 @@ details > .img-ignore-padding-container img {
 .minor-minor-category {
     font-family: 'Roboto Slab';
     font-weight: var(--roboto-font-weight);
-    font-size: 21px;
+    font-size: 22px;
 }
 .label-question {
     --label-color: rgb(150, 232, 253);
@@ -218,7 +229,9 @@ details > .img-ignore-padding-container img {
     position: relative;
     white-space: normal;
     padding-bottom: 12px;
-    width: 100%;
+    margin-left: auto;
+    --move-question-right: 0px;
+    width: calc(100% - var(--move-question-right));
 }
 .label-question::before {
     content: '';
@@ -245,13 +258,43 @@ details > .img-ignore-padding-container img {
     justify-content: center;
     position: absolute;
     top: 5px;
-    left: -60px;
+    --label-icon-left: -60px;
+    left: var(--label-icon-left);
     width: 40px;
     height: 40px;
-    background-color: var(--label-color);
+    background-color: hsl(196deg, 76%, 66%);
     border-radius: 50%;
-    filter: brightness(0.85);
 }
 .label-icon {
     position: absolute;
+}
+#hamborger-menu {
+    top: 0;
+    left: 0;
+    width: 89px;
+    height: 100%;
+    position: absolute;
+    cursor: pointer;
+    display: none;
+    --display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#hamborger-menu > * {
+    display: block;
+}
+@media screen and (max-width: 750px) {
+    #doc-container {
+        --container-padding-right: 20px;
+        --container-padding-left: 35px;
+    }
+    .minor-category {
+        --move-minor-category-left: -10px;
+    }
+    .label-question {
+        --move-question-right: 25px;
+    }
+    .label-icon-container {
+        --label-icon-left: -50px;
+    }
 }

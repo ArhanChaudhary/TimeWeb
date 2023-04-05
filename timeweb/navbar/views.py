@@ -30,7 +30,7 @@ DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ('id', 'immediately_delete_completely_f
     'appearance', 'background_image', 'animation_speed', 'enable_tutorial', 'sorting_animation_threshold', 'oauth_token', 
     'added_gc_assignment_ids', 'seen_latest_changelog', 'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user',
     'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp', 'display_working_days_left', 'background_image_text_shadow_width',
-    'gc_assignments_always_midnight', )
+    'gc_assignments_always_midnight', 'priority_color_borders', 'font', 'should_alert_due_date_incremented', )
 # Make sure to change the logic comparing the old data too if a new field is expensive to equare
 
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(SettingsModel._meta.fields), "update this list"
@@ -50,7 +50,8 @@ DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS = ('immediately_delete_completely_fini
     'lowest_priority_color', 'default_dropdown_tags', 'horizontal_tag_position', 'vertical_tag_position', 'appearance', 'animation_speed',
     'enable_tutorial', 'sorting_animation_threshold', 'oauth_token', 'added_gc_assignment_ids', 'seen_latest_changelog', 
     'nudge_calendar', 'nudge_notifications', 'nudge_canvas', 'user', 'gc_courses_cache', 'device_uuid', 'device_uuid_api_timestamp',
-    'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', )
+    'display_working_days_left', 'background_image_text_shadow_width', 'gc_assignments_always_midnight', 'loosely_enforce_minimum_work_times', 
+    'priority_color_borders', 'font', 'should_alert_due_date_incremented', )
 
 assert len(EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) + len(DONT_EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS) == len(SettingsModel._meta.fields), "update this list"
 @method_decorator(ratelimit(key=utils.get_client_ip, rate='1/s', method="POST", block=True), name='post')
@@ -65,7 +66,6 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
                 'enable_gc_integration': 'token' in request.user.settingsmodel.oauth_token,
             }
             self.context['form'] = SettingsForm(initial=initial, instance=request.user.settingsmodel)
-        self.context['settings_model'] = request.user.settingsmodel
         self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
                             exclude=[*SettingsForm.Meta.exclude, # SettingsForm already excludes these fields but saving the field to a model adds them back
                             *EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS])
@@ -95,15 +95,16 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
             
     
     def valid_form(self, request):
-        if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
-            api.gc_auth_disable(request, save=False)
-        if any(getattr(self.old_data, field) != getattr(self.form.instance, field) for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS):
-            request.session["refresh_dynamic_mode_all"] = True
-        self.form.save()
-        logger.info(f'User \"{request.user}\" updated the settings page')
+        if not request.isExampleAccount:
+            if not self.form.cleaned_data.get("enable_gc_integration") and 'token' in request.user.settingsmodel.oauth_token:
+                api.gc_auth_disable(request, save=False)
+            if any(getattr(self.old_data, field) != getattr(self.form.instance, field) for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS):
+                request.session["refresh_dynamic_mode_all"] = True
+            self.form.save()
+            logger.info(f'User \"{request.user}\" updated the settings page')
 
-        if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in request.user.settingsmodel.oauth_token:
-            return redirect(api.gc_auth_enable(request, next_url="home", current_url="settings"))
+            if self.form.cleaned_data.get("enable_gc_integration") and not 'token' in request.user.settingsmodel.oauth_token:
+                return redirect(api.gc_auth_enable(request, next_url="home", current_url="settings"))
         if self.form.cleaned_data.get("view_deleted_assignments"):
             return redirect("deleted_assignments")
         else:

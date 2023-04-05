@@ -19,14 +19,14 @@ class TimewebForm(forms.ModelForm):
             "needs_more_info",
             "is_google_classroom_assignment",
             "user",
-            "google_classroom_assignment_link",
+            "external_link",
             "hidden",
             "deletion_time",
         )
         # time_per_unit should be first because of logic in views.py
         ADD_CHECKBOX_WIDGET_FIELDS = ["time_per_unit", "y", "x", "min_work_time","works", "funct_round"]
         widgets = {
-            'name': forms.TextInput(attrs={"placeholder": "Ex: Reading book, English essay, Math homework"}),
+            'name': forms.TextInput(attrs={"placeholder": "Ex. Book reading, Math homework, Study for test"}),
             'due_time': forms.HiddenInput(),
             'soft': forms.HiddenInput(),
             'blue_line_start': forms.HiddenInput(),
@@ -190,11 +190,14 @@ class TimewebForm(forms.ModelForm):
         blue_line_start = cleaned_data.get("blue_line_start")
         unit = cleaned_data.get("unit")
         name = cleaned_data.get("name")
+        due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
         # save_assignment from the frontend for needs more info assignments can
         # have works defined but not blue_line_start and etc
         if blue_line_start != None and x != None and assignment_date != None:
             len_works = len(works) - 1
             x_num = utils.days_between_two_dates(x, assignment_date)
+            if due_time and (due_time.hour or due_time.minute):
+                x_num += 1
             if blue_line_start + len_works > x_num:
                 # Don't actually do this bc we need to raise an error for it to be excluded from save_assignment
 
@@ -218,7 +221,6 @@ class TimewebForm(forms.ModelForm):
 
         # if x or assignment date is none, the assignment needs more info
         if x != None and assignment_date != None:
-            due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
             complete_due_date = x + datetime.timedelta(hours=due_time.hour, minutes=due_time.minute)
             if complete_due_date <= assignment_date:
                 self.add_error("x",

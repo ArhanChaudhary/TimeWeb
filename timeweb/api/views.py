@@ -204,7 +204,6 @@ def simplify_course_name(tag_name):
         tag_name = re.sub(abbreviation[0], abbreviation[1], tag_name, flags=re.IGNORECASE)
 
     def tag_name_re_subs(regexes, tag_name):
-        tag_name = " ".join(tag_name.split())
         tag_name_post_re_subs = (
             # if there is something like "a--b" or "a -b" then replace it when "a b"
             # a dash is not usually treated as a space, such as when it's used
@@ -215,13 +214,15 @@ def simplify_course_name(tag_name):
             (r"\(\)", ""),
             # if the string is instead something like "a--" or "a -" or "--a" or "- a" then remove it
             (r"^-+ ?| ?-+$", ""),
+            (r"^,|,$", ""),
         )
+        tag_name = utils.simplify_whitespace(tag_name)
         for regex in regexes:
             pre_tag_name = re.sub(regex, "", tag_name, flags=re.IGNORECASE)
-            pre_tag_name = " ".join(pre_tag_name.split())
+            pre_tag_name = utils.simplify_whitespace(pre_tag_name)
             for post_re_sub in tag_name_post_re_subs:
                 pre_tag_name = re.sub(*post_re_sub, pre_tag_name, flags=re.IGNORECASE)
-                pre_tag_name = " ".join(pre_tag_name.split())
+                pre_tag_name = utils.simplify_whitespace(pre_tag_name)
             if not pre_tag_name or len(tag_name) < 10:
                 return tag_name
             tag_name = pre_tag_name
@@ -236,6 +237,9 @@ def simplify_course_name(tag_name):
     # information to identify the class,
     # 3) less info is anyways better to fit the assignment tag length
     tag_name = tag_name_re_subs([
+        # :)
+        "31181",
+
         # school name
         r"msj(hs)?",
 
@@ -246,9 +250,9 @@ def simplify_course_name(tag_name):
         # 2022 - 3
         r"(?<!\d)(20)?\d\d( | - |-|/)(20)?\d?\d(?!\d)",
         # 2022 American Lit
-        r"^20\d\d(?!\d)",
+        r"^2(\d|0\d\d)(?!\d)",
         # American Lit 2022
-        r"(?<!\d)20\d\d$",
+        r"(?<!\d)2(\d|0\d\d)$",
 
         # remove period number
 
@@ -256,7 +260,7 @@ def simplify_course_name(tag_name):
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|([4-9]|1[0-2]|four|fif|six|seven|eigh|nin|ten|eleven|twelve)th) grade",
         # second period
         # do this above grade-5 or else 5th Period 6th Grade Math => 5th th Grade Math
-        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) per",
+        r"((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th) per|(1st|2nd|3rd|((0|[4-7])th)|[0-7])(º|°)",
         # 3rd quarter
         r"((1|fir)st|(2|seco)nd|(3|thi)rd|(4|four)th) quarter",
         # 1st sem
@@ -267,16 +271,16 @@ def simplify_course_name(tag_name):
         r"\(((1|fir)st|(2|seco)nd|(3|thi)rd|(0|[4-7]|zero|four|fif|six|seven)th)\)",
 
         # Repeat these again
-        r"^20\d\d(?!\d)",
-        r"(?<!\d)20\d\d$",
+        r"^2(\d|0\d\d)(?!\d)",
+        r"(?<!\d)2(\d|0\d\d)$",
 
         # remove teacher title
         r"^m(rs|r|s)\.? [a-z]+(-[a-z]+)?('s)?",
         r"(?<![a-z])m(rs|r|s)\.? [a-z]+(-[a-z]+)?$",
 
         # Repeat this again
-        r"^20\d\d(?!\d)",
-        r"(?<!\d)20\d\d$",
+        r"^2(\d|0\d\d)(?!\d)",
+        r"(?<!\d)2(\d|0\d\d)$",
     ], tag_name)
     return tag_name
 
@@ -498,15 +502,18 @@ def create_gc_assignments(request, order=None):
                 due_time = None
                 x = None
                 x_num = None
-            name = Truncator(assignment['title'].strip()).chars(TimewebModel.name.field.max_length)
+            name = assignment['title']
+            name = utils.simplify_whitespace(name)
+            name = Truncator(name).chars(TimewebModel.name.field.max_length)
             # We don't need to worry if there if this raises a not found error because the courses we
             # request assignments from are the ones in request.user.settingsmodel.gc_courses_cache itself
             tags.insert(0, next(
                 i['name'] for i in request.user.settingsmodel.gc_courses_cache
                 if assignment['courseId'] == i['id']
             ))
-            description = assignment.get('description')
-            google_classroom_assignment_link = assignment.get("alternateLink")
+            if description := assignment.get('description'):
+                description = utils.simplify_whitespace(description)
+            external_link = assignment.get("alternateLink")
             adjusted_blue_line = app_utils.adjust_blue_line(request,
                 old_data=None,
                 assignment_date=assignment_date,
@@ -531,7 +538,7 @@ def create_gc_assignments(request, order=None):
                 "blue_line_start": blue_line_start,
                 "dynamic_start": dynamic_start,
                 # from api, cannot change
-                "google_classroom_assignment_link": google_classroom_assignment_link,
+                "external_link": external_link,
                 "tags": tags,
             })
             # we need to save every id we come across for now because pageSize is now limited

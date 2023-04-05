@@ -8,7 +8,8 @@
     --field-widget-background-color: hsl(0, 0%, 97%);
 }
 #form-wrapper form, #break-days-wrapper {
-    --field-wrapper-border: 1px solid var(--color);
+    --field-wrapper-border-width: 1px;
+    --field-wrapper-border: var(--field-wrapper-border-width) solid var(--color);
 }
 /* Needed for specifity */
 #form-wrapper .field-wrapper > input:focus,
@@ -58,7 +59,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     margin: 5px auto 35px;
     border-radius: 15px;
     --horizontal-form-margin: 15px;
-    padding: 5px var(--horizontal-form-margin) 25px;
+    padding: 7px var(--horizontal-form-margin) 25px;
     --form-width: calc(var(--raw-form-width) - var(--horizontal-form-margin) * 2);
     position: relative;
     letter-spacing: 0.5px;
@@ -92,7 +93,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     --horizontal-field-group-tab-padding: 5%;
     padding: 0 var(--horizontal-field-group-tab-padding);
     height: 30px;
-    margin-top: 10px;
+    margin-top: 25px;
     --border-radius: 5px;
 }
 #form-wrapper #fields-wrapper {
@@ -133,14 +134,14 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     border-left: var(--field-wrapper-border);
     border-right: var(--field-wrapper-border);
     width: calc(50% - var(--horizontal-field-group-tab-padding));
-    margin: 0 -1px;
+    margin: 0 calc(-1 * var(--field-wrapper-border-width));
     border-top-right-radius: var(--border-radius);
     border-top-left-radius: var(--border-radius);
 }
 #form-wrapper .selected-form-tab-styling-line {
     border-bottom: var(--field-wrapper-border);
     align-self: flex-end;
-    width: calc(50% + 1px);
+    width: calc(50% + var(--field-wrapper-border-width));
 }
 #form-wrapper #first-tab-line {
     border-bottom-right-radius: var(--border-radius);
@@ -152,6 +153,8 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #field-group-picker-styling * {
     transition: transform calc(0.2s * var(--animation-speed)) ease-in-out calc(0.05s * var(--animation-speed));
+    --field-wrapper-border-width: 2px;
+    --field-wrapper-border: var(--field-wrapper-border-width) solid var(--color);
 }
 #form-wrapper #field-group-picker-checkbox:not(:checked) ~ #field-group-picker #field-group-picker-styling * {
     transform: translateX(calc(var(--form-width) / 100 * -45));
@@ -250,6 +253,9 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper #id_x, #form-wrapper #id_y {
     padding-left: var(--magic-wand-width);
+}
+#form-wrapper #id_description {
+    --nothing-height: var(--field-height);
 }
 #form-wrapper .field-wrapper.has-widget > input {
     flex-grow: 1;

@@ -1,14 +1,26 @@
 * {
+    /* prevent weird bounce effect on ios */
+    overscroll-behavior: none;
     font-weight: 600;
     /* keep this as selector as * so fonts arent inherited (for example .info-button) */
-    font-family: "Open Sans", sans-serif;
     touch-action: manipulation;
     text-decoration-thickness: 1.5px;
 }
 html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
-    --100vh: calc(var(--vh, 1vh) * 100);
+    --vh: 1vh;
+    --vh: 1dvh;
+    /* if neither are supported, fallback to js base solution in base.js */
+    --100vh: calc(var(--vh) * 100);
+}
+.font-montserrat,
+.font-montserrat .info-button-text {
+    font-family: "Montserrat", sans-serif;
+}
+.font-opensans,
+.font-opensans .info-button-text {
+    font-family: "Open Sans", sans-serif;
 }
 input, textarea {
     -webkit-user-select: text;
@@ -47,7 +59,7 @@ hr {
 }
 /* Override normalize.css */
 html {
-    line-height: unset !important;
+    line-height: 1.36;
 }
 button,
 input,
@@ -66,25 +78,19 @@ textarea
     -webkit-appearance: button;
     border-color: black;
 }
-a {
+a, :visited {
     color: rgb(0, 0, 238);
 }
-a:visited {
-    color: rgb(85, 26, 139);
-}
 @media (prefers-color-scheme: dark) {
-    a {
+    a, :visited {
         color: rgb(158, 158, 255);
     }
-    a:visited {
-        color: rgb(208, 173, 240);
-    }
 }
-body.dark a {
+.dark a, .dark :visited {
     color: rgb(158, 158, 255);
 }
-body.dark a:visited {
-    color: rgb(208, 173, 240);
+.light a, .light :visited {
+    color: rgb(0, 0, 238);
 }
 
 .oudated-serviceworker-registration-bugfix {

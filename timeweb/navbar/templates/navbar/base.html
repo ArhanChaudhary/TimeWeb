@@ -12,15 +12,21 @@
     {% block _js %}{% endblock %}
 {% endblock js %}
 
+{% block extra_header_elements %}
+    <div id="hamborger-menu">
+        <svg width="25px" height="20.75px">
+            <rect y="0" x="0" width="25" height="4.25" fill="white"></rect>
+            <rect y="8.5" x="0" width="25" height="4.25" fill="white"></rect>
+            <rect y="16.5" x="0" width="25" height="4.25" fill="white"></rect>
+        </svg>
+    </div>
+{% endblock %}
+
 {% block content %}
     <div id="flex-container">
-        <div id="table-of-contents-container-label" tabindex="-1">
-            <span class="table-of-contents-header" id="category-table-of-contents-label">Table of contents</span>
-        </div>
         <div id="table-of-contents-container" tabindex="-1">
             <span class="table-of-contents-header" id="category-table-of-contents">Table of contents</span>
             {% if add_faq %}<span class="table-of-contents-header" id="category-important-labels">FAQs</span>{% endif %}
-            <ul id="category-doc-labels"></ul>
         </div>
         {% comment %} no clue why but #doc-container recieves focus {% endcomment %}
         <div id="doc-container" tabindex="-1">
@@ -28,17 +34,15 @@
         </div>
     </div>
     <template id="table-of-contents-major-category-template">
-        <details class="table-of-contents-item" open>
-            <summary>
-                <span></span>
-            </summary>
+        <details class="table-of-contents-item">
+            <summary></summary>
             <ul></ul>
         </details>
     </template>
     <template id="table-of-contents-minor-category-template">
-        <li class="table-of-contents-item">
-            <a></a>
-        </li>
+        <a class="hover-expander">
+            <div class="table-of-contents-item"></div>
+        </a>
     </template>
     <template id="label-icon-template">
         <div class="label-icon-container">

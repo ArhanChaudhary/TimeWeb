@@ -243,6 +243,7 @@ class Crud {
                 locale: {
                     format: 'MM/DD/YYYY'
                 },
+                parentEl: "#form-wrapper",
             }).on('input', function() {
                 last_assignment_date_input_val = $(this).val();
             }).on('hide.daterangepicker', function(e, picker) {
@@ -260,6 +261,7 @@ class Crud {
                     format: 'MM/DD/YYYY h:mm A'
                 },
                 timePicker: true,
+                parentEl: "#form-wrapper",
             }).on('show.daterangepicker', function(e, picker) {
                 old_due_date_val = $(this).val();
                 picker.container.css("transform", `translateX(${$("#form-wrapper #fields-wrapper").css("--magic-wand-width").trim()})`);
@@ -272,7 +274,12 @@ class Crud {
                 } else {
                    var event = "focusout";
                 }
-                $(this).on(event, Crud.alertEarlyDueDate);
+                $(this).on(event, function() {
+                    // prevent hideform from doing this alert
+                    const form_is_showing = $("#overlay").is(":visible");
+                    if (form_is_showing)
+                        Crud.alertEarlyDueDate();
+                });
             })
             that.setCrudHandlers();
         }, 0);
@@ -307,7 +314,7 @@ class Crud {
         } else {
             $(".magic-wand-icon").css("margin-bottom", "");
             $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
-            $("form input:visible").first().focus();
+            setTimeout(() => $("form input:visible").first().focus(), 0);
             $(".field-wrapper.disabled-field").each(function() {
                 $(this).find(".magic-wand-icon").click();
             });
@@ -516,7 +523,8 @@ class Crud {
             // Set button pk so it gets sent on post
             $("#submit-assignment-button").val(sa.id);
             that.showForm();
-            Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
+            if (!(sa.is_google_classroom_assignment && sa.needs_more_info))
+                Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
         });
         $('.delete-button, .restore-button').parent().click(function(e) {
             const $this = $(this);
@@ -819,7 +827,7 @@ class Crud {
         $("#id_name").info('left',
             `Only enter an assignment's name to mark it as "needs more info"
             
-            Useful as a reminder system for assignments you don't want to fully submit to the assignment form`, 
+            Disables functionality but useful as a reminder for short assignments`, 
         "after").css({
             marginTop: -23,
             marginLeft: "auto",

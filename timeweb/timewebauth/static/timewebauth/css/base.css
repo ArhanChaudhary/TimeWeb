@@ -1,22 +1,43 @@
+html {
+    color-scheme: dark;
+}
 body {
-    /* "Sweet airan" gradient from https://www.eggradients.com/category/white-gradient */
-    background-image: linear-gradient(315deg, #ffffff 0%, #d7e1ec 74%);
+    /* do not move background-image to #circles-background to prevent the white background rebound because that messes up the goo */
+    background-image: linear-gradient(150deg, hsl(197deg 41% 15%) 0%, hsl(225, 10%, 10%) 100%);
     background-attachment: fixed;
+    color: hsl(0, 0%, 84%);
+    --primary-blue: hsl(217deg 72% 58%);
+}
+a, :visited {
+    /* override .dark a and other base.css stylings */
+    color: var(--primary-blue) !important;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+    -webkit-text-fill-color: hsl(0, 0%, 84%);
 }
 #accounts-container {
     border-radius: 10px;
-    box-shadow: 0 0 100px -63px black;
     position: relative;
+    border: 5px solid hsl(195deg 34% 44%);
+    box-shadow: 0 0 93px 12px hsl(197deg 41% 27%);
     width: clamp(290px, calc(100vw - 40px), 600px);
-    background: white;
+    --accounts-background: hsl(195deg 44% 8%);
+    background: var(--accounts-background);
     /* Ensures this doesnt overflow at the top */
     margin: auto;
     box-sizing: border-box;
     padding: 15px 40px 25px;
 }
 #accounts-container :focus {
-    outline: 2px solid rgb(0, 109, 249);
+    outline: 2px solid hsl(218deg 70% 50%);
     border-radius: 2px;
+}
+#accounts-container a:focus {
+    outline-color: hsl(218deg 100% 50%);
 }
 #accounts-container > a:first-of-type img {
     display: block;
@@ -35,17 +56,18 @@ body {
     height: 50px;
     display: flex;
     align-items: center;
+    --background-color: hsl(0, 0%, 39%);
 }
 #accounts-arrow-horizontal {
     width: 30px;
     height: 2px;
-    background-color: #afafaf;
+    background-color: var(--background-color);
 }
 #accounts-arrow-container::before, #accounts-arrow-container::after {
     content: "";
     position: absolute;
-    border-bottom: solid 2px #afafaf;
-    border-left: solid 2px #afafaf;
+    border-bottom: solid 2px var(--background-color);
+    border-left: solid 2px var(--background-color);
     width: 12px;
     height: 12px;
     transition: all cubic-bezier(0.77, 0, 0.175, 1) 0.5s;
@@ -88,6 +110,7 @@ body {
     position: absolute;
     right: 10px;
     cursor: pointer;
+    filter: invert(0.8);
 }
 .hide-password-image {
     display: none;
@@ -107,16 +130,18 @@ body {
 }
 #circles-background .bubble-up {
     position: absolute;
+    /* --random-x: 0px !important; */
     --animation-duration: calc(var(--max-animation-duration) - var(--circle-number) * (var(--max-animation-duration) - var(--min-animation-duration))/var(--highest-circle-number) + var(--random-delay));
-    -webkit-animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
-            animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
+    animation: bubbleUp var(--animation-duration) linear -5000s infinite normal;
 }
 #circles-background .bubble-up .bubble-right {
+    /* background-image: url("../images/a.jpeg") !important;
+    background-size: contain !important; */
     width: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     height: calc(var(--max-size) - var(--circle-number) * (var(--max-size) - var(--min-size)) / var(--highest-circle-number));
     border-radius: 50%;
-    -webkit-animation: bubbleRight var(--animation-duration) cubic-bezier(0.5, 0.0625, 0.5, 0.9375) -5000s infinite normal;
-            animation: bubbleRight var(--animation-duration) cubic-bezier(0.5, 0.0625, 0.5, 0.9375) -5000s infinite normal;
+    --original-animation-timing-function: cubic-bezier(0.5, 0.062, 0.5, 0.948);
+    animation: bubbleRight var(--animation-duration) var(--original-animation-timing-function) -5000s infinite normal;
 }
 @-webkit-keyframes bubbleUp {
     from {
@@ -156,16 +181,16 @@ body {
 .socialaccount-button {
     padding: 10px 0;
     position: relative;
-    background: rgb(238, 245, 255);
+    background: hsl(209, 44%, 11%);
     /* Don't make the box-sizing border-box or else the top and bottom paddings wont work */
     width: calc(100% - 2px);
     box-sizing: unset;
     height: 30px;
     cursor: pointer;
 
-    border: 1px solid rgb(13, 106, 255);
+    border: 1px solid var(--primary-blue);
     /* https://stackoverflow.com/questions/22446148/css-box-shadow-transition */
-    box-shadow: inset 0 0 0 0 white, 0 0 3px 1px rgba(13, 106, 255, 0.25);
+    box-shadow: inset 0 0 0 0 transparent, 0 0 3px 1px hsla(218, 100%, 50%, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -174,12 +199,12 @@ body {
 }
 .socialaccount-button:hover, .socialaccount-button:focus {
     transform: scale(1.05, 1.02);
-    box-shadow: inset 0 0 0 0 white, 0 0 4px 1px rgba(13, 106, 255, 0.5);
-    background: white;
+    box-shadow: inset 0 0 0 0 transparent, 0 0 4px 1px hsla(218, 100%, 50%, 0.8);
+    background: var(--accounts-background);
 }
 .socialaccount-button:focus {
-    box-shadow: inset 0 0 0 1px rgb(0, 109, 249), 0 0 0 white;
-    border-color: rgb(0, 109, 249);
+    box-shadow: inset 0 0 0 1px hsl(218deg 100% 50%), 0 0 0 0 transparent;
+    border-color: hsl(218deg 100% 50%);
     /* Override #assignments-container :focus */
     outline: none !important;
     border-radius: initial !important;
@@ -193,7 +218,7 @@ body {
 }
 .socialaccount_provider {
     font-size: 15px;
-    color: rgb(13, 106, 255);
+    color: var(--primary-blue);
     text-decoration: none;
 }
 main {
@@ -204,9 +229,6 @@ main {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-a:not(.dummyforspecifity) {
-    color: rgb(50, 87, 255);
-}
 .add-input-margin {
     margin-bottom: 2em !important;
 }
@@ -216,14 +238,15 @@ input:not([type="submit"], [type="checkbox"], [type="radio"]), textarea {
     margin-bottom: 5px;
     box-sizing: border-box;
     border: none;
-    box-shadow: inset 0 0 3px black;
-    background: white !important;
+    color: inherit;
+    box-shadow: inset 0 0 2px 1px white;
+    background: var(--accounts-background) !important;
     height: 36px;
     border-radius: 4px;
     padding-left: 15px;
 }
 input:not([type="submit"]):focus, textarea:focus {
-    box-shadow: inset 0 0 0 2px rgb(0, 109, 249) !important;
+    box-shadow: inset 0 0 0 2px hsl(218deg 70% 50%) !important;
     /* Override #accounts-container :focus */
     outline: 0 !important;
     border-radius: 4px !important;
@@ -237,18 +260,17 @@ hr {
     left: 50%;
     padding: 0 5px;
     transform: translate(-50%, -34px);
-    background-color: white;
+    background-color: var(--accounts-background);
 }
 
 
-/* MAKE SURE TO UPDATE INLINE EMAIL STYLES IF THESE STYLES ARE CHANGED */
 .submit-button[no-top-margin] {
     margin-top: initial; /* for connections.html */
 }
 .submit-button {
     width: 100%;
-    background: rgb(0, 109, 249);
-    color: white;
+    background: hsl(204deg 78% 33%);
+    color: hsl(0, 0%, 85%);
     border: none;
     padding: 5px 5px;
     margin-top: 30px;
@@ -260,25 +282,23 @@ hr {
     text-align: center;
 }
 .submit-button:focus, .submit-button:hover {
-    background: rgba(0, 109, 249, 0.9);
+    background: hsl(204deg 58% 40%);
+    color: white;
 }
 .submit-button:focus {
     /* Override #accounts-container :focus */
     border-radius: initial !important;
     outline-width: 1px !important;
-}
-.submit-button:focus:hover {
-    /* Override #accounts-container :focus */
-    outline: none !important;
+    outline: 0 !important;
 }
 .submit-button:active {
     transform: translateY(1px);
-    background: rgb(0, 109, 249);
+    background: hsl(204deg 68% 30%);
+
 }
-/* MAKE SURE TO UPDATE INLINE EMAIL STYLES IF THESE STYLES ARE CHANGED */
 
 
-#goo-svg {
+#svg-defs {
     position: absolute;
     width: 0;
     height: 0;
@@ -287,6 +307,6 @@ hr {
     transform-origin: right;
     transform: scale(0.85);
     position: absolute !important;
-    top: 92px;
+    top: 101px;
     right: 40px !important;
 }

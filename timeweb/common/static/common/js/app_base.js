@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // do NOT use originalOptions, IMPORTANT
         // re-trying the ajax does not preserve originalOptions,
         // so we must instread derive it from options
-        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(decodeURIComponent(options.data === undefined ? "" : options.data))), {
+
+        // do not use decodeURIComponent, it will break the url with ampersands in it
+        options.data = $.param($.extend(Object.fromEntries(new URLSearchParams(options.data === undefined ? "" : options.data)), {
             device_uuid: window.DEVICE_UUID,
             tab_creation_time: window.TAB_CREATION_TIME,
             utc_offset: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -35,7 +37,7 @@ $(function() {
                     // Prevent double dipping
                     // I *could* use e.preventDefault instead for forward compatibility, but is risky and prevents some functioanlities
                     // (such as pressing enter to submit a form)
-                    !activeElement.is('button, summary, input[type="file"]')
+                    !activeElement.is('button, summary, input[type="file"], a')
                     // Prevent focused field widgets from toggling on enter form submission
                     && activeElement.attr("tabindex") !== "-1"
                     // keydown fires constantly while enter is being held down, limit it to the first fire
@@ -44,10 +46,6 @@ $(function() {
                 }
                 break;
             }
-            case "Tab":
-                // Prevent tabbing dispositioning screen from tabbing on nav
-                setTimeout(() => $("#site")[0].scrollTo(0,0), 0);
-                break;
         }
     });
     $(document).on('input', 'input[step]', function() {
@@ -59,47 +57,54 @@ $(function() {
             input.val(newVal.substring(0, newVal.indexOf(".") + step.split(".")[1].length + 1));
         }
     });
-    $("input").on("show.daterangepicker", function(e, picker) {
-        function dothething(_timeselects) {
-            _timeselects.on("change", function() {
-                setTimeout(function() {
-                    // idk why but theres always a new minuteselect element when its changed
-                    const minuteselect = picker.container.find(".minuteselect:visible");
-                    minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-                    const timeselects = picker.container.find(".calendar-time > select:visible");
-                    dothething(timeselects);
-                }, 0);
+    // prevent shift keybinds from selecting text too
+    // is not an issue with mobile because shiftKey doesn't exist
+    $(document).on("mousedown", function(e) {
+        if (e.shiftKey && $(e.target).hasClass("block-selection") || $(e.target).parents(".block-selection").length)
+            document.getSelection().removeAllRanges();
+    });
+    if (window.daterangepicker) {
+        const org = daterangepicker.prototype.renderTimePicker;
+        daterangepicker.prototype.renderTimePicker = function() {
+            // daterangepicker rerenders itself every change
+            const ret = org.apply(this, arguments);
+            if (arguments[0] === "left") return ret;
+            $('<a id="daterangepicker-midnight" href="#">midnight</a>').appendTo(this.container.find(".calendar-time")).click(e => {
+                const [hourselect, minuteselect, ampmselect] = this.container.find(".calendar-time > select:visible").toArray();
+                $(hourselect).val(11);
+                $(minuteselect).val(59);
+                $(ampmselect).val("PM");
+                $("select.hourselect").trigger("change.daterangepicker");
             });
+            return ret;
         }
-        // There's a random invisible datepicker, so only query the one that's visible
-        const minuteselect = picker.container.find(".minuteselect:visible");
-        minuteselect.children("[value=\"59\"]").insertAfter(minuteselect.children("[value=\"0\"]"));
-        const timeselects = picker.container.find(".calendar-time > select:visible");
-        dothething(timeselects);
+    }
     // On desktop without an assignment name or on mobile, you can click enter in the form and it will go to the next input without hiding an open daterangepicker
-    }).on('blur', function(e) {
+    $("input").on('blur', function(e) {
         // Can't use relatedTarget because it needs to be on an element with a tabindex, which the daterangepicker doesn't have
         if (!$(":hover").filter(".daterangepicker").length)
             $(this).data("daterangepicker")?.hide();
     });
-    // close dropdown if clicked while open
-    let wasOpen = false;
-    $("#username").mousedown(function(e) {
-        wasOpen = $(this).is(document.activeElement) || $(document.activeElement).parents("#username").length;
-    }).click(function(e) {
-        if (wasOpen)
-            $("#username").blur();
-    });
-    $("#account-dropdown").css("display", "block");
-    $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
-    $("#account-dropdown").css("display", "");
+    if ($("#username").length) {
+        // close dropdown if clicked while open
+        let wasOpen = false;
+        $("#username").mousedown(function(e) {
+            wasOpen = $(this).is(document.activeElement) || $(document.activeElement).parents("#username").length;
+        }).click(function(e) {
+            if (wasOpen)
+                $("#username").blur();
+        });
+        $("#account-dropdown").css("display", "block");
+        $("#account-dropdown").prop("style").setProperty("--margin-right", `${Math.max(0, ($("#account-dropdown").offset().left + $("#account-dropdown").outerWidth()) - (window.innerWidth - 9))}px`);
+        $("#account-dropdown").css("display", "");
+    }
 
     function resetHeaderLayout() {
-        const username = $("#user-greeting #username"),
-            logo = $("#logo-container"),
-            welcome = $("#welcome"),
-            plus_button_width = $("#image-new-container img").length ? $("#image-new-container img").outerWidth(true) : 0,
-            newassignmenttext = $("#new-assignment-text");
+        const username = $("#user-greeting #username");
+        const logo = $("#logo-container");
+        const welcome = $("#welcome");
+        const left_icon_width = $("#image-new-container img, #hamborger-menu").length ? $("#image-new-container img, #hamborger-menu").outerWidth(true) : 0;
+        const left_icon_text = $("#new-assignment-text");
     
         logo.css({
             left: '',
@@ -107,24 +112,28 @@ $(function() {
         });
         logo.find("img").css("width", "");
         welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
-        newassignmenttext.length && newassignmenttext.toggle(!collision(newassignmenttext, logo, { margin: 30 }));
+        if (left_icon_text.length)
+            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 30 }));
     
         if (!collision(username, logo, { margin: 30 })) return;
         logo.css({
-            left: 5 + plus_button_width,
+            left: 5 + left_icon_width,
             transform: "none",
         });
         welcome.toggle(!collision(welcome, logo, { margin: 30 }));
     
         if (!collision(username, logo, { margin: 10 })) return;
         // compress the logo
-        logo.find("img").css("width", Math.max(0, username.offset().left-plus_button_width-20-5));
+        logo.find("img").css("width", Math.max(0, username.offset().left-left_icon_width-20-5));
     }
     if ($("#user-greeting").length) {
         $(window).resize(resetHeaderLayout);
         resetHeaderLayout();
     }
     $("header > *").css("visibility", "visible");
+    $("#hamborger-menu").click(function() {
+        $("#table-of-contents-container").toggleClass("active");
+    });
 });
 // It's important to remember to NOT use .done() or any other callback method on a jquery ajax
 // This is to allow ajaxUtils.error to redo the ajax with the appropriate callbacks
@@ -208,33 +217,27 @@ changeSetting: function(kwargs={}) {
 },
 GCIntegrationError: function(jqXHR) {
     sessionStorage.removeItem("ajaxs");
-    switch (jqXHR.status) {
-        case 302:
-            var reauthorization_url = jqXHR.responseText;
-            $.alert({
-                title: "Invalid credentials.",
-                content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
-                buttons: {
-                    ok: {
+    if (jqXHR.status !== 302) return;
+    const reauthorization_url = jqXHR.responseText;
+    $.alert({
+        title: "Invalid credentials.",
+        content: "Your Google Classroom integration credentials are invalid. Please reauthenticate or disable the integration.",
+        buttons: {
+            ok: {
 
-                    },
-                    "disable integration": {
-                        action: function() {
-                            ajaxUtils.changeSetting({setting: "oauth_token", value: false});
-                        }
-                    },
-                    reauthenticate: {
-                        action: function() {
-                            reloadWhenAppropriate({href: reauthorization_url});
-                        }
-                    },
+            },
+            "disable integration": {
+                action: function() {
+                    ajaxUtils.changeSetting({setting: "oauth_token", value: false});
                 }
-            });
-            break;
-
-        default:
-            ajaxUtils.error.bind(this)(...arguments);
-    }
+            },
+            reauthenticate: {
+                action: function() {
+                    reloadWhenAppropriate({href: reauthorization_url});
+                }
+            },
+        }
+    });
 },
 createGCAssignments: function() {
     let ajaxs = JSON.parse(sessionStorage.getItem("ajaxs")) || [
@@ -345,7 +348,7 @@ saveAssignment: function(batchRequestData, postError) {
                 case 413: {
                     $.alert({
                         title: "Too much data to save.",
-                        content: `If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autofilling work done, you will have to manually perform this action for every assignment.<br><br>
+                        content: `If 1) You're saving an assignment with many work inputs, change its assignment date to today to truncate its work inputs and continue using it. If 2) You're autoinputting work done, you will have to manually perform this action for every assignment.<br><br>
                         
                         We understand if this may be frustrating, so feel free to <a href=\"/contact\">contact us</a> for personal assistance.`,
                         backgroundDismiss: false,

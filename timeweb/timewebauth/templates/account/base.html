@@ -41,7 +41,7 @@
       {% block content %}{% endblock %}
     </div>
   </main>
-  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="goo-svg">
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="svg-defs">
     <defs>
       <filter id="goo">
         <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur"/>
@@ -51,6 +51,10 @@
         to mask the filter over the SourceGraphic:
         <feComposite in="SourceGraphic" in2="goo" operator="atop"/> 
         {% endcomment %}
+      </filter>
+      {% comment %} doesn't really work :( {% endcomment %}
+      <filter id="drop-shadow" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feDropShadow dx="0" dy="0" stdDeviation="100" flood-color="hsl(197deg 41% 27%)" />
       </filter>
     </defs>
   </svg>

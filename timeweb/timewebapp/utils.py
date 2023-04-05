@@ -78,6 +78,38 @@ def deletion_time_fix():
                     assignment.deletion_time += datetime.timedelta(microseconds=100000)
                     assignment.save()
 
+def update_gc_courses_cache():
+    """
+    This function is manually invoked to update every user's gc_courses_cache
+    """
+    from django.conf import settings
+    from api.views import MemoryCache, simplify_courses
+    from navbar.models import SettingsModel
+    from google.oauth2.credentials import Credentials
+    from google.auth.exceptions import RefreshError
+    from google.auth.transport.requests import Request
+    from googleapiclient.discovery import build
+    from common.utils import logger
+    with transaction.atomic():
+        for s in SettingsModel.objects.exclude(oauth_token={}):
+            credentials = Credentials.from_authorized_user_info(s.oauth_token, settings.GC_SCOPES)
+            try:
+                if not credentials.valid:
+                    can_be_refreshed = credentials.expired and credentials.refresh_token
+                    if not can_be_refreshed:
+                        raise RefreshError
+                    credentials.refresh(Request())
+                service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
+                courses = service.courses().list(courseStates=["ACTIVE"]).execute()
+            except RefreshError as e:
+                logger.error("Error with token: %s", e)
+                continue
+            courses = courses.get('courses', [])
+            s.gc_courses_cache = simplify_courses(courses)
+    print("Success\n")
+    for s in SettingsModel.objects.exclude(gc_courses_cache=[]):
+        print(f"{s.user.username}: {s.gc_courses_cache}\n")
+
 def adjust_blue_line(request, *, old_data, assignment_date, x_num):
     assert assignment_date is not None
     date_now = utils.utc_to_local(request, timezone.now())

@@ -51,9 +51,6 @@ header {
     width: 100%;
     background: var(--background-color);
     height: var(--header-height);
-    --header-top-and-bottom-padding: 5px;
-    padding-top: var(--header-top-and-bottom-padding);
-    padding-bottom: var(--header-top-and-bottom-padding);
     padding-right: 5px;
     padding-left: 5px;
     position: absolute;
@@ -81,7 +78,7 @@ header > * {
     cursor: pointer;
     display: flex;
     align-items: center;
-    height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
+    height: 100%;
     position: absolute;
 }
 #image-new-container img {
@@ -94,7 +91,7 @@ header > * {
     color: white;
 }
 #site {
-    --header-height: 70px;
+    --header-height: 80px;
 }
 main {
     position: relative; /* Needed for positioning the background image */
@@ -143,6 +140,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     box-shadow: none;
 }
 .daterangepicker .generic-button {
+    font-size: inherit;
     padding: 2px 10px;
 }
 .daterangepicker .drp-calendar {
@@ -159,15 +157,64 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     background-color: #357ebd;
     color: #fff;
 }
+.daterangepicker {
+    font-family: inherit !important;
+    width: initial !important;
+}
+.daterangepicker,
+.daterangepicker .calendar-table {
+    background-color: var(--primary) !important;
+}
+.daterangepicker .calendar-table td:not(.active, :hover) {
+    background-color: inherit !important;
+}
+.daterangepicker .calendar-table .available span {
+    border-color: var(--color) !important;
+}
+.daterangepicker .calendar-table th, .daterangepicker .calendar-table td {
+    width: 43px !important;
+    height: 29px !important;
+    font-size: 16px !important;
+}
+.daterangepicker.show-calendar .ranges {
+    float: left !important;
+}
+.daterangepicker .drp-calendar {
+    max-width: initial !important;
+}
+.daterangepicker select.hourselect,
+.daterangepicker select.minuteselect,
+.daterangepicker select.secondselect,
+.daterangepicker select.ampmselect {
+    width: 60px !important;
+}
+.daterangepicker,
+.daterangepicker select.monthselect,
+.daterangepicker select.yearselect,
+.daterangepicker select.hourselect,
+.daterangepicker select.minuteselect,
+.daterangepicker select.secondselect,
+.daterangepicker select.ampmselect {
+    font-size: 16px !important;
+}
+.daterangepicker .calendar-time {
+    margin-top: 8px !important;
+}
+.daterangepicker .calendar-table tr:first-of-type > th {
+    vertical-align: middle !important;
+    line-height: 0px !important;
+}
+.daterangepicker #daterangepicker-midnight {
+    margin-left: 6px;
+}
 #logo-container {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     position: relative;
-    margin-top: 3px;
+    margin-top: 1px;
     left: 50%;
     transform: translateX(-50%);
-}
-#logo-container img {
-    display: block;
+    height: 100%;
 }
 #site {
     position: relative;
@@ -178,14 +225,12 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     align-items: center;
     position: absolute;
     right: 32px;
-    height: calc(var(--header-height) - 2 * var(--header-top-and-bottom-padding));
+    height: 100%;
 }
 #user-greeting #username {
     text-decoration: none;
     display: inline-block;
-    padding: 2px 6px;
-    padding-bottom: 4px;
-    margin-top: 2px;
+    padding: 4px 6px;
     background: linear-gradient(rgb(72, 227, 235) 20%,rgb(83,127,163) 80%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -193,7 +238,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     position: relative;
     cursor: pointer;
 }
-#user-greeting #username::after {
+#user-greeting #username::before {
     content: '';
     position: absolute;
     top: 0;
@@ -205,22 +250,30 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     border-radius: 4px;
     transition: transform .2s cubic-bezier(.5,-3,.5,4);
 }
+#user-greeting #username::after {
+    content: '';
+    display: inline-block;
+    margin-left: 5px;
+    border: 6px solid transparent;
+    border-top-color: rgb(22, 177, 185);
+    transform: translateY(3px);
+}
 #user-greeting #username:focus,
 #user-greeting #username :focus {
     outline: 0;
 }
-#user-greeting #username:focus::after {
+#user-greeting #username:focus::before {
     filter: brightness(1.25);
     transform: scale(1.04);
 }
-#user-greeting #username:hover::after {
+#user-greeting #username:hover::before {
     transform: scale(1.04);
 }
 
 #account-dropdown {
     display: none;
     right: 50%;
-    width: 100px;
+    width: 125px;
     cursor: initial;
     position: absolute;
     background: rgb(43, 56, 68);
@@ -257,12 +310,12 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     height: 1px;
     background: hsl(0, 0%, 40%);
 }
-#account-dropdown a {
+#account-dropdown a, #account-dropdown button {
     display: block;
     color: white;
     text-decoration: none;
-    font-size: 14px;
-    padding: 6px;
+    font-size: 16px;
+    padding: 7px;
     text-align: center;
 }
 #account-dropdown .one-line {
@@ -270,14 +323,10 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     padding-bottom: 10px;
 }
 #account-dropdown button {
-    display: block;
-    text-align: center;
-    padding: 6px;
-    font-size: 15px;
     width: 100%;
-    background: none;
+    background: inherit;
 	color: inherit;
-	border: none;
+	border: inherit;
 	cursor: pointer;
 	outline: inherit;
 }
@@ -288,7 +337,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     width: 17px;
     height: 17px;
     border-radius: 50%;
-    background: rgb(33,163,177) !important;
+    background: hsl(186, 69%, 41%) !important;
     font-size: 16px;
     line-height: 17px;
     font-weight: 400;
@@ -309,16 +358,17 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     top: 0;
     position: absolute;
 }
-.info-button:hover {
-    background: rgb(16,135,148);
+.info-button:focus {
+    background: hsl(186, 80%, 30%) !important;
     outline: 0;
 }
-.info-button:hover .info-button-text {
+.info-button:hover:not(.prevent-hover) .info-button-text,
+.info-button:focus .info-button-text {
     height: unset;
     border: 2px solid var(--color);
     overflow: visible;
     padding: 5px 5px !important;
-    transition: padding .1s ease-in-out, opacity .15s linear;
+    transition: padding calc(0.1s * var(--animation-speed)) ease-in-out, opacity calc(0.15s * var(--animation-speed)) linear;
     opacity: 1;
 }
 .info-button-text {
@@ -389,10 +439,6 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     transform: translateX(50%);
     border-color: transparent transparent var(--color) transparent;
 }
-/* Don't know why this is here but it is here */
-.info-button:hover .info-button-text.info-right {
-    left: calc(100% + 12px);
-}
 
 #changelog-container {
     padding: 0 10px;
@@ -401,7 +447,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
     overflow-y: auto !important;
 }
 .jconfirm .jconfirm-content-pane {
-    max-height: 60vh !important;
+    max-height: calc(60 * var(--vh)) !important;
 }
 .jconfirm .jconfirm-box {
     width: min(70vw, 800px) !important;

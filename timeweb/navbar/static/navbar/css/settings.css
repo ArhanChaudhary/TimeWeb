@@ -4,7 +4,7 @@ main {
 #settings-form {
     padding: 0 1em;
     margin: 0 auto;
-    font-size: 17px;
+    font-size: 19px;
     max-width: 1000px;
 }
 #settings-scroller {
@@ -33,7 +33,7 @@ body {
 }
 .field-group-label {
     font-weight: 700;
-    font-size: 20px;
+    font-size: 22px;
     line-height: 20px;
     --lightness: 37%;
     color: hsl(196, 34%, var(--lightness));
@@ -43,6 +43,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    --gap: 100px;
+    gap: var(--gap);
 }
 .field-group > .field-container ~ .field-container {
     margin-top: 15px;
@@ -60,7 +62,7 @@ body {
 }
 .right-side-of-field > * {
     box-sizing: border-box;
-    width: 157px;
+    width: 200px;
     border-color: var(--color);
 }
 .right-side-of-field > :not(.error-note) {
@@ -69,7 +71,7 @@ body {
 .right-side-of-field > input,
 .right-side-of-field > textarea,
 .right-side-of-field > select {
-    font-size: 14px;
+    font-size: 17px;
     border-width: 1px;
     background-color: var(--primary);
 }
@@ -83,12 +85,11 @@ body {
     height: initial !important;
 }
 .clearable-file-input-text {
-    font-size: 14px;
+    font-size: 17px;
 }
 [type="checkbox"] ~ .single-action-label::before {
     width: 100% !important;
     left: 0 !important;
-    font-size: 14px;
 }
 [type="checkbox"]:not(:checked) ~ .single-action-label::before {
     transform: scaleX(0);
@@ -124,7 +125,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    height: 33px;
+    height: 38px;
     -webkit-user-select: none;
        -moz-user-select: none;
         -ms-user-select: none;
@@ -132,6 +133,9 @@ body {
     /* position "Clear image" text */
     z-index: 1;
     transition: all 0.1s ease-in-out;
+}
+#id_default_dropdown_tags {
+    --nothing-height: auto;
 }
 [type="checkbox"] ~ label:not(.break-days-label):hover:active {
     --box-shadow: 0 0 11px -1px hsl(0, 0%, 73%);
@@ -154,7 +158,7 @@ body {
     transform-origin: left;
 }
 [type="checkbox"]:checked ~ label::before {
-    transform: translateX(77px);
+    transform: translateX(99px);
 }
 [type="file"] {
     border: none;
@@ -166,8 +170,15 @@ body {
     text-align: center;
 }
 .field-description {
-    font-size: 0.8em;
+    font-size: 15px;
     opacity: 0.7;
+}
+.responsive-description-container {
+    white-space: nowrap
+}
+.responsive-description-container > * > :first-child {
+    width: 95px;
+    display: inline-block;
 }
 #button-container {
     display: flex;
@@ -191,9 +202,9 @@ body {
     border-top: inherit;
 }
 #break-days-wrapper .break-days-label {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    font-size: 14px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 17px;
     border-top-color: var(--color) !important;
     border-left-color: var(--color) !important;
 }
@@ -221,10 +232,11 @@ body {
     outline: 0;
     box-shadow: 0 0 0 1px hsl(0, 0%, 58%);
 }
-@media screen and (max-width: 750px) {
+@media screen and (max-width: 900px) {
     .field-container {
         align-items: unset;
         flex-flow: column;
+        --gap: 1px;
     }
     #button-container {
         flex-flow: column;
@@ -232,5 +244,8 @@ body {
     .right-side-of-field {
         margin-top: 2px;
         margin-bottom: 18px;
+    }
+    .responsive-description-container > * > :first-child {
+        display: block;
     }
 }

@@ -25,20 +25,12 @@
     {% url 'contact_form' as contact_form %}
     {% url 'blog' as blog %}
     {% url 'policies' as policies %}
-    {% if user.is_authenticated %}
-        {% if request.path == home or request.path == example %}
-            <div id="image-new-container" tabindex="0">
-                <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt draggable="false"/>
-                <span id="new-assignment-text">New Assignment</span>
-            </div>
-        {% endif %}
-    {% endif %}
+    {% block extra_header_elements %}{% endblock %}
     {% if user.is_authenticated %}
         <div id="user-greeting">
             <span id="welcome">Welcome,&nbsp;</span>
             <div tabindex="0" id="username">
-                {{ user.username }}
-                <div id="account-dropdown">
+                {{ user.username }}<div id="account-dropdown">
                     <a href="{{ settings }}" id="settings-nav" class="one-line">Settings<br></a>
                     <a href="{{ user_guide }}" class="one-line">User Guide<br></a>
                     <div class="dropdown-hr"></div>
@@ -63,7 +55,7 @@
         {% comment %} Color stop: #2BC6C7 to #2A2D57 {% endcomment %}
     </a>
 </header>
-<main tabindex="-1" {% if settings_model.background_image %}class="background-image-exists"{% endif %}>
+<main tabindex="-1" {% if user.settingsmodel.background_image %}class="background-image-exists"{% endif %}>
     {% comment %} Use an inline script so .animate is added as EARLY as possible, otherwise the unanimated frames can show up {% endcomment %}
     <script nonce="{{request.csp_nonce}}">
         if ("animation-ran" in sessionStorage || {% if user.is_authenticated %} {% if request.path == home or request.path == example %}false{% else %}true{% endif %} {% else %}true{% endif %}) {

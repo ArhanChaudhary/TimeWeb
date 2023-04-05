@@ -8,12 +8,18 @@ stringifyDate: function(date) {
         ('000' + date.getFullYear()).slice(-4),
     ].join('/');
 },
-formatMinutes: function(total_minutes) {
+formatMinutes: function(total_minutes, verbose=false) {
     const hour = Math.floor(total_minutes / 60),
         minute = Math.ceil(total_minutes % 60);
-    if (!hour) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
-    if (!minute) return hour + "h";
-    return hour + "h " + minute + "m";
+    if (verbose) {
+        if (!hour) return (total_minutes && total_minutes < 1) ? "less than a minute" : minute + " minute" + (minute > 1 ? "s" : "");
+        if (!minute) return hour + " hour" + (hour > 1 ? "s" : "");
+        return hour + " hour" + (hour > 1 ? "s" : "") + " and " + minute + " minute" + (minute > 1 ? "s" : "");
+    } else {
+        if (!hour) return (total_minutes && total_minutes < 1) ? "<1m" : minute + "m";
+        if (!minute) return hour + "h";
+        return hour + "h " + minute + "m";
+    }
 },
 formatSeconds: function(total_seconds) {
     // https://stackoverflow.com/questions/30679279/how-to-convert-seconds-into-year-month-days-hours-minutes-respectively
@@ -214,9 +220,12 @@ setClickHandlers: {
             let len_works = sa.sa.works.length - 1;
             let last_work_input = sa.sa.works[len_works];
             let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
+            const work_input_textbox_label = dom_assignment.find(".work-input-unit-of-time-checkbox");
+            work_input_textbox_label.addClass("disable-conversion");
             todo = Math.max(0, todo);
             dom_assignment.find(".work-input-textbox").val(todo);
             dom_assignment.find(".submit-work-button").click();
+            work_input_textbox_label.removeClass("disable-conversion");
         });
     },
     assignmentsHeaderUI: function() {
@@ -342,13 +351,13 @@ setClickHandlers: {
     },
     generateJConfirmParams: function(params) {
         return {
-            title: `Are you sure you want to autofill ${$("#autofill-selection").val().toLowerCase()} work done for ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
+            title: `Are you sure you want to autoinput ${$("#autofill-selection").val().toLowerCase()} work done for ${params.assignments_in_wrapper.length} ${pluralize("assignment", params.assignments_in_wrapper.length)}?`,
             content: (function() {
                 switch ($("#autofill-selection").val()) {
                     case "No":
-                        return "Assumes you haven't done anything since your last work input and autofills in no work done until today";
+                        return "Assumes you haven't done anything since your last work input and autoinputs in no work done until today";
                     case "All":
-                        return "Assumes you followed your work schedule since your last work input and autofills in all work done until today";
+                        return "Assumes you followed your work schedule since your last work input and autoinputs in all work done until today";
                 }
             })(),
             buttons: {
@@ -525,7 +534,7 @@ addTagHandlers: function() {
         if (dom_assignment.hasClass("open-tag-add-box")) return;
         dom_assignment.addClass("open-tag-add-box");
         $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
-        $this.find(".tag-add-input").focus().val("").attr("tabindex", "");
+        $this.find(".tag-add-input").val("").attr("tabindex", "");
         const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
 
         // This code handles the logic for determining which tags should be added to the tag add dropdown. Let's break this down:
@@ -552,6 +561,10 @@ addTagHandlers: function() {
         final_allTags.push(...unique_allTags.sort());
         // Filter out tags that are already in the assignment
         final_allTags = final_allTags.filter(e => !current_assignment_tags.includes(e));
+        if (!isTouchDevice || !final_allTags.length) {
+            // showing the entire keyboard when you want to add tags can get annoying on mobile
+            $this.find(".tag-add-input").focus();
+        }
 
 
 
@@ -679,8 +692,6 @@ switch (e_key) {
             case "n":
                 if (form_is_showing) return;
                 $("#image-new-container").click();
-                // Fix typing on the assignment form itself
-                e.preventDefault();
                 break;
             case "t":
                 $("#assignments-container").scrollTop(0);
@@ -709,8 +720,6 @@ switch (e_key) {
                         case "e":
                             if (form_is_showing) return;
                             assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                            // Fix typing on the assignment form itself
-                            e.preventDefault();
                             break;
                         case "d": {
                             const click_delete_button = $.Event("click");
@@ -765,12 +774,17 @@ switch (e_key) {
     case "arrowdown":
     case "arrowup":
         if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
-        const open_assignmens_on_screen = $(".open-assignment").filter(function() {
-            return new VisualAssignment($(this)).assignmentGraphIsOnScreen();
-        });
-        if (open_assignmens_on_screen.length !== 0) {
+        const open_assignments_on_screen = $(".open-assignment").map(function() {
+            const sa = new VisualAssignment($(this));
+            return sa.assignmentGraphIsOnScreen() ? sa : null;
+        }).toArray();
+        if (open_assignments_on_screen.length !== 0) {
             // Prevent arrow scroll
             e.preventDefault();
+            for (const sa of open_assignments_on_screen) {
+                sa.setParabolaValues();
+                sa.arrowSkewRatio(e.key);
+            }
         } else {
             // Allow arrow scroll
             // Relies on the fact that #assignments-container is the scrolling element
@@ -805,6 +819,7 @@ setAssignmentScaleUtils: function() {
             const sa = new VisualAssignment($this);
             sa.positionTags();
             sa.displayTruncateWarning();
+            sa.makeGCAnchorVisible();
         });
     });
     // #animate-in is initially display: hidden in priority.js, delay adding the scale
@@ -829,35 +844,42 @@ setAnimationSpeed: function() {
         this.style.setProperty('--scale-percent-y', '1', 'important');
     });
 },
+assignmentLinks: function() {
+    $(".title-link-anchor").each(function() {
+        if (this.href.startsWith(location.origin)) {
+            $(this).attr("href", "//" + this.getAttributeNode("href").value);
+        }
+    });
+},
 insertTutorialMessages: function(first_available_assignment) {
     $("#tutorial-click-assignment-to-open").remove();
-    if (SETTINGS.enable_tutorial) {
-        const assignments_excluding_example = $(".assignment").filter(function() {
-            return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
-        });
-        if (assignments_excluding_example.length) {
-            first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
-            if (!utils.ui.alreadyScrolled) {
-                // setTimeout needed because this runs before domSort
-                setTimeout(function() {
-                    $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
-                    new Promise(function(resolve) {
-                        let scrollTimeout = setTimeout(resolve, 200);
-                        $("#assignments-container").scroll(() => {
-                            clearTimeout(scrollTimeout);
-                            scrollTimeout = setTimeout(resolve, 200);
-                        });
-                    }).then(function() {
-                        $("#assignments-container").off('scroll');
-                        first_available_assignment.focus();
+    if (!SETTINGS.enable_tutorial) return;
+
+    const assignments_excluding_example = $(".assignment").filter(function() {
+        return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
+    });
+    if (assignments_excluding_example.length) {
+        first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
+        if (!utils.ui.alreadyScrolled) {
+            // setTimeout needed because this runs before domSort
+            setTimeout(function() {
+                $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                new Promise(function(resolve) {
+                    let scrollTimeout = setTimeout(resolve, 200);
+                    $("#assignments-container").scroll(() => {
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = setTimeout(resolve, 200);
                     });
-                }, 0);
-                utils.ui.alreadyScrolled = true;
-            }
-        } else {
-            $("#assignments-header").replaceWith('<div id="tutorial-message"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
-            $(".assignment-container, #current-date-container").hide();
+                }).then(function() {
+                    $("#assignments-container").off('scroll');
+                    first_available_assignment.focus();
+                });
+            }, 0);
+            utils.ui.alreadyScrolled = true;
         }
+    } else {
+        $("#assignments-header").replaceWith('<div id="tutorial-message" class="grey-highlight"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
+        $(".assignment-container, #current-date-container").hide();
     }
 },
 graphAlertTutorial: function(days_until_due) {
@@ -956,7 +978,7 @@ saveAndLoadStates: function() {
     // Use beforeunload instead of unload or else the loading screen triggers and $("#assignments-container").scrollTop() becomes 0
     $(window).on('beforeunload', function() {
         sessionStorage.setItem("login_email", ACCOUNT_EMAIL);
-        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) {
+        if (!(SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS)) {
             // Save current open assignments
             sessionStorage.setItem("open_assignments", JSON.stringify(
                 $(".assignment.open-assignment").map(function() {
@@ -988,32 +1010,32 @@ saveAndLoadStates: function() {
 
     // Ensure fonts load for the graph
     document.fonts.ready.then(function() {
-        if (!SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS)
-            // setTimeout so the assignments are clicked after the click handlers are set
-            setTimeout(function() {
-                // Reopen closed assignments
-                if ("open_assignments" in sessionStorage) {
-                    const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                    $(".assignment").each(function() {
-                        const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
-                        if (!was_open) return;
+        if (SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
+        // setTimeout so the assignments are clicked after the click handlers are set
+        setTimeout(function() {
+            // Reopen closed assignments
+            if ("open_assignments" in sessionStorage) {
+                const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+                $(".assignment").each(function() {
+                    const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
+                    if (!was_open) return;
 
-                        // if you edit an open assignment and make it needs more info
-                        // ensure it isn't clicked
-                        const dom_assignment = $(this);
-                        const sa = new VisualAssignment(dom_assignment);
-                        if (sa.canOpenAssignment()) {
-                            dom_assignment.click();
-                        }
-                    });
-                }
+                    // if you edit an open assignment and make it needs more info
+                    // ensure it isn't clicked
+                    const dom_assignment = $(this);
+                    const sa = new VisualAssignment(dom_assignment);
+                    if (sa.canOpenAssignment()) {
+                        dom_assignment.click();
+                    }
+                });
+            }
 
-                // Scroll to original position
-                // Needs to scroll after assignments are opened
-                if ("scroll" in sessionStorage) {
-                    $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
-                }
-            }, 0);
+            // Scroll to original position
+            // Needs to scroll after assignments are opened
+            if ("scroll" in sessionStorage) {
+                $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
+            }
+        }, 0);
     });
 },
 navClickHandlers: function() {
@@ -1348,6 +1370,7 @@ document.addEventListener("DOMContentLoaded", function() {
     setTimeout(() => {
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
+        utils.ui.assignmentLinks();
     }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();

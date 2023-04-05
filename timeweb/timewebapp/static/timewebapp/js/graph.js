@@ -183,8 +183,10 @@ class Assignment {
         due_date.setDate(due_date.getDate() + this.sa.x);
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {x: due_date.getTime()/1000, id: this.sa.id});
 
-        this.sa.alert_due_date_incremented = true;
-        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+        if (SETTINGS.should_alert_due_date_incremented) {
+            this.sa.alert_due_date_incremented = true;
+            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {alert_due_date_incremented: this.sa.alert_due_date_incremented, id: this.sa.id});
+        }
 
         this.sa.skew_ratio = 1;
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
@@ -275,8 +277,6 @@ class VisualAssignment extends Assignment {
     static MINIMUM_CIRCLE_Y = -1000
     static SKEW_RATIO_ROUND_PRECISION = 3
     static SKEW_RATIO_SNAP_DIFF = 0.05
-    static ARROW_KEYDOWN_THRESHOLD = 500
-    static ARROW_KEYDOWN_INTERVAL = 13
     static BUTTON_ERROR_DISPLAY_TIME = 1000
     static TOTAL_ARROW_SKEW_RATIO_STEPS = 100
 
@@ -432,7 +432,8 @@ class VisualAssignment extends Assignment {
             this.draw(raw_x, raw_y);
         }
     }
-    arrowSkewRatio() {
+    arrowSkewRatio(pressed_arrow_key) {
+        pressed_arrow_key = pressed_arrow_key.toLowerCase();
         /**
          * Line: y = ax + b
          * y1 = y - this.red_line_start_y
@@ -481,17 +482,17 @@ class VisualAssignment extends Assignment {
         const original_skew_ratio = this.sa.skew_ratio;
         let x_step = x1 / VisualAssignment.TOTAL_ARROW_SKEW_RATIO_STEPS;
         if (intersection_x !== x1 / 2 &&
-            (this.pressed_arrow_key === "ArrowDown" && x1 / 2 - x_step / 2 < intersection_x && intersection_x < x1 / 2 
-            || this.pressed_arrow_key === "ArrowUp" && x1 / 2 < intersection_x && intersection_x < x1 / 2 + x_step / 2)) {
+            (pressed_arrow_key === "arrowdown" && x1 / 2 - x_step / 2 < intersection_x && intersection_x < x1 / 2 
+            || pressed_arrow_key === "arrowup" && x1 / 2 < intersection_x && intersection_x < x1 / 2 + x_step / 2)) {
             // if the curvature is something like 0.001 and the user presses arrow down or
             // the curvature is something like -0.001 and the user presses arrow up
             // go to 0
             this.sa.skew_ratio = 1;
         } else {
             intersection_x = x_step * Math.round(intersection_x / x_step);
-            if (this.pressed_arrow_key === "ArrowUp")
+            if (pressed_arrow_key === "arrowup")
                 var next_intersection_x = intersection_x - x_step;
-            else if (this.pressed_arrow_key === "ArrowDown")
+            else if (pressed_arrow_key === "arrowdown")
                 var next_intersection_x = intersection_x + x_step;
             
             // plug in next_intersection_x as x into y = y1 - x(y1/x1)
@@ -504,9 +505,9 @@ class VisualAssignment extends Assignment {
         const skew_ratio_bound = this.calcSkewRatioBound();
         // use original_skew_ratio to allow one more arrow before bound so the parabols completely flattens
         // add && or else holding down will cause themselves to trigger each other in an infinite loop
-        if ((original_skew_ratio >= skew_ratio_bound || next_intersection_x === 0) && this.pressed_arrow_key === "ArrowUp") {
+        if ((original_skew_ratio >= skew_ratio_bound || next_intersection_x === 0) && pressed_arrow_key === "arrowup") {
             this.sa.skew_ratio = 2 - skew_ratio_bound;
-        } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && this.pressed_arrow_key === "ArrowDown") {
+        } else if ((original_skew_ratio <= 2 - skew_ratio_bound || next_intersection_x === x1) && pressed_arrow_key === "arrowdown") {
             this.sa.skew_ratio = skew_ratio_bound;
         }
         if (!this.sa.fixed_mode)
@@ -514,7 +515,7 @@ class VisualAssignment extends Assignment {
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: this.sa.skew_ratio, id: this.sa.id});
         new Priority().sort();
     }
-    static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px Open Sans`;
+    static generateCanvasFont = font_size => `${$("body").css("font-weight")} ${font_size}px ${$("body").css("font-family").split(",")[0]}`;
     static getTextHeight = screen => screen.measureText("0").width * 2;
     static setCanvasFont(screen, font_size) {
         screen.font = VisualAssignment.generateCanvasFont(font_size);
@@ -1046,7 +1047,7 @@ class VisualAssignment extends Assignment {
         
         switch ($graph_button.prop("tagName").toLowerCase()) {
             case "button":
-                var original_text = $graph_button.text();
+                var original_text = $graph_button.html();
                 $graph_button.text("Not Applicable");
                 break;
             case "input":
@@ -1062,7 +1063,7 @@ class VisualAssignment extends Assignment {
             $graph_button.removeClass("is-flashing");
             switch ($graph_button.prop("tagName").toLowerCase()) {
                 case "button":
-                    $graph_button.text(original_text);
+                    $graph_button.html(original_text);
                     break;
                 case "input":
                     $graph_button.attr("placeholder", original_text);
@@ -1147,36 +1148,6 @@ class VisualAssignment extends Assignment {
                 fixed_mode_button = this.dom_assignment.find(".fixed-mode-button"),
                 display_in_text_button = this.dom_assignment.find(".display-in-text-button"),
                 delete_work_input_button = this.dom_assignment.find(".delete-work-input-button");
-        // BEGIN Up and down arrow event handler
-        {
-        let graphtimeout,
-            arrow_key_fired = false, // $(document).keydown( fires for every frame a key is held down. This makes it behaves like it fires once
-            graphinterval;
-
-        // looking back i probably could have used e.originalEvent.repeat but uhhh it works ig
-        $(document).keydown(e => {
-            if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.shiftKey && this.assignmentGraphIsOnScreen() && !arrow_key_fired) {
-                // "arrow_key_fired" makes .keydown fire only when a key is pressed, not repeatedly
-                arrow_key_fired = true;
-                this.pressed_arrow_key = e.key;
-                this.arrowSkewRatio();
-                graphtimeout = setTimeout(function() {
-                    clearInterval(graphinterval);
-                    graphinterval = setInterval(this.arrowSkewRatio.bind(this), VisualAssignment.ARROW_KEYDOWN_INTERVAL);
-                }.bind(this), VisualAssignment.ARROW_KEYDOWN_THRESHOLD);
-            }
-        }).keyup(e => {
-            // Ensures the same key pressed fires the keyup to stop change skew ratio
-            // Without this, you could press another key while the down arrow is being pressed for example and stop graphinterval
-            if (e.key === this.pressed_arrow_key) {
-                arrow_key_fired = false;
-                clearTimeout(graphtimeout);
-                clearInterval(graphinterval);
-            }
-        });
-        }
-        // END Up and down arrow event handler
-
         // BEGIN Display in text button
         this.in_graph_display = true;
         const graph_container = this.dom_assignment.find(".graph-container");
@@ -1433,9 +1404,10 @@ class VisualAssignment extends Assignment {
             }
             // Clear once textbox if the input is valid
             work_input_textbox.val("");
-            if (this.unit_is_of_time) {
+            const work_input_textbox_label = this.dom_assignment.find(".work-input-unit-of-time-checkbox")
+            if (this.unit_is_of_time && !work_input_textbox_label.hasClass("disable-conversion")) {
                 const unit_singular = pluralize(this.sa.unit.toLowerCase(), 1);
-                const work_input_textbox_label_is_checked = this.dom_assignment.find(".work-input-unit-of-time-checkbox").is(":checked");
+                const work_input_textbox_label_is_checked = work_input_textbox_label.is(":checked");
                 if (unit_singular === "hour" && !work_input_textbox_label_is_checked) {
                     input_done = Crud.minutesToHours(input_done);
                 } else if (unit_singular === "minute" && work_input_textbox_label_is_checked) {
@@ -1627,7 +1599,8 @@ class VisualAssignment extends Assignment {
 
                 // title_top + title_height - tag_top to first align the top of the tags with the bottom of the title
                 const padding_to_add = title_top + title_height - tag_top + parseFloat(dom_tags.css("--tags-left--margin-bottom"));
-                let original_padding = parseFloat($("#assignments-container").css("--vertical-assignment-padding"));
+                let original_padding = parseFloat($("#assignments-container").css("--original-vertical-assignment-padding"));
+                original_padding += parseFloat($("#assignments-container").css("--first-extra-vertical-assignment-padding") || 0);
                 this.dom_assignment.css("--vertical-assignment-padding", `${Math.max(0, padding_to_add) + original_padding}px`);
 
                 if (SETTINGS.vertical_tag_position === "Top") {
@@ -1643,6 +1616,18 @@ class VisualAssignment extends Assignment {
                 }
                 break;
             }
+        }
+    }
+    makeGCAnchorVisible() {
+        if (!this.sa.is_google_classroom_assignment) return;
+        const title = this.dom_assignment.find(".title");
+        const anchor = this.dom_assignment.find(".title-link-anchor");
+        const title_text = this.dom_assignment.find(".title-text");
+        let sliced = this.sa.name;
+        title_text.text(sliced);
+        while (anchor.position().top + anchor.height() > title.height()) {
+            sliced = sliced.slice(0, -1);
+            title_text.text(sliced);
         }
     }
     displayTruncateWarning() {

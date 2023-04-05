@@ -59,13 +59,14 @@ APPEARANCES = (
 )
 MAX_APPEARANCES_LENGTH = len(max([i[0] for i in APPEARANCES], key=len))
 
-class SettingsModel(models.Model):
-    # Group "Integration Configurations"
-    gc_assignments_always_midnight = models.BooleanField(
-        default=False,
-        verbose_name=_('Google Classroom 11:59 PM Due Time Fix'),
-    )
+FONTS = (
+    ("opensans", "Open Sans"),
+    ("montserrat", "Montserrat"),
+)
 
+MAX_FONTS_LENGTH = len(max([i[0] for i in FONTS], key=len))
+
+class SettingsModel(models.Model):
     # Group "Assignment Deletion"
     immediately_delete_completely_finished_assignments = models.BooleanField(
         default=False,
@@ -110,35 +111,19 @@ class SettingsModel(models.Model):
         verbose_name=_('Close Graph After Submitting Work Input'),
     )
 
-    # Group "Assignment Priority"
+    # Group "Assignment Header"
     show_priority = models.BooleanField(
         default=True,
-        verbose_name=_('Show Priority'),
-    )
-    highest_priority_color = ColorField(
-        default="#e8564a",
-        verbose_name=_('Highest Priority Color'),
-    )
-    lowest_priority_color = ColorField(
-        default="#84d336",
-        verbose_name=_('Lowest Priority Color'),
-    )
-    assignment_sorting = models.CharField(
-        max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
-        choices=ASSIGNMENT_SORTINGS,
-        default=_("Most Priority First"),
-        verbose_name=_('Assignment Sorting: '),
-    )
-    
-    # Group "Assignment Header"
-    default_dropdown_tags = models.JSONField(
-        default=empty_list,
-        blank=True,
-        verbose_name=_('Default Dropdown Tags'),
+        verbose_name=_('Display Priority'),
     )
     display_working_days_left = models.BooleanField(
         default=False,
         verbose_name=('Display Number of Working Days Left'),
+    )
+    default_dropdown_tags = models.JSONField(
+        default=empty_list,
+        blank=True,
+        verbose_name=_('Default Dropdown Tags'),
     )
     horizontal_tag_position = models.CharField(
         max_length=MAX_HORIZONTAL_TAG_POSITIONS_LENGTH,
@@ -153,12 +138,30 @@ class SettingsModel(models.Model):
         verbose_name=_('Vertical Assignment Tag Position'),
     )
 
-    # Group "Personalize"
+    # Group "Appearance"
     appearance = models.CharField(
         max_length=MAX_APPEARANCES_LENGTH,
         choices=APPEARANCES,
         default=_("dark"),
-        verbose_name=_('Appearance'),
+        verbose_name=_('Color Scheme'),
+    )
+    font = models.CharField(
+        max_length=MAX_FONTS_LENGTH,
+        choices=FONTS,
+        default=_("opensans"),
+        verbose_name=_('Font'),
+    )
+    highest_priority_color = ColorField(
+        default="#e8564a",
+        verbose_name=_('Highest Priority Color'),
+    )
+    lowest_priority_color = ColorField(
+        default="#84d336",
+        verbose_name=_('Lowest Priority Color'),
+    )
+    priority_color_borders = models.BooleanField(
+        default=False,
+        verbose_name=_('Priority Color Borders'),
     )
     background_image = models.ImageField(
         upload_to=create_image_path,
@@ -172,25 +175,39 @@ class SettingsModel(models.Model):
         default=_("normal"),
         verbose_name=_('Background Image Text Shadow Width'),
     )
-    animation_speed = models.CharField(
-        max_length=MAX_ANIMATION_SPEED_LENGTH,
-        choices=ANIMATION_SPEED,
-        default=_("1"),
-        verbose_name=_('Animation Speed'),
-    )
 
     # Group "Miscellaneous"
     enable_tutorial = models.BooleanField(
         default=True,
         verbose_name=_('Tutorial'),
     )
+    animation_speed = models.CharField(
+        max_length=MAX_ANIMATION_SPEED_LENGTH,
+        choices=ANIMATION_SPEED,
+        default=_("1"),
+        verbose_name=_('Animation Speed'),
+    )
     sorting_animation_threshold = models.IntegerField(
         default=50,
         validators=[MinValueValidator(0, _("This setting can't be a negative number"))],
         verbose_name=_('Sorting Animation Threshold'),
     )
+    should_alert_due_date_incremented = models.BooleanField(
+        default=True,
+        verbose_name=_('Alert Soft Due Date Incremented'),
+    )
+    gc_assignments_always_midnight = models.BooleanField(
+        default=False,
+        verbose_name=_('Google Classroom 11:59 PM Due Time Fix'),
+    )
 
     # Hidden
+    assignment_sorting = models.CharField(
+        max_length=MAX_ASSIGNMENT_SORTINGS_LENGTH,
+        choices=ASSIGNMENT_SORTINGS,
+        default=_("Most Priority First"),
+        verbose_name=_('Assignment Sorting: '),
+    )
     # Custom field validation in views: hardcoded enable or disable in change_setting
     oauth_token = models.JSONField(
         default=empty_dict,

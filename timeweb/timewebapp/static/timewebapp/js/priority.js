@@ -70,17 +70,21 @@ class Priority {
             }
         }, 0);
     }
-    // https://www.desmos.com/calculator/zlzx0bqhur
+    // https://www.desmos.com/calculator/nhivlbqdzf
     // I will not be explaining anything nor answering any questions
     // goodbye
-    static dayZeroScaleOutput = 5;
+    static dayZeroScaleOutput = 4.2;
     static dueDateTransitionValue = 1.8;
-    static piecewiseCutoff = 2.85;
+    static piecewiseCutoff = 3.9;
     static dueDateScalingFunction(days_until_due) {
-        if (days_until_due > Priority.piecewiseCutoff)
-            return days_until_due - Priority.dueDateTransitionValue;
-        else
-            return days_until_due / (Priority.dayZeroScaleOutput - Priority.dayZeroScaleOutput * Math.pow(days_until_due, 2) / Math.pow(Priority.piecewiseCutoff, 2) + Math.pow(days_until_due, 2) / (Math.pow(Priority.piecewiseCutoff, 2) - Priority.dueDateTransitionValue * Priority.piecewiseCutoff));
+        const x = days_until_due;
+        const a = Priority.dayZeroScaleOutput;
+        const b = Priority.dueDateTransitionValue;
+        const c = Priority.piecewiseCutoff;
+        assert(x > 0);
+        if (x <= c)
+            return x / (a - a * x * x / (c * c) + x * x / (c * c - b * c));
+        return x - b;
     }
     static todoScalingFunction(minutes) {
         return Math.sqrt(minutes);
@@ -168,15 +172,8 @@ class Priority {
         if (todo + last_work_input === sa.sa.y) {
             return "Finish this assignment" + (reference_relative_date ? " today" : "");
         } else if (sa.unit_is_of_time) {
-            let todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
-            let unit_str;
-            if (Crud.shouldConvertToHours(todo_minutes)) {
-                todo_minutes = Crud.minutesToHours(todo_minutes);
-                unit_str = pluralize("hour", todo_minutes);
-            } else {
-                unit_str = pluralize("minute", todo_minutes);
-            }
-            return `Complete ${mathUtils.precisionRound(todo_minutes, 10)} ${unit_str} of work`;
+            const todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+            return `Complete ${utils.formatting.formatMinutes(todo_minutes, true)} of work`;
         } else {
             return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit, todo).toLowerCase()}`;
         }
@@ -457,13 +454,27 @@ class Priority {
                         width: 15,
                         height: 15,
                     }).css({marginLeft: -1, marginRight: -1});
-                    var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
-                    that.total_completion_time += todo_minutes;
-                    const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
-                    if ([0, 1].includes(due_date_minus_today_floor)) {
-                        // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
-                        // when it in fact displays no useful information
-                        if (due_date_minus_today_floor === 0) {
+                    if (hard_due_date_passed) {
+                        todo = sa.sa.y - last_work_input;
+                        var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        // NOTE: in case I add other status groups, it's important that I don't forget to manually add
+                        // conditions to replicate as if the assignment has other status groups. This is because the
+                        // condition !hard_due_date_passed manually skips over status groups that are used for checking
+                        // in later behavior
+                        status_value = Priority.DUE_DATE_PASSED;
+                        if (sa.sa.needs_more_info)
+                            status_message = "This assignment needs more info but passed its due date";
+                        else
+                            status_message = 'This assignment\'s due date has passed';
+                    } else {
+                        var todo_minutes = Crud.safeConversion(todo, sa.sa.time_per_unit);
+                        that.total_completion_time += todo_minutes;
+                        const due_date_minus_today_floor = Math.floor(sa.sa.complete_x) - today_minus_assignment_date;
+                        if (![0, 1].includes(due_date_minus_today_floor)) {
+                            status_value = Priority.UNFINISHED_FOR_TODAY;
+                        } else if (due_date_minus_today_floor === 0) {
+                            // we don't want a question mark and etc assignment due tomorrow toggle the tomorrow or today completion time
+                            // when it in fact displays no useful information
                             that.today_total_completion_time += todo_minutes;
                             status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY;
                         } else if (due_date_minus_today_floor === 1) {
@@ -474,15 +485,6 @@ class Priority {
                                 status_value = Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW;
                             }
                         }
-                    }
-                    if (hard_due_date_passed) {
-                        status_value = Priority.DUE_DATE_PASSED;
-                        if (sa.sa.needs_more_info)
-                            status_message = "This assignment needs more info but passed its due date";
-                        else
-                            status_message = 'This assignment\'s due date has passed';
-                    } else {
-                        status_value = Priority.UNFINISHED_FOR_TODAY;
                         status_message = Priority.generate_UNFINISHED_FOR_TODAY_status_message(sa, todo, last_work_input);
                     }
                 }
@@ -505,15 +507,17 @@ class Priority {
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
-            assignment_header_tick_svg.parents(".assignment-header-button").toggle(
-                ![
+            assignment_header_tick_svg.parents(".assignment-header-button").toggle(!(
+                [
                     Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT, Priority.NOT_YET_ASSIGNED,
                     Priority.FINISHED_FOR_TODAY,
-                    Priority.COMPLETELY_FINISHED
-                ].includes(status_value) && !already_entered_work_input_for_today
-            );
+                    Priority.COMPLETELY_FINISHED,
+                ].includes(status_value)
+                || already_entered_work_input_for_today
+                || sa.sa.needs_more_info
+            ));
             let href = `#tick-svg`;
             assignment_header_tick_svg.find("use").attr("href", href);
             assignment_header_tick_svg.attr("viewBox", (function() {
@@ -600,16 +604,20 @@ class Priority {
 
             // !! is needed because toggleClass only works with booleans
             dom_tags.toggleClass("assignment-has-daysleft", SETTINGS.vertical_tag_position === "Bottom" && SETTINGS.horizontal_tag_position === "Left" && !!str_daysleft);
-            if ([
-                Priority.UNFINISHED_FOR_TODAY,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
-                Priority.DUE_DATE_PASSED
-            ].includes(status_value)) {
-                dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
-            } else {
-                dom_completion_time.text("");
+            switch (status_value) {
+                case Priority.DUE_DATE_PASSED:
+                    if (!Number.isFinite(sa.sa.y) || !Number.isFinite(last_work_input)) {
+                        dom_completion_time.text("");
+                        break;
+                    }
+                case Priority.UNFINISHED_FOR_TODAY:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
+                case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
+                    dom_completion_time.text(utils.formatting.formatMinutes(todo_minutes));
+                    break;
+                default:
+                    dom_completion_time.text("");
             }
             // If the status message is "finish this assignment", display the completion time on mobile
             dom_completion_time.toggleClass("hide-on-mobile", !!sa.unit_is_of_time && todo + last_work_input !== sa.sa.y);
@@ -627,23 +635,30 @@ class Priority {
             error: ajaxUtils.error,
         });
     }
-    alertDueDates() {
+    doAssignmentAlerts() {
         const that = this;
-        let due_date_incremented_notice_title;
-        let due_date_incremented_notice_content;
-        if (that.due_date_incremented_notices.length === 1) {
-            due_date_incremented_notice_title = `Notice: "${that.due_date_incremented_notices[0].name}" has had its due date incremented because it has soft due dates enabled.`;
-        } else if (that.due_date_incremented_notices.length > 1) {
-            due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they have soft due dates enabled.`;
-        }
-        due_date_incremented_notice_content = "This only occurs when an assignment's due date passes and it is still unfinished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
-        if (due_date_incremented_notice_title && !Priority.due_date_incremented_notice_on_screen) {
+        if (!(that.due_date_incremented_notices.length === 0 || Priority.due_date_incremented_notice_on_screen || !SETTINGS.should_alert_due_date_incremented)) {
+            let due_date_incremented_notice_title;
+            let due_date_incremented_notice_content;
+            if (that.due_date_incremented_notices.length === 1) {
+                due_date_incremented_notice_title = `Notice: "${that.due_date_incremented_notices[0].name}" has had its due date incremented because it has soft due dates enabled.`;
+            } else if (that.due_date_incremented_notices.length > 1) {
+                due_date_incremented_notice_title = `Notice: ${utils.formatting.arrayToEnglish(that.due_date_incremented_notices.map(i => i.name))} have had their due dates incremented because they each have soft due dates enabled.`;
+            }
+            due_date_incremented_notice_content = "Soft due dates increment when an assignment's due date passes but is still unfinished. If you don't want this to happen, disable soft due dates in the edit assignment form.";
             Priority.due_date_incremented_notice_on_screen = true;
             $.alert({
                 title: due_date_incremented_notice_title,
                 content: due_date_incremented_notice_content,
                 backgroundDismiss: false,
                 buttons: {
+                    "Don't show again": {
+                        action: function() {
+                            SETTINGS.should_alert_due_date_incremented = false;
+                            ajaxUtils.changeSetting({setting: "should_alert_due_date_incremented", value: SETTINGS.should_alert_due_date_incremented});
+                            this.buttons.ok.action();
+                        }
+                    },
                     ok: {
                         action: function() {
                             Priority.due_date_incremented_notice_on_screen = false;
@@ -653,6 +668,49 @@ class Priority {
                             }
                         }
                     }
+                },
+            });
+        }
+
+        const completely_finished = that.priority_data_list.filter(priority_data => priority_data.status_value === Priority.COMPLETELY_FINISHED);
+        if (completely_finished.length > 5) {
+            $.alert({
+                title: "You have too many completely finished assignments.",
+                content: "Delete them to improve performance and reduce clutter. Note that you can also view and restore deleted assignments in the settings.",
+                backgroundDismiss: false,
+                buttons: {
+                    "Make this automatic": {
+                        action: function() {
+                            this.buttons["Delete assignments"].action(function() {
+                                // do this after /api/delete-assignment or this may run while the database is locked and crash
+                                SETTINGS.immediately_delete_completely_finished_assignments = true;
+                                ajaxUtils.changeSetting({setting: "immediately_delete_completely_finished_assignments", value: SETTINGS.immediately_delete_completely_finished_assignments});
+                            });
+                        }
+                    },
+                    "Delete assignments": {
+                        action: function(extra_success_function) {
+                            const assignments_to_delete = $(completely_finished.map(priority_data => {
+                                const dom_assignment = $(".assignment").eq(priority_data.index);
+                                return dom_assignment[0];
+                            }));
+                            const assignment_ids_to_delete = assignments_to_delete.map(function() {
+                                const sa = utils.loadAssignmentData($(this));
+                                return sa.id;
+                            }).toArray();
+                            const success = function() {
+                                new Crud().transitionDeleteAssignment(assignments_to_delete);
+                                extra_success_function?.();
+                            }
+                            $.ajax({
+                                type: "POST",
+                                url: "/api/delete-assignment",
+                                data: {assignments: JSON.stringify(assignment_ids_to_delete)},
+                                success: success,
+                                error: ajaxUtils.error,
+                            });
+                        }
+                    },
                 },
             });
         }
@@ -732,7 +790,6 @@ class Priority {
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW:
             case Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY:
-            case Priority.DUE_DATE_PASSED:
             case Priority.INCOMPLETE_WORKS:
             case Priority.NO_WORKING_DAYS:
             case Priority.FINISHED_FOR_TODAY:
@@ -779,6 +836,10 @@ class Priority {
                         if (a.status_priority < b.status_priority) return 1;
                 }
                 break;
+            case Priority.DUE_DATE_PASSED:
+                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return 1;
+                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return -1;
+                break;
             case Priority.NOT_YET_ASSIGNED:
                 if (a.today_minus_assignment_date > b.today_minus_assignment_date) return -1;
                 if (a.today_minus_assignment_date < b.today_minus_assignment_date) return 1;
@@ -787,18 +848,18 @@ class Priority {
         if (a.first_real_tag < b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
         if (a.first_real_tag > b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
 
-        switch (status_value) {
-            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
-            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
-            case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
-            case Priority.COMPLETELY_FINISHED:
-                // exact same logic as above
-                // as a note, this will never deal with negative numbers, as a negative
-                // due date means the assignment was already due. so, the status value
-                // will be completely_finished and this if statement won't run
-                if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
-                if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
-                break;
+        if ([
+            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
+            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
+            Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
+            Priority.COMPLETELY_FINISHED,
+        ].includes(status_value)) {
+            // exact same logic as above
+            // as a note, this will never deal with negative numbers, as a negative
+            // due date means the assignment was already due. so, the status value
+            // will be completely_finished and this if statement won't run
+            if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
+            if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
         }
 
         if (a.name < b.name) return -1;
@@ -811,26 +872,28 @@ class Priority {
     }
     priorityDataToPriorityPercentage(priority_data) {
         const that = this;
-        if ([
-            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
-            Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG,
-            Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
-            Priority.NO_WORKING_DAYS,
-            Priority.INCOMPLETE_WORKS
-        ].includes(priority_data.status_value)) {
-            var priority_percentage = NaN;
-        } else if ([
-            Priority.FINISHED_FOR_TODAY,
-            // needed for "This assignment has not yet been assigned" being set to color values greater than 1
-            Priority.NOT_YET_ASSIGNED,
-            Priority.COMPLETELY_FINISHED
-        ].includes(priority_data.status_value)) {
-            var priority_percentage = 0;
-        } else {
-            var priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
-            if (!Number.isFinite(priority_percentage)) {
+        let priority_percentage;
+        switch (priority_data.status_value) {
+            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT:
+            case Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT_WITH_FIRST_TAG:
+            case Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT:
+            case Priority.NO_WORKING_DAYS:
+            case Priority.INCOMPLETE_WORKS:
+                priority_percentage = NaN;
+                break;
+            case Priority.DUE_DATE_PASSED:
                 priority_percentage = 100;
-            }
+                break;
+            case Priority.FINISHED_FOR_TODAY:
+            case Priority.NOT_YET_ASSIGNED: // needed for "This assignment has not yet been assigned" being set to color values greater than 1
+            case Priority.COMPLETELY_FINISHED:
+                priority_percentage = 0;
+                break;
+            default:
+                priority_percentage = Math.max(1, Math.floor(priority_data.status_priority / that.highest_priority * 100 + 1e-10));
+                if (!Number.isFinite(priority_percentage)) {
+                    priority_percentage = 100;
+                }
         }
         return priority_percentage;
     }
@@ -934,7 +997,7 @@ class Priority {
     sortWithoutTimeout() {
         const that = this;
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
-        that.alertDueDates();
+        that.doAssignmentAlerts();
         
         // Updates open graphs' today line and other graph text
         $(window).trigger("redrawGraphs");
@@ -950,7 +1013,6 @@ class Priority {
             Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
             Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
             Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-            Priority.DUE_DATE_PASSED
         ].includes(priority_data.status_value));
         if (that.highest_priority) {
             that.highest_priority = that.highest_priority.status_priority;
@@ -967,8 +1029,7 @@ class Priority {
                     Priority.UNFINISHED_FOR_TODAY,
                     Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
                     Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
-                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-                    Priority.DUE_DATE_PASSED
+                    Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
                 ].includes(priority_data.status_value))
                     continue;
 
@@ -1010,8 +1071,7 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY,
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_END_OF_TOMORROW,
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
-                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY,
-                Priority.DUE_DATE_PASSED
+                Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
             const dom_title = $(".title").eq(priority_data.index);
 
@@ -1072,7 +1132,8 @@ class Priority {
                     Priority.NEEDS_MORE_INFO_AND_NOT_GC_ASSIGNMENT,
                     Priority.NO_WORKING_DAYS,
                     Priority.INCOMPLETE_WORKS,
-                    Priority.COMPLETELY_FINISHED
+                    Priority.COMPLETELY_FINISHED,
+                    Priority.DUE_DATE_PASSED,
                 ].includes(priority_data.status_value) && !dom_assignment.hasClass("assignment-is-deleting")
             ) {
                 first_available_tutorial_assignment = dom_assignment;
@@ -1208,7 +1269,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
     function positionTags() {
         $(".assignment").each(function() {
-            new VisualAssignment($(this)).positionTags();
+            const sa = new VisualAssignment($(this));
+            sa.positionTags();
+            sa.makeGCAnchorVisible();
         });
         if ("scroll" in sessionStorage) {
             $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
