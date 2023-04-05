@@ -587,7 +587,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
 
         is_user_assignment = not self.sm.is_google_classroom_assignment
         description_link = next((
-            url for url in extractor.gen_urls(self.sm.description)
+            url for url in extractor.gen_urls(self.sm.description or '')
             if all(not url.endswith("." + ending) for ending in banned_endings)
         ), None)
         description_has_link = description_link is not None
