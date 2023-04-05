@@ -845,10 +845,7 @@ setAnimationSpeed: function() {
     });
 },
 tutorial: function(first_available_assignment) {
-    $("#tutorial-click-assignment-to-open").remove();
     if (!SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
-
-    first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
 
     const tutorial_alerts = [
         {

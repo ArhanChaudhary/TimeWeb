@@ -256,12 +256,6 @@ main.background-image-exists {
     border-radius: 5px 0 0 5px;
     transition: background-color calc(var(--priority-color-transition-speed) * var(--animation-speed));
 }
-#tutorial-click-assignment-to-open {
-    font-size: 18px;
-    margin-top: 3px;
-    display: inline-block;
-    scroll-margin: 30px;
-}
 .shortcut {
     position: relative;
     display: flex;
