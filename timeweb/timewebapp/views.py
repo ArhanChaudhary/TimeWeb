@@ -28,7 +28,7 @@ from copy import deepcopy
 MAX_TAG_LENGTH = 100
 MAX_NUMBER_OF_TAGS = 5
 EXAMPLE_ASSIGNMENT = {
-    "name": "Read a Book (EXAMPLE ASSIGNMENT)",
+    "name": "Read a Book",
     "x": 20, # Not the db value of x, in this case is just the number of days in the assignment
     "unit": "Chapter",
     "y": 25,
