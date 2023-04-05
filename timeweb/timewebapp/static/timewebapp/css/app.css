@@ -133,6 +133,12 @@ main.background-image-exists {
     margin-top: 10px;
     text-align: center;
 }
+.tutorial-content {
+    color: hsl(0, 0%, 75%);
+}
+.tutorial-content-styled:not(#dummy) {
+    opacity: 1 !important;
+}
 #assignments-header {
     position: relative;
     font-size: 18px;

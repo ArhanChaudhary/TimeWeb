@@ -869,8 +869,12 @@ tutorial: function(first_available_assignment) {
         },
         {
             alignTop: true, // alignTop is a custom extension
-            onDestroy: function() {
-
+            buttons: {
+                next: {
+                    action: function() {
+    
+                    }
+                }
             },
             transition: function(finished_resolver) {
                 first_available_assignment[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
@@ -895,8 +899,8 @@ tutorial: function(first_available_assignment) {
         const alertparam = alertparams.shift();
         alert_number++;
         const alert_template = $($(`#tutorial-${alert_number}-template`).html());
-        alertparam.title = alert_template.filter(".tutorial-title").html();
-        alertparam.content = alert_template.filter(".tutorial-content").html();
+        alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
+        alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
         alertparam.backgroundDismiss = false;
         alertparam.onClose = function() {
             if (this.break) return;
@@ -908,7 +912,10 @@ tutorial: function(first_available_assignment) {
             else
                 finished_resolver();
         }).then(function() {
-            $.alert(alertparam);
+            const a = $.alert(alertparam);
+            setTimeout(function() {
+                a.$content.addClass("tutorial-content-styled");
+            }, 0);
         });
     }
     recurseAlert(tutorial_alerts);
