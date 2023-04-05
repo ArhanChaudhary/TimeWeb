@@ -174,10 +174,10 @@ code {
 .major-category.isSticky::before {
     box-shadow: none;
 }
-.written-on {
+#written-on {
     transform: translateX(var(--move-minor-category-left));
 }
-.written-on::before {
+#written-on::before {
     content: "Last updated: ";
 }
 summary {
