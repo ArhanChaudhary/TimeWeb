@@ -891,7 +891,10 @@ tutorial: function(first_available_assignment) {
     ];
     let alert_number = 0;
     function recurseAlert(alertparams) {
-        if (!alertparams.length) return;
+        if (!alertparams.length) {
+            $("#site").css("pointer-events", "");
+            return;
+        }
 
         const alertparam = alertparams.shift();
         alert_number++;
@@ -900,7 +903,10 @@ tutorial: function(first_available_assignment) {
         alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
         alertparam.backgroundDismiss = false;
         alertparam.onClose = function() {
-            if (this.break) return;
+            if (this.break) {
+                $("#site").css("pointer-events", "");
+                return;
+            }
             recurseAlert(alertparams);
         }
         new Promise(function(finished_resolver) {
@@ -915,6 +921,7 @@ tutorial: function(first_available_assignment) {
             }, 0);
         });
     }
+    $("#site").css("pointer-events", "none");
     recurseAlert(tutorial_alerts);
 },
 exampleAccountAlertTutorial: function() {
