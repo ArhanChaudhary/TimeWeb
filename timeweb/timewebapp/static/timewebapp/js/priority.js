@@ -1081,8 +1081,34 @@ class Priority {
                 new VisualAssignment(dom_assignment).positionTags();
 
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
+                $("#animate-in").css({
+                    position: "absolute",
+                    opacity: 0,
+                });
                 new Promise(function(resolve) {
                     $(window).one('load', function() {
+                        const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
+                        $("#animate-in").css({
+                            position: "",
+                            top: Math.max(
+                                // ensure assignments don't scroll from the top of the screen
+                                // the below min parameter sets the assignment to the very bottom of your screen,
+                                // no matter what
+                                // this ensures that if the assignment is downwards from your scroll position,
+                                // it won't be at the bottom of your screen and instead at the bottom
+                                // of your assignments
+                                Priority.ANIMATE_IN_START_MARGIN,
+                                Math.min(
+                                    // ensure assignments don't scroll from the bottom to the top too far
+                                    window.innerHeight,
+                                    last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
+                                // subtract the offset top to get the actual top value
+                                // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                                // offset top and make that number its new top
+                                ) - $("#animate-in").offset()?.top
+                            ),
+                            marginBottom: -$("#animate-in").outerHeight(),
+                        });
                         // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                         // So, scroll to the next assignment instead
                         // Scroll to dom_assignment because of its scroll-margin
@@ -1201,44 +1227,6 @@ class Priority {
                                 transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
                             });
                 });
-        }
-
-        // Make sure this is set after assignments are sorted and swapped
-        if (that.params.first_sort && $("#animate-in").length) {
-            // Set initial transition values for "#animate-in"
-            // Needs to be after domswap or else "top" bugs out 
-            
-            // First paint is before the fonts are loaded; #animate-in is shown
-            // Use opacity 0 instead of display none so getClientRects() works in utils.js
-            $("#animate-in").css({
-                position: "absolute",
-                opacity: 0,
-            })
-            // Load the fonts first or height() may return the wrong values
-            document.fonts.ready.then(function() {
-                const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
-                $("#animate-in").css({
-                    position: "",
-                    top: Math.max(
-                        // ensure assignments don't scroll from the top of the screen
-                        // the below min parameter sets the assignment to the very bottom of your screen,
-                        // no matter what
-                        // this ensures that if the assignment is downwards from your scroll position,
-                        // it won't be at the bottom of your screen and instead at the bottom
-                        // of your assignments
-                        Priority.ANIMATE_IN_START_MARGIN,
-                        Math.min(
-                            // ensure assignments don't scroll from the bottom to the top too far
-                            window.innerHeight,
-                            last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
-                        // subtract the offset top to get the actual top value
-                        // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                        // offset top and make that number its new top
-                        ) - $("#animate-in").offset().top
-                    ),
-                    marginBottom: -$("#animate-in").outerHeight(),
-                });
-            });
         }
 		that.updateInfoHeader();
         $("#assignments-container").css("opacity", "1");
