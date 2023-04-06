@@ -874,16 +874,11 @@ tutorial: function(first_available_assignment) {
                 }
             },
             transition: function(finished_resolver) {
-                first_available_assignment[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
                 new Promise(function(resolve) {
-                    let scrollTimeout = setTimeout(resolve, 500);
-                    $("#assignments-container").scroll(() => {
-                        clearTimeout(scrollTimeout);
-                        scrollTimeout = setTimeout(resolve, 500);
-                    });
+                    setTimeout(function() {
+                        $(window).trigger('animate-example-assignment', resolve);
+                    }, 150);
                 }).then(function() {
-                    $("#assignments-container").off('scroll');
-                    first_available_assignment.click();
                     setTimeout(finished_resolver, 1000);
                 });
             },
@@ -902,7 +897,7 @@ tutorial: function(first_available_assignment) {
         alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
         alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
         alertparam.backgroundDismiss = false;
-        alertparam.onClose = function() {
+        alertparam.onDestroy = function() {
             if (this.break) {
                 $("#site").css("pointer-events", "");
                 return;
