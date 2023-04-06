@@ -53,22 +53,20 @@ class Priority {
             }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
         }
         // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-        setTimeout(() => {
-            if (params.first_sort) {
-                params.dom_assignment.addClass("transition-instantly");
-            }
-            if (Number.isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
-                params.dom_assignment.css("--priority-color", "var(--color)");
-            } else {
-                const priority_color = that.percentageToColor(params.priority_percentage);
-                params.dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
-            }
-            if (params.first_sort) {
-                // Which element specifically is overflowed seems to have minimal effect on performance
-                params.dom_assignment[0].offsetHeight;
-                params.dom_assignment.removeClass("transition-instantly");
-            }
-        }, 0);
+        if (params.first_sort) {
+            params.dom_assignment.addClass("transition-instantly");
+        }
+        if (Number.isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
+            params.dom_assignment.css("--priority-color", "var(--color)");
+        } else {
+            const priority_color = that.percentageToColor(params.priority_percentage);
+            params.dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
+        }
+        if (params.first_sort) {
+            // Which element specifically is overflowed seems to have minimal effect on performance
+            params.dom_assignment[0].offsetHeight;
+            params.dom_assignment.removeClass("transition-instantly");
+        }
     }
     // https://www.desmos.com/calculator/nhivlbqdzf
     // I will not be explaining anything nor answering any questions
@@ -1117,22 +1115,17 @@ class Priority {
                             // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                             assignment_to_scroll_to = dom_assignment;
                         }
-                        setTimeout(function() {
-							setTimeout(function() {
-                                // scrollIntoView sometimes doesn't work without two setTimeouts
-                                assignment_to_scroll_to[0].scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'nearest',
-                                });
-		                        let scrollTimeout = setTimeout(resolve, 200);
-		                        $("#assignments-container").scroll(() => {
-									if (assignment_container.is("#animate-in"))
-										$("#extra-navs").hide();
-                                    clearTimeout(scrollTimeout);
-                                    scrollTimeout = setTimeout(resolve, 200);
-                                });
-							}, 0);
-						}, 0);
+                        assignment_to_scroll_to[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest',
+                        });
+                        let scrollTimeout = setTimeout(resolve, 200);
+                        $("#assignments-container").scroll(() => {
+                            if (assignment_container.is("#animate-in"))
+                                $("#extra-navs").hide();
+                            clearTimeout(scrollTimeout);
+                            scrollTimeout = setTimeout(resolve, 200);
+                        });
                     });
                 }).then(function() {
                     $("#assignments-container").off('scroll');
