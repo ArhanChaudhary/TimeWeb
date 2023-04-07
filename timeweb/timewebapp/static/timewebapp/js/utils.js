@@ -881,6 +881,7 @@ tutorial: function() {
     // ignore work inputs
     const tutorial_alerts = [
         {
+            id: "intro",
             buttons: {
                 "Skip tutorial": {
                     action: function() {
@@ -892,6 +893,7 @@ tutorial: function() {
             },
         },
         {
+            id: "header",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -912,6 +914,7 @@ tutorial: function() {
             },
         },
         {
+            id: "graph-intro",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -940,6 +943,7 @@ tutorial: function() {
             }
         },
         {
+            id: "x-axis",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -967,6 +971,7 @@ tutorial: function() {
             }
         },
         {
+            id: "y-axis",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -994,6 +999,7 @@ tutorial: function() {
             }
         },
         {
+            id: "work-schedule",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1021,6 +1027,7 @@ tutorial: function() {
             }
         },
         {
+            id: "work-inputs",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1031,6 +1038,7 @@ tutorial: function() {
             }
         },
         {
+            id: "tick-button",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1050,6 +1058,7 @@ tutorial: function() {
             }
         },
         {
+            id: "wrap-up",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1104,7 +1113,6 @@ tutorial: function() {
         }, timeoutparam.wait);
     }
 
-    let alert_number = 0;
     function finishRecurseAlert() {
         $(window).off("resize.tutorial-overlay");
         $("#tutorial-overlay").css({
@@ -1125,8 +1133,7 @@ tutorial: function() {
         }
 
         const alertparam = alertparams.shift();
-        alert_number++;
-        const alert_template = $($(`#tutorial-${alert_number}-template`).html());
+        const alert_template = $($(`#tutorial-${alertparam.id}-template`).html());
         alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
         alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
         if (alertparam.buttons)
