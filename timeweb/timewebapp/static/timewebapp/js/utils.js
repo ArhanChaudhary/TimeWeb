@@ -1137,10 +1137,9 @@ tutorial: function() {
         const alert_template = $($(`#tutorial-${alertparam.id}-template`).html());
         alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
         alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
-        if (alertparam.buttons)
-            alertparam.buttons.next = {}
-        else
-            alertparam.buttons = {next: {}};
+        if (!alertparam.buttons)
+            alertparam.buttons = {};
+        alertparam.buttons[alertparams.length ? "next" : "finish tutorial"] = {};
         alertparam.backgroundDismiss = false;
         alertparam.onDestroy = function() {
             if (this.break) {
