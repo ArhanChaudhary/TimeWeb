@@ -950,10 +950,20 @@ class Priority {
     }
     updateInfoHeader() {
         const that = this;
-        if (!that.total_completion_time || SETTINGS.enable_tutorial) {
+        if (!that.total_completion_time || SETTINGS.enable_tutorial && that.params.first_sort) {
             $("#estimated-total-time, #estimated-completion-time, #important-total-time").removeClass("hide-info");
             $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").hide();
-            $("#estimated-total-time").text(dat.length ? 'You have finished everything for today' : 'You don\'t have any assignments');
+            if (!dat.length || SETTINGS.enable_tutorial && that.params.first_sort) {
+                $("#estimated-total-time").text("You don't have any assignments");
+                if (SETTINGS.enable_tutorial && that.params.first_sort) {
+                    $(window).one("animate-example-assignment", function() {
+                        that.params.first_sort = false;
+                        that.updateInfoHeader.bind(that)();
+                    });
+                }
+            } else {
+                $("#estimated-total-time").text("You have finished everything for today");
+            }
         } else {
             $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #important-total-time").addClass("hide-info");
             $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").show();

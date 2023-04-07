@@ -845,9 +845,40 @@ setAnimationSpeed: function() {
         this.style.setProperty('--scale-percent-y', '1', 'important');
     });
 },
-tutorial: function(first_available_assignment) {
+overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
+    $(window).off("resize.tutorial-overlay");
+    if ($element === null) {
+        $("#tutorial-overlay").css({
+            "--x": "",
+            "--y": "",
+            "--width": "",
+            "--height": "",
+            "--duration": `${duration}ms`,
+        });
+    } else {
+        $(window).on("resize.tutorial-overlay", function() {
+            let rect;
+            if (typeof $element === "function") {
+                rect = $element();
+            } else {
+                rect = $element[0].getBoundingClientRect();
+            }
+            $("#tutorial-overlay").css({
+                "--x": `${rect.left - margin}px`,
+                "--y": `${rect.top - margin}px`,
+                "--width": `${rect.width + margin * 2}px`,
+                "--height": `${rect.height + margin * 2}px`,
+                "--duration": `${duration}ms`,
+            });
+        });
+    }
+    $(window).trigger("resize.tutorial-overlay");
+},
+tutorial: function() {
     if (!SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
 
+    // remove assignment from dom and dat if skip tutorial is clicked
+    // ignore work inputs
     const tutorial_alerts = [
         {
             buttons: {
@@ -855,39 +886,241 @@ tutorial: function(first_available_assignment) {
                     action: function() {
                         this.break = true;
                         SETTINGS.enable_tutorial = false;
-                        // ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+                        ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
                     }
                 },
-                next: {
-                    action: function() {
-    
-                    }
-                }
             },
         },
         {
-            buttons: {
-                next: {
-                    action: function() {
-    
-                    }
-                }
-            },
             transition: function(finished_resolver) {
-                new Promise(function(resolve) {
-                    setTimeout(function() {
-                        $(window).trigger('animate-example-assignment', resolve);
-                    }, 150);
-                }).then(function() {
-                    setTimeout(finished_resolver, 1000);
-                });
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        resolve: 'animate-example-assignment',
+                    },
+                    {
+                        wait: 1500,
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in > .assignment"),
+                        }),
+                    },
+                    {
+                        wait: 1000,
+                        do: finished_resolver,
+                    }
+                ]);
             },
         },
-    ];
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            $("#animate-in > .assignment").focus().click();
+                            utils.ui.overlayAround({
+                                element: $("#animate-in > .assignment"),
+                                margin: 10,
+                                duration: 800,
+                            });
+                        },
+                    },
+                    {
+                        wait: 2000,
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in .graph"),
+                            margin: 5,
+                        }),
+                    },
+                    {
+                        wait: 1000,
+                        do: finished_resolver,
+                    }
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: () => {
+                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    return {
+                                        top: rect.top + rect.height - 55,
+                                        left: rect.left,
+                                        width: rect.width,
+                                        height: 55,
+                                    }
+                                },
+                                margin: 5,
+                            });
+                        }
+                    },
+                    {
+                        wait: 1000,
+                        do: finished_resolver,
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: () => {
+                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    return {
+                                        top: rect.top,
+                                        left: rect.left,
+                                        width: 80,
+                                        height: rect.height,
+                                    }
+                                },
+                                margin: 5,
+                            });
+                        }
+                    },
+                    {
+                        wait: 1000,
+                        do: finished_resolver,
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: () => {
+                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    return {
+                                        top: rect.top,
+                                        left: rect.left,
+                                        width: rect.width,
+                                        height: rect.height,
+                                    }
+                                },
+                                margin: 5,
+                            });
+                        }
+                    },
+                    {
+                        wait: 750,
+                        do: finished_resolver,
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 1000,
+                        do: finished_resolver,
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: $("#animate-in .tick-button").parent(),
+                                margin: 0,
+                            });
+                        }
+                    },
+                    {
+                        wait: 1000,
+                        do: finished_resolver,
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: $("#animate-in > .assignment"),
+                                margin: 10,
+                                duration: 900,
+                            });
+                        }
+                    },
+                    {
+                        wait: 700,
+                        do: () => {
+                            $("#animate-in .tick-button").click();
+                        }
+                    },
+                    {
+                        wait: 2000,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: null,
+                                duration: 1500,
+                            });
+                        }
+                    },
+                    {
+                        wait: 1700,
+                        do: finished_resolver,
+                    }
+                ]);
+            }
+        }
+    ]
+
+    function recurseTimeout(timeoutparams) {
+        if (!timeoutparams.length) return;
+
+        const timeoutparam = timeoutparams.shift();
+        setTimeout(function() {
+            new Promise(function(resolve) {
+                if (timeoutparam.resolve) {
+                    $(window).trigger(timeoutparam.resolve, resolve);
+                } else {
+                    resolve();
+                }
+            }).then(function() {
+                timeoutparam.do?.();
+                recurseTimeout(timeoutparams);
+            });
+        }, timeoutparam.wait);
+    }
+
     let alert_number = 0;
+    function finishRecurseAlert() {
+        $(window).off("resize.tutorial-overlay");
+        $("#tutorial-overlay").css({
+            "--x": "0px",
+            "--y": "0px",
+            "--width": "100%",
+            "--height": "100%",
+            "--duration": "1500ms",
+        });
+        $("#site").css("pointer-events", "");
+        SETTINGS.enable_tutorial = false;
+        ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+    }
     function recurseAlert(alertparams) {
         if (!alertparams.length) {
-            $("#site").css("pointer-events", "");
+            finishRecurseAlert();
             return;
         }
 
@@ -896,10 +1129,14 @@ tutorial: function(first_available_assignment) {
         const alert_template = $($(`#tutorial-${alert_number}-template`).html());
         alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
         alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
+        if (alertparam.buttons)
+            alertparam.buttons.next = {}
+        else
+            alertparam.buttons = {next: {}};
         alertparam.backgroundDismiss = false;
         alertparam.onDestroy = function() {
             if (this.break) {
-                $("#site").css("pointer-events", "");
+                finishRecurseAlert();
                 return;
             }
             recurseAlert(alertparams);
@@ -913,6 +1150,7 @@ tutorial: function(first_available_assignment) {
             const a = $.alert(alertparam);
             setTimeout(function() {
                 a.$content.addClass("tutorial-content-styled");
+                a.$jconfirmBg.css("opacity", "0");
             }, 0);
         });
     }
