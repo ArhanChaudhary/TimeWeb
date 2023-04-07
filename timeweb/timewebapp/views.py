@@ -178,9 +178,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             })
 
             # adds "#animate-in" or "#animate-color" to the assignment whose form was submitted
-            if request.user.settingsmodel.enable_tutorial:
-                self.context['just_created_assignment_id'] = request.user.timewebmodel_set.get(hidden=False, name=EXAMPLE_ASSIGNMENT['name']).id
-            elif request.session.get("just_created_assignment_id"):
+            if request.session.get("just_created_assignment_id"):
                 self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
             elif request.session.get("just_updated_assignment_id"):
                 self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
