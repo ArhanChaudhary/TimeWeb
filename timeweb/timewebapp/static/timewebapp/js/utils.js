@@ -881,7 +881,6 @@ tutorial: function() {
     // ignore work inputs
     const tutorial_alerts = [
         {
-            id: "intro",
             buttons: {
                 "Skip tutorial": {
                     action: function() {
@@ -895,13 +894,12 @@ tutorial: function() {
                 recurseTimeout([
                     {
                         wait: 750,
-                        do: finished_resolver,
+                        do: () => finished_resolver("intro"),
                     }
                 ]);
             },
         },
         {
-            id: "header",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -916,13 +914,12 @@ tutorial: function() {
                     },
                     {
                         wait: 1750,
-                        do: finished_resolver,
+                        do: () => finished_resolver("header"),
                     }
                 ]);
             },
         },
         {
-            id: "graph-intro",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -945,13 +942,12 @@ tutorial: function() {
                     },
                     {
                         wait: 1250,
-                        do: finished_resolver,
+                        do: () => finished_resolver("graph-intro"),
                     }
                 ]);
             }
         },
         {
-            id: "x-axis",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -974,13 +970,12 @@ tutorial: function() {
                     },
                     {
                         wait: 1000,
-                        do: finished_resolver,
+                        do: () => finished_resolver("x-axis"),
                     },
                 ]);
             }
         },
         {
-            id: "y-axis",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1002,13 +997,12 @@ tutorial: function() {
                     },
                     {
                         wait: 1000,
-                        do: finished_resolver,
+                        do: () => finished_resolver("y-axis"),
                     },
                 ]);
             }
         },
         {
-            id: "work-schedule",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1022,24 +1016,22 @@ tutorial: function() {
                     },
                     {
                         wait: 750,
-                        do: finished_resolver,
+                        do: () => finished_resolver("work-schedule"),
                     },
                 ]);
             }
         },
         {
-            id: "work-inputs",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
                         wait: 1000,
-                        do: finished_resolver,
+                        do: () => finished_resolver("work-inputs"),
                     },
                 ]);
             }
         },
         {
-            id: "tick-button",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1053,13 +1045,12 @@ tutorial: function() {
                     },
                     {
                         wait: 1000,
-                        do: finished_resolver,
+                        do: () => finished_resolver("tick-button"),
                     },
                 ]);
             }
         },
         {
-            id: "wrap-up",
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
@@ -1089,7 +1080,7 @@ tutorial: function() {
                     },
                     {
                         wait: 1750,
-                        do: finished_resolver,
+                        do: () => finished_resolver("wrap-up"),
                     }
                 ]);
             }
@@ -1134,9 +1125,6 @@ tutorial: function() {
         }
 
         const alertparam = alertparams.shift();
-        const alert_template = $($(`#tutorial-${alertparam.id}-template`).html());
-        alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
-        alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
         if (!alertparam.buttons)
             alertparam.buttons = {};
         alertparam.buttons[alertparams.length ? "next" : "finish tutorial"] = {};
@@ -1152,8 +1140,11 @@ tutorial: function() {
             if (alertparam.transition)
                 alertparam.transition(finished_resolver);
             else
-                finished_resolver();
-        }).then(function() {
+                finished_resolver(alertparam.id);
+        }).then(function(id) {
+            const alert_template = $($(`#tutorial-${id}-template`).html());
+            alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
+            alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
             const a = $.alert(alertparam);
             setTimeout(function() {
                 a.$content.addClass("tutorial-content-styled");
