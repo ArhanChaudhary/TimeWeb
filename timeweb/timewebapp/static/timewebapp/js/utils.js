@@ -891,6 +891,14 @@ tutorial: function() {
                     }
                 },
             },
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 750,
+                        do: finished_resolver,
+                    }
+                ]);
+            },
         },
         {
             id: "header",
@@ -907,7 +915,7 @@ tutorial: function() {
                         }),
                     },
                     {
-                        wait: 1000,
+                        wait: 1750,
                         do: finished_resolver,
                     }
                 ]);
@@ -929,14 +937,14 @@ tutorial: function() {
                         },
                     },
                     {
-                        wait: 2000,
+                        wait: 2250,
                         do: () => utils.ui.overlayAround({
                             element: $("#animate-in .graph"),
                             margin: 5,
                         }),
                     },
                     {
-                        wait: 1000,
+                        wait: 1250,
                         do: finished_resolver,
                     }
                 ]);
@@ -960,6 +968,7 @@ tutorial: function() {
                                     }
                                 },
                                 margin: 5,
+                                duration: 800,
                             });
                         }
                     },
@@ -1006,15 +1015,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => {
                             utils.ui.overlayAround({
-                                element: () => {
-                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
-                                    return {
-                                        top: rect.top,
-                                        left: rect.left,
-                                        width: rect.width,
-                                        height: rect.height,
-                                    }
-                                },
+                                element: $("#animate-in .graph"),
                                 margin: 5,
                             });
                         }
@@ -1072,7 +1073,7 @@ tutorial: function() {
                         }
                     },
                     {
-                        wait: 700,
+                        wait: 850,
                         do: () => {
                             $("#animate-in .tick-button").click();
                         }
@@ -1082,12 +1083,12 @@ tutorial: function() {
                         do: () => {
                             utils.ui.overlayAround({
                                 element: null,
-                                duration: 1500,
+                                duration: 1250,
                             });
                         }
                     },
                     {
-                        wait: 1700,
+                        wait: 1750,
                         do: finished_resolver,
                     }
                 ]);
