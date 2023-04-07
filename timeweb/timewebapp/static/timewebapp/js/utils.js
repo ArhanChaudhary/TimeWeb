@@ -672,7 +672,8 @@ $(document).keydown(function(e) {
 const e_key = e.key.toLowerCase();
 if (e.ctrlKey || e.metaKey
     || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
-    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)) return;
+    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)
+    || SETTINGS.enable_tutorial) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;
 switch (e_key) {
@@ -865,7 +866,6 @@ tutorial: function(first_available_assignment) {
             },
         },
         {
-            alignTop: true, // alignTop is a custom extension
             buttons: {
                 next: {
                     action: function() {
