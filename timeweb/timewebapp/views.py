@@ -39,7 +39,6 @@ EXAMPLE_ASSIGNMENT = {
     "min_work_time": 2,
     "break_days": [],
     "dynamic_start": 0,
-    "description": "Example assignment description"
 }
 # needs to be down here due to circular imports
 from .forms import TimewebForm
