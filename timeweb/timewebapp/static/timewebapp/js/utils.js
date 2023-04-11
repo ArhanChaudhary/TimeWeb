@@ -883,10 +883,10 @@ tutorial: function() {
         {
             buttons: {
                 "Skip tutorial": {
-                    action: function() {
-                        this.break = true;
-                        SETTINGS.enable_tutorial = false;
-                        ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+                    action: () => {
+                        while (tutorial_alerts.length > 0) {
+                            tutorial_alerts.pop();
+                        }
                     }
                 },
             },
@@ -1140,10 +1140,6 @@ tutorial: function() {
         alertparam.backgroundDismiss = false;
         alertparam.draggable = true;
         alertparam.onDestroy = function() {
-            if (this.break) {
-                finishRecurseAlert();
-                return;
-            }
             recurseAlert(alertparams);
         }
         new Promise(function(finished_resolver) {
