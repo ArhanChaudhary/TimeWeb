@@ -952,24 +952,22 @@ tutorial: function() {
                 recurseTimeout([
                     {
                         wait: 300,
-                        do: () => {
-                            utils.ui.overlayAround({
-                                element: () => {
-                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
-                                    return {
-                                        top: rect.top + rect.height - 55,
-                                        left: rect.left,
-                                        width: rect.width,
-                                        height: 55,
-                                    }
-                                },
-                                margin: 5,
-                                duration: 800,
-                            });
-                        }
+                        do: () => utils.ui.overlayAround({
+                            element: () => {
+                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                return {
+                                    top: rect.top + rect.height - 55,
+                                    left: rect.left,
+                                    width: rect.width,
+                                    height: 55,
+                                }
+                            },
+                            margin: 5,
+                            duration: 800,
+                        }),
                     },
                     {
-                        wait: 1000,
+                        wait: 1050,
                         do: () => finished_resolver("x-axis"),
                     },
                 ]);
@@ -980,23 +978,21 @@ tutorial: function() {
                 recurseTimeout([
                     {
                         wait: 300,
-                        do: () => {
-                            utils.ui.overlayAround({
-                                element: () => {
-                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
-                                    return {
-                                        top: rect.top,
-                                        left: rect.left,
-                                        width: 80,
-                                        height: rect.height,
-                                    }
-                                },
-                                margin: 5,
-                            });
-                        }
+                        do: () => utils.ui.overlayAround({
+                            element: () => {
+                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                return {
+                                    top: rect.top,
+                                    left: rect.left,
+                                    width: 80,
+                                    height: rect.height,
+                                }
+                            },
+                            margin: 5,
+                        }),
                     },
                     {
-                        wait: 1000,
+                        wait: 1250,
                         do: () => finished_resolver("y-axis"),
                     },
                 ]);
@@ -1015,7 +1011,7 @@ tutorial: function() {
                         }
                     },
                     {
-                        wait: 750,
+                        wait: 1250,
                         do: () => finished_resolver("work-schedule"),
                     },
                 ]);
@@ -1036,15 +1032,14 @@ tutorial: function() {
                 recurseTimeout([
                     {
                         wait: 300,
-                        do: () => {
-                            utils.ui.overlayAround({
-                                element: $("#animate-in .tick-button").parent(),
-                                margin: 0,
-                            });
-                        }
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in .tick-button").parent(),
+                            margin: 0,
+                            duration: 1500,
+                        }),
                     },
                     {
-                        wait: 1000,
+                        wait: 1750,
                         do: () => finished_resolver("tick-button"),
                     },
                 ]);
@@ -1055,31 +1050,25 @@ tutorial: function() {
                 recurseTimeout([
                     {
                         wait: 300,
-                        do: () => {
-                            utils.ui.overlayAround({
-                                element: $("#animate-in > .assignment"),
-                                margin: 10,
-                                duration: 900,
-                            });
-                        }
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in > .assignment"),
+                            margin: 10,
+                            duration: 900,
+                        }),
                     },
                     {
-                        wait: 850,
-                        do: () => {
-                            $("#animate-in .tick-button").click();
-                        }
-                    },
-                    {
-                        wait: 2000,
-                        do: () => {
-                            utils.ui.overlayAround({
-                                element: null,
-                                duration: 1250,
-                            });
-                        }
+                        wait: 1300,
+                        do: () => $("#animate-in .tick-button").click(),
                     },
                     {
                         wait: 1750,
+                        do: () => utils.ui.overlayAround({
+                            element: null,
+                            duration: 1250,
+                        }),
+                    },
+                    {
+                        wait: 2250,
                         do: () => finished_resolver("wrap-up"),
                     }
                 ]);
