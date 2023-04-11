@@ -915,6 +915,10 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .fixed-graph {
     position: absolute;
+    transition: filter linear 0.8s 0.1s !important;
+}
+.fixed-graph.blur {
+    filter: blur(3px);
 }
 .graph {
     display: block;

@@ -984,7 +984,7 @@ tutorial: function() {
                                 return {
                                     top: rect.top,
                                     left: rect.left,
-                                    width: 80,
+                                    width: VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15,
                                     height: rect.height,
                                 }
                             },
@@ -1008,6 +1008,7 @@ tutorial: function() {
                                 element: $("#animate-in .graph"),
                                 margin: 5,
                             });
+                            $("#animate-in .fixed-graph").addClass("blur");
                         }
                     },
                     {
@@ -1021,7 +1022,26 @@ tutorial: function() {
             transition: function(finished_resolver) {
                 recurseTimeout([
                     {
-                        wait: 1000,
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: () => {
+                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    return {
+                                        top: rect.top + rect.height - 51,
+                                        left: rect.left + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 9,
+                                        width: 0,
+                                        height: 0
+                                    }
+                                },
+                                duration: 1250,
+                                margin: 20,
+                            });
+                            $("#animate-in .fixed-graph").removeClass("blur");
+                        }
+                    },
+                    {
+                        wait: 1500,
                         do: () => finished_resolver("work-inputs"),
                     },
                 ]);
