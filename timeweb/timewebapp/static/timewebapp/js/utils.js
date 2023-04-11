@@ -1118,6 +1118,7 @@ tutorial: function() {
             alertparam.buttons = {};
         alertparam.buttons[alertparams.length ? "next" : "finish tutorial"] = {};
         alertparam.backgroundDismiss = false;
+        alertparam.draggable = true;
         alertparam.onDestroy = function() {
             if (this.break) {
                 finishRecurseAlert();
