@@ -528,10 +528,11 @@ class Crud {
         });
         $('.delete-button, .restore-button').parent().click(function(e) {
             const $this = $(this);
+            const dom_assignment = $this.parents(".assignment");
+            if (dom_assignment.hasClass("assignment-is-deleting")) return;
             // shift + d while in the close assignment transition bugs it
             // use transitionend to run this
             new Promise(function(resolve) {
-                const dom_assignment = $this.parents(".assignment");
                 if (dom_assignment.hasClass("assignment-is-closing")) {
                     dom_assignment.find(".assignment-footer").one("transitionend", resolve);
                 } else {
@@ -540,7 +541,7 @@ class Crud {
             }).then(function() {
                 if ($this.children(".delete-button").length) {
                     if (e.shiftKey) {
-                        that.deleteAssignment($this);
+                        that.deleteAssignment(dom_assignment);
                         return;
                     }
                     const sa = utils.loadAssignmentData($this);
@@ -551,7 +552,7 @@ class Crud {
                             confirm: {
                                 keys: ['Enter'],
                                 action: function() {
-                                    that.deleteAssignment($this);
+                                    that.deleteAssignment(dom_assignment);
                                 }
                             },
                             cancel: function() {
@@ -560,7 +561,7 @@ class Crud {
                         }
                     });
                 } else if ($this.children(".restore-button").length) {
-                    that.deleteAssignment($this, {restore: true});
+                    that.deleteAssignment(dom_assignment, {restore: true});
                 }
             });
         });
@@ -902,18 +903,14 @@ class Crud {
             }
         });
     }
-    deleteAssignment($button, params={restore: false}) {
+    deleteAssignment(dom_assignment, params={restore: false}) {
         const that = this;
-        // Unfocus to prevent pressing enter to click again
-        $button.blur();
-        const dom_assignment = $button.parents(".assignment");
-        if (dom_assignment.hasClass("assignment-is-deleting")) return;
         dom_assignment.addClass("assignment-is-deleting");
         // Send data to backend and animates its deletion
         const success = function() {
             that.transitionDeleteAssignment(dom_assignment);
         }
-        const sa = utils.loadAssignmentData($button);
+        const sa = utils.loadAssignmentData(dom_assignment);
         if (params.restore)
             $.ajax({
                 type: "PATCH",
