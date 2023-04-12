@@ -82,13 +82,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         self.form = SettingsForm(data=request.POST, files=request.FILES, instance=request.user.settingsmodel)
         request.POST._mutable = _mutable
 
-        form_is_valid = True
-        if not self.form.is_valid():
-            form_is_valid = False
-        elif self.form.cleaned_data.get("background_image") and self.form.cleaned_data.get("background_image").size > settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE:
-            self.form.add_error("background_image", ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576}))
-            form_is_valid = False
-        if form_is_valid:
+        if self.form.is_valid():
             return self.valid_form(request)
         else:
             return self.invalid_form(request)

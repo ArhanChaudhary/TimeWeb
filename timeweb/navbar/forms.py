@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.forms.widgets import ClearableFileInput
 from django.template.loader import render_to_string
@@ -125,6 +126,7 @@ class SettingsForm(forms.ModelForm):
             "should_alert_due_date_incremented": "Display an alert every time when soft due dates are incremented. Soft due dates increment when an assignment's due date passes but is still unfinished.",
             # "enable_tutorial": "You will also be given the option to enable or disable notifications after enabling this.",
         }
+
     def __init__(self, *args, **kwargs):
         # See explanation in TimewebForm.__init__ if i want to parse time inputs for future time field settings
 
@@ -158,6 +160,7 @@ class SettingsForm(forms.ModelForm):
         # Weird {"field": None} logic because the default value is still evaluated even if the key is found for .get
         self.fields = {k: self.fields.get(k, SettingsForm.Meta.extra_fields.get(k, {"field": None})["field"]) for k in new_keyorder}
         self.label_suffix = ""
+
     def clean_default_dropdown_tags(self):
         default_dropdown_tags = self.cleaned_data["default_dropdown_tags"]
         if default_dropdown_tags is None:
@@ -170,6 +173,12 @@ class SettingsForm(forms.ModelForm):
         if any(len(tag) > MAX_TAG_LENGTH for tag in default_dropdown_tags):
             raise forms.ValidationError(_("One or more of your tags are too long (>%(n)d characters)") % {"n": MAX_TAG_LENGTH})
         return default_dropdown_tags
+
+    def clean_background_image(self):
+        background_image = self.cleaned_data["background_image"]
+        if background_image and background_image.size > settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE:
+            raise forms.ValidationError(_('This file is too big (>%(amount)d megabytes)') % {'amount': settings.MAX_BACKGROUND_IMAGE_UPLOAD_SIZE/1048576})
+        return background_image
 
 # needs to be down here due to circular imports
 from timewebapp.views import MAX_TAG_LENGTH
