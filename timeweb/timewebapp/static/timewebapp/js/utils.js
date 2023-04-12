@@ -673,7 +673,7 @@ const e_key = e.key.toLowerCase();
 if (e.ctrlKey || e.metaKey
     || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
     || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)
-    || SETTINGS.enable_tutorial) return;
+    || SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;
 switch (e_key) {
