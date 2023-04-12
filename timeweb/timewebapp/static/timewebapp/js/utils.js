@@ -875,9 +875,6 @@ overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
     $(window).trigger("resize.tutorial-overlay");
 },
 tutorial: function() {
-    if (!SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
-
-    // remove assignment from dom and dat if skip tutorial is clicked
     // ignore work inputs
     const tutorial_alerts = [
         {
@@ -887,6 +884,24 @@ tutorial: function() {
                         while (tutorial_alerts.length > 0) {
                             tutorial_alerts.pop();
                         }
+                        const assignment_container = $("#animate-in");
+                        const dom_assignment = assignment_container.children(".assignment");
+                        const sa = utils.loadAssignmentData(dom_assignment);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/delete-assignment",
+                            data: {assignments: JSON.stringify([sa.id]), actually_delete: true},
+                            success: () => {
+                                assignment_container.remove();
+                                // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
+                                dom_assignment.removeClass("assignment-is-closing open-assignment");
+                                dat = dat.filter(_sa => _sa.id !== sa.id);
+                                // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
+                                new Priority().sort({ dont_swap: true });
+                            },
+                            // no error, fail silently
+                        });
                     }
                 },
             },
@@ -1077,7 +1092,7 @@ tutorial: function() {
                         }),
                     },
                     {
-                        wait: 1300,
+                        wait: 1500,
                         do: () => $("#animate-in .tick-button").click(),
                     },
                     {
