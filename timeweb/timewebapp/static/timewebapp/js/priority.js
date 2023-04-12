@@ -213,7 +213,14 @@ class Priority {
         } else {
             that.params.autofill_no_work_done = [];
         }
-        $(".assignment").each(function(index) {
+        if (SETTINGS.enable_tutorial) {
+            that.current_assignments = $("#animate-in > .assignment");
+            $(".assignment").not(that.current_assignments).parent().hide();
+        } else {
+            that.current_assignments = $(".assignment");
+            that.current_assignments.parent().show();
+        }
+        that.current_assignments.each(function(index) {
             const dom_assignment = $(this);
             const assignment_container = dom_assignment.parent();
             const sa = new Assignment(dom_assignment);
@@ -240,11 +247,11 @@ class Priority {
             let last_work_input = sa.sa.works[len_works];
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
             let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
-            const dom_status_image = $(".status-image").eq(index),
-                dom_status_message = $(".status-message").eq(index),
-                dom_title = $(".title").eq(index),
-                dom_completion_time = $(".completion-time").eq(index),
-                dom_tags = $(".tags").eq(index);
+            const dom_status_image = dom_assignment.find(".status-image");
+            const dom_status_message = dom_assignment.find(".status-message");
+            const dom_title = dom_assignment.find(".title");
+            const dom_completion_time = dom_assignment.find(".completion-time");
+            const dom_tags = dom_assignment.find(".tags");
 
             let first_real_tag = sa.sa.tags[0];
             for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_real_tag); tag_index_iterator++) {
@@ -689,7 +696,7 @@ class Priority {
                     "Delete assignments": {
                         action: function(extra_success_function) {
                             const assignments_to_delete = $(completely_finished.map(priority_data => {
-                                const dom_assignment = $(".assignment").eq(priority_data.index);
+                                const dom_assignment = that.current_assignments.eq(priority_data.index);
                                 return dom_assignment[0];
                             }));
                             const assignment_ids_to_delete = assignments_to_delete.map(function() {
@@ -1106,7 +1113,7 @@ class Priority {
         $(".delete-gc-assignments-from-class, .autofill-work-done, .delete-starred-assignments, .delete-due-date-passed-assignments").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
-            const dom_assignment = $(".assignment").eq(priority_data.index);
+            const dom_assignment = that.current_assignments.eq(priority_data.index);
             const assignment_container = dom_assignment.parents(".assignment-container");
 
             if (!first_available_tutorial_assignment_fallback) {
@@ -1120,7 +1127,7 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
-            const dom_title = $(".title").eq(priority_data.index);
+            const dom_title = dom_assignment.find(".title");
 
             const old_add_priority_percentage = !!dom_title.attr("data-priority");
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
@@ -1136,7 +1143,7 @@ class Priority {
                     // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                     // So, scroll to the next assignment instead
                     // Scroll to dom_assignment because of its scroll-margin
-                    let assignment_to_scroll_to = $(".assignment").eq(that.priority_data_list[index + 1]?.index);
+                    let assignment_to_scroll_to = that.current_assignments.eq(that.priority_data_list[index + 1]?.index);
                     if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                         // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                         assignment_to_scroll_to = dom_assignment;
@@ -1195,7 +1202,7 @@ class Priority {
         if (SETTINGS.enable_tutorial && that.params.first_sort)
             utils.ui.tutorial(first_available_tutorial_assignment);
 
-        const $assignment_container = $(".assignment-container");
+        const $assignment_container = that.current_assignments.parent();
         // We need to do this in a separate loop so single assignment line wrappers are removed appropriately
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             const assignment_container = $assignment_container.eq(priority_data.index);

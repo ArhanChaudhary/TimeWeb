@@ -1141,6 +1141,7 @@ tutorial: function() {
         $("#site").css("pointer-events", "");
         SETTINGS.enable_tutorial = false;
         ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+        new Priority().sort();
     }
     function recurseAlert(alertparams) {
         if (!alertparams.length) {
