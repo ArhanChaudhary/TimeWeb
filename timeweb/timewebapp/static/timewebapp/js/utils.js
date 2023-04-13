@@ -304,7 +304,8 @@ setClickHandlers: {
     // cannot use arrow function to preserve `this`
     confirmAction: function(params) {
         const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
-            return utils.loadAssignmentData($(this)).id;
+            const dom_assignment = $(this);
+            return utils.loadAssignmentData(dom_assignment).id;
         }).toArray();
         const success = function() {
             new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
@@ -380,7 +381,8 @@ setClickHandlers: {
             new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
         }
         const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
-            return utils.loadAssignmentData($(this)).id;
+            const dom_assignment = $(this);
+            return utils.loadAssignmentData(dom_assignment).id;
         }).toArray();
         $.ajax({
             type: "POST",
@@ -455,7 +457,7 @@ addTagHandlers: function() {
         }
         // Plus button was clicked
         if ($(e.target).is(".tag-add-button, .tag-add-button > .icon-slash")) {
-            const sa = utils.loadAssignmentData($this);
+            const sa = utils.loadAssignmentData(dom_assignment);
 
             const checked_tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
                 return $(this).text();
@@ -494,7 +496,7 @@ addTagHandlers: function() {
             for (let tag_name of tag_names) {
                 const tag = $($("#tag-template").html());
                 tag.find(".tag-name").text(tag_name);
-                tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name).attr("data-assignment-id", sa.id);
+                tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name);
                 tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                 tag.addClass("tag-add-transition-disabler");
@@ -591,7 +593,8 @@ addTagHandlers: function() {
         if (tag_wrapper.hasClass("tag-is-deleting")) return;
         tag_wrapper.addClass("keep-delete-open");
         
-        const sa = utils.loadAssignmentData($this);
+        const dom_assignment = $this.parents(".assignment");
+        const sa = utils.loadAssignmentData(dom_assignment);
         const tag_name_to_delete = [$this.attr("data-tag-deletion-name")];
         // Remove data locally from dat
         sa.tags = sa.tags.filter(tag_name => !tag_name_to_delete.includes(tag_name));
@@ -616,7 +619,7 @@ addTagHandlers: function() {
             tag_wrapper.prev().css("z-index", "");
             tag_wrapper.remove();
         });
-        $this.parents(".tags").find(".tag-add-button").removeClass("tag-add-red-box-shadow");
+        dom_assignment.find(".tag-add-button").removeClass("tag-add-red-box-shadow");
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
     }
     $(".tag-add").focusout(function() {
@@ -649,7 +652,8 @@ addTagHandlers: function() {
         },
         onEnd: function() {
             const $this = $(this.el);
-            const sa = utils.loadAssignmentData($this);
+            const dom_assignment = $this.parents(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
             sa.tags = $this.find(".tag-wrapper").filter(function() {
                 // Also remove z-index if it wasnt reset back to none from dragging the tag around
                 return !$(this).css("z-index","").hasClass("tag-is-deleting");
@@ -1244,12 +1248,12 @@ saveAndLoadStates: function() {
             if ("open_assignments" in sessionStorage) {
                 const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
                 $(".assignment").each(function() {
-                    const was_open = open_assignments.includes($(this).attr("data-assignment-id"));
+                    const dom_assignment = $(this);
+                    const was_open = open_assignments.includes(dom_assignment.attr("data-assignment-id"));
                     if (!was_open) return;
 
                     // if you edit an open assignment and make it needs more info
                     // ensure it isn't clicked
-                    const dom_assignment = $(this);
                     const sa = new VisualAssignment(dom_assignment);
                     if (sa.canOpenAssignment()) {
                         dom_assignment.click();

@@ -510,7 +510,8 @@ class Crud {
         });
         // Populate form on edit
         $('.update-button').parent().click(function() {
-            const sa = utils.loadAssignmentData($(this));
+            const dom_assignment = $(this).parents(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
             $("#new-title").text("Edit Assignment");
             $("#submit-assignment-button").text("Edit Assignment");
             Crud.setAssignmentFormFields(Crud.generateAssignmentFormFields(sa));
@@ -544,7 +545,7 @@ class Crud {
                         that.deleteAssignment(dom_assignment);
                         return;
                     }
-                    const sa = utils.loadAssignmentData($this);
+                    const sa = utils.loadAssignmentData(dom_assignment);
                     $.alert({
                         title: `Are you sure you want to delete assignment "${sa.name}"?`,
                         content: utils.formatting.getReversibilityStatus(),

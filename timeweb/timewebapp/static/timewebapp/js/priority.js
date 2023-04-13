@@ -701,7 +701,8 @@ class Priority {
                                 return dom_assignment[0];
                             }));
                             const assignment_ids_to_delete = assignments_to_delete.map(function() {
-                                const sa = utils.loadAssignmentData($(this));
+                                const dom_assignment = $(this);
+                                const sa = utils.loadAssignmentData(dom_assignment);
                                 return sa.id;
                             }).toArray();
                             const success = function() {

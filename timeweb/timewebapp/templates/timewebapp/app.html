@@ -219,16 +219,16 @@
         <div class="priority-color-strip"></div>
         <div class="assignment-header">
           <div class="tags tags-{{ user.settingsmodel.horizontal_tag_position|lower }} tags-{{ user.settingsmodel.vertical_tag_position|lower }}">
-            <span class="tag-sortable-container" data-assignment-id="{{ assignment.pk }}">
+            <span class="tag-sortable-container">
               {% comment %} Remove whitespace to remove inline-black gap (minify-html does not fix this) {% endcomment %}
               {% for tag in assignment.tags %}<div class="tag-wrapper">
                   <div class="tag-name">{{ tag }}</div>
-                  <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
+                  <div class="tag-delete" data-tag-deletion-name="{{ tag }}">
                     <span class="icon-slash x-first-slash"></span>
                     <span class="icon-slash x-second-slash"></span>
                   </div>
                 </div>{% endfor %}</span>
-            <div class="tag-add" data-assignment-id="{{ assignment.pk }}" tabindex="-1">
+            <div class="tag-add" tabindex="-1">
               <span class="icon-slash plus-first-slash"></span>
               <span class="icon-slash plus-second-slash"></span>
               <span class="info-button-text info-bottom tag-add-box">
@@ -281,24 +281,24 @@
           <div class="right-side-of-header">
             <span class="completion-time"></span>
             {% if view_deleted_assignments_in_app_view %}
-              <div class="assignment-header-button" title="Restore Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+              <div class="assignment-header-button" title="Restore Assignment" tabindex="0">
                 <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
                   <use href="#restore-svg"></use>
                 </svg>
               </div>
             {% else %}
-              <div class="assignment-header-button" title="Finish Assignment for Today" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+              <div class="assignment-header-button" title="Finish Assignment for Today" tabindex="0">
                 <svg class="tick-button" width="25" preserveAspectRatio="none">
                   <use href="#tick-svg"></use>
                 </svg>
               </div>
             {% endif %}
-            <div class="assignment-header-button" title="Edit Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+            <div class="assignment-header-button" title="Edit Assignment" tabindex="0">
               <svg viewBox="3.00 3.00 18.00 18.00" class="update-button" width="22" height="22" preserveAspectRatio="none">
                 <use href="#edit-svg"></use>
               </svg>
             </div>
-            <div class="assignment-header-button block-selection" title="Delete Assignment" data-assignment-id="{{ assignment.pk }}" tabindex="0">
+            <div class="assignment-header-button block-selection" title="Delete Assignment" tabindex="0">
               <svg viewBox="0.21 -1277.63 1039.42 1279.13" class="delete-button" height="25" preserveAspectRatio="none">
                 <use href="#delete-svg"></use>
               </svg>
@@ -399,7 +399,7 @@
   <template id="tag-template">
     <div class="tag-wrapper">
       <div class="tag-name"></div>
-      <div class="tag-delete" data-tag-deletion-name="{{ tag }}" data-assignment-id="{{ assignment.pk }}">
+      <div class="tag-delete">
         <span class="icon-slash x-first-slash"></span>
         <span class="icon-slash x-second-slash"></span>
       </div>
