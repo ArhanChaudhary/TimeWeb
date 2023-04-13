@@ -672,7 +672,8 @@ $(document).keydown(function(e) {
 const e_key = e.key.toLowerCase();
 if (e.ctrlKey || e.metaKey
     || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
-    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)) return;
+    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)
+    || SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) return;
 const form_is_showing = $("#overlay").is(":visible");
 const form_is_hidden = !form_is_showing;
 switch (e_key) {
@@ -851,111 +852,337 @@ assignmentLinks: function() {
         }
     });
 },
-insertTutorialMessages: function(first_available_assignment) {
-    $("#tutorial-click-assignment-to-open").remove();
-    if (!SETTINGS.enable_tutorial) return;
-
-    const assignments_excluding_example = $(".assignment").filter(function() {
-        return utils.loadAssignmentData($(this)).name !== EXAMPLE_ASSIGNMENT_NAME;
-    });
-    if (assignments_excluding_example.length) {
-        first_available_assignment.after($("#tutorial-click-assignment-to-open-template").html());
-        if (!utils.ui.alreadyScrolled) {
-            // setTimeout needed because this runs before domSort
-            setTimeout(function() {
-                $("#tutorial-click-assignment-to-open")[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
-                new Promise(function(resolve) {
-                    let scrollTimeout = setTimeout(resolve, 200);
-                    $("#assignments-container").scroll(() => {
-                        clearTimeout(scrollTimeout);
-                        scrollTimeout = setTimeout(resolve, 200);
-                    });
-                }).then(function() {
-                    $("#assignments-container").off('scroll');
-                    first_available_assignment.focus();
-                });
-            }, 0);
-            utils.ui.alreadyScrolled = true;
-        }
+overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
+    $(window).off("resize.tutorial-overlay");
+    if ($element === null) {
+        $("#tutorial-overlay").css({
+            "--x": "",
+            "--y": "",
+            "--width": "",
+            "--height": "",
+            "--duration": `${duration}ms`,
+        });
     } else {
-        $("#assignments-header").replaceWith('<div id="tutorial-message" class="grey-highlight"><div>Welcome to TimeWeb! Thank you so much for your interest!</div><br><div>Create your first school or work assignment by clicking the plus icon to get started.</div></div>');
-        $(".assignment-container, #current-date-container").hide();
-    }
-},
-graphAlertTutorial: function(days_until_due) {
-    // jconfirm may return the focus to .assignment after the alert
-    // and cause a quick scroll jump, this prevents that from happening
-    $(document.activeElement).blur();
-
-    $.alert({
-        title: "Welcome to the graph, a visualization of your assignment's entire work schedule. It is highly recommended to read the graph's section on TimeWeb's <a href=\"/user-guide#what-is-the-assignment-graph\" target=\"_blank\">user guide</a> to understand how to use it." + (isExampleAccount ? "" : "<br><br>Once you're finished, check out the settings to set your preferences."),
-        content: "Check out your example assignment or the <a href=\"/example\">example account</a> to see how TimeWeb handles longer and more complicated assignments.",
-        backgroundDismiss: false,
-        alignTop: true, // alignTop is a custom extension
-        onDestroy: function() {
-        // Service worker push notifs API hasn't yet been implemented :-(
-        // Code once it is implemented:
-
-        //     $.alert({
-        //         title: "Would you like to allow TimeWeb to send notifications?",
-        //         content: "You will be notified of your total estimated completion time daily. If you accidentally click no, you can come back to this popup by re-enabling the tutorial in the settings.",
-        //         backgroundDismiss: false,
-        //         alignTop: true, // alignTop is a custom extension
-        //         buttons: {
-        //             // https://css-tricks.com/creating-scheduled-push-notifications/
-        //             yes: {
-        //                 action: async function() {
-        //                     const reg = await navigator.serviceWorker.getRegistration();
-        //                     Notification.requestPermission().then(permission => {
-        //                         if (permission === 'granted') {
-        //                             reg.showNotification(
-        //                                 'Demo Push Notification',
-        //                                 {
-        //                                     tag: timestamp, // a unique ID
-        //                                     body: 'Hello World', // content of the push notification
-        //                                     data: {
-        //                                         url: window.location.href, // pass the current url to the notification
-        //                                     },
-        //                                     badge: "images/icon-192x192.png",
-        //                                     icon: "images/icon-192x192.png",
-        //                                     actions: [
-        //                                         {
-        //                                             action: 'open',
-        //                                             title: 'Open app',
-        //                                         },
-        //                                         {
-        //                                             action: 'close',
-        //                                             title: 'Close notification',
-        //                                         }
-        //                                     ]
-        //                                 }
-        //                             );
-        //                         }
-        //                     });
-        //                 }
-        //             },
-        //             no: {
-        //                 action: async function() {
-        //                     const reg = await navigator.serviceWorker.getRegistration();
-        //                     const notifications = await reg.getNotifications({
-        //                         includeTriggered: true
-        //                     });
-        //                     notifications.forEach(notification => notification.close());
-        //                 }
-        //             }
-        //         },
-        //         onClose: function() {
-        //             SETTINGS.enable_tutorial = false;
-        //             ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
-        //         },
-        //     });
-            SETTINGS.enable_tutorial = false;
-            ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
-            $("#username").focus().addClass("highlight-setings-nav").one("click", function() {
-                $(this).removeClass("highlight-setings-nav");
+        $(window).on("resize.tutorial-overlay", function() {
+            let rect;
+            if (typeof $element === "function") {
+                rect = $element();
+            } else {
+                rect = $element[0].getBoundingClientRect();
+            }
+            $("#tutorial-overlay").css({
+                "--x": `${rect.left - margin}px`,
+                "--y": `${rect.top - margin}px`,
+                "--width": `${rect.width + margin * 2}px`,
+                "--height": `${rect.height + margin * 2}px`,
+                "--duration": `${duration}ms`,
             });
+        });
+    }
+    $(window).trigger("resize.tutorial-overlay");
+},
+tutorial: function() {
+    // ignore work inputs
+    const tutorial_alerts = [
+        {
+            buttons: {
+                "Skip tutorial": {
+                    action: () => {
+                        while (tutorial_alerts.length > 0) {
+                            tutorial_alerts.pop();
+                        }
+                        const assignment_container = $("#animate-in");
+                        const dom_assignment = assignment_container.children(".assignment");
+                        const sa = utils.loadAssignmentData(dom_assignment);
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/delete-assignment",
+                            data: {assignments: JSON.stringify([sa.id]), actually_delete: true},
+                            success: () => {
+                                assignment_container.remove();
+                                // If you don't include this, drawFixed in graph.js when $(window).trigger() is run is priority.js runs and causes an infinite loop because the canvas doesn't exist (because it was removed in the previous line)
+                                dom_assignment.removeClass("assignment-is-closing open-assignment");
+                                dat = dat.filter(_sa => _sa.id !== sa.id);
+                                // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
+                                new Priority().sort({ dont_swap: true });
+                            },
+                            // no error, fail silently
+                        });
+                    }
+                },
+            },
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 750,
+                        do: () => finished_resolver("intro"),
+                    }
+                ]);
+            },
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        resolve: 'animate-example-assignment',
+                    },
+                    {
+                        wait: 1500,
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in > .assignment"),
+                        }),
+                    },
+                    {
+                        wait: 1750,
+                        do: () => finished_resolver("header"),
+                    }
+                ]);
+            },
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            $("#animate-in > .assignment").focus().click();
+                            utils.ui.overlayAround({
+                                element: $("#animate-in > .assignment"),
+                                margin: 10,
+                                duration: 800,
+                            });
+                        },
+                    },
+                    {
+                        wait: 2250,
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in .graph"),
+                            margin: 5,
+                        }),
+                    },
+                    {
+                        wait: 1250,
+                        do: () => finished_resolver("graph-intro"),
+                    }
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => utils.ui.overlayAround({
+                            element: () => {
+                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                return {
+                                    top: rect.top + rect.height - 55,
+                                    left: rect.left,
+                                    width: rect.width,
+                                    height: 55,
+                                }
+                            },
+                            margin: 5,
+                            duration: 800,
+                        }),
+                    },
+                    {
+                        wait: 1050,
+                        do: () => finished_resolver("x-axis"),
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => utils.ui.overlayAround({
+                            element: () => {
+                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                return {
+                                    top: rect.top,
+                                    left: rect.left,
+                                    width: VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15,
+                                    height: rect.height,
+                                }
+                            },
+                            margin: 5,
+                        }),
+                    },
+                    {
+                        wait: 1250,
+                        do: () => finished_resolver("y-axis"),
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: $("#animate-in .graph"),
+                                margin: 5,
+                            });
+                            $("#animate-in .fixed-graph").addClass("blur");
+                        }
+                    },
+                    {
+                        wait: 1250,
+                        do: () => finished_resolver("work-schedule"),
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => {
+                            utils.ui.overlayAround({
+                                element: () => {
+                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    return {
+                                        top: rect.top + rect.height - 51,
+                                        left: rect.left + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 9,
+                                        width: 0,
+                                        height: 0
+                                    }
+                                },
+                                duration: 1250,
+                                margin: 20,
+                            });
+                            $("#animate-in .fixed-graph").removeClass("blur");
+                        }
+                    },
+                    {
+                        wait: 1500,
+                        do: () => finished_resolver("work-inputs"),
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in .tick-button").parent(),
+                            margin: 0,
+                            duration: 1500,
+                        }),
+                    },
+                    {
+                        wait: 1750,
+                        do: () => finished_resolver("tick-button"),
+                    },
+                ]);
+            }
+        },
+        {
+            transition: function(finished_resolver) {
+                recurseTimeout([
+                    {
+                        wait: 300,
+                        do: () => utils.ui.overlayAround({
+                            element: $("#animate-in > .assignment"),
+                            margin: 10,
+                            duration: 900,
+                        }),
+                    },
+                    {
+                        wait: 1500,
+                        do: () => $("#animate-in .tick-button").click(),
+                    },
+                    {
+                        wait: 1750,
+                        do: () => utils.ui.overlayAround({
+                            element: null,
+                            duration: 1250,
+                        }),
+                    },
+                    {
+                        wait: 2250,
+                        do: () => finished_resolver("wrap-up"),
+                    }
+                ]);
+            }
         }
-    });
+    ]
+
+    function recurseTimeout(timeoutparams) {
+        if (!timeoutparams.length) return;
+
+        const timeoutparam = timeoutparams.shift();
+        setTimeout(function() {
+            new Promise(function(resolve) {
+                if (timeoutparam.resolve) {
+                    $(window).trigger(timeoutparam.resolve, resolve);
+                } else {
+                    resolve();
+                }
+            }).then(function() {
+                timeoutparam.do?.();
+                recurseTimeout(timeoutparams);
+            });
+        }, timeoutparam.wait);
+    }
+
+    function finishRecurseAlert() {
+        $(window).off("resize.tutorial-overlay");
+        $("#tutorial-overlay").css({
+            "--x": "0px",
+            "--y": "0px",
+            "--width": "100%",
+            "--height": "100%",
+            "--duration": "1500ms",
+        });
+        $("#site").css("pointer-events", "");
+        SETTINGS.enable_tutorial = false;
+        ajaxUtils.changeSetting({setting: "enable_tutorial", value: SETTINGS.enable_tutorial});
+        new Priority().sort();
+    }
+    function recurseAlert(alertparams) {
+        if (!alertparams.length) {
+            finishRecurseAlert();
+            return;
+        }
+
+        const alertparam = alertparams.shift();
+        if (!alertparam.buttons)
+            alertparam.buttons = {};
+        alertparam.buttons[alertparams.length ? "next" : "finish tutorial"] = {};
+        alertparam.backgroundDismiss = false;
+        alertparam.draggable = true;
+        alertparam.onDestroy = function() {
+            recurseAlert(alertparams);
+        }
+        new Promise(function(finished_resolver) {
+            if (alertparam.transition)
+                alertparam.transition(finished_resolver);
+            else
+                finished_resolver(alertparam.id);
+        }).then(function(id) {
+            const alert_template = $($(`#tutorial-${id}-template`).html());
+            alertparam.title = alert_template.filter(".tutorial-title").prop("outerHTML");
+            alertparam.content = alert_template.filter(".tutorial-content").prop("outerHTML");
+            const a = $.alert(alertparam);
+            setTimeout(function() {
+                a.$content.addClass("tutorial-content-styled");
+                a.$jconfirmBg.css("opacity", "0");
+            }, 0);
+        });
+    }
+    $("#site").css("pointer-events", "none");
+    recurseAlert(tutorial_alerts);
 },
 exampleAccountAlertTutorial: function() {
     if (sessionStorage.getItem("already-alerted-example-account")) return;

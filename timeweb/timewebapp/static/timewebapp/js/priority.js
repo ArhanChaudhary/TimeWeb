@@ -213,7 +213,14 @@ class Priority {
         } else {
             that.params.autofill_no_work_done = [];
         }
-        $(".assignment").each(function(index) {
+        if (SETTINGS.enable_tutorial) {
+            that.current_assignments = $("#animate-in > .assignment");
+            $(".assignment").not(that.current_assignments).parent().hide();
+        } else {
+            that.current_assignments = $(".assignment");
+            that.current_assignments.parent().show();
+        }
+        that.current_assignments.each(function(index) {
             const dom_assignment = $(this);
             const assignment_container = dom_assignment.parent();
             const sa = new Assignment(dom_assignment);
@@ -240,11 +247,11 @@ class Priority {
             let last_work_input = sa.sa.works[len_works];
             let today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
             let todo = sa.funct(len_works + sa.sa.blue_line_start + 1) - last_work_input;
-            const dom_status_image = $(".status-image").eq(index),
-                dom_status_message = $(".status-message").eq(index),
-                dom_title = $(".title").eq(index),
-                dom_completion_time = $(".completion-time").eq(index),
-                dom_tags = $(".tags").eq(index);
+            const dom_status_image = dom_assignment.find(".status-image");
+            const dom_status_message = dom_assignment.find(".status-message");
+            const dom_title = dom_assignment.find(".title");
+            const dom_completion_time = dom_assignment.find(".completion-time");
+            const dom_tags = dom_assignment.find(".tags");
 
             let first_real_tag = sa.sa.tags[0];
             for (let tag_index_iterator = 1; ["Important","Not Important"].includes(first_real_tag); tag_index_iterator++) {
@@ -689,7 +696,7 @@ class Priority {
                     "Delete assignments": {
                         action: function(extra_success_function) {
                             const assignments_to_delete = $(completely_finished.map(priority_data => {
-                                const dom_assignment = $(".assignment").eq(priority_data.index);
+                                const dom_assignment = that.current_assignments.eq(priority_data.index);
                                 return dom_assignment[0];
                             }));
                             const assignment_ids_to_delete = assignments_to_delete.map(function() {
@@ -950,10 +957,20 @@ class Priority {
     }
     updateInfoHeader() {
         const that = this;
-        if (!that.total_completion_time) {
+        if (!that.total_completion_time || SETTINGS.enable_tutorial && that.params.first_sort) {
             $("#estimated-total-time, #estimated-completion-time, #important-total-time").removeClass("hide-info");
             $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").hide();
-            $("#estimated-total-time").text(dat.length ? 'You have finished everything for today' : 'You don\'t have any assignments');
+            if (!dat.length || SETTINGS.enable_tutorial && that.params.first_sort) {
+                $("#estimated-total-time").text("You don't have any assignments");
+                if (SETTINGS.enable_tutorial && that.params.first_sort) {
+                    $(window).one("animate-example-assignment", function() {
+                        that.params.first_sort = false;
+                        that.updateInfoHeader.bind(that)();
+                    });
+                }
+            } else {
+                $("#estimated-total-time").text("You have finished everything for today");
+            }
         } else {
             $("#hide-button").text() === "Show" && $("#estimated-total-time, #estimated-completion-time, #important-total-time").addClass("hide-info");
             $("#estimated-completion-time, #important-total-time, #hide-button, #estimated-total-time-label").show();
@@ -972,6 +989,45 @@ class Priority {
         if (!that.params.first_sort)
             $("#currently-has-changed-notice").remove();
         utils.ui.tickClock();
+    }
+    static scrollBeforeAssignmentAnimation(resolvers, assignment_to_scroll_to) {
+        function _resolve() {
+            $("#assignments-container").off('scroll.assignmentanimation');
+            resolvers.forEach(resolver => resolver?.());
+        }
+        const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
+        $("#animate-in").css({
+            position: "",
+            top: Math.max(
+                // ensure assignments don't scroll from the top of the screen
+                // the below min parameter sets the assignment to the very bottom of your screen,
+                // no matter what
+                // this ensures that if the assignment is downwards from your scroll position,
+                // it won't be at the bottom of your screen and instead at the bottom
+                // of your assignments
+                Priority.ANIMATE_IN_START_MARGIN,
+                Math.min(
+                    // ensure assignments don't scroll from the bottom to the top too far
+                    window.innerHeight,
+                    last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
+                // subtract the offset top to get the actual top value
+                // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                // offset top and make that number its new top
+                ) - $("#animate-in").offset()?.top
+            ),
+            marginBottom: -$("#animate-in").outerHeight(),
+        });
+        assignment_to_scroll_to[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+        });
+        let scrollTimeout = setTimeout(_resolve, 200);
+        $("#assignments-container").on("scroll.assignmentanimation", () => {
+            if ($("#animate-in").length)
+                $("#extra-navs").hide();
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(_resolve, 200);
+        });
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
         // can still be called from the tags or the end of transitionDeleteAssignment
@@ -1057,7 +1113,7 @@ class Priority {
         $(".delete-gc-assignments-from-class, .autofill-work-done, .delete-starred-assignments, .delete-due-date-passed-assignments").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
-            const dom_assignment = $(".assignment").eq(priority_data.index);
+            const dom_assignment = that.current_assignments.eq(priority_data.index);
             const assignment_container = dom_assignment.parents(".assignment-container");
 
             if (!first_available_tutorial_assignment_fallback) {
@@ -1071,7 +1127,7 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TOMORROW,
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
-            const dom_title = $(".title").eq(priority_data.index);
+            const dom_title = dom_assignment.find(".title");
 
             const old_add_priority_percentage = !!dom_title.attr("data-priority");
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
@@ -1084,51 +1140,22 @@ class Priority {
                     opacity: 0,
                 });
                 new Promise(function(resolve) {
-                    $(window).one('load', function() {
-                        const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
-                        $("#animate-in").css({
-                            position: "",
-                            top: Math.max(
-                                // ensure assignments don't scroll from the top of the screen
-                                // the below min parameter sets the assignment to the very bottom of your screen,
-                                // no matter what
-                                // this ensures that if the assignment is downwards from your scroll position,
-                                // it won't be at the bottom of your screen and instead at the bottom
-                                // of your assignments
-                                Priority.ANIMATE_IN_START_MARGIN,
-                                Math.min(
-                                    // ensure assignments don't scroll from the bottom to the top too far
-                                    window.innerHeight,
-                                    last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
-                                // subtract the offset top to get the actual top value
-                                // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                                // offset top and make that number its new top
-                                ) - $("#animate-in").offset()?.top
-                            ),
-                            marginBottom: -$("#animate-in").outerHeight(),
-                        });
-                        // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
-                        // So, scroll to the next assignment instead
-                        // Scroll to dom_assignment because of its scroll-margin
-                        let assignment_to_scroll_to = $(".assignment").eq(that.priority_data_list[index + 1] ? that.priority_data_list[index + 1].index : undefined);
-                        if (!assignment_to_scroll_to.length || $("#animate-color").length) {
-                            // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
-                            assignment_to_scroll_to = dom_assignment;
-                        }
-                        assignment_to_scroll_to[0].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'nearest',
-                        });
-                        let scrollTimeout = setTimeout(resolve, 200);
-                        $("#assignments-container").scroll(() => {
-                            if (assignment_container.is("#animate-in"))
-                                $("#extra-navs").hide();
-                            clearTimeout(scrollTimeout);
-                            scrollTimeout = setTimeout(resolve, 200);
-                        });
+                    $("#animate-in").css({
+                        position: "absolute",
+                        opacity: 0,
+                    });
+                    // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
+                    // So, scroll to the next assignment instead
+                    // Scroll to dom_assignment because of its scroll-margin
+                    let assignment_to_scroll_to = that.current_assignments.eq(that.priority_data_list[index + 1]?.index);
+                    if (!assignment_to_scroll_to.length || $("#animate-color").length) {
+                        // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
+                        assignment_to_scroll_to = dom_assignment;
+                    }
+                    $(window).one(SETTINGS.enable_tutorial ? 'animate-example-assignment' : 'load', function(e, triggered_resolve) {
+                        Priority.scrollBeforeAssignmentAnimation([resolve, triggered_resolve], assignment_to_scroll_to);
                     });
                 }).then(function() {
-                    $("#assignments-container").off('scroll');
                     that.colorOrAnimateInAssignment({
                         dom_assignment,
                         is_element_submitted: true,
@@ -1176,9 +1203,10 @@ class Priority {
         if (!first_available_tutorial_assignment) {
             first_available_tutorial_assignment = first_available_tutorial_assignment_fallback;
         }
-        utils.ui.insertTutorialMessages(first_available_tutorial_assignment);
+        if (SETTINGS.enable_tutorial && that.params.first_sort)
+            utils.ui.tutorial(first_available_tutorial_assignment);
 
-        const $assignment_container = $(".assignment-container");
+        const $assignment_container = that.current_assignments.parent();
         // We need to do this in a separate loop so single assignment line wrappers are removed appropriately
         for (let [index, priority_data] of that.priority_data_list.entries()) {
             const assignment_container = $assignment_container.eq(priority_data.index);

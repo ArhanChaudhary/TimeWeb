@@ -109,6 +109,9 @@ select {
 .fixed-graph {
     filter: invert(1) hue-rotate(180deg);
 }
+.fixed-graph.blur {
+    filter: invert(1) hue-rotate(180deg) blur(3px);
+}
 .graph-footer > :not(.work-input-textbox-wrapper),
 .graph-footer .work-input-textbox {
     --background-color: hsl(0, 0%, 27%);

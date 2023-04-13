@@ -1641,8 +1641,6 @@ class VisualAssignment extends Assignment {
     }
 }
 window.VisualAssignment = VisualAssignment;
-let already_ran_tutorial = false;
-let prevent_click = false;
 $(function() {
 $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const target = $(e.target);
@@ -1651,7 +1649,7 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const targetInButton = !!target.parents(".assignment-header-button").length || target.is(".assignment-header-button");
     const targetInAnchor = !!target.parents(".title-link-anchor").length || target.is(".title-link-anchor");
     const dontFire = targetInTags || targetInButton || targetInAnchor || targetInFooter;
-    if (dontFire || prevent_click) return;
+    if (dontFire) return;
     const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
     
@@ -1702,20 +1700,5 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0]?.beginElement();
     sa.initUI();
-    (() => {
-        if (!SETTINGS.enable_tutorial || already_ran_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
-        already_ran_tutorial = true;
-        $("#tutorial-click-assignment-to-open").remove();
-
-        const skip_in_debug = false;
-        if (skip_in_debug) return;
-
-        prevent_click = true;
-        setTimeout(function() {
-            const days_until_due = Math.floor(sa.sa.complete_x) - mathUtils.daysBetweenTwoDates(date_now, sa.sa.assignment_date);
-            utils.ui.graphAlertTutorial(days_until_due);
-            prevent_click = false;
-        }, VisualAssignment.BUTTON_ERROR_DISPLAY_TIME);
-    })();
 });
 });

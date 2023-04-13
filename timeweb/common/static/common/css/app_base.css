@@ -452,6 +452,7 @@ select, .daterangepicker .drp-buttons .cancelBtn {
 .jconfirm .jconfirm-box {
     width: min(70vw, 800px) !important;
     background-color: var(--body-background) !important;
+    overflow: visible !important;
 }
 .jconfirm .jconfirm-box div.jconfirm-content-pane .jconfirm-content {
     opacity: 0.55 !important;
