@@ -83,7 +83,7 @@ def update_gc_courses_cache():
     This function is manually invoked to update every user's gc_courses_cache
     """
     from django.conf import settings
-    from api.views import MemoryCache, simplify_courses
+    from api.integrations import MemoryCache, simplify_courses
     from navbar.models import SettingsModel
     from google.oauth2.credentials import Credentials
     from google.auth.exceptions import RefreshError
