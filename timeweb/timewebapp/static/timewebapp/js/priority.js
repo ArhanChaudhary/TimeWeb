@@ -214,15 +214,15 @@ class Priority {
             that.params.autofill_no_work_done = [];
         }
         if (SETTINGS.enable_tutorial) {
-            that.current_assignments = $("#animate-in > .assignment");
-            $(".assignment").not(that.current_assignments).parent().hide();
+            that.current_assignments = $("#animate-in");
+            $(".assignment-container").not(that.current_assignments).hide();
         } else {
-            that.current_assignments = $(".assignment");
-            that.current_assignments.parent().show();
+            that.current_assignments = $(".assignment-container");
+            that.current_assignments.show();
         }
         that.current_assignments.each(function(index) {
-            const dom_assignment = $(this);
-            const assignment_container = dom_assignment.parent();
+            const assignment_container = $(this);
+            const dom_assignment = assignment_container.children(".assignment");
             const sa = new Assignment(dom_assignment);
 
             // Remember: protect ajaxs with !sa.sa.needs_more_info
@@ -696,7 +696,8 @@ class Priority {
                     "Delete assignments": {
                         action: function(extra_success_function) {
                             const assignments_to_delete = $(completely_finished.map(priority_data => {
-                                const dom_assignment = that.current_assignments.eq(priority_data.index);
+                                const assignment_container = that.current_assignments.eq(priority_data.index);
+                                const dom_assignment = assignment_container.children(".assignment");
                                 return dom_assignment[0];
                             }));
                             const assignment_ids_to_delete = assignments_to_delete.map(function() {
@@ -1113,8 +1114,8 @@ class Priority {
         $(".delete-gc-assignments-from-class, .autofill-work-done, .delete-starred-assignments, .delete-due-date-passed-assignments").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
         for (let [index, priority_data] of that.priority_data_list.entries()) {
-            const dom_assignment = that.current_assignments.eq(priority_data.index);
-            const assignment_container = dom_assignment.parents(".assignment-container");
+            const assignment_container = that.current_assignments.eq(priority_data.index);
+            const dom_assignment = assignment_container.children(".assignment");
 
             if (!first_available_tutorial_assignment_fallback) {
                 first_available_tutorial_assignment_fallback = dom_assignment;
@@ -1143,7 +1144,7 @@ class Priority {
                     // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                     // So, scroll to the next assignment instead
                     // Scroll to dom_assignment because of its scroll-margin
-                    let assignment_to_scroll_to = that.current_assignments.eq(that.priority_data_list[index + 1]?.index);
+                    let assignment_to_scroll_to = that.current_assignments.eq(that.priority_data_list[index + 1]?.index).children(".assignment");
                     if (!assignment_to_scroll_to.length || $("#animate-color").length) {
                         // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                         assignment_to_scroll_to = dom_assignment;
@@ -1202,29 +1203,28 @@ class Priority {
         if (SETTINGS.enable_tutorial && that.params.first_sort)
             utils.ui.tutorial(first_available_tutorial_assignment);
 
-        const $assignment_container = that.current_assignments.parent();
         // We need to do this in a separate loop so single assignment line wrappers are removed appropriately
         for (let [index, priority_data] of that.priority_data_list.entries()) {
-            const assignment_container = $assignment_container.eq(priority_data.index);
+            const assignment_container = that.current_assignments.eq(priority_data.index);
             assignment_container.toggleClass("add-shortcut-margin", index === 0 && assignment_container.hasClass("add-line-wrapper"));
         }
         if (!that.params.dont_swap) {
 
-            let tops = new Array($assignment_container.length);
+            let tops = new Array(that.current_assignments.length);
             tops.fill(undefined);
             Object.seal(tops);
 
-            if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
-                $assignment_container.each(function(i) {
+            if (!that.params.first_sort && that.current_assignments.length <= SETTINGS.sorting_animation_threshold)
+                that.current_assignments.each(function(i) {
                     tops[i] = $(this).offset().top;
                 });
 
             for (let [index, priority_data] of that.priority_data_list.entries()) {
-                $assignment_container.eq(priority_data.index).css("order", index);
+                that.current_assignments.eq(priority_data.index).css("order", index);
             }
 
-            if (!that.params.first_sort && $assignment_container.length <= SETTINGS.sorting_animation_threshold)
-                $assignment_container.each(function(i) {
+            if (!that.params.first_sort && that.current_assignments.length <= SETTINGS.sorting_animation_threshold)
+                that.current_assignments.each(function(i) {
                     const assignment_container = $(this);
                     const initial_height = tops[i];
                     let current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned MATRIX_ENDS_WEIGHT
