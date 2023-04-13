@@ -1135,10 +1135,6 @@ class Priority {
                 new VisualAssignment(dom_assignment).positionTags();
 
             if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
-                $("#animate-in").css({
-                    position: "absolute",
-                    opacity: 0,
-                });
                 new Promise(function(resolve) {
                     $("#animate-in").css({
                         position: "absolute",
