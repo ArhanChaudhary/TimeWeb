@@ -443,10 +443,8 @@ addTagHandlers: function() {
             tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
         });
     }
-    // TODO: might be easier to attach the click to $(document) but will do later
-    $(".tag-add").click(tagAddClick);
     let tag_names = new Set();
-    function tagAddClick(e) {
+    $(".tag-add").click(function(e) {
         const $this = $(this);
         const dom_assignment = $this.parents(".assignment");
         // Close add tag box if "Add Tag" is clicked again
@@ -496,7 +494,7 @@ addTagHandlers: function() {
             for (let tag_name of tag_names) {
                 const tag = $($("#tag-template").html());
                 tag.find(".tag-name").text(tag_name);
-                tag.find(".tag-delete").click(tagDelete).attr("data-tag-deletion-name", tag_name);
+                tag.find(".tag-delete").attr("data-tag-deletion-name", tag_name);
                 tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                 tag.addClass("tag-add-transition-disabler");
@@ -585,10 +583,11 @@ addTagHandlers: function() {
             });
         }
         
-    }
-    $(".tag-delete").click(tagDelete);
-    function tagDelete() {
-        const $this = $(this);
+    });
+    $(document).click(function(e) {
+        const $this = $(e.target).closest(".tag-delete");
+        if (!$this.length) return;
+
         const tag_wrapper = $this.parents(".tag-wrapper");
         if (tag_wrapper.hasClass("tag-is-deleting")) return;
         tag_wrapper.addClass("keep-delete-open");
@@ -621,7 +620,7 @@ addTagHandlers: function() {
         });
         dom_assignment.find(".tag-add-button").removeClass("tag-add-red-box-shadow");
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
-    }
+    });
     $(".tag-add").focusout(function() {
         const $this = $(this);
         const dom_assignment = $this.parents(".assignment");
