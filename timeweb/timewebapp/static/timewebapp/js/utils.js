@@ -494,7 +494,6 @@ addTagHandlers: function() {
             for (let tag_name of tag_names) {
                 const tag = $($("#tag-template").html());
                 tag.find(".tag-name").text(tag_name);
-                tag.find(".tag-delete").attr("data-tag-deletion-name", tag_name);
                 tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
 
                 tag.addClass("tag-add-transition-disabler");
@@ -594,7 +593,7 @@ addTagHandlers: function() {
         
         const dom_assignment = $this.parents(".assignment");
         const sa = utils.loadAssignmentData(dom_assignment);
-        const tag_name_to_delete = [$this.attr("data-tag-deletion-name")];
+        const tag_name_to_delete = [$this.siblings(".tag-name").text()];
         // Remove data locally from dat
         sa.tags = sa.tags.filter(tag_name => !tag_name_to_delete.includes(tag_name));
 
