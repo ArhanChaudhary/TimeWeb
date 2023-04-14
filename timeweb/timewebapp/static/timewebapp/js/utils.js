@@ -631,7 +631,7 @@ addTagHandlers: function() {
             // If the user unfocuses the closed tag modal which they previously clicked to close, this will run and add the transitionend event in transitionCloseTagBox to the already closed tag-add-box, which is unwanted and causes bugs
             // I can't just do !$(e.target).is($this) because the tag modal may already be open without the user already previously clicking .tag-add to close it, and the transitionend event is needed in this case
             // So, only return when the tag modal is closed by adding || $this.find(".tag-add-box").css("height") === 0
-            if ($(document.activeElement).parents(".tag-add").length || $(document.activeElement).is($this) || parseFloat($this.find(".tag-add-box").css("height")) === 0) return;
+            if ($(document.activeElement).closest(".tag-add").length || parseFloat($this.find(".tag-add-box").css("height")) === 0) return;
             dom_assignment.removeClass("open-tag-add-box");
             transitionCloseTagBox($this);
         }, 0);

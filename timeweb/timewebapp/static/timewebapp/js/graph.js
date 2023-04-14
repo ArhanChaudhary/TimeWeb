@@ -1645,9 +1645,9 @@ $(function() {
 $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     const target = $(e.target);
     const targetInFooter = !!target.parents(".assignment-footer").length; // only check the children not the actual element so the sides of an assignment can be clicked
-    const targetInTags = !!target.parents(".tags").length || target.is(".tags");
-    const targetInButton = !!target.parents(".assignment-header-button").length || target.is(".assignment-header-button");
-    const targetInAnchor = !!target.parents(".title-link-anchor").length || target.is(".title-link-anchor");
+    const targetInTags = !!target.closest(".tags").length;
+    const targetInButton = !!target.closest(".assignment-header-button").length;
+    const targetInAnchor = !!target.closest(".title-link-anchor").length;
     const dontFire = targetInTags || targetInButton || targetInAnchor || targetInFooter;
     if (dontFire) return;
     const dom_assignment = $(this);
