@@ -176,19 +176,6 @@ class Priority {
             return `Complete ${mathUtils.precisionRound(todo, 10)} ${pluralize(sa.sa.unit, todo).toLowerCase()}`;
         }
     }
-    static setSVGViewBox(dom_svg, href) {
-        if (!Priority.BBoxCache)
-            Priority.BBoxCache = {};
-        let bbox;
-        if (href in Priority.BBoxCache) {
-            bbox = Priority.BBoxCache[href];
-        } else {
-            bbox = dom_svg[0].getBBox();
-            if (!(bbox.x === 0 && bbox.y === 0 && bbox.width === 0 && bbox.height === 0))
-                Priority.BBoxCache[href] = bbox;
-        }
-        dom_svg.attr("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-    }
     // create a sorting function that compares numbers on the number line for less than [0, 1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5]
     static dueDateCompareLessThan(a, b) {
         if (a === b || a === undefined || b === undefined) {
@@ -538,7 +525,7 @@ class Priority {
             ));
             let href = `#tick-svg`;
             assignment_header_tick_svg.find("use").attr("href", href);
-            Priority.setSVGViewBox(assignment_header_tick_svg, href)
+            assignment_header_tick_svg.attr("viewBox", $(href).next().text());
             
             if (delete_starred_assignment_after_sorting && !assignment_container.hasClass("delete-this-starred-assignment")) {
                 starred_assignment_ids_to_delete_after_sorting.add(sa.sa.id);
@@ -590,7 +577,7 @@ class Priority {
                 dom_status_image.show();
                 let href = `#${status_image}-svg`;
                 dom_status_image.find("use").attr("href", href);
-                Priority.setSVGViewBox(dom_status_image, href)
+                dom_status_image.attr("viewBox", $(href).next().text());
             } else {
                 dom_status_image.hide();
                 dom_status_image.find("use").removeAttr("href");
