@@ -425,9 +425,7 @@ setClickHandlers: {
     },
 },
 addTagHandlers: function() {
-    function transitionCloseTagBox($tag_add) {
-        const tag_add_box = $tag_add.find(".tag-add-box");
-
+    function transitionCloseTagBox(tag_add_box) {
         tag_add_box.css({
             height: "unset",
             overflow: "visible",
@@ -443,98 +441,106 @@ addTagHandlers: function() {
             tag_add_box.find(".tag-add-input").attr("tabindex", "-1");
         });
     }
+    
     let tag_names = new Set();
-    $(".tag-add").click(function(e) {
-        const $this = $(this);
-        const dom_assignment = $this.parents(".assignment");
-        // Close add tag box if "Add Tag" is clicked again
-        if (($(e.target).hasClass("tag-add") || $(e.target).parent(".tag-add").length) && dom_assignment.hasClass("open-tag-add-box")) {
-            dom_assignment.removeClass("open-tag-add-box");
-            transitionCloseTagBox($this);
-            return;
-        }
+    $(document).click(function(e) {
+        const $this = $(e.target).closest(".tag-add-button");
+        if (!$this.length) return;
+        
         // Plus button was clicked
-        if ($(e.target).is(".tag-add-button, .tag-add-button > .icon-slash")) {
-            const sa = utils.loadAssignmentData(dom_assignment);
+        const dom_assignment = $this.parents(".assignment");
+        const sa = utils.loadAssignmentData(dom_assignment);
 
-            const checked_tag_names = $this.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
-                return $(this).text();
-            }).toArray();
-            // Push all checked tag names not already in tag_names to tag_names
-            checked_tag_names.forEach(tag_names.add, tag_names);
-            
-            const inputted_tag_name = $this.find(".tag-add-input").val().trim();
-            if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.has(inputted_tag_name)) {
-                tag_names.add(inputted_tag_name);
-            }
-            // Nothing is checked or inputted
-            if (!tag_names.size) {
-                if (utils.ui.close_on_success) {
-                    utils.ui.close_on_success = false;
-                    $this.find(".tag-add-input").blur();
-                }
-                return;
-            }
-            tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
-
-            if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
-                $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
-                $(this).find(".tag-add-input").val("Too Many Tags!");
-                tag_names = new Set();
-                return;
-            }
-
+        const checked_tag_names = dom_assignment.find(".tag-add-selection-item.checked .tag-add-selection-item-name").map(function() {
+            return $(this).text();
+        }).toArray();
+        // Push all checked tag names not already in tag_names to tag_names
+        checked_tag_names.forEach(tag_names.add, tag_names);
+        
+        const inputted_tag_name = dom_assignment.find(".tag-add-input").val().trim();
+        if (inputted_tag_name && inputted_tag_name !== "Too Many Tags!" && !tag_names.has(inputted_tag_name)) {
+            tag_names.add(inputted_tag_name);
+        }
+        // Nothing is checked or inputted
+        if (!tag_names.size) {
             if (utils.ui.close_on_success) {
                 utils.ui.close_on_success = false;
-                $this.find(".tag-add-input").blur();
+                dom_assignment.find(".tag-add-input").blur();
             }
-            // Close box and add tags visually
-            dom_assignment.removeClass("open-tag-add-box");
-            transitionCloseTagBox($this);
-            for (let tag_name of tag_names) {
-                const tag = $($("#tag-template").html());
-                tag.find(".tag-name").text(tag_name);
-                tag.appendTo($this.parents(".tags").find(".tag-sortable-container"));
+            return;
+        }
+        tag_names = new Set([...tag_names].filter(tag_name => !sa.tags.includes(tag_name)));
 
-                tag.addClass("tag-add-transition-disabler");
-                // Need to use jquery instead of css to set marginLeft
-                tag.css({
-                    marginLeft: -tag.outerWidth(true),
-                    opacity: "0",
-                    transform: "scale(0.6)",
-                });
-                tag[0].offsetHeight;
-                tag.removeClass("tag-add-transition-disabler");
-                tag.css({
-                    marginLeft: "",
-                    opacity: "",
-                    transform: "",
-                });
-
-                tag.prev().css("z-index", "1");
-                tag.one("transitionend", function() {
-                    tag.prev().css("z-index", "");
-                });
-            }            
-            if (!tag_names.size) return;
-            sa.tags.push(...tag_names);
-            ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
-            // There are too many conditions on whether to sort or not, so just sort every time
-
-            // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
-            // "important" and "not important" because they were designed to affect priority
-            // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
-                new Priority().sort();
-            // }
+        if (sa.tags.length + tag_names.size > MAX_NUMBER_OF_TAGS) {
+            $(this).find(".tag-add-button").addClass("tag-add-red-box-shadow");
+            $(this).find(".tag-add-input").val("Too Many Tags!");
             tag_names = new Set();
             return;
         }
-        // Tag add textbox was selected or tags were selected
-        if (dom_assignment.hasClass("open-tag-add-box")) return;
+
+        if (utils.ui.close_on_success) {
+            utils.ui.close_on_success = false;
+            dom_assignment.find(".tag-add-input").blur();
+        }
+        // Close box and add tags visually
+        dom_assignment.removeClass("open-tag-add-box");
+        transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
+        for (let tag_name of tag_names) {
+            const tag = $($("#tag-template").html());
+            tag.find(".tag-name").text(tag_name);
+            tag.appendTo(dom_assignment.find(".tag-sortable-container"));
+
+            tag.addClass("tag-add-transition-disabler");
+            // Need to use jquery instead of css to set marginLeft
+            tag.css({
+                marginLeft: -tag.outerWidth(true),
+                opacity: "0",
+                transform: "scale(0.6)",
+            });
+            tag[0].offsetHeight;
+            tag.removeClass("tag-add-transition-disabler");
+            tag.css({
+                marginLeft: "",
+                opacity: "",
+                transform: "",
+            });
+
+            tag.prev().css("z-index", "1");
+            tag.one("transitionend", function() {
+                tag.prev().css("z-index", "");
+            });
+        }            
+        if (!tag_names.size) return;
+        sa.tags.push(...tag_names);
+        ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
+        // There are too many conditions on whether to sort or not, so just sort every time
+
+        // sa.needs_more info for GC class tags or for first_tag sorting for non GC assignments
+        // "important" and "not important" because they were designed to affect priority
+        // if (sa.needs_more_info || tag_names.has("Important") || tag_names.has("Not Important")) {
+            new Priority().sort();
+        // }
+        tag_names = new Set();
+    });
+
+    $(document).click(function(e) {
+        const target = $(e.target)
+        const clicked_add_tag = target.hasClass("tag-add") || target.parent(".tag-add").length;
+        if (!clicked_add_tag) return;
+        
+        // Tag add textbox was clicked or tags were selected
+        const dom_assignment = target.parents(".assignment");
+        if (dom_assignment.hasClass("open-tag-add-box")) {
+            // Close add tag box if "Add Tag" is clicked again
+            dom_assignment.removeClass("open-tag-add-box");
+            transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
+            return;
+        }
+
+        // Tag add pop up was clicked
         dom_assignment.addClass("open-tag-add-box");
-        $this.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
-        $this.find(".tag-add-input").val("").attr("tabindex", "");
-        const container_for_tags = $this.find(".tag-add-overflow-hidden-container");
+        dom_assignment.find(".tag-add-button").removeClass("tag-add-red-box-shadow").attr("tabindex", "0");
+        dom_assignment.find(".tag-add-input").val("").attr("tabindex", "");
 
         // This code handles the logic for determining which tags should be added to the tag add dropdown. Let's break this down:
 
@@ -562,20 +568,20 @@ addTagHandlers: function() {
         final_allTags = final_allTags.filter(e => !current_assignment_tags.includes(e));
         if (!isTouchDevice || !final_allTags.length) {
             // showing the entire keyboard when you want to add tags can get annoying on mobile
-            $this.find(".tag-add-input").focus();
+            dom_assignment.find(".tag-add-input").focus();
         }
 
 
 
         // The tag add box can be reopened while the transitionend from the transitionCloseTagBox function hasn't yet fired, causing all the tags to disppear
         // Trigger the transitionend if this is the case, and since transitionCloseTagAddBox uses .one, it will be disabled after
-        const tag_add_box = $this.find(".tag-add-box");
+        const tag_add_box = dom_assignment.find(".tag-add-box");
         tag_add_box.trigger("transitionend");
 
         for (let tag of final_allTags) {
             const tag_add_selection_item = $($("#tag-add-selection-item-template").html());
             tag_add_selection_item.find(".tag-add-selection-item-name").first().text(tag);
-            container_for_tags.append(tag_add_selection_item);
+            dom_assignment.find(".tag-add-overflow-hidden-container").append(tag_add_selection_item);
             tag_add_selection_item.click(function() {
                 $(this).find(".tag-add-checkbox").prop("checked", !$(this).hasClass("checked"));
                 $(this).toggleClass("checked");
@@ -620,18 +626,20 @@ addTagHandlers: function() {
         dom_assignment.find(".tag-add-button").removeClass("tag-add-red-box-shadow");
         ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {tags: sa.tags, id: sa.id});
     });
-    $(".tag-add").focusout(function() {
-        const $this = $(this);
+    $(document).focusout(function(e) {
+        const $this = $(e.target).closest(".tag-add");
+        if (!$this.length) return;
+
         const dom_assignment = $this.parents(".assignment");
         setTimeout(function() {
             // const tag_add_text_clicked = $(e.currentTarget).is($this) && $(document.activeElement).hasClass("assignment");
 
             // If the user unfocuses the closed tag modal which they previously clicked to close, this will run and add the transitionend event in transitionCloseTagBox to the already closed tag-add-box, which is unwanted and causes bugs
             // I can't just do !$(e.target).is($this) because the tag modal may already be open without the user already previously clicking .tag-add to close it, and the transitionend event is needed in this case
-            // So, only return when the tag modal is closed by adding || $this.find(".tag-add-box").css("height") === 0
-            if ($(document.activeElement).closest(".tag-add").length || parseFloat($this.find(".tag-add-box").css("height")) === 0) return;
+            // So, only return when the tag modal is closed by adding || dom_assignment.find(".tag-add-box").css("height") === 0
+            if ($(document.activeElement).closest(".tag-add").length || parseFloat(dom_assignment.find(".tag-add-box").css("height")) === 0) return;
             dom_assignment.removeClass("open-tag-add-box");
-            transitionCloseTagBox($this);
+            transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
         }, 0);
     });
     $(".tag-sortable-container").sortable({
@@ -652,7 +660,7 @@ addTagHandlers: function() {
             const $this = $(this.el);
             const dom_assignment = $this.parents(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
-            sa.tags = $this.find(".tag-wrapper").filter(function() {
+            sa.tags = dom_assignment.find(".tag-wrapper").filter(function() {
                 // Also remove z-index if it wasnt reset back to none from dragging the tag around
                 return !$(this).css("z-index","").hasClass("tag-is-deleting");
             }).map(function() {
