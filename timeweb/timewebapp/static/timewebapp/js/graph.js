@@ -1635,16 +1635,16 @@ class VisualAssignment extends Assignment {
     }
 }
 window.VisualAssignment = VisualAssignment;
-$(function() {
-$(".assignment").click(function(e/*, params={ initUI: true }*/) {
+$(document).click(function(e) {
     const target = $(e.target);
+    const dom_assignment = target.closest(".assignment");
+    if (!dom_assignment.length) return;
     const targetInFooter = !!target.parents(".assignment-footer").length; // only check the children not the actual element so the sides of an assignment can be clicked
     const targetInTags = !!target.closest(".tags").length;
     const targetInButton = !!target.closest(".assignment-header-button").length;
     const targetInAnchor = !!target.closest(".title-link-anchor").length;
     const dontFire = targetInTags || targetInButton || targetInAnchor || targetInFooter;
     if (dontFire) return;
-    const dom_assignment = $(this);
     const sa = new VisualAssignment(dom_assignment);
     
     if (!sa.canOpenAssignment()) {
@@ -1693,5 +1693,4 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0]?.beginElement();
     sa.initUI();
-});
 });

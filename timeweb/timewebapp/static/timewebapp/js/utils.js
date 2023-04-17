@@ -203,8 +203,10 @@ tickClock: function() {
 },
 setClickHandlers: {
     tickButtons: function() {
-        $(".tick-button").parent().click(function() {
-            const $this = $(this);
+        $(document).click(function(e) {
+            const $this = $(e.target).closest($(".tick-button").parent());
+            if (!$this.length) return;
+
             const dom_assignment = $this.parents(".assignment");
             const sa = new VisualAssignment(dom_assignment);
             sa.setParabolaValues();
@@ -802,22 +804,30 @@ switch (e_key) {
             $("#assignments-container").focus();
         }
         break;
-    }
-    });
-    $(".tag-add-input").keydown(function(e) {
-        if (e.key === "Enter") {
+    case "enter": {
+        const $this = $(e.target).closest(".tag-add-input");
+        if ($this.length) {
             utils.ui.close_on_success = true;
-            $(this).parents(".tags").find(".tag-add-button").click();
+            $this.parents(".assignment").find(".tag-add-button").click();
         }
-    });
+        break;
+    }
+}
+});
 },
 displayFullDueDateOnHover: function() {
-    $(".title").on("mouseover mousemove click", function(e) {
-        $(this).toggleClass("show-long-daysleft", e.offsetY > $(this).height());
+    $(document).on("mouseover mousemove click", function(e) {
+        const $this = $(e.target).closest(".title");
+        if (!$this.length) return;
+
+        $this.toggleClass("show-long-daysleft", e.offsetY > $this.height());
         // could probably validate with touchstart event instead of isTouchDevice
-        if (isTouchDevice && e.offsetY > $(this).height()) return false;
-    }).on("mouseout", function() {
-        $(this).removeClass("show-long-daysleft");
+        if (isTouchDevice && e.offsetY > $this.height()) return false;
+    }).on("mouseout", function(e) {
+        const $this = $(e.target).closest(".title");
+        if (!$this.length) return;
+
+        $this.removeClass("show-long-daysleft");
     });
 },
 setAssignmentScaleUtils: function() {
@@ -1245,33 +1255,30 @@ saveAndLoadStates: function() {
     });
 
     // Ensure fonts load for the graph
-    document.fonts.ready.then(function() {
+    $(window).one("load", function() {
         if (SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
-        // setTimeout so the assignments are clicked after the click handlers are set
-        setTimeout(function() {
-            // Reopen closed assignments
-            if ("open_assignments" in sessionStorage) {
-                const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
-                $(".assignment").each(function() {
-                    const dom_assignment = $(this);
-                    const was_open = open_assignments.includes(dom_assignment.attr("data-assignment-id"));
-                    if (!was_open) return;
+        // Reopen closed assignments
+        if ("open_assignments" in sessionStorage) {
+            const open_assignments = JSON.parse(sessionStorage.getItem("open_assignments"));
+            $(".assignment").each(function() {
+                const dom_assignment = $(this);
+                const was_open = open_assignments.includes(dom_assignment.attr("data-assignment-id"));
+                if (!was_open) return;
 
-                    // if you edit an open assignment and make it needs more info
-                    // ensure it isn't clicked
-                    const sa = new VisualAssignment(dom_assignment);
-                    if (sa.canOpenAssignment()) {
-                        dom_assignment.click();
-                    }
-                });
-            }
+                // if you edit an open assignment and make it needs more info
+                // ensure it isn't clicked
+                const sa = new VisualAssignment(dom_assignment);
+                if (sa.canOpenAssignment()) {
+                    dom_assignment.click();
+                }
+            });
+        }
 
-            // Scroll to original position
-            // Needs to scroll after assignments are opened
-            if ("scroll" in sessionStorage) {
-                $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
-            }
-        }, 0);
+        // Scroll to original position
+        // Needs to scroll after assignments are opened
+        if ("scroll" in sessionStorage) {
+            $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
+        }
     });
 },
 navClickHandlers: function() {

@@ -508,9 +508,11 @@ class Crud {
             $("#submit-assignment-button").text("Create Assignment").val('');
             that.showForm();
         });
-        // Populate form on edit
-        $('.update-button').parent().click(function() {
-            const dom_assignment = $(this).parents(".assignment");
+        $(document).click(function(e) {
+            const $this = $(e.target).closest($('.update-button').parent());
+            if (!$this.length) return;
+
+            const dom_assignment = $this.parents(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
             $("#new-title").text("Edit Assignment");
             $("#submit-assignment-button").text("Edit Assignment");
@@ -527,8 +529,10 @@ class Crud {
             if (!(sa.is_google_classroom_assignment && sa.needs_more_info))
                 Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
         });
-        $('.delete-button, .restore-button').parent().click(function(e) {
-            const $this = $(this);
+        $(document).click(function(e) {
+            const $this = $(e.target).closest($('.delete-button, .restore-button').parent());
+            if (!$this.length) return;
+
             const dom_assignment = $this.parents(".assignment");
             if (dom_assignment.hasClass("assignment-is-deleting")) return;
             // shift + d while in the close assignment transition bugs it
