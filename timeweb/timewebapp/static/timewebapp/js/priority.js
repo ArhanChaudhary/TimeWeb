@@ -995,6 +995,12 @@ class Priority {
 			dom_title.attr("data-daysleft", str_daysleft);
 			dom_title.attr("data-long-daysleft", long_str_daysleft);
 		});
+        $(".assignment").each(function() {
+            const dom_assignment = $(this);
+            const sa = new VisualAssignment(dom_assignment);
+            sa.positionTags();
+            sa.makeGCAnchorVisible();
+        });
 		$("#assignments-container").css("opacity", "1");
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
@@ -1230,27 +1236,15 @@ class Priority {
                 });
         }
 		that.updateInfoHeader();
+        $(".assignment").each(function() {
+            const dom_assignment = $(this);
+            const sa = new VisualAssignment(dom_assignment);
+            sa.positionTags();
+            sa.makeGCAnchorVisible();
+        });
         $("#assignments-container").css("opacity", "1");
         
     }
 }
 window.Priority = Priority;
-document.addEventListener("DOMContentLoaded", function() {
-    new Priority().sort({ first_sort: true });
-    function positionTags() {
-        $(".assignment").each(function() {
-            const sa = new VisualAssignment($(this));
-            sa.positionTags();
-            sa.makeGCAnchorVisible();
-        });
-        if ("scroll" in sessionStorage) {
-            $("#assignments-container").scrollTop(sessionStorage.getItem("scroll"));
-        }
-    }
-    if (SETTINGS.horizontal_tag_position === "Left") {
-        // "Left" is mega slow, do it after
-        $(window).one("load", positionTags);
-    } else {
-        positionTags();
-    }
-});
+document.addEventListener("DOMContentLoaded", () => new Priority().sort({ first_sort: true }));
