@@ -38,37 +38,6 @@ class Priority {
         const v = low_hsv.v + (high_hsv.v - low_hsv.v) * percentage_as_decimal;
         return utils.formatting.hsvToRGB(h, s, v);
     }
-    // Handles coloring and animating assignments that were just created or edited
-    colorOrAnimateInAssignment(params) {
-        const that = this;
-        const assignment_container = params.dom_assignment.parents(".assignment-container");
-        if (assignment_container.is("#animate-in")) {
-            // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
-            // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
-
-            // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
-            params.dom_assignment.parents(".assignment-container").animate({
-                top: "0",
-                opacity: "1",
-                marginBottom: "0",
-            }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
-        }
-        // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-        if (params.first_sort) {
-            params.dom_assignment.addClass("transition-instantly");
-        }
-        if (Number.isNaN(params.priority_percentage) || !SETTINGS.show_priority) {
-            params.dom_assignment.css("--priority-color", "var(--color)");
-        } else {
-            const priority_color = that.percentageToColor(params.priority_percentage);
-            params.dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
-        }
-        if (params.first_sort) {
-            // Which element specifically is overflowed seems to have minimal effect on performance
-            params.dom_assignment[0].offsetHeight;
-            params.dom_assignment.removeClass("transition-instantly");
-        }
-    }
     // https://www.desmos.com/calculator/nhivlbqdzf
     // I will not be explaining anything nor answering any questions
     // goodbye
@@ -1136,11 +1105,29 @@ class Priority {
                     resolve();
                 }
             }).then(function() {
-                that.colorOrAnimateInAssignment({
-                    dom_assignment,
-                    priority_percentage,
-                    first_sort: that.params.first_sort,
-                });
+                if (assignment_container.is("#animate-in")) {
+                    // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
+                    assignment_container.animate({
+                        top: "0",
+                        opacity: "1",
+                        marginBottom: "0",
+                    }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
+                }
+                // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
+                if (that.params.first_sort) {
+                    dom_assignment.addClass("transition-instantly");
+                }
+                if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
+                    dom_assignment.css("--priority-color", "var(--color)");
+                } else {
+                    const priority_color = that.percentageToColor(priority_percentage);
+                    dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
+                }
+                if (that.params.first_sort) {
+                    // Which element specifically is overflowed seems to have minimal effect on performance
+                    dom_assignment[0].offsetHeight;
+                    dom_assignment.removeClass("transition-instantly");
+                }
             });            
             that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && ![
