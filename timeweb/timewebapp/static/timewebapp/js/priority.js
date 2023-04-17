@@ -997,10 +997,12 @@ class Priority {
 		});
         $(".assignment").each(function() {
             const dom_assignment = $(this);
+            utils.ui.setAssignmentScaleUtils(dom_assignment);
             const sa = new VisualAssignment(dom_assignment);
             sa.positionTags();
             sa.makeGCAnchorVisible();
         });
+        utils.ui.setAssignmentsContainerScaleUtils();
 		$("#assignments-container").css("opacity", "1");
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
@@ -1238,12 +1240,13 @@ class Priority {
 		that.updateInfoHeader();
         $(".assignment").each(function() {
             const dom_assignment = $(this);
+            utils.ui.setAssignmentScaleUtils(dom_assignment);
             const sa = new VisualAssignment(dom_assignment);
             sa.positionTags();
             sa.makeGCAnchorVisible();
         });
+        utils.ui.setAssignmentsContainerScaleUtils();
         $("#assignments-container").css("opacity", "1");
-        
     }
 }
 window.Priority = Priority;

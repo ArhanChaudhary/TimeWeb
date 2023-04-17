@@ -830,39 +830,29 @@ displayFullDueDateOnHover: function() {
         $this.removeClass("show-long-daysleft");
     });
 },
-setAssignmentScaleUtils: function() {
-    // width * percentx = width+10
-    // percentx = 1 + 10/width
-    $(window).resize(function() {
-        $("#assignments-container").css('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
-        $(".assignment").each(function() {
-            const $this = $(this);
-            const sa = new VisualAssignment($this);
-            sa.positionTags();
-            sa.makeGCAnchorVisible();
-        });
-    });
-    // #animate-in is initially display: hidden in priority.js, delay adding the scale
-    document.fonts.ready.then(function() {
-        setTimeout(function() {
-            // height * percenty = height+5
-            // percenty = 1 + 5/height
-            $("#assignments-container").css('--scale-percent-x',`${1 + 10/$(".assignment").first().width()}`);
-            $(".assignment").each(function() {
-                if (1 + 10/$(this).height() > 1.05) return;
-                $(this).css('--scale-percent-y',`${1 + 10/$(this).height()}`);
-            });
-        }, 0);
-    });
+setAssignmentsContainerScaleUtils: function() {
+    // width * percentx = widt + 10
+    // percentx = 1 + 10 / width
+    if (SETTINGS.animation_speed === 0) {
+        $("#assignments-container").css('--scale-percent-x', '1');
+    } else {
+        $("#assignments-container").css('--scale-percent-x', `${1 + 10 / $(".assignment").first().width()}`);
+    }
+},
+setAssignmentScaleUtils: function(dom_assignment) {
+    if (SETTINGS.animation_speed === 0) {
+        dom_assignment.css('--scale-percent-y', '1');
+    } else {
+        const scale = 1 + 10 / dom_assignment.height();
+        // height * percenty = height + 10
+        // percenty = 1 + 10 / height
+        if (scale <= 1.05) {
+            dom_assignment.css('--scale-percent-y', scale);
+        }
+    }
 },
 setAnimationSpeed: function() {
     $("main").css('--animation-speed', SETTINGS.animation_speed);
-    if (SETTINGS.animation_speed !== 0) return;
-
-    $(".assignment").each(function() {
-        this.style.setProperty('--scale-percent-x', '1', 'important');
-        this.style.setProperty('--scale-percent-y', '1', 'important');
-    });
 },
 assignmentLinks: function() {
     $(".title-link-anchor").each(function() {
@@ -1612,7 +1602,16 @@ document.addEventListener("DOMContentLoaded", function() {
             utils.ui.setClickHandlers.tickButtons();
             utils.ui.setClickHandlers.assignmentSorting();
         }
-        utils.ui.setAssignmentScaleUtils();
+        $(window).on("resize", function() {
+            $(".assignment").each(function() {
+                const dom_assignment = $(this);
+                utils.ui.setAssignmentScaleUtils(dom_assignment);
+                const sa = new VisualAssignment(dom_assignment);
+                sa.positionTags();
+                sa.makeGCAnchorVisible();
+            });
+            utils.ui.setAssignmentsContainerScaleUtils();
+        });
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
         utils.ui.assignmentLinks();
