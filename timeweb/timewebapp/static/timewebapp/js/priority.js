@@ -979,11 +979,34 @@ class Priority {
             scrollTimeout = setTimeout(_resolve, 200);
         });
     }
-    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
-        // can still be called from the tags or the end of transitionDeleteAssignment
-        if (VIEWING_DELETED_ASSIGNMENTS) return;
+    sortDeletedAssignmentsView() {
+        const complete_date_now = utils.getRawDateNow();
+		$(".assignment").each(function() {
+            let deletion_time = new Assignment($(this)).sa.deletion_time;
+            let str_daysleft = `Deleted ${utils.formatting.formatSeconds((complete_date_now - deletion_time) / 1000)} ago`;
 
+            if (complete_date_now.getFullYear() === deletion_time.getFullYear()) {
+                var long_str_daysleft = deletion_time.toLocaleDateString([], {month: 'long', day: 'numeric'});
+            } else {
+                var long_str_daysleft = deletion_time.toLocaleDateString([], {year: 'numeric', month: 'long', day: 'numeric'});
+            }
+            long_str_daysleft = `Deleted ${long_str_daysleft}`;
+			const dom_title = $(this).find(".title");
+			dom_title.attr("data-daysleft", str_daysleft);
+			dom_title.attr("data-long-daysleft", long_str_daysleft);
+		});
+		$("#assignments-container").css("opacity", "1");
+    }
+    sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
         this.params = params;
+
+        // can still be called from the tags or the end of transitionDeleteAssignment
+        if (VIEWING_DELETED_ASSIGNMENTS) {
+            if (this.params.first_sort) {
+                this.sortDeletedAssignmentsView();
+            }
+            return;
+        }
         if (Priority.is_currently_sorting) {
             Priority.recurse_params = this.params;
         } else {
@@ -1213,26 +1236,7 @@ class Priority {
 }
 window.Priority = Priority;
 document.addEventListener("DOMContentLoaded", function() {
-	if (VIEWING_DELETED_ASSIGNMENTS) {
-		const complete_date_now = utils.getRawDateNow();
-		$(".assignment").each(function() {
-            let deletion_time = new Assignment($(this)).sa.deletion_time;
-            let str_daysleft = `Deleted ${utils.formatting.formatSeconds((complete_date_now - deletion_time) / 1000)} ago`;
-
-            if (complete_date_now.getFullYear() === deletion_time.getFullYear()) {
-                var long_str_daysleft = deletion_time.toLocaleDateString([], {month: 'long', day: 'numeric'});
-            } else {
-                var long_str_daysleft = deletion_time.toLocaleDateString([], {year: 'numeric', month: 'long', day: 'numeric'});
-            }
-            long_str_daysleft = `Deleted ${long_str_daysleft}`;
-			const dom_title = $(this).find(".title");
-			dom_title.attr("data-daysleft", str_daysleft);
-			dom_title.attr("data-long-daysleft", long_str_daysleft);
-		});
-		$("#assignments-container").css("opacity", "1");
-	} else {
-		new Priority().sort({ first_sort: true });
-	}
+    new Priority().sort({ first_sort: true });
     function positionTags() {
         $(".assignment").each(function() {
             const sa = new VisualAssignment($(this));
