@@ -1619,7 +1619,7 @@ class VisualAssignment extends Assignment {
         }
     }
     makeGCAnchorVisible() {
-        if (!this.sa.is_google_classroom_assignment) return;
+        if (!this.sa.external_link) return;
         const title = this.dom_assignment.find(".title");
         const anchor = this.dom_assignment.find(".title-link-anchor");
         const title_text = this.dom_assignment.find(".title-text");
