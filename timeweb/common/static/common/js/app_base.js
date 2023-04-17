@@ -111,16 +111,16 @@ $(function() {
             transform: '',
         });
         logo.find("img").css("width", "");
-        welcome.toggle(!collision(welcome, logo, { margin: 30 })); // Do this toggle after the logo's css is reset or it might clip into the logo
+        welcome.toggle(!collision(welcome, logo, { margin: 60 })); // Do this toggle after the logo's css is reset or it might clip into the logo
         if (left_icon_text.length)
-            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 30 }));
+            left_icon_text.toggle(!collision(left_icon_text, logo, { margin: 45 }));
     
         if (!collision(username, logo, { margin: 30 })) return;
         logo.css({
-            left: 5 + left_icon_width,
+            left: 10 + left_icon_width,
             transform: "none",
         });
-        welcome.toggle(!collision(welcome, logo, { margin: 30 }));
+        welcome.toggle(!collision(welcome, logo, { margin: 60 }));
     
         if (!collision(username, logo, { margin: 10 })) return;
         // compress the logo
