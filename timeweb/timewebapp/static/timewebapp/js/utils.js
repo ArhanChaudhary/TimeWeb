@@ -982,7 +982,7 @@ tutorial: function() {
                         }),
                     },
                     {
-                        wait: 1050,
+                        wait: 1250,
                         do: () => finished_resolver("x-axis"),
                     },
                 ]);
@@ -1096,14 +1096,14 @@ tutorial: function() {
                         do: () => $("#animate-in .tick-button").click(),
                     },
                     {
-                        wait: 1750,
+                        wait: 2000,
                         do: () => utils.ui.overlayAround({
                             element: null,
                             duration: 1250,
                         }),
                     },
                     {
-                        wait: 2250,
+                        wait: 2000,
                         do: () => finished_resolver("wrap-up"),
                     }
                 ]);
