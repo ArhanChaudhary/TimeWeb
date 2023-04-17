@@ -41,7 +41,8 @@ class Priority {
     // Handles coloring and animating assignments that were just created or edited
     colorOrAnimateInAssignment(params) {
         const that = this;
-        if ($("#animate-in").length && params.is_element_submitted) {
+        const assignment_container = params.dom_assignment.parents(".assignment-container");
+        if (assignment_container.is("#animate-in")) {
             // If a new assignment was created and the assignment that colorOrAnimateInAssignment() was called on is the assignment that was created, animate it easing in
             // I can't just have is_element_submitted as a condition because is_element_submitted will be true for both "#animate-in" and "#animate-color"
 
@@ -1114,9 +1115,9 @@ class Priority {
             if (old_add_priority_percentage !== add_priority_percentage && document.contains(dom_assignment[0]))
                 new VisualAssignment(dom_assignment).positionTags();
 
-            if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
-                new Promise(function(resolve) {
-                    $("#animate-in").css({
+            new Promise(function(resolve) {
+                if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
+                    assignment_container.filter("#animate-in").css({
                         position: "absolute",
                         opacity: 0,
                     });
@@ -1131,22 +1132,16 @@ class Priority {
                     $(window).one(SETTINGS.enable_tutorial ? 'animate-example-assignment' : 'load', function(e, triggered_resolve) {
                         Priority.scrollBeforeAssignmentAnimation([resolve, triggered_resolve], assignment_to_scroll_to);
                     });
-                }).then(function() {
-                    that.colorOrAnimateInAssignment({
-                        dom_assignment,
-                        is_element_submitted: true,
-                        priority_percentage,
-                        first_sort: that.params.first_sort,
-                    });
-                });
-            } else {
+                } else {
+                    resolve();
+                }
+            }).then(function() {
                 that.colorOrAnimateInAssignment({
                     dom_assignment,
-                    is_element_submitted: false,
                     priority_percentage,
                     first_sort: that.params.first_sort,
                 });
-            }
+            });            
             that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && ![
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
