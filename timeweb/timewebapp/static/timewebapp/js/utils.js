@@ -821,7 +821,6 @@ setAssignmentScaleUtils: function() {
             const $this = $(this);
             const sa = new VisualAssignment($this);
             sa.positionTags();
-            sa.displayTruncateWarning();
             sa.makeGCAnchorVisible();
         });
     });

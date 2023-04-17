@@ -1630,12 +1630,6 @@ class VisualAssignment extends Assignment {
             title_text.text(sliced);
         }
     }
-    displayTruncateWarning() {
-        // remove for now
-        return;
-        const dom_left_side_of_header = this.dom_assignment.find(".left-side-of-header");
-        dom_left_side_of_header.toggleClass("display-truncate-warning", dom_left_side_of_header.find(".description").hasOverflown());
-    }
     canOpenAssignment() {
         return !this.sa.needs_more_info;
     }
@@ -1696,7 +1690,6 @@ $(".assignment").click(function(e/*, params={ initUI: true }*/) {
     assignment_footer.stop(false, true);
     dom_assignment.addClass("open-assignment");
     sa.positionTags();
-    sa.displayTruncateWarning();
     assignment_footer.css("display", "block");
     dom_assignment.find(".rising-arrow-animation")[0]?.beginElement();
     sa.initUI();
