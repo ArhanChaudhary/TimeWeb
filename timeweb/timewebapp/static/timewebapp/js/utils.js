@@ -1594,16 +1594,18 @@ for (let sa of dat) {
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {
-        if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
-        utils.ui.setClickHandlers.tickButtons();
         utils.ui.setClickHandlers.assignmentsHeaderUI();
-        utils.ui.setClickHandlers.assignmentSorting();
     }
     utils.ui.setClickHandlers.shortcuts();
     utils.ui.setKeybinds();
     utils.ui.displayFullDueDateOnHover();
-    utils.ui.setAssignmentScaleUtils();
     setTimeout(() => {
+        if (!VIEWING_DELETED_ASSIGNMENTS) {
+            if (SETTINGS.gc_integration_enabled) ajaxUtils.createGCAssignments();
+            utils.ui.setClickHandlers.tickButtons();
+            utils.ui.setClickHandlers.assignmentSorting();
+        }
+        utils.ui.setAssignmentScaleUtils();
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
         utils.ui.assignmentLinks();
