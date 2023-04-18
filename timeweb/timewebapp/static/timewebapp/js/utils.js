@@ -163,6 +163,8 @@ tickClock: function() {
             // Don't reload in the next day to preserve changes made in the simulation
             // Don't reload in the example account because date_now set in the example account causes an infinite reload loop  
             if (utils.in_simulation || isExampleAccount) return;
+            // even though this may be unnecessary i don't care because this will happen very infrequently and making this
+            // perform optimally is a waste of time
             reloadWhenAppropriate();
         }
 

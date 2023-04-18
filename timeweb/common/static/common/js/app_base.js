@@ -182,9 +182,7 @@ error: function(response, textStatus) {
 
             },
             "reload this page": {
-                action: function() {
-                    reloadWhenAppropriate();
-                },
+                action: () => reloadWhenAppropriate(),
             },
             "try again": {
                 action: () => {
@@ -373,7 +371,7 @@ alertInvalidState: function() {
 
             },
             reload: {
-                action: reloadWhenAppropriate,
+                action: () => reloadWhenAppropriate(),
             },
         },
         onDestroy: function() {
