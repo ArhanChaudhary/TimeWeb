@@ -1416,51 +1416,11 @@ inLineWrapperQuery: function($first_assignment_container) {
     });
     return ret;
 },
-}
-
-window.SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
-SETTINGS.animation_speed = +SETTINGS.animation_speed;
-if (!SETTINGS.seen_latest_changelog) {
-    latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
-    setTimeout(function() {
-        const update_wrapper = document.createElement("ul");
-        for (const update of latest_changelog.updates) {
-            const li = document.createElement("li");
-            li.innerHTML = update;
-            update_wrapper.appendChild(li);
-        }
-        const bugfixes_wrapper = document.createElement("ul");
-        for (const bugfix of latest_changelog.bugfixes) {
-            const li = document.createElement("li");
-            li.innerHTML = bugfix;
-            bugfixes_wrapper.appendChild(li);
-        }
-        update_wrapper.appendChild(bugfixes_wrapper);
-        const jconfirm = $.alert({
-            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version} (${latest_changelog.date})`,
-            content: update_wrapper.outerHTML + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
-            backgroundDismiss: false,
-            onClose: function() {
-                SETTINGS.seen_latest_changelog = true;
-                ajaxUtils.changeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
-            }
-        });
-        setTimeout(function() {
-            jconfirm.$content.prop("style").setProperty("opacity", "0.85", "important");
-            jconfirm.$titleContainer.css("padding-bottom", 5);
-        }, 0);
-    }, 500);
-}
-SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
-window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
-SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
-SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
-if (isExampleAccount) {
-    x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
-}
-// Load in assignment data
-window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
-for (let sa of dat) {
+initSA: function(sa) {
+    let x_transform;
+    if (isExampleAccount) {
+        x_transform = mathUtils.daysBetweenTwoDates(date_now, new Date(2021, 4, 3));
+    }
     if (sa.assignment_date) {
         sa.assignment_date = new Date(sa.assignment_date);
         // NOTE: compare all dates in the front end in the user's time zone
@@ -1582,7 +1542,51 @@ for (let sa of dat) {
     if (isExampleAccount) {
         sa.break_days = sa.break_days.map(break_day => (break_day + x_transform) % 7);
     }
-};
+}
+}
+
+window.SETTINGS = JSON.parse(document.getElementById("settings-model").textContent);
+SETTINGS.animation_speed = +SETTINGS.animation_speed;
+if (!SETTINGS.seen_latest_changelog) {
+    latest_changelog = JSON.parse(document.getElementById("latest-changelog").textContent);
+    setTimeout(function() {
+        const update_wrapper = document.createElement("ul");
+        for (const update of latest_changelog.updates) {
+            const li = document.createElement("li");
+            li.innerHTML = update;
+            update_wrapper.appendChild(li);
+        }
+        const bugfixes_wrapper = document.createElement("ul");
+        for (const bugfix of latest_changelog.bugfixes) {
+            const li = document.createElement("li");
+            li.innerHTML = bugfix;
+            bugfixes_wrapper.appendChild(li);
+        }
+        update_wrapper.appendChild(bugfixes_wrapper);
+        const jconfirm = $.alert({
+            title: `Hey there! A new update is here :D!<br><br>${latest_changelog.version} (${latest_changelog.date})`,
+            content: update_wrapper.outerHTML + "This can also be viewed on TimeWeb's <a href=\"/changelog\">changelog</a>.",
+            backgroundDismiss: false,
+            onClose: function() {
+                SETTINGS.seen_latest_changelog = true;
+                ajaxUtils.changeSetting({setting: "seen_latest_changelog", value: SETTINGS.seen_latest_changelog});
+            }
+        });
+        setTimeout(function() {
+            jconfirm.$content.prop("style").setProperty("opacity", "0.85", "important");
+            jconfirm.$titleContainer.css("padding-bottom", 5);
+        }, 0);
+    }, 500);
+}
+SETTINGS.def_break_days = SETTINGS.def_break_days.map(Number);
+window.date_now = new Date(utils.getRawDateNow({ dont_stem_off_date_now: true }).toDateString());
+SETTINGS.highest_priority_color = utils.formatting.hexToRGB(SETTINGS.highest_priority_color);
+SETTINGS.lowest_priority_color = utils.formatting.hexToRGB(SETTINGS.lowest_priority_color);
+// Load in assignment data
+window.dat = JSON.parse(document.getElementById("assignment-models").textContent);
+for (const sa of dat) {
+    utils.initSA(sa);
+}
 // Use DOMContentLoaded because $(function() { fires too slowly
 document.addEventListener("DOMContentLoaded", function() {
     if (!VIEWING_DELETED_ASSIGNMENTS) {
