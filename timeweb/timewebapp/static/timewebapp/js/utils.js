@@ -644,7 +644,9 @@ addTagHandlers: function() {
             transitionCloseTagBox(dom_assignment.find(".tag-add-box"));
         }, 0);
     });
-    $(".tag-sortable-container").sortable({
+},
+makeAssignmentTagsSortable: function(dom_assignment) {
+    dom_assignment.find(".tag-sortable-container").sortable({
         animation: 150,
         // some mobile phones consider a tap to be a drag,
         // preventing tag deletion
@@ -853,13 +855,6 @@ setAssignmentScaleUtils: function(dom_assignment) {
 },
 setAnimationSpeed: function() {
     $("main").css('--animation-speed', SETTINGS.animation_speed);
-},
-assignmentLinks: function() {
-    $(".title-link-anchor").each(function() {
-        if (this.href.startsWith(location.origin)) {
-            $(this).attr("href", "//" + this.getAttributeNode("href").value);
-        }
-    });
 },
 overlayAround: function({element: $element, duration=1000, margin=15 } = {}) {
     $(window).off("resize.tutorial-overlay");
@@ -1243,8 +1238,6 @@ saveAndLoadStates: function() {
             return true;
         }
     });
-
-    // Ensure fonts load for the graph
     $(window).one("load", function() {
         if (SETTINGS.enable_tutorial || VIEWING_DELETED_ASSIGNMENTS) return;
         // Reopen closed assignments
@@ -1614,7 +1607,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
-        utils.ui.assignmentLinks();
     }, 0);
     utils.ui.saveAndLoadStates();
     utils.ui.navClickHandlers();

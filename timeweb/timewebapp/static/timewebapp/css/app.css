@@ -5,7 +5,6 @@ html {
 #assignments-container {
     position: relative;
     overflow-y: auto;
-    opacity: 0;
     margin-top: -10px;
     padding-top: 10px;
     --scale-percent-y: 1.05;
@@ -83,7 +82,7 @@ main.background-image-exists {
     min-height: calc(var(--100vh) - var(--header-height) - 10px);
     position: relative;
 }
-#extra-navs-positioner > span {
+#extra-navs-assignment-positioner {
     display: flex;
     flex-flow: column;
 }

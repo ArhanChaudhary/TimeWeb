@@ -76,13 +76,14 @@ EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT = (
 assert len(INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT) + len(EXCLUDE_FROM_SETTINGS_MODEL_JSON_SCRIPT) == len(SettingsModel._meta.fields), "update this list"
 
 EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT = (
-    "external_link", "user", "hidden"
+    "user", "hidden",
 )
 INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT = (
     "assignment_date", "x", "due_time", "blue_line_start", "y", "min_work_time", "time_per_unit",
     "works", "funct_round", "break_days", "skew_ratio", "fixed_mode", "dynamic_start", "id", "name",
     "soft", "unit", "description", "tags", "is_google_classroom_assignment",
     "alert_due_date_incremented", "dont_hide_again", "deletion_time", "needs_more_info",
+    "external_link",
 )
 
 assert len(INCLUDE_IN_ASSIGNMENT_MODELS_JSON_SCRIPT) + len(EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) == len(TimewebModel._meta.fields), "update this list"

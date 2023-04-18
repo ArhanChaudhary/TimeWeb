@@ -169,6 +169,56 @@ class Priority {
             return a < 0;
         }
     }
+    populateAssignmentDOM(assignment_container, sa) {
+        const dom_assignment = assignment_container.children(".assignment");
+        if (sa.needs_more_info) {
+            dom_assignment.addClass("needs-more-info");
+        }
+        dom_assignment.attr("data-assignment-id", sa.id);
+
+        if (SETTINGS.enable_tutorial && sa.name === EXAMPLE_ASSIGNMENT_NAME) {
+
+
+            // dont use #animate-in as the reference, use is_example when implemented
+
+
+            assignment_container.attr("id", "animate-in");
+        }
+
+        let tags = $();
+        for (const tag_name of sa.tags) {
+            const tag = $($("#tag-template").html());
+            tag.find(".tag-name").text(tag_name);
+            tags = tags.add(tag);
+        }
+        tags.appendTo(dom_assignment.find(".tag-sortable-container"));
+        setTimeout(() => utils.ui.makeAssignmentTagsSortable(dom_assignment), 0);
+
+        dom_assignment.find(".title-text").text(sa.name);
+
+        const dom_title_link_anchor = dom_assignment.find(".title-link-anchor");
+        if (sa.external_link) {
+            dom_title_link_anchor.attr("href", sa.external_link);
+            if (dom_title_link_anchor.prop("href").startsWith(location.origin)) {
+                dom_title_link_anchor.attr("href", "//" + sa.external_link);
+            }
+        } else {
+            dom_title_link_anchor.remove();
+        }
+
+        const dom_description = dom_assignment.find(".description");
+        if (sa.description) {
+            for (const line of sa.description.split("\n")) {
+                dom_description.append(document.createTextNode(line));
+                dom_description.append("<br>");
+            }
+        } else {
+            dom_description.remove();
+        }
+
+        dom_assignment.find(".work-input-unit-of-time-checkbox").attr("id", `work-input-label-${sa.id}`);
+        dom_assignment.find(".work-input-unit-of-time-widget").attr("for", `work-input-label-${sa.id}`);
+    }
     updateAssignmentHeaderMessagesAndSetPriorityData() {
         const that = this;
         const complete_date_now = utils.getRawDateNow();
@@ -183,12 +233,28 @@ class Priority {
         } else {
             that.params.autofill_no_work_done = [];
         }
-        if (SETTINGS.enable_tutorial) {
-            that.assignments_to_sort = $("#animate-in");
-            $(".assignment-container").not(that.assignments_to_sort).hide();
-        } else {
-            that.assignments_to_sort = $(".assignment-container");
-            that.assignments_to_sort.show();
+        that.assignments_to_sort = $();
+        that.new_ids = [];
+        that.existing_ids = {};
+        $(".assignment-container").each(function() {
+            const assignment_container = $(this);
+            const dom_assignment = assignment_container.children(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment)
+            that.existing_ids[sa.id] = assignment_container;
+        });
+        for (const sa of dat) {
+            if (SETTINGS.enable_tutorial && sa.name !== EXAMPLE_ASSIGNMENT_NAME) {
+                continue;
+            }
+            let assignment_container;
+            if (sa.id in that.existing_ids) {
+                assignment_container = that.existing_ids[sa.id];
+            } else {
+                that.new_ids.push(sa.id);
+                assignment_container = $($("#assignment-template").html());
+                that.populateAssignmentDOM(assignment_container, sa);
+            }
+            that.assignments_to_sort = that.assignments_to_sort.add(assignment_container);
         }
         that.assignments_to_sort.each(function(index) {
             const assignment_container = $(this);
@@ -578,7 +644,7 @@ class Priority {
         if (!starred_assignment_ids_to_delete_after_sorting.size) return;
 
         const success = function() {
-            new Crud().transitionDeleteAssignment($(".assignment-container.delete-this-starred-assignment > .assignment"));
+            new Crud().transitionDeleteAssignment(that.assignments_to_sort.filter(".delete-this-starred-assignment").children(".assignment"));
         }
         $.ajax({
             type: "POST",
@@ -980,9 +1046,20 @@ class Priority {
         });
     }
     sortDeletedAssignmentsView() {
+        const that = this;
+
+        that.assignments_to_sort = $();
+        for (const sa of dat) {
+            const assignment_container = $($("#assignment-template").html());
+            that.populateAssignmentDOM(assignment_container, sa);
+            that.assignments_to_sort = that.assignments_to_sort.add(assignment_container);
+        }
+
         const complete_date_now = utils.getRawDateNow();
-		$(".assignment").each(function() {
-            let deletion_time = new Assignment($(this)).sa.deletion_time;
+        that.assignments_to_sort.each(function() {
+            const assignment_container = $(this);
+            const dom_assignment = assignment_container.children(".assignment");
+            let deletion_time = new Assignment(dom_assignment).sa.deletion_time;
             let str_daysleft = `Deleted ${utils.formatting.formatSeconds((complete_date_now - deletion_time) / 1000)} ago`;
 
             if (complete_date_now.getFullYear() === deletion_time.getFullYear()) {
@@ -991,19 +1068,25 @@ class Priority {
                 var long_str_daysleft = deletion_time.toLocaleDateString([], {year: 'numeric', month: 'long', day: 'numeric'});
             }
             long_str_daysleft = `Deleted ${long_str_daysleft}`;
-			const dom_title = $(this).find(".title");
-			dom_title.attr("data-daysleft", str_daysleft);
-			dom_title.attr("data-long-daysleft", long_str_daysleft);
-		});
-        $(".assignment").each(function() {
-            const dom_assignment = $(this);
+            const dom_title = dom_assignment.find(".title");
+            dom_title.attr("data-daysleft", str_daysleft);
+            dom_title.attr("data-long-daysleft", long_str_daysleft);
+        });
+
+        if (VIEWING_DELETED_ASSIGNMENTS) {
+            $("#extra-navs-assignment-positioner").prepend(that.assignments_to_sort);
+        } else {
+            $("#extra-navs-assignment-positioner").append(that.assignments_to_sort);
+        }
+
+        that.assignments_to_sort.each(function() {
+            const dom_assignment = $(this).children(".assignment");
             utils.ui.setAssignmentScaleUtils(dom_assignment);
             const sa = new VisualAssignment(dom_assignment);
             sa.positionTags();
             sa.makeGCAnchorVisible();
         });
         utils.ui.setAssignmentsContainerScaleUtils();
-		$("#assignments-container").css("opacity", "1");
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false, dont_swap: false}) {
         this.params = params;
@@ -1109,11 +1192,7 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
             const dom_title = dom_assignment.find(".title");
-
-            const old_add_priority_percentage = !!dom_title.attr("data-priority");
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
-            if (old_add_priority_percentage !== add_priority_percentage && document.contains(dom_assignment[0]))
-                new VisualAssignment(dom_assignment).positionTags();
 
             new Promise(function(resolve) {
                 if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
@@ -1125,7 +1204,7 @@ class Priority {
                     // So, scroll to the next assignment instead
                     // Scroll to dom_assignment because of its scroll-margin
                     let assignment_to_scroll_to = that.assignments_to_sort.eq(that.priority_data_list[index + 1]?.index).children(".assignment");
-                    if (!assignment_to_scroll_to.length || $("#animate-color").length) {
+                    if (!assignment_to_scroll_to.length || assignment_container.is("#animate-color")) {
                         // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
                         assignment_to_scroll_to = dom_assignment;
                     }
@@ -1145,21 +1224,13 @@ class Priority {
                     }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
                 }
                 // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
-                if (that.params.first_sort) {
-                    dom_assignment.addClass("transition-instantly");
-                }
                 if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
                     dom_assignment.css("--priority-color", "var(--color)");
                 } else {
                     const priority_color = that.percentageToColor(priority_percentage);
                     dom_assignment.css("--priority-color", `rgb(${priority_color.r}, ${priority_color.g}, ${priority_color.b})`);
                 }
-                if (that.params.first_sort) {
-                    // Which element specifically is overflowed seems to have minimal effect on performance
-                    dom_assignment[0].offsetHeight;
-                    dom_assignment.removeClass("transition-instantly");
-                }
-            });            
+            });
             that.addAssignmentShortcut(dom_assignment, priority_data);
             if (!first_available_tutorial_assignment && ![
                     Priority.NEEDS_MORE_INFO_AND_GC_ASSIGNMENT,
@@ -1180,13 +1251,15 @@ class Priority {
         that.prev_finished_assignment?.addClass("last-add-line-wrapper");
         that.prev_due_date_passed_assignment?.addClass("last-add-line-wrapper");
 
-        // wrappers that wrap only around one assignment
-        $(".assignment-container.first-add-line-wrapper.last-add-line-wrapper").each(function() {
-            if ($(this).find(".allow-singular-wrapper").length) return;
+        that.assignments_to_sort.each(function() {
+            const assignment_container = $(this);
+            const should_remove_singular_wrapper = assignment_container.is(".first-add-line-wrapper.last-add-line-wrapper")
+                && !assignment_container.find(".allow-singular-wrapper").length;
+            if (!should_remove_singular_wrapper) return;
 
             // Remove .delete-starred-assignments and every other shortcut
-            $(this).removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
-            $(this).find(".shortcut").remove();
+            assignment_container.removeClass("first-add-line-wrapper last-add-line-wrapper add-line-wrapper");
+            assignment_container.find(".shortcut").remove();
         });
 
         if (!first_available_tutorial_assignment) {
@@ -1238,15 +1311,25 @@ class Priority {
                 });
         }
 		that.updateInfoHeader();
-        $(".assignment").each(function() {
-            const dom_assignment = $(this);
+        const new_assignments = that.assignments_to_sort.filter(function() {
+            const dom_assignment = $(this).children(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
+            return that.new_ids.includes(sa.id);
+        });
+        if (VIEWING_DELETED_ASSIGNMENTS) {
+            $("#extra-navs-assignment-positioner").prepend(new_assignments);
+        } else {
+            $("#extra-navs-assignment-positioner").append(new_assignments);
+        }
+
+        new_assignments.each(function() {
+            const dom_assignment = $(this).children(".assignment");
             utils.ui.setAssignmentScaleUtils(dom_assignment);
             const sa = new VisualAssignment(dom_assignment);
             sa.positionTags();
             sa.makeGCAnchorVisible();
         });
         utils.ui.setAssignmentsContainerScaleUtils();
-        $("#assignments-container").css("opacity", "1");
     }
 }
 window.Priority = Priority;
