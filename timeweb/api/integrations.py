@@ -3,15 +3,16 @@ from django.shortcuts import redirect
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import gettext as _
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
-from common.views import logger
+from django.forms.models import model_to_dict
 
 # App stuff
 import common.utils as utils
 import timewebapp.utils as app_utils
 from timewebapp.models import TimewebModel
+from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 
 # Google API
 from google.oauth2.credentials import Credentials
@@ -30,11 +31,12 @@ from oauthlib.oauth2.rfc6749.errors import (
 )
 
 # Misc
-from django.utils.text import Truncator
 import re
 import os
 import datetime
 import json
+from common.views import logger
+from django.utils.text import Truncator
 
 MAX_DESCENDING_COURSEWORK_PAGE_SIZE = 15
 MAX_ASCENDING_COURSEWORK_PAGE_SIZE = 35
@@ -166,7 +168,7 @@ def update_gc_courses(request):
     credentials = Credentials.from_authorized_user_info(request.user.settingsmodel.oauth_token, settings.GC_SCOPES)
     if not credentials.valid:
         # rest this logic on create_gc_assignments, idrc if its invalid here
-        return HttpResponse(status=204)
+        return JsonResponse({"next": "continue"})
     service = build('classroom', 'v1', credentials=credentials, cache=MemoryCache())
     try:
         # .execute() also rarely leads to 503s which I expect may have been from a temporary outage
@@ -175,16 +177,16 @@ def update_gc_courses(request):
         return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
     # If connection to the server randomly dies (could happen locally when wifi is off)
     except (ServerNotFoundError, TimeoutError):
-        return HttpResponse(status=204)
+        return JsonResponse({"next": "continue"})
     except HttpError as e:
         if e.status_code == 429:
             # Ratelimited, don't care
-            return HttpResponse(status=204)
+            return JsonResponse({"next": "continue"})
         if e.status_code >= 500:
             # this happened one time:
             # googleapiclient.errors.HttpError: <HttpError 503 when requesting https://classroom.googleapis.com/v1/courses?alt=json returned "The service is currently unavailable.". Details: "The service is currently unavailable.">
             logger.error(e)
-            return HttpResponse(status=204)
+            return JsonResponse({"next": "continue"})
         raise e
     courses = courses.get('courses', [])
     old_courses = request.user.settingsmodel.gc_courses_cache
@@ -215,7 +217,7 @@ def update_gc_courses(request):
         # In this case, create_gc_assignments again
         if not set(course['id'] for course in new_courses).issubset(set(course['id'] for course in old_courses)):
             return create_gc_assignments(request, "descending")
-    return HttpResponse(status=200)
+    return JsonResponse({"next": "stop"})
 
 def simplify_courses(courses, include_name=True):
     return [{
@@ -243,7 +245,7 @@ def create_gc_assignments(request, order=None):
             return HttpResponse(gc_auth_enable(request, next_url="home", current_url="home"), status=302)
         # If connection to the server randomly dies (could happen locally when wifi is off)
         except TransportError:
-            return HttpResponse(status=204)
+            return JsonResponse({"next": "continue"})
         else:
             request.user.settingsmodel.oauth_token.update(json.loads(credentials.to_json()))
             request.user.settingsmodel.save()
@@ -453,10 +455,10 @@ def create_gc_assignments(request, order=None):
         # request.user.settingsmodel.save() is thread-safe, bulk_create runs directly
         # through the ORM is not
         # refer to the explanation in create_gc_assignments for more context
-        return HttpResponse(status=200)
+        return JsonResponse({"next": "stop"})
     cache.delete(concurrent_request_key)
     if not gc_model_data:
-        return HttpResponse(status=204)
+        return JsonResponse({"next": "continue"})
     static_gc_model_fields = {
         # from app
         "skew_ratio": request.user.settingsmodel.def_skew_ratio,
@@ -472,9 +474,10 @@ def create_gc_assignments(request, order=None):
         # y is missing
         "y": None,
     }
-    TimewebModel.objects.bulk_create(TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data)
     request.user.settingsmodel.save()
-    return HttpResponse(status=205)
+    created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data]
+    TimewebModel.objects.bulk_create(created)
+    return JsonResponse({"assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created], "next": "continue"})
 
 def generate_gc_authorization_url(request, *, next_url, current_url):
     flow = Flow.from_client_config(

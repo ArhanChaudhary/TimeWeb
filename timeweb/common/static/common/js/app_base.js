@@ -214,7 +214,6 @@ changeSetting: function(kwargs={}) {
     });
 },
 GCIntegrationError: function(jqXHR) {
-    sessionStorage.removeItem("ajaxs");
     if (jqXHR.status !== 302) return;
     const reauthorization_url = jqXHR.responseText;
     $.alert({
@@ -238,26 +237,37 @@ GCIntegrationError: function(jqXHR) {
     });
 },
 createGCAssignments: function() {
-    let ajaxs = JSON.parse(sessionStorage.getItem("ajaxs")) || [
+    const ajaxs = [
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "descending"}},
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
         {type: "POST", url: '/api/update-gc-courses'},
         {type: "POST", url: '/api/create-gc-assignments', data: {order: "ascending"}},
     ];
-    let ajaxCallback = function(response, textStatus, jqXHR={} /* in case .success is manually called if ajax is disabled */) {
+    let ajaxCallback = function(response) {
+        // indicates: this ajax means we have to terminate everything and
+        // restart the later queue from the beginning
+
+        // raised if:
+        // concurrent requests are made
+        // update-gc-courses doesn't add any new courses (saves last ajax)
+        if (response.next === "stop") return;
+
+        // indicates: this ajax means google classroom assignments were
+        // created
+        if (response.assignments) {
+            for (let sa of response.assignments) {
+                utils.initSA(sa);
+                dat.push(sa);
+            }
+            new Priority().sort();
+        }
+
         // indicates: this ajax didn't create any assignments, go to the next
         // ajax in ajaxs
-        if (jqXHR.status === 204) {
-            // If the last ajaxs ajax reloads, ajaxs in sessionStorage will be []
-            // .shift on an empty array returns undefined, which is truthy
-            // So, it won't redo all the ajaxs, eliminating the need for a
-            // request session to manually prevent the ajaxs from being redone
-            // aka the legacy variable CREATING_GC_ASSIGNMENTS_FROM_FRONTEND
+        if (response.next === "continue") {
             let ajax = ajaxs.shift();
-            if (!ajax) {
-                sessionStorage.removeItem("ajaxs");
-                return;
-            }
+            if (!ajax) return;
+
             $.ajax({
                 type: ajax.type,
                 url: ajax.url,
@@ -265,22 +275,9 @@ createGCAssignments: function() {
                 error: ajaxUtils.GCIntegrationError,
                 success: ajaxCallback,
             });
-        // indicates: this ajax means google classroom assignments were
-        // created
-        } else if (jqXHR.status === 205) {
-            sessionStorage.setItem("ajaxs", JSON.stringify(ajaxs));
-            reloadWhenAppropriate();
-        // indicates: this ajax means we have to terminate everything and
-        // restart the later queue from the beginning
-
-        // raised if:
-        // concurrent requests are made
-        // update-gc-courses doesn't add any new courses (saves last ajax)
-        } else if (jqXHR.status === 200) {
-            sessionStorage.removeItem("ajaxs");
         }
     }
-    ajaxCallback(undefined, undefined, {status: 204});
+    ajaxCallback({next: "continue"});
 },
 batchRequest: function(batchCallbackName, batchCallback, kwargs={}) {
     switch (batchCallbackName) {
