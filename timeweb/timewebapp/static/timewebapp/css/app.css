@@ -233,9 +233,9 @@ main.background-image-exists {
     --box-shadow-priority: inset 0 0 0 var(--priority-color-border-width) var(--priority-color);
 }
 /* do not remove the :not() thing from here i wasted an hour debugging because of this */
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .priority-color-strip,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .fancy-coloring,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly {
+.assignment-container:not(.animate-in, .animate-color) .assignment.transition-instantly .priority-color-strip,
+.assignment-container:not(.animate-in, .animate-color) .assignment.transition-instantly .fancy-coloring,
+.assignment-container:not(.animate-in, .animate-color) .assignment.transition-instantly {
     transition: none;
 }
 .assignment:not(.open-assignment):hover, .assignment:not(.open-assignment):focus {

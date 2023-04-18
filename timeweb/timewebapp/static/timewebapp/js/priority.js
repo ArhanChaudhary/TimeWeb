@@ -2,7 +2,7 @@
 class Priority {
     static ANIMATE_IN_DURATION = 1500 * SETTINGS.animation_speed;
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
-    static ANIMATE_IN_START_MARGIN = 120; // Moves #animate-in a bit below the last assignment to give it more breathing room
+    static ANIMATE_IN_START_MARGIN = 120; // Moves .animate-in a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 100;
     
     static DUE_DATE_PASSED = 12;
@@ -177,12 +177,8 @@ class Priority {
         dom_assignment.attr("data-assignment-id", sa.id);
 
         if (SETTINGS.enable_tutorial && sa.name === EXAMPLE_ASSIGNMENT_NAME) {
-
-
-            // dont use #animate-in as the reference, use is_example when implemented
-
-
-            assignment_container.attr("id", "animate-in");
+            // dont use .animate-in as the reference, use is_example when implemented
+            assignment_container.addClass("animate-in");
         }
 
         let tags = $();
@@ -1012,26 +1008,29 @@ class Priority {
             resolvers.forEach(resolver => resolver?.());
         }
         const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
-        $("#animate-in").css({
-            position: "",
-            top: Math.max(
-                // ensure assignments don't scroll from the top of the screen
-                // the below min parameter sets the assignment to the very bottom of your screen,
-                // no matter what
-                // this ensures that if the assignment is downwards from your scroll position,
-                // it won't be at the bottom of your screen and instead at the bottom
-                // of your assignments
-                Priority.ANIMATE_IN_START_MARGIN,
-                Math.min(
-                    // ensure assignments don't scroll from the bottom to the top too far
-                    window.innerHeight,
-                    last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
-                // subtract the offset top to get the actual top value
-                // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                // offset top and make that number its new top
-                ) - $("#animate-in").offset()?.top
-            ),
-            marginBottom: -$("#animate-in").outerHeight(),
+        $(".animate-in").each(function() {
+            const assignment_container = $(this);
+            assignment_container.css({
+                position: "",
+                top: Math.max(
+                    // ensure assignments don't scroll from the top of the screen
+                    // the below min parameter sets the assignment to the very bottom of your screen,
+                    // no matter what
+                    // this ensures that if the assignment is downwards from your scroll position,
+                    // it won't be at the bottom of your screen and instead at the bottom
+                    // of your assignments
+                    Priority.ANIMATE_IN_START_MARGIN,
+                    Math.min(
+                        // ensure assignments don't scroll from the bottom to the top too far
+                        window.innerHeight,
+                        last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
+                    // subtract the offset top to get the actual top value
+                    // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                    // offset top and make that number its new top
+                    ) - assignment_container.offset()?.top
+                ),
+                marginBottom: -assignment_container.outerHeight(),
+            });
         });
         assignment_to_scroll_to[0].scrollIntoView({
             behavior: 'smooth',
@@ -1039,7 +1038,7 @@ class Priority {
         });
         let scrollTimeout = setTimeout(_resolve, 200);
         $("#assignments-container").on("scroll.assignmentanimation", () => {
-            if ($("#animate-in").length)
+            if ($(".animate-in").length)
                 $("#extra-navs").hide();
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(_resolve, 200);
@@ -1195,17 +1194,17 @@ class Priority {
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
             new Promise(function(resolve) {
-                if (that.params.first_sort && assignment_container.is("#animate-color, #animate-in")) {
-                    assignment_container.filter("#animate-in").css({
+                if (that.params.first_sort && assignment_container.is(".animate-color, .animate-in")) {
+                    assignment_container.filter(".animate-in").css({
                         position: "absolute",
                         opacity: 0,
                     });
-                    // Since "#animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
+                    // Since ".animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                     // So, scroll to the next assignment instead
                     // Scroll to dom_assignment because of its scroll-margin
                     let assignment_to_scroll_to = that.assignments_to_sort.eq(that.priority_data_list[index + 1]?.index).children(".assignment");
-                    if (!assignment_to_scroll_to.length || assignment_container.is("#animate-color")) {
-                        // If "#animate-color" exists or "#animate-in" is the last assignment on the list, scroll to itself instead
+                    if (!assignment_to_scroll_to.length || assignment_container.hasClass("animate-color")) {
+                        // If ".animate-color" exists or ".animate-in" is the last assignment on the list, scroll to itself instead
                         assignment_to_scroll_to = dom_assignment;
                     }
                     $(window).one(SETTINGS.enable_tutorial ? 'animate-example-assignment' : 'load', function(e, triggered_resolve) {
@@ -1215,7 +1214,7 @@ class Priority {
                     resolve();
                 }
             }).then(function() {
-                if (assignment_container.is("#animate-in")) {
+                if (assignment_container.hasClass("animate-in")) {
                     // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
                     assignment_container.animate({
                         top: "0",
@@ -1223,7 +1222,7 @@ class Priority {
                         marginBottom: "0",
                     }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
                 }
-                // A jQuery animation isn't needed for the background of "#animate-color" because it is transitioned using css
+                // A jQuery animation isn't needed for the background of ".animate-color" because it is transitioned using css
                 if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
                     dom_assignment.css("--priority-color", "var(--color)");
                 } else {

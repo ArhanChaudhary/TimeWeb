@@ -897,7 +897,7 @@ tutorial: function() {
                         while (tutorial_alerts.length > 0) {
                             tutorial_alerts.pop();
                         }
-                        const assignment_container = $("#animate-in");
+                        const assignment_container = $(".animate-in");
                         const dom_assignment = assignment_container.children(".assignment");
                         const sa = utils.loadAssignmentData(dom_assignment);
 
@@ -937,7 +937,7 @@ tutorial: function() {
                     {
                         wait: 1500,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in > .assignment"),
+                            element: $(".animate-in > .assignment"),
                         }),
                     },
                     {
@@ -953,9 +953,9 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => {
-                            $("#animate-in > .assignment").focus().click();
+                            $(".animate-in > .assignment").focus().click();
                             utils.ui.overlayAround({
-                                element: $("#animate-in > .assignment"),
+                                element: $(".animate-in > .assignment"),
                                 margin: 10,
                                 duration: 800,
                             });
@@ -964,7 +964,7 @@ tutorial: function() {
                     {
                         wait: 2250,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in .graph"),
+                            element: $(".animate-in .graph"),
                             margin: 5,
                         }),
                     },
@@ -982,7 +982,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top + rect.height - 55,
                                     left: rect.left,
@@ -1008,7 +1008,7 @@ tutorial: function() {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
                             element: () => {
-                                const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                const rect = $(".animate-in .graph")[0].getBoundingClientRect();
                                 return {
                                     top: rect.top,
                                     left: rect.left,
@@ -1033,10 +1033,10 @@ tutorial: function() {
                         wait: 300,
                         do: () => {
                             utils.ui.overlayAround({
-                                element: $("#animate-in .graph"),
+                                element: $(".animate-in .graph"),
                                 margin: 5,
                             });
-                            $("#animate-in .fixed-graph").addClass("blur");
+                            $(".animate-in .fixed-graph").addClass("blur");
                         }
                     },
                     {
@@ -1054,7 +1054,7 @@ tutorial: function() {
                         do: () => {
                             utils.ui.overlayAround({
                                 element: () => {
-                                    const rect = $("#animate-in .graph")[0].getBoundingClientRect();
+                                    const rect = $(".animate-in .graph")[0].getBoundingClientRect();
                                     return {
                                         top: rect.top + rect.height - 51,
                                         left: rect.left + VisualAssignment.GRAPH_Y_AXIS_MARGIN + 9,
@@ -1065,7 +1065,7 @@ tutorial: function() {
                                 duration: 1250,
                                 margin: 20,
                             });
-                            $("#animate-in .fixed-graph").removeClass("blur");
+                            $(".animate-in .fixed-graph").removeClass("blur");
                         }
                     },
                     {
@@ -1081,7 +1081,7 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in .tick-button").parent(),
+                            element: $(".animate-in .tick-button").parent(),
                             margin: 0,
                             duration: 1500,
                         }),
@@ -1099,14 +1099,14 @@ tutorial: function() {
                     {
                         wait: 300,
                         do: () => utils.ui.overlayAround({
-                            element: $("#animate-in > .assignment"),
+                            element: $(".animate-in > .assignment"),
                             margin: 10,
                             duration: 900,
                         }),
                     },
                     {
                         wait: 1500,
-                        do: () => $("#animate-in .tick-button").click(),
+                        do: () => $(".animate-in .tick-button").click(),
                     },
                     {
                         wait: 1750,

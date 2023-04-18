@@ -53,8 +53,8 @@ select {
 .assignment-header-button:focus, .assignment-header-button:hover {
     --background-color: rgb(86, 116, 129);
 }
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .left-side-of-header,
-.assignment-container:not(#animate-in, #animate-color) .assignment.transition-instantly .left-side-of-header a {
+.assignment-container:not(.animate-in, .animate-color) .assignment.transition-instantly .left-side-of-header,
+.assignment-container:not(.animate-in, .animate-color) .assignment.transition-instantly .left-side-of-header a {
     transition: none;
 }
 .left-side-of-header.fancy-coloring, .left-side-of-header.fancy-coloring a {
