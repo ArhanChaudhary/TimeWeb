@@ -647,6 +647,7 @@ class Priority {
             url: "/api/delete-assignment",
             data: {assignments: JSON.stringify([...starred_assignment_ids_to_delete_after_sorting])},
             success: success,
+            fakeSuccessArguments: [],
             error: ajaxUtils.error,
         });
     }
@@ -724,6 +725,7 @@ class Priority {
                                 url: "/api/delete-assignment",
                                 data: {assignments: JSON.stringify(assignment_ids_to_delete)},
                                 success: success,
+                                fakeSuccessArguments: [],
                                 error: ajaxUtils.error,
                             });
                         }

@@ -922,6 +922,7 @@ class Crud {
                 url: "/api/restore-assignment",
                 data: {assignments: JSON.stringify([sa.id])},
                 success: success,
+                fakeSuccessArguments: [],
                 error: function() {
                     dom_assignment.removeClass("assignment-is-deleting");
                     ajaxUtils.error.bind(this)(...arguments);
@@ -934,6 +935,7 @@ class Crud {
                 url: "/api/delete-assignment",
                 data: {assignments: JSON.stringify([sa.id]), actually_delete: VIEWING_DELETED_ASSIGNMENTS},
                 success: success,
+                fakeSuccessArguments: [],
                 error: function() {
                     dom_assignment.removeClass("assignment-is-deleting");
                     ajaxUtils.error.bind(this)(...arguments);

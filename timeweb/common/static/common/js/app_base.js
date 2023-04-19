@@ -7,8 +7,9 @@ document.addEventListener("DOMContentLoaded", function() {
         },
     });
     $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+        assert(!("success" in options) || "fakeSuccessArguments" in options);
         if (ajaxUtils?.disable_ajax) {
-            options.success?.();
+            options.success?.(...options.fakeSuccessArguments);
             jqXHR.abort();
             return;
         }
@@ -275,6 +276,7 @@ createGCAssignments: function() {
                 data: ajax.data,
                 error: ajaxUtils.GCIntegrationError,
                 success: ajaxCallback,
+                fakeSuccessArguments: [{next: "stop"}],
             });
         }
     }

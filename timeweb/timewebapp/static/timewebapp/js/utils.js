@@ -319,6 +319,7 @@ setClickHandlers: {
             url: "/api/delete-assignment",
             data: {assignments: JSON.stringify(assignment_ids_to_delete)},
             success: success,
+            fakeSuccessArguments: [],
             error: ajaxUtils.error,
         });
     },
@@ -393,6 +394,7 @@ setClickHandlers: {
             url: "/api/delete-assignment",
             data: {assignments: JSON.stringify(assignment_ids_to_delete)},
             success: success,
+            fakeSuccessArguments: [],
             error: ajaxUtils.error,
         });
     },
@@ -913,6 +915,7 @@ tutorial: function() {
                                 // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
                                 new Priority().sort();
                             },
+                            fakeSuccessArguments: [],
                             // no error, fail silently
                         });
                     }
