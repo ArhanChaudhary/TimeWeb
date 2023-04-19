@@ -2,7 +2,7 @@
 class Priority {
     static ANIMATE_IN_DURATION = 1500 * SETTINGS.animation_speed;
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
-    static ANIMATE_IN_START_MARGIN = 120; // Moves .animate-in a bit below the last assignment to give it more breathing room
+    static ANIMATE_IN_START_MARGIN = 120; // Move just_created a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 100;
     
     static DUE_DATE_PASSED = 12;
@@ -176,9 +176,9 @@ class Priority {
         }
         dom_assignment.attr("data-assignment-id", sa.id);
 
+        // use is_example when implemented
         if (SETTINGS.enable_tutorial && sa.name === EXAMPLE_ASSIGNMENT_NAME) {
-            // dont use .animate-in as the reference, use is_example when implemented
-            assignment_container.addClass("animate-in");
+            sa.just_created = true;
         }
 
         let tags = $();
@@ -1003,6 +1003,7 @@ class Priority {
         utils.ui.tickClock();
     }
     static scrollBeforeAssignmentAnimation(resolvers, assignment_to_scroll_to) {
+        $("#extra-navs").hide();
         function _resolve() {
             $("#assignments-container").off('scroll.assignmentanimation');
             resolvers.forEach(resolver => resolver?.());
@@ -1011,10 +1012,9 @@ class Priority {
             behavior: 'smooth',
             block: 'nearest',
         });
+
         let scrollTimeout = setTimeout(_resolve, 200);
         $("#assignments-container").on("scroll.assignmentanimation", () => {
-            if ($(".animate-in").length)
-                $("#extra-navs").hide();
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(_resolve, 200);
         });
@@ -1150,9 +1150,10 @@ class Priority {
         let first_available_tutorial_assignment;
         $(".delete-gc-assignments-from-class, .autofill-work-done, .delete-starred-assignments, .delete-due-date-passed-assignments").remove();
         $(".first-add-line-wrapper, .last-add-line-wrapper").removeClass("first-add-line-wrapper last-add-line-wrapper");
-        for (let [index, priority_data] of that.priority_data_list.entries()) {
+        for (const priority_data of that.priority_data_list) {
             const assignment_container = that.assignments_to_sort.eq(priority_data.index);
             const dom_assignment = assignment_container.children(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
 
             if (!first_available_tutorial_assignment_fallback) {
                 first_available_tutorial_assignment_fallback = dom_assignment;
@@ -1168,23 +1169,26 @@ class Priority {
             const dom_title = dom_assignment.find(".title");
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
 
+            const is_animate_color = assignment_container.hasClass("animate-color");
+            const just_created_cache = sa.just_created;
             new Promise(function(resolve) {
-                if (that.params.first_sort && assignment_container.is(".animate-color, .animate-in")) {
-                    assignment_container.filter(".animate-in").css({
-                        position: "absolute",
-                        opacity: 0,
-                    });
-                    // Since ".animate-in" will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
+                if (that.params.first_sort && (sa.just_created || is_animate_color)) {
+                    if (sa.just_created)
+                        assignment_container.css({
+                            position: "absolute",
+                            opacity: 0,
+                        });
+                    // Since just_created will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
                     // So, scroll to the next assignment instead
                     // Scroll to dom_assignment because of its scroll-margin
                     let assignment_to_scroll_to = that.assignments_to_sort.eq(that.priority_data_list[index + 1]?.index).children(".assignment");
-                    if (!assignment_to_scroll_to.length || assignment_container.hasClass("animate-color")) {
-                        // If ".animate-color" exists or ".animate-in" is the last assignment on the list, scroll to itself instead
+                    if (!assignment_to_scroll_to.length || is_animate_color) {
+                        // If ".animate-color" exists or just_created is the last assignment on the list, scroll to itself instead
                         assignment_to_scroll_to = dom_assignment;
                     }
                     $(window).one(SETTINGS.enable_tutorial ? 'animate-example-assignment' : 'load', function(e, triggered_resolve) {
                         const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
-                        if (assignment_container.hasClass("animate-in")) {
+                        if (just_created_cache) {
                             // this needs to be included here are not at the resolver because assignment_to_scroll_to might be assignment_container itself
                             // and the positioning wont be correct
                             assignment_container.css({
@@ -1215,7 +1219,7 @@ class Priority {
                     resolve();
                 }
             }).then(function() {
-                if (assignment_container.hasClass("animate-in")) {
+                if (just_created_cache) {
                     // Don't make this a CSS animation because margin-bottom is used a lot on .assignment-container and it's easier if it doesn't have a css transition
                     assignment_container.animate({
                         top: "0",

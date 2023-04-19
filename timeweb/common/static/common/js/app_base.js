@@ -257,6 +257,7 @@ createGCAssignments: function() {
         if (response.assignments) {
             for (let sa of response.assignments) {
                 utils.initSA(sa);
+                sa.just_created = true;
                 dat.push(sa);
             }
             new Priority().sort();
