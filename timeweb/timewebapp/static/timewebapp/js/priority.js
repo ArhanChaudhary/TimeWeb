@@ -1294,6 +1294,9 @@ class Priority {
         if (!that.params.first_sort && that.assignments_to_sort.length <= SETTINGS.sorting_animation_threshold)
             that.assignments_to_sort.each(function(i) {
                 const assignment_container = $(this);
+                const dom_assignment = assignment_container.children(".assignment");
+                const sa = utils.loadAssignmentData(dom_assignment);
+
                 const initial_height = tops[i];
                 let current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned MATRIX_ENDS_WEIGHT
                 // Assignments can move while this is being executed; current_translate_value becomes old inaccurate
@@ -1303,14 +1306,16 @@ class Priority {
                 const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
                 const transform_value = initial_height - final_height;
                 assignment_container.removeAttr("data-initial-top-offset");
-                assignment_container.addClass("transform-instantly")
-                        .css("transform", `translateY(${transform_value}px)`)
-                        [0].offsetHeight;
-                assignment_container.removeClass("transform-instantly")
-                        .css({
-                            transform: "",
-                            transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
-                        });
+                if (sa.id in that.existing_ids) {
+                    assignment_container.addClass("transform-instantly");
+                    assignment_container.css("transform", `translateY(${transform_value}px)`);
+                    assignment_container[0].offsetHeight;
+                    assignment_container.removeClass("transform-instantly")
+                }
+                assignment_container.css({
+                    transform: "",
+                    transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
+                });
             });
 
 		that.updateInfoHeader();
