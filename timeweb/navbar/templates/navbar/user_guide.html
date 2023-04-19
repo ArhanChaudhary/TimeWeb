@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{% static 'navbar/css/user_guide.css' %}">
 {% endblock %}
 
+{% block _js %}
+    {{ default_settings|json_script:"default-settings" }}
+{% endblock %}
 
 {% url 'example' as example %}
 
@@ -126,7 +129,7 @@ the span groups the major and minor categories together for user_guide.js
         An optional minimum amount of time you will work on this assignment for all of its working days.
     </p>
     <p>
-        This input's default of 15 minutes can be changed in the settings.
+        This input's default of <span data-default-setting="def_min_work_time"></span> minutes can be changed in the settings.
     </p>
     <div class="minor-category" id="advanced-assignment-form-inputs">
 		Advanced inputs

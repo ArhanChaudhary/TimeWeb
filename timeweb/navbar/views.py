@@ -139,6 +139,9 @@ class UserguideView(TimewebGenericView):
     template_name = "navbar/user_guide.html"
     
     def get(self, request):
+        self.context['default_settings'] = model_to_dict(SettingsForm().save(commit=False),
+                            exclude=[*SettingsForm.Meta.exclude, # SettingsForm already excludes these fields but saving the field to a model adds them back
+                            *EXCLUDE_FROM_DEFAULT_SETTINGS_FIELDS])
         self.context['add_faq'] = True
         return super().get(request)
 
