@@ -1007,31 +1007,6 @@ class Priority {
             $("#assignments-container").off('scroll.assignmentanimation');
             resolvers.forEach(resolver => resolver?.());
         }
-        const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
-        $(".animate-in").each(function() {
-            const assignment_container = $(this);
-            assignment_container.css({
-                position: "",
-                top: Math.max(
-                    // ensure assignments don't scroll from the top of the screen
-                    // the below min parameter sets the assignment to the very bottom of your screen,
-                    // no matter what
-                    // this ensures that if the assignment is downwards from your scroll position,
-                    // it won't be at the bottom of your screen and instead at the bottom
-                    // of your assignments
-                    Priority.ANIMATE_IN_START_MARGIN,
-                    Math.min(
-                        // ensure assignments don't scroll from the bottom to the top too far
-                        window.innerHeight,
-                        last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
-                    // subtract the offset top to get the actual top value
-                    // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                    // offset top and make that number its new top
-                    ) - assignment_container.offset()?.top
-                ),
-                marginBottom: -assignment_container.outerHeight(),
-            });
-        });
         assignment_to_scroll_to[0].scrollIntoView({
             behavior: 'smooth',
             block: 'nearest',
@@ -1208,6 +1183,32 @@ class Priority {
                         assignment_to_scroll_to = dom_assignment;
                     }
                     $(window).one(SETTINGS.enable_tutorial ? 'animate-example-assignment' : 'load', function(e, triggered_resolve) {
+                        const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
+                        if (assignment_container.hasClass("animate-in")) {
+                            // this needs to be included here are not at the resolver because assignment_to_scroll_to might be assignment_container itself
+                            // and the positioning wont be correct
+                            assignment_container.css({
+                                position: "",
+                                top: Math.max(
+                                    // ensure assignments don't scroll from the top of the screen
+                                    // the below min parameter sets the assignment to the very bottom of your screen,
+                                    // no matter what
+                                    // this ensures that if the assignment is downwards from your scroll position,
+                                    // it won't be at the bottom of your screen and instead at the bottom
+                                    // of your assignments
+                                    Priority.ANIMATE_IN_START_MARGIN,
+                                    Math.min(
+                                        // ensure assignments don't scroll from the bottom to the top too far
+                                        window.innerHeight,
+                                        last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
+                                    // subtract the offset top to get the actual top value
+                                    // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                                    // offset top and make that number its new top
+                                    ) - assignment_container.offset()?.top
+                                ),
+                                marginBottom: -assignment_container.outerHeight(),
+                            });
+                        }
                         Priority.scrollBeforeAssignmentAnimation([resolve, triggered_resolve], assignment_to_scroll_to);
                     });
                 } else {
