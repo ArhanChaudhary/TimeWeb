@@ -1151,7 +1151,12 @@ class Priority {
                 Priority.UNFINISHED_FOR_TODAY_AND_DUE_TODAY
             ].includes(priority_data.status_value);
             const dom_title = dom_assignment.find(".title");
+
+            const old_add_priority_percentage = !!dom_title.attr("data-priority");
             dom_title.attr("data-priority", add_priority_percentage ? `Priority: ${priority_percentage}%` : "");
+            if (old_add_priority_percentage !== add_priority_percentage && sa.id in that.existing_ids) {
+                new VisualAssignment(dom_assignment).positionTags();
+            }
 
             const is_animate_color = assignment_container.hasClass("animate-color");
             const just_created_cache = sa.just_created;
