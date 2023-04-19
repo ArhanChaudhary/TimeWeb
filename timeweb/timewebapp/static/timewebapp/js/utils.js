@@ -1604,15 +1604,34 @@ document.addEventListener("DOMContentLoaded", function() {
             utils.ui.setClickHandlers.tickButtons();
             utils.ui.setClickHandlers.assignmentSorting();
         }
+        let resizeTimeout;
         $(window).on("resize", function() {
-            $(".assignment").each(function() {
-                const dom_assignment = $(this);
-                utils.ui.setAssignmentScaleUtils(dom_assignment);
-                const sa = new VisualAssignment(dom_assignment);
-                sa.positionTags();
-                sa.makeGCAnchorVisible();
-            });
-            utils.ui.setAssignmentsContainerScaleUtils();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                const $assignment = $(".assignment");
+                const sas = new Array($assignment.length);
+                sas.fill(undefined);
+                Object.seal(sas);
+                // yes, this is faster
+                $assignment.each(function(i) {
+                    const dom_assignment = $(this);
+                    const sa = new VisualAssignment(dom_assignment);
+                    sas[i] = sa;
+                });
+                $assignment.each(function(i) {
+                    const sa = sas[i];
+                    utils.ui.setAssignmentScaleUtils(sa.dom_assignment);
+                });
+                $assignment.each(function(i) {
+                    const sa = sas[i];
+                    sa.positionTags();
+                });
+                $assignment.each(function(i) {
+                    const sa = sas[i];
+                    sa.makeGCAnchorVisible();
+                });
+                utils.ui.setAssignmentsContainerScaleUtils();
+            }, 250);
         });
         utils.ui.addTagHandlers();
         utils.ui.setAnimationSpeed();
