@@ -911,7 +911,7 @@ tutorial: function() {
                                 dom_assignment.removeClass("assignment-is-closing open-assignment");
                                 dat = dat.filter(_sa => _sa.id !== sa.id);
                                 // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-                                new Priority().sort({ dont_swap: true });
+                                new Priority().sort();
                             },
                             // no error, fail silently
                         });

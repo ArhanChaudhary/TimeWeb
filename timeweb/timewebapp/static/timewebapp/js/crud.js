@@ -890,7 +890,7 @@ class Crud {
                 if (i === $dom_assignment.length - 1) {
                     dat = dat.filter(sa => !ids.has(sa.id));
                     // Although nothing needs to be swapped, new Priority().sort() still needs to be run to recolor and prioritize assignments and place shortcuts accordingly
-                    new Priority().sort({ dont_swap: true });
+                    new Priority().sort();
                 }
             }
             
