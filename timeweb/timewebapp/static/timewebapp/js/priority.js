@@ -23,6 +23,7 @@ class Priority {
         const that = this;
         that.due_date_incremented_notices = [];
         that.priority_data_list = [];
+        that.scroll_assignment_animation_resolvers = [];
         that.total_completion_time = 0;
         that.today_total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
@@ -1004,7 +1005,6 @@ class Priority {
             $("#currently-has-changed-notice").remove();
         utils.ui.tickClock();
     }
-    static scroll_assignment_animation_resolvers = []
     sortDeletedAssignmentsView() {
         const that = this;
 
@@ -1164,7 +1164,7 @@ class Priority {
             const just_created_cache = sa.just_created;
             new Promise(function(resolve) {
                 if (sa.just_created || is_animate_color) {
-                    Priority.scroll_assignment_animation_resolvers.push(resolve);
+                    that.scroll_assignment_animation_resolvers.push(resolve);
                 } else {
                     resolve();
                 }
@@ -1354,7 +1354,7 @@ class Priority {
                 delete sa.just_created;
             }
         }
-        if (Priority.scroll_assignment_animation_resolvers.length) {
+        if (that.scroll_assignment_animation_resolvers.length) {
             $("#extra-navs").hide();
             assignment_container_to_scroll_to.children(".assignment")[0].scrollIntoView({
                 behavior: 'smooth',
@@ -1366,8 +1366,8 @@ class Priority {
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(function() {
                     $("#assignments-container").off('scroll.assignmentanimation');
-                    while (Priority.scroll_assignment_animation_resolvers.length)
-                        Priority.scroll_assignment_animation_resolvers.shift()();
+                    while (that.scroll_assignment_animation_resolvers.length)
+                        that.scroll_assignment_animation_resolvers.shift()();
                 }, 200);
             }).trigger("scroll.assignmentanimation");
         }
