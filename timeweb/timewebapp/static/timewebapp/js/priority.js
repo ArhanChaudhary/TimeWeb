@@ -1002,23 +1002,7 @@ class Priority {
             $("#currently-has-changed-notice").remove();
         utils.ui.tickClock();
     }
-    static scrollBeforeAssignmentAnimation(resolvers, assignment_to_scroll_to) {
-        $("#extra-navs").hide();
-        function _resolve() {
-            $("#assignments-container").off('scroll.assignmentanimation');
-            resolvers.forEach(resolver => resolver?.());
-        }
-        assignment_to_scroll_to[0].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-        });
-
-        let scrollTimeout = setTimeout(_resolve, 200);
-        $("#assignments-container").on("scroll.assignmentanimation", () => {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(_resolve, 200);
-        });
-    }
+    static scroll_assignment_animation_resolvers = []
     sortDeletedAssignmentsView() {
         const that = this;
 
@@ -1172,49 +1156,8 @@ class Priority {
             const is_animate_color = assignment_container.hasClass("animate-color");
             const just_created_cache = sa.just_created;
             new Promise(function(resolve) {
-                if (that.params.first_sort && (sa.just_created || is_animate_color)) {
-                    if (sa.just_created)
-                        assignment_container.css({
-                            position: "absolute",
-                            opacity: 0,
-                        });
-                    // Since just_created will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
-                    // So, scroll to the next assignment instead
-                    // Scroll to dom_assignment because of its scroll-margin
-                    let assignment_to_scroll_to = that.assignments_to_sort.eq(that.priority_data_list[index + 1]?.index).children(".assignment");
-                    if (!assignment_to_scroll_to.length || is_animate_color) {
-                        // If ".animate-color" exists or just_created is the last assignment on the list, scroll to itself instead
-                        assignment_to_scroll_to = dom_assignment;
-                    }
-                    $(window).one(SETTINGS.enable_tutorial ? 'animate-example-assignment' : 'load', function(e, triggered_resolve) {
-                        const last_visual_assignment = utils.flexboxOrderQuery(".assignment-container").last();
-                        if (just_created_cache) {
-                            // this needs to be included here are not at the resolver because assignment_to_scroll_to might be assignment_container itself
-                            // and the positioning wont be correct
-                            assignment_container.css({
-                                position: "",
-                                top: Math.max(
-                                    // ensure assignments don't scroll from the top of the screen
-                                    // the below min parameter sets the assignment to the very bottom of your screen,
-                                    // no matter what
-                                    // this ensures that if the assignment is downwards from your scroll position,
-                                    // it won't be at the bottom of your screen and instead at the bottom
-                                    // of your assignments
-                                    Priority.ANIMATE_IN_START_MARGIN,
-                                    Math.min(
-                                        // ensure assignments don't scroll from the bottom to the top too far
-                                        window.innerHeight,
-                                        last_visual_assignment.offset().top + last_visual_assignment.height() + Priority.ANIMATE_IN_START_MARGIN
-                                    // subtract the offset top to get the actual top value
-                                    // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                                    // offset top and make that number its new top
-                                    ) - assignment_container.offset()?.top
-                                ),
-                                marginBottom: -assignment_container.outerHeight(),
-                            });
-                        }
-                        Priority.scrollBeforeAssignmentAnimation([resolve, triggered_resolve], assignment_to_scroll_to);
-                    });
+                if (sa.just_created || is_animate_color) {
+                    Priority.scroll_assignment_animation_resolvers.push(resolve);
                 } else {
                     resolve();
                 }
@@ -1337,6 +1280,90 @@ class Priority {
             sa.positionTags();
             sa.makeGCAnchorVisible();
         });
+
+        let last_visual_assignment_bottom;
+        let assignment_container_to_scroll_to;
+
+        // another tops for
+        let tops2 = new Array(that.priority_data_list.length);
+        tops2.fill(undefined);
+        Object.seal(tops2);
+
+        for (let i = 0; i < that.priority_data_list.length; i++) {
+            const priority_data = that.priority_data_list[i];
+            const assignment_container = that.assignments_to_sort.eq(priority_data.index);
+            const dom_assignment = assignment_container.children(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
+
+            tops2[i] = assignment_container.offset().top;
+
+            const is_animate_color = assignment_container.hasClass("animate-color");
+            if (!assignment_container_to_scroll_to && (sa.just_created || is_animate_color)) {
+                // Since sa.just_created will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
+                // So, scroll to the next assignment instead
+                // Scroll to dom_assignment because of its scroll-margin
+                assignment_container_to_scroll_to = that.assignments_to_sort.eq(that.priority_data_list[i + 1]?.index);
+                if (!assignment_container_to_scroll_to.length || assignment_container.hasClass("animate-color")) {
+                    // If ".animate-color" exists or sa.just_created is the last assignment on the list, scroll to itself instead
+                    assignment_container_to_scroll_to = assignment_container;
+                }
+            }
+        }
+        for (let i = that.priority_data_list.length - 1; i >= 0; i--) {
+            const priority_data = that.priority_data_list[i];
+            const assignment_container = that.assignments_to_sort.eq(priority_data.index);
+            const dom_assignment = assignment_container.children(".assignment");
+            const sa = utils.loadAssignmentData(dom_assignment);
+
+            if (!last_visual_assignment_bottom && !sa.just_created) {
+                const last_visual_assignment = assignment_container;
+                last_visual_assignment_bottom = last_visual_assignment.offset().top + last_visual_assignment.height();
+            }
+
+            if (sa.just_created) {
+                // this needs to be included before the resolver because assignment_container_to_scroll_to might be assignment_container itself
+                // and the positioning wont be correct
+                assignment_container.css({
+                    top: Math.max(
+                        // ensure assignments don't scroll from the top of the screen
+                        // the below min parameter sets the assignment to the very bottom of your screen,
+                        // no matter what
+                        // this ensures that if the assignment is downwards from your scroll position,
+                        // it won't be at the bottom of your screen and instead at the bottom
+                        // of your assignments
+                        Priority.ANIMATE_IN_START_MARGIN,
+                        Math.min(
+                            // ensure assignments don't scroll from the bottom to the top too far
+                            window.innerHeight,
+                            last_visual_assignment_bottom + Priority.ANIMATE_IN_START_MARGIN
+                        // subtract the offset top to get the actual top value
+                        // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                        // offset top and make that number its new top
+                        ) - tops2[i]
+                    ),
+                    marginBottom: -assignment_container.outerHeight(),
+                    opacity: 0,
+                });
+                delete sa.just_created;
+            }
+        }
+        if (Priority.scroll_assignment_animation_resolvers.length) {
+            $("#extra-navs").hide();
+            assignment_container_to_scroll_to.children(".assignment")[0].scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+            });
+
+            let scrollTimeout;
+            $("#assignments-container").on("scroll.assignmentanimation", () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    $("#assignments-container").off('scroll.assignmentanimation');
+                    while (Priority.scroll_assignment_animation_resolvers.length)
+                        Priority.scroll_assignment_animation_resolvers.shift()();
+                }, 200);
+            }).trigger("scroll.assignmentanimation");
+        }
         utils.ui.setAssignmentsContainerScaleUtils();
     }
 }
