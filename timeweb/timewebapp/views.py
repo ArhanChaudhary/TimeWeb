@@ -39,7 +39,7 @@ EXAMPLE_ASSIGNMENT = {
 # needs to be down here due to circular imports
 from .forms import TimewebForm
 from navbar.forms import SettingsForm
-DELETED_ASSIGNMENTS_PER_PAGE = 70
+DELETED_ASSIGNMENTS_PER_PAGE = 50
 
 INCLUDE_IN_SETTINGS_MODEL_JSON_SCRIPT = (
     'immediately_delete_completely_finished_assignments', 'def_min_work_time', 'def_break_days',
