@@ -4,7 +4,9 @@ from django.urls import resolve
 from django.core.exceptions import RequestDataTooBig
 from django.utils import timezone
 
-from .urls import EXCLUDE_FROM_UPDATING_STATE
+from .urls import EXCLUDE_FROM_UPDATING_STATE, CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION
+
+import json
 
 class APIValidationMiddleware:
     def __init__(self, get_response):
@@ -40,6 +42,9 @@ class APIValidationMiddleware:
         res = self.get_response(request)
         if resolved.url_name in EXCLUDE_FROM_UPDATING_STATE:
             return res
+        if resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION:
+            if resolved.url_name == "create_gc_assignments" and "assignments" not in json.loads(res.content.decode('ascii')):
+                return res
         request.user.settingsmodel.device_uuid = device_uuid
         request.user.settingsmodel.device_uuid_api_timestamp = timezone.now()
         request.user.settingsmodel.save()

@@ -13,8 +13,6 @@ urlpatterns = [
 ]
 INCLUDE_IN_STATE_EVALUATION = ("delete_assignment", "restore_assignment", "save_assignment", 
     "change_setting", )
-EXCLUDE_FROM_UPDATING_STATE = ("evaluate_changed_state", "update_gc_courses", "gc_auth_callback",
-    # if you reload twice really fast the first api call can update the 
-    # api state and display the outdated assignments message
-    "create_gc_assignments", )
-assert len(INCLUDE_IN_STATE_EVALUATION) + len(EXCLUDE_FROM_UPDATING_STATE) == len(urlpatterns), "update this"
+CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION = ("create_gc_assignments", )
+EXCLUDE_FROM_UPDATING_STATE = ("evaluate_changed_state", "update_gc_courses", "gc_auth_callback", )
+assert len(INCLUDE_IN_STATE_EVALUATION) + len(CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION) + len(EXCLUDE_FROM_UPDATING_STATE) == len(urlpatterns), "update this"
