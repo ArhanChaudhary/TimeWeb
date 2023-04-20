@@ -215,7 +215,7 @@ class Crud {
         Crud.alerted_early_due_time = true;
 
         $.alert({
-            title: "Your due time is early.",
+            title: `Your due time of ${picker.startDate.format("h:mm A")} is early.`,
             content: "TimeWeb assigns work past midnight for assignments due in the morning. To avoid this, set the due time to midnight.",
             backgroundDismiss: false,
             buttons: {
