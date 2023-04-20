@@ -1356,20 +1356,35 @@ class Priority {
         }
         if (that.scroll_assignment_animation_resolvers.length) {
             $("#extra-navs").hide();
-            assignment_container_to_scroll_to.children(".assignment")[0].scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-            });
 
-            let scrollTimeout;
-            $("#assignments-container").on("scroll.assignmentanimation", () => {
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(function() {
-                    $("#assignments-container").off('scroll.assignmentanimation');
-                    while (that.scroll_assignment_animation_resolvers.length)
-                        that.scroll_assignment_animation_resolvers.shift()();
-                }, 200);
-            }).trigger("scroll.assignmentanimation");
+            const dom_assignment_to_scroll_to = assignment_container_to_scroll_to.children(".assignment");
+            const rect = dom_assignment_to_scroll_to[0].getBoundingClientRect();
+            const scroll_margin_top = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-top"));
+            const scroll_margin_bottom = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-bottom"));
+            const on_screen = rect.top > scroll_margin_top && rect.top + rect.height + scroll_margin_bottom < window.innerHeight;
+
+            new Promise(function(resolve) {
+                if (on_screen) {
+                    resolve();
+                    return;
+                }
+                dom_assignment_to_scroll_to[0].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                });
+                let scrollTimeout;
+                $("#assignments-container").on("scroll.assignmentanimation", () => {
+                    clearTimeout(scrollTimeout);
+                    // skip settimeout if already in view
+                    scrollTimeout = setTimeout(function() {
+                        $("#assignments-container").off('scroll.assignmentanimation');
+                        resolve();
+                    }, 200);
+                }).trigger("scroll.assignmentanimation");
+            }).then(function() {
+                while (that.scroll_assignment_animation_resolvers.length)
+                    that.scroll_assignment_animation_resolvers.shift()();
+            });
         }
         utils.ui.setAssignmentsContainerScaleUtils();
     }
