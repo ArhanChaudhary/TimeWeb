@@ -1288,7 +1288,6 @@ class Priority {
             sa.makeGCAnchorVisible();
         });
 
-        let last_visual_assignment_bottom;
         let assignment_container_to_scroll_to;
 
         // another tops for
@@ -1316,20 +1315,19 @@ class Priority {
                 }
             }
         }
-        for (let i = that.priority_data_list.length - 1; i >= 0; i--) {
+        const last_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[that.priority_data_list.length - 1].index);
+        const last_assignment_container_bottom = tops2[tops2.length - 1] + last_assignment_container.height();
+        let previous_margin_bottoms = 0;
+        for (let i = 0; i < that.priority_data_list.length; i++) {
             const priority_data = that.priority_data_list[i];
             const assignment_container = that.assignments_to_sort.eq(priority_data.index);
             const dom_assignment = assignment_container.children(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
 
-            if (!last_visual_assignment_bottom && !sa.just_created) {
-                const last_visual_assignment = assignment_container;
-                last_visual_assignment_bottom = last_visual_assignment.offset().top + last_visual_assignment.height();
-            }
-
             if (sa.just_created) {
                 // this needs to be included before the resolver because assignment_container_to_scroll_to might be assignment_container itself
                 // and the positioning wont be correct
+                const margin_bottom = assignment_container.outerHeight();
                 assignment_container.css({
                     top: Math.max(
                         // ensure assignments don't scroll from the top of the screen
@@ -1342,15 +1340,16 @@ class Priority {
                         Math.min(
                             // ensure assignments don't scroll from the bottom to the top too far
                             window.innerHeight,
-                            last_visual_assignment_bottom + Priority.ANIMATE_IN_START_MARGIN
+                            last_assignment_container_bottom + Priority.ANIMATE_IN_START_MARGIN
                         // subtract the offset top to get the actual top value
                         // eg if we want this to be at 500px from the top of the screen, subtract its existing
                         // offset top and make that number its new top
                         ) - tops2[i]
-                    ),
-                    marginBottom: -assignment_container.outerHeight(),
+                    ) + previous_margin_bottoms,
+                    marginBottom: -margin_bottom,
                     opacity: 0,
                 });
+                previous_margin_bottoms += margin_bottom;
                 delete sa.just_created;
             }
         }
