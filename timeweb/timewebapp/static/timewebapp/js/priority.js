@@ -538,6 +538,7 @@ class Priority {
             }
 
             let {str_daysleft, long_str_daysleft, mobile_str_daysleft} = Priority.generateDaysleftMessages(sa, complete_date_now, hard_due_date_passed);
+            // make sure to appropriately modify sortDeletedAssignments if attributes are added or removed to dom_title
             dom_title.attr("data-daysleft", str_daysleft);
             dom_title.attr("data-long-daysleft", long_str_daysleft);
             dom_title.attr("data-mobile-daysleft", mobile_str_daysleft);
@@ -1031,6 +1032,7 @@ class Priority {
             const dom_title = dom_assignment.find(".title");
             dom_title.attr("data-daysleft", str_daysleft);
             dom_title.attr("data-long-daysleft", long_str_daysleft);
+            dom_title.attr("data-mobile-daysleft", str_daysleft);
         });
 
         if (VIEWING_DELETED_ASSIGNMENTS) {
