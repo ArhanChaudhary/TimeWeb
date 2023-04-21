@@ -477,7 +477,11 @@ def create_gc_assignments(request, order=None):
     request.user.settingsmodel.save()
     created = [TimewebModel(**assignment | static_gc_model_fields) for assignment in gc_model_data]
     TimewebModel.objects.bulk_create(created)
-    return JsonResponse({"assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created], "next": "continue"})
+    return JsonResponse({
+        "assignments": [model_to_dict(i, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT) for i in created],
+        "update_state": True,
+        "next": "continue",
+    })
 
 def generate_gc_authorization_url(request, *, next_url, current_url):
     flow = Flow.from_client_config(
