@@ -1352,7 +1352,7 @@ main.finished-header-transition #extra-navs {
         --negative-horizontal-margin: -9px;
     }
     .assignment-header > :nth-last-child(2) {
-        --assignment-header-text-right-margin: 10px;
+        --assignment-header-text-right-margin: 15px;
     }
     .assignment-header-button {
         margin-left: 0px;
