@@ -1249,8 +1249,14 @@ class Priority {
                 const initial_height = tops[i];
                 let current_translate_value = (assignment_container.css("transform").split(",")[5]||")").slice(0,-1); // Read the translateY value from the returned MATRIX_ENDS_WEIGHT
                 // Assignments can move while this is being executed; current_translate_value becomes old inaccurate
-                // Account for this for this execution time inconsistency by multiplying it by an eyeballed adjustment factor of 0.9
-                current_translate_value *= 0.9;
+                // Account for this for this execution time inconsistency by adjusting the current_translate_value
+                const factor = 0.9;
+                const max_diff = 25;
+                if (Math.abs(current_translate_value - current_translate_value * factor) <= max_diff) {
+                    current_translate_value *= factor;
+                } else {
+                    current_translate_value -= Math.sign(current_translate_value) * max_diff;
+                }
                 // If an assignment is doing a transition and this is called again, subtract its transform value to find its final top offset
                 const final_height = assignment_container.offset().top - Math.sign(current_translate_value) * Math.floor(Math.abs(current_translate_value)); // the "Math" stuff floors or ceils the value closer to zero
                 const transform_value = initial_height - final_height;
