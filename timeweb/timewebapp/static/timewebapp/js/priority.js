@@ -1221,12 +1221,6 @@ class Priority {
         if (SETTINGS.enable_tutorial && that.params.first_sort)
             utils.ui.tutorial(first_available_tutorial_assignment);
 
-        // We need to do this in a separate loop so single assignment line wrappers are removed appropriately
-        for (let [index, priority_data] of that.priority_data_list.entries()) {
-            const assignment_container = that.assignments_to_sort.eq(priority_data.index);
-            assignment_container.toggleClass("add-shortcut-margin", index === 0 && assignment_container.hasClass("add-line-wrapper"));
-        }
-
         let tops = new Array(that.assignments_to_sort.length);
         tops.fill(undefined);
         Object.seal(tops);
@@ -1379,6 +1373,11 @@ class Priority {
                 while (that.scroll_assignment_animation_resolvers.length)
                     that.scroll_assignment_animation_resolvers.shift()();
             });
+        }
+        {
+            const first_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[0].index);
+            const add_shortcut_margin = first_assignment_container.hasClass("add-line-wrapper");
+            $("#assignments-header").toggleClass("add-shortcut-margin", add_shortcut_margin);
         }
         utils.ui.setAssignmentsContainerScaleUtils();
     }

@@ -147,6 +147,10 @@ main.background-image-exists {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    transition: margin-bottom 350ms ease-out;
+}
+#assignments-header.add-shortcut-margin {
+    margin-bottom: 5px;
 }
 #assignments-header > * {
     white-space: nowrap;
@@ -258,9 +262,6 @@ main.background-image-exists {
     --margin-top-and-bottom: var(--outer-assignment-vertical-padding);
     margin-top: calc(-2 * var(--outer-assignment-vertical-padding) + var(--margin-top-and-bottom));
     margin-bottom: var(--margin-top-and-bottom);
-}
-.assignment-container.add-shortcut-margin {
-    margin-top: 5px;
 }
 .shortcut-text {
     white-space: nowrap;
