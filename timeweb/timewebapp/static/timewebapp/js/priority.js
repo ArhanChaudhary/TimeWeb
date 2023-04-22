@@ -1322,15 +1322,25 @@ class Priority {
                 // this needs to be included before the resolver because assignment_container_to_scroll_to might be assignment_container itself
                 // and the positioning wont be correct
                 const margin_bottom = assignment_container.outerHeight();
+                const just_created_animation_margin = 120;
                 assignment_container.css({
-                    top: Math.min(
-                        // ensure assignments don't scroll from the bottom to the top too far
-                        window.innerHeight,
-                        last_assignment_container_bottom + 120 // 120 for a bit more breathing room
-                    // subtract the offset top to get the actual top value
-                    // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                    // offset top and make that number its new top
-                    ) - tops2[i] + previous_margin_bottoms,
+                    top: Math.max(
+                        // ensure assignments don't scroll from the top of the screen
+                        // the below min parameter sets the assignment to the very bottom of your screen,
+                        // no matter what
+                        // this ensures that if the assignment is downwards from your scroll position,
+                        // it won't be at the bottom of your screen and instead at the bottom
+                        // of your assignments
+                        just_created_animation_margin,
+                        Math.min(
+                            // ensure assignments don't scroll from the bottom to the top too far
+                            window.innerHeight,
+                            last_assignment_container_bottom + just_created_animation_margin
+                        // subtract the offset top to get the actual top value
+                        // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                        // offset top and make that number its new top
+                        ) - tops2[i] + previous_margin_bottoms
+                    ),
                     marginBottom: -margin_bottom,
                     opacity: 0,
                 });
