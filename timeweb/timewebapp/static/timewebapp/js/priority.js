@@ -1174,7 +1174,7 @@ class Priority {
                         top: "0",
                         opacity: "1",
                         marginBottom: "0",
-                    }, 1500 * SETTINGS.animation_speed, "easeOutCubic", () => {$("#extra-navs").show()});
+                    }, 1500 * SETTINGS.animation_speed, "easeOutCubic");
                 }
                 // A jQuery animation isn't needed for the background of ".animate-color" because it is transitioned using css
                 if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
@@ -1339,8 +1339,6 @@ class Priority {
             }
         }
         if (that.scroll_assignment_animation_resolvers.length) {
-            $("#extra-navs").hide();
-
             const dom_assignment_to_scroll_to = assignment_container_to_scroll_to.children(".assignment");
             const rect = dom_assignment_to_scroll_to[0].getBoundingClientRect();
             const scroll_margin_top = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-top"));

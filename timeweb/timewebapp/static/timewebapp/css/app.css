@@ -1034,6 +1034,10 @@ do this because midde-of-header is hidden in the delete assignments view */
     bottom: 0;
     right: 0;
     left: 0;
+    /* opacity < 1 on just_created assignmnets creates a new stacking content
+    for them and positions it behind extra-navs; add z-index: -1 to stop that */
+    z-index: -1;
+
     display: flex;
     visibility: hidden;
     justify-content: center;
