@@ -1,8 +1,5 @@
 // THIS FILE HAS NOT YET BEEN FULLY DOCUMENTED
 class Priority {
-    static ANIMATE_IN_DURATION = 1500 * SETTINGS.animation_speed;
-    static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
-    static ANIMATE_IN_START_MARGIN = 120; // Move just_created a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 100;
 
     static DUE_DATE_PASSED = 12;
@@ -1177,7 +1174,7 @@ class Priority {
                         top: "0",
                         opacity: "1",
                         marginBottom: "0",
-                    }, Priority.ANIMATE_IN_DURATION, "easeOutCubic", () => {$("#extra-navs").show()});
+                    }, 1500 * SETTINGS.animation_speed, "easeOutCubic", () => {$("#extra-navs").show()});
                 }
                 // A jQuery animation isn't needed for the background of ".animate-color" because it is transitioned using css
                 if (Number.isNaN(priority_percentage) || !SETTINGS.show_priority) {
@@ -1266,7 +1263,7 @@ class Priority {
                 }
                 assignment_container.css({
                     transform: "",
-                    transitionDuration: `${Priority.SWAP_TRANSITION_DELAY_FUNCTION(transform_value)}s`, // Delays longer transforms
+                    transitionDuration: `${(1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed}s`, // Delays longer transforms
                 });
             });
 
@@ -1334,7 +1331,7 @@ class Priority {
                     top: Math.min(
                         // ensure assignments don't scroll from the bottom to the top too far
                         window.innerHeight,
-                        last_assignment_container_bottom + Priority.ANIMATE_IN_START_MARGIN
+                        last_assignment_container_bottom + 120 // 120 for a bit more breathing room
                     // subtract the offset top to get the actual top value
                     // eg if we want this to be at 500px from the top of the screen, subtract its existing
                     // offset top and make that number its new top
