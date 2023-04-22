@@ -4,7 +4,7 @@ class Priority {
     static SWAP_TRANSITION_DELAY_FUNCTION = transform_value => (1.75 + Math.abs(transform_value) / 2000) * SETTINGS.animation_speed;
     static ANIMATE_IN_START_MARGIN = 120; // Move just_created a bit below the last assignment to give it more breathing room
     static TOO_MUCH_TO_AUTOFILL_CUTOFF = 100;
-    
+
     static DUE_DATE_PASSED = 12;
     static INCOMPLETE_WORKS = 11;
     static NO_WORKING_DAYS = 10;
@@ -28,7 +28,7 @@ class Priority {
         that.today_total_completion_time = 0;
         that.tomorrow_total_completion_time = 0;
     }
-    
+
     percentageToColor(priority_percentage) {
         const that = this;
         const percentage_as_decimal = priority_percentage / 100;
@@ -110,7 +110,7 @@ class Priority {
                 // NOTE: due_date_minus_today > 0 and complete_due_date <= complete_date_now might be redundant but idc
                 const incomplete_past_inputs = today_minus_assignment_date > len_works + sa.sa.blue_line_start || complete_due_date <= complete_date_now && sa.sa.soft;
                 const reached_end_of_assignment = len_works + sa.sa.blue_line_start === sa.sa.x;
-                if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0 && !incomplete_past_inputs && !reached_end_of_assignment && SETTINGS.display_working_days_left) { 
+                if (Number.isFinite(sa.sa.y) && due_date_minus_today > 0 && !incomplete_past_inputs && !reached_end_of_assignment && SETTINGS.display_working_days_left) {
                     // due_date_minus_today floors the due time, so let's also do this on the work days left for consistency
                     // we do this because it doesn't make logical sense to say an assignment is due in 2 days when it is due in 25 hours
 
@@ -267,7 +267,7 @@ class Priority {
                 sa.sa.skew_ratio = 2 - skew_ratio_bound;
                 !sa.sa.needs_more_info && ajaxUtils.batchRequest("saveAssignment", ajaxUtils.saveAssignment, {skew_ratio: sa.sa.skew_ratio, id: sa.sa.id});
             }
-            
+
             sa.setParabolaValues();
             if (that.params.first_sort && !sa.sa.needs_more_info && !sa.sa.fixed_mode && dom_assignment.hasClass("refresh-dynamic-mode")) {
                 // Fix dynamic start if y or anything else was changed
@@ -292,7 +292,7 @@ class Priority {
             }
             if (first_real_tag)
                 first_real_tag = first_real_tag.toLowerCase();
-            
+
             if (sa.sa.tags.includes("Important")) {
                 var has_important_tag = true;
             }
@@ -305,7 +305,7 @@ class Priority {
             if (sa.sa.due_time && (sa.sa.due_time.hour || sa.sa.due_time.minute)) {
                 complete_due_date.setMinutes(complete_due_date.getMinutes() + sa.sa.due_time.hour * 60 + sa.sa.due_time.minute);
             }
-            
+
             // This evaluates to false if complete_due_date or complete_date_now are invalid dates
             const due_date_passed = complete_due_date <= complete_date_now;
 
@@ -337,7 +337,7 @@ class Priority {
                     todo = sa.funct(len_works+sa.sa.blue_line_start+1) - last_work_input;
                 }
             }
-            
+
             // if sa.sa.y is null, I would expect finished_work_inputs to be false
             // However, inequalities with null can sometimes be true!
             // Check if sa.sa.y is a number, and do the same for last_work_input for extra precaution
@@ -366,7 +366,7 @@ class Priority {
                 dom_status_image.attr({
                     width: 11,
                     height: 18,
-                }).css("margin-left", 2);            
+                }).css("margin-left", 2);
             } else if (finished_work_inputs) {
                 status_value = Priority.COMPLETELY_FINISHED;
                 status_image = "completely_finished";
@@ -407,7 +407,7 @@ class Priority {
                         }
                     }
                     /**
-                     * 
+                     *
                      * 1st column: today_minus_assignment_date
                      * 2nd column: sa.sa.x
                      * 3rd column: ideal value for the new due date
@@ -424,8 +424,8 @@ class Priority {
                     // If the user edits their due date before their last work input and there is a work input on x,
                     // don't increment the due date over here
 
-                    // This is for the sake of being consistent; due time only changes 
-                    // Plus it would be extremely jarring to the user to have an alert immediately after creating an 
+                    // This is for the sake of being consistent; due time only changes
+                    // Plus it would be extremely jarring to the user to have an alert immediately after creating an
                     // assignment and seeing a due date different from what they entered
                     const increment_due_date_condition = sa.sa.soft && today_minus_assignment_date >= sa.sa.x;
                     if (increment_due_date_condition) {
@@ -542,7 +542,7 @@ class Priority {
             dom_title.attr("data-daysleft", str_daysleft);
             dom_title.attr("data-long-daysleft", long_str_daysleft);
             dom_title.attr("data-mobile-daysleft", mobile_str_daysleft);
-            
+
             const already_entered_work_input_for_today = today_minus_assignment_date < len_works + sa.sa.blue_line_start; // Can't just define this once because len_works changes
             const assignment_header_button = assignment_container.find(".assignment-header-button");
             const assignment_header_tick_svg = assignment_header_button.find(".tick-button");
@@ -560,7 +560,7 @@ class Priority {
             let href = `#tick-svg`;
             assignment_header_tick_svg.find("use").attr("href", href);
             assignment_header_tick_svg.attr("viewBox", $(href).next().text());
-            
+
             if (delete_starred_assignment_after_sorting && !assignment_container.hasClass("delete-this-starred-assignment")) {
                 starred_assignment_ids_to_delete_after_sorting.add(sa.sa.id);
             }
@@ -768,16 +768,16 @@ class Priority {
 
                 // "r" < "z" => true
                 // "r" < undefined => false (the below makes this true)
-                
+
                 // "z" > "r" => true
                 // undefined > "r" => false (the below makes this true)
-                
+
                 // a.first_real_tag !== undefined: If both are undefined, skip this check
                 if (a.first_real_tag < b.first_real_tag || a.first_real_tag === undefined && b.first_real_tag !== undefined) return 1;
                 if (a.first_real_tag > b.first_real_tag || b.first_real_tag === undefined && a.first_real_tag !== undefined) return -1;
                 break;
         }
-        
+
         let a_status_value = a.status_value;
         let b_status_value = b.status_value;
         // +Ignore tags if its a google classroom assignment and it needs more info because important and not important can mess up some ordering
@@ -831,15 +831,15 @@ class Priority {
                         break;
                     case "Soonest Due Date First":
                         // b.due_date_minus_today === undefined: Treat undefined as positive infinity
-        
+
                         // 5 < 10 => true
                         // 5 < undefined => false (the below makes this true)
-                        
+
                         // 10 > 5 => true
                         // undefined > 5 => false (the below makes this true)
-                        
+
                         // a.due_date_minus_today !== undefined: If both are undefined, skip this check
-        
+
                         // we need a custom lt and gt comparator so we can deal with negative numbers
                         if (Priority.dueDateCompareLessThan(a.due_date_minus_today, b.due_date_minus_today) || b.due_date_minus_today === undefined && a.due_date_minus_today !== undefined) return -1;
                         if (Priority.dueDateCompareGreaterThan(a.due_date_minus_today, b.due_date_minus_today) || a.due_date_minus_today === undefined && b.due_date_minus_today !== undefined) return 1;
@@ -1078,7 +1078,7 @@ class Priority {
         const that = this;
         that.updateAssignmentHeaderMessagesAndSetPriorityData();
         that.doAssignmentAlerts();
-        
+
         // Updates open graphs' today line and other graph text
         $(window).trigger("redrawGraphs");
 
