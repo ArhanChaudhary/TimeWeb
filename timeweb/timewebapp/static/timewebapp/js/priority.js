@@ -1288,31 +1288,27 @@ class Priority {
         });
 
         let assignment_container_to_scroll_to;
+        let first_just_created;
 
-        // another tops for
+        // another tops for after new_assignments are added to the dom
         let tops2 = new Array(that.priority_data_list.length);
         tops2.fill(undefined);
         Object.seal(tops2);
-
-        for (let i = 0; i < that.priority_data_list.length; i++) {
-            const priority_data = that.priority_data_list[i];
+        for (const [i, priority_data] of that.priority_data_list.entries()) {
             const assignment_container = that.assignments_to_sort.eq(priority_data.index);
             const dom_assignment = assignment_container.children(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
 
             tops2[i] = assignment_container.offset().top;
-
-            const is_animate_color = assignment_container.hasClass("animate-color");
-            if (!assignment_container_to_scroll_to && (sa.just_created || is_animate_color)) {
-                // Since sa.just_created will have a bottom margin of negative its height, the next assignment will be in its final position at the start of the animation
-                // So, scroll to the next assignment instead
-                // Scroll to dom_assignment because of its scroll-margin
-                assignment_container_to_scroll_to = that.assignments_to_sort.eq(that.priority_data_list[i + 1]?.index);
-                if (!assignment_container_to_scroll_to.length || assignment_container.hasClass("animate-color")) {
-                    // If ".animate-color" exists or sa.just_created is the last assignment on the list, scroll to itself instead
-                    assignment_container_to_scroll_to = assignment_container;
-                }
+            if (first_just_created && !assignment_container_to_scroll_to && !sa.just_created) {
+                assignment_container_to_scroll_to = assignment_container;
             }
+            if (sa.just_created && !first_just_created) {
+                first_just_created = assignment_container;
+            }
+        }
+        if (!assignment_container_to_scroll_to) {
+            assignment_container_to_scroll_to = first_just_created;
         }
         const last_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[that.priority_data_list.length - 1].index);
         const last_assignment_container_bottom = tops2[tops2.length - 1] + last_assignment_container.height();
