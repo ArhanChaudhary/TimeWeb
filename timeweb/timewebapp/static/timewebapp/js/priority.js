@@ -1331,23 +1331,14 @@ class Priority {
                 // and the positioning wont be correct
                 const margin_bottom = assignment_container.outerHeight();
                 assignment_container.css({
-                    top: Math.max(
-                        // ensure assignments don't scroll from the top of the screen
-                        // the below min parameter sets the assignment to the very bottom of your screen,
-                        // no matter what
-                        // this ensures that if the assignment is downwards from your scroll position,
-                        // it won't be at the bottom of your screen and instead at the bottom
-                        // of your assignments
-                        Priority.ANIMATE_IN_START_MARGIN,
-                        Math.min(
-                            // ensure assignments don't scroll from the bottom to the top too far
-                            window.innerHeight,
-                            last_assignment_container_bottom + Priority.ANIMATE_IN_START_MARGIN
-                        // subtract the offset top to get the actual top value
-                        // eg if we want this to be at 500px from the top of the screen, subtract its existing
-                        // offset top and make that number its new top
-                        ) - tops2[i]
-                    ) + previous_margin_bottoms,
+                    top: Math.min(
+                        // ensure assignments don't scroll from the bottom to the top too far
+                        window.innerHeight,
+                        last_assignment_container_bottom + Priority.ANIMATE_IN_START_MARGIN
+                    // subtract the offset top to get the actual top value
+                    // eg if we want this to be at 500px from the top of the screen, subtract its existing
+                    // offset top and make that number its new top
+                    ) - tops2[i] + previous_margin_bottoms,
                     marginBottom: -margin_bottom,
                     opacity: 0,
                 });
