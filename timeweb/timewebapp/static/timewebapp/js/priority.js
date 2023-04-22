@@ -1365,13 +1365,14 @@ class Priority {
                     dom_assignment_to_scroll_to[0].scrollIntoView({
                         behavior: 'smooth',
                         block: 'nearest',
-                    })
+                    });
                 }, 0);
                 let scrollTimeout;
-                $("#assignments-container").on("scroll.assignmentanimation", () => {
+                $("#assignments-container").on("scroll.assignmentanimation", function() {
+                    $("#assignments-container").css("overflow-y", "hidden");
                     clearTimeout(scrollTimeout);
                     scrollTimeout = setTimeout(function() {
-                        $("#assignments-container").off('scroll.assignmentanimation');
+                        $("#assignments-container").off('scroll.assignmentanimation').css("overflow-y", "");
                         resolve();
                     // assumes 20 fps is the lowest scroll handler refresh rate
                     // 50ms * 20 = 1000ms
