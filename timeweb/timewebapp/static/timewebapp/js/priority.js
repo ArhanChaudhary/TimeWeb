@@ -1317,8 +1317,7 @@ class Priority {
         const last_assignment_container = that.assignments_to_sort.eq(that.priority_data_list[that.priority_data_list.length - 1].index);
         const last_assignment_container_bottom = tops2[tops2.length - 1] + last_assignment_container.height();
         let previous_margin_bottoms = 0;
-        for (let i = 0; i < that.priority_data_list.length; i++) {
-            const priority_data = that.priority_data_list[i];
+        for (const [i, priority_data] of that.priority_data_list.entries()) {
             const assignment_container = that.assignments_to_sort.eq(priority_data.index);
             const dom_assignment = assignment_container.children(".assignment");
             const sa = utils.loadAssignmentData(dom_assignment);
@@ -1367,11 +1366,12 @@ class Priority {
                 let scrollTimeout;
                 $("#assignments-container").on("scroll.assignmentanimation", () => {
                     clearTimeout(scrollTimeout);
-                    // skip settimeout if already in view
                     scrollTimeout = setTimeout(function() {
                         $("#assignments-container").off('scroll.assignmentanimation');
                         resolve();
-                    }, 200);
+                    // assumes 20 fps is the lowest scroll handler refresh rate
+                    // 50ms * 20 = 1000ms
+                    }, 50);
                 }).trigger("scroll.assignmentanimation");
             }).then(function() {
                 while (that.scroll_assignment_animation_resolvers.length)
