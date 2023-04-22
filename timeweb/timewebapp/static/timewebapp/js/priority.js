@@ -1357,10 +1357,13 @@ class Priority {
                     resolve();
                     return;
                 }
-                dom_assignment_to_scroll_to[0].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                });
+                // https://stackoverflow.com/a/71181885/12230735
+                setTimeout(function() {
+                    dom_assignment_to_scroll_to[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                    })
+                }, 0);
                 let scrollTimeout;
                 $("#assignments-container").on("scroll.assignmentanimation", () => {
                     clearTimeout(scrollTimeout);
