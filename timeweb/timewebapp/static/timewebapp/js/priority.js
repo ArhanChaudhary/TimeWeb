@@ -1350,7 +1350,7 @@ class Priority {
             const rect = dom_assignment_to_scroll_to[0].getBoundingClientRect();
             const scroll_margin_top = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-top"));
             const scroll_margin_bottom = parseFloat(dom_assignment_to_scroll_to.css("scroll-margin-bottom"));
-            const on_screen = rect.top > scroll_margin_top && rect.top + rect.height + scroll_margin_bottom < window.innerHeight;
+            const on_screen = rect.top > scroll_margin_top + parseFloat($("header").css("--header-height")) && rect.top + rect.height + scroll_margin_bottom < window.innerHeight;
 
             new Promise(function(resolve) {
                 if (on_screen) {
