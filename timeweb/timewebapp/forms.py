@@ -118,7 +118,7 @@ class TimewebForm(forms.ModelForm):
         works = self.cleaned_data['works']
         if works is None:
             works = 0
-        if isinstance(works, int):
+        if isinstance(works, (int, float)):
             works = [str(works)]
         if not isinstance(works, list) or not all(isinstance(work, str) for work in works):
             raise forms.ValidationError(_("Invalid work inputs"))
