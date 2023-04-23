@@ -204,8 +204,11 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 # included in the invalid form
                 _mutable = form.data._mutable
                 form.data._mutable = True
-                form.data['x'] += " " + form.data['due_time']
-                del form.data['due_time']
+                try:
+                    form.data['x'] += " " + form.data['due_time']
+                    del form.data['due_time']
+                except KeyError:
+                    pass
                 form.data._mutable = _mutable
 
                 invalid_form_context['form'] = form
