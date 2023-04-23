@@ -170,9 +170,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper #field-group-picker-checkbox:checked ~ #fields-wrapper #first-field-group .instant-margin-transition {
     margin-bottom: -9999px !important;
 }
-#form-wrapper .notransition {
-    transition: none;
-}
 #form-wrapper .field-wrapper {
     /* for positioning */
     width: 100%;

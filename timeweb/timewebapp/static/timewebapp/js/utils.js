@@ -496,7 +496,7 @@ addTagHandlers: function() {
             tag.find(".tag-name").text(tag_name);
             tag.appendTo(dom_assignment.find(".tag-sortable-container"));
 
-            tag.addClass("tag-add-transition-disabler");
+            tag.addClass("transition-disabler");
             // Need to use jquery instead of css to set marginLeft
             tag.css({
                 marginLeft: -tag.outerWidth(true),
@@ -504,7 +504,7 @@ addTagHandlers: function() {
                 transform: "scale(0.6)",
             });
             tag[0].offsetHeight;
-            tag.removeClass("tag-add-transition-disabler");
+            tag.removeClass("transition-disabler");
             tag.css({
                 marginLeft: "",
                 opacity: "",

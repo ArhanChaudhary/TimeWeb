@@ -346,11 +346,11 @@ class VisualAssignment extends Assignment {
             // Don't hide graph hover point label on set skew ratio end if enabled
             if (!e.isTrigger) {
                 const hover_point_label = this.dom_assignment.find(".hover-point-label");
-                hover_point_label.addClass("disable-hover-point-label-transition hide-label").removeClass("move-left");
+                hover_point_label.addClass("transition-disabler hide-label").removeClass("move-left");
                 hover_point_label.css("--x", 0);
                 hover_point_label.css("--y", 0);
                 hover_point_label[0].offsetHeight;
-                hover_point_label.removeClass("disable-hover-point-label-transition");
+                hover_point_label.removeClass("transition-disabler");
             }
         }
     }
@@ -653,7 +653,7 @@ class VisualAssignment extends Assignment {
             // converting from minutes to hours can result in hidden decimal places, so we round so the user isnt overwhelmed
             const point_str = `(Day: ${str_mouse_x}, ${pluralize(this.sa.unit,1)}: ${Math.floor(funct_mouse_x * 100) / 100})`;
             if (hover_point_label.hasClass("hide-label")) {
-                hover_point_label.addClass("disable-hover-point-label-transition");
+                hover_point_label.addClass("transition-disabler");
             }
             hover_point_label.css("--x", point_x);
             hover_point_label.css("--y", point_y);
@@ -661,7 +661,7 @@ class VisualAssignment extends Assignment {
             hover_point_label.toggleClass("move-left", point_x + screen.measureText(point_str).width + 8 > this.width - 5);
             if (hover_point_label.hasClass("hide-label")) {
                 hover_point_label[0].offsetHeight;
-                hover_point_label.removeClass("disable-hover-point-label-transition hide-label");
+                hover_point_label.removeClass("transition-disabler hide-label");
             }
             screen.beginPath();
 

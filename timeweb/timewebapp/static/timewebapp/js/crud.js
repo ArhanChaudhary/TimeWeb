@@ -578,19 +578,19 @@ class Crud {
             let second_minus_first = $("#form-wrapper #second-field-group .instant-margin-transition")[0].scrollHeight - $("#form-wrapper #first-field-group .instant-margin-transition")[0].scrollHeight;
             if ($("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
                 $("#first-field-group").css("margin-bottom", -second_minus_first).one("transitionend", function() {
-                    $("#first-field-group").addClass("notransition");
+                    $("#first-field-group").addClass("transition-disabler");
                     $("#first-field-group").css("margin-bottom", "");
                     $("#first-field-group")[0].offsetHeight;
-                    $("#first-field-group").removeClass("notransition");
+                    $("#first-field-group").removeClass("transition-disabler");
                     $("#first-field-group .instant-margin-transition").css("margin-bottom", "");
                 });
                 $("#first-field-group .instant-margin-transition").css("margin-bottom", second_minus_first);
             } else {
                 $("#second-field-group").css("margin-bottom", second_minus_first).one("transitionend", function() {
-                    $("#second-field-group").addClass("notransition");
+                    $("#second-field-group").addClass("transition-disabler");
                     $("#second-field-group").css("margin-bottom", "");
                     $("#second-field-group")[0].offsetHeight;
-                    $("#second-field-group").removeClass("notransition");
+                    $("#second-field-group").removeClass("transition-disabler");
                     $("#second-field-group .instant-margin-transition").css("margin-bottom", "");
                 });
                 $("#second-field-group .instant-margin-transition").css("margin-bottom", -second_minus_first);

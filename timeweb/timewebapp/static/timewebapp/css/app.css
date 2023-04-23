@@ -205,7 +205,7 @@ main.background-image-exists {
     padding: var(--outer-assignment-vertical-padding) var(--outer-assignment-horizontal-padding);
     --shortcut-border-radius: 6px;
 }
-.assignment-container.transform-instantly, .assignment-container.transform-instantly .assignment-footer {
+.assignment-container.transition-disabler .assignment-footer {
     transition: none !important;
 }
 #extra-navs-positioner {
@@ -763,9 +763,6 @@ do this because midde-of-header is hidden in the delete assignments view */
 .tag-add-checkbox {
     appearance: revert;
 }
-.tag-add-transition-disabler {
-    transition: none !important;
-}
 .icon-slash {
     top: 0;
     bottom: 0;
@@ -903,9 +900,6 @@ do this because midde-of-header is hidden in the delete assignments view */
 }
 .hover-point-label.move-left {
     --translatex: calc(-100% - 10px);
-}
-.hover-point-label.disable-hover-point-label-transition {
-    transition: none;
 }
 .fixed-graph {
     position: absolute;

@@ -207,6 +207,9 @@ select, .daterangepicker .drp-buttons .cancelBtn {
 .daterangepicker #daterangepicker-midnight {
     margin-left: 6px;
 }
+.transition-disabler {
+    transition: none !important;
+}
 #logo-container {
     display: inline-flex;
     align-items: center;

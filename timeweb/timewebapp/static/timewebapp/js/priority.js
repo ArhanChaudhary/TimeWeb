@@ -1256,10 +1256,10 @@ class Priority {
                 const transform_value = initial_height - final_height;
                 assignment_container.removeAttr("data-initial-top-offset");
                 if (sa.id in that.existing_ids) {
-                    assignment_container.addClass("transform-instantly");
+                    assignment_container.addClass("transition-disabler");
                     assignment_container.css("transform", `translateY(${transform_value}px)`);
                     assignment_container[0].offsetHeight;
-                    assignment_container.removeClass("transform-instantly")
+                    assignment_container.removeClass("transition-disabler")
                 }
                 assignment_container.css({
                     transform: "",
