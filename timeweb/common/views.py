@@ -9,7 +9,6 @@ with open("changelogs.json", "r") as f:
     CHANGELOGS = json_load(f)
 
 logger = getLogger('django')
-logger.propagate = False
 
 class TimewebGenericView(TemplateResponseMixin, View):
     def __init__(self):
