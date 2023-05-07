@@ -1045,7 +1045,6 @@ class Priority {
             sa.positionTags();
             sa.makeGCAnchorVisible();
         });
-        utils.ui.setAssignmentsContainerScaleUtils();
     }
     sort(params={first_sort: false, autofill_all_work_done: false, autofill_no_work_done: false}) {
         this.params = params;
@@ -1388,7 +1387,6 @@ class Priority {
             const add_shortcut_margin = first_assignment_container.hasClass("add-line-wrapper");
             $("#assignments-header").toggleClass("add-shortcut-margin", add_shortcut_margin);
         }
-        utils.ui.setAssignmentsContainerScaleUtils();
     }
 }
 window.Priority = Priority;
