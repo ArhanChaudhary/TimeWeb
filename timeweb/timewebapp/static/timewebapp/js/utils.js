@@ -685,141 +685,198 @@ makeAssignmentTagsSortable: function(dom_assignment) {
     });
 },
 setKeybinds: function() {
-$(document).keydown(function(e) {
-// it's important to not modify e.key because then the event object itself will be modified
-const e_key = e.key.toLowerCase();
-if (e.ctrlKey || e.metaKey
-    || VIEWING_DELETED_ASSIGNMENTS && ["backspace", "s", "f", "n"].includes(e_key)
-    || e.originalEvent.repeat && ["backspace", "s", "f", "0"].includes(e_key)
-    || SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS) return;
-const form_is_showing = $("#overlay").is(":visible");
-const form_is_hidden = !form_is_showing;
-switch (e_key) {
-    case "n":
-    case "e":
-    case "d":
-    case "r":
-    case "backspace":
-    case "s":
-    case "f":
-    case "0":
-    case "o":
-    case "c":
-    case "t":
-        if (!["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
-        switch (e_key) {
-            case "n":
-                if (form_is_showing) return;
-                $("#image-new-container").click();
-                break;
-            case "t":
-                $("#assignments-container").scrollTop(0);
-                break;
-            case "e":
-            case "d":
-            case "r":
-            case "backspace":
-            case "s":
-            case "f":
-            case "0":
-            case "o":
-            case "c":
-                let assignment_container = $(":hover").filter(".assignment-container");
-                if (!assignment_container.length) assignment_container = $(document.activeElement).parents(".assignment-container");
-                let dom_assignment = assignment_container.children(".assignment");
-                if (assignment_container.length) {
-                    if (!dom_assignment.hasClass("has-been-clicked")) {
-                        new VisualAssignment(dom_assignment).initUI();
+    const keybinds = {
+        escape: {
+            do: function(e) {
+                $("#form-wrapper #cancel-button").click();
+            },
+        },
+        arrowup: {
+            require_hidden_form: true,
+            do: function(e) {
+                const open_assignments_on_screen = $(".open-assignment").map(function() {
+                    const sa = new VisualAssignment($(this));
+                    return sa.assignmentGraphIsOnScreen() ? sa : null;
+                }).toArray();
+                if (open_assignments_on_screen.length !== 0) {
+                    // Prevent arrow scroll
+                    e.preventDefault();
+                    for (const sa of open_assignments_on_screen) {
+                        sa.setParabolaValues();
+                        sa.arrowSkewRatio(e.key);
                     }
-                    switch (e_key) {
-                        case "o":
-                        case "c":
-                            dom_assignment.click();
-                            break;
-                        case "e":
-                            if (form_is_showing) return;
-                            assignment_container.find(".update-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "d": {
-                            const click_delete_button = $.Event("click");
-                            click_delete_button.shiftKey = e.shiftKey;
-                            assignment_container.find(".delete-button").parents(".assignment-header-button").focus().trigger(click_delete_button);
-                            break;
-                        }
-                        case "r":
-                            assignment_container.find(".restore-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "f":
-                            assignment_container.find(".tick-button").is(":visible") && assignment_container.find(".tick-button").parents(".assignment-header-button").focus().click();
-                            break;
-                        case "0":
-                            if (!dom_assignment.hasClass("open-assignment")) {
-                                dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement()
-                            }
-                            dom_assignment.find(".work-input-textbox").val("0");
-                            dom_assignment.find(".submit-work-button").click();
-                            break;
-                        case "backspace":
-                        case "s":
-                            // I would animate the arrow for backspace too but 
-                            // that only works when an assignment is open
-                            if (dom_assignment.hasClass("open-assignment")) {
-                            switch (e_key) {
-                                case "backspace":
-                                    var graph_button = assignment_container.find(".delete-work-input-button");
-                                    break;
-                                case "s":
-                                    var graph_button = assignment_container.find(".skew-ratio-button");
-                                    break;
-                            }
-                            // We can't use a normal .click().focus() or else
-                            // a graph button out of view scrolls it all the way to the middle of the page
-                            graph_button.click();
-                            // scroll AFTER it is clicked, the click even may call Priority.sort and further
-                            // alter the position of the graph button
-                            graph_button[0].scrollIntoView({block: "nearest"});
-                            setTimeout(() => graph_button.focus(), 0);
-                            }
-                            break;
-                    }
-                    break;
+                } else {
+                    // Allow arrow scroll
+                    // Relies on the fact that #assignments-container is the scrolling element
+                    $("#assignments-container").focus();
                 }
-        }
-        break;
-    case "escape":
-        // doesn't work on daterangepicker inputs because DateRangePicker.prototype.keydown prevents default the event
-        new Crud().hideForm();
-        break;
-    case "arrowdown":
-    case "arrowup":
-        if (["textarea"].includes($(document.activeElement).prop("tagName").toLowerCase())) return;
-        const open_assignments_on_screen = $(".open-assignment").map(function() {
-            const sa = new VisualAssignment($(this));
-            return sa.assignmentGraphIsOnScreen() ? sa : null;
-        }).toArray();
-        if (open_assignments_on_screen.length !== 0) {
-            // Prevent arrow scroll
-            e.preventDefault();
-            for (const sa of open_assignments_on_screen) {
-                sa.setParabolaValues();
-                sa.arrowSkewRatio(e.key);
-            }
-        } else {
-            // Allow arrow scroll
-            // Relies on the fact that #assignments-container is the scrolling element
-            $("#assignments-container").focus();
-        }
-        break;
-    case "enter": {
-        const $this = $(e.target).closest(".tag-add-input");
-        if ($this.length) {
-            utils.ui.close_on_success = true;
-            $this.parents(".assignment").find(".tag-add-button").click();
-        }
-        break;
+            },
+        },
+        enter: {
+            do: function(e) {
+                const $this = $(e.target).closest(".tag-add-input");
+                if ($this.length) {
+                    utils.ui.close_on_success = true;
+                    $this.parents(".assignment").find(".tag-add-button").click();
+                }
+            },
+        },
+        n: {
+            ignore_in_deleted_assignments_view: true,
+            require_no_focused_input: true,
+            require_hidden_form: true,
+            do: function(e) {
+                $("#image-new-container").click();
+            },
+        },
+        t: {
+            require_no_focused_input: true,
+            do: function(e) {
+                $("#assignments-container").scrollTop(0);
+            },
+        },
+        o: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            do_override: function(assignment_container) {
+                const dom_assignment = assignment_container.children(".assignment");
+                dom_assignment.click();
+            },
+        },
+        e: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".update-button").parents(".assignment-header-button");
+            },
+        },
+        d: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".delete-button").parents(".assignment-header-button");
+            },
+        },
+        r: {
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".restore-button").parents(".assignment-header-button");
+            },
+        },
+        f: {
+            ignore_in_deleted_assignments_view: true,
+            ignore_repeat: true,
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            require_visible_element: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".tick-button").parents(".assignment-header-button");
+            },
+        },
+        0: {
+            require_no_focused_input: true,
+            ignore_repeat: true,
+            require_hovered_assignment: true,
+            do_override: function(assignment_container) {
+                const dom_assignment = assignment_container.children(".assignment");
+                if (!dom_assignment.hasClass("open-assignment")) {
+                    dom_assignment.find(".falling-arrow-animation-instant")[0].beginElement();
+                }
+                dom_assignment.find(".work-input-textbox").val("0");
+                dom_assignment.find(".submit-work-button").click();
+            },
+        },
+        backspace: {
+            ignore_in_deleted_assignments_view: true,
+            ignore_repeat: true,
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            require_open_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".delete-work-input-button");
+            },
+        },
+        s: {
+            ignore_in_deleted_assignments_view: true,
+            ignore_repeat: true,
+            require_no_focused_input: true,
+            require_hovered_assignment: true,
+            require_open_assignment: true,
+            element_to_click: function(assignment_container) {
+                return assignment_container.find(".skew-ratio-button");
+            },
+        },
     }
-}
-});
+    keybinds.arrowdown = {
+        require_hidden_form: true,
+        do: keybinds.arrowup.do,
+    }
+    keybinds.c = {
+        require_no_focused_input: true,
+        require_hovered_assignment: true,
+        do_override: keybinds.o.do_override,
+    }
+    $(document).keydown(function(e) {
+        // it's important to not modify e.key because then the event object itself will be modified
+        const e_key = e.key.toLowerCase();
+        const keybind = keybinds[e_key];
+        if (
+            !keybind
+            || e.ctrlKey
+            || e.metaKey
+            || SETTINGS.enable_tutorial && !VIEWING_DELETED_ASSIGNMENTS
+            || keybind.ignore_in_deleted_assignments_view && VIEWING_DELETED_ASSIGNMENTS
+            || keybind.ignore_repeat && e.originalEvent.repeat
+        ) return;
+
+        if (!keybind.require_no_focused_input) {
+            if (keybind.require_hidden_form && $("#overlay").hasClass("show-form"))
+                return;
+            keybind.do(e);
+            return;
+        }
+
+        if (["input", "textarea"].includes($(document.activeElement).prop("tagName").toLowerCase()))
+            return;
+
+        if (!keybind.require_hovered_assignment) {
+            if (keybind.require_hidden_form && $("#overlay").hasClass("show-form"))
+                return;
+            keybind.do(e);
+            return;
+        }
+
+        let assignment_container = $(":hover").filter(".assignment-container");
+        if (!assignment_container.length) {
+            assignment_container = $(document.activeElement).parents(".assignment-container");
+        }
+        const dom_assignment = assignment_container.children(".assignment");
+        if (!assignment_container.length)
+            return;
+
+        if (!dom_assignment.hasClass("has-been-clicked")) {
+            new VisualAssignment(dom_assignment).initUI();
+        }
+
+        if (keybind.require_open_assignment && !dom_assignment.hasClass("open-assignment"))
+            return;
+
+        if (keybind.do_override) {
+            keybind.do_override(assignment_container);
+            return;
+        }
+
+        const element_to_click = keybind.element_to_click(assignment_container);
+        if (keybind.require_visible_element && !element_to_click.is(":visible") || !element_to_click.length)
+            return;
+
+        const $click = $.Event("click");
+        $click.shiftKey = e.shiftKey;
+        element_to_click.trigger($click);
+        element_to_click[0].scrollIntoView({block: "nearest"});
+        setTimeout(() => element_to_click.focus(), 0);
+    });
 },
 displayFullDueDateOnHover: function() {
     $(document).on("mouseover mousemove click", function(e) {
