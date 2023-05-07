@@ -45,26 +45,39 @@ def post(request):
     pk = request.POST['submit-button']
     if pk == '':
         pk = None
-        request.created_assignment = True
-        request.updated_assignment = False
+        created_assignment = True
+        edited_assignment = False
     else:
-        request.created_assignment = False
-        request.updated_assignment = True
+        created_assignment = False
+        edited_assignment = True
     
     # for parsing due times in forms.py
     _mutable = request.POST._mutable
     request.POST._mutable = True
-    form = TimewebForm(data=request.POST, request=request)
+    submitted_form = TimewebForm(data=request.POST, request=request)
     request.POST._mutable = _mutable
 
-    if form.is_valid():
-        return valid_form(request)
-    else:
-        return invalid_form(request)
+    if not submitted_form.is_valid():
+        logger.info(f"User \"{request.user}\" submitted an invalid form")
 
-def valid_form(request):
-    if request.created_assignment:
-        sm = form.save(commit=False)
+        # field value is set to "Predicted" and field is disabled in crud.js
+        # We can't do both of those in the backend because setting the field value doesn't work for disabled fields
+
+        # adds an auxillary class .disabled-field to determine whether or not the field was predicted in the submission
+        context['x_was_predicted'] = 'x' not in request.POST
+        context['y_was_predicted'] = 'y' not in request.POST
+        if created_assignment:
+            context['submit'] = 'Create Assignment'
+        else:
+            assert edited_assignment
+            context['invalid_form_pk'] = pk
+            context['submit'] = 'Edit Assignment'
+        context['form'] = submitted_form.data.urlencode() # TimewebForm is not json serializable
+        request.session['invalid_form_context'] = context
+        return redirect("home")
+
+    if created_assignment:
+        sm = submitted_form.save(commit=False)
         old_data = None
 
         # Set defaults
@@ -72,26 +85,26 @@ def valid_form(request):
         first_work = Decimal(sm.works[0])
         sm.user = request.user
     else:
-        assert request.updated_assignment
+        assert edited_assignment
         sm = request.user.timewebmodel_set.get(pk=pk)
         old_data = deepcopy(sm)
 
         # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
         # Excluded: id, blue_line_start, skew_ratio, works, fixed_mode, dynamic_start, tags, alert_due_date_incremented, dont_hide_again
 
-        sm.name = form.cleaned_data.get("name")
-        sm.assignment_date = form.cleaned_data.get("assignment_date")
-        sm.x = form.cleaned_data.get("x")
-        sm.due_time = form.cleaned_data.get("due_time")
-        sm.soft = form.cleaned_data.get("soft")
-        sm.unit = form.cleaned_data.get("unit")
-        sm.y = form.cleaned_data.get("y")
-        first_work = Decimal(form.cleaned_data.get("works")[0])
-        sm.time_per_unit = form.cleaned_data.get("time_per_unit")
-        sm.description = form.cleaned_data.get("description")
-        sm.funct_round = form.cleaned_data.get("funct_round")
-        sm.min_work_time = form.cleaned_data.get("min_work_time")
-        sm.break_days = form.cleaned_data.get("break_days")
+        sm.name = submitted_form.cleaned_data.get("name")
+        sm.assignment_date = submitted_form.cleaned_data.get("assignment_date")
+        sm.x = submitted_form.cleaned_data.get("x")
+        sm.due_time = submitted_form.cleaned_data.get("due_time")
+        sm.soft = submitted_form.cleaned_data.get("soft")
+        sm.unit = submitted_form.cleaned_data.get("unit")
+        sm.y = submitted_form.cleaned_data.get("y")
+        first_work = Decimal(submitted_form.cleaned_data.get("works")[0])
+        sm.time_per_unit = submitted_form.cleaned_data.get("time_per_unit")
+        sm.description = submitted_form.cleaned_data.get("description")
+        sm.funct_round = submitted_form.cleaned_data.get("funct_round")
+        sm.min_work_time = submitted_form.cleaned_data.get("min_work_time")
+        sm.break_days = submitted_form.cleaned_data.get("break_days")
 
         if old_data.assignment_date:
             old_data.assignment_date = old_data.assignment_date.replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
@@ -116,20 +129,20 @@ def valid_form(request):
                 |      | other  | NA     | NA             | pass  |
                 +------+--------+--------+----------------+-------+
                 '''
-                if sm.unit.lower() in ('hour', 'hours') and not form.cleaned_data.get(f"{field}-widget-checkbox"):
+                if sm.unit.lower() in ('hour', 'hours') and not submitted_form.cleaned_data.get(f"{field}-widget-checkbox"):
                     setattr(sm, field, app_utils.minutes_to_hours(getattr(sm, field)))
-                elif sm.unit.lower() in ('minute', 'minutes') and form.cleaned_data.get(f"{field}-widget-checkbox"):
+                elif sm.unit.lower() in ('minute', 'minutes') and submitted_form.cleaned_data.get(f"{field}-widget-checkbox"):
                     setattr(sm, field, app_utils.hours_to_minutes(getattr(sm, field)))
             elif field == "works":
                 # NOTE: changing just funct_round unit should not affect the rest of works
                 # so it is safe to do this and not include it as a condition where works is
                 # redefined if unit changes from minute to hour or vice versa
-                if sm.unit.lower() in ('hour', 'hours') and not form.cleaned_data.get(f"{field}-widget-checkbox"):
+                if sm.unit.lower() in ('hour', 'hours') and not submitted_form.cleaned_data.get(f"{field}-widget-checkbox"):
                     first_work = app_utils.minutes_to_hours(first_work)
-                elif sm.unit.lower() in ('minute', 'minutes') and form.cleaned_data.get(f"{field}-widget-checkbox"):
+                elif sm.unit.lower() in ('minute', 'minutes') and submitted_form.cleaned_data.get(f"{field}-widget-checkbox"):
                     first_work = app_utils.hours_to_minutes(first_work)
             elif field in ("min_work_time", "time_per_unit"):
-                if form.cleaned_data.get(f"{field}-widget-checkbox"):
+                if submitted_form.cleaned_data.get(f"{field}-widget-checkbox"):
                     setattr(sm, field, app_utils.hours_to_minutes(getattr(sm, field)))
                 if field in ("min_work_time", ):
                     setattr(sm, field, app_utils.safe_conversion(getattr(sm, field), 1 / sm.time_per_unit))
@@ -160,7 +173,7 @@ def valid_form(request):
         min_work_time_funct_round = ceil(sm.min_work_time / sm.funct_round) * sm.funct_round if sm.min_work_time else sm.funct_round
         # NOTE: (sm.x is None and sm.y is None) is impossible
         if sm.x is None:
-            if request.created_assignment or old_data.needs_more_info:
+            if created_assignment or old_data.needs_more_info:
                 adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                     old_data=old_data,
                     assignment_date=sm.assignment_date,
@@ -173,7 +186,7 @@ def valid_form(request):
                 )
                 new_first_work = first_work
             else:
-                assert request.updated_assignment
+                assert edited_assignment
                 adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                     old_data=old_data,
                     assignment_date=sm.assignment_date,
@@ -338,11 +351,11 @@ def valid_form(request):
                 # new_min_work_time_funct_round = ceil(sm.min_work_time / new_funct_round) * new_funct_round if sm.min_work_time else new_funct_round
                 # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
                 
-        if request.created_assignment or old_data.needs_more_info or adjusted_blue_line['capped_at_x_num']:
+        if created_assignment or old_data.needs_more_info or adjusted_blue_line['capped_at_x_num']:
             sm.dynamic_start = sm.blue_line_start
             sm.works = [str(first_work)]
         else:
-            assert request.updated_assignment
+            assert edited_assignment
             sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, sm.assignment_date)
             if sm.dynamic_start < 0:
                 sm.dynamic_start = 0
@@ -395,7 +408,7 @@ def valid_form(request):
 
     # # Reset skew ratio if the red line x axis (x - (blue_line_start + leN_works)) or y axis (y - red_line_start_y)
     # # dynamic_start, blue_line_start (both from red_line_start_y), x, works, or y needs to be different
-    # if (request.updated_assignment and (
+    # if (updated_assignment and (
     #         old_data.x != sm.x or 
     #         old_data.y != sm.y or 
     #         old_data.works != sm.works or
@@ -418,19 +431,19 @@ def valid_form(request):
         if all(not url.endswith("." + ending) for ending in banned_endings)
     ), None)
     description_has_link = description_link is not None
-    description_has_changed = request.created_assignment or sm.description != old_data.description
+    description_has_changed = created_assignment or sm.description != old_data.description
     
     if is_user_assignment and description_has_link and description_has_changed:
         sm.description = sm.description.replace(description_link, '')
-        sm.description = form.fields['description'].clean(sm.description)
+        sm.description = submitted_form.fields['description'].clean(sm.description)
         sm.external_link = description_link
 
     sm.save()
-    if request.created_assignment:
+    if created_assignment:
         logger.info(f'User \"{request.user}\" created assignment "{sm.name}"')
         request.session["just_created_assignment_id"] = sm.pk
     else:
-        assert request.updated_assignment
+        assert edited_assignment
         logger.info(f'User \"{request.user}\" updated assignment "{sm.name}"')
         request.session['just_updated_assignment_id'] = sm.pk
         for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS:
@@ -439,25 +452,6 @@ def valid_form(request):
             if field == "works" and getattr(old_data, field)[0] != getattr(sm, field)[0] or getattr(old_data, field) != getattr(sm, field):
                 request.session['refresh_dynamic_mode'] = sm.pk
                 break
-    return redirect("home")
-
-def invalid_form(request):
-    logger.info(f"User \"{request.user}\" submitted an invalid form")
-
-    # field value is set to "Predicted" and field is disabled in crud.js
-    # We can't do both of those in the backend because setting the field value doesn't work for disabled fields
-
-    # adds an auxillary class .disabled-field to determine whether or not the field was predicted in the submission
-    context['x_was_predicted'] = 'x' not in request.POST
-    context['y_was_predicted'] = 'y' not in request.POST
-    if request.created_assignment:
-        context['submit'] = 'Create Assignment'
-    else:
-        assert request.updated_assignment
-        context['invalid_form_pk'] = pk
-        context['submit'] = 'Edit Assignment'
-    context['form'] = form.data.urlencode() # TimewebForm is not json serializable
-    request.session['invalid_form_context'] = context
     return redirect("home")
 
 @require_http_methods(["POST"])
