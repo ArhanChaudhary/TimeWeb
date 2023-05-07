@@ -13,7 +13,7 @@
             const MAX_NUMBER_OF_TAGS = {{ MAX_NUMBER_OF_TAGS }};
             const GC_API_INIT_FAILED = {% if GC_API_INIT_FAILED %}true{% else %}false{% endif %};
             const EDITING_EXAMPLE_ACCOUNT = {% if EDITING_EXAMPLE_ACCOUNT %}true{% else %}false{% endif %};
-            const VIEWING_DELETED_ASSIGNMENTS = {% if view_deleted_assignments_in_app_view %}true{% else %}false{% endif %};
+            const VIEWING_DELETED_ASSIGNMENTS = {% if VIEWING_DELETED_ASSIGNMENTS %}true{% else %}false{% endif %};
             const RELOAD_VIEWS = [{% for view in RELOAD_VIEWS %}"{{ view }}", {% endfor %}];
 
             {

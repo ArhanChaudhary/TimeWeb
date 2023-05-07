@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block extra_header_elements %}
-  {% if not view_deleted_assignments_in_app_view %}
+  {% if not VIEWING_DELETED_ASSIGNMENTS %}
     <div id="image-new-container" tabindex="0">
       <img width="42" height="42" src="{% static 'timewebapp/images/plus.webp' %}" alt draggable="false"/>
       <span id="new-assignment-text">New Assignment</span>
@@ -123,7 +123,7 @@
     </div>
   </div>
   {% comment %} add tabindex because some js makes main focusable {% endcomment %}
-  <div id="assignments-container" class="{% if view_deleted_assignments_in_app_view %}viewing-deleted-assignments{% endif %}
+  <div id="assignments-container" class="{% if VIEWING_DELETED_ASSIGNMENTS %}viewing-deleted-assignments{% endif %}
   {% if user.settingsmodel.background_image %}{{ user.settingsmodel.background_image_text_shadow_width }}-text-shadow-width{% endif %}
   {% if user.settingsmodel.priority_color_borders %}priority-color-borders{% endif %}" tabindex="-1">
     <script nonce="{{request.csp_nonce}}">
@@ -149,7 +149,7 @@
     <div id="extra-navs-positioner">
       {% comment %} <span> so :last-child is forwards-compatible {% endcomment %}
       <span id="extra-navs-assignment-positioner">
-        {% if not view_deleted_assignments_in_app_view %}
+        {% if not VIEWING_DELETED_ASSIGNMENTS %}
           <div id="assignments-header" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>
             <span id="todo-wrapper">
               <span id="estimated-total-time-label">Todo:</span>
@@ -177,14 +177,14 @@
         appropriately change priority.js if dom layout for the span children changes
         (before #no-assignments-message and after #assignments-header)
         {% endcomment %}
-        {% if view_deleted_assignments_in_app_view %}
+        {% if VIEWING_DELETED_ASSIGNMENTS %}
           <div id="no-assignments-message" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...</div>
         {% endif %}
       </span>
       <div id="extra-navs">
         {% comment %} extra-navs already has a filter style {% endcomment %}
         <span {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>
-          {% if view_deleted_assignments_in_app_view %}
+          {% if VIEWING_DELETED_ASSIGNMENTS %}
             {% if show_previous_page %}
               <span id="previous-page">Previous Page</span>
             {% endif %}
@@ -252,7 +252,7 @@
             </span>
             <div class="description"></div>
           </div>
-          {% if not view_deleted_assignments_in_app_view %}
+          {% if not VIEWING_DELETED_ASSIGNMENTS %}
             <div class="middle-of-header">
               <svg width="20px" height="20px" class="arrow-container">
                 <polygon points="5,0 5,20 15,10" fill="currentColor">
@@ -271,7 +271,7 @@
           {% endif %}
           <div class="right-side-of-header">
             <span class="completion-time"></span>
-            {% if view_deleted_assignments_in_app_view %}
+            {% if VIEWING_DELETED_ASSIGNMENTS %}
               <div class="assignment-header-button" title="Restore Assignment" tabindex="0">
                 <svg viewBox="252 252.18 247.73 247.64" class="restore-button" width="24" height="24" preserveAspectRatio="none">
                   <use href="#restore-svg"></use>
@@ -310,7 +310,7 @@
             </table>
           </div>
           <div class="graph-footer">
-            {% if not view_deleted_assignments_in_app_view %}
+            {% if not VIEWING_DELETED_ASSIGNMENTS %}
               <button class="delete-work-input-button">Delete <span class="hide-on-small-mobile">Work </span>Input</button>
               <div class="work-input-textbox-wrapper">
                 <input type="checkbox" class="work-input-unit-of-time-checkbox">
