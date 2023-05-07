@@ -1372,10 +1372,7 @@ navClickHandlers: function() {
 
 }
 },
-loadAssignmentData: function($element_with_id_attribute, directly_is_pk=false) {
-    if (directly_is_pk) return dat.find(assignment => assignment.id == $element_with_id_attribute);
-    return dat.find(assignment => assignment.id == $element_with_id_attribute.attr("data-assignment-id"));
-},
+loadAssignmentData: $element_with_id_attribute => dat.find(assignment => assignment.id === parseInt($element_with_id_attribute.attr("data-assignment-id"))),
 getRawDateNow: function(params={ dont_stem_off_date_now: false }) {
     const raw_date_now = new Date();
     if (!params.dont_stem_off_date_now) {

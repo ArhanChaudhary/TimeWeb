@@ -11,6 +11,22 @@
     --hide-form-transition-duration: 0.1s;
     --toggle-form-transition-timing-function: cubic-bezier(.02, .01, .47, 1);
 }
+#overlay.show-form {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity var(--show-form-transition-duration) var(--toggle-form-transition-timing-function);
+}
+#overlay.show-form #form-wrapper {
+    top: 15px;
+}
+#overlay.hide-form {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s var(--show-form-transition-duration), opacity var(--hide-form-transition-duration) var(--toggle-form-transition-timing-function);
+}
+#overlay.hide-form #form-wrapper {
+    top: 0;
+}
 #form-wrapper {
     --raw-form-width: min(calc(100vw - 55px), 490px);
     --horizontal-form-margin: 15px;
@@ -380,6 +396,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     transform: scale(3);
 }
 #form-wrapper #submit-assignment-button {
+    width: 350px;
     align-self: center;
     padding: 20px 72px;
     color: var(--color);
@@ -406,8 +423,10 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper .assignment-form-error-note {
     text-align: center;
+    z-index: -1;
     font-size: 14px;
     color: var(--error-note-color);
+    transition: all 0.3s cubic-bezier(.02, .01, .47, 1);
 }
 #break-days-wrapper {
     flex-grow: 1;

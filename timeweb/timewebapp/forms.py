@@ -35,13 +35,9 @@ class TimewebForm(forms.ModelForm):
             'dynamic_start': forms.HiddenInput(),
             'tags': forms.HiddenInput(),
             'unit': forms.TextInput(attrs={"placeholder": "Ex: Chapter, Paragraph, Question", "class": "dont-mark-invalid-if-empty"}),
-            'works': forms.NumberInput(attrs={"min":"0","step":"0.01"}),
+            'works': forms.NumberInput(attrs={"step": "0.01"}),
             # break_days also has dont-mark-invalid-if-empty just not here
-            'y': forms.NumberInput(attrs={"min":"0"}),
-            'time_per_unit': forms.NumberInput(attrs={"min":"0"}),
             'description': forms.Textarea(attrs={"rows": "1", "class": "dont-mark-invalid-if-empty"}),
-            'funct_round': forms.NumberInput(attrs={"min":"0"}),
-            'min_work_time': forms.NumberInput(attrs={"min":"0"}),
             'alert_due_date_incremented': forms.HiddenInput(),
             'dont_hide_again': forms.HiddenInput(),
         }

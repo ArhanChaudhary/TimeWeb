@@ -48,9 +48,9 @@
     <img alt id="background-image" src="{{ user.settingsmodel.background_image.url }}" width="{{ user.settingsmodel.background_image.width }}" height="{{ user.settingsmodel.background_image.height }}" draggable="false">
   {% endif %}
   <div id="tutorial-overlay"></div>
-  <div id="overlay">
+  <div id="overlay" class="hide-form">
     <div id="form-wrapper">
-      <form method="POST" autocomplete="off">
+      <form autocomplete="off">
         <img id="cancel-button" width="20" height="20" src="{% static 'timewebapp/images/x.webp' %}" alt="Cancel" draggable="false" tabindex="0">
         <div id="new-title">{{submit}}</div>
         <input id="field-group-picker-checkbox" type="checkbox" hidden>
@@ -64,7 +64,6 @@
           </div>
         </label>
         <div id="fields-wrapper">
-          {% csrf_token %}
           {% for field in form.visible_fields %}
 
             {% if field.name == "name" %}
@@ -109,18 +108,12 @@
                   <label class="field-widget" for="{{ field.name }}-widget-checkbox"></label>
                 {% endif %}
               {% endif %}
-              {% for error in field.errors %}
-                {% comment %} Only adds form errors to the name field in the example account {% endcomment %}
-                {% if user.email != EXAMPLE_ACCOUNT_EMAIL or field.name == "name" %}
-                  <div class="assignment-form-error-note" id="error_{{ field.auto_id }}">{{ error|escape }}</div>
-                {% endif %}
-              {% endfor %}
             </div>
           {% endfor %}
             </div>
           </div>
         </div>
-        <button {% if invalid_form_pk %}value="{{ invalid_form_pk }}"{% endif %}type="submit" name="submit-button" id="submit-assignment-button" class="generic-button" title="(Enter)">{{submit}}</button>
+        <button type="submit" id="submit-assignment-button" class="generic-button"></button>
       </form>
     </div>
   </div>
@@ -180,7 +173,7 @@
         (before #no-assignments-message and after #assignments-header)
         {% endcomment %}
         {% if VIEWING_DELETED_ASSIGNMENTS %}
-          <div id="no-assignments-message" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments...</div>
+          <div id="no-assignments-message" {% if user.settingsmodel.background_image %}class="grey-highlight"{% endif %}>You don't have any deleted assignments on this page...</div>
         {% endif %}
       </span>
       <div id="extra-navs">
