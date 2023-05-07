@@ -84,20 +84,20 @@ class TimewebForm(forms.ModelForm):
                 'invalid': _("The minimum work time is invalid"),
             },
         }
-    def __init__(self, *args, **kwargs):
-
-        # form instances from update field validation vs from form submission is different
-        # Parse ones from form submissions correctly
-        if isinstance(kwargs.get('data', {}).get('x'), str) and 'due_time' not in kwargs['data'] and kwargs['data']['x']:
-            kwargs['data']['due_time'] = kwargs['data']['x'].split(" ", 1)[1]
-            kwargs['data']['due_time'] = datetime.datetime.strptime(kwargs['data']['due_time'], '%I:%M %p').time()
-            kwargs['data']['due_time'] = kwargs['data']['due_time'].strftime('%H:%M')
-
-            kwargs['data']['x'] = kwargs['data']['x'].split(" ", 1)[0]
+    def __init__(self, data=None, *args, **kwargs):
+        if data is not None:
+            data = data.copy()
+            if isinstance(data.get('x'), str) and 'due_time' not in data and data['x']:
+                # form instances from update field validation vs from form submission is different
+                # Parse ones from form submissions correctly
+                data['due_time'] = data['x'].split(" ", 1)[1]
+                data['due_time'] = datetime.datetime.strptime(data['due_time'], '%I:%M %p').time()
+                data['due_time'] = data['due_time'].strftime('%H:%M')
+                data['x'] = data['x'].split(" ", 1)[0]
 
         self.request = kwargs.pop('request')
-        super().__init__(*args, **kwargs)
-        assert not self.is_bound or 'data' in kwargs, 'pls specify the data kwarg for readibility'
+        super().__init__(data, *args, **kwargs)
+        assert not self.is_bound or data is not None, 'pls specify the data kwarg for readibility'
         for field_name in TimewebForm.Meta.ADD_CHECKBOX_WIDGET_FIELDS:
             self.fields[f"{field_name}-widget-checkbox"] = forms.BooleanField(widget=forms.HiddenInput(), required=False)
         self.label_suffix = ""
@@ -106,8 +106,6 @@ class TimewebForm(forms.ModelForm):
         name = self.cleaned_data['name']
         if name == "":
             raise forms.ValidationError(_("You can't have a blank name"))
-        if self.request.isExampleAccount and not settings.EDITING_EXAMPLE_ACCOUNT:
-            raise forms.ValidationError(_("You can't create nor edit assignments in the example account"))
         return name
     
     def clean_works(self):
@@ -115,6 +113,8 @@ class TimewebForm(forms.ModelForm):
         if works is None:
             works = 0
         if isinstance(works, int):
+            if works < 0:
+                raise forms.ValidationError(_("This field's value must be positive or zero"))
             works = [str(works)]
         if not isinstance(works, list) or not all(isinstance(work, str) for work in works):
             raise forms.ValidationError(_("Invalid work inputs"))
@@ -180,13 +180,24 @@ class TimewebForm(forms.ModelForm):
 
         y = cleaned_data.get("y")
         works = cleaned_data.get("works")
-        first_work = Decimal(works[0])
+        try:
+            first_work = works[0]
+        except TypeError:
+            first_work = None
+        else:
+            first_work = Decimal(first_work)
         x = cleaned_data.get("x")
         assignment_date = cleaned_data.get("assignment_date")
         blue_line_start = cleaned_data.get("blue_line_start")
         unit = cleaned_data.get("unit")
         name = cleaned_data.get("name")
         due_time = cleaned_data.get("due_time") or datetime.time(0, 0)
+        if 'x' not in self.request.POST and not y:
+            # x is disabled but y doesn't have a value
+            self.add_error("y", forms.ValidationError("Please enter a value for the due date's prediction"))
+        if 'y' not in self.request.POST and not x:
+            # y is disabled but x doesn't have a value
+            self.add_error("x", forms.ValidationError("Please enter a value for the other field's prediction"))
         # save_assignment from the frontend for needs more info assignments can
         # have works defined but not blue_line_start and etc
         if blue_line_start != None and x != None and assignment_date != None:
@@ -205,7 +216,7 @@ class TimewebForm(forms.ModelForm):
                 # ok, even with this check. While they won't get deleted server side, they will client side, and
                 # the user will eventually delete work inputs until before the due date and skip this error
                 self.add_error("works", forms.ValidationError("You have too many work inputs"))
-        elif y != None and first_work * normalize_works >= y * normalize_y >= 1:
+        elif y is not None and first_work is not None and first_work * normalize_works >= y * normalize_y >= 1:
             self.add_error("works",
                 forms.ValidationError(_("This field's value of %(value)s can't be %(equal_to_or_greater_than)s the previous field's value of %(y)s"),code='invalid',params={
                     'value': f"{first_work}{({1: 'm', 60: 'h'}[normalize_works] if comparing_time else '')}",

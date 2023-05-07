@@ -5,7 +5,6 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
 from django.contrib.auth import logout, login
-from django.http import QueryDict
 from django.utils.decorators import method_decorator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -163,47 +162,7 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
             self.context['settings_form'] = SettingsForm(initial={ # unbound form
                 'assignment_sorting': request.user.settingsmodel.assignment_sorting,
             })
-
-            # adds ".animate-in" or ".animate-color" to the assignment whose form was submitted
-            if request.session.get("just_created_assignment_id"):
-                self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
-            elif request.session.get("just_updated_assignment_id"):
-                self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
-            if request.session.get("refresh_dynamic_mode"):
-                self.context['refresh_dynamic_mode'] = request.session.pop("refresh_dynamic_mode")
-
-
-
-
-
-
-
-
-            # REMOVE!!!!!!
-
-
-
-
-
-            if invalid_form_context := request.session.pop('invalid_form_context', None):
-                parsed = QueryDict(invalid_form_context['form'])
-                request.utc_offset = parsed['utc_offset']
-                form = TimewebForm(data=parsed, request=request)
-                assert not form.is_valid(), f"{form.data}, {form.errors}"
-                for field in form.errors:
-                    form[field].field.widget.attrs['class'] = form[field].field.widget.attrs.get('class', "") + ' invalid'
-                # we need to undo what happens in TimewebForm.__init__ to ensure the due time is
-                # included in the invalid form
-                _mutable = form.data._mutable
-                form.data._mutable = True
-                form.data['x'] += " " + form.data['due_time']
-                del form.data['due_time']
-                form.data._mutable = _mutable
-
-                invalid_form_context['form'] = form
-                self.context.update(invalid_form_context)
-        if 'form' not in self.context:
-            self.context['form'] = TimewebForm(request=request)
+        self.context['form'] = TimewebForm(request=request)
         logger.info(f'User \"{request.user}\" is now viewing the home page')
         return super().get(request)
 

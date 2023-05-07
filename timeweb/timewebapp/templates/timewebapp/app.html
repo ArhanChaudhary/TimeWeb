@@ -52,7 +52,7 @@
     <div id="form-wrapper">
       <form autocomplete="off">
         <img id="cancel-button" width="20" height="20" src="{% static 'timewebapp/images/x.webp' %}" alt="Cancel" draggable="false" tabindex="0">
-        <div id="new-title">{{submit}}</div>
+        <div id="new-title"></div>
         <input id="field-group-picker-checkbox" type="checkbox" hidden>
         <label id="field-group-picker" for="field-group-picker-checkbox">
           <span class="field-group-picker-label" id="standard-field-group-label">Standard</span>
@@ -78,7 +78,6 @@
 
             <div class="field-wrapper
               {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
-              {% if field.name == 'x' and x_was_predicted or field.name == 'y' and y_was_predicted %} disabled-field {% endif %}
               {% if field.name == 'y' %} disable-widget-along-with-field {% endif %}
               {% if field.name == "x" or field.name == "y" %} has-magic-wand-icon {% endif %}" 
               id="id-{{ field.name }}-field-wrapper"

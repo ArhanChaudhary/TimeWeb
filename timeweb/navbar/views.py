@@ -64,12 +64,7 @@ class SettingsView(LoginRequiredMixin, TimewebGenericView):
         
     def post(self, request):
         self.old_data = deepcopy(request.user.settingsmodel)
-
-        # for parsing default due times in forms.py
-        _mutable = request.POST._mutable
-        request.POST._mutable = True
         self.form = SettingsForm(data=request.POST, files=request.FILES, instance=request.user.settingsmodel)
-        request.POST._mutable = _mutable
 
         if self.form.is_valid():
             return self.valid_form(request)

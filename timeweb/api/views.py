@@ -2,18 +2,19 @@
 
 # Abstractions
 from django.utils.translation import gettext as _
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, JsonResponse
 from django.utils import timezone
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
-from django.shortcuts import redirect
+from django.forms.models import model_to_dict
 
 # App stuff
 import common.utils as utils
 import timewebapp.utils as app_utils
 from . import integrations
 from timewebapp.models import TimewebModel
+from timewebapp.views import EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT
 from timewebapp.forms import TimewebForm
 from navbar.models import SettingsModel
 from navbar.forms import SettingsForm
@@ -40,41 +41,20 @@ DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "descrip
                                         "deletion_time", "user", "needs_more_info")
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
-def post(request):
-    # The frontend adds the assignment's pk as the "value" attribute to the submit button
-    pk = request.POST['submit-button']
-    if pk == '':
-        pk = None
-        created_assignment = True
-        edited_assignment = False
-    else:
-        created_assignment = False
-        edited_assignment = True
-    
-    # for parsing due times in forms.py
-    _mutable = request.POST._mutable
-    request.POST._mutable = True
+@require_http_methods(["POST"])
+def submit_assignment(request):
+    id_ = request.POST['id']
+    edited_assignment = bool(id_)
+    created_assignment = not edited_assignment
+
     submitted_form = TimewebForm(data=request.POST, request=request)
-    request.POST._mutable = _mutable
 
     if not submitted_form.is_valid():
         logger.info(f"User \"{request.user}\" submitted an invalid form")
-
-        # field value is set to "Predicted" and field is disabled in crud.js
-        # We can't do both of those in the backend because setting the field value doesn't work for disabled fields
-
-        # adds an auxillary class .disabled-field to determine whether or not the field was predicted in the submission
-        context['x_was_predicted'] = 'x' not in request.POST
-        context['y_was_predicted'] = 'y' not in request.POST
-        if created_assignment:
-            context['submit'] = 'Create Assignment'
-        else:
-            assert edited_assignment
-            context['invalid_form_pk'] = pk
-            context['submit'] = 'Edit Assignment'
-        context['form'] = submitted_form.data.urlencode() # TimewebForm is not json serializable
-        request.session['invalid_form_context'] = context
-        return redirect("home")
+        return JsonResponse({
+            "valid": False,
+            "errors": submitted_form.errors,
+        })
 
     if created_assignment:
         sm = submitted_form.save(commit=False)
@@ -86,7 +66,7 @@ def post(request):
         sm.user = request.user
     else:
         assert edited_assignment
-        sm = request.user.timewebmodel_set.get(pk=pk)
+        sm = request.user.timewebmodel_set.get(pk=id_)
         old_data = deepcopy(sm)
 
         # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
@@ -441,18 +421,23 @@ def post(request):
     sm.save()
     if created_assignment:
         logger.info(f'User \"{request.user}\" created assignment "{sm.name}"')
-        request.session["just_created_assignment_id"] = sm.pk
+        refresh_dynamic_mode = None
     else:
-        assert edited_assignment
         logger.info(f'User \"{request.user}\" updated assignment "{sm.name}"')
-        request.session['just_updated_assignment_id'] = sm.pk
+        refresh_dynamic_mode = False
         for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS:
             # this includes fields from TimewebForm.Meta.exclude
             # keep it like this because form_valid may internally and manually change these fields
             if field == "works" and getattr(old_data, field)[0] != getattr(sm, field)[0] or getattr(old_data, field) != getattr(sm, field):
-                request.session['refresh_dynamic_mode'] = sm.pk
+                refresh_dynamic_mode = True
                 break
-    return redirect("home")
+    return JsonResponse({
+        'valid': True,
+        'edited_assignment': edited_assignment,
+        'refresh_dynamic_mode': refresh_dynamic_mode,
+        'assignments': [model_to_dict(sm, exclude=EXCLUDE_FROM_ASSIGNMENT_MODELS_JSON_SCRIPT)],
+    })
+
 
 @require_http_methods(["POST"])
 def delete_assignment(request):

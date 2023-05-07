@@ -2,6 +2,7 @@ from django.urls import path
 from . import views, integrations
 
 urlpatterns = [
+    path("submit-assignment/", views.submit_assignment, name="submit_assignment"),
     path("delete-assignment/", views.delete_assignment, name="delete_assignment"),
     path("restore-assignment/", views.restore_assignment, name="restore_assignment"),
     path("save-assignment/", views.save_assignment, name="save_assignment"),
@@ -11,8 +12,8 @@ urlpatterns = [
     path("update-gc-courses/", integrations.update_gc_courses, name="update_gc_courses"),
     path("gc-auth-callback/", integrations.gc_auth_callback, name="gc_auth_callback"),
 ]
-INCLUDE_IN_STATE_EVALUATION = ("delete_assignment", "restore_assignment", "save_assignment", 
-    "change_setting", )
+INCLUDE_IN_STATE_EVALUATION = ("submit_assignment", "delete_assignment",
+    "restore_assignment", "save_assignment", "change_setting", )
 CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION = (
     # having create_gc_assignments in this list used to run the risk of having the
     # "your assignments are outdated" alert to run (see bb9dac2) 
