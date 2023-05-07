@@ -41,7 +41,7 @@ class APIValidationMiddleware:
         res = self.get_response(request)
         if (
             resolved.url_name in EXCLUDE_FROM_UPDATING_STATE or
-            resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION and not json.loads(res.content.decode('ascii')).get('update_state')
+            resolved.url_name in CONDITIONALLY_EXCLUDE_FROM_STATE_EVALUATION and not json.loads(res.content.decode('utf-8')).get('update_state')
         ):
             return res
         request.user.settingsmodel.device_uuid = device_uuid
