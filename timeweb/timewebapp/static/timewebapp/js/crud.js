@@ -283,24 +283,15 @@ class Crud {
         const that = this;
         if (params.show_instantly) {
             $('#overlay').show().find("#form-wrapper").css("top", 15);
-            // cursed way to position magic wand icon
-            // TODO: ideally i want a span wrapper around input so i dont have to consult the dark arts to position the magic wand icon
             $(".magic-wand-icon").each(function() {
                 const field_wrapper = $(this).parents(".field-wrapper");
-                const error_note = field_wrapper.find(".assignment-form-error-note");
-
                 // the class is just to determine whether or not the field was previously predicted
                 if (field_wrapper.hasClass("disabled-field")) {
                     field_wrapper.removeClass("disabled-field");
                     field_wrapper.find(".magic-wand-icon").click();
                 }
-
-                if (!error_note.length) return;
-                // ew
-                $(this).css("margin-bottom", error_note.height());
             });
         } else {
-            $(".magic-wand-icon").css("margin-bottom", "");
             $("#overlay").fadeIn(300).find("#form-wrapper").animate({top: 15}, 300);
             setTimeout(() => $("#form-wrapper form input:visible").first().focus(), 0);
             $(".field-wrapper.disabled-field").each(function() {

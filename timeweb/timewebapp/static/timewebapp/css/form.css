@@ -1,3 +1,32 @@
+#overlay {
+    overflow: auto;
+    background-color: hsla(0, 0%, 0%, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1002;
+    --show-form-transition-duration: 0.3s;
+    --hide-form-transition-duration: 0.1s;
+    --toggle-form-transition-timing-function: cubic-bezier(.02, .01, .47, 1);
+}
+#form-wrapper {
+    --raw-form-width: min(calc(100vw - 55px), 490px);
+    --horizontal-form-margin: 15px;
+    --form-width: calc(var(--raw-form-width) - var(--horizontal-form-margin) * 2);
+    --input-label-spacing: 2px;
+    position: relative;
+    width: var(--raw-form-width);
+    box-sizing: border-box;
+    padding: 7px var(--horizontal-form-margin) 25px;
+    margin: 5px auto 35px;
+    border-radius: 15px;
+    background: var(--primary);
+    box-shadow: 0 0 100px -23px black;
+    letter-spacing: 0.5px;
+    transition: top 0.3s cubic-bezier(.02, .01, .47, 1);
+}
 #form-wrapper form {
     display: flex;
     font-size: 17px;
@@ -49,20 +78,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper label[for='id_assignment_date']::after {
     content: "(Enter today if you don't remember)";
-}
-#form-wrapper {
-    --raw-form-width: min(calc(100vw - 55px), 490px);
-    width: var(--raw-form-width);
-    box-sizing: border-box;
-    background: var(--primary);
-    box-shadow: 0 0 100px -23px black;
-    margin: 5px auto 35px;
-    border-radius: 15px;
-    --horizontal-form-margin: 15px;
-    padding: 7px var(--horizontal-form-margin) 25px;
-    --form-width: calc(var(--raw-form-width) - var(--horizontal-form-margin) * 2);
-    position: relative;
-    letter-spacing: 0.5px;
 }
 #form-wrapper #cancel-button {
     position: absolute;
@@ -235,12 +250,15 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 }
 #form-wrapper .magic-wand-icon {
     cursor: pointer;
-    --inside-padding: 3px;
+    z-index: 1;
+    position: relative;
     left: calc(var(--inside-padding) + 2px);
-    bottom: var(--inside-padding);
-    position: absolute;
-    padding-bottom: inherit;
-    height: calc(var(--field-height) - var(--inside-padding) * 2);
+    margin-top: inherit;
+    --inside-padding: 3px;
+    top: calc(var(--inside-padding) + var(--input-label-spacing));
+    --width-and-height: calc(var(--field-height) - var(--inside-padding) * 2);
+    height: var(--width-and-height);
+    margin-right: calc(0.01px - var(--width-and-height));
 }
 #form-wrapper #fields-wrapper {
     --magic-wand-width: 34px;
@@ -261,6 +279,10 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     width: initial;
     border-top-right-radius: initial;
     border-bottom-right-radius: initial;
+}
+#form-wrapper .field-wrapper.has-magic-wand-icon > input {
+    width: initial;
+    flex-grow: 1;
 }
 #form-wrapper .field-wrapper.has-widget.disabled-field:not(.disable-widget-along-with-field) > input:first-of-type {
     border-right: none;
@@ -284,7 +306,7 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper .field-wrapper > .field-widget,
 #form-wrapper .field-wrapper > textarea,
 #break-days-wrapper {
-    margin-top: 2px;
+    margin-top: var(--input-label-spacing);
     border: var(--field-wrapper-border);
     box-sizing: border-box; 
     border-radius: 3px;
@@ -386,17 +408,6 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
     text-align: center;
     font-size: 14px;
     color: var(--error-note-color);
-}
-#overlay {
-    overflow: auto;
-    background-color: hsla(0, 0%, 0%, 0.2);
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 1002;
-    display: none;
 }
 #break-days-wrapper {
     flex-grow: 1;

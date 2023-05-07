@@ -18,8 +18,6 @@ select {
     --background-color-default: hsl(0, 0%, 16%);
     --background-color-hover: hsl(0, 0%, 17%);
     --background-color-active: hsl(0, 0%, 15%);
-}
-#form-wrapper #submit-assignment-button {
     border-color: black;
 }
 #form-wrapper .field-wrapper > input,

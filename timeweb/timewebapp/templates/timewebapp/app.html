@@ -77,22 +77,24 @@
                 <div class="instant-margin-transition">
             {% endif %}
 
-            <div class="field-wrapper {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
-              {% comment %} tells crud.js the field was predicted {% endcomment %}
+            <div class="field-wrapper
+              {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %} has-widget {% endif %}
               {% if field.name == 'x' and x_was_predicted or field.name == 'y' and y_was_predicted %} disabled-field {% endif %}
-              {% if field.name == 'y' %} disable-widget-along-with-field {% endif %}" 
-            id="id-{{ field.name }}-field-wrapper">
+              {% if field.name == 'y' %} disable-widget-along-with-field {% endif %}
+              {% if field.name == "x" or field.name == "y" %} has-magic-wand-icon {% endif %}" 
+              id="id-{{ field.name }}-field-wrapper"
+            >
               {% if field.name == "break_days" %}
                 <label id="break-days-label-title">Work Days</label>
                 {% include 'timewebapp/widgets/work_days.html' %}
               {% else %}
                 {{ field.label_tag }}
-                {{ field }}
                 {% if field.name == "x" or field.name == "y" %}
                   <svg class="magic-wand-icon" viewBox="2.19 10 488.31 488.28">
                     <use href="#magic_wand-svg"></use>
                   </svg>
                 {% endif %}
+                {{ field }}
               {% endif %}
               {% if field.name in ADD_CHECKBOX_WIDGET_FIELDS %}
                 {% if field.name == "x" %}
