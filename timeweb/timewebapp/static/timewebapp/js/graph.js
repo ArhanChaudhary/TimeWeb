@@ -279,6 +279,7 @@ class VisualAssignment extends Assignment {
     static SKEW_RATIO_SNAP_DIFF = 0.05
     static BUTTON_ERROR_DISPLAY_TIME = 1000
     static TOTAL_ARROW_SKEW_RATIO_STEPS = 100
+    static scale = window.devicePixelRatio || 2
 
     constructor(dom_assignment) {
         super(dom_assignment);
@@ -299,7 +300,6 @@ class VisualAssignment extends Assignment {
             this.date_string_options = {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'};
             this.date_string_options_no_weekday = {year: 'numeric', month: 'long', day: 'numeric'};
         }
-        this.scale = window.devicePixelRatio || 2;
     }
     initUI() {
         const first_click = !this.dom_assignment.hasClass('has-been-clicked');
@@ -323,7 +323,6 @@ class VisualAssignment extends Assignment {
             this.red_line_start_x = this.sa.dynamic_start;
             this.red_line_start_y = this.sa.works[this.red_line_start_x - this.sa.blue_line_start];
         }
-        this.scale = window.devicePixelRatio || 2; // Zoom in/out
         const assignment_footer = this.dom_assignment.find(".assignment-footer");
         if (assignment_footer.is(":visible")) {
             this.width = this.fixed_graph.width();
@@ -336,10 +335,10 @@ class VisualAssignment extends Assignment {
         }
         this.wCon = (this.width - (VisualAssignment.GRAPH_Y_AXIS_MARGIN + 15)) / this.sa.complete_x;
         this.hCon = (this.height - 55) / this.sa.y;
-        this.graph[0].width = this.width * this.scale;
-        this.graph[0].height = this.height * this.scale;
-        this.fixed_graph[0].width = this.width * this.scale;
-        this.fixed_graph[0].height = this.height * this.scale;
+        this.graph[0].width = this.width * VisualAssignment.scale;
+        this.graph[0].height = this.height * VisualAssignment.scale;
+        this.fixed_graph[0].width = this.width * VisualAssignment.scale;
+        this.fixed_graph[0].height = this.height * VisualAssignment.scale;
         if (this.dom_assignment.hasClass("open-assignment") || this.dom_assignment.hasClass("assignment-is-closing")) {
             this.drawFixed();
             this.draw();
@@ -582,7 +581,7 @@ class VisualAssignment extends Assignment {
             this.last_draw_at_works = draw_at_works;
         }
         const screen = this.graph[0].getContext("2d");
-        screen.scale(this.scale, this.scale);
+        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
         screen.clearRect(0, 0, this.width, this.height);
 
         const rounded_skew_ratio = mathUtils.precisionRound(this.sa.skew_ratio - 1, VisualAssignment.SKEW_RATIO_ROUND_PRECISION);
@@ -718,7 +717,7 @@ class VisualAssignment extends Assignment {
                 center(Priority.generate_UNFINISHED_FOR_TODAY_status_message(this, todo, last_work_input), 2);
             }
         }
-        screen.scale(1 / this.scale, 1 / this.scale);
+        screen.scale(1 / VisualAssignment.scale, 1 / VisualAssignment.scale);
     }
     static GRAPH_Y_AXIS_MARGIN = 55;
     static SMALLER_SMALLER_MARGIN_X = 11;
@@ -730,7 +729,7 @@ class VisualAssignment extends Assignment {
     //hard (the entire function)
     drawFixed() {
         const screen = this.fixed_graph[0].getContext("2d");
-        screen.scale(this.scale, this.scale);
+        screen.scale(VisualAssignment.scale, VisualAssignment.scale);
         let gradient = screen.createLinearGradient(0, 0, 0, this.height * 4 / 3);
         gradient.addColorStop(0, "white");
         gradient.addColorStop(1, "hsl(0, 0%, 83%)");
