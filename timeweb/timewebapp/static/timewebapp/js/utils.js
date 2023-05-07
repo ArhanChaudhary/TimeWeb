@@ -1256,7 +1256,7 @@ saveAndLoadStates: function() {
                 // if you edit an open assignment and make it needs more info
                 // ensure it isn't clicked
                 const sa = new VisualAssignment(dom_assignment);
-                if (sa.canOpenAssignment()) {
+                if (!sa.sa.needs_more_info) {
                     dom_assignment.click();
                 }
             });

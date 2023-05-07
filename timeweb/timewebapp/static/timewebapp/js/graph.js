@@ -550,7 +550,6 @@ class VisualAssignment extends Assignment {
         }
         const len_works = this.sa.works.length - 1;
         const last_work_input = this.sa.works[len_works];
-        const today_minus_assignment_date = mathUtils.daysBetweenTwoDates(date_now, this.sa.assignment_date);
         const assignment_container = this.dom_assignment.parents(".assignment-container");
 
         // draw() always runs setParabolaValues but I'll leave it like this because it's easier to maintain and for forward compatibility
@@ -1630,9 +1629,6 @@ class VisualAssignment extends Assignment {
             title_text.text(sliced);
         }
     }
-    canOpenAssignment() {
-        return !this.sa.needs_more_info;
-    }
 }
 window.VisualAssignment = VisualAssignment;
 $(document).click(function(e) {
@@ -1647,7 +1643,7 @@ $(document).click(function(e) {
     if (dontFire) return;
     const sa = new VisualAssignment(dom_assignment);
     
-    if (!sa.canOpenAssignment()) {
+    if (sa.sa.needs_more_info) {
         dom_assignment.find(".update-button").click();
         return;
     }
