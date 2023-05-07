@@ -40,11 +40,11 @@ DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS = ("id", "name", "soft", "unit", "descrip
                                         "deletion_time", "user", "needs_more_info")
 assert len(TRIGGER_DYNAMIC_MODE_RESET_FIELDS) + len(DONT_TRIGGER_DYNAMIC_MODE_RESET_FIELDS) == len(TimewebModel._meta.fields), "update this list"
 
-def post(self, request):
+def post(request):
     # The frontend adds the assignment's pk as the "value" attribute to the submit button
-    self.pk = request.POST['submit-button']
-    if self.pk == '':
-        self.pk = None
+    pk = request.POST['submit-button']
+    if pk == '':
+        pk = None
         request.created_assignment = True
         request.updated_assignment = False
     else:
@@ -54,44 +54,44 @@ def post(self, request):
     # for parsing due times in forms.py
     _mutable = request.POST._mutable
     request.POST._mutable = True
-    self.form = TimewebForm(data=request.POST, request=request)
+    form = TimewebForm(data=request.POST, request=request)
     request.POST._mutable = _mutable
 
-    if self.form.is_valid():
-        return self.valid_form(request)
+    if form.is_valid():
+        return valid_form(request)
     else:
-        return self.invalid_form(request)
+        return invalid_form(request)
 
-def valid_form(self, request):
+def valid_form(request):
     if request.created_assignment:
-        self.sm = self.form.save(commit=False)
+        sm = form.save(commit=False)
         old_data = None
 
         # Set defaults
-        self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
-        first_work = Decimal(self.sm.works[0])
-        self.sm.user = request.user
+        sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
+        first_work = Decimal(sm.works[0])
+        sm.user = request.user
     else:
         assert request.updated_assignment
-        self.sm = request.user.timewebmodel_set.get(pk=self.pk)
-        old_data = deepcopy(self.sm)
+        sm = request.user.timewebmodel_set.get(pk=pk)
+        old_data = deepcopy(sm)
 
         # TODO: I ideally want to use a TimewebForm with an instance kwarg, see 64baf58
         # Excluded: id, blue_line_start, skew_ratio, works, fixed_mode, dynamic_start, tags, alert_due_date_incremented, dont_hide_again
 
-        self.sm.name = self.form.cleaned_data.get("name")
-        self.sm.assignment_date = self.form.cleaned_data.get("assignment_date")
-        self.sm.x = self.form.cleaned_data.get("x")
-        self.sm.due_time = self.form.cleaned_data.get("due_time")
-        self.sm.soft = self.form.cleaned_data.get("soft")
-        self.sm.unit = self.form.cleaned_data.get("unit")
-        self.sm.y = self.form.cleaned_data.get("y")
-        first_work = Decimal(self.form.cleaned_data.get("works")[0])
-        self.sm.time_per_unit = self.form.cleaned_data.get("time_per_unit")
-        self.sm.description = self.form.cleaned_data.get("description")
-        self.sm.funct_round = self.form.cleaned_data.get("funct_round")
-        self.sm.min_work_time = self.form.cleaned_data.get("min_work_time")
-        self.sm.break_days = self.form.cleaned_data.get("break_days")
+        sm.name = form.cleaned_data.get("name")
+        sm.assignment_date = form.cleaned_data.get("assignment_date")
+        sm.x = form.cleaned_data.get("x")
+        sm.due_time = form.cleaned_data.get("due_time")
+        sm.soft = form.cleaned_data.get("soft")
+        sm.unit = form.cleaned_data.get("unit")
+        sm.y = form.cleaned_data.get("y")
+        first_work = Decimal(form.cleaned_data.get("works")[0])
+        sm.time_per_unit = form.cleaned_data.get("time_per_unit")
+        sm.description = form.cleaned_data.get("description")
+        sm.funct_round = form.cleaned_data.get("funct_round")
+        sm.min_work_time = form.cleaned_data.get("min_work_time")
+        sm.break_days = form.cleaned_data.get("break_days")
 
         if old_data.assignment_date:
             old_data.assignment_date = old_data.assignment_date.replace(tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
@@ -116,73 +116,73 @@ def valid_form(self, request):
                 |      | other  | NA     | NA             | pass  |
                 +------+--------+--------+----------------+-------+
                 '''
-                if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                    setattr(self.sm, field, app_utils.minutes_to_hours(getattr(self.sm, field)))
-                elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                    setattr(self.sm, field, app_utils.hours_to_minutes(getattr(self.sm, field)))
+                if sm.unit.lower() in ('hour', 'hours') and not form.cleaned_data.get(f"{field}-widget-checkbox"):
+                    setattr(sm, field, app_utils.minutes_to_hours(getattr(sm, field)))
+                elif sm.unit.lower() in ('minute', 'minutes') and form.cleaned_data.get(f"{field}-widget-checkbox"):
+                    setattr(sm, field, app_utils.hours_to_minutes(getattr(sm, field)))
             elif field == "works":
                 # NOTE: changing just funct_round unit should not affect the rest of works
                 # so it is safe to do this and not include it as a condition where works is
                 # redefined if unit changes from minute to hour or vice versa
-                if self.sm.unit.lower() in ('hour', 'hours') and not self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                if sm.unit.lower() in ('hour', 'hours') and not form.cleaned_data.get(f"{field}-widget-checkbox"):
                     first_work = app_utils.minutes_to_hours(first_work)
-                elif self.sm.unit.lower() in ('minute', 'minutes') and self.form.cleaned_data.get(f"{field}-widget-checkbox"):
+                elif sm.unit.lower() in ('minute', 'minutes') and form.cleaned_data.get(f"{field}-widget-checkbox"):
                     first_work = app_utils.hours_to_minutes(first_work)
             elif field in ("min_work_time", "time_per_unit"):
-                if self.form.cleaned_data.get(f"{field}-widget-checkbox"):
-                    setattr(self.sm, field, app_utils.hours_to_minutes(getattr(self.sm, field)))
+                if form.cleaned_data.get(f"{field}-widget-checkbox"):
+                    setattr(sm, field, app_utils.hours_to_minutes(getattr(sm, field)))
                 if field in ("min_work_time", ):
-                    setattr(self.sm, field, app_utils.safe_conversion(getattr(self.sm, field), 1 / self.sm.time_per_unit))
+                    setattr(sm, field, app_utils.safe_conversion(getattr(sm, field), 1 / sm.time_per_unit))
         except TypeError:
             pass
 
     # We don't actually need to do any further checking if x or y were predicted because of the frontend's validation
     if (
-        self.sm.assignment_date is None or self.sm.time_per_unit is None or
-        self.sm.x is None and self.sm.y is None or
+        sm.assignment_date is None or sm.time_per_unit is None or
+        sm.x is None and sm.y is None or
         # if x is empty and y was not predicted (y is a value)
         request.POST.get('x') == "" and 'y' in request.POST or 
         # if y is empty and x was not predicted (x is a value)
         request.POST.get('y') == "" and 'x' in request.POST
     ):
-        self.sm.needs_more_info = True
-        self.sm.works = [str(first_work)]
+        sm.needs_more_info = True
+        sm.works = [str(first_work)]
     else:
-        self.sm.needs_more_info = False
+        sm.needs_more_info = False
         date_now = utils.utc_to_local(request, timezone.now())
         date_now = date_now.replace(hour=0, minute=0, second=0, microsecond=0)
         if settings.EDITING_EXAMPLE_ACCOUNT:
             # Example account date (for below logic purposes)
             original_date_now = date_now
             date_now = utils.utc_to_local(request, datetime.datetime(2021, 5, 3, tzinfo=timezone.utc))
-            self.sm.assignment_date -= original_date_now - date_now
-            self.sm.x -= original_date_now - date_now
-        min_work_time_funct_round = ceil(self.sm.min_work_time / self.sm.funct_round) * self.sm.funct_round if self.sm.min_work_time else self.sm.funct_round
-        # NOTE: (self.sm.x is None and self.sm.y is None) is impossible
-        if self.sm.x is None:
+            sm.assignment_date -= original_date_now - date_now
+            sm.x -= original_date_now - date_now
+        min_work_time_funct_round = ceil(sm.min_work_time / sm.funct_round) * sm.funct_round if sm.min_work_time else sm.funct_round
+        # NOTE: (sm.x is None and sm.y is None) is impossible
+        if sm.x is None:
             if request.created_assignment or old_data.needs_more_info:
                 adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                     old_data=old_data,
-                    assignment_date=self.sm.assignment_date,
+                    assignment_date=sm.assignment_date,
                     x_num=None
                 )
                 mods = app_utils.calc_mod_days(
-                    assignment_date=self.sm.assignment_date,
+                    assignment_date=sm.assignment_date,
                     blue_line_start=adjusted_blue_line_partial['blue_line_start'],
-                    break_days=self.sm.break_days
+                    break_days=sm.break_days
                 )
                 new_first_work = first_work
             else:
                 assert request.updated_assignment
                 adjusted_blue_line_partial = app_utils.adjust_blue_line(request,
                     old_data=old_data,
-                    assignment_date=self.sm.assignment_date,
+                    assignment_date=sm.assignment_date,
                     x_num=None
                 )
                 mods = app_utils.calc_mod_days(
-                    assignment_date=self.sm.assignment_date,
+                    assignment_date=sm.assignment_date,
                     blue_line_start=old_data.blue_line_start,
-                    break_days=self.sm.break_days
+                    break_days=sm.break_days
                 )
                 removed_works_start = adjusted_blue_line_partial['removed_works_start']
                 removed_works_end = adjusted_blue_line_partial['removed_works_end']
@@ -199,11 +199,11 @@ def valid_form(self, request):
                 else:
                     new_first_work = first_work
             # the prediction for y is ceiled so also ceil the prediction for the due date for consistency
-            work_day_count = ceil((self.sm.y - new_first_work) / min_work_time_funct_round)
+            work_day_count = ceil((sm.y - new_first_work) / min_work_time_funct_round)
 
-            if not work_day_count or len(self.sm.break_days) == 7:
+            if not work_day_count or len(sm.break_days) == 7:
                 x_num = 1
-            elif self.sm.break_days:
+            elif sm.break_days:
                 # Terrible implementation of inversing calcModDays
 
                 # For reference, look at this:
@@ -220,22 +220,22 @@ def valid_form(self, request):
                 
                 # I subtract one at the end of the assignment for the for loop
                 # And I subtract one in the middle of the equation to fix a wrong week bug that isn't worth fixing
-                guess_x = 7 * floor(work_day_count / (7 - len(self.sm.break_days)) - 1) - 1
+                guess_x = 7 * floor(work_day_count / (7 - len(sm.break_days)) - 1) - 1
                 while 1:
                     guess_x += 1
                     # logic stolen from Assignment.funct
-                    if guess_x - (guess_x // 7 * len(self.sm.break_days) + mods[guess_x % 7]) == work_day_count:
+                    if guess_x - (guess_x // 7 * len(sm.break_days) + mods[guess_x % 7]) == work_day_count:
                         x_num = max(1, guess_x)
                         break
             else:
                 x_num = work_day_count
             # Make sure assignments arent finished by x_num
-            # x_num = date_now+timedelta(x_num) - min(date_now, self.sm.assignment_date)
-            if self.sm.assignment_date < date_now:
-                # x_num = (date_now + timedelta(x_num) - self.sm.assignment_date).days
-                # x_num = (date_now - self.sm.assignment_date).days + x_num
-                # x_num += (date_now - self.sm.assignment_date).days
-                x_num += utils.days_between_two_dates(date_now, self.sm.assignment_date)
+            # x_num = date_now+timedelta(x_num) - min(date_now, sm.assignment_date)
+            if sm.assignment_date < date_now:
+                # x_num = (date_now + timedelta(x_num) - sm.assignment_date).days
+                # x_num = (date_now - sm.assignment_date).days + x_num
+                # x_num += (date_now - sm.assignment_date).days
+                x_num += utils.days_between_two_dates(date_now, sm.assignment_date)
                 # There is no need to modify blue_line_start by this addition because it is adjusted earlier
                 # To see why this is the case, let's think about this abstractly.
                 # We are adding x_num to the due date, and the due date is after the assignment date and,
@@ -243,29 +243,29 @@ def valid_form(self, request):
                 # to the end of the assignment, away from all of these affect variables, this addition should,
                 #  in theory, not affect blue_line_start.
             try:
-                self.sm.x = self.sm.assignment_date + datetime.timedelta(x_num)
+                sm.x = sm.assignment_date + datetime.timedelta(x_num)
             except OverflowError:
-                self.sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
-                self.sm.x = self.sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
-                x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
+                sm.x = datetime.datetime.max - datetime.timedelta(10) # -10 to prevent overflow errors
+                sm.x = sm.x.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.zoneinfo.ZoneInfo(request.utc_offset))
+                x_num = utils.days_between_two_dates(sm.x, sm.assignment_date)
         else:
-            x_num = utils.days_between_two_dates(self.sm.x, self.sm.assignment_date)
-        if self.sm.due_time and (self.sm.due_time.hour or self.sm.due_time.minute):
-            complete_x_num = Decimal(x_num) + Decimal(self.sm.due_time.hour * 60 + self.sm.due_time.minute) / Decimal(24 * 60)
+            x_num = utils.days_between_two_dates(sm.x, sm.assignment_date)
+        if sm.due_time and (sm.due_time.hour or sm.due_time.minute):
+            complete_x_num = Decimal(x_num) + Decimal(sm.due_time.hour * 60 + sm.due_time.minute) / Decimal(24 * 60)
             x_num += 1
         else:
             complete_x_num = x_num
         adjusted_blue_line = app_utils.adjust_blue_line(request,
             old_data=old_data,
-            assignment_date=self.sm.assignment_date,
+            assignment_date=sm.assignment_date,
             x_num=x_num
         )
-        self.sm.blue_line_start = adjusted_blue_line['blue_line_start']
-        if self.sm.y is None:
+        sm.blue_line_start = adjusted_blue_line['blue_line_start']
+        if sm.y is None:
             mods = app_utils.calc_mod_days(
-                assignment_date=self.sm.assignment_date,
-                blue_line_start=self.sm.blue_line_start,
-                break_days=self.sm.break_days
+                assignment_date=sm.assignment_date,
+                blue_line_start=sm.blue_line_start,
+                break_days=sm.break_days
             )
             # logic stolen from parabola.js:
 
@@ -275,24 +275,24 @@ def valid_form(self, request):
             #     x1 = Math.ceil(x1);
             # }
 
-            complete_work_day_count = complete_x_num - self.sm.blue_line_start
-            complete_work_day_count -= floor((x_num - self.sm.blue_line_start) / 7) * len(self.sm.break_days) + mods[(x_num - self.sm.blue_line_start) % 7]
+            complete_work_day_count = complete_x_num - sm.blue_line_start
+            complete_work_day_count -= floor((x_num - sm.blue_line_start) / 7) * len(sm.break_days) + mods[(x_num - sm.blue_line_start) % 7]
             # first +1 for js
-            if str((self.sm.assignment_date.weekday()+1 + floor(complete_x_num)) % 7) in self.sm.break_days:
+            if str((sm.assignment_date.weekday()+1 + floor(complete_x_num)) % 7) in sm.break_days:
                 complete_work_day_count = ceil(complete_work_day_count)
             # we need to ceil (the prediction for due date is ceiled so also ceil the prediction for y for consistency) 
             # to the nearest funct_round in the case of fractional values of complete_work_day_count that may not
             # multiply to a multiple of funct_round
-            self.sm.y = self.sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / self.sm.funct_round) + first_work
+            sm.y = sm.funct_round * ceil((min_work_time_funct_round * complete_work_day_count) / sm.funct_round) + first_work
             # if min work time is for example 1 hour and work_day_count is 7 days, the user would ideally want to see
             # unit as "hour" and y as 7 hours instead of "minute" and 420 minutes
-            if self.sm.unit.lower() in ('minute', 'minutes') and app_utils.should_convert_to_hours(self.sm.y):
+            if sm.unit.lower() in ('minute', 'minutes') and app_utils.should_convert_to_hours(sm.y):
                 # so far all in the scope of minutes to define new_min_work_time_funct_round
                 new_unit = "Minute"
-                new_y = self.sm.y
+                new_y = sm.y
                 new_time_per_unit = Decimal(3600)
                 new_funct_round = Decimal(30)
-                new_min_work_time = self.sm.min_work_time
+                new_min_work_time = sm.min_work_time
 
                 new_min_work_time_funct_round = ceil(new_min_work_time / new_funct_round) * new_funct_round if new_min_work_time else new_funct_round
                 if new_min_work_time_funct_round <= min_work_time_funct_round:
@@ -302,11 +302,11 @@ def valid_form(self, request):
                     new_time_per_unit = app_utils.minutes_to_hours(new_time_per_unit)
                     new_funct_round = app_utils.minutes_to_hours(new_funct_round)
                     new_min_work_time = app_utils.minutes_to_hours(new_min_work_time)
-                    self.sm.unit = new_unit
-                    self.sm.y = new_y
-                    self.sm.time_per_unit = new_time_per_unit
-                    self.sm.funct_round = new_funct_round
-                    self.sm.min_work_time = new_min_work_time
+                    sm.unit = new_unit
+                    sm.y = new_y
+                    sm.time_per_unit = new_time_per_unit
+                    sm.funct_round = new_funct_round
+                    sm.min_work_time = new_min_work_time
                 
                 # In case I need a reference:
 
@@ -327,44 +327,44 @@ def valid_form(self, request):
                 # # x doesn't change
                 # # y doesn't change
                 # # min_work_time changes,
-                # # Undo the 1 / self.sm.time_per_unit, true original min work time in minutes
-                # self.sm.min_work_time = self.sm.min_work_time * self.sm.time_per_unit # (change this to be safe conversion)
+                # # Undo the 1 / sm.time_per_unit, true original min work time in minutes
+                # sm.min_work_time = sm.min_work_time * sm.time_per_unit # (change this to be safe conversion)
                 # # Redo that but with new_time_per_unit, new min work time in terms of time_per_unit
-                # self.sm.min_work_time = self.sm.min_work_time / new_time_per_unit
+                # sm.min_work_time = sm.min_work_time / new_time_per_unit
                 # # works doesn't change
                 # new_funct_round = app_utils.minutes_to_hours(new_funct_round)
 
-                # current_min_work_time_funct_round_minutes = min_work_time_funct_round * self.sm.time_per_unit # (change this to be safe conversion)
-                # new_min_work_time_funct_round = ceil(self.sm.min_work_time / new_funct_round) * new_funct_round if self.sm.min_work_time else new_funct_round
+                # current_min_work_time_funct_round_minutes = min_work_time_funct_round * sm.time_per_unit # (change this to be safe conversion)
+                # new_min_work_time_funct_round = ceil(sm.min_work_time / new_funct_round) * new_funct_round if sm.min_work_time else new_funct_round
                 # new_min_work_time_funct_round_minutes = new_min_work_time_funct_round * new_time_per_unit
                 
         if request.created_assignment or old_data.needs_more_info or adjusted_blue_line['capped_at_x_num']:
-            self.sm.dynamic_start = self.sm.blue_line_start
-            self.sm.works = [str(first_work)]
+            sm.dynamic_start = sm.blue_line_start
+            sm.works = [str(first_work)]
         else:
             assert request.updated_assignment
-            self.sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, self.sm.assignment_date)
-            if self.sm.dynamic_start < 0:
-                self.sm.dynamic_start = 0
+            sm.dynamic_start += utils.days_between_two_dates(old_data.assignment_date, sm.assignment_date)
+            if sm.dynamic_start < 0:
+                sm.dynamic_start = 0
             # Should we include the dynamic_start >= x_num check?
             # Let's see if this is possible
 
-            # if this runs, then self.sm.blue_line_start >= x_num is false
+            # if this runs, then sm.blue_line_start >= x_num is false
             # so blue_line_start < x_num
 
             # We also know that dynamic_start >= blue_line_start
 
             # Combining these, the following inequality is true at this point:
             # dynamic_start >= blue_line_start < x_num, which does not imply dynamic_start >= x_num is false
-            elif self.sm.dynamic_start >= x_num:
-                self.sm.dynamic_start = x_num - 1
+            elif sm.dynamic_start >= x_num:
+                sm.dynamic_start = x_num - 1
             removed_works_start = adjusted_blue_line['removed_works_start']
             removed_works_end = adjusted_blue_line['removed_works_end']
             actual_len_works = removed_works_end + 1 - removed_works_start
             len_works = actual_len_works - 1
             if len_works >= 0:
-                unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and self.sm.unit.lower() in ('minute', 'minutes')
-                unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and self.sm.unit.lower() in ('hour', 'hours')
+                unit_changed_from_hour_to_minute = old_data.unit.lower() in ('hour', 'hours') and sm.unit.lower() in ('minute', 'minutes')
+                unit_changed_from_minute_to_hour = old_data.unit.lower() in ('minute', 'minutes') and sm.unit.lower() in ('hour', 'hours')
                 # app_utils.minutes_to_hours and app_utils.hours_to_minutes are not needed because i want this to be an accurate conversion
                 if unit_changed_from_hour_to_minute:
                     old_data.works = [str(app_utils.hours_to_minutes(Decimal(i))) for i in old_data.works]
@@ -373,91 +373,91 @@ def valid_form(self, request):
                 # If the edited assign date cuts off some of the work inputs, adjust the work inputs accordingly
                 works_displacement = Decimal(old_data.works[0]) - first_work
                 if not (
-                    # All of these need to be true to skip redfining self.sm.works:
+                    # All of these need to be true to skip redfining sm.works:
                     works_displacement == 0 and
                     removed_works_start == 0 and
                     removed_works_end + 1 == len(old_data.works) and
                     not unit_changed_from_hour_to_minute and
                     not unit_changed_from_minute_to_hour
                 ):
-                    self.sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start, removed_works_end + 1)]
+                    sm.works = [str(Decimal(old_data.works[n]) - works_displacement) for n in range(removed_works_start, removed_works_end + 1)]
             else:
                 # If the assignment or due date cuts off every work input
-                self.sm.works = [str(first_work)]
+                sm.works = [str(first_work)]
                 actual_len_works = 1
                 len_works = actual_len_works - 1
-            if Decimal(self.sm.works[len_works]) >= self.sm.y:
+            if Decimal(sm.works[len_works]) >= sm.y:
                 # ensures assignments don't immediately delete after editing a y value
                 # less than the last work input
-                self.sm.dont_hide_again = True
+                sm.dont_hide_again = True
 
     # This could be too annoying; don't do this
 
     # # Reset skew ratio if the red line x axis (x - (blue_line_start + leN_works)) or y axis (y - red_line_start_y)
     # # dynamic_start, blue_line_start (both from red_line_start_y), x, works, or y needs to be different
     # if (request.updated_assignment and (
-    #         old_data.x != self.sm.x or 
-    #         old_data.y != self.sm.y or 
-    #         old_data.works != self.sm.works or
-    #         old_data.blue_line_start != self.sm.blue_line_start or 
-    #         old_data.dynamic_start != self.sm.dynamic_start
+    #         old_data.x != sm.x or 
+    #         old_data.y != sm.y or 
+    #         old_data.works != sm.works or
+    #         old_data.blue_line_start != sm.blue_line_start or 
+    #         old_data.dynamic_start != sm.dynamic_start
     # )):
-    #     self.sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
+    #     sm.skew_ratio = request.user.settingsmodel.def_skew_ratio
 
-    if self.sm.assignment_date:
-        self.sm.assignment_date = self.sm.assignment_date.replace(tzinfo=timezone.utc)
-    if self.sm.x:
-        self.sm.x = self.sm.x.replace(tzinfo=timezone.utc)
+    if sm.assignment_date:
+        sm.assignment_date = sm.assignment_date.replace(tzinfo=timezone.utc)
+    if sm.x:
+        sm.x = sm.x.replace(tzinfo=timezone.utc)
 
     # ap cs may have .java homework which are counted as links
     banned_endings = ("java", )
 
-    is_user_assignment = not self.sm.is_google_classroom_assignment
+    is_user_assignment = not sm.is_google_classroom_assignment
     description_link = next((
-        url for url in extractor.gen_urls(self.sm.description or '')
+        url for url in extractor.gen_urls(sm.description or '')
         if all(not url.endswith("." + ending) for ending in banned_endings)
     ), None)
     description_has_link = description_link is not None
-    description_has_changed = request.created_assignment or self.sm.description != old_data.description
+    description_has_changed = request.created_assignment or sm.description != old_data.description
     
     if is_user_assignment and description_has_link and description_has_changed:
-        self.sm.description = self.sm.description.replace(description_link, '')
-        self.sm.description = self.form.fields['description'].clean(self.sm.description)
-        self.sm.external_link = description_link
+        sm.description = sm.description.replace(description_link, '')
+        sm.description = form.fields['description'].clean(sm.description)
+        sm.external_link = description_link
 
-    self.sm.save()
+    sm.save()
     if request.created_assignment:
-        logger.info(f'User \"{request.user}\" created assignment "{self.sm.name}"')
-        request.session["just_created_assignment_id"] = self.sm.pk
+        logger.info(f'User \"{request.user}\" created assignment "{sm.name}"')
+        request.session["just_created_assignment_id"] = sm.pk
     else:
         assert request.updated_assignment
-        logger.info(f'User \"{request.user}\" updated assignment "{self.sm.name}"')
-        request.session['just_updated_assignment_id'] = self.sm.pk
+        logger.info(f'User \"{request.user}\" updated assignment "{sm.name}"')
+        request.session['just_updated_assignment_id'] = sm.pk
         for field in TRIGGER_DYNAMIC_MODE_RESET_FIELDS:
             # this includes fields from TimewebForm.Meta.exclude
             # keep it like this because form_valid may internally and manually change these fields
-            if field == "works" and getattr(old_data, field)[0] != getattr(self.sm, field)[0] or getattr(old_data, field) != getattr(self.sm, field):
-                request.session['refresh_dynamic_mode'] = self.sm.pk
+            if field == "works" and getattr(old_data, field)[0] != getattr(sm, field)[0] or getattr(old_data, field) != getattr(sm, field):
+                request.session['refresh_dynamic_mode'] = sm.pk
                 break
     return redirect("home")
 
-def invalid_form(self, request):
+def invalid_form(request):
     logger.info(f"User \"{request.user}\" submitted an invalid form")
 
     # field value is set to "Predicted" and field is disabled in crud.js
     # We can't do both of those in the backend because setting the field value doesn't work for disabled fields
 
     # adds an auxillary class .disabled-field to determine whether or not the field was predicted in the submission
-    self.context['x_was_predicted'] = 'x' not in request.POST
-    self.context['y_was_predicted'] = 'y' not in request.POST
+    context['x_was_predicted'] = 'x' not in request.POST
+    context['y_was_predicted'] = 'y' not in request.POST
     if request.created_assignment:
-        self.context['submit'] = 'Create Assignment'
+        context['submit'] = 'Create Assignment'
     else:
         assert request.updated_assignment
-        self.context['invalid_form_pk'] = self.pk
-        self.context['submit'] = 'Edit Assignment'
-    self.context['form'] = self.form.data.urlencode() # TimewebForm is not json serializable
-    request.session['invalid_form_context'] = self.context
+        context['invalid_form_pk'] = pk
+        context['submit'] = 'Edit Assignment'
+    context['form'] = form.data.urlencode() # TimewebForm is not json serializable
+    request.session['invalid_form_context'] = context
     return redirect("home")
 
 @require_http_methods(["POST"])
