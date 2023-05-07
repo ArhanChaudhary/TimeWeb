@@ -169,8 +169,6 @@ class TimewebView(LoginRequiredMixin, TimewebGenericView):
                 self.context['just_created_assignment_id'] = request.session.pop("just_created_assignment_id")
             elif request.session.get("just_updated_assignment_id"):
                 self.context['just_updated_assignment_id'] = request.session.pop("just_updated_assignment_id")
-            if request.session.get("refresh_dynamic_mode_all"):
-                self.context['refresh_dynamic_mode_all'] = request.session.pop("refresh_dynamic_mode_all")
             if request.session.get("refresh_dynamic_mode"):
                 self.context['refresh_dynamic_mode'] = request.session.pop("refresh_dynamic_mode")
 
