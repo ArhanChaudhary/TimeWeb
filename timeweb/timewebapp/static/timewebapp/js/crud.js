@@ -159,22 +159,6 @@ class Crud {
         showDropdowns: true,
         singleDatePicker: true,
     }
-    static ALL_FOCUSABLE_FORM_INPUTS = (function() {
-        // use DOMContentLoaded instead of $(function() { so it is defined soon enough for showForm({params: show_instantly})
-        document.addEventListener("DOMContentLoaded", function() {
-            // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
-            Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]")
-                .filter(function() {
-                    return !$(this).attr("name")?.endsWith("-widget-checkbox");
-                });
-        });
-    })()
-    static FORM_ANIMATION_DURATION = 300
-    static FORM_POSITION_TOP = 15
-    static DELETE_ASSIGNMENT_TRANSITION_DURATION = 750 * SETTINGS.animation_speed
-    static STEP_SIZE_AUTO_LOWER_ROUND = 0.05
-    static SHORTCUT_DELETION_ANIMATION_THRESHOLD = 15
-
     // it is important to use .click instead of .prop("checked", true/false) so the animation click handler fires
     static STANDARD_FIELD_GROUP = () => {
         if ($("#form-wrapper #field-group-picker-checkbox").prop("checked")) {
@@ -207,12 +191,13 @@ class Crud {
             }
         }
     }
-    static alertEarlyDueDate() {
+    alertEarlyDueDate() {
+        const that = this;
         const picker = $("#id_x").data("daterangepicker");
         if (!(
             6 <= picker.startDate.hours() && picker.startDate.hours() <= 11
-        ) || Crud.alerted_early_due_time) return;
-        Crud.alerted_early_due_time = true;
+        ) || that.alerted_early_due_time) return;
+        that.alerted_early_due_time = true;
 
         $.alert({
             title: "Your due time is early.",
@@ -232,6 +217,11 @@ class Crud {
     }
     init() {
         const that = this;
+        // https://stackoverflow.com/questions/7668525/is-there-a-jquery-selector-to-get-all-elements-that-can-get-focus
+        Crud.ALL_FOCUSABLE_FORM_INPUTS = $('#fields-wrapper').find("a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex], [contenteditable]")
+            .filter(function() {
+                return !$(this).attr("name")?.endsWith("-widget-checkbox");
+            });
         setTimeout(() => {
             // no today's date button because it already defaults to today on new assignment
             // although a user might want a today button for editing an assignment date to today
@@ -275,10 +265,8 @@ class Crud {
                    var event = "focusout";
                 }
                 $(this).on(event, function() {
-                    // prevent hideform from doing this alert
-                    const form_is_showing = $("#overlay").is(":visible");
-                    if (form_is_showing)
-                        Crud.alertEarlyDueDate();
+                    if ($("#overlay").is(":visible"))
+                        that.alertEarlyDueDate();
                 });
             })
             that.setCrudHandlers();
@@ -294,7 +282,7 @@ class Crud {
     showForm(params={show_instantly: false}) {
         const that = this;
         if (params.show_instantly) {
-            $('#overlay').show().find("#form-wrapper").css("top", Crud.FORM_POSITION_TOP);
+            $('#overlay').show().find("#form-wrapper").css("top", 15);
             // cursed way to position magic wand icon
             // TODO: ideally i want a span wrapper around input so i dont have to consult the dark arts to position the magic wand icon
             $(".magic-wand-icon").each(function() {
@@ -313,14 +301,14 @@ class Crud {
             });
         } else {
             $(".magic-wand-icon").css("margin-bottom", "");
-            $("#overlay").fadeIn(Crud.FORM_ANIMATION_DURATION).find("#form-wrapper").animate({top: Crud.FORM_POSITION_TOP}, Crud.FORM_ANIMATION_DURATION);
+            $("#overlay").fadeIn(300).find("#form-wrapper").animate({top: 15}, 300);
             setTimeout(() => $("#form-wrapper form input:visible").first().focus(), 0);
             $(".field-wrapper.disabled-field").each(function() {
                 $(this).find(".magic-wand-icon").click();
             });
         }
-        Crud.one_unit_of_work_alert_already_shown = false;
-        Crud.alerted_early_due_time = false;
+        that.one_unit_of_work_alert_already_shown = false;
+        that.alerted_early_due_time = false;
         that.old_unit_value = undefined;
         that.replaceUnit();
 
@@ -338,14 +326,14 @@ class Crud {
             $("#overlay").hide().find("#form-wrapper");
             $(".assignment-form-error-note").remove(); // Remove all error notes when form is exited
         } else {
-            $("#overlay").fadeOut(Crud.FORM_ANIMATION_DURATION, function() {
+            $("#overlay").fadeOut(300, function() {
                 // Remove all error notes when form is exited
                 $(".invalid").removeClass("invalid");
                 $(".assignment-form-error-note").remove();
                 Crud.GO_TO_FIELD_GROUP({standard: true});
                 // You may stll be focused on an <input> when the form is hidden, invalidating keybinds
                 $(document.activeElement).blur();
-            }).find("#form-wrapper").animate({top: 0}, Crud.FORM_ANIMATION_DURATION);
+            }).find("#form-wrapper").animate({top: 0}, 300);
             $("#form-wrapper input").each(function() {
                 // hideForm when not focused on an input (such as pressing escape) sometimes forgets to hide the daterangepicker
                 // manually do so
@@ -527,7 +515,7 @@ class Crud {
             $("#submit-assignment-button").val(sa.id);
             that.showForm();
             if (!(sa.is_google_classroom_assignment && sa.needs_more_info))
-                Crud.alerted_early_due_time = true; // dont display the early due time alert in edit
+                that.alerted_early_due_time = true; // dont display the early due time alert in edit
         });
         $(document).click(function(e) {
             const $this = $(e.target).closest($('.delete-button, .restore-button').parent());
@@ -546,7 +534,7 @@ class Crud {
             }).then(function() {
                 if ($this.children(".delete-button").length) {
                     if (e.shiftKey) {
-                        that.deleteAssignment(dom_assignment);
+                        Crud.deleteAssignment(dom_assignment);
                         return;
                     }
                     const sa = utils.loadAssignmentData(dom_assignment);
@@ -557,7 +545,7 @@ class Crud {
                             confirm: {
                                 keys: ['Enter'],
                                 action: function() {
-                                    that.deleteAssignment(dom_assignment);
+                                    Crud.deleteAssignment(dom_assignment);
                                 }
                             },
                             cancel: function() {
@@ -566,7 +554,7 @@ class Crud {
                         }
                     });
                 } else if ($this.children(".restore-button").length) {
-                    that.deleteAssignment(dom_assignment, {restore: true});
+                    Crud.deleteAssignment(dom_assignment, {restore: true});
                 }
             });
         });
@@ -686,8 +674,6 @@ class Crud {
         //     }
         // });
         $("#id_description").expandableTextareaHeight();
-        Crud.one_unit_of_work_alert_already_shown = false;
-        Crud.alerted_early_due_time = false;
         $("#id_y, #id_x, #id_assignment_date, #id_min_work_time, #id_time_per_unit").on("focusout", () => {
             let time_per_unit = $("#id_time_per_unit");
             if ($("#time_per_unit-widget-checkbox").prop("checked")) {
@@ -717,14 +703,14 @@ class Crud {
                 // 1hr min work time => 5 days and 3h time_per_unit for this alert
                 time_per_unit >= Math.max(min_work_time, 30) * 3 &&
                 complete_x >= 5 &&
-                !Crud.one_unit_of_work_alert_already_shown
+                !that.one_unit_of_work_alert_already_shown
             )) return;
 
             $.alert({
                 title: "This assignment is <b>strongly not recommended</b> to be created with only one unit of work in this manner.",
                 content: "Please consider splitting up your assignment into either 1) smaller and more plentiful units of work or 2) units of time, by clearing the name of each unit of work field.",
                 onClose: function() {
-                    Crud.one_unit_of_work_alert_already_shown = true;
+                    that.one_unit_of_work_alert_already_shown = true;
                 }
             })
         });
@@ -825,9 +811,6 @@ class Crud {
             url.searchParams.delete('everything_before');
             window.location.href = url.href;
         });
-        if ($("#next-page").length || $("#previous-page").length) {
-            $("#no-assignments-message").text("You don't have any deleted assignments on this page...")
-        }
     }
     addInfoButtons() {
         $("#id_name").info('left',
@@ -869,8 +852,7 @@ class Crud {
         });
     }
     // Delete assignment
-    transitionDeleteAssignment($dom_assignment) {
-        const that = this;
+    static transitionDeleteAssignment($dom_assignment) {
         const ids = new Set();
         $dom_assignment.each(function(i) {
             const dom_assignment = $(this);
@@ -894,26 +876,33 @@ class Crud {
                 }
             }
             
-            if ($dom_assignment.length > Crud.SHORTCUT_DELETION_ANIMATION_THRESHOLD) {
+            const shortcut_deletion_animation_threshold = 15;
+            if ($dom_assignment.length > shortcut_deletion_animation_threshold) {
                 transition_callback();
-            } else {
-                // Opacity CSS transition
-                dom_assignment.css({
-                    opacity: "0",
-                    zIndex: dom_assignment.css("z-index")-2,
-                });
-                // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
-                assignment_container.animate({marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))}, 
-                    Crud.DELETE_ASSIGNMENT_TRANSITION_DURATION, "easeOutCubic", transition_callback);
+                return;
             }
+            // Opacity CSS transition
+            dom_assignment.css({
+                opacity: 0,
+                zIndex: dom_assignment.css("z-index") - 2,
+            });
+            // Use css transitions because the animate property on assignment_container is reserved for other things in priority.js
+            assignment_container.animate(
+                {
+                    // don't do outerHeight to ignore shortcut heights
+                    marginBottom: -(dom_assignment.height() + parseFloat(assignment_container.css("padding-top")) + parseFloat(assignment_container.css("padding-bottom")))
+                },
+                750 * SETTINGS.animation_speed,
+                "easeOutCubic",
+                transition_callback
+            );
         });
     }
-    deleteAssignment(dom_assignment, params={restore: false}) {
-        const that = this;
+    static deleteAssignment(dom_assignment, params={restore: false}) {
         dom_assignment.addClass("assignment-is-deleting");
         // Send data to backend and animates its deletion
         const success = function() {
-            that.transitionDeleteAssignment(dom_assignment);
+            Crud.transitionDeleteAssignment(dom_assignment);
         }
         const sa = utils.loadAssignmentData(dom_assignment);
         if (params.restore)

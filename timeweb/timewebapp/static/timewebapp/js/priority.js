@@ -639,7 +639,7 @@ class Priority {
         if (!starred_assignment_ids_to_delete_after_sorting.size) return;
 
         const success = function() {
-            new Crud().transitionDeleteAssignment(that.assignments_to_sort.filter(".delete-this-starred-assignment").children(".assignment"));
+            Crud.transitionDeleteAssignment(that.assignments_to_sort.filter(".delete-this-starred-assignment").children(".assignment"));
         }
         $.ajax({
             type: "POST",
@@ -716,7 +716,7 @@ class Priority {
                                 return sa.id;
                             }).toArray();
                             const success = function() {
-                                new Crud().transitionDeleteAssignment(assignments_to_delete);
+                                Crud.transitionDeleteAssignment(assignments_to_delete);
                                 extra_success_function?.();
                             }
                             $.ajax({

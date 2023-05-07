@@ -312,7 +312,7 @@ setClickHandlers: {
             return utils.loadAssignmentData(dom_assignment).id;
         }).toArray();
         const success = function() {
-            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+            Crud.transitionDeleteAssignment(params.assignments_in_wrapper);
         }
         $.ajax({
             type: "POST",
@@ -383,7 +383,7 @@ setClickHandlers: {
     confirmAction: function(params) {
         const success = function() {
             params.$this.off("click");
-            new Crud().transitionDeleteAssignment(params.assignments_in_wrapper);
+            Crud.transitionDeleteAssignment(params.assignments_in_wrapper);
         }
         const assignment_ids_to_delete = params.assignments_in_wrapper.map(function() {
             const dom_assignment = $(this);
