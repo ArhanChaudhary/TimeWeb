@@ -459,12 +459,20 @@ class Crud {
         }
         that.old_unit_value = singular.toLowerCase();
     }
-    addErrorNotes(field_wrapper, error_list) {
+    addErrorNotes(field_wrapper, error_list, is_potato) {
         const that = this;
 
+        if (is_potato) {
+            $(document.activeElement).blur();
+            field_wrapper.addClass("potato");
+        }
         const dom_errors = $("<div>").addClass("assignment-form-error-note");
         for (const error of error_list) {
-            dom_errors.append(document.createTextNode(error));
+            if (is_potato) {
+                dom_errors.append(error);
+            } else {
+                dom_errors.append(document.createTextNode(error));
+            }
             dom_errors.append("<br>");
         }
         const field_wrapper_input = field_wrapper.find(Crud.ALL_FOCUSABLE_FORM_INPUTS).not(".field-widget-checkbox");
@@ -742,6 +750,11 @@ class Crud {
         $("#form-wrapper form").submit(function(e) {
             e.preventDefault();
 
+            if ($("#id_name").val() === "potato?") {
+                const potato_field_wrapper = $("#id_name").parents(".field-wrapper");
+                that.addErrorNotes(potato_field_wrapper, ["<a href=\"https://www.youtube.com/watch?v=Qijju-y_NzI\">potato.</a>"], true);
+                return;
+            }
             if (utils.in_simulation || VIEWING_DELETED_ASSIGNMENTS) {
                 let error_messages;
                 if (utils.in_simulation) {

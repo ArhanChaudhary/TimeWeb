@@ -282,6 +282,12 @@ https://stackoverflow.com/questions/21839523/cant-combine-selectors-using-commas
 #form-wrapper #id_name {
     padding-right: 26px;
 }
+#form-wrapper .potato {
+    --error-note-color: hsl(286.8deg 100% 50%);
+}
+#form-wrapper .potato .assignment-form-error-note a {
+    color: var(--error-note-color);
+}
 #form-wrapper #id_x, #form-wrapper #id_y {
     padding-left: var(--magic-wand-width);
 }
